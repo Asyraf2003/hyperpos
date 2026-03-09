@@ -1,18 +1,21 @@
-CATATAN HANDOFF — KASIR BENGKEL — PENUTUP STEP 3 / PEMBUKA STEP 4
+CATATAN HANDOFF — KASIR BENGKEL — PENUTUP STEP 3a
 
 ## Metadata
 - Tanggal: 2026-03-10
-- Nama slice / topik: Step 3 — Identity & Access minimal
-- Workflow step: Step 3
-- Status: SELESAI untuk minimal slice yang dikunci
-- Progres: 100%
+- Nama slice / topik: Step 3a — Identity & Access minimal slice
+- Workflow step: Step 3a of Step 3
+- Status: SELESAI untuk Step 3a (minimal slice)
+- Progres: 100% untuk Step 3a
+- Progres terhadap Step 3 induk: belum final
 
 ## Target halaman kerja
-Menyelesaikan minimal slice Step 3 Identity & Access agar memenuhi syarat pembuka Step 4:
+Menyelesaikan minimal slice Step 3 Identity & Access: 
 
 - implementasi minimum Step 3 ada
 - test minimum Step 3 pass
 - verifikasi Step 3 pass
+- halaman ini bukan penutup penuh Step 3 induk
+- halaman ini hanya menutup Step 3a minimal slice
 
 ## Referensi yang dipakai `[REF]`
 
@@ -150,7 +153,8 @@ Menyelesaikan minimal slice Step 3 Identity & Access agar memenuhi syarat pembuk
   - hasil: PASS, `Tests\Arch\HexagonalDependencyTest` lulus, 1 test, 2 assertions
 
 ## Blocker aktif `[BLOCKER]`
-- tidak ada blocker aktif
+- tidak ada blocker aktif untuk Step 3a
+- masih ada sisa scope Step 3 induk yang belum dikerjakan dan sudah diklasifikasikan sebagai area defer untuk Step 3b
 
 ## State repo yang penting untuk langkah berikutnya
 
@@ -174,10 +178,11 @@ Menyelesaikan minimal slice Step 3 Identity & Access agar memenuhi syarat pembuk
 
 ## Next step paling aman `[NEXT]`
 
-- Buka halaman kerja baru untuk Blueprint Step 4 dengan membawa handoff ini.
-- Jangan buka ulang Step 3 kecuali ada:
+- Jangan buka ulang Step 3a kecuali ada:
   - bug nyata pada implementasi Step 3, atau
   - kebutuhan baru yang menyentuh area `DEFER`.
+- Buka halaman kerja baru untuk Step 3b — operasionalisasi Identity & Access agar sisa output Workflow Induk Step 3 bisa ditutup tanpa mengubah Workflow Induk.
+- Step 4 tetap tertutup sampai Step 3 induk selesai penuh.
 
 ## Catatan masuk halaman berikutnya
 
@@ -191,16 +196,16 @@ Saat membuka halaman kerja berikutnya, bawa minimal:
 ## Ringkasan singkat siap tempel
 
 ### Ringkasan
-- target: selesaikan minimal slice Step 3 Identity & Access
+- target: selesaikan Step 3a minimal slice Identity & Access
 - status: selesai
-- progres: 100%
+- progres: 100% untuk Step 3a
 - hasil utama:
-  - policy akses transaksi admin / kasir sudah dibangun
+  - policy akses transaksi admin/kasir sudah dibangun
   - response success/error sudah dikonsolidasikan
   - middleware pre-check transaksi sudah ada
   - unit test minimum pass
   - arch test pass
-- next step: buka Blueprint Step 4 di halaman baru
+- next step: buka Step 3b di halaman baru untuk menutup sisa Step 3 induk
 
 ### Jangan dibuka ulang
 - keputusan role aktif v1 hanya `admin` dan `kasir`
@@ -211,5 +216,5 @@ Saat membuka halaman kerja berikutnya, bawa minimal:
 
 ### Data minimum bila ingin lanjut
 - handoff ini
-- referensi Step 4 yang relevan
+- referensi Step 3b yang relevan
 - snapshot repo terbaru hanya bila Step 4 menyentuh area yang perlu inspeksi baru
