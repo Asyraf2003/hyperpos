@@ -17,13 +17,13 @@ final class DisableAdminTransactionCapabilityHandlerTest extends TestCase
 {
     public function test_disable_capability_for_admin_succeeds_and_is_audited(): void
     {
-        $actors = new InMemoryActorAccessReaderPort([
+        $actors = new DisableActorAccessReaderFake([
             'admin-1' => new ActorAccess('admin-1', Role::admin()),
         ]);
-        $capabilities = new InMemoryAdminTransactionCapabilityStatePort([
+        $capabilities = new DisableAdminTransactionCapabilityStateFake([
             'admin-1' => AdminTransactionCapabilityState::active('admin-1'),
         ]);
-        $audit = new SpyAuditLogPort();
+        $audit = new DisableAuditLogSpy();
 
         $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
 
@@ -39,11 +39,11 @@ final class DisableAdminTransactionCapabilityHandlerTest extends TestCase
 
     public function test_disable_capability_fails_for_non_admin(): void
     {
-        $actors = new InMemoryActorAccessReaderPort([
+        $actors = new DisableActorAccessReaderFake([
             'kasir-1' => new ActorAccess('kasir-1', Role::kasir()),
         ]);
-        $capabilities = new InMemoryAdminTransactionCapabilityStatePort();
-        $audit = new SpyAuditLogPort();
+        $capabilities = new DisableAdminTransactionCapabilityStateFake();
+        $audit = new DisableAuditLogSpy();
 
         $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
 
@@ -56,9 +56,9 @@ final class DisableAdminTransactionCapabilityHandlerTest extends TestCase
 
     public function test_disable_capability_fails_for_unknown_actor(): void
     {
-        $actors = new InMemoryActorAccessReaderPort();
-        $capabilities = new InMemoryAdminTransactionCapabilityStatePort();
-        $audit = new SpyAuditLogPort();
+        $actors = new DisableActorAccessReaderFake();
+        $capabilities = new DisableAdminTransactionCapabilityStateFake();
+        $audit = new DisableAuditLogSpy();
 
         $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
 
@@ -70,7 +70,7 @@ final class DisableAdminTransactionCapabilityHandlerTest extends TestCase
     }
 }
 
-final class InMemoryActorAccessReaderPort implements ActorAccessReaderPort
+final class DisableActorAccessReaderFake implements ActorAccessReaderPort
 {
     /**
      * @param array<string, ActorAccess> $items
@@ -86,7 +86,7 @@ final class InMemoryActorAccessReaderPort implements ActorAccessReaderPort
     }
 }
 
-final class InMemoryAdminTransactionCapabilityStatePort implements AdminTransactionCapabilityStatePort
+final class DisableAdminTransactionCapabilityStateFake implements AdminTransactionCapabilityStatePort
 {
     /**
      * @param array<string, AdminTransactionCapabilityState> $items
@@ -112,7 +112,7 @@ final class InMemoryAdminTransactionCapabilityStatePort implements AdminTransact
     }
 }
 
-final class SpyAuditLogPort implements AuditLogPort
+final class DisableAuditLogSpy implements AuditLogPort
 {
     /**
      * @var array<int, array{event:string, context:array<string, mixed>}>

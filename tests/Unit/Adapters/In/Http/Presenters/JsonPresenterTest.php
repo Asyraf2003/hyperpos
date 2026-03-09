@@ -7,7 +7,7 @@ namespace Tests\Unit\Adapters\In\Http\Presenters;
 use App\Adapters\In\Http\Presenters\JsonPresenter;
 use App\Adapters\In\Http\Presenters\Response\JsonResultResponder;
 use App\Application\Shared\DTO\Result;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 final class JsonPresenterTest extends TestCase
 {

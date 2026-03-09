@@ -6,7 +6,7 @@ namespace Tests\Unit\Adapters\In\Http\Presenters\Response;
 
 use App\Adapters\In\Http\Presenters\Response\JsonResultResponder;
 use App\Application\Shared\DTO\Result;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 final class JsonResultResponderTest extends TestCase
 {
