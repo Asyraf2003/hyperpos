@@ -14,8 +14,8 @@ use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Tests\TestCase;
 
 final class EnsureTransactionEntryAllowedTest extends TestCase
 {
