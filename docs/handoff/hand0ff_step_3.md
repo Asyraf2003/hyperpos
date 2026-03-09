@@ -1,202 +1,215 @@
-Catatan Handoff — Kasir Bengkel — Masuk Step 4
+CATATAN HANDOFF — KASIR BENGKEL — PENUTUP STEP 3 / PEMBUKA STEP 4
 
--Tanggal: 2026-03-10
--Nama slice / topik: Step 3 — Identity & Access minimal
--Workflow step: Step 3
--Status: SELESAI untuk minimal slice yang dikunci
--Progres: 100%
+## Metadata
+- Tanggal: 2026-03-10
+- Nama slice / topik: Step 3 — Identity & Access minimal
+- Workflow step: Step 3
+- Status: SELESAI untuk minimal slice yang dikunci
+- Progres: 100%
 
-Target Halaman Kerja
--Menyelesaikan minimal slice Step 3 Identity & Access agar memenuhi syarat pembuka Step 4
--Implementasi minimum Step 3 ada
--Test minimum Step 3 pass
--Verifikasi Step 3 pass
+## Target halaman kerja
+Menyelesaikan minimal slice Step 3 Identity & Access agar memenuhi syarat pembuka Step 4:
 
-Scope Yang Benar-benar Dikerjakan Pada Halaman Ini
--Kontrak minimum IdentityAccess
--Policy akses input transaksi
--Response shape
--Middleware design + implementasi minimum
--Unit test minimum
--Verifikasi boundary hexagonal
--Referensi yang dipakai [REF]
+- implementasi minimum Step 3 ada
+- test minimum Step 3 pass
+- verifikasi Step 3 pass
 
-Blueprint
--Blueprint khusus Step 3 — Identity & Access minimal yang dibekukan di halaman ini
+## Referensi yang dipakai `[REF]`
 
-Workflow
--Workflow Induk — Step 3 Identity & Access minimal
+### Dokumen
+- Blueprint:
+  - `docs/blueprint/blueprint_v1.md`
+- Workflow:
+  - `docs/workflow/workflow_v1.md`
+- DoD:
+  - `docs/dod/dod_v1.md`
+- ADR:
+  - `docs/adr/0007-admin-transaction-entry-behind-capability-policy.md`
 
-Dod
--Output wajib Step 3 dari Workflow Induk
--Kasir bisa input transaksi
--Admin butuh policy aktif untuk input transaksi
--Semua perubahan policy tercatat
+### Handoff sebelumnya
+- Tidak ada handoff formal yang dijadikan source of truth utama saat membuka halaman ini.
+- Jika perlu jejak fase sebelumnya, file yang tersedia di repo adalah:
+  - `docs/handoff/handoff_step_2.md`
 
-Adr
--ADR-0007 — Admin Transaction Entry Behind Capability Policy
+### Snapshot repo / output command yang dipakai
+- tree / inspeksi area:
+  - `tree app`
+  - `tree tests`
+  - `tree bootstrap app/Http routes`
+- file yang diinspeksi:
+  - `app/Ports/Out/CapabilityPolicyPort.php`
+  - `app/Ports/Out/AuditLogPort.php`
+  - `app/Adapters/Out/Policy/NullCapabilityPolicyAdapter.php`
+  - `app/Adapters/Out/Audit/NullAuditLogAdapter.php`
+  - `app/Providers/HexagonalServiceProvider.php`
+  - `app/Application/Shared/DTO/Result.php`
+  - `app/Adapters/In/Http/Presenters/JsonPresenter.php`
+  - `tests/TestCase.php`
+  - `phpunit.xml`
+  - `bootstrap/app.php`
+  - `Makefile`
+- output command verifikasi:
+  - `php artisan test tests/Unit`
+  - `php artisan test tests/Arch`
 
-Handoff Sebelumnya
--Tidak ada handoff formal baru yang dipakai; halaman ini mengunci ulang fokus dari Product slice ke Step 3
+## Fakta terkunci `[FACT]`
 
-Snapshot Repo / Output Command Yang Dipakai
--Tree app
--Isi
--App/Ports/Out/CapabilityPolicyPort.php
--App/Ports/Out/AuditLogPort.php
--App/Adapters/Out/Policy/NullCapabilityPolicyAdapter.php
--App/Adapters/Out/Audit/NullAuditLogAdapter.php
--App/Providers/HexagonalServiceProvider.php
--App/Application/Shared/DTO/Result.php
--App/Adapters/In/Http/Presenters/JsonPresenter.php
--Tree tests
--Tests/TestCase.php
--Phpunit.xml
--Tree bootstrap app/Http routes
--Bootstrap/app.php
--Makefile
--Output
--Php artisan test tests/Unit
--Php artisan test tests/Arch
+- Step aktif yang benar untuk fase ini adalah Step 3 — Identity & Access minimal, bukan Product Master.
+- Role aktif v1 yang dipakai saat ini hanya `admin` dan `kasir`.
+- `kasir` boleh input transaksi.
+- `admin` tidak otomatis boleh input transaksi.
+- `admin` hanya boleh input transaksi bila capability/policy transaksi aktif.
+- Perubahan capability admin transaksi harus diaudit.
+- Penggunaan capability transaksi oleh admin harus dapat ditelusuri / diaudit.
+- `app/Models/User.php`, migration user bawaan Laravel, dan seeder bawaan Laravel bukan source of truth domain Step 3.
+- Struktur implementasi Step 3 diarahkan ke hexagonal di folder `app/`.
+- `app/Application/Shared/DTO/Result.php` existing dipakai sebagai contract hasil application.
+- Success/error response dikontrol lewat satu area presenter response.
+- `php artisan test tests/Unit` pass dengan hasil: 27 tests, 74 assertions.
+- `php artisan test tests/Arch` pass dengan hasil: 1 test, 2 assertions.
 
-Fakta Terkunci [Fact]
--Step aktif yang benar untuk fase ini adalah Step 3 — Identity & Access minimal, bukan Product Master
--Role aktif v1 yang dipakai saat ini hanya admin dan kasir
--Kasir boleh input transaksi
--Admin tidak otomatis boleh input transaksi
--Admin hanya boleh input transaksi bila capability/policy transaksi aktif
--Perubahan capability admin transaksi harus diaudit
--Penggunaan capability transaksi oleh admin harus dapat ditelusuri/audit
--App/Models/User.php, migration user bawaan Laravel, dan seeder bawaan Laravel bukan sumber kebenaran domain Step 3
--Struktur implementasi Step 3 diarahkan ke hexagonal di folder app
--Result.php existing dipakai sebagai contract hasil application
--Success/error response dikontrol lewat satu area presenter response
--Tests/Unit pass: 27 tests, 74 assertions
--Tests/Arch pass: 1 test, 2 assertions
+## Scope yang dipakai
 
-Scope Yang Dipakai
--[SCOPE-IN]
--Kontrak minimum actor/role/capability/audit
--Policy keputusan akses input transaksi
--Use case enable/disable capability admin transaksi
--Response shape untuk UI
--Middleware pre-check transaksi
--Unit test minimum
--Verifikasi boundary hexagonal
--[SCOPE-OUT]
--Product Master
--Supplier Invoice
--Payment / refund / laporan
--Multi-role aktif
--Multi-policy aktif
--Trust score aktif
--Persistence/storage final untuk actor/capability/audit
--Controller/request/route operasional final untuk kelola capability
--Migration final actor/role/capability/audit
+### `[SCOPE-IN]`
+- kontrak minimum actor / role / capability / audit
+- policy keputusan akses input transaksi
+- use case enable / disable capability admin transaksi
+- response shape untuk UI
+- middleware pre-check transaksi
+- unit test minimum
+- verifikasi boundary hexagonal
 
-Keputusan Yang Dikunci [Decision]
--Actor v1 memakai satu role aktif per actor
--Role v1 hanya admin dan kasir
--Role dipisah sebagai konsep eksplisit, tidak disebar sebagai string liar
--Capability admin transaksi dipisah dari role dan dimodelkan sebagai state per actor
--TransactionEntryPolicy menjadi pengambil keputusan final akses transaksi
--Middleware hanya delegator/pre-check HTTP, bukan pengambil keputusan final
--AuditLogPort existing direuse
--CapabilityPolicyPort existing tidak dijadikan pusat Step 3
--Ditambah port khusus Step 3
--ActorAccessReaderPort
--AdminTransactionCapabilityStatePort
--Result.php tetap dipakai di application
--Success/error response dikonsolidasikan di presenter response folder
--TransactionEntryPolicy dipertahankan final
--Test middleware disusun memakai policy asli + fake ports, bukan subclass atas policy final
--Area infra/persistence/entrypoint yang belum punya fakta final ditetapkan sebagai DEFER, bukan dipaksa diisi sekarang
+### `[SCOPE-OUT]`
+- Product Master
+- Supplier Invoice
+- payment / refund / laporan
+- multi-role aktif
+- multi-policy aktif
+- trust score aktif
+- persistence / storage final untuk actor / capability / audit
+- controller / request / route operasional final untuk kelola capability
+- migration final actor / role / capability / audit
 
-File Yang Dibuat/diubah [Files]
--File baru
--App/Core/IdentityAccess/Role/Role.php
--App/Core/IdentityAccess/Actor/ActorAccess.php
--App/Core/IdentityAccess/Capability/AdminTransactionCapabilityState.php
--App/Core/IdentityAccess/Score/TransactionEntryScore.php
--App/Ports/Out/IdentityAccess/ActorAccessReaderPort.php
--App/Ports/Out/IdentityAccess/AdminTransactionCapabilityStatePort.php
--App/Application/IdentityAccess/Policies/TransactionEntryPolicy.php
--App/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandler.php
--App/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandler.php
--App/Adapters/Out/IdentityAccess/NullActorAccessReaderAdapter.php
--App/Adapters/Out/IdentityAccess/NullAdminTransactionCapabilityStateAdapter.php
--App/Adapters/In/Http/Presenters/Response/JsonResultResponder.php
--App/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowed.php
--Tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php
--Tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php
--Tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php
--Tests/Unit/Adapters/In/Http/Presenters/Response/JsonResultResponderTest.php
--Tests/Unit/Adapters/In/Http/Presenters/JsonPresenterTest.php
--Tests/Unit/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowedTest.php
--File diubah
--App/Adapters/In/Http/Presenters/JsonPresenter.php
--App/Providers/HexagonalServiceProvider.php
--Bootstrap/app.php
+## Keputusan yang dikunci `[DECISION]`
 
-Bukti Verifikasi [Proof]
--Command
--Php artisan test tests/Unit/Adapters/In/Http/Presenters
--Hasil: PASS, 4 tests lulus
--Command
--Php artisan test tests/Unit
--Hasil: PASS, 27 tests lulus, 74 assertions
--Command
--Php artisan test tests/Arch
--Hasil: PASS, Tests\Arch\HexagonalDependencyTest lulus, 1 test, 2 assertions
+- Actor v1 memakai satu role aktif per actor.
+- Role v1 hanya `admin` dan `kasir`.
+- Role dipisah sebagai konsep eksplisit, tidak disebar sebagai string liar.
+- Capability admin transaksi dipisah dari role dan dimodelkan sebagai state per actor.
+- `TransactionEntryPolicy` menjadi pengambil keputusan final akses transaksi.
+- Middleware hanya delegator / pre-check HTTP, bukan pengambil keputusan final.
+- `AuditLogPort` existing direuse.
+- `CapabilityPolicyPort` existing tidak dijadikan pusat Step 3.
+- Ditambah port khusus Step 3:
+  - `ActorAccessReaderPort`
+  - `AdminTransactionCapabilityStatePort`
+- `Result.php` tetap dipakai di application.
+- Success/error response dikonsolidasikan di presenter response folder.
+- `TransactionEntryPolicy` dipertahankan final.
+- Test middleware disusun memakai policy asli + fake ports, bukan subclass atas policy final.
+- Area infra / persistence / entrypoint yang belum punya fakta final ditetapkan sebagai `DEFER`, bukan dipaksa diisi sekarang.
 
-Blocker Aktif [Blocker]
--Tidak ada blocker aktif
+## File yang dibuat / diubah `[FILES]`
 
-State Repo Yang Penting Untuk Langkah Berikutnya
--Minimal slice Step 3 sudah hidup di app/Core/IdentityAccess, app/Application/IdentityAccess, app/Ports/Out/IdentityAccess, dan adapter HTTP/response terkait
--Bootstrap/app.php adalah titik registrasi middleware pada repo ini; app/Http/Kernel.php tidak ada
--TransactionEntryPolicy tetap final dan menjadi sumber keputusan akses transaksi
--JsonResultResponder adalah titik kontrol response success/error yang dipakai bersama Result
--Port ActorAccessReaderPort dan AdminTransactionCapabilityStatePort saat ini masih dibind ke null adapter baseline
--Area berikut belum diisi dan tetap resmi ditunda
--Adapter actor access nyata
--Adapter capability state nyata
--Audit adapter nyata
--Aturan siapa yang boleh enable/disable capability
--Registrasi middleware lanjutan di luar yang sudah dibutuhkan minimal slice
--Controller/request/route operasional capability
--Migration actor/role/capability/audit
+### File baru
+- `app/Core/IdentityAccess/Role/Role.php`
+- `app/Core/IdentityAccess/Actor/ActorAccess.php`
+- `app/Core/IdentityAccess/Capability/AdminTransactionCapabilityState.php`
+- `app/Core/IdentityAccess/Score/TransactionEntryScore.php`
+- `app/Ports/Out/IdentityAccess/ActorAccessReaderPort.php`
+- `app/Ports/Out/IdentityAccess/AdminTransactionCapabilityStatePort.php`
+- `app/Application/IdentityAccess/Policies/TransactionEntryPolicy.php`
+- `app/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandler.php`
+- `app/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandler.php`
+- `app/Adapters/Out/IdentityAccess/NullActorAccessReaderAdapter.php`
+- `app/Adapters/Out/IdentityAccess/NullAdminTransactionCapabilityStateAdapter.php`
+- `app/Adapters/In/Http/Presenters/Response/JsonResultResponder.php`
+- `app/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowed.php`
+- `tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php`
+- `tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php`
+- `tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php`
+- `tests/Unit/Adapters/In/Http/Presenters/Response/JsonResultResponderTest.php`
+- `tests/Unit/Adapters/In/Http/Presenters/JsonPresenterTest.php`
+- `tests/Unit/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowedTest.php`
 
-Next Step Paling Aman [Next]
--Buka halaman kerja baru untuk Blueprint Step 4 dengan membawa handoff ini, tanpa membuka ulang Step 3 kecuali ada kasus khusus yang menyentuh area DEFER atau bug nyata pada implementasi Step 3
+### File diubah
+- `app/Adapters/In/Http/Presenters/JsonPresenter.php`
+- `app/Providers/HexagonalServiceProvider.php`
+- `bootstrap/app.php`
 
-Catatan Masuk Halaman Berikutnya
--Saat membuka halaman kerja berikutnya, bawa minimal
--File handoff ini
--Docs/setting_control/first_in.md
--Docs/setting_control/ai_contract.md
--Referensi docs yang relevan saja
--Snapshot file/output terbaru bila diperlukan
+## Bukti verifikasi `[PROOF]`
 
-Ringkasan Singkat Siap Tempel
--Ringkasan
--Target: selesaikan minimal slice Step 3 Identity & Access
--Status: selesai
--Progres: 100%
--Hasil utama
--Policy akses transaksi admin/kasir sudah dibangun
--Response success/error sudah dikonsolidasikan
--Middleware pre-check transaksi sudah ada
--Unit test minimum pass
--Arch test pass
--Next step: buka Blueprint Step 4 di halaman baru
--Jangan dibuka ulang
--Keputusan role aktif v1 hanya admin dan kasir
--Keputusan bahwa admin butuh capability aktif untuk input transaksi
--Keputusan bahwa TransactionEntryPolicy adalah pengambil keputusan final
--Keputusan bahwa Result + response presenter menjadi pola response Step 3
--Area DEFER jangan dipaksa diisi tanpa fakta/file konkret
--Data minimum bila ingin lanjut
--Handoff ini
--Referensi Step 4 yang relevan
--Snapshot repo terbaru hanya bila Step 4 menyentuh area yang perlu inspeksi baru
+- command:
+  - `php artisan test tests/Unit/Adapters/In/Http/Presenters`
+  - hasil: PASS, 4 tests lulus
+- command:
+  - `php artisan test tests/Unit`
+  - hasil: PASS, 27 tests lulus, 74 assertions
+- command:
+  - `php artisan test tests/Arch`
+  - hasil: PASS, `Tests\Arch\HexagonalDependencyTest` lulus, 1 test, 2 assertions
+
+## Blocker aktif `[BLOCKER]`
+- tidak ada blocker aktif
+
+## State repo yang penting untuk langkah berikutnya
+
+- Minimal slice Step 3 sudah hidup di:
+  - `app/Core/IdentityAccess`
+  - `app/Application/IdentityAccess`
+  - `app/Ports/Out/IdentityAccess`
+  - adapter HTTP / response terkait
+- `bootstrap/app.php` adalah titik registrasi middleware pada repo ini; `app/Http/Kernel.php` tidak ada.
+- `TransactionEntryPolicy` tetap final dan menjadi source of truth keputusan akses transaksi.
+- `JsonResultResponder` adalah titik kontrol response success/error yang dipakai bersama `Result`.
+- Port `ActorAccessReaderPort` dan `AdminTransactionCapabilityStatePort` saat ini masih dibind ke null adapter baseline.
+- Area berikut belum diisi dan tetap resmi ditunda:
+  - adapter actor access nyata
+  - adapter capability state nyata
+  - audit adapter nyata
+  - aturan siapa yang boleh enable / disable capability
+  - registrasi middleware lanjutan di luar yang sudah dibutuhkan minimal slice
+  - controller / request / route operasional capability
+  - migration actor / role / capability / audit
+
+## Next step paling aman `[NEXT]`
+
+- Buka halaman kerja baru untuk Blueprint Step 4 dengan membawa handoff ini.
+- Jangan buka ulang Step 3 kecuali ada:
+  - bug nyata pada implementasi Step 3, atau
+  - kebutuhan baru yang menyentuh area `DEFER`.
+
+## Catatan masuk halaman berikutnya
+
+Saat membuka halaman kerja berikutnya, bawa minimal:
+- file handoff ini
+- `docs/setting_control/first_in.md`
+- `docs/setting_control/ai_contract.md`
+- referensi docs yang relevan saja
+- snapshot file / output terbaru bila diperlukan
+
+## Ringkasan singkat siap tempel
+
+### Ringkasan
+- target: selesaikan minimal slice Step 3 Identity & Access
+- status: selesai
+- progres: 100%
+- hasil utama:
+  - policy akses transaksi admin / kasir sudah dibangun
+  - response success/error sudah dikonsolidasikan
+  - middleware pre-check transaksi sudah ada
+  - unit test minimum pass
+  - arch test pass
+- next step: buka Blueprint Step 4 di halaman baru
+
+### Jangan dibuka ulang
+- keputusan role aktif v1 hanya `admin` dan `kasir`
+- keputusan bahwa `admin` butuh capability aktif untuk input transaksi
+- keputusan bahwa `TransactionEntryPolicy` adalah pengambil keputusan final
+- keputusan bahwa `Result + response presenter` menjadi pola response Step 3
+- area `DEFER` jangan dipaksa diisi tanpa fakta / file konkret
+
+### Data minimum bila ingin lanjut
+- handoff ini
+- referensi Step 4 yang relevan
+- snapshot repo terbaru hanya bila Step 4 menyentuh area yang perlu inspeksi baru
