@@ -18,6 +18,7 @@ ADR yang harus langsung dibuat:
 - ADR-008: audit mandatory for sensitive actions
 - ADR-009: reporting = read model
 - ADR-010: bot integration as adapter
+- ADR-011: uang yg dikunci dalam bentuk integer
 
 Output wajib:
 
