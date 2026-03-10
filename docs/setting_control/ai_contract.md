@@ -11,6 +11,7 @@ Dokumen ini adalah kontrak kerja yang harus diikuti AI di setiap halaman kerja p
 6. jangan buka ulang domain final kecuali ada konflik nyata
 7. progres wajib berbasis bukti
 8. keputusan harus bisa dilacak ke dokumen atau bukti repo
+9. bila ada usulan pengembangan, AI wajib memberi beberapa opsi yang tetap selaras dengan blueprint/tujuan project dan standar enterprise, disertai plus-minus dalam konteks project serta rekomendasi terbaik
 
 ## Urutan kerja wajib
 AI harus mengikuti urutan ini:
@@ -20,10 +21,13 @@ AI harus mengikuti urutan ini:
 3. baca referensi yang relevan
 4. pisahkan fakta vs gap
 5. buat blueprint khusus scope halaman ini
-6. pecah workflow jadi langkah kecil
-7. pilih satu langkah aktif
-8. sebutkan bukti selesai untuk langkah itu
-9. setelah user kirim bukti, baru lanjut
+6. bila ada usulan pengembangan, susun beberapa opsi yang feasible
+7. nilai plus-minus tiap opsi dalam konteks project
+8. pilih rekomendasi terbaik bila keputusan memang perlu diambil
+9. pecah workflow jadi langkah kecil
+10. pilih satu langkah aktif
+11. sebutkan bukti selesai untuk langkah itu
+12. setelah user kirim bukti, baru lanjut
 
 ## Aturan pemisahan informasi
 AI wajib memisahkan dengan jelas:
@@ -70,6 +74,20 @@ Contoh yang salah:
 - minta semua migration
 - minta semua docs
 
+## Aturan analisis pengembangan
+Kalau ada usulan pengembangan, perubahan desain, penambahan fitur, atau alternatif implementasi, AI wajib:
+1. menyusun beberapa opsi yang benar-benar feasible
+2. memastikan tiap opsi tetap selaras dengan blueprint, tujuan project, dan scope halaman kerja
+3. memberi plus-minus tiap opsi dalam konteks project ini, minimal dari sisi:
+   - dampak ke blueprint/domain final
+   - kompleksitas implementasi
+   - risiko coupling/regresi
+   - kemudahan audit/maintenance
+   - keamanan rollout
+4. memberi rekomendasi opsi terbaik beserta alasan
+5. meminta hanya data minimum bila fakta belum cukup untuk menilai opsi
+6. tidak mengusulkan opsi yang membuka ulang domain final kecuali ada konflik nyata atau bukti baru yang valid
+
 ## Aturan perubahan scope
 Kalau user memberi target yang bertentangan dengan handoff atau dokumen final:
 1. AI harus menyebut konfliknya
@@ -93,6 +111,7 @@ AI wajib:
 - tidak menumpuk banyak langkah eksekusi sekaligus
 - tidak menulis fitur besar saat fondasi belum siap
 - tidak membawa topik transaksi/policy/payment bila scope-nya bukan itu
+- bila ada usulan pengembangan, tampilkan opsi secara disiplin dan tetap dalam batas scope halaman kerja
 
 ## Aturan sebelum menutup halaman kerja
 Sebelum halaman kerja ditutup, AI wajib membantu menyusun:
@@ -116,6 +135,7 @@ Gunakan struktur berikut dalam jawaban kerja:
 - `[SCOPE-OUT]`
 - `[GAP]`
 - `[DECISION]`
+- `Opsi Pengembangan` (hanya bila memang ada usulan pengembangan)
 - Blueprint
 - Workflow
 - `[STEP]`
