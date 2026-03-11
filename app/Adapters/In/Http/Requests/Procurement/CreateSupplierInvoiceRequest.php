@@ -21,6 +21,8 @@ final class CreateSupplierInvoiceRequest extends FormRequest
         return [
             'nama_pt_pengirim' => ['required', 'string'],
             'tanggal_pengiriman' => ['required', 'date_format:Y-m-d'],
+            'auto_receive' => ['sometimes', 'boolean'],
+            'tanggal_terima' => ['nullable', 'date_format:Y-m-d'],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.product_id' => ['required', 'string'],
             'lines.*.qty_pcs' => ['required', 'integer', 'min:1'],

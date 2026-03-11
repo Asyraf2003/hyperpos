@@ -6,6 +6,7 @@ use App\Adapters\In\Http\Controllers\HealthCheckController;
 use App\Adapters\In\Http\Controllers\IdentityAccess\DisableAdminTransactionCapabilityController;
 use App\Adapters\In\Http\Controllers\IdentityAccess\EnableAdminTransactionCapabilityController;
 use App\Adapters\In\Http\Controllers\Procurement\CreateSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Procurement\ReceiveSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\CreateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\UpdateProductController;
 use Illuminate\Support\Facades\Route;
@@ -39,4 +40,9 @@ Route::post(
 Route::post(
     '/procurement/supplier-invoices/create',
     CreateSupplierInvoiceController::class,
+);
+
+Route::post(
+    '/procurement/supplier-invoices/{supplierInvoiceId}/receive',
+    ReceiveSupplierInvoiceController::class,
 );

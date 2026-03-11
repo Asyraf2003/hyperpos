@@ -9,10 +9,17 @@ use App\Adapters\Out\Auth\LaravelUuidAdapter;
 use App\Adapters\Out\Clock\SystemClockAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseActorAccessReaderAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminTransactionCapabilityStateAdapter;
+use App\Adapters\Out\Inventory\DatabaseInventoryMovementWriterAdapter;
+use App\Adapters\Out\Inventory\DatabaseProductInventoryReaderAdapter;
+use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
 use App\Adapters\Out\Persistence\DatabaseTransactionManagerAdapter;
 use App\Adapters\Out\Policy\NullCapabilityPolicyAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceLineReaderAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierReaderAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierReceiptLineReaderAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierReceiptWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
@@ -24,8 +31,15 @@ use App\Ports\Out\CapabilityPolicyPort;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
+use App\Ports\Out\Inventory\InventoryMovementWriterPort;
+use App\Ports\Out\Inventory\ProductInventoryReaderPort;
+use App\Ports\Out\Inventory\ProductInventoryWriterPort;
+use App\Ports\Out\Procurement\SupplierInvoiceLineReaderPort;
+use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\Procurement\SupplierReaderPort;
+use App\Ports\Out\Procurement\SupplierReceiptLineReaderPort;
+use App\Ports\Out\Procurement\SupplierReceiptWriterPort;
 use App\Ports\Out\Procurement\SupplierWriterPort;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
@@ -56,5 +70,13 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierReaderPort::class, DatabaseSupplierReaderAdapter::class);
         $this->app->singleton(SupplierWriterPort::class, DatabaseSupplierWriterAdapter::class);
         $this->app->singleton(SupplierInvoiceWriterPort::class, DatabaseSupplierInvoiceWriterAdapter::class);
+        $this->app->singleton(SupplierInvoiceReaderPort::class, DatabaseSupplierInvoiceReaderAdapter::class);
+        $this->app->singleton(SupplierInvoiceLineReaderPort::class, DatabaseSupplierInvoiceLineReaderAdapter::class);
+        $this->app->singleton(SupplierReceiptLineReaderPort::class, DatabaseSupplierReceiptLineReaderAdapter::class);
+        $this->app->singleton(SupplierReceiptWriterPort::class, DatabaseSupplierReceiptWriterAdapter::class);
+
+        $this->app->singleton(InventoryMovementWriterPort::class, DatabaseInventoryMovementWriterAdapter::class);
+        $this->app->singleton(ProductInventoryReaderPort::class, DatabaseProductInventoryReaderAdapter::class);
+        $this->app->singleton(ProductInventoryWriterPort::class, DatabaseProductInventoryWriterAdapter::class);
     }
 }

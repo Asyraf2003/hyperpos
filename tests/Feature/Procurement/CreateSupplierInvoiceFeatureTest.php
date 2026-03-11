@@ -12,7 +12,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_create_supplier_invoice_endpoint_stores_invoice_with_existing_product_and_creates_supplier_when_missing(): void
+    public function test_create_supplier_invoice_endpoint_auto_receives_by_default_and_updates_inventory(): void
     {
         DB::table('products')->insert([
             'id' => 'product-1',
@@ -75,20 +75,85 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertDatabaseHas('supplier_invoice_lines', [
+        $invoiceLine1 = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', (string) $invoice->id)
+            ->where('product_id', 'product-1')
+            ->first();
+
+        $invoiceLine2 = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', (string) $invoice->id)
+            ->where('product_id', 'product-2')
+            ->first();
+
+        $this->assertNotNull($invoiceLine1);
+        $this->assertNotNull($invoiceLine2);
+
+        $this->assertDatabaseHas('supplier_receipts', [
             'supplier_invoice_id' => (string) $invoice->id,
-            'product_id' => 'product-1',
-            'qty_pcs' => 2,
-            'line_total_rupiah' => 20000,
-            'unit_cost_rupiah' => 10000,
+            'tanggal_terima' => '2026-03-12',
         ]);
 
-        $this->assertDatabaseHas('supplier_invoice_lines', [
-            'supplier_invoice_id' => (string) $invoice->id,
-            'product_id' => 'product-2',
-            'qty_pcs' => 3,
-            'line_total_rupiah' => 30000,
+        $receipt = DB::table('supplier_receipts')
+            ->where('supplier_invoice_id', (string) $invoice->id)
+            ->first();
+
+        $this->assertNotNull($receipt);
+
+        $this->assertDatabaseHas('supplier_receipt_lines', [
+            'supplier_receipt_id' => (string) $receipt->id,
+            'supplier_invoice_line_id' => (string) $invoiceLine1->id,
+            'qty_diterima' => 2,
+        ]);
+
+        $this->assertDatabaseHas('supplier_receipt_lines', [
+            'supplier_receipt_id' => (string) $receipt->id,
+            'supplier_invoice_line_id' => (string) $invoiceLine2->id,
+            'qty_diterima' => 3,
+        ]);
+
+        $receiptLine1 = DB::table('supplier_receipt_lines')
+            ->where('supplier_receipt_id', (string) $receipt->id)
+            ->where('supplier_invoice_line_id', (string) $invoiceLine1->id)
+            ->first();
+
+        $receiptLine2 = DB::table('supplier_receipt_lines')
+            ->where('supplier_receipt_id', (string) $receipt->id)
+            ->where('supplier_invoice_line_id', (string) $invoiceLine2->id)
+            ->first();
+
+        $this->assertNotNull($receiptLine1);
+        $this->assertNotNull($receiptLine2);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-1',
+            'movement_type' => 'stock_in',
+            'source_type' => 'supplier_receipt_line',
+            'source_id' => (string) $receiptLine1->id,
+            'tanggal_mutasi' => '2026-03-12',
+            'qty_delta' => 2,
             'unit_cost_rupiah' => 10000,
+            'total_cost_rupiah' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-2',
+            'movement_type' => 'stock_in',
+            'source_type' => 'supplier_receipt_line',
+            'source_id' => (string) $receiptLine2->id,
+            'tanggal_mutasi' => '2026-03-12',
+            'qty_delta' => 3,
+            'unit_cost_rupiah' => 10000,
+            'total_cost_rupiah' => 30000,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-1',
+            'qty_on_hand' => 2,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-2',
+            'qty_on_hand' => 3,
         ]);
     }
 
@@ -111,6 +176,10 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('suppliers', 0);
         $this->assertDatabaseCount('supplier_invoices', 0);
         $this->assertDatabaseCount('supplier_invoice_lines', 0);
+        $this->assertDatabaseCount('supplier_receipts', 0);
+        $this->assertDatabaseCount('supplier_receipt_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('product_inventory', 0);
     }
 
     public function test_create_supplier_invoice_endpoint_rejects_line_total_that_is_not_evenly_divisible_by_qty(): void
@@ -141,9 +210,13 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('suppliers', 0);
         $this->assertDatabaseCount('supplier_invoices', 0);
         $this->assertDatabaseCount('supplier_invoice_lines', 0);
+        $this->assertDatabaseCount('supplier_receipts', 0);
+        $this->assertDatabaseCount('supplier_receipt_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('product_inventory', 0);
     }
 
-    public function test_create_supplier_invoice_endpoint_reuses_existing_supplier_with_same_normalized_name(): void
+    public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier(): void
     {
         DB::table('products')->insert([
             'id' => 'product-1',
@@ -163,6 +236,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $response = $this->postJson('/procurement/supplier-invoices/create', [
             'nama_pt_pengirim' => '  pt   sumber    makmur ',
             'tanggal_pengiriman' => '2026-01-30',
+            'auto_receive' => false,
             'lines' => [
                 [
                     'product_id' => 'product-1',
@@ -182,5 +256,10 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             'jatuh_tempo' => '2026-02-28',
             'grand_total_rupiah' => 20000,
         ]);
+
+        $this->assertDatabaseCount('supplier_receipts', 0);
+        $this->assertDatabaseCount('supplier_receipt_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('product_inventory', 0);
     }
 }
