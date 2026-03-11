@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\HealthCheckController;
 use App\Adapters\In\Http\Controllers\IdentityAccess\DisableAdminTransactionCapabilityController;
 use App\Adapters\In\Http\Controllers\IdentityAccess\EnableAdminTransactionCapabilityController;
+use App\Adapters\In\Http\Controllers\Procurement\CreateSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\CreateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\UpdateProductController;
 use Illuminate\Support\Facades\Route;
@@ -33,4 +34,9 @@ Route::post(
 Route::post(
     '/product-catalog/products/{productId}/update',
     UpdateProductController::class,
+);
+
+Route::post(
+    '/procurement/supplier-invoices/create',
+    CreateSupplierInvoiceController::class,
 );
