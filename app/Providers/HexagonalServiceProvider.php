@@ -31,7 +31,9 @@ use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
+use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
 use App\Application\System\Health\HealthCheckHandler;
+use App\Core\Inventory\Policies\NegativeStockPolicy;
 use App\Ports\In\HealthCheckUseCase;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\CapabilityPolicyPort;
@@ -73,6 +75,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(AuditLogPort::class, DatabaseAuditLogAdapter::class);
         $this->app->singleton(CapabilityPolicyPort::class, NullCapabilityPolicyAdapter::class);
         $this->app->singleton(TransactionManagerPort::class, DatabaseTransactionManagerAdapter::class);
+        $this->app->singleton(NegativeStockPolicy::class, DefaultNegativeStockPolicy::class);
 
         $this->app->singleton(ActorAccessReaderPort::class, DatabaseActorAccessReaderAdapter::class);
         $this->app->singleton(AdminTransactionCapabilityStatePort::class, DatabaseAdminTransactionCapabilityStateAdapter::class);

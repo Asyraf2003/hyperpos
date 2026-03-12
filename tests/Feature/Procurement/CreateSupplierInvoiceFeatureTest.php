@@ -283,7 +283,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseHas('supplier_invoices', [
             'supplier_id' => 'supplier-1',
             'tanggal_pengiriman' => '2026-01-30',
-            'jatuh_tempo' => '2026-03-01',
+            'jatuh_tempo' => '2026-02-28',
             'grand_total_rupiah' => 20000,
         ]);
 

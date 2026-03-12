@@ -57,6 +57,21 @@ final class ProductInventory
         $this->qtyOnHand += $qty;
     }
 
+    public function decrease(int $qty): void
+    {
+        if ($qty <= 0) {
+            throw new DomainException('Qty pengurangan stok harus lebih besar dari nol.');
+        }
+
+        $newQtyOnHand = $this->qtyOnHand - $qty;
+
+        if ($newQtyOnHand < 0) {
+            throw new DomainException('Qty on hand tidak boleh negatif.');
+        }
+
+        $this->qtyOnHand = $newQtyOnHand;
+    }
+
     private static function assertValid(
         string $productId,
         int $qtyOnHand,

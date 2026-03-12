@@ -99,6 +99,38 @@ final class ProductInventoryCosting
         $this->avgCostRupiah = $newAvgCostRupiah;
     }
 
+    public function applyOutgoingStock(
+        int $existingQtyOnHand,
+        int $qtyIssue,
+    ): void {
+        if ($existingQtyOnHand <= 0) {
+            throw new DomainException('Qty on hand existing pada inventory costing harus lebih besar dari nol.');
+        }
+
+        if ($qtyIssue <= 0) {
+            throw new DomainException('Qty issue pada inventory costing harus lebih besar dari nol.');
+        }
+
+        if ($qtyIssue > $existingQtyOnHand) {
+            throw new DomainException('Qty issue pada inventory costing melebihi saldo tersedia.');
+        }
+
+        if ($this->inventoryValueRupiah->isZero()) {
+            throw new DomainException('Inventory costing projection wajib direbuild sebelum mengurangi stok.');
+        }
+
+        $outgoingValueRupiah = $this->avgCostRupiah->multiply($qtyIssue);
+        $newInventoryValueRupiah = $this->inventoryValueRupiah->subtract($outgoingValueRupiah);
+        $newInventoryValueRupiah->ensureNotNegative('Inventory value rupiah tidak boleh negatif setelah issue stok.');
+
+        $remainingQtyOnHand = $existingQtyOnHand - $qtyIssue;
+
+        $this->inventoryValueRupiah = $newInventoryValueRupiah;
+        $this->avgCostRupiah = $remainingQtyOnHand === 0
+            ? Money::zero()
+            : $this->avgCostRupiah;
+    }
+
     private static function assertValid(
         string $productId,
         Money $avgCostRupiah,
