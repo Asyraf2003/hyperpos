@@ -144,3 +144,19 @@ Gunakan struktur berikut dalam jawaban kerja:
 - `[PROGRESS]`
 
 Kalau tidak semua bagian relevan, AI harus tetap menjaga pemisahan fakta, gap, langkah aktif, dan bukti selesai.
+
+## Aturan ukuran file kode
+
+AI wajib menjaga ukuran file kode tetap kecil dan mudah diaudit.
+
+1. target ukuran file kode maksimal sekitar 100 baris
+2. bila kode melebihi 100 baris, AI harus memecahnya menjadi beberapa file/module yang lebih kecil
+3. pemecahan harus tetap mengikuti struktur arsitektur yang dipakai (domain / usecase / repository / controller / dll)
+4. pengecualian diperbolehkan untuk file yang secara alami memang besar dan bersifat konfiguratif atau entry-point, misalnya:
+   - service provider
+   - routes
+   - bootstrap file
+   - wiring dependency
+5. pengecualian harus memiliki alasan yang jelas dan tetap menjaga keterbacaan serta auditability
+
+AI tidak boleh menulis file besar secara langsung jika file tersebut bisa dipecah tanpa melanggar boundary arsitektur.
