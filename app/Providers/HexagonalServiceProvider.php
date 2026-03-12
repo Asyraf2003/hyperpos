@@ -11,6 +11,9 @@ use App\Adapters\Out\IdentityAccess\DatabaseActorAccessReaderAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminTransactionCapabilityStateAdapter;
 use App\Adapters\Out\Inventory\DatabaseInventoryMovementReaderAdapter;
 use App\Adapters\Out\Inventory\DatabaseInventoryMovementWriterAdapter;
+use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingProjectionWriterAdapter;
+use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingReaderAdapter;
+use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryProjectionWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryReaderAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
@@ -37,6 +40,9 @@ use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
 use App\Ports\Out\Inventory\InventoryMovementReaderPort;
 use App\Ports\Out\Inventory\InventoryMovementWriterPort;
+use App\Ports\Out\Inventory\ProductInventoryCostingProjectionWriterPort;
+use App\Ports\Out\Inventory\ProductInventoryCostingReaderPort;
+use App\Ports\Out\Inventory\ProductInventoryCostingWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryProjectionWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Inventory\ProductInventoryWriterPort;
@@ -87,8 +93,13 @@ class HexagonalServiceProvider extends ServiceProvider
 
         $this->app->singleton(InventoryMovementReaderPort::class, DatabaseInventoryMovementReaderAdapter::class);
         $this->app->singleton(InventoryMovementWriterPort::class, DatabaseInventoryMovementWriterAdapter::class);
+
         $this->app->singleton(ProductInventoryReaderPort::class, DatabaseProductInventoryReaderAdapter::class);
         $this->app->singleton(ProductInventoryWriterPort::class, DatabaseProductInventoryWriterAdapter::class);
         $this->app->singleton(ProductInventoryProjectionWriterPort::class, DatabaseProductInventoryProjectionWriterAdapter::class);
+
+        $this->app->singleton(ProductInventoryCostingReaderPort::class, DatabaseProductInventoryCostingReaderAdapter::class);
+        $this->app->singleton(ProductInventoryCostingWriterPort::class, DatabaseProductInventoryCostingWriterAdapter::class);
+        $this->app->singleton(ProductInventoryCostingProjectionWriterPort::class, DatabaseProductInventoryCostingProjectionWriterAdapter::class);
     }
 }

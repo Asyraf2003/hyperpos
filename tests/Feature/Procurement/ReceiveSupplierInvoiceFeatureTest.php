@@ -24,6 +24,12 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
             'qty_on_hand' => 3,
         ]);
 
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 30000,
+        ]);
+
         $response = $this->postJson('/procurement/supplier-invoices/invoice-1/receive', [
             'tanggal_terima' => '2026-03-13',
             'lines' => [
@@ -75,6 +81,12 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
             'product_id' => 'product-1',
             'qty_on_hand' => 7,
         ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 70000,
+        ]);
     }
 
     public function test_receive_supplier_invoice_endpoint_rejects_unknown_supplier_invoice(): void
@@ -95,6 +107,7 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
     public function test_receive_supplier_invoice_endpoint_rejects_line_that_does_not_belong_to_target_invoice(): void
@@ -123,6 +136,7 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
     public function test_receive_supplier_invoice_endpoint_rejects_over_receive_after_previous_receipts(): void
@@ -160,6 +174,8 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipts', 1);
         $this->assertDatabaseCount('supplier_receipt_lines', 1);
         $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
     private function seedProduct(

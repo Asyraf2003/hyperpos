@@ -163,6 +163,18 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             'product_id' => 'product-2',
             'qty_on_hand' => 3,
         ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-2',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 30000,
+        ]);
     }
 
     public function test_create_supplier_invoice_endpoint_rejects_unknown_product(): void
@@ -189,6 +201,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
     public function test_create_supplier_invoice_endpoint_rejects_line_total_that_is_not_evenly_divisible_by_qty(): void
@@ -224,6 +237,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
     public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier(): void
@@ -260,10 +274,16 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseCount('suppliers', 1);
 
+        $this->assertDatabaseHas('suppliers', [
+            'id' => 'supplier-1',
+            'nama_pt_pengirim' => 'PT Sumber Makmur',
+            'nama_pt_pengirim_normalized' => 'pt sumber makmur',
+        ]);
+
         $this->assertDatabaseHas('supplier_invoices', [
             'supplier_id' => 'supplier-1',
             'tanggal_pengiriman' => '2026-01-30',
-            'jatuh_tempo' => '2026-02-28',
+            'jatuh_tempo' => '2026-03-01',
             'grand_total_rupiah' => 20000,
         ]);
 
@@ -285,5 +305,6 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
+        $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 }
