@@ -44,20 +44,25 @@ Output wajib:
 
 ## Step 3 — Identity & Access minimal
 
-Tujuan: role dan policy dasar hidup dulu.
+Tujuan: fondasi role, capability, policy akses transaksi, dan audit perubahan policy hidup dulu.
 
 Kerja:
 
-- user
+- user / actor access minimum
 - role admin/kasir
-- policy admin boleh input transaksi atau tidak
-- audit saat policy diubah
+- capability admin transaction entry
+- policy keputusan akses input transaksi
+- audit saat capability / policy transaksi diubah
+- jalur operasional minimum enable/disable capability
 
 Output wajib:
 
-- kasir bisa input transaksi
-- admin butuh policy aktif untuk input transaksi
-- semua perubahan policy tercatat
+- role aktif `admin` dan `kasir` hidup sebagai fondasi Identity & Access
+- `TransactionEntryPolicy` hidup sebagai pengambil keputusan akses input transaksi
+- admin tidak otomatis boleh input transaksi tanpa capability aktif
+- perubahan capability admin transaksi tercatat
+- enable/disable capability admin transaksi terbukti operasional end-to-end
+- pembuktian input transaksi operasional nyata dilakukan pada step bounded context Nota Operasional / Service-Sales Case saat entry point transaksi sudah ada
 
 ## Step 4 — Product Catalog
 
