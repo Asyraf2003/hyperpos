@@ -17,6 +17,9 @@ use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryProjectionWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryReaderAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
+use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
+use App\Adapters\Out\Note\DatabaseNoteWriterAdapter;
+use App\Adapters\Out\Note\DatabaseWorkItemWriterAdapter;
 use App\Adapters\Out\Persistence\DatabaseTransactionManagerAdapter;
 use App\Adapters\Out\Policy\NullCapabilityPolicyAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceLineReaderAdapter;
@@ -48,6 +51,9 @@ use App\Ports\Out\Inventory\ProductInventoryCostingWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryProjectionWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Inventory\ProductInventoryWriterPort;
+use App\Ports\Out\Note\NoteReaderPort;
+use App\Ports\Out\Note\NoteWriterPort;
+use App\Ports\Out\Note\WorkItemWriterPort;
 use App\Ports\Out\Procurement\SupplierInvoiceLineReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
@@ -104,5 +110,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(ProductInventoryCostingReaderPort::class, DatabaseProductInventoryCostingReaderAdapter::class);
         $this->app->singleton(ProductInventoryCostingWriterPort::class, DatabaseProductInventoryCostingWriterAdapter::class);
         $this->app->singleton(ProductInventoryCostingProjectionWriterPort::class, DatabaseProductInventoryCostingProjectionWriterAdapter::class);
+
+        $this->app->singleton(NoteReaderPort::class, DatabaseNoteReaderAdapter::class);
+        $this->app->singleton(NoteWriterPort::class, DatabaseNoteWriterAdapter::class);
+        $this->app->singleton(WorkItemWriterPort::class, DatabaseWorkItemWriterAdapter::class);
     }
 }
