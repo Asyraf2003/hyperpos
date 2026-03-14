@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\Application\Note\UseCases;
 
+use App\Application\Inventory\Services\IssueInventoryOperation;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\ExternalPurchaseLine;
 use App\Core\Note\WorkItem\ServiceDetail;
+use App\Core\Note\WorkItem\StoreStockLine;
 use App\Core\Note\WorkItem\WorkItem;
+use App\Core\ProductCatalog\Product\Product;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\Note\WorkItemWriterPort;
+use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
 use Throwable;
@@ -23,6 +27,8 @@ final class AddWorkItemHandler
         private readonly NoteReaderPort $notes,
         private readonly NoteWriterPort $noteWriter,
         private readonly WorkItemWriterPort $workItems,
+        private readonly ProductReaderPort $products,
+        private readonly IssueInventoryOperation $issueInventory,
         private readonly TransactionManagerPort $transactions,
         private readonly UuidPort $uuid,
     ) {
@@ -31,6 +37,7 @@ final class AddWorkItemHandler
     /**
      * @param array<string, mixed> $serviceDetailPayload
      * @param array<int, array<string, mixed>> $externalPurchaseLinesPayload
+     * @param array<int, array<string, mixed>> $storeStockLinesPayload
      */
     public function handle(
         string $noteId,
@@ -38,6 +45,7 @@ final class AddWorkItemHandler
         string $transactionType,
         array $serviceDetailPayload,
         array $externalPurchaseLinesPayload = [],
+        array $storeStockLinesPayload = [],
     ): Result {
         try {
             $normalizedNoteId = $this->normalizeRequired($noteId, 'Note id pada work item wajib ada.');
@@ -70,11 +78,23 @@ final class AddWorkItemHandler
                 $normalizedTransactionType,
                 $serviceDetailPayload,
                 $externalPurchaseLinesPayload,
+                $storeStockLinesPayload,
             );
 
             $note->addWorkItem($workItem);
 
             $this->workItems->create($workItem);
+
+            foreach ($workItem->storeStockLines() as $storeStockLine) {
+                $this->issueInventory->execute(
+                    $storeStockLine->productId(),
+                    $storeStockLine->qty(),
+                    $note->transactionDate(),
+                    'work_item_store_stock_line',
+                    $storeStockLine->id(),
+                );
+            }
+
             $this->noteWriter->updateTotal($note);
 
             $this->transactions->commit();
@@ -95,11 +115,13 @@ final class AddWorkItemHandler
                         'status' => $workItem->status(),
                         'subtotal_rupiah' => $workItem->subtotalRupiah()->amount(),
                     ],
-                    'service_detail' => [
-                        'service_name' => $workItem->serviceDetail()?->serviceName(),
-                        'service_price_rupiah' => $workItem->serviceDetail()?->servicePriceRupiah()->amount(),
-                        'part_source' => $workItem->serviceDetail()?->partSource(),
-                    ],
+                    'service_detail' => $workItem->serviceDetail() === null
+                        ? null
+                        : [
+                            'service_name' => $workItem->serviceDetail()?->serviceName(),
+                            'service_price_rupiah' => $workItem->serviceDetail()?->servicePriceRupiah()->amount(),
+                            'part_source' => $workItem->serviceDetail()?->partSource(),
+                        ],
                     'external_purchase_lines' => array_map(
                         static fn (ExternalPurchaseLine $line): array => [
                             'id' => $line->id(),
@@ -109,6 +131,15 @@ final class AddWorkItemHandler
                             'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
                         ],
                         $workItem->externalPurchaseLines(),
+                    ),
+                    'store_stock_lines' => array_map(
+                        static fn (StoreStockLine $line): array => [
+                            'id' => $line->id(),
+                            'product_id' => $line->productId(),
+                            'qty' => $line->qty(),
+                            'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
+                        ],
+                        $workItem->storeStockLines(),
                     ),
                 ],
                 'Work item berhasil ditambahkan ke note.'
@@ -134,6 +165,7 @@ final class AddWorkItemHandler
     /**
      * @param array<string, mixed> $serviceDetailPayload
      * @param array<int, array<string, mixed>> $externalPurchaseLinesPayload
+     * @param array<int, array<string, mixed>> $storeStockLinesPayload
      */
     private function buildWorkItem(
         string $noteId,
@@ -141,15 +173,14 @@ final class AddWorkItemHandler
         string $transactionType,
         array $serviceDetailPayload,
         array $externalPurchaseLinesPayload,
+        array $storeStockLinesPayload,
     ): WorkItem {
-        $serviceDetail = $this->buildServiceDetail($serviceDetailPayload);
-
         if ($transactionType === WorkItem::TYPE_SERVICE_ONLY) {
             return WorkItem::createServiceOnly(
                 $this->uuid->generate(),
                 $noteId,
                 $lineNo,
-                $serviceDetail,
+                $this->buildServiceDetail($serviceDetailPayload),
             );
         }
 
@@ -158,8 +189,27 @@ final class AddWorkItemHandler
                 $this->uuid->generate(),
                 $noteId,
                 $lineNo,
-                $serviceDetail,
+                $this->buildServiceDetail($serviceDetailPayload),
                 $this->buildExternalPurchaseLines($externalPurchaseLinesPayload),
+            );
+        }
+
+        if ($transactionType === WorkItem::TYPE_STORE_STOCK_SALE_ONLY) {
+            return WorkItem::createStoreStockSaleOnly(
+                $this->uuid->generate(),
+                $noteId,
+                $lineNo,
+                $this->buildStoreStockLines($storeStockLinesPayload),
+            );
+        }
+
+        if ($transactionType === WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART) {
+            return WorkItem::createServiceWithStoreStockPart(
+                $this->uuid->generate(),
+                $noteId,
+                $lineNo,
+                $this->buildServiceDetail($serviceDetailPayload),
+                $this->buildStoreStockLines($storeStockLinesPayload),
             );
         }
 
@@ -220,6 +270,66 @@ final class AddWorkItemHandler
         }
 
         return $externalPurchaseLines;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $storeStockLinesPayload
+     * @return list<StoreStockLine>
+     */
+    private function buildStoreStockLines(array $storeStockLinesPayload): array
+    {
+        $storeStockLines = [];
+
+        foreach ($storeStockLinesPayload as $linePayload) {
+            if (array_key_exists('product_id', $linePayload) === false) {
+                throw new DomainException('Product id pada store stock line wajib ada.');
+            }
+
+            if (array_key_exists('qty', $linePayload) === false) {
+                throw new DomainException('Qty pada store stock line wajib ada.');
+            }
+
+            if (array_key_exists('line_total_rupiah', $linePayload) === false) {
+                throw new DomainException('Line total rupiah pada store stock line wajib ada.');
+            }
+
+            $productId = trim((string) $linePayload['product_id']);
+            $qty = (int) $linePayload['qty'];
+            $lineTotalRupiah = Money::fromInt((int) $linePayload['line_total_rupiah']);
+
+            $product = $this->products->getById($productId);
+
+            if ($product === null) {
+                throw new DomainException('Product store stock tidak ditemukan.');
+            }
+
+            $this->assertStoreStockLinePricingFloor($product, $qty, $lineTotalRupiah);
+
+            $storeStockLines[] = StoreStockLine::create(
+                $this->uuid->generate(),
+                $productId,
+                $qty,
+                $lineTotalRupiah,
+            );
+        }
+
+        return $storeStockLines;
+    }
+
+    private function assertStoreStockLinePricingFloor(
+        Product $product,
+        int $qty,
+        Money $lineTotalRupiah,
+    ): void {
+        if ($qty <= 0) {
+            throw new DomainException('Qty pada store stock line harus lebih besar dari nol.');
+        }
+
+        $minimumAllowedLineTotal = $product->hargaJual()->multiply($qty);
+
+        if ($lineTotalRupiah->greaterThanOrEqual($minimumAllowedLineTotal) === false) {
+            throw new DomainException('Line total rupiah pada store stock line tidak boleh di bawah floor pricing product.');
+        }
     }
 
     private function normalizeRequired(string $value, string $message): string
