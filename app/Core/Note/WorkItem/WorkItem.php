@@ -15,9 +15,12 @@ final class WorkItem
 
     public const TYPE_SERVICE_ONLY = 'service_only';
     public const TYPE_SERVICE_WITH_EXTERNAL_PURCHASE = 'service_with_external_purchase';
+    public const TYPE_STORE_STOCK_SALE_ONLY = 'store_stock_sale_only';
+    public const TYPE_SERVICE_WITH_STORE_STOCK_PART = 'service_with_store_stock_part';
 
     /**
      * @param list<ExternalPurchaseLine> $externalPurchaseLines
+     * @param list<StoreStockLine> $storeStockLines
      */
     private function __construct(
         private string $id,
@@ -28,6 +31,7 @@ final class WorkItem
         private Money $subtotalRupiah,
         private ?ServiceDetail $serviceDetail,
         private array $externalPurchaseLines,
+        private array $storeStockLines,
     ) {
     }
 
@@ -49,6 +53,7 @@ final class WorkItem
             trim($status),
             $serviceDetail->servicePriceRupiah(),
             $serviceDetail,
+            [],
             [],
         );
     }
@@ -76,11 +81,66 @@ final class WorkItem
             self::calculateSubtotalForServiceWithExternalPurchase($serviceDetail, $externalPurchaseLines),
             $serviceDetail,
             array_values($externalPurchaseLines),
+            [],
+        );
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    public static function createStoreStockSaleOnly(
+        string $id,
+        string $noteId,
+        int $lineNo,
+        array $storeStockLines,
+        string $status = self::STATUS_OPEN,
+    ): self {
+        self::assertValidCommon($id, $noteId, $lineNo, $status);
+        self::assertStoreStockSaleOnlyDetail($storeStockLines);
+
+        return new self(
+            trim($id),
+            trim($noteId),
+            $lineNo,
+            self::TYPE_STORE_STOCK_SALE_ONLY,
+            trim($status),
+            self::calculateSubtotalForStoreStockLines($storeStockLines),
+            null,
+            [],
+            array_values($storeStockLines),
+        );
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    public static function createServiceWithStoreStockPart(
+        string $id,
+        string $noteId,
+        int $lineNo,
+        ServiceDetail $serviceDetail,
+        array $storeStockLines,
+        string $status = self::STATUS_OPEN,
+    ): self {
+        self::assertValidCommon($id, $noteId, $lineNo, $status);
+        self::assertServiceWithStoreStockPartDetail($serviceDetail, $storeStockLines);
+
+        return new self(
+            trim($id),
+            trim($noteId),
+            $lineNo,
+            self::TYPE_SERVICE_WITH_STORE_STOCK_PART,
+            trim($status),
+            self::calculateSubtotalForServiceWithStoreStockPart($serviceDetail, $storeStockLines),
+            $serviceDetail,
+            [],
+            array_values($storeStockLines),
         );
     }
 
     /**
      * @param list<ExternalPurchaseLine> $externalPurchaseLines
+     * @param list<StoreStockLine> $storeStockLines
      */
     public static function rehydrate(
         string $id,
@@ -91,10 +151,12 @@ final class WorkItem
         Money $subtotalRupiah,
         ?ServiceDetail $serviceDetail,
         array $externalPurchaseLines = [],
+        array $storeStockLines = [],
     ): self {
         self::assertValidCommon($id, $noteId, $lineNo, $status);
         self::assertValidTransactionType($transactionType);
         self::assertValidExternalPurchaseLines($externalPurchaseLines);
+        self::assertValidStoreStockLines($storeStockLines);
 
         $normalizedTransactionType = trim($transactionType);
 
@@ -109,6 +171,10 @@ final class WorkItem
                 throw new DomainException('External purchase lines harus kosong untuk work item service only.');
             }
 
+            if ($storeStockLines !== []) {
+                throw new DomainException('Store stock lines harus kosong untuk work item service only.');
+            }
+
             if ($subtotalRupiah->equals($serviceDetail->servicePriceRupiah()) === false) {
                 throw new DomainException('Subtotal work item service only tidak konsisten.');
             }
@@ -121,6 +187,10 @@ final class WorkItem
 
             self::assertServiceWithExternalPurchaseDetail($serviceDetail, $externalPurchaseLines);
 
+            if ($storeStockLines !== []) {
+                throw new DomainException('Store stock lines harus kosong untuk work item service with external purchase.');
+            }
+
             $calculatedSubtotal = self::calculateSubtotalForServiceWithExternalPurchase(
                 $serviceDetail,
                 $externalPurchaseLines,
@@ -128,6 +198,45 @@ final class WorkItem
 
             if ($subtotalRupiah->equals($calculatedSubtotal) === false) {
                 throw new DomainException('Subtotal work item service with external purchase tidak konsisten.');
+            }
+        }
+
+        if ($normalizedTransactionType === self::TYPE_STORE_STOCK_SALE_ONLY) {
+            if ($serviceDetail !== null) {
+                throw new DomainException('Service detail harus kosong untuk work item store stock sale only.');
+            }
+
+            if ($externalPurchaseLines !== []) {
+                throw new DomainException('External purchase lines harus kosong untuk work item store stock sale only.');
+            }
+
+            self::assertStoreStockSaleOnlyDetail($storeStockLines);
+
+            $calculatedSubtotal = self::calculateSubtotalForStoreStockLines($storeStockLines);
+
+            if ($subtotalRupiah->equals($calculatedSubtotal) === false) {
+                throw new DomainException('Subtotal work item store stock sale only tidak konsisten.');
+            }
+        }
+
+        if ($normalizedTransactionType === self::TYPE_SERVICE_WITH_STORE_STOCK_PART) {
+            if ($serviceDetail === null) {
+                throw new DomainException('Service detail wajib ada untuk work item service with store stock part.');
+            }
+
+            if ($externalPurchaseLines !== []) {
+                throw new DomainException('External purchase lines harus kosong untuk work item service with store stock part.');
+            }
+
+            self::assertServiceWithStoreStockPartDetail($serviceDetail, $storeStockLines);
+
+            $calculatedSubtotal = self::calculateSubtotalForServiceWithStoreStockPart(
+                $serviceDetail,
+                $storeStockLines,
+            );
+
+            if ($subtotalRupiah->equals($calculatedSubtotal) === false) {
+                throw new DomainException('Subtotal work item service with store stock part tidak konsisten.');
             }
         }
 
@@ -140,6 +249,7 @@ final class WorkItem
             $subtotalRupiah,
             $serviceDetail,
             array_values($externalPurchaseLines),
+            array_values($storeStockLines),
         );
     }
 
@@ -196,6 +306,14 @@ final class WorkItem
         return $this->externalPurchaseLines;
     }
 
+    /**
+     * @return list<StoreStockLine>
+     */
+    public function storeStockLines(): array
+    {
+        return $this->storeStockLines;
+    }
+
     private static function assertValidCommon(
         string $id,
         string $noteId,
@@ -238,6 +356,8 @@ final class WorkItem
             [
                 self::TYPE_SERVICE_ONLY,
                 self::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE,
+                self::TYPE_STORE_STOCK_SALE_ONLY,
+                self::TYPE_SERVICE_WITH_STORE_STOCK_PART,
             ],
             true
         ) === false) {
@@ -272,6 +392,36 @@ final class WorkItem
     }
 
     /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    private static function assertStoreStockSaleOnlyDetail(array $storeStockLines): void
+    {
+        if ($storeStockLines === []) {
+            throw new DomainException('Store stock lines minimal harus memiliki satu line.');
+        }
+
+        self::assertValidStoreStockLines($storeStockLines);
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    private static function assertServiceWithStoreStockPartDetail(
+        ServiceDetail $serviceDetail,
+        array $storeStockLines,
+    ): void {
+        if ($serviceDetail->partSource() !== ServiceDetail::PART_SOURCE_NONE) {
+            throw new DomainException('Part source untuk service with store stock part harus none.');
+        }
+
+        if ($storeStockLines === []) {
+            throw new DomainException('Store stock lines minimal harus memiliki satu line.');
+        }
+
+        self::assertValidStoreStockLines($storeStockLines);
+    }
+
+    /**
      * @param list<ExternalPurchaseLine> $externalPurchaseLines
      */
     private static function assertValidExternalPurchaseLines(array $externalPurchaseLines): void
@@ -279,6 +429,18 @@ final class WorkItem
         foreach ($externalPurchaseLines as $line) {
             if ($line instanceof ExternalPurchaseLine === false) {
                 throw new DomainException('External purchase line pada work item tidak valid.');
+            }
+        }
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    private static function assertValidStoreStockLines(array $storeStockLines): void
+    {
+        foreach ($storeStockLines as $line) {
+            if ($line instanceof StoreStockLine === false) {
+                throw new DomainException('Store stock line pada work item tidak valid.');
             }
         }
     }
@@ -297,5 +459,30 @@ final class WorkItem
         }
 
         return $subtotal;
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    private static function calculateSubtotalForStoreStockLines(array $storeStockLines): Money
+    {
+        $subtotal = Money::zero();
+
+        foreach ($storeStockLines as $line) {
+            $subtotal = $subtotal->add($line->lineTotalRupiah());
+        }
+
+        return $subtotal;
+    }
+
+    /**
+     * @param list<StoreStockLine> $storeStockLines
+     */
+    private static function calculateSubtotalForServiceWithStoreStockPart(
+        ServiceDetail $serviceDetail,
+        array $storeStockLines,
+    ): Money {
+        return $serviceDetail->servicePriceRupiah()
+            ->add(self::calculateSubtotalForStoreStockLines($storeStockLines));
     }
 }
