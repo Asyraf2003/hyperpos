@@ -21,7 +21,6 @@ use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteWriterAdapter;
 use App\Adapters\Out\Note\DatabaseWorkItemWriterAdapter;
 use App\Adapters\Out\Persistence\DatabaseTransactionManagerAdapter;
-use App\Adapters\Out\Policy\NullCapabilityPolicyAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceLineReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceWriterAdapter;
@@ -39,7 +38,6 @@ use App\Application\System\Health\HealthCheckHandler;
 use App\Core\Inventory\Policies\NegativeStockPolicy;
 use App\Ports\In\HealthCheckUseCase;
 use App\Ports\Out\AuditLogPort;
-use App\Ports\Out\CapabilityPolicyPort;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
@@ -79,7 +77,6 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(ClockPort::class, SystemClockAdapter::class);
         $this->app->singleton(UuidPort::class, LaravelUuidAdapter::class);
         $this->app->singleton(AuditLogPort::class, DatabaseAuditLogAdapter::class);
-        $this->app->singleton(CapabilityPolicyPort::class, NullCapabilityPolicyAdapter::class);
         $this->app->singleton(TransactionManagerPort::class, DatabaseTransactionManagerAdapter::class);
         $this->app->singleton(NegativeStockPolicy::class, DefaultNegativeStockPolicy::class);
 
