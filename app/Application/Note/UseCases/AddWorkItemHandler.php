@@ -54,10 +54,7 @@ final class AddWorkItemHandler
                 'Transaction type pada work item wajib ada.'
             );
         } catch (DomainException $e) {
-            return Result::failure(
-                $e->getMessage(),
-                ['work_item' => ['INVALID_WORK_ITEM']]
-            );
+            return $this->failureFromDomainException($e);
         }
 
         $transactionStarted = false;
@@ -149,10 +146,7 @@ final class AddWorkItemHandler
                 $this->transactions->rollBack();
             }
 
-            return Result::failure(
-                $e->getMessage(),
-                ['work_item' => ['INVALID_WORK_ITEM']]
-            );
+            return $this->failureFromDomainException($e);
         } catch (Throwable $e) {
             if ($transactionStarted) {
                 $this->transactions->rollBack();
@@ -293,21 +287,19 @@ final class AddWorkItemHandler
                 throw new DomainException('Line total rupiah pada store stock line wajib ada.');
             }
 
-            $productId = trim((string) $linePayload['product_id']);
+            $product = $this->getExistingProduct((string) $linePayload['product_id']);
             $qty = (int) $linePayload['qty'];
             $lineTotalRupiah = Money::fromInt((int) $linePayload['line_total_rupiah']);
 
-            $product = $this->products->getById($productId);
-
-            if ($product === null) {
-                throw new DomainException('Product store stock tidak ditemukan.');
-            }
-
-            $this->assertStoreStockLinePricingFloor($product, $qty, $lineTotalRupiah);
+            $this->assertStoreStockLineNotBelowMinimumSellingPrice(
+                $product,
+                $qty,
+                $lineTotalRupiah,
+            );
 
             $storeStockLines[] = StoreStockLine::create(
                 $this->uuid->generate(),
-                $productId,
+                $product->id(),
                 $qty,
                 $lineTotalRupiah,
             );
@@ -316,7 +308,23 @@ final class AddWorkItemHandler
         return $storeStockLines;
     }
 
-    private function assertStoreStockLinePricingFloor(
+    private function getExistingProduct(string $productId): Product
+    {
+        $normalizedProductId = $this->normalizeRequired(
+            $productId,
+            'Product id pada store stock line wajib ada.'
+        );
+
+        $product = $this->products->getById($normalizedProductId);
+
+        if ($product === null) {
+            throw new DomainException('Product pada store stock line tidak ditemukan.');
+        }
+
+        return $product;
+    }
+
+    private function assertStoreStockLineNotBelowMinimumSellingPrice(
         Product $product,
         int $qty,
         Money $lineTotalRupiah,
@@ -325,11 +333,48 @@ final class AddWorkItemHandler
             throw new DomainException('Qty pada store stock line harus lebih besar dari nol.');
         }
 
-        $minimumAllowedLineTotal = $product->hargaJual()->multiply($qty);
+        $minimumLineTotalRupiah = $product->hargaJual()->amount() * $qty;
 
-        if ($lineTotalRupiah->greaterThanOrEqual($minimumAllowedLineTotal) === false) {
-            throw new DomainException('Line total rupiah pada store stock line tidak boleh di bawah floor pricing product.');
+        if ($lineTotalRupiah->amount() < $minimumLineTotalRupiah) {
+            throw new DomainException('Harga jual pada store stock line tidak boleh di bawah harga jual minimum.');
         }
+    }
+
+    private function failureFromDomainException(DomainException $e): Result
+    {
+        $errorCode = $this->classifyErrorCode($e->getMessage());
+        $errorKey = $this->classifyErrorKey($errorCode);
+
+        return Result::failure(
+            $e->getMessage(),
+            [$errorKey => [$errorCode]]
+        );
+    }
+
+    private function classifyErrorCode(string $message): string
+    {
+        if (str_contains($message, 'Stok inventory tidak cukup')) {
+            return 'INVENTORY_INSUFFICIENT_STOCK';
+        }
+
+        if (str_contains($message, 'harga jual minimum')) {
+            return 'PRICING_BELOW_MINIMUM_SELLING_PRICE';
+        }
+
+        return 'INVALID_WORK_ITEM';
+    }
+
+    private function classifyErrorKey(string $errorCode): string
+    {
+        if ($errorCode === 'INVENTORY_INSUFFICIENT_STOCK') {
+            return 'inventory';
+        }
+
+        if ($errorCode === 'PRICING_BELOW_MINIMUM_SELLING_PRICE') {
+            return 'pricing';
+        }
+
+        return 'work_item';
     }
 
     private function normalizeRequired(string $value, string $message): string

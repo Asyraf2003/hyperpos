@@ -41,10 +41,7 @@ final class UpdateWorkItemStatusHandler
                 throw new DomainException('Line number pada update status work item harus lebih besar dari nol.');
             }
         } catch (DomainException $e) {
-            return Result::failure(
-                $e->getMessage(),
-                ['work_item' => ['INVALID_WORK_ITEM']]
-            );
+            return $this->failureFromDomainException($e);
         }
 
         $transactionStarted = false;
@@ -90,10 +87,7 @@ final class UpdateWorkItemStatusHandler
                 $this->transactions->rollBack();
             }
 
-            return Result::failure(
-                $e->getMessage(),
-                ['work_item' => ['INVALID_WORK_ITEM']]
-            );
+            return $this->failureFromDomainException($e);
         } catch (Throwable $e) {
             if ($transactionStarted) {
                 $this->transactions->rollBack();
@@ -134,6 +128,25 @@ final class UpdateWorkItemStatusHandler
         }
 
         throw new DomainException('Target status work item belum didukung pada slice ini.');
+    }
+
+    private function failureFromDomainException(DomainException $e): Result
+    {
+        $errorCode = $this->classifyErrorCode($e->getMessage());
+
+        return Result::failure(
+            $e->getMessage(),
+            ['work_item' => [$errorCode]]
+        );
+    }
+
+    private function classifyErrorCode(string $message): string
+    {
+        if (str_contains($message, 'Target status work item belum didukung')) {
+            return 'NOTE_INVALID_WORK_ITEM_STATE';
+        }
+
+        return 'INVALID_WORK_ITEM';
     }
 
     private function normalizeRequired(string $value, string $message): string

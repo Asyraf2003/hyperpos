@@ -145,6 +145,10 @@ final class AddServiceWithStoreStockPartWorkItemFeatureTest extends TestCase
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertTrue($result->isFailure());
+        $this->assertSame(
+            ['inventory' => ['INVENTORY_INSUFFICIENT_STOCK']],
+            $result->errors(),
+        );
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
@@ -198,6 +202,10 @@ final class AddServiceWithStoreStockPartWorkItemFeatureTest extends TestCase
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertTrue($result->isFailure());
+        $this->assertSame(
+            ['pricing' => ['PRICING_BELOW_MINIMUM_SELLING_PRICE']],
+            $result->errors(),
+        );
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
