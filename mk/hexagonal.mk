@@ -1,4 +1,4 @@
-.PHONY: dev lint fmt test test-unit test-domain test-feature test-report test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check verify audit-lines audit-contract
+.PHONY: dev lint fmt test test-unit test-domain test-feature test-report test-audit test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check verify audit-lines audit-contract
 
 dev:
 	php artisan serve
@@ -23,6 +23,9 @@ test-feature:
 
 test-report:
 	php artisan test tests/Feature/Reporting
+
+test-audit:
+	php artisan test tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php
 
 test-integration:
 	php artisan test tests/Feature
