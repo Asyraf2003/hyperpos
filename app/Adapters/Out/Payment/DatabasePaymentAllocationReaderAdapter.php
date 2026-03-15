@@ -13,16 +13,32 @@ final class DatabasePaymentAllocationReaderAdapter implements PaymentAllocationR
 {
     public function getTotalAllocatedAmountByNoteId(string $noteId): Money
     {
-        $normalizedNoteId = trim($noteId);
-
-        if ($normalizedNoteId === '') {
-            throw new DomainException('Note id pada payment allocation wajib ada.');
-        }
+        $normalizedNoteId = $this->normalize($noteId, 'Note id pada payment allocation wajib ada.');
 
         $totalAllocated = (int) DB::table('payment_allocations')
             ->where('note_id', $normalizedNoteId)
             ->sum('amount_rupiah');
 
         return Money::fromInt($totalAllocated);
+    }
+
+    public function getTotalAllocatedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money
+    {
+        $paymentId = $this->normalize($customerPaymentId, 'Customer payment id pada payment allocation wajib ada.');
+        $normalizedNoteId = $this->normalize($noteId, 'Note id pada payment allocation wajib ada.');
+
+        $totalAllocated = (int) DB::table('payment_allocations')
+            ->where('customer_payment_id', $paymentId)
+            ->where('note_id', $normalizedNoteId)
+            ->sum('amount_rupiah');
+
+        return Money::fromInt($totalAllocated);
+    }
+
+    private function normalize(string $value, string $message): string
+    {
+        $normalized = trim($value);
+        if ($normalized === '') throw new DomainException($message);
+        return $normalized;
     }
 }
