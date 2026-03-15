@@ -1,4 +1,4 @@
-.PHONY: dev fmt test test-unit test-domain test-feature test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check
+.PHONY: dev lint fmt test test-unit test-domain test-feature test-report test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check verify audit-lines audit-contract
 
 dev:
 	php artisan serve
@@ -20,6 +20,9 @@ test-domain:
 
 test-feature:
 	php artisan test tests/Feature
+
+test-report:
+	php artisan test tests/Feature/Reporting
 
 test-integration:
 	php artisan test tests/Feature
@@ -53,7 +56,6 @@ audit-lines:
 
 audit-contract: audit-lines
 	@echo "Contract audit passed."
-
 
 check: audit-hex test
 
