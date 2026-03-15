@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Application\Inventory\Services\IssueInventoryOperation;
+use App\Application\Note\Policies\NoteAddabilityPolicy;
 use App\Application\Note\Services\AddWorkItemErrorClassifier;
 use App\Application\Note\Services\WorkItemFactory;
 use App\Application\Shared\DTO\Result;
-use App\Core\Note\Policies\NoteAddabilityPolicy;
 use App\Core\Shared\Exceptions\DomainException;
+use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Note\{NoteReaderPort, NoteWriterPort, WorkItemWriterPort};
 use App\Ports\Out\TransactionManagerPort;
-use App\Ports\Out\AuditLogPort;
 use Throwable;
 
 final class AddWorkItemHandler
@@ -35,7 +35,7 @@ final class AddWorkItemHandler
         try {
             $this->transactions->begin(); $started = true;
             $note = $this->notes->getById(trim($nId)) ?? throw new DomainException('Note tidak ditemukan.');
-            
+
             $this->addability->assertAllowed($note);
             $workItem = $this->factory->build($note->id(), $lNo, trim($type), $sd, $ext, $sto);
             $note->addWorkItem($workItem);
@@ -46,7 +46,6 @@ final class AddWorkItemHandler
             }
             $this->noteWriter->updateTotal($note);
 
-            // ADR-0008: Audit-First Mutation
             $this->audit->record('work_item_added', [
                 'note_id' => $note->id(),
                 'work_item_id' => $workItem->id(),

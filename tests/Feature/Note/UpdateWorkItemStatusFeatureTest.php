@@ -213,6 +213,53 @@ final class UpdateWorkItemStatusFeatureTest extends TestCase
         ]);
     }
 
+    public function test_update_work_item_status_handler_rejects_paid_note_for_standard_flow(): void
+    {
+        $this->loginAsKasir();
+        $this->seedNote('note-1', 'Budi Santoso', '2026-03-14', 30000);
+
+        DB::table('work_items')->insert([
+            'id' => 'work-item-1',
+            'note_id' => 'note-1',
+            'line_no' => 1,
+            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
+            'status' => WorkItem::STATUS_OPEN,
+            'subtotal_rupiah' => 30000,
+        ]);
+
+        DB::table('work_item_service_details')->insert([
+            'work_item_id' => 'work-item-1',
+            'service_name' => 'Servis Karburator',
+            'service_price_rupiah' => 30000,
+            'part_source' => ServiceDetail::PART_SOURCE_NONE,
+        ]);
+
+        $this->seedCustomerPayment('payment-1', 30000, '2026-03-15');
+        $this->seedPaymentAllocation('allocation-1', 'payment-1', 'note-1', 30000);
+
+        $updateStatus = app(UpdateWorkItemStatusHandler::class);
+
+        $result = $updateStatus->handle(
+            'note-1',
+            1,
+            WorkItem::STATUS_DONE,
+        );
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertTrue($result->isFailure());
+        $this->assertSame(
+            ['work_item' => ['INVALID_WORK_ITEM_STATE']],
+            $result->errors(),
+        );
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'work-item-1',
+            'note_id' => 'note-1',
+            'line_no' => 1,
+            'status' => WorkItem::STATUS_OPEN,
+        ]);
+    }
+
     private function seedNote(
         string $id,
         string $customerName,
@@ -224,6 +271,32 @@ final class UpdateWorkItemStatusFeatureTest extends TestCase
             'customer_name' => $customerName,
             'transaction_date' => $transactionDate,
             'total_rupiah' => $totalRupiah,
+        ]);
+    }
+
+    private function seedCustomerPayment(
+        string $id,
+        int $amountRupiah,
+        string $paidAt,
+    ): void {
+        DB::table('customer_payments')->insert([
+            'id' => $id,
+            'amount_rupiah' => $amountRupiah,
+            'paid_at' => $paidAt,
+        ]);
+    }
+
+    private function seedPaymentAllocation(
+        string $id,
+        string $customerPaymentId,
+        string $noteId,
+        int $amountRupiah,
+    ): void {
+        DB::table('payment_allocations')->insert([
+            'id' => $id,
+            'customer_payment_id' => $customerPaymentId,
+            'note_id' => $noteId,
+            'amount_rupiah' => $amountRupiah,
         ]);
     }
 }
