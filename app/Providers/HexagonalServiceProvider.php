@@ -52,8 +52,9 @@ use App\Application\Procurement\Services\SupplierInvoiceFactory;
 use App\Application\Procurement\Services\SupplierReceiptFactory;
 use App\Application\Procurement\Services\SupplierService;
 use App\Application\System\Health\HealthCheckHandler;
+use App\Application\Note\Policies\NoteAddabilityPolicy;
+use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Core\Inventory\Policies\NegativeStockPolicy;
-use App\Core\Note\Policies\NoteAddabilityPolicy;
 use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Ports\In\HealthCheckUseCase;
 use App\Ports\Out\AuditLogPort;
@@ -121,7 +122,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierService::class);
         $this->app->singleton(SupplierInvoiceFactory::class);
         $this->app->singleton(SupplierReceiptFactory::class);
-
+        $this->app->singleton(NotePaidStatusPolicy::class);
+        $this->app->singleton(NoteAddabilityPolicy::class);
+        
         // --- Identity & Access ---
         $this->app->singleton(ActorAccessReaderPort::class, DatabaseActorAccessReaderAdapter::class);
         $this->app->singleton(AdminTransactionCapabilityStatePort::class, DatabaseAdminTransactionCapabilityStateAdapter::class);
