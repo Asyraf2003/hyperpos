@@ -11,157 +11,47 @@ use DateTimeImmutable;
 
 final class Note
 {
-    /**
-     * @param list<WorkItem> $workItems
-     */
-    private function __construct(
-        private string $id,
-        private string $customerName,
-        private DateTimeImmutable $transactionDate,
-        private array $workItems,
-        private Money $totalRupiah,
-    ) {
+    use NoteState;
+    use NoteValidation;
+
+    public static function create(string $id, string $name, DateTimeImmutable $date): self
+    {
+        self::assertValidIdentity($id, $name);
+        return new self(trim($id), trim($name), $date, [], Money::zero());
     }
 
-    public static function create(
-        string $id,
-        string $customerName,
-        DateTimeImmutable $transactionDate,
-    ): self {
-        self::assertValidIdentity($id, $customerName);
-
-        return new self(
-            trim($id),
-            trim($customerName),
-            $transactionDate,
-            [],
-            Money::zero(),
-        );
-    }
-
-    /**
-     * @param list<WorkItem> $workItems
-     */
-    public static function rehydrate(
-        string $id,
-        string $customerName,
-        DateTimeImmutable $transactionDate,
-        Money $totalRupiah,
-        array $workItems = [],
-    ): self {
-        self::assertValidIdentity($id, $customerName);
+    /** @param list<WorkItem> $workItems */
+    public static function rehydrate(string $id, string $name, DateTimeImmutable $date, Money $total, array $workItems = []): self
+    {
+        self::assertValidIdentity($id, $name);
         self::assertValidWorkItems($workItems);
-
-        $totalRupiah->ensureNotNegative('Total rupiah note tidak boleh negatif.');
+        $total->ensureNotNegative('Total note tidak boleh negatif.');
 
         if ($workItems !== []) {
-            $calculatedTotal = self::calculateTotalFromWorkItems($workItems);
-
-            if ($calculatedTotal->equals($totalRupiah) === false) {
-                throw new DomainException('Total rupiah note tidak konsisten dengan subtotal work item.');
+            if (!self::calculateTotalFromWorkItems($workItems)->equals($total)) {
+                throw new DomainException('Total note tidak konsisten dengan subtotal work item.');
             }
         }
 
-        return new self(
-            trim($id),
-            trim($customerName),
-            $transactionDate,
-            array_values($workItems),
-            $totalRupiah,
-        );
+        return new self(trim($id), trim($name), $date, array_values($workItems), $total);
     }
 
-    public function addWorkItem(WorkItem $workItem): void
+    public function addWorkItem(WorkItem $item): void
     {
-        if ($workItem->noteId() !== $this->id) {
-            throw new DomainException('Work item tidak belong ke note ini.');
+        if ($item->noteId() !== $this->id) throw new DomainException('Work item tidak belong ke note ini.');
+
+        foreach ($this->workItems as $existing) {
+            if ($existing->id() === $item->id()) throw new DomainException('Work item ID duplikat.');
+            if ($existing->lineNo() === $item->lineNo()) throw new DomainException('Line number duplikat.');
         }
 
-        foreach ($this->workItems as $existingWorkItem) {
-            if ($existingWorkItem->id() === $workItem->id()) {
-                throw new DomainException('Work item id pada note tidak boleh duplikat.');
-            }
-
-            if ($existingWorkItem->lineNo() === $workItem->lineNo()) {
-                throw new DomainException('Line number pada note tidak boleh duplikat.');
-            }
-        }
-
-        $this->workItems[] = $workItem;
-        $this->totalRupiah = $this->totalRupiah->add($workItem->subtotalRupiah());
+        $this->workItems[] = $item;
+        $this->totalRupiah = $this->totalRupiah->add($item->subtotalRupiah());
     }
 
-    public function syncTotalRupiah(Money $totalRupiah): void
+    public function syncTotalRupiah(Money $total): void
     {
-        $totalRupiah->ensureNotNegative('Total rupiah note tidak boleh negatif.');
-
-        $this->totalRupiah = $totalRupiah;
-    }
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function customerName(): string
-    {
-        return $this->customerName;
-    }
-
-    public function transactionDate(): DateTimeImmutable
-    {
-        return $this->transactionDate;
-    }
-
-    /**
-     * @return list<WorkItem>
-     */
-    public function workItems(): array
-    {
-        return $this->workItems;
-    }
-
-    public function totalRupiah(): Money
-    {
-        return $this->totalRupiah;
-    }
-
-    private static function assertValidIdentity(
-        string $id,
-        string $customerName,
-    ): void {
-        if (trim($id) === '') {
-            throw new DomainException('Note id wajib ada.');
-        }
-
-        if (trim($customerName) === '') {
-            throw new DomainException('Customer name pada note wajib ada.');
-        }
-    }
-
-    /**
-     * @param list<WorkItem> $workItems
-     */
-    private static function assertValidWorkItems(array $workItems): void
-    {
-        foreach ($workItems as $workItem) {
-            if ($workItem instanceof WorkItem === false) {
-                throw new DomainException('Work item pada note tidak valid.');
-            }
-        }
-    }
-
-    /**
-     * @param list<WorkItem> $workItems
-     */
-    private static function calculateTotalFromWorkItems(array $workItems): Money
-    {
-        $total = Money::zero();
-
-        foreach ($workItems as $workItem) {
-            $total = $total->add($workItem->subtotalRupiah());
-        }
-
-        return $total;
+        $total->ensureNotNegative('Total note tidak boleh negatif.');
+        $this->totalRupiah = $total;
     }
 }

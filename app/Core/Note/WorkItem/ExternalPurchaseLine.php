@@ -15,88 +15,31 @@ final class ExternalPurchaseLine
         private Money $unitCostRupiah,
         private int $qty,
         private Money $lineTotalRupiah,
-    ) {
-    }
+    ) {}
 
-    public static function create(
-        string $id,
-        string $costDescription,
-        Money $unitCostRupiah,
-        int $qty,
-    ): self {
-        self::assertValid($id, $costDescription, $unitCostRupiah, $qty);
-
-        return new self(
-            trim($id),
-            trim($costDescription),
-            $unitCostRupiah,
-            $qty,
-            $unitCostRupiah->multiply($qty),
-        );
-    }
-
-    public static function rehydrate(
-        string $id,
-        string $costDescription,
-        Money $unitCostRupiah,
-        int $qty,
-    ): self {
-        self::assertValid($id, $costDescription, $unitCostRupiah, $qty);
-
-        return new self(
-            trim($id),
-            trim($costDescription),
-            $unitCostRupiah,
-            $qty,
-            $unitCostRupiah->multiply($qty),
-        );
-    }
-
-    public function id(): string
+    public static function create(string $id, string $desc, Money $unitCost, int $qty): self
     {
-        return $this->id;
+        self::assertValid($id, $desc, $unitCost, $qty);
+        return new self(trim($id), trim($desc), $unitCost, $qty, $unitCost->multiply($qty));
     }
 
-    public function costDescription(): string
+    public static function rehydrate(string $id, string $desc, Money $unitCost, int $qty): self
     {
-        return $this->costDescription;
+        self::assertValid($id, $desc, $unitCost, $qty);
+        return new self(trim($id), trim($desc), $unitCost, $qty, $unitCost->multiply($qty));
     }
 
-    public function unitCostRupiah(): Money
+    public function id(): string { return $this->id; }
+    public function costDescription(): string { return $this->costDescription; }
+    public function unitCostRupiah(): Money { return $this->unitCostRupiah; }
+    public function qty(): int { return $this->qty; }
+    public function lineTotalRupiah(): Money { return $this->lineTotalRupiah; }
+
+    private static function assertValid(string $id, string $desc, Money $unitCost, int $qty): void
     {
-        return $this->unitCostRupiah;
-    }
-
-    public function qty(): int
-    {
-        return $this->qty;
-    }
-
-    public function lineTotalRupiah(): Money
-    {
-        return $this->lineTotalRupiah;
-    }
-
-    private static function assertValid(
-        string $id,
-        string $costDescription,
-        Money $unitCostRupiah,
-        int $qty,
-    ): void {
-        if (trim($id) === '') {
-            throw new DomainException('External purchase line id wajib ada.');
-        }
-
-        if (trim($costDescription) === '') {
-            throw new DomainException('Cost description pada external purchase line wajib ada.');
-        }
-
-        if ($unitCostRupiah->greaterThan(Money::zero()) === false) {
-            throw new DomainException('Unit cost rupiah pada external purchase line harus lebih besar dari nol.');
-        }
-
-        if ($qty <= 0) {
-            throw new DomainException('Qty pada external purchase line harus lebih besar dari nol.');
-        }
+        if (trim($id) === '') throw new DomainException('ID wajib ada.');
+        if (trim($desc) === '') throw new DomainException('Cost description wajib ada.');
+        if (!$unitCost->greaterThan(Money::zero())) throw new DomainException('Unit cost harus > 0.');
+        if ($qty <= 0) throw new DomainException('Qty harus > 0.');
     }
 }
