@@ -16,6 +16,7 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\Note\WorkItemWriterPort;
+use App\Ports\Out\Payment\PaymentAllocationReaderPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
@@ -27,6 +28,7 @@ final class AddWorkItemHandler
         private readonly NoteReaderPort $notes,
         private readonly NoteWriterPort $noteWriter,
         private readonly WorkItemWriterPort $workItems,
+        private readonly PaymentAllocationReaderPort $paymentAllocations,
         private readonly ProductReaderPort $products,
         private readonly IssueInventoryOperation $issueInventory,
         private readonly TransactionManagerPort $transactions,
@@ -68,6 +70,11 @@ final class AddWorkItemHandler
             if ($note === null) {
                 throw new DomainException('Note tidak ditemukan.');
             }
+
+            $this->assertNoteAllowsNewWorkItem(
+                $note->id(),
+                $note->totalRupiah(),
+            );
 
             $workItem = $this->buildWorkItem(
                 $note->id(),
@@ -153,6 +160,24 @@ final class AddWorkItemHandler
             }
 
             throw $e;
+        }
+    }
+
+    private function assertNoteAllowsNewWorkItem(
+        string $noteId,
+        Money $noteTotalRupiah,
+    ): void {
+        if ($noteTotalRupiah->greaterThan(Money::zero()) === false) {
+            return;
+        }
+
+        $totalAllocatedByNoteRupiah = $this->paymentAllocations
+            ->getTotalAllocatedAmountByNoteId($noteId);
+
+        $totalAllocatedByNoteRupiah->ensureNotNegative('Total alokasi pada note tidak boleh negatif.');
+
+        if ($totalAllocatedByNoteRupiah->greaterThanOrEqual($noteTotalRupiah)) {
+            throw new DomainException('Item baru tidak boleh ditambahkan ke note yang sudah lunas.');
         }
     }
 
@@ -361,6 +386,10 @@ final class AddWorkItemHandler
             return 'PRICING_BELOW_MINIMUM_SELLING_PRICE';
         }
 
+        if (str_contains($message, 'note yang sudah lunas')) {
+            return 'NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_PAID';
+        }
+
         return 'INVALID_WORK_ITEM';
     }
 
@@ -372,6 +401,10 @@ final class AddWorkItemHandler
 
         if ($errorCode === 'PRICING_BELOW_MINIMUM_SELLING_PRICE') {
             return 'pricing';
+        }
+
+        if ($errorCode === 'NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_PAID') {
+            return 'note';
         }
 
         return 'work_item';

@@ -20,6 +20,10 @@ use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
 use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteWriterAdapter;
 use App\Adapters\Out\Note\DatabaseWorkItemWriterAdapter;
+use App\Adapters\Out\Payment\DatabaseCustomerPaymentReaderAdapter;
+use App\Adapters\Out\Payment\DatabaseCustomerPaymentWriterAdapter;
+use App\Adapters\Out\Payment\DatabasePaymentAllocationReaderAdapter;
+use App\Adapters\Out\Payment\DatabasePaymentAllocationWriterAdapter;
 use App\Adapters\Out\Persistence\DatabaseTransactionManagerAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceLineReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceReaderAdapter;
@@ -52,6 +56,10 @@ use App\Ports\Out\Inventory\ProductInventoryWriterPort;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\Note\WorkItemWriterPort;
+use App\Ports\Out\Payment\CustomerPaymentReaderPort;
+use App\Ports\Out\Payment\CustomerPaymentWriterPort;
+use App\Ports\Out\Payment\PaymentAllocationReaderPort;
+use App\Ports\Out\Payment\PaymentAllocationWriterPort;
 use App\Ports\Out\Procurement\SupplierInvoiceLineReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
@@ -111,5 +119,10 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(NoteReaderPort::class, DatabaseNoteReaderAdapter::class);
         $this->app->singleton(NoteWriterPort::class, DatabaseNoteWriterAdapter::class);
         $this->app->singleton(WorkItemWriterPort::class, DatabaseWorkItemWriterAdapter::class);
+
+        $this->app->singleton(CustomerPaymentWriterPort::class, DatabaseCustomerPaymentWriterAdapter::class);
+        $this->app->singleton(CustomerPaymentReaderPort::class, DatabaseCustomerPaymentReaderAdapter::class);
+        $this->app->singleton(PaymentAllocationWriterPort::class, DatabasePaymentAllocationWriterAdapter::class);
+        $this->app->singleton(PaymentAllocationReaderPort::class, DatabasePaymentAllocationReaderAdapter::class);
     }
 }
