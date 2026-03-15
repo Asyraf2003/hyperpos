@@ -11,6 +11,17 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseCustomerRefundReaderAdapter implements CustomerRefundReaderPort
 {
+    public function getTotalRefundedAmountByNoteId(string $noteId): Money
+    {
+        $normalizedNoteId = $this->normalize($noteId, 'Note id pada customer refund wajib ada.');
+
+        $total = (int) DB::table('customer_refunds')
+            ->where('note_id', $normalizedNoteId)
+            ->sum('amount_rupiah');
+
+        return Money::fromInt($total);
+    }
+
     public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money
     {
         $paymentId = $this->normalize($customerPaymentId, 'Customer payment id pada customer refund wajib ada.');
@@ -27,7 +38,11 @@ final class DatabaseCustomerRefundReaderAdapter implements CustomerRefundReaderP
     private function normalize(string $value, string $message): string
     {
         $normalized = trim($value);
-        if ($normalized === '') throw new DomainException($message);
+
+        if ($normalized === '') {
+            throw new DomainException($message);
+        }
+
         return $normalized;
     }
 }

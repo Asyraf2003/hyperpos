@@ -7,12 +7,15 @@ namespace App\Application\Note\Policies;
 use App\Core\Note\Note\Note;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
+use App\Ports\Out\Payment\CustomerRefundReaderPort;
 use App\Ports\Out\Payment\PaymentAllocationReaderPort;
 
 final class NotePaidStatusPolicy
 {
-    public function __construct(private readonly PaymentAllocationReaderPort $allocations)
-    {
+    public function __construct(
+        private readonly PaymentAllocationReaderPort $allocations,
+        private readonly CustomerRefundReaderPort $refunds,
+    ) {
     }
 
     public function isPaid(Note $note): bool
@@ -24,7 +27,13 @@ final class NotePaidStatusPolicy
         $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id());
         $allocated->ensureNotNegative('Total alokasi pada note tidak boleh negatif.');
 
-        return $allocated->greaterThanOrEqual($note->totalRupiah());
+        $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id());
+        $refunded->ensureNotNegative('Total refund pada note tidak boleh negatif.');
+
+        $netSettlement = $allocated->subtract($refunded);
+        $netSettlement->ensureNotNegative('Net settlement pada note tidak boleh negatif.');
+
+        return $netSettlement->greaterThanOrEqual($note->totalRupiah());
     }
 
     public function assertNotPaidForStandardMutation(Note $note): void
