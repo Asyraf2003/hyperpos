@@ -12,9 +12,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProductSeeder::class,
             SupplierSeeder::class,
+            EmployeeFinanceSeeder::class,
             SupplierInvoiceSeeder::class,
             WorkshopStressTestSeeder::class,
-            EmployeeFinanceSeeder::class,
         ]);
     }
 }
