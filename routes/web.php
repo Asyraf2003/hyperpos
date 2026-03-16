@@ -53,4 +53,11 @@ Route::middleware('transaction.entry')->group(function (): void {
         '/procurement/supplier-invoices/{supplierInvoiceId}/receive',
         ReceiveSupplierInvoiceController::class,
     );
+
+    // Employee Finance
+    Route::post('/employee-finance/employees/register', \App\Adapters\In\Http\Controllers\EmployeeFinance\RegisterEmployeeController::class);
+    Route::post('/employee-finance/employees/{employeeId}/update-salary', \App\Adapters\In\Http\Controllers\EmployeeFinance\UpdateEmployeeBaseSalaryController::class);
+    Route::post('/employee-finance/debts/record', \App\Adapters\In\Http\Controllers\EmployeeFinance\RecordEmployeeDebtController::class);
+    Route::post('/employee-finance/debts/{debtId}/pay', \App\Adapters\In\Http\Controllers\EmployeeFinance\PayEmployeeDebtController::class);
+    Route::post('/employee-finance/payroll/disburse', \App\Adapters\In\Http\Controllers\EmployeeFinance\DisbursePayrollController::class);
 });
