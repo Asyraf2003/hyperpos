@@ -9,5 +9,4 @@ enum DisbursementMode: string
     case DAILY = 'daily';
     case WEEKLY = 'weekly';
     case MONTHLY = 'monthly';
-    case MANUAL = 'manual';
 }

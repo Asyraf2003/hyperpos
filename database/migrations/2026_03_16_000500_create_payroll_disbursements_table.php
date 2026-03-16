@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignUuid('employee_id')->constrained('employees')->restrictOnDelete();
             $table->bigInteger('amount');
             $table->dateTime('disbursement_date');
-            $table->string('mode', 20); // 'daily', 'weekly', 'monthly', 'manual'
+            $table->string('mode', 20); // 'daily', 'weekly', 'monthly'
             $table->text('notes')->nullable();
             $table->timestamps();
         });

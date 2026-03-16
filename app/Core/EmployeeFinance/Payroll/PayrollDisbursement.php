@@ -18,9 +18,12 @@ class PayrollDisbursement
         private DisbursementMode $mode,
         private ?string $notes = null
     ) {
-        // Nominal pencairan tidak boleh negatif (tetapi nol mungkin diizinkan jika hanya bayar hutang via slip gaji di masa depan)
+        if ($amount->isZero()) {
+            throw new InvalidArgumentException('Nominal pencairan gaji harus lebih dari nol.');
+        }
+
         if ($amount->isNegative()) {
-            throw new InvalidArgumentException("Nominal pencairan gaji tidak boleh negatif.");
+            throw new InvalidArgumentException('Nominal pencairan gaji tidak boleh negatif.');
         }
     }
 
@@ -42,10 +45,33 @@ class PayrollDisbursement
         );
     }
 
-    public function getId(): string { return $this->id; }
-    public function getEmployeeId(): string { return $this->employeeId; }
-    public function getAmount(): Money { return $this->amount; }
-    public function getDisbursementDate(): DateTimeImmutable { return $this->disbursementDate; }
-    public function getMode(): DisbursementMode { return $this->mode; }
-    public function getNotes(): ?string { return $this->notes; }
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getEmployeeId(): string
+    {
+        return $this->employeeId;
+    }
+
+    public function getAmount(): Money
+    {
+        return $this->amount;
+    }
+
+    public function getDisbursementDate(): DateTimeImmutable
+    {
+        return $this->disbursementDate;
+    }
+
+    public function getMode(): DisbursementMode
+    {
+        return $this->mode;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
 }
