@@ -42,6 +42,23 @@ class EmployeeDebt
         );
     }
 
+    /**
+     * @param array<string, DebtPayment> $payments
+     */
+    public static function rehydrate(
+        string $id,
+        string $employeeId,
+        Money $totalDebt,
+        Money $remainingBalance,
+        DebtStatus $status,
+        ?string $notes,
+        array $payments
+    ): self {
+        $instance = new self($id, $employeeId, $totalDebt, $remainingBalance, $status, $notes);
+        $instance->payments = $payments;
+        return $instance;
+    }
+
     public function pay(DebtPayment $payment): void
     {
         if ($this->status === DebtStatus::PAID) {
