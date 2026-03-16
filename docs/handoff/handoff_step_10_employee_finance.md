@@ -4,18 +4,19 @@
 - Tanggal: 2026-03-17
 - Nama slice / topik: Step 10 — Employee Finance
 - Workflow step: Step 10
-- Status: IMPLEMENTED, PARTIALLY VERIFIED
-- Progres: 90%
+- Status: CLOSED
+- Progres: 100%
 
 ## Target halaman kerja
-Menertibkan hasil implementasi Step 10 Employee Finance agar kembali sinkron dengan workflow resmi dan hasil audit repo, tanpa membangun ulang bounded context.
+Menertibkan hasil implementasi Step 10 Employee Finance agar kembali sinkron dengan workflow resmi dan hasil audit repo, lalu menutup Step 10 dengan bukti verifikasi yang sah.
 
-Target spesifik yang telah diaudit:
+Target spesifik yang telah diaudit dan dibuktikan:
 - employee registration
 - payroll manual
 - payroll mode harian/mingguan/bulanan
 - employee debt
 - debt payment
+- update base salary
 
 ## Referensi yang dipakai `[REF]`
 - Blueprint:
@@ -31,6 +32,9 @@ Target spesifik yang telah diaudit:
 - Snapshot repo / output command yang dipakai:
   - `tree -L9 app database docs mk resources routes scripts tests`
   - `php artisan test tests/Feature/EmployeeFinance`
+  - `php artisan test tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php`
+  - `php artisan test tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php`
+  - `php artisan test tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php`
   - `php artisan test tests/Arch`
   - `php artisan test`
   - `php -l app/Application/EmployeeFinance/UseCases/DisbursePayrollHandler.php`
@@ -39,6 +43,7 @@ Target spesifik yang telah diaudit:
   - `php -l app/Core/EmployeeFinance/Employee/Employee.php`
   - `php -l app/Core/EmployeeFinance/Employee/PayPeriod.php`
   - `php -l app/Core/EmployeeFinance/Payroll/DisbursementMode.php`
+  - `php -l database/seeders/EmployeeFinanceSeeder.php`
   - `make verify`
   - `grep -R -n "DisbursementMode::MANUAL\|manual'\|manual\"" app tests database routes docs 2>/dev/null`
 
@@ -58,9 +63,12 @@ Target spesifik yang telah diaudit:
   - routes
 - `tests/Arch` lulus setelah audit.
 - `make verify` lulus setelah audit.
-- `php artisan test tests/Feature/EmployeeFinance` lulus untuk:
-  - `RegisterEmployeeFeatureTest`
+- `php artisan test tests/Feature/EmployeeFinance` lulus penuh dengan:
+  - `DisbursePayrollFeatureTest`
+  - `PayEmployeeDebtFeatureTest`
   - `RecordEmployeeDebtFeatureTest`
+  - `RegisterEmployeeFeatureTest`
+  - `UpdateEmployeeBaseSalaryFeatureTest`
 - `php artisan test` lulus secara umum, dengan 1 risky test di area Payment yang bukan blocker khusus Step 10.
 - Handoff Gemini sebelumnya tidak valid sebagai closure final karena:
   - mengklaim 100%
@@ -79,6 +87,7 @@ Target spesifik yang telah diaudit:
   - request register salary diubah menjadi `min:1`
   - request update salary diubah menjadi `min:1`
   - domain `Employee` sekarang menolak base salary `<= 0`
+  - seeder Employee Finance diselaraskan dengan kontrak final Step 10
 
 ## Scope yang dipakai
 ### `[SCOPE-IN]`
@@ -101,24 +110,21 @@ Target spesifik yang telah diaudit:
   - `PayEmployeeDebtRequest`
   - `DisbursePayrollRequest`
 - Sinkronisasi kontrak kode terhadap workflow resmi Step 10.
-- Verifikasi syntax, arch test, feature test EmployeeFinance, dan `make verify`.
+- Sinkronisasi seeder terhadap kontrak final Step 10.
+- Verifikasi syntax, arch test, feature test EmployeeFinance, full test suite, dan `make verify`.
 
 ### `[SCOPE-OUT]`
 - Menambahkan fitur baru di luar workflow Step 10.
 - Auto payroll / cron payroll.
 - Timesheet / absensi.
 - Read model reporting employee finance.
-- Menutup gap test baru untuk:
-  - `PayEmployeeDebt`
-  - `DisbursePayroll`
-  - `UpdateEmployeeBaseSalary`
 - Rewrite total bounded context Employee Finance.
 
 ## Keputusan yang dikunci `[DECISION]`
 - Source of truth untuk Step 10 tetap:
   - workflow
   - blueprint
-- Handoff dan ADR hasil Gemini harus direvisi, bukan dijadikan acuan final.
+- Handoff dan ADR hasil Gemini direvisi dan tidak lagi dipakai sebagai acuan lama.
 - Employee Finance tidak perlu dibangun ulang; cukup perbaikan kecil terarah.
 - `manual` bukan nilai enum payroll mode.
 - Payroll mode yang sah untuk Step 10:
@@ -131,10 +137,7 @@ Target spesifik yang telah diaudit:
 - Debt payment wajib lebih dari nol.
 - Debt payment tidak boleh melebihi sisa hutang.
 - Hutang yang sudah lunas tidak boleh menerima pembayaran lagi.
-- Step 10 belum boleh ditutup 100% sebelum proof untuk handler berikut benar-benar ada:
-  - `PayEmployeeDebt`
-  - `DisbursePayroll`
-  - `UpdateEmployeeBaseSalary`
+- Seeder Step 10 harus tetap sinkron dengan kontrak final payroll/pay period/debt payment.
 
 ## File yang dibuat/diubah `[FILES]`
 
@@ -147,7 +150,11 @@ Target spesifik yang telah diaudit:
 - `app/Adapters/In/Http/Requests/EmployeeFinance/UpdateEmployeeBaseSalaryRequest.php`
 - `app/Adapters/In/Http/Requests/EmployeeFinance/RegisterEmployeeRequest.php`
 - `tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php`
+- `tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php`
+- `tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php`
+- `tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php`
 - `database/migrations/2026_03_16_000500_create_payroll_disbursements_table.php`
+- `database/seeders/EmployeeFinanceSeeder.php`
 - `docs/handoff/handoff_step_10_employee_finance.md`
 - `docs/adr/0013-employee-finance-foundation.md`
 
@@ -155,8 +162,19 @@ Target spesifik yang telah diaudit:
 - command:
   - `php artisan test tests/Feature/EmployeeFinance`
   - hasil:
-    - `RecordEmployeeDebtFeatureTest` pass
-    - `RegisterEmployeeFeatureTest` pass
+    - seluruh feature test Employee Finance pass
+- command:
+  - `php artisan test tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php`
+  - hasil:
+    - pass
+- command:
+  - `php artisan test tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php`
+  - hasil:
+    - pass
+- command:
+  - `php artisan test tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php`
+  - hasil:
+    - pass
 - command:
   - `php artisan test tests/Arch`
   - hasil:
@@ -171,56 +189,46 @@ Target spesifik yang telah diaudit:
   - hasil:
     - suite pass
     - terdapat `1 risky` di area Payment, bukan blocker khusus Step 10
-- command:
-  - `grep -R -n "DisbursementMode::MANUAL\|manual'\|manual\"" app tests database routes docs 2>/dev/null`
-  - hasil:
-    - referensi `manual` yang bocor berhasil diinventarisasi dan dibersihkan dari kontrak mode payroll
 
 ## Blocker aktif
-- Belum ada feature test spesifik untuk:
-  - `PayEmployeeDebtHandler`
-  - `DisbursePayrollHandler`
-  - `UpdateEmployeeBaseSalaryHandler`
-- Karena itu Step 10 belum layak diberi status `100% closed`.
+- tidak ada blocker aktif untuk penutupan Step 10
 
 ## State repo yang penting untuk langkah berikutnya
-- Bounded context Employee Finance tetap dipertahankan.
-- Perbaikan audit sudah mengunci rule penting payroll, debt payment, dan base salary.
+- Bounded context Employee Finance sudah sinkron dengan workflow resmi Step 10.
+- Perbaikan audit sudah mengunci rule penting payroll, debt payment, base salary, dan pay period.
 - Struktur besar Step 10 tidak perlu rewrite.
-- Langkah berikut paling aman adalah menutup gap proof untuk 3 handler yang belum punya feature test eksplisit.
+- Step 10 sudah layak ditutup dan langkah berikutnya dapat berpindah ke workflow berikutnya.
 
 ## Next step paling aman `[NEXT]`
-- Tambahkan feature test untuk:
-  - `PayEmployeeDebtHandler`
-  - `DisbursePayrollHandler`
-  - `UpdateEmployeeBaseSalaryHandler`
+- Buka workflow step berikutnya dengan membawa handoff ini sebagai source of truth Step 10.
 
 ## Catatan masuk halaman berikutnya
-Bila Step 10 ingin ditutup penuh, bawa minimal:
+Bila ingin lanjut ke step berikutnya, bawa minimal:
 - handoff ini
 - `docs/workflow/workflow_v1.md`
 - `docs/blueprint/blueprint_v1.md`
 - `docs/adr/0013-employee-finance-foundation.md`
-- bukti test terbaru
+- output test terbaru
 
 ## Ringkasan singkat siap tempel
 
 ### Ringkasan
-- target: audit dan sinkronisasi hasil implementasi Step 10 Employee Finance.
-- status: IMPLEMENTED, PARTIALLY VERIFIED.
-- progres: 90%.
+- target: audit, sinkronisasi, dan penutupan Step 10 Employee Finance.
+- status: CLOSED.
+- progres: 100%.
 - hasil utama:
   - struktur Step 10 aman
   - tidak perlu rewrite
-  - kontrak payroll/base salary/pay period sudah dirapikan
-  - closure Gemini lama dinyatakan tidak valid
+  - kontrak payroll/base salary/pay period/debt payment sudah dirapikan
+  - feature proof Step 10 sudah lengkap
+  - closure Gemini lama dinyatakan tidak valid dan sudah diganti
 - next step:
-  - tambah proof test untuk pay debt, disburse payroll, dan update salary.
+  - lanjut ke workflow berikutnya dengan handoff ini.
 
 ### Jangan dibuka ulang
 - Jangan hidupkan kembali `manual` sebagai enum payroll mode.
 - Jangan turunkan base salary ke `0`.
-- Jangan menutup Step 10 sebagai `100%` tanpa bukti test handler yang belum ada.
+- Jangan ubah ulang kontrak Step 10 tanpa konflik fakta baru.
 
 ### Data minimum bila ingin lanjut
 - `docs/handoff/handoff_step_10_employee_finance.md`

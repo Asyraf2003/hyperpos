@@ -87,14 +87,12 @@ Yang tidak termasuk ADR ini:
 - Domain Employee Finance tetap selaras dengan workflow resmi Step 10.
 - Payroll, debt, dan debt payment memiliki kontrak dasar yang cukup ketat.
 - Arsitektur tetap konsisten dengan pola hexagonal repo.
+- Step 10 sudah memiliki proof test eksplisit untuk register employee, update salary, debt record, debt payment, dan payroll disbursement.
 
 ### Negatif
-- Step 10 belum boleh dianggap closure final hanya dari keberadaan file.
-- Masih diperlukan proof test eksplisit untuk:
-  - `PayEmployeeDebtHandler`
-  - `DisbursePayrollHandler`
-  - `UpdateEmployeeBaseSalaryHandler`
+- Step berikutnya tidak boleh mengubah kembali kontrak payroll/pay period/base salary tanpa dasar fakta baru.
+- Karena payroll pada Step 10 tetap manual, otomasi absensi atau auto payroll harus dibuka sebagai slice baru, bukan diselundupkan ke kontrak ini.
 
 ### Netral
 - Bounded context Employee Finance tidak perlu dibangun ulang.
-- Perbaikan cukup dilakukan sebagai patch terarah pada kontrak domain, request, dan dokumen closure.
+- Perbaikan cukup dilakukan sebagai patch terarah pada kontrak domain, request, test, seeder, dan dokumen closure.
