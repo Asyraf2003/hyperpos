@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SupplierSeeder::class,       // 2. Master Supplier
             SupplierInvoiceSeeder::class, // 3. Transaksi Faktur (Butuh 1 & 2)
             WorkshopStressTestSeeder::class,
+            EmployeeFinanceSeeder::class,
         ]);
     }
 }
