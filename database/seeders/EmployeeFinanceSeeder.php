@@ -8,37 +8,42 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Faker\Factory;
 
 final class EmployeeFinanceSeeder extends Seeder
 {
     public function run(): void
     {
-        $now = Carbon::now();
-        $employeeId = Str::uuid()->toString();
+        $faker = Factory::create('id_ID');
+        
+        for ($i = 0; $i < 20; $i++) {
+            $employeeId = Str::uuid()->toString();
+            $baseSalary = $faker->randomElement([3000000, 3500000, 4000000, 4500000, 5000000]);
+            
+            DB::table('employees')->insert([
+                'id' => $employeeId,
+                'name' => $faker->name,
+                'phone' => '081' . $faker->numerify('#########'),
+                'base_salary' => $baseSalary,
+                'pay_period' => 'monthly',
+                'status' => 'active',
+                'created_at' => Carbon::now()->subYear(),
+                'updated_at' => Carbon::now()->subYear(),
+            ]);
 
-        // 1. Buat Karyawan Master
-        DB::table('employees')->insert([
-            'id' => $employeeId,
-            'name' => 'Budi Teknisi',
-            'phone' => '081234567890',
-            'base_salary' => 3000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
-
-        // 2. Buatkan Hutang Awal
-        $debtId = Str::uuid()->toString();
-        DB::table('employee_debts')->insert([
-            'id' => $debtId,
-            'employee_id' => $employeeId,
-            'total_debt' => 500000,
-            'remaining_balance' => 500000,
-            'status' => 'unpaid',
-            'notes' => 'Kasbon awal bulan',
-            'created_at' => $now,
-            'updated_at' => $now,
-        ]);
+            for ($month = 1; $month <= 12; $month++) {
+                $disburseDate = Carbon::now()->subMonths($month)->day(25);
+                DB::table('payroll_disbursements')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'employee_id' => $employeeId,
+                    'amount' => $baseSalary,
+                    'disbursement_date' => $disburseDate->format('Y-m-d H:i:s'),
+                    'mode' => 'monthly',
+                    'notes' => 'Gaji bulan ' . $disburseDate->format('F Y'),
+                    'created_at' => $disburseDate,
+                    'updated_at' => $disburseDate,
+                ]);
+            }
+        }
     }
 }
