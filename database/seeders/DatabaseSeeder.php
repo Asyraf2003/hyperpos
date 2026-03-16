@@ -6,11 +6,12 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // Intentionally left blank.
+        $this->call([
+            ProductSeeder::class,        // 1. Master Produk
+            SupplierSeeder::class,       // 2. Master Supplier
+            SupplierInvoiceSeeder::class, // 3. Transaksi Faktur (Butuh 1 & 2)
+        ]);
     }
 }
