@@ -13,11 +13,12 @@ use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Payment\{CustomerPaymentReaderPort, CustomerRefundReaderPort, CustomerRefundWriterPort, PaymentAllocationReaderPort};
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
-use DateTimeImmutable;
 use Throwable;
 
 final class RecordCustomerRefundHandler
 {
+    use RecordCustomerRefundSupportTrait;
+
     public function __construct(
         private readonly CustomerPaymentReaderPort $customerPayments,
         private readonly CustomerRefundReaderPort $refunds,
@@ -74,28 +75,11 @@ final class RecordCustomerRefundHandler
 
             $this->refundWriter->create($refund);
 
-            $this->audit->record('customer_refund_recorded', [
-                'refund_id' => $refund->id(),
-                'customer_payment_id' => $refund->customerPaymentId(),
-                'note_id' => $refund->noteId(),
-                'amount_rupiah' => $refund->amountRupiah()->amount(),
-                'refunded_at' => $refund->refundedAt()->format('Y-m-d'),
-                'reason' => $refund->reason(),
-                'performed_by_actor_id' => trim($performedByActorId),
-            ]);
+            $this->audit->record('customer_refund_recorded', $this->formatAuditPayload($refund, $performedByActorId));
 
             $this->transactions->commit();
 
-            return Result::success([
-                'refund' => [
-                    'id' => $refund->id(),
-                    'customer_payment_id' => $refund->customerPaymentId(),
-                    'note_id' => $refund->noteId(),
-                    'amount_rupiah' => $refund->amountRupiah()->amount(),
-                    'refunded_at' => $refund->refundedAt()->format('Y-m-d'),
-                    'reason' => $refund->reason(),
-                ],
-            ], 'Customer refund berhasil dicatat.');
+            return Result::success($this->formatSuccessPayload($refund), 'Customer refund berhasil dicatat.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
             return $this->classify($e);
@@ -103,29 +87,5 @@ final class RecordCustomerRefundHandler
             if ($started) $this->transactions->rollBack();
             throw $e;
         }
-    }
-
-    private function parseRefundedAt(string $refundedAt): DateTimeImmutable
-    {
-        $normalized = trim($refundedAt);
-        $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $normalized);
-
-        if ($parsed === false || $parsed->format('Y-m-d') !== $normalized) {
-            throw new DomainException('Refunded at pada customer refund wajib berupa tanggal yang valid dengan format Y-m-d.');
-        }
-
-        return $parsed;
-    }
-
-    private function classify(DomainException $e): Result
-    {
-        $message = $e->getMessage();
-        $code = match ($message) {
-            'Target refund tidak ditemukan.' => 'REFUND_INVALID_TARGET',
-            'Refund melebihi total allocation untuk payment-note pair.' => 'REFUND_EXCEEDS_ALLOCATED_PAIR',
-            default => 'INVALID_CUSTOMER_REFUND',
-        };
-
-        return Result::failure($message, ['refund' => [$code]]);
     }
 }
