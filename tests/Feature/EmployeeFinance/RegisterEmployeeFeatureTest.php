@@ -34,4 +34,27 @@ final class RegisterEmployeeFeatureTest extends TestCase
             'status' => 'active',
         ]);
     }
+
+    public function test_register_employee_handler_accepts_daily_pay_period(): void
+    {
+        $handler = app(RegisterEmployeeHandler::class);
+
+        $id = $handler->handle(
+            'Budi Harian',
+            '081200000001',
+            150000,
+            'daily'
+        );
+
+        $this->assertIsString($id);
+
+        $this->assertDatabaseHas('employees', [
+            'id' => $id,
+            'name' => 'Budi Harian',
+            'phone' => '081200000001',
+            'base_salary' => 150000,
+            'pay_period' => 'daily',
+            'status' => 'active',
+        ]);
+    }
 }

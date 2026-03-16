@@ -6,6 +6,7 @@ namespace App\Core\EmployeeFinance\Employee;
 
 enum PayPeriod: string
 {
+    case DAILY = 'daily';
     case WEEKLY = 'weekly';
     case MONTHLY = 'monthly';
 }

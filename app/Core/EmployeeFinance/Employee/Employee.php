@@ -29,14 +29,7 @@ class Employee
         Money $baseSalary,
         PayPeriod $payPeriod
     ): self {
-        return new self(
-            $id,
-            $name,
-            $phone,
-            $baseSalary,
-            $payPeriod,
-            EmployeeStatus::ACTIVE
-        );
+        return new self($id, $name, $phone, $baseSalary, $payPeriod, EmployeeStatus::ACTIVE);
     }
 
     public function updateBaseSalary(Money $newSalary, ?string $reason = null): void
@@ -69,33 +62,10 @@ class Employee
         }
     }
 
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function getBaseSalary(): Money
-    {
-        return $this->baseSalary;
-    }
-
-    public function getPayPeriod(): PayPeriod
-    {
-        return $this->payPeriod;
-    }
-
-    public function getStatus(): EmployeeStatus
-    {
-        return $this->status;
-    }
+    public function getId(): string { return $this->id; }
+    public function getName(): string { return $this->name; }
+    public function getPhone(): ?string { return $this->phone; }
+    public function getBaseSalary(): Money { return $this->baseSalary; }
+    public function getPayPeriod(): PayPeriod { return $this->payPeriod; }
+    public function getStatus(): EmployeeStatus { return $this->status; }
 }
