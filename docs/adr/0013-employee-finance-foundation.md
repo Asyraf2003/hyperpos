@@ -1,33 +1,100 @@
 # ADR-013: Employee Finance Foundation
 
 ## Status
-Proposed
+Accepted
 
 ## Context
-Sistem membutuhkan pengelolaan SDM yang mencakup data identitas, penggajian manual, dan pengelolaan hutang sesuai Blueprint 1.3 (7).
+Workflow Step 10 mengharuskan domain SDM aktif dengan cakupan:
+
+- employee
+- payroll manual
+- payroll mode harian/mingguan/bulanan
+- employee debt
+- debt payment
+
+Output wajib Step 10:
+
+- gaji manual dengan tanggal dan nominal valid
+- hutang karyawan dan pembayaran hutang tercatat
+
+Audit implementasi menunjukkan bounded context Employee Finance sudah masuk ke repo, namun artefak awal dari AI sebelumnya tidak sinkron penuh dengan workflow resmi. Karena itu kontrak domain dikunci ulang lewat ADR ini.
 
 ## Decision
-1. **Entitas Employee**:
-   - `id`: UUID
-   - `name`: String (max 100)
-   - `phone_number`: String (format internasional, unique)
-   - `default_salary_mode`: Enum (DAILY, WEEKLY, MONTHLY, MANUAL)
-   - `join_date`: Date
-   - `is_active`: Boolean
 
-2. **Entitas PayrollEntry**:
-   - Mencatat gaji yang dibayarkan secara manual.
-   - Field: `id`, `employee_id`, `amount` (int), `period_start`, `period_end`, `payout_date`, `note`.
+### 1. Employee adalah aggregate root untuk master karyawan
+Field inti yang dikunci:
+- `id`
+- `name`
+- `phone`
+- `baseSalary`
+- `payPeriod`
+- `status`
 
-3. **Entitas EmployeeDebt & Payment**:
-   - Hutang dan pembayaran dipisah untuk audit trail.
-   - Hutang: `id`, `employee_id`, `amount`, `reason`, `date`.
-   - Pembayaran: `id`, `debt_id`, `amount`, `date`, `source` (CASH/PAYROLL_DEDUCTION).
+Aturan:
+- nama tidak boleh kosong
+- base salary wajib lebih dari nol
+- employee baru diregistrasikan dengan status aktif
 
-4. **Integrasi Keuangan**:
-   - Pembayaran gaji tidak otomatis memotong stok atau berhubungan dengan inventory.
-   - Semua angka adalah integer Rupiah.
+### 2. Pay period yang sah untuk Employee hanya:
+- `daily`
+- `weekly`
+- `monthly`
+
+`manual` bukan pay period.
+
+### 3. Payroll disbursement dicatat manual oleh admin
+Payroll pada Step 10 bersifat manual, artinya:
+- nominal dimasukkan eksplisit oleh admin
+- tanggal pencairan dimasukkan eksplisit oleh admin
+- pencairan tidak dihitung otomatis dari sistem absensi atau cron
+
+Manual adalah cara pencatatan, bukan enum mode periodisasi.
+
+### 4. Payroll disbursement memiliki mode:
+- `daily`
+- `weekly`
+- `monthly`
+
+Aturan:
+- nominal payroll wajib lebih dari nol
+- tanggal pencairan wajib valid
+- employee harus ada sebelum payroll dicatat
+
+### 5. Employee debt dipisah dari payroll disbursement
+Debt ledger dan payroll ledger adalah aggregate yang berbeda agar histori finansial tetap bersih.
+
+### 6. Debt payment adalah child entity di dalam EmployeeDebt
+Aturan:
+- nominal pembayaran wajib lebih dari nol
+- pembayaran tidak boleh melebihi sisa hutang
+- hutang yang sudah lunas tidak boleh menerima pembayaran lagi
+
+### 7. Penurunan gaji pokok wajib alasan
+Jika base salary baru lebih kecil daripada base salary lama, alasan wajib diisi.
+
+### 8. Semua nominal uang disimpan sebagai integer rupiah
+Seluruh nilai uang di Employee Finance memakai `Money` berbasis integer untuk menghindari drift pecahan.
+
+### 9. Step 10 tidak mencakup auto payroll dan read model reporting
+Yang tidak termasuk ADR ini:
+- auto payroll
+- timesheet / absensi
+- reporting read model employee finance
 
 ## Consequences
-- Admin harus menginput data karyawan secara manual sebelum bisa mencatat gaji/hutang.
-- Memungkinkan tracking hutang karyawan yang presisi dan histori penggajian yang rapi.
+
+### Positif
+- Domain Employee Finance tetap selaras dengan workflow resmi Step 10.
+- Payroll, debt, dan debt payment memiliki kontrak dasar yang cukup ketat.
+- Arsitektur tetap konsisten dengan pola hexagonal repo.
+
+### Negatif
+- Step 10 belum boleh dianggap closure final hanya dari keberadaan file.
+- Masih diperlukan proof test eksplisit untuk:
+  - `PayEmployeeDebtHandler`
+  - `DisbursePayrollHandler`
+  - `UpdateEmployeeBaseSalaryHandler`
+
+### Netral
+- Bounded context Employee Finance tidak perlu dibangun ulang.
+- Perbaikan cukup dilakukan sebagai patch terarah pada kontrak domain, request, dan dokumen closure.
