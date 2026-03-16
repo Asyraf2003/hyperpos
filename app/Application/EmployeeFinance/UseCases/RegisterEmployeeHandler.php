@@ -10,6 +10,7 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
+use Throwable;
 
 class RegisterEmployeeHandler
 {
@@ -26,12 +27,9 @@ class RegisterEmployeeHandler
         int $baseSalaryAmount,
         string $payPeriodValue
     ): string {
-        return $this->transactionManager->execute(function () use (
-            $name,
-            $phone,
-            $baseSalaryAmount,
-            $payPeriodValue
-        ) {
+        $this->transactionManager->begin();
+
+        try {
             $id = $this->uuidPort->generate();
             $baseSalary = Money::fromInt($baseSalaryAmount);
             $payPeriod = PayPeriod::from($payPeriodValue);
@@ -40,7 +38,12 @@ class RegisterEmployeeHandler
 
             $this->employeeWriter->save($employee);
 
+            $this->transactionManager->commit();
+
             return $id;
-        });
+        } catch (Throwable $e) {
+            $this->transactionManager->rollBack();
+            throw $e;
+        }
     }
 }

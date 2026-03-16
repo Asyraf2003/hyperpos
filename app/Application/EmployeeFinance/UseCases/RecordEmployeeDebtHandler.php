@@ -4,41 +4,47 @@ declare(strict_types=1);
 
 namespace App\Application\EmployeeFinance\UseCases;
 
+use App\Core\EmployeeFinance\EmployeeDebt\EmployeeDebt;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
-use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
+use App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort;
 use App\Ports\Out\TransactionManagerPort;
+use App\Ports\Out\UuidPort;
 use InvalidArgumentException;
 use Throwable;
 
-class UpdateEmployeeBaseSalaryHandler
+class RecordEmployeeDebtHandler
 {
     public function __construct(
         private EmployeeReaderPort $employeeReader,
-        private EmployeeWriterPort $employeeWriter,
+        private EmployeeDebtWriterPort $debtWriter,
+        private UuidPort $uuidPort,
         private TransactionManagerPort $transactionManager
     ) {
     }
 
-    public function handle(string $employeeId, int $newSalaryAmount, ?string $reason = null): void
+    public function handle(string $employeeId, int $debtAmount, ?string $notes = null): string
     {
         $this->transactionManager->begin();
 
         try {
+            // Validasi keberadaan karyawan sebelum memberikan hutang
             $employee = $this->employeeReader->findById($employeeId);
             
             if (!$employee) {
                 throw new InvalidArgumentException("Karyawan tidak ditemukan.");
             }
 
-            $newSalary = Money::fromInt($newSalaryAmount);
-            
-            // Aturan Domain Exception untuk "penurunan wajib alasan" dieksekusi di sini
-            $employee->updateBaseSalary($newSalary, $reason);
+            $id = $this->uuidPort->generate();
+            $amount = Money::fromInt($debtAmount);
 
-            $this->employeeWriter->save($employee);
+            $debt = EmployeeDebt::record($id, $employeeId, $amount, $notes);
+
+            $this->debtWriter->save($debt);
 
             $this->transactionManager->commit();
+
+            return $id;
         } catch (Throwable $e) {
             $this->transactionManager->rollBack();
             throw $e;
