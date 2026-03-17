@@ -41,6 +41,8 @@ use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
+use App\Ports\Out\Reporting\TransactionReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseTransactionReportingSourceReaderAdapter;
 use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
 use App\Application\Inventory\Services\InventoryCostingProjectionBuilder;
 use App\Application\Inventory\Services\InventoryProjectionBuilder;
@@ -168,6 +170,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(CustomerRefundReaderPort::class, DatabaseCustomerRefundReaderAdapter::class);
         $this->app->singleton(PaymentAllocationWriterPort::class, DatabasePaymentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentAllocationReaderPort::class, DatabasePaymentAllocationReaderAdapter::class);
+        $this->app->singleton(TransactionReportingSourceReaderPort::class, DatabaseTransactionReportingSourceReaderAdapter::class);
 
         // Employee Finance
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);

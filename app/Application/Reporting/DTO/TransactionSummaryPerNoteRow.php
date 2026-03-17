@@ -6,5 +6,79 @@ namespace App\Application\Reporting\DTO;
 
 final class TransactionSummaryPerNoteRow
 {
-    // TODO Step 12 Paket B
+    public function __construct(
+        private readonly string $noteId,
+        private readonly string $transactionDate,
+        private readonly string $customerName,
+        private readonly int $grossTransactionRupiah,
+        private readonly int $allocatedPaymentRupiah,
+        private readonly int $refundedRupiah,
+    ) {
+    }
+
+    public function noteId(): string
+    {
+        return $this->noteId;
+    }
+
+    public function transactionDate(): string
+    {
+        return $this->transactionDate;
+    }
+
+    public function customerName(): string
+    {
+        return $this->customerName;
+    }
+
+    public function grossTransactionRupiah(): int
+    {
+        return $this->grossTransactionRupiah;
+    }
+
+    public function allocatedPaymentRupiah(): int
+    {
+        return $this->allocatedPaymentRupiah;
+    }
+
+    public function refundedRupiah(): int
+    {
+        return $this->refundedRupiah;
+    }
+
+    public function netCashCollectedRupiah(): int
+    {
+        return $this->allocatedPaymentRupiah - $this->refundedRupiah;
+    }
+
+    public function outstandingRupiah(): int
+    {
+        return $this->grossTransactionRupiah - $this->allocatedPaymentRupiah + $this->refundedRupiah;
+    }
+
+    /**
+     * @return array{
+     *   note_id:string,
+     *   transaction_date:string,
+     *   customer_name:string,
+     *   gross_transaction_rupiah:int,
+     *   allocated_payment_rupiah:int,
+     *   refunded_rupiah:int,
+     *   net_cash_collected_rupiah:int,
+     *   outstanding_rupiah:int
+     * }
+     */
+    public function toArray(): array
+    {
+        return [
+            'note_id' => $this->noteId(),
+            'transaction_date' => $this->transactionDate(),
+            'customer_name' => $this->customerName(),
+            'gross_transaction_rupiah' => $this->grossTransactionRupiah(),
+            'allocated_payment_rupiah' => $this->allocatedPaymentRupiah(),
+            'refunded_rupiah' => $this->refundedRupiah(),
+            'net_cash_collected_rupiah' => $this->netCashCollectedRupiah(),
+            'outstanding_rupiah' => $this->outstandingRupiah(),
+        ];
+    }
 }

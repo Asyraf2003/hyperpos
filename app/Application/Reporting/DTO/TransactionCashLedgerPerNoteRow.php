@@ -6,5 +6,73 @@ namespace App\Application\Reporting\DTO;
 
 final class TransactionCashLedgerPerNoteRow
 {
-    // TODO Step 12 Paket B
+    public function __construct(
+        private readonly string $noteId,
+        private readonly string $eventDate,
+        private readonly string $eventType,
+        private readonly string $direction,
+        private readonly int $eventAmountRupiah,
+        private readonly ?string $customerPaymentId,
+        private readonly ?string $refundId,
+    ) {
+    }
+
+    public function noteId(): string
+    {
+        return $this->noteId;
+    }
+
+    public function eventDate(): string
+    {
+        return $this->eventDate;
+    }
+
+    public function eventType(): string
+    {
+        return $this->eventType;
+    }
+
+    public function direction(): string
+    {
+        return $this->direction;
+    }
+
+    public function eventAmountRupiah(): int
+    {
+        return $this->eventAmountRupiah;
+    }
+
+    public function customerPaymentId(): ?string
+    {
+        return $this->customerPaymentId;
+    }
+
+    public function refundId(): ?string
+    {
+        return $this->refundId;
+    }
+
+    /**
+     * @return array{
+     *   note_id:string,
+     *   event_date:string,
+     *   event_type:string,
+     *   direction:string,
+     *   event_amount_rupiah:int,
+     *   customer_payment_id:?string,
+     *   refund_id:?string
+     * }
+     */
+    public function toArray(): array
+    {
+        return [
+            'note_id' => $this->noteId(),
+            'event_date' => $this->eventDate(),
+            'event_type' => $this->eventType(),
+            'direction' => $this->direction(),
+            'event_amount_rupiah' => $this->eventAmountRupiah(),
+            'customer_payment_id' => $this->customerPaymentId(),
+            'refund_id' => $this->refundId(),
+        ];
+    }
 }
