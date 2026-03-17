@@ -15,6 +15,8 @@ final class PaymentAllocationPolicyTest extends TestCase
     {
         $policy = new PaymentAllocationPolicy();
 
+        $this->expectNotToPerformAssertions();
+
         $policy->assertAllocatable(
             Money::fromInt(50000),
             Money::fromInt(150000),
@@ -22,8 +24,6 @@ final class PaymentAllocationPolicyTest extends TestCase
             Money::fromInt(120000),
             Money::fromInt(30000),
         );
-
-        $this->assertTrue(true);
     }
 
     public function test_it_rejects_allocation_when_amount_exceeds_remaining_payment(): void
