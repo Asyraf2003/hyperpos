@@ -96,6 +96,12 @@ use App\Ports\Out\ProductCatalog\ProductWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
 use Illuminate\Support\ServiceProvider;
+use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
+use App\Adapters\Out\Expense\DatabaseExpenseCategoryWriterAdapter;
+use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
+use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
+use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
+use App\Ports\Out\Expense\OperationalExpenseWriterPort;
 
 class HexagonalServiceProvider extends ServiceProvider
 {
@@ -169,5 +175,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\PayrollDisbursementWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter::class);
+
+        $this->app->singleton(ExpenseCategoryReaderPort::class, DatabaseExpenseCategoryReaderAdapter::class);
+        $this->app->singleton(ExpenseCategoryWriterPort::class, DatabaseExpenseCategoryWriterAdapter::class);
+        $this->app->singleton(OperationalExpenseWriterPort::class, DatabaseOperationalExpenseWriterAdapter::class);
     }
 }
