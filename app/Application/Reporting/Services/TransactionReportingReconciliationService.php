@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Services;
 
+use App\Application\Reporting\DTO\TransactionCashLedgerPerNoteRow;
 use App\Application\Reporting\DTO\TransactionSummaryPerNoteRow;
 
 final class TransactionReportingReconciliationService
@@ -44,6 +45,41 @@ final class TransactionReportingReconciliationService
 
         if ($actualRefunded !== $expected['refunded_rupiah']) {
             throw new \RuntimeException('Reporting mismatch: refunded_rupiah.');
+        }
+    }
+
+    /**
+     * @param list<TransactionCashLedgerPerNoteRow> $rows
+     * @param array{
+     *   total_in_rupiah:int,
+     *   total_out_rupiah:int
+     * } $expected
+     */
+    public function assertTransactionCashLedgerMatches(array $rows, array $expected): void
+    {
+        $actualIn = 0;
+        $actualOut = 0;
+
+        foreach ($rows as $row) {
+            if ($row->direction() === 'in') {
+                $actualIn += $row->eventAmountRupiah();
+                continue;
+            }
+
+            if ($row->direction() === 'out') {
+                $actualOut += $row->eventAmountRupiah();
+                continue;
+            }
+
+            throw new \RuntimeException('Reporting mismatch: invalid ledger direction.');
+        }
+
+        if ($actualIn !== $expected['total_in_rupiah']) {
+            throw new \RuntimeException('Reporting mismatch: total_in_rupiah.');
+        }
+
+        if ($actualOut !== $expected['total_out_rupiah']) {
+            throw new \RuntimeException('Reporting mismatch: total_out_rupiah.');
         }
     }
 }
