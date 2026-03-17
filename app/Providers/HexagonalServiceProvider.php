@@ -43,6 +43,12 @@ use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
 use App\Ports\Out\Reporting\TransactionReportingSourceReaderPort;
 use App\Adapters\Out\Reporting\DatabaseTransactionReportingSourceReaderAdapter;
+use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
+use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
+use App\Ports\Out\Reporting\SupplierPayableReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseSupplierPayableReportingSourceReaderAdapter;
 use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
 use App\Application\Inventory\Services\InventoryCostingProjectionBuilder;
 use App\Application\Inventory\Services\InventoryProjectionBuilder;
@@ -171,6 +177,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentAllocationWriterPort::class, DatabasePaymentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentAllocationReaderPort::class, DatabasePaymentAllocationReaderAdapter::class);
         $this->app->singleton(TransactionReportingSourceReaderPort::class, DatabaseTransactionReportingSourceReaderAdapter::class);
+        $this->app->singleton(OperationalExpenseReportingSourceReaderPort::class, DatabaseOperationalExpenseReportingSourceReaderAdapter::class);
+        $this->app->singleton(EmployeeDebtReportingSourceReaderPort::class, DatabaseEmployeeDebtReportingSourceReaderAdapter::class);
+        $this->app->singleton(SupplierPayableReportingSourceReaderPort::class, DatabaseSupplierPayableReportingSourceReaderAdapter::class);
 
         // Employee Finance
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
