@@ -37,7 +37,29 @@ final class GetTransactionSummaryPerNoteFeatureTest extends TestCase
 
         $this->assertIsArray($data);
         $this->assertArrayHasKey('rows', $data);
-        $this->assertSame([], $data['rows']);
+
+        $this->assertSame([
+            [
+                'note_id' => 'note-1',
+                'transaction_date' => '2026-03-14',
+                'customer_name' => 'Budi',
+                'gross_transaction_rupiah' => 100000,
+                'allocated_payment_rupiah' => 60000,
+                'refunded_rupiah' => 10000,
+                'net_cash_collected_rupiah' => 50000,
+                'outstanding_rupiah' => 50000,
+            ],
+            [
+                'note_id' => 'note-2',
+                'transaction_date' => '2026-03-15',
+                'customer_name' => 'Siti',
+                'gross_transaction_rupiah' => 50000,
+                'allocated_payment_rupiah' => 50000,
+                'refunded_rupiah' => 0,
+                'net_cash_collected_rupiah' => 50000,
+                'outstanding_rupiah' => 0,
+            ],
+        ], $data['rows']);
     }
 
     private function seedNote(string $id, string $customerName, string $transactionDate, int $totalRupiah): void
