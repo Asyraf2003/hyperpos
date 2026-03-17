@@ -28,8 +28,8 @@ final class SupplierPayableSummaryBuilder
                 return new SupplierPayableSummaryRow(
                     $row['supplier_invoice_id'],
                     $row['supplier_id'],
-                    $row['shipmentDate'] ?? $row['shipment_date'],
-                    $row['dueDate'] ?? $row['due_date'],
+                    $row['shipment_date'],
+                    $row['due_date'],
                     $row['grand_total_rupiah'],
                     $row['total_paid_rupiah'],
                     $row['grand_total_rupiah'] - $row['total_paid_rupiah'],
