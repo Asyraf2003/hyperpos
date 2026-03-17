@@ -51,6 +51,8 @@ use App\Ports\Out\Reporting\SupplierPayableReportingSourceReaderPort;
 use App\Adapters\Out\Reporting\DatabaseSupplierPayableReportingSourceReaderAdapter;
 use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
+use App\Ports\Out\Reporting\OperationalProfitReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseOperationalProfitReportingSourceReaderAdapter;
 use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
 use App\Application\Inventory\Services\InventoryCostingProjectionBuilder;
 use App\Application\Inventory\Services\InventoryProjectionBuilder;
@@ -183,6 +185,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(EmployeeDebtReportingSourceReaderPort::class, DatabaseEmployeeDebtReportingSourceReaderAdapter::class);
         $this->app->singleton(SupplierPayableReportingSourceReaderPort::class, DatabaseSupplierPayableReportingSourceReaderAdapter::class);
         $this->app->singleton(InventoryMovementReportingSourceReaderPort::class, DatabaseInventoryMovementReportingSourceReaderAdapter::class);
+        $this->app->singleton(OperationalProfitReportingSourceReaderPort::class, DatabaseOperationalProfitReportingSourceReaderAdapter::class);
 
         // Employee Finance
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
