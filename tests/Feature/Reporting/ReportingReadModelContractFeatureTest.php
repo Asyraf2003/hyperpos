@@ -27,6 +27,25 @@ final class ReportingReadModelContractFeatureTest extends TestCase
         );
     }
 
+    public function test_reporting_adr_includes_expense_entries_as_domain_final_source(): void
+    {
+        $path = base_path('docs/adr/0009-reporting-as-read-model.md');
+
+        $this->assertFileExists($path);
+
+        $content = file_get_contents($path);
+
+        $this->assertNotFalse($content);
+        $this->assertStringContainsString(
+            'expense entries',
+            $content,
+        );
+        $this->assertStringContainsString(
+            'laporan biaya operasional',
+            $content,
+        );
+    }
+
     public function test_workflow_places_reporting_read_models_in_step_12(): void
     {
         $path = base_path('docs/workflow/workflow_v1.md');
