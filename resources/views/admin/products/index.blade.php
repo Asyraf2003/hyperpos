@@ -49,9 +49,9 @@
                                     <td>{{ $product->ukuran() ?? '-' }}</td>
                                     <td>Rp {{ number_format($product->hargaJual()->amount(), 0, ',', '.') }}</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                        <a href="{{ route('admin.products.edit', ['productId' => $product->id()]) }}" class="btn btn-sm btn-outline-secondary">
                                             Edit
-                                        </button>
+                                        </a>
                                     </td>
                                 </tr>
                             @empty

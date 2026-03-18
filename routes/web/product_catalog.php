@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Product\CreateProductPageController;
+use App\Adapters\In\Http\Controllers\Admin\Product\EditProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
+use App\Adapters\In\Http\Controllers\Admin\Product\UpdateProductController as WebUpdateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\CreateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\UpdateProductController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +20,12 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::post('/admin/products', StoreProductController::class)
         ->name('admin.products.store');
+
+    Route::get('/admin/products/{productId}/edit', EditProductPageController::class)
+        ->name('admin.products.edit');
+
+    Route::post('/admin/products/{productId}', WebUpdateProductController::class)
+        ->name('admin.products.update');
 });
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {
