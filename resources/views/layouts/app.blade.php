@@ -27,7 +27,7 @@
             @include('layouts.partials.topbar')
 
             <div class="page-content">
-                @include('layouts.partials.flash')
+                @include('layouts.partials.alerts')
 
                 @hasSection('heading')
                     <div class="page-heading">

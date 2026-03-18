@@ -3,6 +3,7 @@
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureAdminPageAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureCashierAreaAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureTransactionEntryAllowed;
+use App\Adapters\In\Http\Middleware\IdentityAccess\ShareAppShellData;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'transaction.entry' => EnsureTransactionEntryAllowed::class,
             'admin.page' => EnsureAdminPageAccess::class,
             'cashier.area' => EnsureCashierAreaAccess::class,
+            'app.shell' => ShareAppShellData::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

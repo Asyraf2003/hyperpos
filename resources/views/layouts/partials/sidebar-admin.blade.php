@@ -1,15 +1,3 @@
-@php
-    $authUser = auth()->user();
-    $canAccessCashierArea = false;
-
-    if ($authUser !== null) {
-        $capability = app(\App\Ports\Out\IdentityAccess\AdminCashierAreaAccessStatePort::class)
-            ->getByActorId((string) $authUser->getAuthIdentifier());
-
-        $canAccessCashierArea = $capability->isActive();
-    }
-@endphp
-
 <div id="sidebar">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header position-relative">
@@ -70,7 +58,7 @@
                     </a>
                 </li>
 
-                @if ($canAccessCashierArea)
+                @if (($appShell['can_access_cashier_area'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">
                             <i class="bi bi-arrow-left-right"></i>
