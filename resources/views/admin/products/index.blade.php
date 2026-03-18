@@ -22,10 +22,9 @@
                                 placeholder="Cari kode, nama, atau merek"
                                 autocomplete="off"
                             >
-                            <small class="text-muted">Pencarian otomatis mulai 2 huruf.</small>
                         </form>
 
-                        <button type="button" id="open-product-filter" class="btn btn-light-secondary">Filter</button>
+                        <button type="button" id="open-product-filter" class="btn btn-primary">Filter</button>
                         <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Product</a>
                     </div>
                 </div>

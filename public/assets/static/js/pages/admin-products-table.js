@@ -2,7 +2,7 @@
   const c = window.productTableConfig;
   if (!c) return;
 
-  const s = {
+  const defaults = {
     q: "",
     page: 1,
     sort_by: "nama_barang",
@@ -13,6 +13,9 @@
     harga_min: "",
     harga_max: ""
   };
+
+  const allowedSortBy = new Set(["nama_barang", "merek", "ukuran", "harga_jual", "stok_saat_ini"]);
+  const allowedSortDir = new Set(["asc", "desc"]);
 
   const $ = (id) => document.getElementById(id);
   const body = $("product-table-body");
@@ -38,24 +41,75 @@
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const editUrl = (id) => c.editBaseUrl.replace("__ID__", encodeURIComponent(id));
 
-  const drawOpen = (open) => {
-    drawer.classList.toggle("d-none", !open);
-    backdrop.classList.toggle("d-none", !open);
+  const trimValue = (v) => String(v ?? "").trim();
+
+  const intOrDefault = (v, fallback) => {
+    const n = Number.parseInt(String(v ?? ""), 10);
+    return Number.isNaN(n) || n < 1 ? fallback : n;
   };
 
-  const params = () => {
-    const p = new URLSearchParams({
+  const stateFromUrl = () => {
+    const p = new URLSearchParams(window.location.search);
+
+    const sortBy = trimValue(p.get("sort_by"));
+    const sortDir = trimValue(p.get("sort_dir"));
+
+    return {
+      q: trimValue(p.get("q")),
+      page: intOrDefault(p.get("page"), 1),
+      sort_by: allowedSortBy.has(sortBy) ? sortBy : defaults.sort_by,
+      sort_dir: allowedSortDir.has(sortDir) ? sortDir : defaults.sort_dir,
+      merek: trimValue(p.get("merek")),
+      ukuran_min: trimValue(p.get("ukuran_min")),
+      ukuran_max: trimValue(p.get("ukuran_max")),
+      harga_min: trimValue(p.get("harga_min")),
+      harga_max: trimValue(p.get("harga_max"))
+    };
+  };
+
+  const s = stateFromUrl();
+
+  const syncInputsFromState = () => {
+    searchInput.value = s.q;
+    filterForm.elements["merek"].value = s.merek;
+    filterForm.elements["ukuran_min"].value = s.ukuran_min;
+    filterForm.elements["ukuran_max"].value = s.ukuran_max;
+    filterForm.elements["harga_min"].value = s.harga_min;
+    filterForm.elements["harga_max"].value = s.harga_max;
+  };
+
+  const paramsObject = () => {
+    const obj = {
       page: String(s.page),
       per_page: "10",
       sort_by: s.sort_by,
       sort_dir: s.sort_dir
-    });
+    };
 
     ["q", "merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
-      if (s[k]) p.set(k, s[k]);
+      if (s[k]) obj[k] = s[k];
     });
 
-    return p.toString();
+    return obj;
+  };
+
+  const paramsString = () => new URLSearchParams(paramsObject()).toString();
+
+  const updateUrl = (replace = false) => {
+    const url = new URL(window.location.href);
+    url.search = paramsString();
+
+    if (replace) {
+      window.history.replaceState(null, "", url);
+      return;
+    }
+
+    window.history.pushState(null, "", url);
+  };
+
+  const drawOpen = (open) => {
+    drawer.classList.toggle("d-none", !open);
+    backdrop.classList.toggle("d-none", !open);
   };
 
   const rowHtml = (r, i, meta) => `
@@ -120,12 +174,12 @@
     });
   };
 
-  const load = async () => {
+  const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
 
     body.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
-    const res = await fetch(`${c.endpoint}?${params()}`, {
+    const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
     });
 
@@ -144,12 +198,14 @@
     renderSummary(json.data.meta || {});
     renderPager(json.data.meta || {});
     renderSortIndicators();
+    syncInputsFromState();
+    updateUrl(replaceUrl);
   };
 
   searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const value = searchInput.value.trim();
+    const value = trimValue(searchInput.value);
 
     if (value.length === 0) {
       s.q = "";
@@ -166,14 +222,14 @@
   });
 
   searchInput.addEventListener("input", () => {
-    const value = searchInput.value.trim();
+    const value = trimValue(searchInput.value);
 
     clearTimeout(searchDebounceTimer);
 
     if (value.length === 0) {
       s.q = "";
       s.page = 1;
-      searchDebounceTimer = setTimeout(load, 250);
+      searchDebounceTimer = setTimeout(() => load(), 250);
       return;
     }
 
@@ -198,7 +254,7 @@
     const f = new FormData(filterForm);
 
     ["merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
-      s[k] = String(f.get(k) || "").trim();
+      s[k] = trimValue(f.get(k));
     });
 
     s.page = 1;
@@ -238,6 +294,14 @@
     load();
   });
 
+  window.addEventListener("popstate", () => {
+    Object.assign(s, stateFromUrl());
+    syncInputsFromState();
+    renderSortIndicators();
+    load(true);
+  });
+
+  syncInputsFromState();
   renderSortIndicators();
-  load();
+  load(true);
 })();
