@@ -22,11 +22,31 @@
             </div>
 
             <div class="card-body">
-                <div class="row g-3 mb-3">
+                <form action="{{ route('admin.products.index') }}" method="get" class="row g-3 mb-3">
                     <div class="col-12 col-md-6 col-lg-4">
-                        <input type="text" class="form-control" placeholder="Pencarian product menyusul" disabled>
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ $query ?? '' }}"
+                            class="form-control"
+                            placeholder="Cari kode, nama, atau merek"
+                        >
                     </div>
-                </div>
+
+                    <div class="col-12 col-md-auto">
+                        <button type="submit" class="btn btn-outline-primary">
+                            Cari
+                        </button>
+                    </div>
+
+                    @if (($query ?? '') !== '')
+                        <div class="col-12 col-md-auto">
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
+                                Reset
+                            </a>
+                        </div>
+                    @endif
+                </form>
 
                 <div class="table-responsive">
                     <table class="table table-lg">
@@ -57,7 +77,11 @@
                             @empty
                                 <tr>
                                     <td colspan="6" class="text-center text-muted py-4">
-                                        Belum ada product master.
+                                        @if (($query ?? '') !== '')
+                                            Tidak ada product yang cocok dengan pencarian.
+                                        @else
+                                            Belum ada product master.
+                                        @endif
                                     </td>
                                 </tr>
                             @endforelse

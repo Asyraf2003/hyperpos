@@ -47,6 +47,40 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
         return $products;
     }
 
+    /**
+     * @return array<int, Product>
+     */
+    public function search(string $query): array
+    {
+        $normalizedQuery = trim($query);
+
+        if ($normalizedQuery === '') {
+            return $this->findAll();
+        }
+
+        $rows = DB::table('products')
+            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual'])
+            ->where(function ($builder) use ($normalizedQuery): void {
+                $builder
+                    ->where('kode_barang', 'like', '%' . $normalizedQuery . '%')
+                    ->orWhere('nama_barang', 'like', '%' . $normalizedQuery . '%')
+                    ->orWhere('merek', 'like', '%' . $normalizedQuery . '%');
+            })
+            ->orderBy('nama_barang')
+            ->orderBy('merek')
+            ->orderBy('ukuran')
+            ->orderBy('id')
+            ->get();
+
+        $products = [];
+
+        foreach ($rows as $row) {
+            $products[] = $this->mapRowToProduct($row);
+        }
+
+        return $products;
+    }
+
     private function mapRowToProduct(object $row): Product
     {
         return Product::rehydrate(

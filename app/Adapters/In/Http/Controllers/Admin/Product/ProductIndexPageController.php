@@ -6,6 +6,7 @@ namespace App\Adapters\In\Http\Controllers\Admin\Product;
 
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 final class ProductIndexPageController extends Controller
@@ -15,10 +16,15 @@ final class ProductIndexPageController extends Controller
     ) {
     }
 
-    public function __invoke(): View
+    public function __invoke(Request $request): View
     {
+        $query = trim((string) $request->query('q', ''));
+
         return view('admin.products.index', [
-            'products' => $this->products->findAll(),
+            'products' => $query === ''
+                ? $this->products->findAll()
+                : $this->products->search($query),
+            'query' => $query,
         ]);
     }
 }

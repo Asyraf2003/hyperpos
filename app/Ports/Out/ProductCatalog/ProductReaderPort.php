@@ -14,4 +14,9 @@ interface ProductReaderPort
      * @return array<int, Product>
      */
     public function findAll(): array;
+
+    /**
+     * @return array<int, Product>
+     */
+    public function search(string $query): array;
 }

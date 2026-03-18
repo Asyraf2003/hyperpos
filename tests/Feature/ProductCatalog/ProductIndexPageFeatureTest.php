@@ -92,6 +92,101 @@ final class ProductIndexPageFeatureTest extends TestCase
         $response->assertSee('Rp 35.000');
     }
 
+    public function test_admin_can_search_product_by_nama_barang(): void
+    {
+        $user = $this->createUserWithRole('admin-product-search-name@example.test', 'admin');
+
+        DB::table('products')->insert([
+            [
+                'id' => 'product-1',
+                'kode_barang' => 'KB-001',
+                'nama_barang' => 'Ban Luar',
+                'merek' => 'Federal',
+                'ukuran' => 90,
+                'harga_jual' => 35000,
+            ],
+            [
+                'id' => 'product-2',
+                'kode_barang' => 'KB-002',
+                'nama_barang' => 'Aki Kering',
+                'merek' => 'GS Astra',
+                'ukuran' => null,
+                'harga_jual' => 120000,
+            ],
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['q' => 'Ban']));
+
+        $response->assertOk();
+        $response->assertSeeDisplayableValue('Ban');
+        $response->assertSee('Ban Luar');
+        $response->assertDontSee('Aki Kering');
+    }
+
+    public function test_admin_can_search_product_by_kode_barang_or_merek(): void
+    {
+        $user = $this->createUserWithRole('admin-product-search-code-brand@example.test', 'admin');
+
+        DB::table('products')->insert([
+            [
+                'id' => 'product-1',
+                'kode_barang' => 'KB-101',
+                'nama_barang' => 'Ban Luar',
+                'merek' => 'Federal',
+                'ukuran' => 90,
+                'harga_jual' => 35000,
+            ],
+            [
+                'id' => 'product-2',
+                'kode_barang' => 'KB-202',
+                'nama_barang' => 'Aki Kering',
+                'merek' => 'GS Astra',
+                'ukuran' => null,
+                'harga_jual' => 120000,
+            ],
+        ]);
+
+        $responseByCode = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['q' => 'KB-202']));
+
+        $responseByCode->assertOk();
+        $responseByCode->assertSee('Aki Kering');
+        $responseByCode->assertDontSee('Ban Luar');
+
+        $responseByBrand = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['q' => 'Federal']));
+
+        $responseByBrand->assertOk();
+        $responseByBrand->assertSee('Ban Luar');
+        $responseByBrand->assertDontSee('Aki Kering');
+    }
+
+    public function test_admin_sees_search_empty_state_when_query_has_no_match(): void
+    {
+        $user = $this->createUserWithRole('admin-product-search-empty@example.test', 'admin');
+
+        DB::table('products')->insert([
+            'id' => 'product-1',
+            'kode_barang' => 'KB-001',
+            'nama_barang' => 'Ban Luar',
+            'merek' => 'Federal',
+            'ukuran' => 90,
+            'harga_jual' => 35000,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['q' => 'TidakAda']));
+
+        $response->assertOk();
+        $response->assertSee('Tidak ada product yang cocok dengan pencarian.');
+        $response->assertDontSee('Ban Luar');
+    }
+
     private function createUserWithRole(string $email, string $role): User
     {
         $user = User::query()->create([
