@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Adapters\In\Http\Controllers\Admin\Product\CreateProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\CreateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\UpdateProductController;
 use Illuminate\Support\Facades\Route;
@@ -10,6 +12,12 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
     Route::get('/admin/products', ProductIndexPageController::class)
         ->name('admin.products.index');
+
+    Route::get('/admin/products/create', CreateProductPageController::class)
+        ->name('admin.products.create');
+
+    Route::post('/admin/products', StoreProductController::class)
+        ->name('admin.products.store');
 });
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {

@@ -15,9 +15,9 @@
                         </p>
                     </div>
 
-                    <button type="button" class="btn btn-primary" disabled>
+                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
                         Tambah Product
-                    </button>
+                    </a>
                 </div>
             </div>
 
