@@ -1,11 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Kasir Dashboard')
-@section('page_heading', 'Kasir Dashboard')
-
-@section('sidebar')
-    @include('layouts.partials.sidebar-cashier')
-@endsection
+@section('heading', 'Kasir Dashboard')
 
 @section('content')
     <section class="row">
@@ -56,10 +52,10 @@
         <div class="col-12 col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h4>Info Role</h4>
+                    <h4>Info Halaman</h4>
                 </div>
                 <div class="card-body">
-                    <p class="mb-2"><strong>Role:</strong> Kasir</p>
+                    <p class="mb-2"><strong>Area:</strong> Kasir</p>
                     <p class="mb-0"><strong>Status:</strong> Dummy UI only</p>
                 </div>
             </div>

@@ -4,26 +4,41 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Auth;
 
+use App\Adapters\In\Http\Requests\Auth\LoginRequest;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 
-final class LoginPageController extends Controller
+final class AuthenticateController extends Controller
 {
     public function __construct(
         private readonly ActorAccessReaderPort $actors,
     ) {
     }
 
-    public function __invoke(Request $request): View|RedirectResponse
+    public function __invoke(LoginRequest $request): RedirectResponse
     {
+        if (Auth::guard('web')->attempt($request->credentials(), $request->boolean('remember')) === false) {
+            return back()
+                ->withErrors([
+                    'email' => 'Email atau password tidak valid.',
+                ])
+                ->withInput($request->safe()->only(['email']));
+        }
+
+        $request->session()->regenerate();
+
         $actorId = $request->user()?->getAuthIdentifier();
 
         if ($actorId === null) {
-            return view('auth.login');
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()
+                ->route('login')
+                ->with('error', 'Autentikasi gagal diproses.');
         }
 
         $actor = $this->actors->findByActorId((string) $actorId);
@@ -39,11 +54,15 @@ final class LoginPageController extends Controller
         }
 
         if ($actor->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()
+                ->intended(route('admin.dashboard'))
+                ->with('success', 'Login berhasil.');
         }
 
         if ($actor->isKasir()) {
-            return redirect()->route('cashier.dashboard');
+            return redirect()
+                ->intended(route('cashier.dashboard'))
+                ->with('success', 'Login berhasil.');
         }
 
         Auth::guard('web')->logout();
