@@ -7,14 +7,15 @@ namespace App\Adapters\Out\ProductCatalog;
 use App\Core\ProductCatalog\Product\Product;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseProductReaderAdapter implements ProductReaderPort
 {
     public function getById(string $productId): ?Product
     {
-        $row = DB::table('products')
-            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual'])
+        $row = $this->baseSelect()
             ->where('id', $productId)
             ->first();
 
@@ -30,21 +31,9 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
      */
     public function findAll(): array
     {
-        $rows = DB::table('products')
-            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual'])
-            ->orderBy('nama_barang')
-            ->orderBy('merek')
-            ->orderBy('ukuran')
-            ->orderBy('id')
-            ->get();
+        $rows = $this->applyOrdering($this->baseSelect())->get();
 
-        $products = [];
-
-        foreach ($rows as $row) {
-            $products[] = $this->mapRowToProduct($row);
-        }
-
-        return $products;
+        return $this->mapRowsToProducts($rows);
     }
 
     /**
@@ -58,20 +47,60 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
             return $this->findAll();
         }
 
-        $rows = DB::table('products')
-            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual'])
-            ->where(function ($builder) use ($normalizedQuery): void {
-                $builder
-                    ->where('kode_barang', 'like', '%' . $normalizedQuery . '%')
-                    ->orWhere('nama_barang', 'like', '%' . $normalizedQuery . '%')
-                    ->orWhere('merek', 'like', '%' . $normalizedQuery . '%');
-            })
+        $rows = $this->applyOrdering($this->applySearch($this->baseSelect(), $normalizedQuery))->get();
+
+        return $this->mapRowsToProducts($rows);
+    }
+
+    public function findPaginated(int $perPage = 10): LengthAwarePaginator
+    {
+        return $this->applyOrdering($this->baseSelect())->paginate($perPage);
+    }
+
+    public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator
+    {
+        $normalizedQuery = trim($query);
+
+        if ($normalizedQuery === '') {
+            return $this->findPaginated($perPage);
+        }
+
+        return $this->applyOrdering(
+            $this->applySearch($this->baseSelect(), $normalizedQuery)
+        )->paginate($perPage);
+    }
+
+    private function baseSelect(): Builder
+    {
+        return DB::table('products')
+            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual']);
+    }
+
+    private function applySearch(Builder $query, string $keyword): Builder
+    {
+        return $query->where(function (Builder $builder) use ($keyword): void {
+            $builder
+                ->where('kode_barang', 'like', '%' . $keyword . '%')
+                ->orWhere('nama_barang', 'like', '%' . $keyword . '%')
+                ->orWhere('merek', 'like', '%' . $keyword . '%');
+        });
+    }
+
+    private function applyOrdering(Builder $query): Builder
+    {
+        return $query
             ->orderBy('nama_barang')
             ->orderBy('merek')
             ->orderBy('ukuran')
-            ->orderBy('id')
-            ->get();
+            ->orderBy('id');
+    }
 
+    /**
+     * @param iterable<object> $rows
+     * @return array<int, Product>
+     */
+    private function mapRowsToProducts(iterable $rows): array
+    {
         $products = [];
 
         foreach ($rows as $row) {

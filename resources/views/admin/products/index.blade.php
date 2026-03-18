@@ -52,6 +52,7 @@
                     <table class="table table-lg">
                         <thead>
                             <tr>
+                                <th style="width: 64px;">#</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
                                 <th>Merek</th>
@@ -61,8 +62,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($products as $product)
+                            @forelse ($products as $index => $product)
                                 <tr>
+                                    <td>{{ $products->firstItem() + $index }}</td>
                                     <td>{{ $product->kodeBarang() ?? '-' }}</td>
                                     <td>{{ $product->namaBarang() }}</td>
                                     <td>{{ $product->merek() }}</td>
@@ -76,7 +78,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">
+                                    <td colspan="7" class="text-center text-muted py-4">
                                         @if (($query ?? '') !== '')
                                             Tidak ada product yang cocok dengan pencarian.
                                         @else
@@ -88,6 +90,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                @if ($products->total() > 0)
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                        <small class="text-muted">
+                            Total: {{ $products->total() }} product
+                        </small>
+
+                        @include('layouts.partials.pagination', ['paginator' => $products])
+                    </div>
+                @endif
             </div>
         </div>
     </section>

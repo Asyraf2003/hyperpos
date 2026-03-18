@@ -120,7 +120,7 @@ final class ProductIndexPageFeatureTest extends TestCase
             ->get(route('admin.products.index', ['q' => 'Ban']));
 
         $response->assertOk();
-        $response->assertSeeDisplayableValue('Ban');
+        $response->assertSee('value="Ban"', false);
         $response->assertSee('Ban Luar');
         $response->assertDontSee('Aki Kering');
     }
@@ -185,6 +185,74 @@ final class ProductIndexPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Tidak ada product yang cocok dengan pencarian.');
         $response->assertDontSee('Ban Luar');
+    }
+
+    public function test_admin_can_see_paginated_product_rows_on_second_page(): void
+    {
+        $user = $this->createUserWithRole('admin-product-pagination@example.test', 'admin');
+
+        $records = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+            $records[] = [
+                'id' => 'product-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'kode_barang' => 'KB-' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+                'nama_barang' => 'Produk ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'merek' => 'Merek A',
+                'ukuran' => null,
+                'harga_jual' => 10000 + $i,
+            ];
+        }
+
+        DB::table('products')->insert($records);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['page' => 2]));
+
+        $response->assertOk();
+        $response->assertSee('Produk 11');
+        $response->assertSee('Produk 12');
+        $response->assertDontSee('Produk 01');
+    }
+
+    public function test_admin_can_access_second_page_of_search_result(): void
+    {
+        $user = $this->createUserWithRole('admin-product-search-pagination@example.test', 'admin');
+
+        $records = [];
+
+        for ($i = 1; $i <= 11; $i++) {
+            $records[] = [
+                'id' => 'ban-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'kode_barang' => 'BAN-' . str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+                'nama_barang' => 'Ban ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'merek' => 'Federal',
+                'ukuran' => null,
+                'harga_jual' => 20000 + $i,
+            ];
+        }
+
+        $records[] = [
+            'id' => 'aki-01',
+            'kode_barang' => 'AKI-001',
+            'nama_barang' => 'Aki Kering',
+            'merek' => 'GS Astra',
+            'ukuran' => null,
+            'harga_jual' => 120000,
+        ];
+
+        DB::table('products')->insert($records);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('admin.products.index', ['q' => 'Ban', 'page' => 2]));
+
+        $response->assertOk();
+        $response->assertSee('value="Ban"', false);
+        $response->assertSee('Ban 11');
+        $response->assertDontSee('Ban 01');
+        $response->assertDontSee('Aki Kering');
     }
 
     private function createUserWithRole(string $email, string $role): User

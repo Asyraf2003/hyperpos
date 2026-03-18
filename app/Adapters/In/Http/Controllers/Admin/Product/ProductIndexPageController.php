@@ -11,6 +11,8 @@ use Illuminate\Routing\Controller;
 
 final class ProductIndexPageController extends Controller
 {
+    private const PER_PAGE = 10;
+
     public function __construct(
         private readonly ProductReaderPort $products,
     ) {
@@ -20,10 +22,16 @@ final class ProductIndexPageController extends Controller
     {
         $query = trim((string) $request->query('q', ''));
 
+        $products = $query === ''
+            ? $this->products->findPaginated(self::PER_PAGE)
+            : $this->products->searchPaginated($query, self::PER_PAGE);
+
+        if ($query !== '') {
+            $products->appends(['q' => $query]);
+        }
+
         return view('admin.products.index', [
-            'products' => $query === ''
-                ? $this->products->findAll()
-                : $this->products->search($query),
+            'products' => $products,
             'query' => $query,
         ]);
     }
