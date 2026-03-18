@@ -54,7 +54,13 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
 
     public function findPaginated(int $perPage = 10): LengthAwarePaginator
     {
-        return $this->applyOrdering($this->baseSelect())->paginate($perPage);
+        $paginator = $this->applyOrdering($this->baseSelect())->paginate($perPage);
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map(fn (object $row): Product => $this->mapRowToProduct($row))
+        );
+
+        return $paginator;
     }
 
     public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator
@@ -65,9 +71,15 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
             return $this->findPaginated($perPage);
         }
 
-        return $this->applyOrdering(
+        $paginator = $this->applyOrdering(
             $this->applySearch($this->baseSelect(), $normalizedQuery)
         )->paginate($perPage);
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map(fn (object $row): Product => $this->mapRowToProduct($row))
+        );
+
+        return $paginator;
     }
 
     private function baseSelect(): Builder
