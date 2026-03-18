@@ -3,7 +3,7 @@
 @section('title', 'Login')
 
 @section('content')
-    <h1 class="auth-title">Log in.</h1>
+    <h1 class="auth-title">Log iddn.</h1>
     <p class="auth-subtitle mb-5">Aplikasi internal. Registrasi publik tidak tersedia.</p>
 
     <form action="#" method="get">
