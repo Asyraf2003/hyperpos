@@ -35,7 +35,7 @@
                     <table class="table table-lg" id="product-table">
                         <thead>
                             <tr>
-                                <th style="width: 64px;">#</th>
+                                <th style="width: 64px;">No</th>
                                 <th>Kode Barang</th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_barang">

@@ -1,6 +1,6 @@
 <div id="product-filter-backdrop" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-none" style="z-index: 1040;"></div>
 
-<div id="product-filter-drawer" class="position-fixed top-0 end-0 h-100 bg-white border-start shadow d-none" style="width: 360px; z-index: 1050; overflow-y: auto;">
+<div id="product-filter-drawer" class="position-fixed top-0 end-0 h-100 bg-body border-start shadow d-none" style="width: 360px; z-index: 1050; overflow-y: auto;">
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Filter Product</h5>
