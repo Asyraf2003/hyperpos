@@ -14,23 +14,23 @@ final class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat User Admin (Owner)
-        $admin = User::create([
-            'name' => 'Asyraf Mubarak',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('12345678'),
-        ]);
+        $admin = User::query()->updateOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'name' => 'Asyraf Mubarak',
+                'password' => Hash::make('12345678'),
+            ],
+        );
 
-        // 2. Buat User Kasir
-        $kasir = User::create([
-            'name' => 'Liya',
-            'email' => 'kasir@gmail.com',
-            'password' => Hash::make('12345678'),
-        ]);
+        $kasir = User::query()->updateOrCreate(
+            ['email' => 'kasir@gmail.com'],
+            [
+                'name' => 'Liya',
+                'password' => Hash::make('12345678'),
+            ],
+        );
 
-        // 3. Petakan ke Actor Access (Domain Otorisasi)
-        // actor_id di migrasi Anda adalah string, jadi kita cast ID-nya.
-        DB::table('actor_accesses')->insert([
+        DB::table('actor_accesses')->upsert([
             [
                 'actor_id' => (string) $admin->id,
                 'role' => Role::ADMIN,
@@ -39,6 +39,13 @@ final class UserSeeder extends Seeder
                 'actor_id' => (string) $kasir->id,
                 'role' => Role::KASIR,
             ],
-        ]);
+        ], ['actor_id'], ['role']);
+
+        DB::table('admin_cashier_area_access_states')->upsert([
+            [
+                'actor_id' => (string) $admin->id,
+                'active' => true,
+            ],
+        ], ['actor_id'], ['active']);
     }
 }

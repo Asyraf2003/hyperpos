@@ -1,9 +1,11 @@
 <?php
 
+use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureAdminPageAccess;
+use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureCashierAreaAccess;
+use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureTransactionEntryAllowed;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureTransactionEntryAllowed;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'transaction.entry' => EnsureTransactionEntryAllowed::class,
+            'admin.page' => EnsureAdminPageAccess::class,
+            'cashier.area' => EnsureCashierAreaAccess::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

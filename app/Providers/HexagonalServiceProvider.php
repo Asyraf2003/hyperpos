@@ -9,7 +9,11 @@ namespace App\Providers;
 use App\Adapters\Out\Audit\DatabaseAuditLogAdapter;
 use App\Adapters\Out\Auth\LaravelUuidAdapter;
 use App\Adapters\Out\Clock\SystemClockAdapter;
+use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
+use App\Adapters\Out\Expense\DatabaseExpenseCategoryWriterAdapter;
+use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseActorAccessReaderAdapter;
+use App\Adapters\Out\IdentityAccess\DatabaseAdminCashierAreaAccessStateAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminTransactionCapabilityStateAdapter;
 use App\Adapters\Out\Inventory\DatabaseInventoryMovementReaderAdapter;
 use App\Adapters\Out\Inventory\DatabaseInventoryMovementWriterAdapter;
@@ -41,18 +45,12 @@ use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
-use App\Ports\Out\Reporting\TransactionReportingSourceReaderPort;
-use App\Adapters\Out\Reporting\DatabaseTransactionReportingSourceReaderAdapter;
-use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
-use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
-use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
 use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
-use App\Ports\Out\Reporting\SupplierPayableReportingSourceReaderPort;
-use App\Adapters\Out\Reporting\DatabaseSupplierPayableReportingSourceReaderAdapter;
-use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
-use App\Ports\Out\Reporting\OperationalProfitReportingSourceReaderPort;
+use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalProfitReportingSourceReaderAdapter;
+use App\Adapters\Out\Reporting\DatabaseSupplierPayableReportingSourceReaderAdapter;
+use App\Adapters\Out\Reporting\DatabaseTransactionReportingSourceReaderAdapter;
 use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
 use App\Application\Inventory\Services\InventoryCostingProjectionBuilder;
 use App\Application\Inventory\Services\InventoryProjectionBuilder;
@@ -74,7 +72,16 @@ use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Ports\In\HealthCheckUseCase;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\ClockPort;
+use App\Ports\Out\EmployeeFinance\EmployeeDebtReaderPort;
+use App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort;
+use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
+use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
+use App\Ports\Out\EmployeeFinance\PayrollDisbursementWriterPort;
+use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
+use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
+use App\Ports\Out\Expense\OperationalExpenseWriterPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
+use App\Ports\Out\IdentityAccess\AdminCashierAreaAccessStatePort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
 use App\Ports\Out\Inventory\InventoryMovementReaderPort;
 use App\Ports\Out\Inventory\InventoryMovementWriterPort;
@@ -105,15 +112,15 @@ use App\Ports\Out\Procurement\SupplierWriterPort;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
+use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
+use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
+use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
+use App\Ports\Out\Reporting\OperationalProfitReportingSourceReaderPort;
+use App\Ports\Out\Reporting\SupplierPayableReportingSourceReaderPort;
+use App\Ports\Out\Reporting\TransactionReportingSourceReaderPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
 use Illuminate\Support\ServiceProvider;
-use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
-use App\Adapters\Out\Expense\DatabaseExpenseCategoryWriterAdapter;
-use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
-use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
-use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
-use App\Ports\Out\Expense\OperationalExpenseWriterPort;
 
 class HexagonalServiceProvider extends ServiceProvider
 {
@@ -146,6 +153,7 @@ class HexagonalServiceProvider extends ServiceProvider
 
         $this->app->singleton(ActorAccessReaderPort::class, DatabaseActorAccessReaderAdapter::class);
         $this->app->singleton(AdminTransactionCapabilityStatePort::class, DatabaseAdminTransactionCapabilityStateAdapter::class);
+        $this->app->singleton(AdminCashierAreaAccessStatePort::class, DatabaseAdminCashierAreaAccessStateAdapter::class);
 
         $this->app->singleton(ProductReaderPort::class, DatabaseProductReaderAdapter::class);
         $this->app->singleton(ProductWriterPort::class, DatabaseProductWriterAdapter::class);
@@ -180,6 +188,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(CustomerRefundReaderPort::class, DatabaseCustomerRefundReaderAdapter::class);
         $this->app->singleton(PaymentAllocationWriterPort::class, DatabasePaymentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentAllocationReaderPort::class, DatabasePaymentAllocationReaderAdapter::class);
+
         $this->app->singleton(TransactionReportingSourceReaderPort::class, DatabaseTransactionReportingSourceReaderAdapter::class);
         $this->app->singleton(OperationalExpenseReportingSourceReaderPort::class, DatabaseOperationalExpenseReportingSourceReaderAdapter::class);
         $this->app->singleton(EmployeeDebtReportingSourceReaderPort::class, DatabaseEmployeeDebtReportingSourceReaderAdapter::class);
@@ -187,12 +196,11 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(InventoryMovementReportingSourceReaderPort::class, DatabaseInventoryMovementReportingSourceReaderAdapter::class);
         $this->app->singleton(OperationalProfitReportingSourceReaderPort::class, DatabaseOperationalProfitReportingSourceReaderAdapter::class);
 
-        // Employee Finance
-        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
-        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeWriterAdapter::class);
-        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
-        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);
-        $this->app->singleton(\App\Ports\Out\EmployeeFinance\PayrollDisbursementWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter::class);
+        $this->app->singleton(EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
+        $this->app->singleton(EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeWriterAdapter::class);
+        $this->app->singleton(EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
+        $this->app->singleton(EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);
+        $this->app->singleton(PayrollDisbursementWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter::class);
 
         $this->app->singleton(ExpenseCategoryReaderPort::class, DatabaseExpenseCategoryReaderAdapter::class);
         $this->app->singleton(ExpenseCategoryWriterPort::class, DatabaseExpenseCategoryWriterAdapter::class);

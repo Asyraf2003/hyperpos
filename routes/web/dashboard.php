@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('web')->group(function (): void {
     Route::redirect('/', '/login');
 
-    Route::get('/admin/dashboard', AdminDashboardPageController::class)
-        ->name('admin.dashboard');
+    Route::middleware(['auth', 'admin.page'])->group(function (): void {
+        Route::get('/admin/dashboard', AdminDashboardPageController::class)
+            ->name('admin.dashboard');
+    });
 
-    Route::get('/cashier/dashboard', CashierDashboardPageController::class)
-        ->name('cashier.dashboard');
+    Route::middleware(['auth', 'cashier.area'])->group(function (): void {
+        Route::get('/cashier/dashboard', CashierDashboardPageController::class)
+            ->name('cashier.dashboard');
+    });
 });
