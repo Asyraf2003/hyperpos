@@ -17,15 +17,15 @@ final class UserSeeder extends Seeder
         // 1. Buat User Admin (Owner)
         $admin = User::create([
             'name' => 'Asyraf Mubarak',
-            'email' => 'asyraf@bengkel.id',
-            'password' => Hash::make('password_admin'),
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('12345678'),
         ]);
 
         // 2. Buat User Kasir
         $kasir = User::create([
             'name' => 'Liya',
-            'email' => 'liya@bengkel.id',
-            'password' => Hash::make('password_kasir'),
+            'email' => 'kasir@gmail.com',
+            'password' => Hash::make('12345678'),
         ]);
 
         // 3. Petakan ke Actor Access (Domain Otorisasi)
