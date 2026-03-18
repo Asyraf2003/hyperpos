@@ -5,33 +5,27 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\Admin\Product\CreateProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\EditProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\UpdateProductController as WebUpdateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\CreateProductController;
 use App\Adapters\In\Http\Controllers\ProductCatalog\UpdateProductController;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
+    Route::get('/admin/products/table', ProductTableDataController::class)
+        ->name('admin.products.table');
+});
+
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
-    Route::get('/admin/products', ProductIndexPageController::class)
-        ->name('admin.products.index');
-
-    Route::get('/admin/products/create', CreateProductPageController::class)
-        ->name('admin.products.create');
-
-    Route::post('/admin/products', StoreProductController::class)
-        ->name('admin.products.store');
-
-    Route::get('/admin/products/{productId}/edit', EditProductPageController::class)
-        ->name('admin.products.edit');
-
-    Route::post('/admin/products/{productId}', WebUpdateProductController::class)
-        ->name('admin.products.update');
+    Route::get('/admin/products', ProductIndexPageController::class)->name('admin.products.index');
+    Route::get('/admin/products/create', CreateProductPageController::class)->name('admin.products.create');
+    Route::post('/admin/products', StoreProductController::class)->name('admin.products.store');
+    Route::get('/admin/products/{productId}/edit', EditProductPageController::class)->name('admin.products.edit');
+    Route::post('/admin/products/{productId}', WebUpdateProductController::class)->name('admin.products.update');
 });
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {
-    Route::post('/product-catalog/products/create', CreateProductController::class)
-        ->name('product-catalog.products.create');
-
-    Route::post('/product-catalog/products/{productId}/update', UpdateProductController::class)
-        ->name('product-catalog.products.update');
+    Route::post('/product-catalog/products/create', CreateProductController::class)->name('product-catalog.products.create');
+    Route::post('/product-catalog/products/{productId}/update', UpdateProductController::class)->name('product-catalog.products.update');
 });
