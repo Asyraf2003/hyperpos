@@ -19,7 +19,7 @@ final class AuthenticateController extends Controller
 
     public function __invoke(LoginRequest $request): RedirectResponse
     {
-        if (Auth::guard('web')->attempt($request->credentials(), $request->boolean('remember')) === false) {
+        if (Auth::attempt($request->credentials(), $request->boolean('remember')) === false) {
             return back()
                 ->withErrors([
                     'email' => 'Email atau password tidak valid.',
@@ -32,7 +32,7 @@ final class AuthenticateController extends Controller
         $actorId = $request->user()?->getAuthIdentifier();
 
         if ($actorId === null) {
-            Auth::guard('web')->logout();
+            Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
@@ -44,7 +44,7 @@ final class AuthenticateController extends Controller
         $actor = $this->actors->findByActorId((string) $actorId);
 
         if ($actor === null) {
-            Auth::guard('web')->logout();
+            Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
@@ -65,7 +65,7 @@ final class AuthenticateController extends Controller
                 ->with('success', 'Login berhasil.');
         }
 
-        Auth::guard('web')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

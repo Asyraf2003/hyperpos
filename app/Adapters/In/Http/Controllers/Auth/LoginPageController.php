@@ -29,7 +29,7 @@ final class LoginPageController extends Controller
         $actor = $this->actors->findByActorId((string) $actorId);
 
         if ($actor === null) {
-            Auth::guard('web')->logout();
+            Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
@@ -46,7 +46,7 @@ final class LoginPageController extends Controller
             return redirect()->route('cashier.dashboard');
         }
 
-        Auth::guard('web')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

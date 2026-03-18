@@ -36,7 +36,7 @@ final class EnsureCashierAreaAccess
         $actor = $this->actors->findByActorId((string) $actorId);
 
         if ($actor === null) {
-            Auth::guard('web')->logout();
+            Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
@@ -47,7 +47,7 @@ final class EnsureCashierAreaAccess
 
         $decision = $this->policy->decide((string) $actorId, [
             'path' => $request->path(),
-            'route_name' => $request->route()?->getName(),
+            'route_name' => $request->route()->getName(),
         ]);
 
         if ($decision->isFailure()) {
