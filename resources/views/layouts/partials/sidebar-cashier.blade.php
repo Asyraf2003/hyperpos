@@ -1,3 +1,13 @@
+@php
+    $authUser = auth()->user();
+    $actor = null;
+
+    if ($authUser !== null) {
+        $actor = app(\App\Ports\Out\IdentityAccess\ActorAccessReaderPort::class)
+            ->findByActorId((string) $authUser->getAuthIdentifier());
+    }
+@endphp
+
 <div id="sidebar">
     <div class="sidebar-wrapper active">
         <div class="sidebar-header position-relative">
@@ -57,6 +67,15 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+
+                @if ($actor !== null && $actor->isAdmin())
+                    <li class="sidebar-item {{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
+                            <i class="bi bi-arrow-return-left"></i>
+                            <span>Kembali ke Admin</span>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </div>
     </div>
