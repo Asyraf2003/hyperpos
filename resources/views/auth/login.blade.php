@@ -4,7 +4,7 @@
 
 @section('content')
     <h1 class="auth-title">Log in.</h1>
-    <p class="auth-subtitle mb-5">Halaman login dummy untuk slice UI awal.</p>
+    <p class="auth-subtitle mb-5">Aplikasi internal. Akses akun dikelola secara terbatas.</p>
 
     <form action="#" method="get">
         <div class="form-group position-relative has-icon-left mb-4">
@@ -34,10 +34,9 @@
         </div>
     </form>
 
-    <div class="text-center mt-5 text-lg fs-4">
-        <p class="text-gray-600">
-            Belum punya akun?
-            <a href="{{ route('register') }}" class="font-bold">Register</a>
+    <div class="text-center mt-5 text-lg fs-6">
+        <p class="text-gray-600 mb-0">
+            Registrasi publik dinonaktifkan untuk aplikasi internal.
         </p>
     </div>
 @endsection
