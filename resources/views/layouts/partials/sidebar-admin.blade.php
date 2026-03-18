@@ -58,6 +58,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.products.index') }}" class="sidebar-link">
+                        <i class="bi bi-box-seam-fill"></i>
+                        <span>Product</span>
+                    </a>
+                </li>
+
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">

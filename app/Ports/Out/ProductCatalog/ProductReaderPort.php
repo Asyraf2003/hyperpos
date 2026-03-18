@@ -9,4 +9,9 @@ use App\Core\ProductCatalog\Product\Product;
 interface ProductReaderPort
 {
     public function getById(string $productId): ?Product;
+
+    /**
+     * @return array<int, Product>
+     */
+    public function findAll(): array;
 }
