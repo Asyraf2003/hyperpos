@@ -14,9 +14,15 @@
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="product-search-form" class="d-flex gap-2">
-                            <input type="text" id="product-search-input" class="form-control" placeholder="Cari kode, nama, atau merek">
-                            <button type="submit" class="btn btn-outline-primary">Cari</button>
+                        <form id="product-search-form" class="d-flex flex-column gap-1">
+                            <input
+                                type="text"
+                                id="product-search-input"
+                                class="form-control"
+                                placeholder="Cari kode, nama, atau merek"
+                                autocomplete="off"
+                            >
+                            <small class="text-muted">Pencarian otomatis mulai 2 huruf.</small>
                         </form>
 
                         <button type="button" id="open-product-filter" class="btn btn-light-secondary">Filter</button>
@@ -32,11 +38,36 @@
                             <tr>
                                 <th style="width: 64px;">#</th>
                                 <th>Kode Barang</th>
-                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_barang">Nama Barang</button></th>
-                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="merek">Merek</button></th>
-                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="ukuran">Ukuran</button></th>
-                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="harga_jual">Harga Jual</button></th>
-                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="stok_saat_ini">Stok Saat Ini</button></th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_barang">
+                                        Nama Barang
+                                        <span class="ms-1 text-muted" data-sort-indicator="nama_barang">↕</span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="merek">
+                                        Merek
+                                        <span class="ms-1 text-muted" data-sort-indicator="merek">↕</span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="ukuran">
+                                        Ukuran
+                                        <span class="ms-1 text-muted" data-sort-indicator="ukuran">↕</span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="harga_jual">
+                                        Harga Jual
+                                        <span class="ms-1 text-muted" data-sort-indicator="harga_jual">↕</span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="stok_saat_ini">
+                                        Stok Saat Ini
+                                        <span class="ms-1 text-muted" data-sort-indicator="stok_saat_ini">↕</span>
+                                    </button>
+                                </th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
