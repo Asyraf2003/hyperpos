@@ -15,9 +15,9 @@ final class ProductTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_search_and_filter_product_table(): void
     {
-        $this->seed('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000, 6);
-        $this->seed('product-2', 'KB-002', 'Aki Kering', 'GS Astra', null, 120000, 3);
-        $this->seed('product-3', 'KB-003', 'Ban Dalam', 'Federal', 80, 18000, 5);
+        $this->seedProductRow('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000, 6);
+        $this->seedProductRow('product-2', 'KB-002', 'Aki Kering', 'GS Astra', null, 120000, 3);
+        $this->seedProductRow('product-3', 'KB-003', 'Ban Dalam', 'Federal', 80, 18000, 5);
 
         $response = $this->actingAs($this->admin())->get(route('admin.products.table', ['q' => 'Ban', 'merek' => 'Federal']));
 
@@ -29,8 +29,8 @@ final class ProductTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_sort_product_table_by_stok_saat_ini_desc(): void
     {
-        $this->seed('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000, 2);
-        $this->seed('product-2', 'KB-002', 'Aki Kering', 'GS Astra', null, 120000, 8);
+        $this->seedProductRow('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000, 2);
+        $this->seedProductRow('product-2', 'KB-002', 'Aki Kering', 'GS Astra', null, 120000, 8);
 
         $response = $this->actingAs($this->admin())->get(route('admin.products.table', ['sort_by' => 'stok_saat_ini', 'sort_dir' => 'desc']));
 
@@ -41,7 +41,7 @@ final class ProductTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_access_second_page_of_product_table(): void
     {
-        for ($i = 1; $i <= 11; $i++) $this->seed('product-'.$i, 'KB-'.$i, 'Produk '.str_pad((string) $i, 2, '0', STR_PAD_LEFT), 'Federal', null, 10000 + $i, 0);
+        for ($i = 1; $i <= 11; $i++) $this->seedProductRow('product-'.$i, 'KB-'.$i, 'Produk '.str_pad((string) $i, 2, '0', STR_PAD_LEFT), 'Federal', null, 10000 + $i, 0);
 
         $response = $this->actingAs($this->admin())->get(route('admin.products.table', ['page' => 2]));
 
@@ -58,7 +58,7 @@ final class ProductTableDataQueryFeatureTest extends TestCase
         return $user;
     }
 
-    private function seed(string $id, ?string $kode, string $nama, string $merek, ?int $ukuran, int $harga, int $stok): void
+    private function seedProductRow(string $id, ?string $kode, string $nama, string $merek, ?int $ukuran, int $harga, int $stok): void
     {
         DB::table('products')->insert(['id' => $id, 'kode_barang' => $kode, 'nama_barang' => $nama, 'merek' => $merek, 'ukuran' => $ukuran, 'harga_jual' => $harga]);
         DB::table('product_inventory')->insert(['product_id' => $id, 'qty_on_hand' => $stok]);
