@@ -42,6 +42,7 @@ use App\Adapters\Out\Procurement\DatabaseSupplierReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierReceiptLineReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierReceiptWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
@@ -110,6 +111,7 @@ use App\Ports\Out\Procurement\SupplierReaderPort;
 use App\Ports\Out\Procurement\SupplierReceiptLineReaderPort;
 use App\Ports\Out\Procurement\SupplierReceiptWriterPort;
 use App\Ports\Out\Procurement\SupplierWriterPort;
+use App\Ports\Out\Procurement\SupplierTableReaderPort;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductTableReaderPort;
@@ -164,6 +166,7 @@ class HexagonalServiceProvider extends ServiceProvider
 
         $this->app->singleton(SupplierReaderPort::class, DatabaseSupplierReaderAdapter::class);
         $this->app->singleton(SupplierWriterPort::class, DatabaseSupplierWriterAdapter::class);
+        $this->app->singleton(SupplierTableReaderPort::class, DatabaseSupplierTableReaderAdapter::class);
         $this->app->singleton(SupplierInvoiceWriterPort::class, DatabaseSupplierInvoiceWriterAdapter::class);
         $this->app->singleton(SupplierInvoiceReaderPort::class, DatabaseSupplierInvoiceReaderAdapter::class);
         $this->app->singleton(SupplierInvoiceLineReaderPort::class, DatabaseSupplierInvoiceLineReaderAdapter::class);
