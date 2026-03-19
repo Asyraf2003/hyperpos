@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Procurement\CreateSupplierInvoicePageController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProductLookupController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
@@ -18,6 +19,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::get('/admin/procurement/supplier-invoices/table', ProcurementInvoiceTableDataController::class)
         ->name('admin.procurement.supplier-invoices.table');
+
+    Route::get('/admin/procurement/products/lookup', ProductLookupController::class)
+        ->name('admin.procurement.products.lookup');
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
