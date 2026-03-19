@@ -72,6 +72,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.procurement.supplier-invoices.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="sidebar-link">
+                        <i class="bi bi-receipt"></i>
+                        <span>Procurement</span>
+                    </a>
+                </li>
+
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">
