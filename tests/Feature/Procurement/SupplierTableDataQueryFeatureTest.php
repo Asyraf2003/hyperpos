@@ -72,6 +72,29 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $response->assertJsonPath('data.rows.0.last_shipment_date', '2026-03-18');
     }
 
+    public function test_admin_can_sort_supplier_table_by_last_shipment_date_desc_and_keep_supplier_without_invoice_at_bottom(): void
+    {
+        $this->seedSupplier('supplier-1', 'PT Alpha Motor');
+        $this->seedSupplier('supplier-2', 'PT Beta Parts');
+        $this->seedSupplier('supplier-3', 'PT Gamma Abadi');
+
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
+        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-18', '2026-04-18', 50000);
+
+        $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
+            'sort_by' => 'last_shipment_date',
+            'sort_dir' => 'desc',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.rows.0.nama_pt_pengirim', 'PT Beta Parts');
+        $response->assertJsonPath('data.rows.0.last_shipment_date', '2026-03-18');
+        $response->assertJsonPath('data.rows.1.nama_pt_pengirim', 'PT Alpha Motor');
+        $response->assertJsonPath('data.rows.1.last_shipment_date', '2026-03-15');
+        $response->assertJsonPath('data.rows.2.nama_pt_pengirim', 'PT Gamma Abadi');
+        $response->assertJsonPath('data.rows.2.last_shipment_date', null);
+    }
+
     public function test_admin_can_access_second_page_of_supplier_table(): void
     {
         for ($i = 1; $i <= 11; $i++) {

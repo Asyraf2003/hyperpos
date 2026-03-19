@@ -37,6 +37,25 @@
   }[m]));
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
+  const angka = (v) => Number(v || 0).toLocaleString("id-ID");
+
+  const tanggalId = (v) => {
+    if (!v) {
+      return "-";
+    }
+
+    const date = new Date(`${v}T00:00:00`);
+
+    if (Number.isNaN(date.getTime())) {
+      return esc(v);
+    }
+
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }).format(date);
+  };
 
   const trimValue = (v) => String(v ?? "").trim();
 
@@ -96,10 +115,10 @@
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
       <td>${esc(r.nama_pt_pengirim)}</td>
-      <td class="text-end">${esc(r.invoice_count)}</td>
+      <td class="text-end">${angka(r.invoice_count)}</td>
       <td class="text-end">${rupiah(r.outstanding_rupiah)}</td>
-      <td class="text-end">${esc(r.invoice_unpaid_count)}</td>
-      <td>${r.last_shipment_date ? esc(r.last_shipment_date) : "-"}</td>
+      <td class="text-end">${angka(r.invoice_unpaid_count)}</td>
+      <td>${tanggalId(r.last_shipment_date)}</td>
     </tr>
   `;
 
