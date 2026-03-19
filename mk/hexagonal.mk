@@ -1,4 +1,4 @@
-.PHONY: dev lint fmt test test-unit test-domain test-feature test-report test-audit test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check verify audit-lines audit-contract
+.PHONY: dev lint fmt test test-unit test-domain test-feature test-report test-audit test-integration test-money test-stock test-arch audit-hex migrate rollback reset-db coverage ci check verify audit-lines audit-blade audit-contract
 
 dev:
 	php artisan serve
@@ -57,13 +57,16 @@ coverage:
 audit-lines:
 	@php scripts/audit-line-count.php
 
-audit-contract: audit-lines
+audit-blade:
+	@php scripts/audit-blade-no-php.php
+
+audit-contract: audit-lines audit-blade
 	@echo "Contract audit passed."
 
 check: audit-hex test
 
-# Gerbang Verifikasi Utama (Test + Lint + Line Audit)
-verify: lint audit-lines test
+# Gerbang Verifikasi Utama (Test + Lint + Contract Audit)
+verify: lint audit-contract test
 
 # Alias untuk CI sesuai DoD 3.3
 ci: verify
