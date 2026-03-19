@@ -31,7 +31,7 @@ final class SupplierTableQueryRequest extends FormRequest
             'q' => ['nullable', 'string'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
-            'sort_by' => ['nullable', 'in:nama_pt_pengirim'],
+            'sort_by' => ['nullable', 'in:nama_pt_pengirim,invoice_count,outstanding_rupiah,invoice_unpaid_count,last_shipment_date'],
             'sort_dir' => ['nullable', 'in:asc,desc'],
         ];
     }

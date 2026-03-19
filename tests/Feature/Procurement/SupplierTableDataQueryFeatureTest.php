@@ -26,19 +26,50 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $response->assertJsonPath('data.meta.filters.q', 'PT');
     }
 
-    public function test_admin_can_sort_supplier_table_by_nama_pt_pengirim_desc(): void
+    public function test_admin_can_sort_supplier_table_by_outstanding_rupiah_desc(): void
     {
         $this->seedSupplier('supplier-1', 'PT Alpha Motor');
         $this->seedSupplier('supplier-2', 'PT Zebra Parts');
 
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
+        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 100000);
+
+        $this->seedPayment('payment-1', 'invoice-1', 70000, '2026-03-16', 'pending');
+        $this->seedPayment('payment-2', 'invoice-2', 10000, '2026-03-17', 'pending');
+
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
-            'sort_by' => 'nama_pt_pengirim',
+            'sort_by' => 'outstanding_rupiah',
             'sort_dir' => 'desc',
         ]));
 
         $response->assertOk();
         $response->assertJsonPath('data.rows.0.nama_pt_pengirim', 'PT Zebra Parts');
+        $response->assertJsonPath('data.rows.0.outstanding_rupiah', 90000);
         $response->assertJsonPath('data.rows.1.nama_pt_pengirim', 'PT Alpha Motor');
+        $response->assertJsonPath('data.rows.1.outstanding_rupiah', 30000);
+    }
+
+    public function test_admin_can_get_supplier_summary_aggregation_from_multiple_invoices(): void
+    {
+        $this->seedSupplier('supplier-1', 'PT Sumber Makmur');
+
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
+        $this->seedInvoice('invoice-2', 'supplier-1', '2026-03-18', '2026-04-18', 50000);
+
+        $this->seedPayment('payment-1', 'invoice-1', 25000, '2026-03-16', 'pending');
+        $this->seedPayment('payment-2', 'invoice-2', 50000, '2026-03-18', 'uploaded');
+
+        $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
+            'q' => 'Sumber',
+        ]));
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data.rows');
+        $response->assertJsonPath('data.rows.0.nama_pt_pengirim', 'PT Sumber Makmur');
+        $response->assertJsonPath('data.rows.0.invoice_count', 2);
+        $response->assertJsonPath('data.rows.0.outstanding_rupiah', 75000);
+        $response->assertJsonPath('data.rows.0.invoice_unpaid_count', 1);
+        $response->assertJsonPath('data.rows.0.last_shipment_date', '2026-03-18');
     }
 
     public function test_admin_can_access_second_page_of_supplier_table(): void
@@ -56,6 +87,10 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $response->assertJsonPath('data.meta.page', 2);
         $response->assertJsonPath('data.meta.last_page', 2);
         $response->assertJsonPath('data.rows.0.nama_pt_pengirim', 'Supplier 11');
+        $response->assertJsonPath('data.rows.0.invoice_count', 0);
+        $response->assertJsonPath('data.rows.0.outstanding_rupiah', 0);
+        $response->assertJsonPath('data.rows.0.invoice_unpaid_count', 0);
+        $response->assertJsonPath('data.rows.0.last_shipment_date', null);
     }
 
     private function admin(): User
@@ -80,6 +115,39 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
             'id' => $id,
             'nama_pt_pengirim' => $namaPtPengirim,
             'nama_pt_pengirim_normalized' => mb_strtolower($namaPtPengirim),
+        ]);
+    }
+
+    private function seedInvoice(
+        string $id,
+        string $supplierId,
+        string $shipmentDate,
+        string $dueDate,
+        int $grandTotal,
+    ): void {
+        DB::table('supplier_invoices')->insert([
+            'id' => $id,
+            'supplier_id' => $supplierId,
+            'tanggal_pengiriman' => $shipmentDate,
+            'jatuh_tempo' => $dueDate,
+            'grand_total_rupiah' => $grandTotal,
+        ]);
+    }
+
+    private function seedPayment(
+        string $id,
+        string $invoiceId,
+        int $amount,
+        string $paidAt,
+        string $proofStatus,
+    ): void {
+        DB::table('supplier_payments')->insert([
+            'id' => $id,
+            'supplier_invoice_id' => $invoiceId,
+            'amount_rupiah' => $amount,
+            'paid_at' => $paidAt,
+            'proof_status' => $proofStatus,
+            'proof_storage_path' => null,
         ]);
     }
 }

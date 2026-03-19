@@ -12,7 +12,11 @@ interface SupplierTableReaderPort
      * @return array{
      *   rows:list<array{
      *     id:string,
-     *     nama_pt_pengirim:string
+     *     nama_pt_pengirim:string,
+     *     invoice_count:int,
+     *     outstanding_rupiah:int,
+     *     invoice_unpaid_count:int,
+     *     last_shipment_date:?string
      *   }>,
      *   meta:array{
      *     page:int,
