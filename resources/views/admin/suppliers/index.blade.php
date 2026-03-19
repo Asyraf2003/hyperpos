@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Daftar supplier</h4>
-                        <p class="mb-0 text-muted">Interactive table supplier untuk admin.</p>
+                        <h4 class="card-title mb-1">Ringkasan supplier</h4>
+                        <p class="mb-0 text-muted">Supplier Summary List untuk admin.</p>
                     </div>
 
                     <form id="supplier-search-form" class="d-flex flex-column gap-1">
@@ -37,10 +37,36 @@
                                         <span class="ms-1 text-muted" data-sort-indicator="nama_pt_pengirim">↕</span>
                                     </button>
                                 </th>
+                                <th class="text-end">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_count">
+                                        Jumlah Invoice
+                                        <span class="ms-1 text-muted" data-sort-indicator="invoice_count">↕</span>
+                                    </button>
+                                </th>
+                                <th class="text-end">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="outstanding_rupiah">
+                                        Outstanding
+                                        <span class="ms-1 text-muted" data-sort-indicator="outstanding_rupiah">↕</span>
+                                    </button>
+                                </th>
+                                <th class="text-end">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_unpaid_count">
+                                        Invoice Belum Lunas
+                                        <span class="ms-1 text-muted" data-sort-indicator="invoice_unpaid_count">↕</span>
+                                    </button>
+                                </th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="last_shipment_date">
+                                        Pengiriman Terakhir
+                                        <span class="ms-1 text-muted" data-sort-indicator="last_shipment_date">↕</span>
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="supplier-table-body">
-                            <tr><td colspan="2" class="text-center text-muted py-4">Memuat data...</td></tr>
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Memuat data...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

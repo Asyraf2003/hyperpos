@@ -9,7 +9,13 @@
     sort_dir: "asc"
   };
 
-  const allowedSortBy = new Set(["nama_pt_pengirim"]);
+  const allowedSortBy = new Set([
+    "nama_pt_pengirim",
+    "invoice_count",
+    "outstanding_rupiah",
+    "invoice_unpaid_count",
+    "last_shipment_date"
+  ]);
   const allowedSortDir = new Set(["asc", "desc"]);
 
   const $ = (id) => document.getElementById(id);
@@ -22,13 +28,15 @@
   let searchDebounceTimer = null;
   let requestCounter = 0;
 
-  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+  const esc = (v) => String(v ?? "").replace(/[&<>\"']/g, (m) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
   }[m]));
+
+  const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
 
   const trimValue = (v) => String(v ?? "").trim();
 
@@ -88,12 +96,16 @@
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
       <td>${esc(r.nama_pt_pengirim)}</td>
+      <td class="text-end">${esc(r.invoice_count)}</td>
+      <td class="text-end">${rupiah(r.outstanding_rupiah)}</td>
+      <td class="text-end">${esc(r.invoice_unpaid_count)}</td>
+      <td>${r.last_shipment_date ? esc(r.last_shipment_date) : "-"}</td>
     </tr>
   `;
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">Tidak ada supplier yang cocok.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada supplier yang cocok.</td></tr>`;
       return;
     }
 
@@ -141,7 +153,7 @@
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
 
-    body.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
@@ -154,7 +166,7 @@
     }
 
     if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="2" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
       return;
     }
 
@@ -220,7 +232,7 @@
         s.sort_dir = s.sort_dir === "asc" ? "desc" : "asc";
       } else {
         s.sort_by = key;
-        s.sort_dir = "asc";
+        s.sort_dir = key === "last_shipment_date" ? "desc" : "asc";
       }
 
       s.page = 1;
