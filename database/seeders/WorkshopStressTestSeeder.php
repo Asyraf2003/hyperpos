@@ -24,10 +24,23 @@ final class WorkshopStressTestSeeder extends Seeder
         RecordCustomerRefundHandler $recordRefund
     ): void {
         $products = DB::table('products')->get();
-        $admin = DB::table('users')->where('email', 'asyraf@bengkel.id')->first();
-        $kasir = DB::table('users')->where('email', 'liya@bengkel.id')->first();
+        $admin = DB::table('users')->where('email', 'admin@gmail.com')->first();
+        $kasir = DB::table('users')->where('email', 'kasir@gmail.com')->first();
 
-        if ($products->isEmpty() || !$admin || !$kasir) return;
+        if ($products->isEmpty()) {
+            $this->command->error("Gagal: Tabel products kosong!");
+            return;
+        }
+        if (!$admin) {
+            $this->command->error("Gagal: Admin admin@gmail.com tidak ditemukan!");
+            return;
+        }
+        if (!$kasir) {
+            $this->command->error("Gagal: Kasir kasir@gmail.com tidak ditemukan!");
+            return;
+        }
+
+        $this->command->info("Prasyarat OK. Menjalankan stress test untuk " . $products->count() . " produk.");
 
         // 1. Otorisasi Capability (Grounded: column 'active')
         DB::table('admin_transaction_capability_states')->updateOrInsert(
