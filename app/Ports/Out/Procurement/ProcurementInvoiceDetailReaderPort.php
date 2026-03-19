@@ -18,7 +18,10 @@ interface ProcurementInvoiceDetailReaderPort
      *     total_paid_rupiah:int,
      *     outstanding_rupiah:int,
      *     receipt_count:int,
-     *     total_received_qty:int
+     *     total_received_qty:int,
+     *     policy_state:string,
+     *     lock_reasons:list<string>,
+     *     allowed_actions:list<string>
      *   },
      *   lines: list<array{
      *     id:string,

@@ -37,7 +37,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Nota supplier tidak ditemukan.');
     }
 
-    public function test_admin_can_access_procurement_invoice_detail_page(): void
+    public function test_admin_can_access_procurement_invoice_detail_page_as_locked_when_receipt_and_payment_exist(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
         $this->seedProduct('product-2', null, 'Aki Kering', 'GS Astra', null, 120000);
@@ -61,6 +61,14 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']));
 
         $response->assertOk();
+
+        $response->assertSee('Policy State');
+        $response->assertSee('Locked');
+        $response->assertSee('Allowed Actions');
+        $response->assertSee('Correction / reversal');
+        $response->assertSee('Lock Reasons');
+        $response->assertSee('Receipt sudah tercatat');
+        $response->assertSee('Payment efektif sudah tercatat');
 
         $response->assertSee('Ringkasan Nota');
         $response->assertSee('Line Invoice');
@@ -87,6 +95,28 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Aki Kering');
         $response->assertSee('GS Astra');
         $response->assertSee('Rp 130.000');
+    }
+
+    public function test_admin_can_access_procurement_invoice_detail_page_as_editable_when_no_receipt_and_no_payment_exist(): void
+    {
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
+        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+
+        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 20000);
+        $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']));
+
+        $response->assertOk();
+
+        $response->assertSee('Policy State');
+        $response->assertSee('Editable');
+        $response->assertSee('Allowed Actions');
+        $response->assertSee('Edit invoice');
+        $response->assertSee('Void invoice');
+        $response->assertSee('Lock Reasons');
+        $response->assertSee('Belum ada efek turunan primer.');
     }
 
     private function user(string $role): User

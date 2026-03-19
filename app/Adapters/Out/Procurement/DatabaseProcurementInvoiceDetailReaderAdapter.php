@@ -85,6 +85,24 @@ final class DatabaseProcurementInvoiceDetailReaderAdapter implements Procurement
             ])
             ->all();
 
+        $totalPaidRupiah = (int) $summary->total_paid_rupiah;
+        $receiptCount = (int) $summary->receipt_count;
+
+        $lockReasons = [];
+
+        if ($receiptCount > 0) {
+            $lockReasons[] = 'receipt_recorded';
+        }
+
+        if ($totalPaidRupiah > 0) {
+            $lockReasons[] = 'payment_effective_recorded';
+        }
+
+        $policyState = $lockReasons === [] ? 'editable' : 'locked';
+        $allowedActions = $policyState === 'editable'
+            ? ['edit', 'void']
+            : ['correction'];
+
         return [
             'summary' => [
                 'supplier_invoice_id' => (string) $summary->supplier_invoice_id,
@@ -93,10 +111,13 @@ final class DatabaseProcurementInvoiceDetailReaderAdapter implements Procurement
                 'shipment_date' => (string) $summary->shipment_date,
                 'due_date' => (string) $summary->due_date,
                 'grand_total_rupiah' => (int) $summary->grand_total_rupiah,
-                'total_paid_rupiah' => (int) $summary->total_paid_rupiah,
+                'total_paid_rupiah' => $totalPaidRupiah,
                 'outstanding_rupiah' => (int) $summary->outstanding_rupiah,
-                'receipt_count' => (int) $summary->receipt_count,
+                'receipt_count' => $receiptCount,
                 'total_received_qty' => (int) $summary->total_received_qty,
+                'policy_state' => $policyState,
+                'lock_reasons' => $lockReasons,
+                'allowed_actions' => $allowedActions,
             ],
             'lines' => $lines,
         ];

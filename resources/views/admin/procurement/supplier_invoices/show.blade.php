@@ -6,6 +6,25 @@
 @section('content')
     @php
         $rupiah = static fn (int $value): string => 'Rp ' . number_format($value, 0, ',', '.');
+
+        $policyBadgeClass = $summary['policy_state'] === 'locked'
+            ? 'bg-danger'
+            : 'bg-success';
+
+        $policyLabel = $summary['policy_state'] === 'locked'
+            ? 'Locked'
+            : 'Editable';
+
+        $lockReasonLabels = [
+            'receipt_recorded' => 'Receipt sudah tercatat',
+            'payment_effective_recorded' => 'Payment efektif sudah tercatat',
+        ];
+
+        $actionLabels = [
+            'edit' => 'Edit invoice',
+            'void' => 'Void invoice',
+            'correction' => 'Correction / reversal',
+        ];
     @endphp
 
     <section class="section">
@@ -26,6 +45,41 @@
                     </div>
 
                     <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Policy State</small>
+                            <span class="badge {{ $policyBadgeClass }}">{{ $policyLabel }}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Allowed Actions</small>
+
+                            @if ($summary['allowed_actions'] === [])
+                                <div class="text-muted">Tidak ada action.</div>
+                            @else
+                                <ul class="mb-0 ps-3">
+                                    @foreach ($summary['allowed_actions'] as $action)
+                                        <li>{{ $actionLabels[$action] ?? $action }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Lock Reasons</small>
+
+                            @if ($summary['lock_reasons'] === [])
+                                <div class="text-muted">Belum ada efek turunan primer.</div>
+                            @else
+                                <ul class="mb-0 ps-3">
+                                    @foreach ($summary['lock_reasons'] as $reason)
+                                        <li>{{ $lockReasonLabels[$reason] ?? $reason }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </div>
+
+                        <hr>
+
                         <div class="mb-3">
                             <small class="text-muted d-block">Nomor Nota</small>
                             <strong>{{ $summary['supplier_invoice_id'] }}</strong>
