@@ -44,6 +44,7 @@
   }[m]));
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
+  const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
 
   const trimValue = (v) => String(v ?? "").trim();
 
@@ -116,12 +117,15 @@
       <td>${rupiah(r.outstanding_rupiah)}</td>
       <td>${esc(r.receipt_count)}</td>
       <td>${esc(r.total_received_qty)}</td>
+      <td class="text-center">
+        <a href="${detailUrl(r.supplier_invoice_id)}" class="btn btn-sm btn-outline-secondary">Detail</a>
+      </td>
     </tr>
   `;
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="10" class="text-center text-muted py-4">Tidak ada nota supplier yang cocok.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Tidak ada nota supplier yang cocok.</td></tr>`;
       return;
     }
 
@@ -169,7 +173,7 @@
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
 
-    body.innerHTML = `<tr><td colspan="10" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+    body.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
@@ -182,7 +186,7 @@
     }
 
     if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
       return;
     }
 

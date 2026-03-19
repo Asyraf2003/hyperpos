@@ -103,10 +103,11 @@
                                         <span class="ms-1 text-muted" data-sort-indicator="total_received_qty">↕</span>
                                     </button>
                                 </th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="procurement-invoice-table-body">
-                            <tr><td colspan="10" class="text-center text-muted py-4">Memuat data...</td></tr>
+                            <tr><td colspan="11" class="text-center text-muted py-4">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -123,7 +124,8 @@
 @push('scripts')
     <script>
         window.procurementInvoiceTableConfig = {
-            endpoint: @json(route('admin.procurement.supplier-invoices.table'))
+            endpoint: @json(route('admin.procurement.supplier-invoices.table')),
+            detailBaseUrl: @json(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => '__ID__']))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-invoices-table.js') }}"></script>
