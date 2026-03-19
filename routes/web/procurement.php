@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Adapters\In\Http\Controllers\Admin\Procurement\CreateSupplierInvoicePageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Supplier\SupplierIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Supplier\SupplierTableDataController;
 use App\Adapters\In\Http\Controllers\Procurement\CreateSupplierInvoiceController;
@@ -24,6 +26,12 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/procurement/supplier-invoices', ProcurementInvoiceIndexPageController::class)
         ->name('admin.procurement.supplier-invoices.index');
+
+    Route::get('/admin/procurement/supplier-invoices/create', CreateSupplierInvoicePageController::class)
+        ->name('admin.procurement.supplier-invoices.create');
+
+    Route::post('/admin/procurement/supplier-invoices', StoreSupplierInvoiceController::class)
+        ->name('admin.procurement.supplier-invoices.store');
 });
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {

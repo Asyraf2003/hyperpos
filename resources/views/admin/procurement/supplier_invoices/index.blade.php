@@ -14,15 +14,21 @@
                             <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
                         </div>
 
-                        <form id="procurement-search-form" class="d-flex flex-column gap-1">
-                            <input
-                                type="text"
-                                id="procurement-search-input"
-                                class="form-control"
-                                placeholder="Cari nomor nota atau nama PT"
-                                autocomplete="off"
-                            >
-                        </form>
+                        <div class="d-flex flex-column flex-md-row gap-2">
+                            <form id="procurement-search-form" class="d-flex flex-column gap-1">
+                                <input
+                                    type="text"
+                                    id="procurement-search-input"
+                                    class="form-control"
+                                    placeholder="Cari nomor nota atau nama PT"
+                                    autocomplete="off"
+                                >
+                            </form>
+
+                            <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
+                                Buat Nota Supplier
+                            </a>
+                        </div>
                     </div>
 
                     <form id="procurement-filter-form" class="row g-2">
