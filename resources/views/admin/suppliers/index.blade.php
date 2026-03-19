@@ -1,0 +1,64 @@
+@extends('layouts.app')
+
+@section('title', 'Supplier')
+@section('heading', 'Supplier')
+
+@section('content')
+    <section class="section">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                    <div>
+                        <h4 class="card-title mb-1">Daftar supplier</h4>
+                        <p class="mb-0 text-muted">Interactive table supplier untuk admin.</p>
+                    </div>
+
+                    <form id="supplier-search-form" class="d-flex flex-column gap-1">
+                        <input
+                            type="text"
+                            id="supplier-search-input"
+                            class="form-control"
+                            placeholder="Cari nama PT pengirim"
+                            autocomplete="off"
+                        >
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-lg" id="supplier-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 64px;">No</th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_pt_pengirim">
+                                        Nama PT Pengirim
+                                        <span class="ms-1 text-muted" data-sort-indicator="nama_pt_pengirim">↕</span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="supplier-table-body">
+                            <tr><td colspan="2" class="text-center text-muted py-4">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                    <small id="supplier-table-summary" class="text-muted">Total: -</small>
+                    <div id="supplier-table-pagination"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@push('scripts')
+    <script>
+        window.supplierTableConfig = {
+            endpoint: @json(route('admin.suppliers.table'))
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-suppliers-table.js') }}"></script>
+@endpush
