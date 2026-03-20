@@ -99,6 +99,7 @@ final class RecordSupplierPaymentFeatureTest extends TestCase
         DB::table('supplier_invoices')->insert([
             'id' => 'invoice-1',
             'supplier_id' => 'supplier-1',
+            'supplier_nama_pt_pengirim_snapshot' => 'PT Supplier Test',
             'tanggal_pengiriman' => '2026-03-15',
             'jatuh_tempo' => '2026-04-15',
             'grand_total_rupiah' => 100000,
@@ -108,6 +109,10 @@ final class RecordSupplierPaymentFeatureTest extends TestCase
             'id' => 'invoice-line-1',
             'supplier_invoice_id' => 'invoice-1',
             'product_id' => 'product-1',
+            'product_kode_barang_snapshot' => 'KB-001',
+            'product_nama_barang_snapshot' => 'Ban Luar',
+            'product_merek_snapshot' => 'Federal',
+            'product_ukuran_snapshot' => 100,
             'qty_pcs' => 2,
             'line_total_rupiah' => 100000,
             'unit_cost_rupiah' => 50000,
