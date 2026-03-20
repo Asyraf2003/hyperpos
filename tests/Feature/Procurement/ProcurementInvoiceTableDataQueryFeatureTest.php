@@ -18,8 +18,8 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         $this->seedSupplier('supplier-1', 'PT Federal Abadi');
         $this->seedSupplier('supplier-2', 'PT Astra Otoparts');
 
-        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
-        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 50000);
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Federal Abadi');
+        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 50000, 'PT Astra Otoparts');
 
         $response = $this->actingAs($this->admin())
             ->get(route('admin.procurement.supplier-invoices.table', ['q' => 'Federal']));
@@ -35,8 +35,8 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         $this->seedSupplier('supplier-1', 'PT Alpha Motor');
         $this->seedSupplier('supplier-2', 'PT Zebra Parts');
 
-        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
-        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 100000);
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Alpha Motor');
+        $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 100000, 'PT Zebra Parts');
 
         $this->seedPayment('payment-1', 'invoice-1', 70000, '2026-03-16', 'pending');
         $this->seedPayment('payment-2', 'invoice-2', 10000, '2026-03-17', 'pending');
@@ -56,9 +56,9 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
     {
         $this->seedSupplier('supplier-1', 'PT Federal Abadi');
 
-        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-10', '2026-04-10', 100000);
-        $this->seedInvoice('invoice-2', 'supplier-1', '2026-03-15', '2026-04-15', 110000);
-        $this->seedInvoice('invoice-3', 'supplier-1', '2026-03-20', '2026-04-20', 120000);
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-10', '2026-04-10', 100000, 'PT Federal Abadi');
+        $this->seedInvoice('invoice-2', 'supplier-1', '2026-03-15', '2026-04-15', 110000, 'PT Federal Abadi');
+        $this->seedInvoice('invoice-3', 'supplier-1', '2026-03-20', '2026-04-20', 120000, 'PT Federal Abadi');
 
         $response = $this->actingAs($this->admin())
             ->get(route('admin.procurement.supplier-invoices.table', [
@@ -85,7 +85,8 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
                 'supplier-1',
                 '2026-03-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
                 '2026-04-' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
-                10000 + $i
+                10000 + $i,
+                'PT Federal Abadi'
             );
         }
 
@@ -127,11 +128,18 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         ]);
     }
 
-    private function seedInvoice(string $id, string $supplierId, string $shipmentDate, string $dueDate, int $grandTotal): void
-    {
+    private function seedInvoice(
+        string $id,
+        string $supplierId,
+        string $shipmentDate,
+        string $dueDate,
+        int $grandTotal,
+        string $supplierNamaPtPengirimSnapshot
+    ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
             'supplier_id' => $supplierId,
+            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
             'tanggal_pengiriman' => $shipmentDate,
             'jatuh_tempo' => $dueDate,
             'grand_total_rupiah' => $grandTotal,
@@ -147,6 +155,25 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
             'paid_at' => $paidAt,
             'proof_status' => $proofStatus,
             'proof_storage_path' => null,
+        ]);
+    }
+
+    private function seedReceipt(string $id, string $invoiceId, string $tanggalTerima): void
+    {
+        DB::table('supplier_receipts')->insert([
+            'id' => $id,
+            'supplier_invoice_id' => $invoiceId,
+            'tanggal_terima' => $tanggalTerima,
+        ]);
+    }
+
+    private function seedReceiptLine(string $id, string $receiptId, string $invoiceLineId, int $qtyDiterima): void
+    {
+        DB::table('supplier_receipt_lines')->insert([
+            'id' => $id,
+            'supplier_receipt_id' => $receiptId,
+            'supplier_invoice_line_id' => $invoiceLineId,
+            'qty_diterima' => $qtyDiterima,
         ]);
     }
 }
