@@ -1,8 +1,3 @@
-@php
-    $start = max(1, $paginator->currentPage() - 2);
-    $end = min($paginator->lastPage(), $paginator->currentPage() + 2);
-@endphp
-
 @if ($paginator->lastPage() > 1)
     <nav aria-label="Page navigation example">
         <ul class="pagination pagination-primary mb-0">
@@ -18,11 +13,11 @@
                 @endif
             </li>
 
-            @for ($page = $start; $page <= $end; $page++)
+            @foreach (range(max(1, $paginator->currentPage() - 2), min($paginator->lastPage(), $paginator->currentPage() + 2)) as $page)
                 <li class="page-item {{ $page === $paginator->currentPage() ? 'active' : '' }}">
                     <a class="page-link" href="{{ $paginator->url($page) }}">{{ $page }}</a>
                 </li>
-            @endfor
+            @endforeach
 
             <li class="page-item {{ $paginator->hasMorePages() ? '' : 'disabled' }}">
                 @if ($paginator->hasMorePages())
