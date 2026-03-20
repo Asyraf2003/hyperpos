@@ -12,7 +12,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_create_supplier_invoice_endpoint_auto_receives_by_default_and_updates_inventory(): void
+    public function test_create_supplier_invoice_endpoint_auto_receives_by_default_and_updates_inventory_without_auto_recording_payment(): void
     {
         $this->loginAsKasir();
         DB::table('products')->insert([
@@ -76,13 +76,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertDatabaseHas('supplier_payments', [
-            'supplier_invoice_id' => (string) $invoice->id,
-            'amount_rupiah' => 50000,
-            'paid_at' => '2026-03-12',
-            'proof_status' => 'pending',
-            'proof_storage_path' => null,
-        ]);
+        $this->assertDatabaseCount('supplier_payments', 0);
 
         $invoiceLine1 = DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_id', (string) $invoice->id)
@@ -181,6 +175,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
     public function test_create_supplier_invoice_endpoint_rejects_unknown_product(): void
     {
         $this->loginAsKasir();
+
         $response = $this->postJson('/procurement/supplier-invoices/create', [
             'nama_pt_pengirim' => 'PT Sumber Makmur',
             'tanggal_pengiriman' => '2026-03-12',
@@ -243,7 +238,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('product_inventory_costing', 0);
     }
 
-    public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier(): void
+    public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier_without_auto_recording_payment(): void
     {
         $this->loginAsKasir();
         DB::table('products')->insert([
@@ -297,13 +292,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertNotNull($invoice);
 
-        $this->assertDatabaseHas('supplier_payments', [
-            'supplier_invoice_id' => (string) $invoice->id,
-            'amount_rupiah' => 20000,
-            'paid_at' => '2026-01-30',
-            'proof_status' => 'pending',
-            'proof_storage_path' => null,
-        ]);
+        $this->assertDatabaseCount('supplier_payments', 0);
 
         $this->assertDatabaseCount('supplier_receipts', 0);
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
