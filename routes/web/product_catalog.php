@@ -26,7 +26,7 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
     Route::get('/admin/products/create', CreateProductPageController::class)->name('admin.products.create');
     Route::post('/admin/products', StoreProductController::class)->name('admin.products.store');
     Route::get('/admin/products/{productId}/edit', EditProductPageController::class)->name('admin.products.edit');
-    Route::post('/admin/products/{productId}', WebUpdateProductController::class)->name('admin.products.update');
+    Route::put('/admin/products/{productId}', WebUpdateProductController::class)->name('admin.products.update');
 });
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {

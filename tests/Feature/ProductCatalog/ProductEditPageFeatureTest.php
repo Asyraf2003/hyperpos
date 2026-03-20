@@ -83,7 +83,7 @@ final class ProductEditPageFeatureTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.products.update', ['productId' => 'product-1']), [
+            ->put(route('admin.products.update', ['productId' => 'product-1']), [
                 'kode_barang' => 'KB-001-REV',
                 'nama_barang' => 'Supra X',
                 'merek' => 'Federal',
@@ -129,7 +129,7 @@ final class ProductEditPageFeatureTest extends TestCase
         $response = $this
             ->from(route('admin.products.edit', ['productId' => 'product-2']))
             ->actingAs($user)
-            ->post(route('admin.products.update', ['productId' => 'product-2']), [
+            ->put(route('admin.products.update', ['productId' => 'product-2']), [
                 'kode_barang' => null,
                 'nama_barang' => 'Supra',
                 'merek' => 'Federal',
@@ -157,7 +157,7 @@ final class ProductEditPageFeatureTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->post(route('admin.products.update', ['productId' => 'missing-product']), [
+            ->put(route('admin.products.update', ['productId' => 'missing-product']), [
                 'kode_barang' => 'KB-404',
                 'nama_barang' => 'Revo',
                 'merek' => 'Federal',
