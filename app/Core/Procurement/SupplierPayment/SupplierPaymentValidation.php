@@ -11,19 +11,44 @@ trait SupplierPaymentValidation
 {
     private static function assertValid(string $id, string $invId, Money $amt, string $status, ?string $path): void
     {
-        if (trim($id) === '') throw new DomainException('ID wajib ada.');
-        if (trim($invId) === '') throw new DomainException('Invoice ID wajib ada.');
-        if (!$amt->greaterThan(Money::zero())) throw new DomainException('Amount harus > 0.');
-        
-        $path = self::normalizePath($path);
-        if ($status === SupplierPayment::PROOF_STATUS_PENDING && $path !== null) throw new DomainException('Path harus kosong jika pending.');
-        if ($status === SupplierPayment::PROOF_STATUS_UPLOADED && $path === null) throw new DomainException('Path wajib ada jika uploaded.');
+        if (trim($id) === '') {
+            throw new DomainException('ID wajib ada.');
+        }
+
+        if (trim($invId) === '') {
+            throw new DomainException('Invoice ID wajib ada.');
+        }
+
+        if (! $amt->greaterThan(Money::zero())) {
+            throw new DomainException('Amount harus > 0.');
+        }
+
+        $normalizedStatus = trim($status);
+        $normalizedPath = self::normalizePath($path);
+
+        if (! in_array($normalizedStatus, [
+            SupplierPayment::PROOF_STATUS_PENDING,
+            SupplierPayment::PROOF_STATUS_UPLOADED,
+        ], true)) {
+            throw new DomainException('Status bukti pembayaran supplier tidak valid.');
+        }
+
+        if ($normalizedStatus === SupplierPayment::PROOF_STATUS_PENDING && $normalizedPath !== null) {
+            throw new DomainException('Path harus kosong jika pending.');
+        }
+
+        // uploaded boleh tanpa proof_storage_path karena source of truth bukti
+        // pembayaran pindah ke tabel attachment terpisah.
     }
 
     private static function normalizePath(?string $path): ?string
     {
-        if ($path === null) return null;
+        if ($path === null) {
+            return null;
+        }
+
         $val = trim($path);
+
         return $val === '' ? null : $val;
     }
 }

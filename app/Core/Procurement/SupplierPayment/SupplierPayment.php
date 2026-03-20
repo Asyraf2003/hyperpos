@@ -16,21 +16,55 @@ final class SupplierPayment
     use SupplierPaymentState;
     use SupplierPaymentValidation;
 
-    public static function create(string $id, string $invId, Money $amt, DateTimeImmutable $paid, string $status, ?string $path): self
-    {
+    public static function create(
+        string $id,
+        string $invId,
+        Money $amt,
+        DateTimeImmutable $paid,
+        string $status,
+        ?string $path
+    ): self {
         self::assertValid($id, $invId, $amt, $status, $path);
-        return new self(trim($id), trim($invId), $amt, $paid, $status, self::normalizePath($path));
+
+        return new self(
+            trim($id),
+            trim($invId),
+            $amt,
+            $paid,
+            trim($status),
+            self::normalizePath($path)
+        );
     }
 
-    public static function rehydrate(string $id, string $invId, Money $amt, DateTimeImmutable $paid, string $status, ?string $path): self
-    {
+    public static function rehydrate(
+        string $id,
+        string $invId,
+        Money $amt,
+        DateTimeImmutable $paid,
+        string $status,
+        ?string $path
+    ): self {
         self::assertValid($id, $invId, $amt, $status, $path);
-        return new self(trim($id), trim($invId), $amt, $paid, $status, self::normalizePath($path));
+
+        return new self(
+            trim($id),
+            trim($invId),
+            $amt,
+            $paid,
+            trim($status),
+            self::normalizePath($path)
+        );
+    }
+
+    public function markProofUploaded(): void
+    {
+        $this->proofStatus = self::PROOF_STATUS_UPLOADED;
     }
 
     public function attachProof(string $path): void
     {
         $normalized = self::normalizePath($path) ?? throw new DomainException('Path wajib ada.');
+
         $this->proofStoragePath = $normalized;
         $this->proofStatus = self::PROOF_STATUS_UPLOADED;
     }
