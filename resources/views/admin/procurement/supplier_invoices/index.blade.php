@@ -104,7 +104,7 @@
         </div>
 
         {{-- Asumsi path penempatan file partial Anda, silakan sesuaikan jika letak foldernya berbeda --}}
-        @include('admin.procurement.partials.filter_drawer')
+        @include('admin.procurement.supplier_invoices.partials.filter_drawer')
     </section>
 @endsection
 
