@@ -238,10 +238,12 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         string $tanggalPengiriman,
         string $jatuhTempo,
         int $grandTotalRupiah,
+        string $supplierNamaPtPengirimSnapshot = 'PT Sumber Makmur',
     ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
             'supplier_id' => $supplierId,
+            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
             'tanggal_pengiriman' => $tanggalPengiriman,
             'jatuh_tempo' => $jatuhTempo,
             'grand_total_rupiah' => $grandTotalRupiah,
@@ -255,11 +257,19 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         int $qtyPcs,
         int $lineTotalRupiah,
         int $unitCostRupiah,
+        ?string $productKodeBarangSnapshot = 'KB-001',
+        string $productNamaBarangSnapshot = 'Supra',
+        string $productMerekSnapshot = 'Federal',
+        ?int $productUkuranSnapshot = 100,
     ): void {
         DB::table('supplier_invoice_lines')->insert([
             'id' => $id,
             'supplier_invoice_id' => $supplierInvoiceId,
             'product_id' => $productId,
+            'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
+            'product_nama_barang_snapshot' => $productNamaBarangSnapshot,
+            'product_merek_snapshot' => $productMerekSnapshot,
+            'product_ukuran_snapshot' => $productUkuranSnapshot,
             'qty_pcs' => $qtyPcs,
             'line_total_rupiah' => $lineTotalRupiah,
             'unit_cost_rupiah' => $unitCostRupiah,
