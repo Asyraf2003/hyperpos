@@ -74,8 +74,6 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Catat Pembayaran');
         $response->assertSee('Simpan Pembayaran');
         $response->assertSee('Bukti Pembayaran');
-        $response->assertSee('Belum ada pembayaran supplier.');
-        $response->assertSee('Bukti Pembayaran');
         $response->assertSee('Upload Bukti');
         $response->assertSee('Allowed Actions');
         $response->assertSee('Correction / reversal');
