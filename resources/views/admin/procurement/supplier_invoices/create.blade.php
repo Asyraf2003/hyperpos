@@ -4,31 +4,6 @@
 @section('heading', 'Buat Nota Supplier')
 
 @section('content')
-    @php
-        $oldLines = old('lines', [
-            ['product_id' => '', 'qty_pcs' => '1', 'line_total_rupiah' => ''],
-        ]);
-
-        $buildProductLabel = static function ($product): string {
-            $parts = [
-                $product->namaBarang(),
-                $product->merek(),
-            ];
-
-            if ($product->ukuran() !== null) {
-                $parts[] = (string) $product->ukuran();
-            }
-
-            $label = implode(' - ', $parts);
-
-            if ($product->kodeBarang() !== null) {
-                $label .= ' (' . $product->kodeBarang() . ')';
-            }
-
-            return $label;
-        };
-    @endphp
-
     <section class="section">
         <form action="{{ route('admin.procurement.supplier-invoices.store') }}" method="post" novalidate>
             @csrf
@@ -58,20 +33,8 @@
                                 </div>
                             @enderror
 
-                            <div id="procurement-line-items" data-next-index="{{ count($oldLines) }}">
-                                @foreach ($oldLines as $index => $line)
-                                    @php
-                                        $selectedProductId = (string) ($line['product_id'] ?? '');
-                                        $selectedProduct = collect($products)->first(
-                                            fn ($product) => $product->id() === $selectedProductId
-                                        );
-
-                                        $selectedLabel = $selectedProduct ? $buildProductLabel($selectedProduct) : '';
-                                        $lineTotalDisplay = isset($line['line_total_rupiah']) && $line['line_total_rupiah'] !== ''
-                                            ? number_format((int) $line['line_total_rupiah'], 0, ',', '.')
-                                            : '';
-                                    @endphp
-
+                            <div id="procurement-line-items" data-next-index="{{ count($lineItemsView) }}">
+                                @foreach ($lineItemsView as $lineView)
                                     <div class="border rounded p-3 mb-3" data-line-item>
                                         <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                             <div>
@@ -91,15 +54,15 @@
 
                                                     <input
                                                         type="hidden"
-                                                        name="lines[{{ $index }}][product_id]"
-                                                        value="{{ $selectedProductId }}"
+                                                        name="lines[{{ $lineView['index'] }}][product_id]"
+                                                        value="{{ $lineView['selected_product_id'] }}"
                                                         data-product-id
                                                     >
 
                                                     <input
                                                         type="text"
-                                                        value="{{ $selectedLabel }}"
-                                                        class="form-control @error('lines.' . $index . '.product_id') is-invalid @enderror"
+                                                        value="{{ $lineView['selected_label'] }}"
+                                                        class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
                                                         placeholder="Ketik minimal 2 huruf untuk cari product"
                                                         autocomplete="off"
                                                         data-product-search
@@ -111,7 +74,7 @@
                                                         data-product-results
                                                     ></div>
 
-                                                    @error('lines.' . $index . '.product_id')
+                                                    @error('lines.' . $lineView['index'] . '.product_id')
                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
                                                 </div>
@@ -123,14 +86,14 @@
                                                     <input
                                                         type="text"
                                                         inputmode="numeric"
-                                                        name="lines[{{ $index }}][qty_pcs]"
-                                                        value="{{ (string) ($line['qty_pcs'] ?? '1') }}"
-                                                        class="form-control @error('lines.' . $index . '.qty_pcs') is-invalid @enderror"
+                                                        name="lines[{{ $lineView['index'] }}][qty_pcs]"
+                                                        value="{{ $lineView['qty_pcs'] }}"
+                                                        class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
                                                         placeholder="Contoh: 2"
                                                         data-qty-input
                                                         required
                                                     >
-                                                    @error('lines.' . $index . '.qty_pcs')
+                                                    @error('lines.' . $lineView['index'] . '.qty_pcs')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
@@ -142,22 +105,22 @@
 
                                                     <input
                                                         type="hidden"
-                                                        name="lines[{{ $index }}][line_total_rupiah]"
-                                                        value="{{ (string) ($line['line_total_rupiah'] ?? '') }}"
+                                                        name="lines[{{ $lineView['index'] }}][line_total_rupiah]"
+                                                        value="{{ $lineView['line_total_raw'] }}"
                                                         data-money-raw
                                                     >
 
                                                     <input
                                                         type="text"
                                                         inputmode="numeric"
-                                                        value="{{ $lineTotalDisplay }}"
-                                                        class="form-control @error('lines.' . $index . '.line_total_rupiah') is-invalid @enderror"
+                                                        value="{{ $lineView['line_total_display'] }}"
+                                                        class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
                                                         placeholder="Contoh: 150.000"
                                                         data-money-display
                                                         required
                                                     >
 
-                                                    @error('lines.' . $index . '.line_total_rupiah')
+                                                    @error('lines.' . $lineView['index'] . '.line_total_rupiah')
                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
                                                 </div>
