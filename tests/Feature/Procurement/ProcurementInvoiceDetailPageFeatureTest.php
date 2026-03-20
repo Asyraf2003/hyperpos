@@ -46,7 +46,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 150000);
 
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
-        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000);
+        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000, null, 'Aki Kering', 'GS Astra', null);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 50000, '2026-03-16', 'pending');
         $this->seedSupplierPayment('payment-2', 'invoice-1', 25000, '2026-03-17', 'uploaded', null);
@@ -195,11 +195,13 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         string $supplierId,
         string $shipmentDate,
         string $dueDate,
-        int $grandTotalRupiah
+        int $grandTotalRupiah,
+        string $supplierNamaPtPengirimSnapshot = 'PT Sumber Makmur'
     ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
             'supplier_id' => $supplierId,
+            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
             'tanggal_pengiriman' => $shipmentDate,
             'jatuh_tempo' => $dueDate,
             'grand_total_rupiah' => $grandTotalRupiah,
@@ -212,12 +214,20 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         string $productId,
         int $qtyPcs,
         int $lineTotalRupiah,
-        int $unitCostRupiah
+        int $unitCostRupiah,
+        ?string $productKodeBarangSnapshot = 'KB-001',
+        string $productNamaBarangSnapshot = 'Ban Luar',
+        string $productMerekSnapshot = 'Federal',
+        ?int $productUkuranSnapshot = 90
     ): void {
         DB::table('supplier_invoice_lines')->insert([
             'id' => $id,
             'supplier_invoice_id' => $supplierInvoiceId,
             'product_id' => $productId,
+            'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
+            'product_nama_barang_snapshot' => $productNamaBarangSnapshot,
+            'product_merek_snapshot' => $productMerekSnapshot,
+            'product_ukuran_snapshot' => $productUkuranSnapshot,
             'qty_pcs' => $qtyPcs,
             'line_total_rupiah' => $lineTotalRupiah,
             'unit_cost_rupiah' => $unitCostRupiah,

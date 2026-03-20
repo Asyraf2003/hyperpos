@@ -22,19 +22,11 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
 
         DB::table('product_inventory')->insert([
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'qty_on_hand' => 3,
         ]);
 
         DB::table('product_inventory_costing')->insert([
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'avg_cost_rupiah' => 10000,
             'inventory_value_rupiah' => 30000,
         ]);
@@ -77,10 +69,6 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('inventory_movements', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'movement_type' => 'stock_in',
             'source_type' => 'supplier_receipt_line',
             'source_id' => (string) $receiptLine->id,
@@ -92,19 +80,11 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'qty_on_hand' => 7,
         ]);
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'avg_cost_rupiah' => 10000,
             'inventory_value_rupiah' => 70000,
         ]);

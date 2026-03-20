@@ -74,11 +74,18 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
         ]);
     }
 
-    private function seedInvoice(string $id, string $supplierId, string $shipmentDate, string $dueDate, int $grandTotal): void
-    {
+    private function seedInvoice(
+        string $id,
+        string $supplierId,
+        string $shipmentDate,
+        string $dueDate,
+        int $grandTotal,
+        string $supplierNamaPtPengirimSnapshot = 'PT Federal Abadi'
+    ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
             'supplier_id' => $supplierId,
+            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
             'tanggal_pengiriman' => $shipmentDate,
             'jatuh_tempo' => $dueDate,
             'grand_total_rupiah' => $grandTotal,
