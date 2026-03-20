@@ -49,13 +49,17 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 50000, '2026-03-16', 'pending');
-        $this->seedSupplierPayment(
+        $this->seedSupplierPayment('payment-2', 'invoice-1', 25000, '2026-03-17', 'uploaded', null);
+
+        $this->seedSupplierPaymentProofAttachment(
+            'attachment-1',
             'payment-2',
-            'invoice-1',
-            25000,
-            '2026-03-17',
-            'uploaded',
             'supplier-payment-proofs/payment-2/proof.pdf',
+            'proof.pdf',
+            'application/pdf',
+            120000,
+            '2026-03-17 10:00:00',
+            'actor-admin',
         );
 
         $this->seedSupplierReceipt('receipt-1', 'invoice-1', '2026-03-16');
@@ -106,6 +110,12 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Aki Kering');
         $response->assertSee('GS Astra');
         $response->assertSee('Rp 130.000');
+
+        $response->assertSee('Sudah Ada Bukti');
+        $response->assertSee('Belum Ada Bukti');
+        $response->assertSee('Jumlah Lampiran');
+        $response->assertSee('Riwayat Lampiran');
+        $response->assertSee('proof.pdf');
     }
 
     public function test_admin_can_access_procurement_invoice_detail_page_as_editable_when_no_receipt_and_no_payment_exist(): void
@@ -229,6 +239,28 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             'paid_at' => $paidAt,
             'proof_status' => $proofStatus,
             'proof_storage_path' => $proofStoragePath,
+        ]);
+    }
+
+    private function seedSupplierPaymentProofAttachment(
+        string $id,
+        string $supplierPaymentId,
+        string $storagePath,
+        string $originalFilename,
+        string $mimeType,
+        int $fileSizeBytes,
+        string $uploadedAt,
+        string $uploadedByActorId
+    ): void {
+        DB::table('supplier_payment_proof_attachments')->insert([
+            'id' => $id,
+            'supplier_payment_id' => $supplierPaymentId,
+            'storage_path' => $storagePath,
+            'original_filename' => $originalFilename,
+            'mime_type' => $mimeType,
+            'file_size_bytes' => $fileSizeBytes,
+            'uploaded_at' => $uploadedAt,
+            'uploaded_by_actor_id' => $uploadedByActorId,
         ]);
     }
 
