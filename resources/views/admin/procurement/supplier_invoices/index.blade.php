@@ -7,44 +7,28 @@
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex flex-column gap-3">
-                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
-                        <div>
-                            <h4 class="card-title mb-1">Daftar nota supplier</h4>
-                            <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
-                        </div>
-
-                        <div class="d-flex flex-column flex-md-row gap-2">
-                            <form id="procurement-search-form" class="d-flex flex-column gap-1">
-                                <input
-                                    type="text"
-                                    id="procurement-search-input"
-                                    class="form-control"
-                                    placeholder="Cari nomor nota atau nama PT"
-                                    autocomplete="off"
-                                >
-                            </form>
-
-                            <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
-                                Buat Nota Supplier
-                            </a>
-                        </div>
+                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                    <div>
+                        <h4 class="card-title mb-1">Daftar nota supplier</h4>
+                        <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
                     </div>
 
-                    <form id="procurement-filter-form" class="row g-2">
-                        <div class="col-12 col-md-3">
-                            <label for="shipment_date_from" class="form-label mb-1">Tgl Kirim Dari</label>
-                            <input type="date" id="shipment_date_from" name="shipment_date_from" class="form-control">
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label for="shipment_date_to" class="form-label mb-1">Tgl Kirim Sampai</label>
-                            <input type="date" id="shipment_date_to" name="shipment_date_to" class="form-control">
-                        </div>
-                        <div class="col-12 col-md-6 d-flex align-items-end gap-2">
-                            <button type="submit" class="btn btn-primary">Terapkan</button>
-                            <button type="button" id="reset-procurement-filter" class="btn btn-light-secondary">Reset</button>
-                        </div>
-                    </form>
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="procurement-search-form" class="d-flex flex-column gap-1">
+                            <input
+                                type="text"
+                                id="procurement-search-input"
+                                class="form-control"
+                                placeholder="Cari nomor nota atau nama PT"
+                                autocomplete="off"
+                            >
+                        </form>
+
+                        <button type="button" id="open-procurement-filter" class="btn btn-primary">Filter</button>
+                        <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
+                            Buat Nota Supplier
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -118,6 +102,9 @@
                 </div>
             </div>
         </div>
+
+        {{-- Asumsi path penempatan file partial Anda, silakan sesuaikan jika letak foldernya berbeda --}}
+        @include('admin.procurement.partials.filter_drawer')
     </section>
 @endsection
 

@@ -6,6 +6,54 @@
 @section('content')
     <section class="section">
         <div class="row">
+            <div class="col-12 col-xl-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Line Invoice</h4>
+                        <p class="mb-0 text-muted">Daftar item pembelian yang tercatat pada nota supplier ini.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode</th>
+                                        <th>Nama Barang</th>
+                                        <th>Merek</th>
+                                        <th>Ukuran</th>
+                                        <th>Qty</th>
+                                        <th>Unit Cost</th>
+                                        <th>Line Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($linesView as $index => $line)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $line['kode_barang'] ?? '-' }}</td>
+                                            <td>{{ $line['nama_barang'] }}</td>
+                                            <td>{{ $line['merek'] }}</td>
+                                            <td>{{ $line['ukuran'] ?? '-' }}</td>
+                                            <td>{{ $line['qty_pcs'] }}</td>
+                                            <td>{{ $line['unit_cost_label'] }}</td>
+                                            <td>{{ $line['line_total_label'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                Tidak ada line invoice.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="col-12 col-xl-4">
                 <div class="card">
                     <div class="card-header">
@@ -239,54 +287,7 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-12 col-xl-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title mb-1">Line Invoice</h4>
-                        <p class="mb-0 text-muted">Daftar item pembelian yang tercatat pada nota supplier ini.</p>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-lg">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kode</th>
-                                        <th>Nama Barang</th>
-                                        <th>Merek</th>
-                                        <th>Ukuran</th>
-                                        <th>Qty</th>
-                                        <th>Unit Cost</th>
-                                        <th>Line Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($linesView as $index => $line)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $line['kode_barang'] ?? '-' }}</td>
-                                            <td>{{ $line['nama_barang'] }}</td>
-                                            <td>{{ $line['merek'] }}</td>
-                                            <td>{{ $line['ukuran'] ?? '-' }}</td>
-                                            <td>{{ $line['qty_pcs'] }}</td>
-                                            <td>{{ $line['unit_cost_label'] }}</td>
-                                            <td>{{ $line['line_total_label'] }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
-                                                Tidak ada line invoice.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </section>
 @endsection
