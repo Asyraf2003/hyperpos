@@ -36,7 +36,7 @@
                 <div class="table-responsive">
                     <table class="table table-lg" id="procurement-invoice-table">
                         <thead>
-                            <tr>
+                            <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
                                 <th>Nota</th>
                                 <th>
@@ -89,7 +89,7 @@
                                 </th>
                                 <th class="text-center">Aksi</th>
                             </tr>
-                        </thead>
+                        </thead>                        
                         <tbody id="procurement-invoice-table-body">
                             <tr><td colspan="11" class="text-center text-muted py-4">Memuat data...</td></tr>
                         </tbody>

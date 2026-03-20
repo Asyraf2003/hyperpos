@@ -29,7 +29,7 @@
                 <div class="table-responsive">
                     <table class="table table-lg" id="supplier-table">
                         <thead>
-                            <tr>
+                            <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_pt_pengirim">

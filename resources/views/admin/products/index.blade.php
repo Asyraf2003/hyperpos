@@ -34,7 +34,7 @@
                 <div class="table-responsive">
                     <table class="table table-lg" id="product-table">
                         <thead>
-                            <tr>
+                            <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
                                 <th>Kode Barang</th>
                                 <th>
