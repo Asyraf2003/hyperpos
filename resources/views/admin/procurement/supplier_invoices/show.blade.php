@@ -214,11 +214,19 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Bukti Pembayaran</h4>
-                        <p class="mb-0 text-muted">Upload bukti ke payment row yang sudah tercatat.</p>
+                        <p class="mb-0 text-muted">Upload bukti ke payment row yang sudah tercatat. Maksimal 3 file per upload dan boleh upload lagi untuk payment yang sama.</p>
                     </div>
 
                     <div class="card-body">
                         @error('supplier_payment_proof')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        @error('proof_files')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        @error('proof_files.*')
                             <div class="alert alert-danger">{{ $message }}</div>
                         @enderror
 
@@ -243,43 +251,66 @@
                                             <strong>{{ $payment['amount_label'] }}</strong>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <small class="text-muted d-block">Proof Status</small>
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Status Bukti</small>
                                             <strong>{{ $payment['proof_status_label'] }}</strong>
                                         </div>
 
-                                        @if ($payment['can_attach_proof'])
-                                            <form
-                                                action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
-                                                method="post"
-                                                enctype="multipart/form-data"
-                                            >
-                                                @csrf
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block">Jumlah Lampiran</small>
+                                            <strong>{{ $payment['attachment_count'] }}</strong>
+                                        </div>
 
-                                                <div class="form-group mb-3">
-                                                    <label class="form-label" for="proof_file_{{ $payment['id'] }}">File Bukti</label>
-                                                    <input
-                                                        type="file"
-                                                        id="proof_file_{{ $payment['id'] }}"
-                                                        name="proof_file"
-                                                        class="form-control @error('proof_file') is-invalid @enderror"
-                                                        accept=".jpg,.jpeg,.png,.pdf"
-                                                        required
-                                                    >
-                                                    @error('proof_file')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
+                                        <form
+                                            action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
+                                            method="post"
+                                            enctype="multipart/form-data"
+                                        >
+                                            @csrf
 
-                                                <button type="submit" class="btn btn-outline-primary">
-                                                    Upload Bukti
-                                                </button>
-                                            </form>
-                                        @else
-                                            <div class="text-muted">
-                                                Bukti tersimpan: {{ $payment['proof_storage_path'] ?? '-' }}
+                                            <div class="form-group mb-3">
+                                                <label class="form-label" for="proof_files_{{ $payment['id'] }}">File Bukti</label>
+                                                <input
+                                                    type="file"
+                                                    id="proof_files_{{ $payment['id'] }}"
+                                                    name="proof_files[]"
+                                                    class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
+                                                    accept=".jpg,.jpeg,.png,.pdf"
+                                                    multiple
+                                                    required
+                                                >
+                                                <small class="text-muted d-block mt-1">
+                                                    Maksimal 3 file per upload. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
+                                                </small>
                                             </div>
-                                        @endif
+
+                                            <button type="submit" class="btn btn-outline-primary">
+                                                Upload Bukti
+                                            </button>
+                                        </form>
+
+                                        <hr>
+
+                                        <div>
+                                            <small class="text-muted d-block mb-2">Riwayat Lampiran</small>
+
+                                            @if ($payment['attachments'] === [])
+                                                <div class="text-muted">Belum ada lampiran bukti.</div>
+                                            @else
+                                                <div class="d-flex flex-column gap-2">
+                                                    @foreach ($payment['attachments'] as $attachment)
+                                                        <div class="border rounded p-2">
+                                                            <div><strong>{{ $attachment['original_filename'] }}</strong></div>
+                                                            <div class="small text-muted">Mime: {{ $attachment['mime_type'] }}</div>
+                                                            <div class="small text-muted">Ukuran: {{ number_format($attachment['file_size_bytes']) }} byte</div>
+                                                            <div class="small text-muted">Uploaded At: {{ $attachment['uploaded_at'] }}</div>
+                                                            <div class="small text-muted">Actor: {{ $attachment['uploaded_by_actor_id'] }}</div>
+                                                            <div class="small text-muted">Path: {{ $attachment['storage_path'] }}</div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -287,7 +318,7 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </section>
 @endsection
