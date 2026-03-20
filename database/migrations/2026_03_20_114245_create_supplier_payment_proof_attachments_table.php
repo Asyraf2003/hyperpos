@@ -20,9 +20,12 @@ return new class extends Migration
             $table->timestamp('uploaded_at');
             $table->string('uploaded_by_actor_id');
 
-            $table->index('supplier_payment_id');
-            $table->index('uploaded_at');
-            $table->index(['supplier_payment_id', 'uploaded_at']);
+            $table->index('supplier_payment_id', 'sp_pa_payment_idx');
+            $table->index('uploaded_at', 'sp_pa_uploaded_idx');
+            $table->index(
+                ['supplier_payment_id', 'uploaded_at'],
+                'sp_pa_payment_uploaded_idx'
+            );
         });
     }
 
