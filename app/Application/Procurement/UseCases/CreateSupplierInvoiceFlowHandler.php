@@ -64,6 +64,7 @@ final class CreateSupplierInvoiceFlowHandler
             $invoice = SupplierInvoice::create(
                 $this->uuid->generate(),
                 $supplier->id(),
+                $supplier->namaPtPengirim(),
                 $dateKirim,
                 $this->invoiceFactory->makeLines($lines)
             );

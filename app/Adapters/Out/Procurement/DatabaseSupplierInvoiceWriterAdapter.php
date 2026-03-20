@@ -26,6 +26,7 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
         return [
             'id' => $supplierInvoice->id(),
             'supplier_id' => $supplierInvoice->supplierId(),
+            'supplier_nama_pt_pengirim_snapshot' => $supplierInvoice->supplierNamaPtPengirimSnapshot(),
             'tanggal_pengiriman' => $supplierInvoice->tanggalPengiriman()->format('Y-m-d'),
             'jatuh_tempo' => $supplierInvoice->jatuhTempo()->format('Y-m-d'),
             'grand_total_rupiah' => $supplierInvoice->grandTotalRupiah()->amount(),
@@ -33,7 +34,7 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
     }
 
     /**
-     * @return list<array<string, string|int>>
+     * @return list<array<string, string|int|null>>
      */
     private function toLineRecords(SupplierInvoice $supplierInvoice): array
     {
@@ -42,6 +43,10 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
                 'id' => $line->id(),
                 'supplier_invoice_id' => $supplierInvoice->id(),
                 'product_id' => $line->productId(),
+                'product_kode_barang_snapshot' => $line->productKodeBarangSnapshot(),
+                'product_nama_barang_snapshot' => $line->productNamaBarangSnapshot(),
+                'product_merek_snapshot' => $line->productMerekSnapshot(),
+                'product_ukuran_snapshot' => $line->productUkuranSnapshot(),
                 'qty_pcs' => $line->qtyPcs(),
                 'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
                 'unit_cost_rupiah' => $line->unitCostRupiah()->amount(),

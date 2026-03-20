@@ -12,37 +12,119 @@ final class SupplierInvoiceLine
     private function __construct(
         private string $id,
         private string $productId,
+        private ?string $productKodeBarangSnapshot,
+        private string $productNamaBarangSnapshot,
+        private string $productMerekSnapshot,
+        private ?int $productUkuranSnapshot,
         private int $qtyPcs,
         private Money $lineTotalRupiah,
         private Money $unitCostRupiah,
-    ) {}
-
-    public static function create(string $id, string $pId, int $qty, Money $total): self
-    {
-        self::assertValid($id, $pId, $qty, $total);
-        $unitCost = Money::fromInt(intdiv($total->amount(), $qty));
-        return new self(trim($id), trim($pId), $qty, $total, $unitCost);
+    ) {
     }
 
-    public static function rehydrate(string $id, string $pId, int $qty, Money $total): self
-    {
-        self::assertValid($id, $pId, $qty, $total);
+    public static function create(
+        string $id,
+        string $pId,
+        ?string $productKodeBarangSnapshot,
+        string $productNamaBarangSnapshot,
+        string $productMerekSnapshot,
+        ?int $productUkuranSnapshot,
+        int $qty,
+        Money $total
+    ): self {
+        self::assertValid(
+            $id,
+            $pId,
+            $productNamaBarangSnapshot,
+            $productMerekSnapshot,
+            $qty,
+            $total
+        );
+
         $unitCost = Money::fromInt(intdiv($total->amount(), $qty));
-        return new self(trim($id), trim($pId), $qty, $total, $unitCost);
+
+        return new self(
+            trim($id),
+            trim($pId),
+            self::normalizeNullableString($productKodeBarangSnapshot),
+            trim($productNamaBarangSnapshot),
+            trim($productMerekSnapshot),
+            $productUkuranSnapshot,
+            $qty,
+            $total,
+            $unitCost
+        );
+    }
+
+    public static function rehydrate(
+        string $id,
+        string $pId,
+        ?string $productKodeBarangSnapshot,
+        string $productNamaBarangSnapshot,
+        string $productMerekSnapshot,
+        ?int $productUkuranSnapshot,
+        int $qty,
+        Money $total
+    ): self {
+        self::assertValid(
+            $id,
+            $pId,
+            $productNamaBarangSnapshot,
+            $productMerekSnapshot,
+            $qty,
+            $total
+        );
+
+        $unitCost = Money::fromInt(intdiv($total->amount(), $qty));
+
+        return new self(
+            trim($id),
+            trim($pId),
+            self::normalizeNullableString($productKodeBarangSnapshot),
+            trim($productNamaBarangSnapshot),
+            trim($productMerekSnapshot),
+            $productUkuranSnapshot,
+            $qty,
+            $total,
+            $unitCost
+        );
     }
 
     public function id(): string { return $this->id; }
     public function productId(): string { return $this->productId; }
+    public function productKodeBarangSnapshot(): ?string { return $this->productKodeBarangSnapshot; }
+    public function productNamaBarangSnapshot(): string { return $this->productNamaBarangSnapshot; }
+    public function productMerekSnapshot(): string { return $this->productMerekSnapshot; }
+    public function productUkuranSnapshot(): ?int { return $this->productUkuranSnapshot; }
     public function qtyPcs(): int { return $this->qtyPcs; }
     public function lineTotalRupiah(): Money { return $this->lineTotalRupiah; }
     public function unitCostRupiah(): Money { return $this->unitCostRupiah; }
 
-    private static function assertValid(string $id, string $pId, int $qty, Money $total): void
-    {
+    private static function assertValid(
+        string $id,
+        string $pId,
+        string $productNamaBarangSnapshot,
+        string $productMerekSnapshot,
+        int $qty,
+        Money $total
+    ): void {
         if (trim($id) === '') throw new DomainException('ID wajib ada.');
         if (trim($pId) === '') throw new DomainException('Product ID wajib ada.');
+        if (trim($productNamaBarangSnapshot) === '') throw new DomainException('Snapshot nama barang wajib ada.');
+        if (trim($productMerekSnapshot) === '') throw new DomainException('Snapshot merek wajib ada.');
         if ($qty <= 0) throw new DomainException('Qty harus > 0.');
         if (!$total->greaterThan(Money::zero())) throw new DomainException('Total harus > 0.');
         if ($total->amount() % $qty !== 0) throw new DomainException('Total harus habis dibagi qty.');
+    }
+
+    private static function normalizeNullableString(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = trim($value);
+
+        return $normalized === '' ? null : $normalized;
     }
 }

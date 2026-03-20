@@ -11,10 +11,11 @@ use DateTimeImmutable;
 trait SupplierInvoiceValidation
 {
     /** @param list<SupplierInvoiceLine> $lines */
-    private static function assertValid(string $id, string $sId, array $lines): void
+    private static function assertValid(string $id, string $sId, string $supplierNamaPtPengirimSnapshot, array $lines): void
     {
         if (trim($id) === '') throw new DomainException('ID wajib ada.');
         if (trim($sId) === '') throw new DomainException('Supplier ID wajib ada.');
+        if (trim($supplierNamaPtPengirimSnapshot) === '') throw new DomainException('Snapshot nama supplier wajib ada.');
         if ($lines === []) throw new DomainException('Minimal 1 line.');
         foreach ($lines as $l) {
             if (!$l instanceof SupplierInvoiceLine) throw new DomainException('Line tidak valid.');

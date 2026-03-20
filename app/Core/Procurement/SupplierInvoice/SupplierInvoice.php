@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core\Procurement\SupplierInvoice;
 
-use App\Core\Shared\ValueObjects\Money;
 use DateTimeImmutable;
 
 final class SupplierInvoice
@@ -13,16 +12,44 @@ final class SupplierInvoice
     use SupplierInvoiceValidation;
 
     /** @param list<SupplierInvoiceLine> $lines */
-    public static function create(string $id, string $sId, DateTimeImmutable $tgl, array $lines): self
-    {
-        self::assertValid($id, $sId, $lines);
-        return new self($id, trim($sId), $tgl, self::calculateJatuhTempo($tgl), array_values($lines), self::calculateGrandTotalRupiah($lines));
+    public static function create(
+        string $id,
+        string $sId,
+        string $supplierNamaPtPengirimSnapshot,
+        DateTimeImmutable $tgl,
+        array $lines
+    ): self {
+        self::assertValid($id, $sId, $supplierNamaPtPengirimSnapshot, $lines);
+
+        return new self(
+            trim($id),
+            trim($sId),
+            trim($supplierNamaPtPengirimSnapshot),
+            $tgl,
+            self::calculateJatuhTempo($tgl),
+            array_values($lines),
+            self::calculateGrandTotalRupiah($lines)
+        );
     }
 
     /** @param list<SupplierInvoiceLine> $lines */
-    public static function rehydrate(string $id, string $sId, DateTimeImmutable $tgl, array $lines): self
-    {
-        self::assertValid($id, $sId, $lines);
-        return new self($id, trim($sId), $tgl, self::calculateJatuhTempo($tgl), array_values($lines), self::calculateGrandTotalRupiah($lines));
+    public static function rehydrate(
+        string $id,
+        string $sId,
+        string $supplierNamaPtPengirimSnapshot,
+        DateTimeImmutable $tgl,
+        array $lines
+    ): self {
+        self::assertValid($id, $sId, $supplierNamaPtPengirimSnapshot, $lines);
+
+        return new self(
+            trim($id),
+            trim($sId),
+            trim($supplierNamaPtPengirimSnapshot),
+            $tgl,
+            self::calculateJatuhTempo($tgl),
+            array_values($lines),
+            self::calculateGrandTotalRupiah($lines)
+        );
     }
 }

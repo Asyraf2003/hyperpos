@@ -16,7 +16,12 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
     public function getById(string $supplierInvoiceId): ?SupplierInvoice
     {
         $invoiceRow = DB::table('supplier_invoices')
-            ->select(['id', 'supplier_id', 'tanggal_pengiriman'])
+            ->select([
+                'id',
+                'supplier_id',
+                'supplier_nama_pt_pengirim_snapshot',
+                'tanggal_pengiriman',
+            ])
             ->where('id', $supplierInvoiceId)
             ->first();
 
@@ -29,6 +34,10 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
                 'id',
                 'supplier_invoice_id',
                 'product_id',
+                'product_kode_barang_snapshot',
+                'product_nama_barang_snapshot',
+                'product_merek_snapshot',
+                'product_ukuran_snapshot',
                 'qty_pcs',
                 'line_total_rupiah',
             ])
@@ -41,6 +50,10 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
             $lines[] = SupplierInvoiceLine::rehydrate(
                 (string) $row->id,
                 (string) $row->product_id,
+                $row->product_kode_barang_snapshot !== null ? (string) $row->product_kode_barang_snapshot : null,
+                (string) $row->product_nama_barang_snapshot,
+                (string) $row->product_merek_snapshot,
+                $row->product_ukuran_snapshot !== null ? (int) $row->product_ukuran_snapshot : null,
                 (int) $row->qty_pcs,
                 Money::fromInt((int) $row->line_total_rupiah),
             );
@@ -49,6 +62,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
         return SupplierInvoice::rehydrate(
             (string) $invoiceRow->id,
             (string) $invoiceRow->supplier_id,
+            (string) $invoiceRow->supplier_nama_pt_pengirim_snapshot,
             new DateTimeImmutable((string) $invoiceRow->tanggal_pengiriman),
             $lines,
         );

@@ -15,7 +15,8 @@ final class SupplierInvoiceFactory
     public function __construct(
         private ProductReaderPort $products,
         private UuidPort $uuid
-    ) {}
+    ) {
+    }
 
     public function makeLines(array $lines): array
     {
@@ -23,13 +24,19 @@ final class SupplierInvoiceFactory
 
         return array_map(function ($l) {
             $pId = trim((string)($l['product_id'] ?? ''));
-            if ($pId === '' || !$this->products->getById($pId)) {
+            $product = $pId !== '' ? $this->products->getById($pId) : null;
+
+            if ($product === null) {
                 throw new DomainException('Product tidak ditemukan.');
             }
 
             return SupplierInvoiceLine::create(
                 $this->uuid->generate(),
                 $pId,
+                $product->kodeBarang(),
+                $product->namaBarang(),
+                $product->merek(),
+                $product->ukuran(),
                 (int)($l['qty_pcs'] ?? 0),
                 Money::fromInt((int)($l['line_total_rupiah'] ?? 0))
             );
