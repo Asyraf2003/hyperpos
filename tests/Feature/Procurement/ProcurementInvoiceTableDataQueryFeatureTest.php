@@ -103,6 +103,25 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         $response->assertJsonPath('data.rows.0.supplier_invoice_id', 'invoice-11');
     }
 
+    public function test_admin_can_view_receipt_aggregations_in_procurement_invoice_table(): void
+    {
+        $this->seedSupplier('supplier-1', 'PT Makmur');
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Makmur');
+
+        $this->seedReceipt('receipt-1', 'invoice-1', '2026-03-16');
+        $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'line-1', 5);
+
+        $this->seedReceipt('receipt-2', 'invoice-1', '2026-03-17');
+        $this->seedReceiptLine('receipt-line-2', 'receipt-2', 'line-2', 10);
+
+        $response = $this->actingAs($this->admin())
+            ->get(route('admin.procurement.supplier-invoices.table'));
+
+        $response->assertOk();
+        $response->assertJsonPath('data.rows.0.receipt_count', 2);
+        $response->assertJsonPath('data.rows.0.total_received_qty', 15);
+    }
+
     private function admin(): User
     {
         $user = User::query()->create([
