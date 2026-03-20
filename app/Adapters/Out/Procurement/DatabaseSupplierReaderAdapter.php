@@ -10,6 +10,23 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierReaderAdapter implements SupplierReaderPort
 {
+    public function getById(string $supplierId): ?Supplier
+    {
+        $row = DB::table('suppliers')
+            ->select(['id', 'nama_pt_pengirim', 'nama_pt_pengirim_normalized'])
+            ->where('id', $supplierId)
+            ->first();
+
+        if ($row === null) {
+            return null;
+        }
+
+        return Supplier::rehydrate(
+            (string) $row->id,
+            (string) $row->nama_pt_pengirim,
+        );
+    }
+
     public function getByNormalizedNamaPtPengirim(string $namaPtPengirimNormalized): ?Supplier
     {
         $row = DB::table('suppliers')

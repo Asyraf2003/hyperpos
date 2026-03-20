@@ -15,6 +15,13 @@ final class DatabaseSupplierWriterAdapter implements SupplierWriterPort
         DB::table('suppliers')->insert($this->toRecord($supplier));
     }
 
+    public function update(Supplier $supplier): void
+    {
+        DB::table('suppliers')
+            ->where('id', $supplier->id())
+            ->update($this->toRecord($supplier));
+    }
+
     /**
      * @return array<string, string>
      */

@@ -22,7 +22,7 @@ final class Supplier
         self::assertValid($id, $namaPtPengirim);
 
         return new self(
-            $id,
+            trim($id),
             trim($namaPtPengirim),
             self::normalizeNamaPtPengirim($namaPtPengirim),
         );
@@ -35,10 +35,18 @@ final class Supplier
         self::assertValid($id, $namaPtPengirim);
 
         return new self(
-            $id,
+            trim($id),
             trim($namaPtPengirim),
             self::normalizeNamaPtPengirim($namaPtPengirim),
         );
+    }
+
+    public function rename(string $namaPtPengirim): void
+    {
+        self::assertValid($this->id, $namaPtPengirim);
+
+        $this->namaPtPengirim = trim($namaPtPengirim);
+        $this->namaPtPengirimNormalized = self::normalizeNamaPtPengirim($namaPtPengirim);
     }
 
     public function id(): string

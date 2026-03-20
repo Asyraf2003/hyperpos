@@ -9,4 +9,6 @@ use App\Core\Procurement\Supplier\Supplier;
 interface SupplierWriterPort
 {
     public function create(Supplier $supplier): void;
+
+    public function update(Supplier $supplier): void;
 }

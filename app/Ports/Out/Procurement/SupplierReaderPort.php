@@ -8,5 +8,7 @@ use App\Core\Procurement\Supplier\Supplier;
 
 interface SupplierReaderPort
 {
+    public function getById(string $supplierId): ?Supplier;
+
     public function getByNormalizedNamaPtPengirim(string $namaPtPengirimNormalized): ?Supplier;
 }
