@@ -177,6 +177,7 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         ]);
     }
 
+
     private function seedReceipt(string $id, string $invoiceId, string $tanggalTerima): void
     {
         DB::table('supplier_receipts')->insert([
