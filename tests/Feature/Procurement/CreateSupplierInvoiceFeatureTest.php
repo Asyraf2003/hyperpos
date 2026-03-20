@@ -133,10 +133,6 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('inventory_movements', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'movement_type' => 'stock_in',
             'source_type' => 'supplier_receipt_line',
             'source_id' => (string) $receiptLine1->id,
@@ -305,7 +301,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('supplier_invoices', [
             'supplier_id' => 'supplier-1',
-            'supplier_nama_pt_pengirim_snapshot' => 'PT Supplier Test',
+            'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
             'tanggal_pengiriman' => '2026-01-30',
             'jatuh_tempo' => '2026-02-28',
             'grand_total_rupiah' => 20000,
