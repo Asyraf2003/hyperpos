@@ -105,6 +105,139 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Catat Pembayaran</h4>
+                        <p class="mb-0 text-muted">Pembayaran supplier dicatat eksplisit per invoice.</p>
+                    </div>
+
+                    <div class="card-body">
+                        @error('supplier_payment')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        @if ($summaryView['can_record_payment'])
+                            <form action="{{ route('admin.procurement.supplier-invoices.payments.store', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}" method="post">
+                                @csrf
+
+                                <div class="form-group mb-4">
+                                    <label for="payment_date" class="form-label">Tanggal Bayar</label>
+                                    <input
+                                        type="date"
+                                        id="payment_date"
+                                        name="payment_date"
+                                        value="{{ old('payment_date') }}"
+                                        class="form-control @error('payment_date') is-invalid @enderror"
+                                        required
+                                    >
+                                    @error('payment_date')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label for="amount" class="form-label">Nominal Bayar</label>
+                                    <input
+                                        type="number"
+                                        id="amount"
+                                        name="amount"
+                                        value="{{ old('amount', $summaryView['outstanding_amount']) }}"
+                                        class="form-control @error('amount') is-invalid @enderror"
+                                        min="1"
+                                        step="1"
+                                        required
+                                    >
+                                    @error('amount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    Simpan Pembayaran
+                                </button>
+                            </form>
+                        @else
+                            <div class="text-muted">Invoice supplier ini sudah lunas. Tidak ada pembayaran tambahan yang bisa dicatat.</div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Bukti Pembayaran</h4>
+                        <p class="mb-0 text-muted">Upload bukti ke payment row yang sudah tercatat.</p>
+                    </div>
+
+                    <div class="card-body">
+                        @error('supplier_payment_proof')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        @if ($paymentsView === [])
+                            <div class="text-muted">Belum ada pembayaran supplier.</div>
+                        @else
+                            <div class="d-flex flex-column gap-3">
+                                @foreach ($paymentsView as $payment)
+                                    <div class="border rounded p-3">
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Payment ID</small>
+                                            <strong>{{ $payment['id'] }}</strong>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Tanggal Bayar</small>
+                                            <strong>{{ $payment['paid_at'] }}</strong>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <small class="text-muted d-block">Nominal</small>
+                                            <strong>{{ $payment['amount_label'] }}</strong>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <small class="text-muted d-block">Proof Status</small>
+                                            <strong>{{ $payment['proof_status_label'] }}</strong>
+                                        </div>
+
+                                        @if ($payment['can_attach_proof'])
+                                            <form
+                                                action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
+                                                method="post"
+                                                enctype="multipart/form-data"
+                                            >
+                                                @csrf
+
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label" for="proof_file_{{ $payment['id'] }}">File Bukti</label>
+                                                    <input
+                                                        type="file"
+                                                        id="proof_file_{{ $payment['id'] }}"
+                                                        name="proof_file"
+                                                        class="form-control @error('proof_file') is-invalid @enderror"
+                                                        accept=".jpg,.jpeg,.png,.pdf"
+                                                        required
+                                                    >
+                                                    @error('proof_file')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <button type="submit" class="btn btn-outline-primary">
+                                                    Upload Bukti
+                                                </button>
+                                            </form>
+                                        @else
+                                            <div class="text-muted">
+                                                Bukti tersimpan: {{ $payment['proof_storage_path'] ?? '-' }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
 
             <div class="col-12 col-xl-8">

@@ -9,4 +9,6 @@ use App\Core\Procurement\SupplierPayment\SupplierPayment;
 interface SupplierPaymentWriterPort
 {
     public function create(SupplierPayment $supplierPayment): void;
+
+    public function update(SupplierPayment $supplierPayment): void;
 }

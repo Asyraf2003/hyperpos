@@ -49,7 +49,14 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 50000, '2026-03-16', 'pending');
-        $this->seedSupplierPayment('payment-2', 'invoice-1', 25000, '2026-03-17', 'uploaded');
+        $this->seedSupplierPayment(
+            'payment-2',
+            'invoice-1',
+            25000,
+            '2026-03-17',
+            'uploaded',
+            'supplier-payment-proofs/payment-2/proof.pdf',
+        );
 
         $this->seedSupplierReceipt('receipt-1', 'invoice-1', '2026-03-16');
         $this->seedSupplierReceipt('receipt-2', 'invoice-1', '2026-03-17');
@@ -64,6 +71,12 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertSee('Policy State');
         $response->assertSee('Locked');
+        $response->assertSee('Catat Pembayaran');
+        $response->assertSee('Simpan Pembayaran');
+        $response->assertSee('Bukti Pembayaran');
+        $response->assertSee('Belum ada pembayaran supplier.');
+        $response->assertSee('Bukti Pembayaran');
+        $response->assertSee('Upload Bukti');
         $response->assertSee('Allowed Actions');
         $response->assertSee('Correction / reversal');
         $response->assertSee('Lock Reasons');
@@ -112,6 +125,10 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertSee('Policy State');
         $response->assertSee('Editable');
+        $response->assertSee('Catat Pembayaran');
+        $response->assertSee('Simpan Pembayaran');
+        $response->assertSee('Bukti Pembayaran');
+        $response->assertSee('Belum ada pembayaran supplier.');
         $response->assertSee('Allowed Actions');
         $response->assertSee('Edit invoice');
         $response->assertSee('Void invoice');
@@ -204,7 +221,8 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         string $supplierInvoiceId,
         int $amountRupiah,
         string $paidAt,
-        string $proofStatus
+        string $proofStatus,
+        ?string $proofStoragePath = null
     ): void {
         DB::table('supplier_payments')->insert([
             'id' => $id,
@@ -212,7 +230,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             'amount_rupiah' => $amountRupiah,
             'paid_at' => $paidAt,
             'proof_status' => $proofStatus,
-            'proof_storage_path' => null,
+            'proof_storage_path' => $proofStoragePath,
         ]);
     }
 

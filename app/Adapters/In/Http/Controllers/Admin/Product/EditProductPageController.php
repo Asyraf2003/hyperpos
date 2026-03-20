@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Product;
 
+use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -13,6 +14,7 @@ final class EditProductPageController extends Controller
 {
     public function __construct(
         private readonly ProductReaderPort $products,
+        private readonly ProductInventoryReaderPort $inventories,
     ) {
     }
 
@@ -26,8 +28,11 @@ final class EditProductPageController extends Controller
                 ->with('error', 'Product tidak ditemukan.');
         }
 
+        $inventory = $this->inventories->getByProductId($productId);
+
         return view('admin.products.edit', [
             'product' => $product,
+            'currentStock' => $inventory?->qtyOnHand() ?? 0,
         ]);
     }
 }

@@ -6,7 +6,7 @@
 @section('content')
     <section class="section">
         <div class="row">
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-xl-6">
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
@@ -140,6 +140,84 @@
                                     Batal
                                 </a>
                             </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Stock Adjustment</h4>
+                        <p class="mb-0 text-muted">
+                            Slice ini khusus pengurangan stok operasional resmi lewat movement ledger.
+                        </p>
+                    </div>
+
+                    <div class="card-body">
+                        @error('stock_adjustment')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        <div class="mb-4">
+                            <small class="text-muted d-block">Stok Saat Ini</small>
+                            <strong>{{ $currentStock }}</strong>
+                        </div>
+
+                        <form action="{{ route('admin.products.stock-adjustments.store', ['productId' => $product->id()]) }}" method="post">
+                            @csrf
+
+                            <div class="form-group mb-4">
+                                <label for="adjusted_at" class="form-label">Tanggal Adjustment</label>
+                                <input
+                                    type="date"
+                                    id="adjusted_at"
+                                    name="adjusted_at"
+                                    value="{{ old('adjusted_at') }}"
+                                    class="form-control @error('adjusted_at') is-invalid @enderror"
+                                    required
+                                >
+                                @error('adjusted_at')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="qty_issue" class="form-label">Qty Keluar</label>
+                                <input
+                                    type="number"
+                                    id="qty_issue"
+                                    name="qty_issue"
+                                    value="{{ old('qty_issue') }}"
+                                    class="form-control @error('qty_issue') is-invalid @enderror"
+                                    min="1"
+                                    step="1"
+                                    placeholder="Contoh: 2"
+                                    required
+                                >
+                                @error('qty_issue')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="reason" class="form-label">Alasan</label>
+                                <textarea
+                                    id="reason"
+                                    name="reason"
+                                    rows="4"
+                                    class="form-control @error('reason') is-invalid @enderror"
+                                    placeholder="Contoh: barang rusak, hilang, atau retur keluar"
+                                    required
+                                >{{ old('reason') }}</textarea>
+                                @error('reason')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit" class="btn btn-danger">
+                                Catat Stock Adjustment
+                            </button>
                         </form>
                     </div>
                 </div>

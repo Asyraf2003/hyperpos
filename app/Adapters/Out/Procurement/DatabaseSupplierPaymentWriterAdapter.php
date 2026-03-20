@@ -15,6 +15,13 @@ final class DatabaseSupplierPaymentWriterAdapter implements SupplierPaymentWrite
         DB::table('supplier_payments')->insert($this->toRecord($supplierPayment));
     }
 
+    public function update(SupplierPayment $supplierPayment): void
+    {
+        DB::table('supplier_payments')
+            ->where('id', $supplierPayment->id())
+            ->update($this->toRecord($supplierPayment));
+    }
+
     /**
      * @return array<string, string|int|null>
      */
