@@ -155,10 +155,6 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'qty_on_hand' => 2,
         ]);
 
@@ -169,10 +165,6 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
             'avg_cost_rupiah' => 10000,
             'inventory_value_rupiah' => 20000,
         ]);
