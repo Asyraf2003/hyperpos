@@ -31,6 +31,10 @@
   const searchInput = $("procurement-search-input");
   const filterForm = $("procurement-filter-form");
   const resetFilter = $("reset-procurement-filter");
+  
+  // PENAMBAHAN: Variabel untuk drawer
+  const drawer = $("procurement-filter-drawer");
+  const backdrop = $("procurement-filter-backdrop");
 
   let searchDebounceTimer = null;
   let requestCounter = 0;
@@ -103,6 +107,12 @@
     }
 
     window.history.pushState(null, "", url);
+  };
+
+  // PENAMBAHAN: Fungsi untuk toggle drawer
+  const drawOpen = (open) => {
+    drawer.classList.toggle("d-none", !open);
+    backdrop.classList.toggle("d-none", !open);
   };
 
   const rowHtml = (r, i, meta) => `
@@ -198,6 +208,11 @@
     updateUrl(replaceUrl);
   };
 
+  // PENAMBAHAN: Event listener untuk tombol filter (Buka/Tutup/Backdrop)
+  $("open-procurement-filter").addEventListener("click", () => drawOpen(true));
+  $("close-procurement-filter").addEventListener("click", () => drawOpen(false));
+  backdrop.addEventListener("click", () => drawOpen(false));
+
   searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const value = trimValue(searchInput.value);
@@ -245,6 +260,9 @@
     s.shipment_date_from = trimValue(f.get("shipment_date_from"));
     s.shipment_date_to = trimValue(f.get("shipment_date_to"));
     s.page = 1;
+    
+    // PENAMBAHAN: Tutup drawer setelah submit
+    drawOpen(false);
     load();
   });
 
@@ -253,6 +271,9 @@
     s.shipment_date_to = "";
     s.page = 1;
     syncInputsFromState();
+    
+    // PENAMBAHAN: Tutup drawer setelah di-reset
+    drawOpen(false);
     load();
   });
 
