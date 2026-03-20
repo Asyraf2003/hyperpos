@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Services\SupplierPaymentProofAttachmentFactory;
 use App\Application\Shared\DTO\Result;
-use App\Core\Procurement\SupplierPaymentProofAttachment\SupplierPaymentProofAttachment;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\AuditLogPort;
-use App\Ports\Out\ClockPort;
 use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentWriterPort;
 use App\Ports\Out\Procurement\SupplierPaymentReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentWriterPort;
 use App\Ports\Out\TransactionManagerPort;
-use App\Ports\Out\UuidPort;
 use Throwable;
 
 final class AttachSupplierPaymentProofHandler
@@ -22,19 +20,18 @@ final class AttachSupplierPaymentProofHandler
         private readonly SupplierPaymentReaderPort $payments,
         private readonly SupplierPaymentWriterPort $writer,
         private readonly SupplierPaymentProofAttachmentWriterPort $attachments,
+        private readonly SupplierPaymentProofAttachmentFactory $attachmentFactory,
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
-        private readonly UuidPort $uuid,
-        private readonly ClockPort $clock,
     ) {
     }
 
     /**
      * @param list<array{
-     *   storage_path:string,
-     *   original_filename:string,
-     *   mime_type:string,
-     *   file_size_bytes:int
+     * storage_path:string,
+     * original_filename:string,
+     * mime_type:string,
+     * file_size_bytes:int
      * }> $proofFiles
      */
     public function handle(string $supplierPaymentId, array $proofFiles, string $performedByActorId): Result
@@ -58,35 +55,12 @@ final class AttachSupplierPaymentProofHandler
                 return $this->fail('Bukti pembayaran wajib diunggah.', 'SUPPLIER_PAYMENT_PROOF_REQUIRED');
             }
 
-            $attachmentRecords = [];
-            $storedPaths = [];
-
-            foreach ($proofFiles as $proofFile) {
-                $storagePath = trim((string) ($proofFile['storage_path'] ?? ''));
-                $originalFilename = trim((string) ($proofFile['original_filename'] ?? ''));
-                $mimeType = trim((string) ($proofFile['mime_type'] ?? ''));
-                $fileSizeBytes = (int) ($proofFile['file_size_bytes'] ?? 0);
-
-                $attachment = SupplierPaymentProofAttachment::create(
-                    $this->uuid->generate(),
-                    $payment->id(),
-                    $storagePath,
-                    $originalFilename,
-                    $mimeType,
-                    $fileSizeBytes,
-                    $this->clock->now(),
-                    $actorId,
-                );
-
-                $attachmentRecords[] = $attachment;
-                $storedPaths[] = $attachment->storagePath();
-            }
+            [$attachmentRecords, $storedPaths] = $this->attachmentFactory->makeMany($payment->id(), $proofFiles, $actorId);
 
             $this->transactions->begin();
             $started = true;
 
             $this->attachments->createMany($attachmentRecords);
-
             $payment->markProofUploaded();
             $this->writer->update($payment);
 
@@ -108,16 +82,10 @@ final class AttachSupplierPaymentProofHandler
                 'attachment_storage_paths' => $storedPaths,
             ], 'Bukti pembayaran supplier berhasil diunggah.');
         } catch (DomainException $e) {
-            if ($started) {
-                $this->transactions->rollBack();
-            }
-
+            if ($started) $this->transactions->rollBack();
             return $this->fail($e->getMessage(), 'INVALID_SUPPLIER_PAYMENT_PROOF');
         } catch (Throwable $e) {
-            if ($started) {
-                $this->transactions->rollBack();
-            }
-
+            if ($started) $this->transactions->rollBack();
             throw $e;
         }
     }
