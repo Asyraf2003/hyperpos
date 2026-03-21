@@ -64,6 +64,8 @@
     return Number.isNaN(n) || n < 1 ? fallback : n;
   };
 
+  const editUrl = (supplierId) => `${String(c.editBaseUrl || "").replace(/\/$/, "")}/${encodeURIComponent(supplierId)}/edit`;
+
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
 
@@ -119,12 +121,17 @@
       <td class="text-end">${rupiah(r.outstanding_rupiah)}</td>
       <td class="text-end">${angka(r.invoice_unpaid_count)}</td>
       <td>${tanggalId(r.last_shipment_date)}</td>
+      <td>
+        <a href="${editUrl(r.id)}" class="btn btn-sm btn-outline-primary">
+          Edit
+        </a>
+      </td>
     </tr>
   `;
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada supplier yang cocok.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada supplier yang cocok.</td></tr>`;
       return;
     }
 
@@ -172,7 +179,7 @@
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
 
-    body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+    body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
@@ -185,7 +192,7 @@
     }
 
     if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
       return;
     }
 

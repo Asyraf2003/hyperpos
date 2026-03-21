@@ -61,11 +61,12 @@
                                         <span class="ms-1 text-muted" data-sort-indicator="last_shipment_date">↕</span>
                                     </button>
                                 </th>
+                                <th style="width: 120px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="supplier-table-body">
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Memuat data...</td>
+                                <td colspan="7" class="text-center text-muted py-4">Memuat data...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -83,7 +84,8 @@
 @push('scripts')
     <script>
         window.supplierTableConfig = {
-            endpoint: @json(route('admin.suppliers.table'))
+            endpoint: @json(route('admin.suppliers.table')),
+            editBaseUrl: @json(url('/admin/suppliers'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-suppliers-table.js') }}"></script>
