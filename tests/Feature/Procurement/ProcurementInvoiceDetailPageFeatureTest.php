@@ -41,9 +41,9 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
         $this->seedProduct('product-2', null, 'Aki Kering', 'GS Astra', null, 120000);
-        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+        $this->seedSupplier('supplier-1', 'PT Supplier Baru', 'pt supplier baru');
 
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 150000);
+        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 150000, 'PT Sumber Makmur');
 
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
         $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000, null, 'Aki Kering', 'GS Astra', null);
@@ -89,6 +89,9 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Line Invoice');
 
         $response->assertSee('invoice-1');
+        $response->assertSee('Supplier Saat Ini');
+        $response->assertSee('PT Supplier Baru');
+        $response->assertSee('Nama Saat Nota Dibuat');
         $response->assertSee('PT Sumber Makmur');
         $response->assertSee('2026-03-15');
         $response->assertSee('2026-04-15');

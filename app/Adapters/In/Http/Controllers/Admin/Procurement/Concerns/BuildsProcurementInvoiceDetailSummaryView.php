@@ -14,9 +14,13 @@ trait BuildsProcurementInvoiceDetailSummaryView
     {
         $outstandingAmount = (int) ($summary['outstanding_rupiah'] ?? 0);
 
+        $supplierNamaCurrent = trim((string) ($summary['supplier_nama_pt_pengirim_current'] ?? ''));
+        $supplierNamaSnapshot = trim((string) ($summary['supplier_nama_pt_pengirim_snapshot'] ?? ''));
+
         return [
             'supplier_invoice_id' => (string) ($summary['supplier_invoice_id'] ?? ''),
-            'nama_pt_pengirim' => (string) ($summary['nama_pt_pengirim'] ?? ''),
+            'supplier_nama_pt_pengirim_current' => $supplierNamaCurrent,
+            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaSnapshot,
             'shipment_date' => (string) ($summary['shipment_date'] ?? ''),
             'due_date' => (string) ($summary['due_date'] ?? ''),
             'grand_total_label' => $this->formatRupiah((int) ($summary['grand_total_rupiah'] ?? 0)),

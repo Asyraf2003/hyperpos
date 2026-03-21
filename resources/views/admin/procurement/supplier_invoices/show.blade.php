@@ -111,8 +111,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Nama PT</small>
-                            <strong>{{ $summaryView['nama_pt_pengirim'] }}</strong>
+                            <small class="text-muted d-block">Supplier Saat Ini</small>
+                            <strong>{{ $summaryView['supplier_nama_pt_pengirim_current'] !== '' ? $summaryView['supplier_nama_pt_pengirim_current'] : '-' }}</strong>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Nama Saat Nota Dibuat</small>
+                            <strong>{{ $summaryView['supplier_nama_pt_pengirim_snapshot'] !== '' ? $summaryView['supplier_nama_pt_pengirim_snapshot'] : '-' }}</strong>
                         </div>
 
                         <div class="mb-3">

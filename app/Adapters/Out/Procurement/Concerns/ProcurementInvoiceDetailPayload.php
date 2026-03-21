@@ -45,7 +45,10 @@ trait ProcurementInvoiceDetailPayload
             'summary' => [
                 'supplier_invoice_id' => (string) $summary->supplier_invoice_id,
                 'supplier_id' => (string) $summary->supplier_id,
-                'nama_pt_pengirim' => (string) $summary->nama_pt_pengirim,
+                'supplier_nama_pt_pengirim_current' => $summary->supplier_nama_pt_pengirim_current !== null
+                    ? (string) $summary->supplier_nama_pt_pengirim_current
+                    : '',
+                'supplier_nama_pt_pengirim_snapshot' => (string) $summary->supplier_nama_pt_pengirim_snapshot,
                 'shipment_date' => (string) $summary->shipment_date,
                 'due_date' => (string) $summary->due_date,
                 'grand_total_rupiah' => (int) $summary->grand_total_rupiah,
