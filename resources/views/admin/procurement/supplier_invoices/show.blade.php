@@ -175,7 +175,7 @@
                                         type="date"
                                         id="payment_date"
                                         name="payment_date"
-                                        value="{{ old('payment_date') }}"
+                                        value="{{ old('payment_date', now()->format('Y-m-d')) }}"
                                         class="form-control @error('payment_date') is-invalid @enderror"
                                         required
                                     >

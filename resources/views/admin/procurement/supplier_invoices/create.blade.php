@@ -241,7 +241,7 @@
                                     type="date"
                                     id="tanggal_pengiriman"
                                     name="tanggal_pengiriman"
-                                    value="{{ old('tanggal_pengiriman') }}"
+                                    value="{{ old('tanggal_pengiriman', now()->format('Y-m-d')) }}"
                                     class="form-control @error('tanggal_pengiriman') is-invalid @enderror"
                                     required
                                 >
@@ -256,7 +256,7 @@
                                     type="date"
                                     id="tanggal_terima"
                                     name="tanggal_terima"
-                                    value="{{ old('tanggal_terima') }}"
+                                    value="{{ old('tanggal_terima', now()->format('Y-m-d')) }}"
                                     class="form-control @error('tanggal_terima') is-invalid @enderror"
                                 >
                                 <small class="text-muted">

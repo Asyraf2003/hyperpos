@@ -173,7 +173,7 @@
                                     type="date"
                                     id="adjusted_at"
                                     name="adjusted_at"
-                                    value="{{ old('adjusted_at') }}"
+                                    value="{{ old('adjusted_at', now()->format('Y-m-d')) }}"
                                     class="form-control @error('adjusted_at') is-invalid @enderror"
                                     required
                                 >
