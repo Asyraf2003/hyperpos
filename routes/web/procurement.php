@@ -10,8 +10,10 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPa
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Admin\Supplier\EditSupplierPageController;
 use App\Adapters\In\Http\Controllers\Admin\Supplier\SupplierIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Supplier\SupplierTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\Supplier\UpdateSupplierController;
 use App\Adapters\In\Http\Controllers\Procurement\CreateSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Procurement\ReceiveSupplierInvoiceController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,12 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
     Route::get('/admin/suppliers', SupplierIndexPageController::class)
         ->name('admin.suppliers.index');
+
+    Route::get('/admin/suppliers/{supplierId}/edit', EditSupplierPageController::class)
+        ->name('admin.suppliers.edit');
+
+    Route::put('/admin/suppliers/{supplierId}', UpdateSupplierController::class)
+        ->name('admin.suppliers.update');
 
     Route::get('/admin/procurement/supplier-invoices', ProcurementInvoiceIndexPageController::class)
         ->name('admin.procurement.supplier-invoices.index');
