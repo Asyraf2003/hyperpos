@@ -116,6 +116,8 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Jumlah Lampiran');
         $response->assertSee('Riwayat Lampiran');
         $response->assertSee('proof.pdf');
+        $response->assertSee('Lihat PDF');
+        $response->assertSee('Unduh');
     }
 
     public function test_admin_can_access_procurement_invoice_detail_page_as_editable_when_no_receipt_and_no_payment_exist(): void

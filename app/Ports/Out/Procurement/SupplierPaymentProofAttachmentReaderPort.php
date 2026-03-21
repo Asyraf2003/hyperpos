@@ -8,6 +8,8 @@ use App\Core\Procurement\SupplierPaymentProofAttachment\SupplierPaymentProofAtta
 
 interface SupplierPaymentProofAttachmentReaderPort
 {
+    public function getById(string $attachmentId): ?SupplierPaymentProofAttachment;
+
     /**
      * @return list<SupplierPaymentProofAttachment>
      */

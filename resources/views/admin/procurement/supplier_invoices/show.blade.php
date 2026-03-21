@@ -310,12 +310,60 @@
                                                 <div class="d-flex flex-column gap-2">
                                                     @foreach ($payment['attachments'] as $attachment)
                                                         <div class="border rounded p-2">
+                                                            @if (str_starts_with($attachment['mime_type'], 'image/'))
+                                                                <div class="mb-2">
+                                                                    <img
+                                                                        src="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
+                                                                        alt="{{ $attachment['original_filename'] }}"
+                                                                        class="img-fluid rounded border"
+                                                                        style="max-height: 180px;"
+                                                                    >
+                                                                </div>
+                                                            @endif
+
                                                             <div><strong>{{ $attachment['original_filename'] }}</strong></div>
                                                             <div class="small text-muted">Mime: {{ $attachment['mime_type'] }}</div>
                                                             <div class="small text-muted">Ukuran: {{ number_format($attachment['file_size_bytes']) }} byte</div>
                                                             <div class="small text-muted">Uploaded At: {{ $attachment['uploaded_at'] }}</div>
                                                             <div class="small text-muted">Actor: {{ $attachment['uploaded_by_actor_id'] }}</div>
-                                                            <div class="small text-muted">Path: {{ $attachment['storage_path'] }}</div>
+
+                                                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                                                @if ($attachment['mime_type'] === 'application/pdf')
+                                                                    <a
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
+                                                                        target="_blank"
+                                                                        rel="noopener"
+                                                                        class="btn btn-sm btn-outline-primary"
+                                                                    >
+                                                                        Lihat PDF
+                                                                    </a>
+                                                                @elseif (str_starts_with($attachment['mime_type'], 'image/'))
+                                                                    <a
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
+                                                                        target="_blank"
+                                                                        rel="noopener"
+                                                                        class="btn btn-sm btn-outline-primary"
+                                                                    >
+                                                                        Lihat Gambar
+                                                                    </a>
+                                                                @else
+                                                                    <a
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
+                                                                        target="_blank"
+                                                                        rel="noopener"
+                                                                        class="btn btn-sm btn-outline-primary"
+                                                                    >
+                                                                        Lihat File
+                                                                    </a>
+                                                                @endif
+
+                                                                <a
+                                                                    href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id'], 'download' => 1]) }}"
+                                                                    class="btn btn-sm btn-outline-secondary"
+                                                                >
+                                                                    Unduh
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     @endforeach
                                                 </div>

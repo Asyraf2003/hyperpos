@@ -11,6 +11,24 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierPaymentProofAttachmentReaderAdapter implements SupplierPaymentProofAttachmentReaderPort
 {
+    public function getById(string $attachmentId): ?SupplierPaymentProofAttachment
+    {
+        $row = DB::table('supplier_payment_proof_attachments')
+            ->where('id', $attachmentId)
+            ->first([
+                'id',
+                'supplier_payment_id',
+                'storage_path',
+                'original_filename',
+                'mime_type',
+                'file_size_bytes',
+                'uploaded_at',
+                'uploaded_by_actor_id',
+            ]);
+
+        return $row !== null ? $this->mapRowToAttachment($row) : null;
+    }
+
     public function listBySupplierPaymentId(string $supplierPaymentId): array
     {
         return DB::table('supplier_payment_proof_attachments')
@@ -27,16 +45,21 @@ final class DatabaseSupplierPaymentProofAttachmentReaderAdapter implements Suppl
                 'uploaded_at',
                 'uploaded_by_actor_id',
             ])
-            ->map(static fn (object $row): SupplierPaymentProofAttachment => SupplierPaymentProofAttachment::rehydrate(
-                (string) $row->id,
-                (string) $row->supplier_payment_id,
-                (string) $row->storage_path,
-                (string) $row->original_filename,
-                (string) $row->mime_type,
-                (int) $row->file_size_bytes,
-                new DateTimeImmutable((string) $row->uploaded_at),
-                (string) $row->uploaded_by_actor_id,
-            ))
+            ->map(fn (object $row): SupplierPaymentProofAttachment => $this->mapRowToAttachment($row))
             ->all();
+    }
+
+    private function mapRowToAttachment(object $row): SupplierPaymentProofAttachment
+    {
+        return SupplierPaymentProofAttachment::rehydrate(
+            (string) $row->id,
+            (string) $row->supplier_payment_id,
+            (string) $row->storage_path,
+            (string) $row->original_filename,
+            (string) $row->mime_type,
+            (int) $row->file_size_bytes,
+            new DateTimeImmutable((string) $row->uploaded_at),
+            (string) $row->uploaded_by_actor_id,
+        );
     }
 }
