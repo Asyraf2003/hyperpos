@@ -36,9 +36,12 @@ final class SupplierIndexPageFeatureTest extends TestCase
         $response->assertSee('Outstanding');
         $response->assertSee('Invoice Belum Lunas');
         $response->assertSee('Pengiriman Terakhir');
+        $response->assertSee('Aksi');
         $response->assertSee('supplier-search-form', false);
         $response->assertSee('supplier-table-body', false);
         $response->assertSee('admin-suppliers-table.js');
+        $response->assertSee('editBaseUrl', false);
+        $response->assertSee('/admin/suppliers', false);
     }
 
     private function user(string $role): User
