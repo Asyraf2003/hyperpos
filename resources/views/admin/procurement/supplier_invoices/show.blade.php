@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Nota Supplier')
-@section('heading', 'Detail Nota Supplier')
+@section('title', 'Detail Nota Pemasok')
+@section('heading', 'Detail Nota Pemasok')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,8 @@
             <div class="col-12 col-xl-8">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Line Invoice</h4>
-                        <p class="mb-0 text-muted">Daftar item pembelian yang tercatat pada nota supplier ini.</p>
+                        <h4 class="card-title mb-1">Rincian Faktur</h4>
+                        <p class="mb-0 text-muted">Daftar item pembelian yang tercatat pada nota pemasok ini.</p>
                     </div>
 
                     <div class="card-body">
@@ -23,9 +23,9 @@
                                         <th>Nama Barang</th>
                                         <th>Merek</th>
                                         <th>Ukuran</th>
-                                        <th>Qty</th>
-                                        <th>Unit Cost</th>
-                                        <th>Line Total</th>
+                                        <th>Kuantitas</th>
+                                        <th>Harga Pcs</th>
+                                        <th>Total Rincian</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -43,7 +43,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="8" class="text-center text-muted py-4">
-                                                Tidak ada line invoice.
+                                                Tidak ada rincian faktur.
                                             </td>
                                         </tr>
                                     @endforelse
@@ -60,7 +60,7 @@
                         <div class="d-flex justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Ringkasan Nota</h4>
-                                <p class="mb-0 text-muted">Data header dan status finansial invoice supplier.</p>
+                                <p class="mb-0 text-muted">Data judul dan status finansial faktur pemasok.</p>
                             </div>
 
                             <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="btn btn-light-secondary">
@@ -71,15 +71,15 @@
 
                     <div class="card-body">
                         <div class="mb-3">
-                            <small class="text-muted d-block">Policy State</small>
+                            <small class="text-muted d-block">Status</small>
                             <span class="badge {{ $policyView['badge_class'] }}">{{ $policyView['label'] }}</span>
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Allowed Actions</small>
+                            <small class="text-muted d-block">Menyetujui Aksi</small>
 
                             @if ($policyView['allowed_actions'] === [])
-                                <div class="text-muted">Tidak ada action.</div>
+                                <div class="text-muted">Tidak ada aksi.</div>
                             @else
                                 <ul class="mb-0 ps-3">
                                     @foreach ($policyView['allowed_actions'] as $actionLabel)
@@ -90,7 +90,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Lock Reasons</small>
+                            <small class="text-muted d-block">Alasan Penguncian</small>
 
                             @if ($policyView['lock_reasons'] === [])
                                 <div class="text-muted">Belum ada efek turunan primer.</div>
@@ -111,7 +111,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Supplier Saat Ini</small>
+                            <small class="text-muted d-block">Pemasok Saat Ini</small>
                             <strong>{{ $summaryView['supplier_nama_pt_pengirim_current'] !== '' ? $summaryView['supplier_nama_pt_pengirim_current'] : '-' }}</strong>
                         </div>
 
@@ -133,27 +133,27 @@
                         <hr>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Grand Total</small>
+                            <small class="text-muted d-block">Total Keseluruhan</small>
                             <strong>{{ $summaryView['grand_total_label'] }}</strong>
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Total Paid</small>
+                            <small class="text-muted d-block">Total Dibayar</small>
                             <strong>{{ $summaryView['total_paid_label'] }}</strong>
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Outstanding</small>
+                            <small class="text-muted d-block">Sisa Tagihan</small>
                             <strong>{{ $summaryView['outstanding_label'] }}</strong>
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Receipt Count</small>
+                            <small class="text-muted d-block">Frekuensi Penerimaan</small>
                             <strong>{{ $summaryView['receipt_count'] }}</strong>
                         </div>
 
                         <div>
-                            <small class="text-muted d-block">Total Received Qty</small>
+                            <small class="text-muted d-block">Total Jumlah Diterima</small>
                             <strong>{{ $summaryView['total_received_qty'] }}</strong>
                         </div>
                     </div>
@@ -162,7 +162,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Catat Pembayaran</h4>
-                        <p class="mb-0 text-muted">Pembayaran supplier dicatat eksplisit per invoice.</p>
+                        <p class="mb-0 text-muted">Pembayaran pemasok dicatat eksplisit per faktur.</p>
                     </div>
 
                     <div class="card-body">
@@ -221,7 +221,7 @@
                                 </button>
                             </form>
                         @else
-                            <div class="text-muted">Invoice supplier ini sudah lunas. Tidak ada pembayaran tambahan yang bisa dicatat.</div>
+                            <div class="text-muted">Faktur pemasok ini sudah lunas. Tidak ada pembayaran tambahan yang bisa dicatat.</div>
                         @endif
                     </div>
                 </div>
@@ -229,7 +229,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Bukti Pembayaran</h4>
-                        <p class="mb-0 text-muted">Upload bukti ke payment row yang sudah tercatat. Maksimal 3 file per upload dan boleh upload lagi untuk payment yang sama.</p>
+                        <p class="mb-0 text-muted">Upload bukti ke payment row yang sudah tercatat. Maksimal 3 file per upload dan boleh upload lagi untuk pembayaran yang sama.</p>
                     </div>
 
                     <div class="card-body">
@@ -246,13 +246,13 @@
                         @enderror
 
                         @if ($paymentsView === [])
-                            <div class="text-muted">Belum ada pembayaran supplier.</div>
+                            <div class="text-muted">Belum ada pembayaran faktur.</div>
                         @else
                             <div class="d-flex flex-column gap-3">
                                 @foreach ($paymentsView as $payment)
                                     <div class="border rounded p-3">
                                         <div class="mb-2">
-                                            <small class="text-muted d-block">Payment ID</small>
+                                            <small class="text-muted d-block">ID Pembayaran</small>
                                             <strong>{{ $payment['id'] }}</strong>
                                         </div>
 

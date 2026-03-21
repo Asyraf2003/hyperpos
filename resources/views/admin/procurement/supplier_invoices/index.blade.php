@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Procurement')
-@section('heading', 'Procurement')
+@section('title', 'Pembelian Stok')
+@section('heading', 'Pembelian Stok')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Daftar nota supplier</h4>
-                        <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
+                        <h4 class="card-title mb-1">Daftar nota pemasok</h4>
+                        <p class="mb-0 text-muted">Interactive table pembelian stok untuk admin.</p>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
@@ -26,7 +26,7 @@
 
                         <button type="button" id="open-procurement-filter" class="btn btn-primary">Filter</button>
                         <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
-                            Buat Nota Supplier
+                            Buat Nota Pemasok
                         </a>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="shipment_date">
-                                        Tgl Kirim
+                                        Tanggal Kirim
                                         <span class="ms-1 text-muted" data-sort-indicator="shipment_date">↕</span>
                                     </button>
                                 </th>
@@ -59,31 +59,31 @@
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="grand_total_rupiah">
-                                        Grand Total
+                                        Total Keseluruhan
                                         <span class="ms-1 text-muted" data-sort-indicator="grand_total_rupiah">↕</span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_paid_rupiah">
-                                        Total Paid
+                                        Total Dibayar
                                         <span class="ms-1 text-muted" data-sort-indicator="total_paid_rupiah">↕</span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="outstanding_rupiah">
-                                        Outstanding
+                                        Sisa Tagihan
                                         <span class="ms-1 text-muted" data-sort-indicator="outstanding_rupiah">↕</span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="receipt_count">
-                                        Receipt
+                                        Penerimaan Barang
                                         <span class="ms-1 text-muted" data-sort-indicator="receipt_count">↕</span>
                                     </button>
                                 </th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_received_qty">
-                                        Qty Diterima
+                                        Kuantitas Diterima
                                         <span class="ms-1 text-muted" data-sort-indicator="total_received_qty">↕</span>
                                     </button>
                                 </th>

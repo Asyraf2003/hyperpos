@@ -3,7 +3,7 @@
 <div id="product-filter-drawer" class="position-fixed top-0 end-0 h-100 bg-body border-start shadow d-none" style="width: 360px; z-index: 1050; overflow-y: auto;">
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Filter Product</h5>
+            <h5 class="mb-0">Filter Produk</h5>
             <button type="button" id="close-product-filter" class="btn btn-sm btn-light-secondary">Tutup</button>
         </div>
 
@@ -46,7 +46,7 @@
             </div>
 
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Apply Filter</button>
+                <button type="submit" class="btn btn-primary">Terapkan Filter</button>
                 <button type="button" id="reset-product-filter" class="btn btn-light-secondary">Reset</button>
             </div>
         </form>
