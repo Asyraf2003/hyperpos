@@ -184,20 +184,30 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group mb-4">
-                                    <label for="amount" class="form-label">Nominal Bayar</label>
+                                <div class="form-group mb-4" data-money-input-group>
+                                    <label for="amount_display" class="form-label">Nominal Bayar</label>
+
                                     <input
-                                        type="number"
+                                        type="hidden"
                                         id="amount"
                                         name="amount"
                                         value="{{ old('amount', $summaryView['outstanding_amount']) }}"
+                                        data-money-raw
+                                    >
+
+                                    <input
+                                        type="text"
+                                        id="amount_display"
+                                        value="{{ old('amount', $summaryView['outstanding_amount']) }}"
                                         class="form-control @error('amount') is-invalid @enderror"
-                                        min="1"
-                                        step="1"
+                                        placeholder="Contoh: 150.000"
+                                        inputmode="numeric"
+                                        data-money-display
                                         required
                                     >
+
                                     @error('amount')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -322,3 +332,10 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
+    <script>
+        window.AdminMoneyInput?.bindBySelector(document);
+    </script>
+@endpush
