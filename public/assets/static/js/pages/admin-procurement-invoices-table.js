@@ -50,6 +50,19 @@
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
 
+  const supplierCellHtml = (row) => {
+    const currentName = trimValue(row.supplier_nama_pt_pengirim_current);
+    const snapshotName = trimValue(row.supplier_nama_pt_pengirim_snapshot);
+
+    const primary = currentName || snapshotName || "-";
+    const showSnapshot = snapshotName && currentName && snapshotName !== currentName;
+
+    return `
+      <div class="fw-semibold">${esc(primary)}</div>
+      ${showSnapshot ? `<div class="small text-muted">saat nota dibuat: ${esc(snapshotName)}</div>` : ""}
+    `;
+  };
+
   const trimValue = (v) => String(v ?? "").trim();
 
   const intOrDefault = (v, fallback) => {
@@ -119,7 +132,7 @@
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
       <td>${esc(r.supplier_invoice_id)}</td>
-      <td>${esc(r.nama_pt_pengirim)}</td>
+      <td>${supplierCellHtml(r)}</td>
       <td>${esc(r.shipment_date)}</td>
       <td>${esc(r.due_date)}</td>
       <td>${rupiah(r.grand_total_rupiah)}</td>

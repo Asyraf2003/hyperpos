@@ -17,6 +17,7 @@ trait ProcurementInvoiceTableFilters
             $query->where(function (Builder $builder) use ($keyword): void {
                 $builder
                     ->where('supplier_invoices.id', 'like', '%' . $keyword . '%')
+                    ->orWhere('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%')
                     ->orWhere('supplier_invoices.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%');
             });
         }

@@ -27,6 +27,7 @@ trait ProcurementInvoiceTableBaseQuery
             ->groupBy('supplier_receipts.supplier_invoice_id');
 
         return DB::table('supplier_invoices')
+            ->leftJoin('suppliers', 'suppliers.id', '=', 'supplier_invoices.supplier_id')
             ->leftJoinSub($paymentTotalsSubquery, 'payment_totals', function ($join): void {
                 $join->on('payment_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
             })
@@ -38,7 +39,8 @@ trait ProcurementInvoiceTableBaseQuery
             })
             ->select([
                 'supplier_invoices.id as supplier_invoice_id',
-                'supplier_invoices.supplier_nama_pt_pengirim_snapshot as nama_pt_pengirim',
+                'suppliers.nama_pt_pengirim as supplier_nama_pt_pengirim_current',
+                'supplier_invoices.supplier_nama_pt_pengirim_snapshot as supplier_nama_pt_pengirim_snapshot',
                 'supplier_invoices.tanggal_pengiriman as shipment_date',
                 'supplier_invoices.jatuh_tempo as due_date',
                 'supplier_invoices.grand_total_rupiah',

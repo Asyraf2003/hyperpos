@@ -30,6 +30,30 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         $response->assertJsonPath('data.meta.filters.q', 'Federal');
     }
 
+    public function test_admin_can_search_procurement_invoice_table_by_current_or_snapshot_supplier_name(): void
+    {
+        $this->seedSupplier('supplier-1', 'PT Supplier Baru');
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Federal Abadi');
+
+        $admin = $this->admin();
+
+        $responseCurrent = $this->actingAs($admin)
+            ->get(route('admin.procurement.supplier-invoices.table', ['q' => 'Supplier Baru']));
+
+        $responseCurrent->assertOk();
+        $responseCurrent->assertJsonCount(1, 'data.rows');
+        $responseCurrent->assertJsonPath('data.rows.0.supplier_invoice_id', 'invoice-1');
+        $responseCurrent->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_current', 'PT Supplier Baru');
+        $responseCurrent->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_snapshot', 'PT Federal Abadi');
+
+        $responseSnapshot = $this->actingAs($admin)
+            ->get(route('admin.procurement.supplier-invoices.table', ['q' => 'Federal Abadi']));
+
+        $responseSnapshot->assertOk();
+        $responseSnapshot->assertJsonCount(1, 'data.rows');
+        $responseSnapshot->assertJsonPath('data.rows.0.supplier_invoice_id', 'invoice-1');
+    }
+
     public function test_admin_can_sort_procurement_invoice_table_by_outstanding_desc(): void
     {
         $this->seedSupplier('supplier-1', 'PT Alpha Motor');

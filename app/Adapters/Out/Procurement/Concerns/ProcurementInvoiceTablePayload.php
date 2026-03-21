@@ -19,7 +19,10 @@ trait ProcurementInvoiceTablePayload
     {
         $rows = array_map(static fn (object $row): array => [
             'supplier_invoice_id' => (string) $row->supplier_invoice_id,
-            'nama_pt_pengirim' => (string) $row->nama_pt_pengirim,
+            'supplier_nama_pt_pengirim_current' => $row->supplier_nama_pt_pengirim_current !== null
+                ? (string) $row->supplier_nama_pt_pengirim_current
+                : '',
+            'supplier_nama_pt_pengirim_snapshot' => (string) $row->supplier_nama_pt_pengirim_snapshot,
             'shipment_date' => (string) $row->shipment_date,
             'due_date' => (string) $row->due_date,
             'grand_total_rupiah' => (int) $row->grand_total_rupiah,

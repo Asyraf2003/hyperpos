@@ -30,8 +30,8 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
 
     public function test_admin_can_get_procurement_invoice_table_json(): void
     {
-        $this->seedSupplier('supplier-1', 'PT Federal Abadi');
-        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
+        $this->seedSupplier('supplier-1', 'PT Supplier Baru');
+        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Federal Abadi');
         $this->seedPayment('payment-1', 'invoice-1', 40000, '2026-03-16', 'pending');
         $this->seedReceipt('receipt-1', 'invoice-1', '2026-03-17');
         $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-1', 3);
@@ -42,7 +42,8 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('success', true);
         $response->assertJsonPath('data.rows.0.supplier_invoice_id', 'invoice-1');
-        $response->assertJsonPath('data.rows.0.nama_pt_pengirim', 'PT Federal Abadi');
+        $response->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_current', 'PT Supplier Baru');
+        $response->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_snapshot', 'PT Federal Abadi');
         $response->assertJsonPath('data.rows.0.total_paid_rupiah', 40000);
         $response->assertJsonPath('data.rows.0.outstanding_rupiah', 60000);
         $response->assertJsonPath('data.rows.0.receipt_count', 1);
