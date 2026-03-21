@@ -54,7 +54,7 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
-                        <span>Dasbor</span>
+                        <span>Dashboard</span>
                     </a>
                 </li>
 
