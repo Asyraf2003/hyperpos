@@ -13,7 +13,7 @@
             <div class="card">
                 <div class="card-body">
                     <p class="mb-0">
-                        Halaman dashboard admin siap dipakai sebagai fondasi UI.
+                        Halaman dashboard admin siap dipakai sebagai fondasi.
                     </p>
                 </div>
             </div>

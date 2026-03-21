@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Buat Nota Supplier')
-@section('heading', 'Buat Nota Supplier')
+@section('title', 'Buat Nota Pemasok')
+@section('heading', 'Buat Nota Pemasok')
 
 @section('content')
     <section class="section">
@@ -21,7 +21,7 @@
                                 </div>
 
                                 <button type="button" id="add-procurement-line" class="btn btn-primary">
-                                    Tambah Line
+                                    Tambah Rincian
                                 </button>
                             </div>
                         </div>
@@ -38,8 +38,8 @@
                                     <div class="border rounded p-3 mb-3" data-line-item>
                                         <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                             <div>
-                                                <h6 class="mb-0">Line {{ $loop->iteration }}</h6>
-                                                <small class="text-muted">Isi product, qty, dan nilai line.</small>
+                                                <h6 class="mb-0">Rincian {{ $loop->iteration }}</h6>
+                                                <small class="text-muted">Isi Produk, Kuantitas dan Nilai rincian.</small>
                                             </div>
 
                                             <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
@@ -50,7 +50,7 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <div class="form-group mb-3 position-relative">
-                                                    <label class="form-label">Product</label>
+                                                    <label class="form-label">Produk</label>
 
                                                     <input
                                                         type="hidden"
@@ -63,7 +63,7 @@
                                                         type="text"
                                                         value="{{ $lineView['selected_label'] }}"
                                                         class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
-                                                        placeholder="Ketik minimal 2 huruf untuk cari product"
+                                                        placeholder="Ketik minimal 2 huruf untuk cari produk"
                                                         autocomplete="off"
                                                         data-product-search
                                                     >
@@ -82,7 +82,7 @@
 
                                             <div class="col-12 col-lg-4">
                                                 <div class="form-group mb-3">
-                                                    <label class="form-label">Qty PCS</label>
+                                                    <label class="form-label">Kuantitas Pcs</label>
                                                     <input
                                                         type="text"
                                                         inputmode="numeric"
@@ -101,7 +101,7 @@
 
                                             <div class="col-12 col-lg-8">
                                                 <div class="form-group mb-3">
-                                                    <label class="form-label">Line Total Rupiah</label>
+                                                    <label class="form-label">Rincian Total Rupiah</label>
 
                                                     <input
                                                         type="hidden"
@@ -135,7 +135,7 @@
                                     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                         <div>
                                             <h6 class="mb-0">Line Baru</h6>
-                                            <small class="text-muted">Isi product, qty, dan nilai line.</small>
+                                            <small class="text-muted">Isi produk, kuantitas, dan nilai rincian.</small>
                                         </div>
 
                                         <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
@@ -146,14 +146,14 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group mb-3 position-relative">
-                                                <label class="form-label">Product</label>
+                                                <label class="form-label">Produk</label>
 
                                                 <input type="hidden" name="lines[__INDEX__][product_id]" value="" data-product-id>
 
                                                 <input
                                                     type="text"
                                                     class="form-control"
-                                                    placeholder="Ketik minimal 2 huruf untuk cari product"
+                                                    placeholder="Ketik minimal 2 huruf untuk cari produk"
                                                     autocomplete="off"
                                                     data-product-search
                                                 >
@@ -168,7 +168,7 @@
 
                                         <div class="col-12 col-lg-4">
                                             <div class="form-group mb-3">
-                                                <label class="form-label">Qty PCS</label>
+                                                <label class="form-label">Kuantitas Pcs</label>
                                                 <input
                                                     type="text"
                                                     inputmode="numeric"
@@ -184,7 +184,7 @@
 
                                         <div class="col-12 col-lg-8">
                                             <div class="form-group mb-3">
-                                                <label class="form-label">Line Total Rupiah</label>
+                                                <label class="form-label">Rincian Total Rupiah</label>
 
                                                 <input
                                                     type="hidden"
@@ -281,11 +281,11 @@
                                             {{ old('auto_receive', '1') === '1' ? 'checked' : '' }}
                                         >
                                         <label class="form-check-label" for="auto_receive_yes">
-                                            Auto receive
+                                            Auto lunas
                                         </label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Nota langsung masuk flow terima barang setelah dibuat.
+                                        Nota langsung masuk alur terima barang setelah dibuat.
                                     </small>
                                 </div>
 
@@ -304,14 +304,14 @@
                                         </label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Nota disimpan tanpa auto receive.
+                                        Nota disimpan tanpa auto lunas.
                                     </small>
                                 </div>
                             </div>
 
                             <div class="d-flex justify-content-start gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    Simpan Nota Supplier
+                                    Simpan Nota Pemasok
                                 </button>
                                 <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="btn btn-light-secondary">
                                     Batal
