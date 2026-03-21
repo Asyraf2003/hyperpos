@@ -137,7 +137,7 @@ final class WorkshopStressTestSeeder extends Seeder
                 'supplier_invoice_id' => $invId,
                 'amount_rupiah' => (int)$invLines->sum('line_total_rupiah'),
                 'paid_at' => $date,
-                'proof_status' => 'valid'
+                'proof_status' => 'pending'
             ]);
         }
     }
