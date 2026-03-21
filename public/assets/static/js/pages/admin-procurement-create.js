@@ -22,12 +22,6 @@
     "'": "&#39;"
   }[m]));
 
-  const digitsOnly = (value) => String(value ?? "").replace(/\D+/g, "");
-  const formatThousands = (value) => {
-    const digits = digitsOnly(value);
-    if (digits === "") return "";
-    return Number.parseInt(digits, 10).toLocaleString("id-ID");
-  };
 
   const updateRemoveButtons = () => {
     const items = container.querySelectorAll("[data-line-item]");
@@ -82,18 +76,8 @@
   };
 
   const initMoneyInput = (item) => {
-    const display = item.querySelector("[data-money-display]");
-    const raw = item.querySelector("[data-money-raw]");
-    if (!display || !raw) return;
-
-    const syncMoney = () => {
-      raw.value = digitsOnly(display.value);
-      display.value = formatThousands(display.value);
-    };
-
-    display.addEventListener("input", syncMoney);
-    display.addEventListener("blur", syncMoney);
-    syncMoney();
+    if (!window.AdminMoneyInput) return;
+    window.AdminMoneyInput.bindBySelector(item);
   };
 
   const initQtyInput = (item) => {
@@ -101,7 +85,9 @@
     if (!qtyInput) return;
 
     const syncQty = () => {
-      qtyInput.value = digitsOnly(qtyInput.value);
+      qtyInput.value = window.AdminMoneyInput
+        ? window.AdminMoneyInput.digitsOnly(qtyInput.value)
+        : String(qtyInput.value ?? "").replace(/\D+/g, "");
     };
 
     qtyInput.addEventListener("input", syncQty);

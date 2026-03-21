@@ -110,21 +110,30 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <div class="form-group mb-4">
-                                        <label for="harga_jual" class="form-label">Harga Jual</label>
+                                    <div class="form-group mb-4" data-money-input-group>
+                                        <label for="harga_jual_display" class="form-label">Harga Jual</label>
+
                                         <input
-                                            type="number"
+                                            type="hidden"
                                             id="harga_jual"
                                             name="harga_jual"
                                             value="{{ old('harga_jual', $product->hargaJual()->amount()) }}"
+                                            data-money-raw
+                                        >
+
+                                        <input
+                                            type="text"
+                                            id="harga_jual_display"
+                                            value="{{ old('harga_jual', $product->hargaJual()->amount()) }}"
                                             class="form-control @error('harga_jual') is-invalid @enderror"
-                                            placeholder="Contoh: 15000"
-                                            min="1"
-                                            step="1"
+                                            placeholder="Contoh: 15.000"
+                                            inputmode="numeric"
+                                            data-money-display
                                             required
                                         >
+
                                         @error('harga_jual')
-                                            <div class="invalid-feedback">
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
@@ -225,3 +234,10 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
+    <script>
+        window.AdminMoneyInput?.bindBySelector(document);
+    </script>
+@endpush

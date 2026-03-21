@@ -326,6 +326,7 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.procurementCreateConfig = {
             lookupEndpoint: @json(route('admin.procurement.products.lookup'))
