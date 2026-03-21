@@ -77,7 +77,11 @@
 
   const initMoneyInput = (item) => {
     if (!window.AdminMoneyInput) return;
-    window.AdminMoneyInput.bindBySelector(item);
+
+    const display = item.querySelector("[data-money-display]");
+    const raw = item.querySelector("[data-money-raw]");
+
+    window.AdminMoneyInput.bindMoneyPair(display, raw);
   };
 
   const initQtyInput = (item) => {
