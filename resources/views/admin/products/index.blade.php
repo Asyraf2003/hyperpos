@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Product')
-@section('heading', 'Product')
+@section('title', 'Produk')
+@section('heading', 'Produk')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Master barang bengkel</h4>
-                        <p class="mb-0 text-muted">Interactive table product untuk admin.</p>
+                        <h4 class="card-title mb-1">Master Barang Bengkel</h4>
+                        <p class="mb-0 text-muted">Tabel interaktif produk untuk admin.</p>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
@@ -25,7 +25,7 @@
                         </form>
 
                         <button type="button" id="open-product-filter" class="btn btn-primary">Filter</button>
-                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Product</a>
+                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Produk</a>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                             </tr>
                         </thead>
                         <tbody id="product-table-body">
-                            <tr><td colspan="8" class="text-center text-muted py-4">Memuat data...</td></tr>
+                            <tr><td colspan="8" class="text-center text-muted py-4">Sedang memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>

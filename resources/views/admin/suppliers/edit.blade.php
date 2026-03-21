@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Supplier')
-@section('heading', 'Edit Supplier')
+@section('title', 'Ubah Pemasok')
+@section('heading', 'Ubah Pemasok')
 
 @section('content')
     <section class="section">
@@ -11,8 +11,8 @@
                     <div class="card-header">
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Perbarui supplier</h4>
-                                <p class="mb-0 text-muted">Ubah nama supplier master tanpa mengubah histori procurement.</p>
+                                <h4 class="card-title mb-1">Perbarui Pemasok</h4>
+                                <p class="mb-0 text-muted">Ubah nama pemasok utama tanpa mengubah riwayat pengadaan.</p>
                             </div>
 
                             <a href="{{ route('admin.suppliers.index') }}" class="btn btn-light-secondary">

@@ -1,10 +1,10 @@
 @extends('layouts.auth')
 
-@section('title', 'Login')
+@section('title', 'Masuk')
 
 @section('content')
-    <h1 class="auth-title">Login</h1>
-    <p class="auth-subtitle mb-5">Aplikasi internal. Registrasi publik tidak tersedia.</p>
+    <h1 class="auth-title">Masuk</h1>
+    <p class="auth-subtitle mb-5">Aplikasi internal. Pendaftaran publik tidak tersedia.</p>
 
     <form action="{{ route('login.attempt') }}" method="post">
         @csrf
@@ -34,7 +34,7 @@
                 type="password"
                 name="password"
                 class="form-control form-control-xl @error('password') is-invalid @enderror"
-                placeholder="Password"
+                placeholder="Kata sandi"
                 autocomplete="current-password"
             >
             <div class="form-control-icon">
@@ -57,7 +57,7 @@
                 {{ old('remember') ? 'checked' : '' }}
             >
             <label class="form-check-label text-gray-600" for="remember-me">
-                Keep me logged in
+                Tetap masuk
             </label>
         </div>
 

@@ -54,28 +54,28 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
-                        <span>Dashboard</span>
+                        <span>Dasbor</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.products.index') }}" class="sidebar-link">
                         <i class="bi bi-box-seam-fill"></i>
-                        <span>Product</span>
+                        <span>Produk</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.suppliers.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.suppliers.index') }}" class="sidebar-link">
                         <i class="bi bi-truck"></i>
-                        <span>Supplier</span>
+                        <span>Pemasok</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.procurement.supplier-invoices.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="sidebar-link">
                         <i class="bi bi-receipt"></i>
-                        <span>Procurement</span>
+                        <span>Pengadaan</span>
                     </a>
                 </li>
 
@@ -83,7 +83,7 @@
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">
                             <i class="bi bi-arrow-left-right"></i>
-                            <span>Masuk Area Kasir</span>
+                            <span>Masuk ke Area Kasir</span>
                         </a>
                     </li>
                 @endif

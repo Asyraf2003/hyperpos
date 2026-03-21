@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Product')
-@section('heading', 'Edit Product')
+@section('title', 'Edit Produk')
+@section('heading', 'Edit Produk')
 
 @section('content')
     <section class="section">
@@ -11,9 +11,9 @@
                     <div class="card-header">
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Perbarui product master</h4>
+                                <h4 class="card-title mb-1">Perbarui produk master</h4>
                                 <p class="mb-0 text-muted">
-                                    Ubah data product.
+                                    Ubah data produk.
                                 </p>
                             </div>
 
@@ -157,9 +157,9 @@
             <div class="col-12 col-xl-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Stock Adjustment</h4>
+                        <h4 class="card-title mb-1">Stok Penyesuaian</h4>
                         <p class="mb-0 text-muted">
-                            Slice ini khusus pengurangan stok operasional resmi lewat movement ledger.
+                            Bagian ini khusus untuk pencatatan pengurangan stok operasional melalui Mutasi.
                         </p>
                     </div>
 
@@ -177,7 +177,7 @@
                             @csrf
 
                             <div class="form-group mb-4">
-                                <label for="adjusted_at" class="form-label">Tanggal Adjustment</label>
+                                <label for="adjusted_at" class="form-label">Tanggal Mutasi</label>
                                 <input
                                     type="date"
                                     id="adjusted_at"
@@ -192,7 +192,7 @@
                             </div>
 
                             <div class="form-group mb-4">
-                                <label for="qty_issue" class="form-label">Qty Keluar</label>
+                                <label for="qty_issue" class="form-label">Kuantitas Keluar</label>
                                 <input
                                     type="number"
                                     id="qty_issue"
@@ -225,7 +225,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-danger">
-                                Catat Stock Adjustment
+                                Catat Stok Penyesuaian
                             </button>
                         </form>
                     </div>
