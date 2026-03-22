@@ -66,7 +66,7 @@ audit-contract: audit-lines audit-blade
 check: audit-hex test
 
 # Gerbang Verifikasi Utama (Test + Lint + Contract Audit)
-verify: lint audit-contract test
+verify: git-push lint audit-contract test
 
 # Alias untuk CI sesuai DoD 3.3
 ci: verify
