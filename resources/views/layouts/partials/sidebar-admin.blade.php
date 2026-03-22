@@ -86,6 +86,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.payrolls.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.payrolls.index') }}" class="sidebar-link">
+                        <i class="bi bi-cash-stack"></i>
+                        <span>Gaji</span>
+                    </a>
+                </li>
+
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">
