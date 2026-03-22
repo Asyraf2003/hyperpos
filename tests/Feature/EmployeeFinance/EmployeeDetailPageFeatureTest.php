@@ -42,9 +42,52 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Budi Santoso');
         $response->assertSee('Mingguan');
         $response->assertSee('Aktif');
-        $response->assertSee('Section Hutang Karyawan');
-        $response->assertSee('Section Riwayat Gaji');
+        $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('Riwayat Hutang');
+        $response->assertSee('Riwayat Pembayaran Hutang');
         $response->assertSee('Edit Karyawan');
+    }
+
+    public function test_admin_can_see_employee_debt_summary_and_histories_on_detail_page(): void
+    {
+        $employeeId = $this->seedEmployee();
+        $debtId = (string) Str::uuid();
+
+        DB::table('employee_debts')->insert([
+            'id' => $debtId,
+            'employee_id' => $employeeId,
+            'total_debt' => 1000000,
+            'remaining_balance' => 250000,
+            'status' => 'unpaid',
+            'notes' => 'Pinjaman kebutuhan keluarga',
+            'created_at' => now()->subDays(5),
+            'updated_at' => now()->subDays(5),
+        ]);
+
+        DB::table('employee_debt_payments')->insert([
+            'id' => (string) Str::uuid(),
+            'employee_debt_id' => $debtId,
+            'amount' => 750000,
+            'payment_date' => now()->subDay(),
+            'notes' => 'Potong gaji minggu ini',
+            'created_at' => now()->subDay(),
+            'updated_at' => now()->subDay(),
+        ]);
+
+        $response = $this->actingAs($this->createUserWithRole('admin-employee-detail-debt@example.test', 'admin'))
+            ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
+
+        $response->assertOk();
+        $response->assertSee('Total Record Hutang');
+        $response->assertSee('1');
+        $response->assertSee('Rp1.000.000');
+        $response->assertSee('Rp250.000');
+        $response->assertSee('1 aktif');
+        $response->assertSee('0 lunas');
+        $response->assertSee('Pinjaman kebutuhan keluarga');
+        $response->assertSee('Belum Lunas');
+        $response->assertSee('Potong gaji minggu ini');
+        $response->assertSee('Buka Debt');
     }
 
     public function test_admin_is_redirected_to_index_when_employee_detail_is_missing(): void
