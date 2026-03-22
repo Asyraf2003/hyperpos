@@ -16,10 +16,6 @@
                                     Perubahan master karyawan wajib menyertakan catatan koreksi.
                                 </p>
                             </div>
-
-                            <a href="{{ route('admin.employees.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

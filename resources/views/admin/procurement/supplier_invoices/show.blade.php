@@ -62,10 +62,6 @@
                                 <h4 class="card-title mb-1">Ringkasan Nota</h4>
                                 <p class="mb-0 text-muted">Data utama dan status finansial nota supplier.</p>
                             </div>
-
-                            <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

@@ -5,14 +5,6 @@
 
 @section('content')
     <section class="section">
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
         <div class="row">
             <div class="col-12 col-xl-4">
                 <div class="card">
@@ -22,10 +14,6 @@
                                 <h4 class="card-title mb-1">Ringkasan Karyawan</h4>
                                 <p class="mb-0 text-muted">Profil dasar karyawan untuk pusat detail operasional.</p>
                             </div>
-
-                            <a href="{{ route('admin.employees.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

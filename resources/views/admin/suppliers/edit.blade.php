@@ -14,10 +14,6 @@
                                 <h4 class="card-title mb-1">Edit Supplier</h4>
                                 <p class="mb-0 text-muted">Ubah nama pemasok utama tanpa mengubah riwayat pengadaan.</p>
                             </div>
-
-                            <a href="{{ route('admin.suppliers.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

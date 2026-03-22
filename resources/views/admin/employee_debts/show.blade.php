@@ -20,10 +20,6 @@
                                 <h4 class="card-title mb-1">Ringkasan Hutang</h4>
                                 <p class="mb-0 text-muted">Status dan saldo hutang karyawan.</p>
                             </div>
-
-                            <a href="{{ route('admin.employee-debts.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

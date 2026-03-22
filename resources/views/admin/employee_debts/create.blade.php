@@ -16,10 +16,6 @@
                                     Catat hutang baru untuk karyawan.
                                 </p>
                             </div>
-
-                            <a href="{{ route('admin.employee-debts.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 

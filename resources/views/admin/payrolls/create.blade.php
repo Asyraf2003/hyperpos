@@ -40,10 +40,6 @@
                                 <h4 class="card-title mb-1">Detail Batch Pencairan</h4>
                                 <p class="mb-0 text-muted">Panel detail di kanan, daftar karyawan dipilih dari panel kiri.</p>
                             </div>
-
-                            <a href="{{ route('admin.payrolls.index') }}" class="btn btn-light-secondary">
-                                Kembali
-                            </a>
                         </div>
                     </div>
 
