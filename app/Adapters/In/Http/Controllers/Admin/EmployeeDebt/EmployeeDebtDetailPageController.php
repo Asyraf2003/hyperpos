@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\EmployeeDebt;
 
+use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentListQuery;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtDetailPageQuery;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
 final class EmployeeDebtDetailPageController extends Controller
 {
-    public function __invoke(string $debtId, DatabaseEmployeeDebtDetailPageQuery $query): View|RedirectResponse
-    {
+    public function __invoke(
+        string $debtId,
+        DatabaseEmployeeDebtDetailPageQuery $query,
+        DatabaseEmployeeDebtAdjustmentListQuery $adjustmentQuery,
+    ): View|RedirectResponse {
         $detail = $query->findById($debtId);
 
         if ($detail === null) {
@@ -23,6 +27,7 @@ final class EmployeeDebtDetailPageController extends Controller
 
         return view('admin.employee_debts.show', [
             'detail' => $detail,
+            'adjustments' => $adjustmentQuery->findByDebtId($debtId),
         ]);
     }
 }

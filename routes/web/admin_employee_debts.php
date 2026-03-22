@@ -6,6 +6,7 @@ use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\CreateEmployeeDebtPageCo
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\StoreEmployeeDebtAdjustmentController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\StoreEmployeeDebtController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\StoreEmployeeDebtPaymentController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/employee-debts/{debtId}/payments', StoreEmployeeDebtPaymentController::class)
         ->name('admin.employee-debts.payments.store');
+
+    Route::post('/admin/employee-debts/{debtId}/adjustments', StoreEmployeeDebtAdjustmentController::class)
+        ->name('admin.employee-debts.adjustments.store');
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
