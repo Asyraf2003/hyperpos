@@ -45,10 +45,11 @@ final class CreatePayrollPageFeatureTest extends TestCase
             ->get(route('admin.payrolls.create'));
 
         $response->assertOk();
-        $response->assertSee('Catat Pencairan Gaji');
-        $response->assertSee('Nominal Pencairan');
-        $response->assertSee('Tanggal Pencairan');
-        $response->assertSee('Simpan Pencairan Gaji');
+        $response->assertSee('Cari Karyawan');
+        $response->assertSee('Informasi Karyawan Terpilih');
+        $response->assertSee('Periode Gaji Karyawan');
+        $response->assertSee('Mode Pencairan');
+        $response->assertSee('admin-payroll-create.js');
     }
 
     public function test_admin_can_store_payroll_from_create_page(): void
