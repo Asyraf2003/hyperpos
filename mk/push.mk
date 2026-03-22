@@ -4,10 +4,10 @@ git-push:
 	@git status
 	@echo "Adding all changes..."
 	@git add .
-	@# Menghitung jumlah commit saat ini + 1
 	$(eval NEXT_COUNT=$(shell echo $$(($$(git rev-list --count HEAD 2>/dev/null || echo 0) + 1))))
-	@echo "Auto-committing as: commit $(NEXT_COUNT)"
-	@git commit -m "commit $(NEXT_COUNT)"
+	@echo "Attempting auto-commit as: commit $(NEXT_COUNT)"
+	@# Menambahkan '|| true' agar Makefile tidak berhenti jika tidak ada yang perlu di-commit
+	@git commit -m "commit $(NEXT_COUNT)" || echo "Nothing new to commit, moving to push..."
 	@echo "Pushing to origin main..."
 	@git push origin main
 	@echo "Done!"
