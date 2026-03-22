@@ -43,19 +43,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h4>Menu Kasir Sementara</h4>
-                </div>
-                <div class="card-body">
-                    <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action">Buat Nota</a>
-                        <a href="#" class="list-group-item list-group-item-action">Cari Pelanggan</a>
-                        <a href="#" class="list-group-item list-group-item-action">Daftar Transaksi</a>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-12 col-lg-3">
