@@ -28,10 +28,9 @@ final class EmployeeDebtIndexPageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_employee_debt_index_page_and_see_existing_rows(): void
+    public function test_admin_can_access_employee_debt_index_page_and_see_employee_summary_rows(): void
     {
         $employeeId = (string) Str::uuid();
-        $debtId = (string) Str::uuid();
 
         DB::table('employees')->insert([
             'id' => $employeeId,
@@ -45,26 +44,42 @@ final class EmployeeDebtIndexPageFeatureTest extends TestCase
         ]);
 
         DB::table('employee_debts')->insert([
-            'id' => $debtId,
-            'employee_id' => $employeeId,
-            'total_debt' => 1000000,
-            'remaining_balance' => 750000,
-            'status' => 'unpaid',
-            'notes' => 'Kasbon awal',
-            'created_at' => '2026-03-22 10:00:00',
-            'updated_at' => now(),
+            [
+                'id' => (string) Str::uuid(),
+                'employee_id' => $employeeId,
+                'total_debt' => 1000000,
+                'remaining_balance' => 750000,
+                'status' => 'unpaid',
+                'notes' => 'Kasbon awal',
+                'created_at' => '2026-03-22 10:00:00',
+                'updated_at' => now(),
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'employee_id' => $employeeId,
+                'total_debt' => 500000,
+                'remaining_balance' => 0,
+                'status' => 'paid',
+                'notes' => 'Kasbon kedua',
+                'created_at' => '2026-03-23 10:00:00',
+                'updated_at' => now(),
+            ],
         ]);
 
         $response = $this->actingAs($this->createUserWithRole('admin-debt-index@example.test', 'admin'))
             ->get(route('admin.employee-debts.index'));
 
         $response->assertOk();
-        $response->assertSee('Riwayat Hutang Karyawan');
+        $response->assertSee('Ringkasan Hutang Karyawan');
         $response->assertSee('Asyraf Hutang');
-        $response->assertSee('Rp1.000.000');
+        $response->assertSee('2026-03-23');
+        $response->assertSee('2');
+        $response->assertSee('Rp1.500.000');
         $response->assertSee('Rp750.000');
-        $response->assertSee('Belum Lunas');
-        $response->assertSee('Kasbon awal');
+        $response->assertSee('1 aktif / 1 lunas');
+        $response->assertSee('Buka Detail Karyawan');
+        $response->assertDontSee('Kasbon awal');
+        $response->assertDontSee('Kasbon kedua');
     }
 
     private function createUserWithRole(string $email, string $role): User

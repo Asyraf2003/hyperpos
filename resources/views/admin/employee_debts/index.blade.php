@@ -1,28 +1,24 @@
 @extends('layouts.app')
 
-@section('title', 'Hutang')
-@section('heading', 'Hutang')
+@section('title', 'Hutang Karyawan')
+@section('heading', 'Hutang Karyawan')
 
 @section('content')
     <section class="section">
         @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         <div class="card">
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Riwayat Hutang Karyawan</h4>
-                        <p class="mb-0 text-muted">Pencatatan hutang manual dan status pelunasannya.</p>
+                        <h4 class="card-title mb-1">Ringkasan Hutang Karyawan</h4>
+                        <p class="mb-0 text-muted">Entry list debt yang mengarah ke pusat detail karyawan.</p>
                     </div>
 
                     <div>
@@ -37,12 +33,12 @@
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
-                                <th>Tanggal</th>
                                 <th>Karyawan</th>
+                                <th>Terakhir Dicatat</th>
+                                <th>Total Record</th>
                                 <th>Total Hutang</th>
-                                <th>Sisa Hutang</th>
-                                <th>Status</th>
-                                <th>Catatan</th>
+                                <th>Total Sisa</th>
+                                <th>Status Record</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -50,15 +46,18 @@
                             @forelse ($rows as $row)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $row['recorded_at'] }}</td>
                                     <td>{{ $row['employee_name'] }}</td>
-                                    <td>Rp{{ $row['total_debt_formatted'] }}</td>
-                                    <td>Rp{{ $row['remaining_balance_formatted'] }}</td>
-                                    <td>{{ $row['status_label'] }}</td>
-                                    <td>{{ $row['notes'] ?? '-' }}</td>
+                                    <td>{{ $row['latest_recorded_at'] }}</td>
+                                    <td>{{ $row['total_debt_records'] }}</td>
+                                    <td>Rp{{ $row['total_debt_amount_formatted'] }}</td>
+                                    <td>Rp{{ $row['total_remaining_balance_formatted'] }}</td>
+                                    <td>{{ $row['active_debt_count'] }} aktif / {{ $row['paid_debt_count'] }} lunas</td>
                                     <td class="text-center">
-                                        <a href="{{ route('admin.employee-debts.show', ['debtId' => $row['id']]) }}" class="btn btn-sm btn-light-primary">
-                                            Detail
+                                        <a
+                                            href="{{ route('admin.employees.show', ['employeeId' => $row['employee_id']]) }}"
+                                            class="btn btn-sm btn-light-primary"
+                                        >
+                                            Buka Detail Karyawan
                                         </a>
                                     </td>
                                 </tr>

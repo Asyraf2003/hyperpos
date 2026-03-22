@@ -9,67 +9,36 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeDebtListPageQuery
 {
-    /**
-     * @return list<array{
-     *     id: string,
-     *     employee_id: string,
-     *     employee_name: string,
-     *     total_debt: int,
-     *     total_debt_formatted: string,
-     *     remaining_balance: int,
-     *     remaining_balance_formatted: string,
-     *     status_value: string,
-     *     status_label: string,
-     *     notes: ?string,
-     *     recorded_at: string
-     * }>
-     */
     public function latest(): array
     {
         return DB::table('employee_debts')
             ->join('employees', 'employees.id', '=', 'employee_debts.employee_id')
-            ->select([
-                'employee_debts.id',
-                'employee_debts.employee_id',
-                'employees.name as employee_name',
-                'employee_debts.total_debt',
-                'employee_debts.remaining_balance',
-                'employee_debts.status',
-                'employee_debts.notes',
-                'employee_debts.created_at',
-            ])
-            ->orderByDesc('employee_debts.created_at')
-            ->limit(50)
+            ->select(['employee_debts.employee_id', 'employees.name as employee_name'])
+            ->selectRaw('COUNT(*) as total_debt_records')
+            ->selectRaw('SUM(employee_debts.total_debt) as total_debt_amount')
+            ->selectRaw('SUM(employee_debts.remaining_balance) as total_remaining_balance')
+            ->selectRaw("SUM(CASE WHEN employee_debts.status = 'unpaid' THEN 1 ELSE 0 END) as active_debt_count")
+            ->selectRaw("SUM(CASE WHEN employee_debts.status = 'paid' THEN 1 ELSE 0 END) as paid_debt_count")
+            ->selectRaw('MAX(employee_debts.created_at) as latest_recorded_at')
+            ->groupBy('employee_debts.employee_id', 'employees.name')
+            ->orderByDesc('latest_recorded_at')
             ->get()
             ->map(function (object $row): array {
-                $totalDebt = (int) $row->total_debt;
-                $remainingBalance = (int) $row->remaining_balance;
-                $statusValue = (string) $row->status;
+                $totalDebtAmount = (int) $row->total_debt_amount;
+                $totalRemainingBalance = (int) $row->total_remaining_balance;
 
                 return [
-                    'id' => (string) $row->id,
                     'employee_id' => (string) $row->employee_id,
                     'employee_name' => (string) $row->employee_name,
-                    'total_debt' => $totalDebt,
-                    'total_debt_formatted' => number_format($totalDebt, 0, ',', '.'),
-                    'remaining_balance' => $remainingBalance,
-                    'remaining_balance_formatted' => number_format($remainingBalance, 0, ',', '.'),
-                    'status_value' => $statusValue,
-                    'status_label' => $this->statusLabel($statusValue),
-                    'notes' => $row->notes !== null ? (string) $row->notes : null,
-                    'recorded_at' => Carbon::parse((string) $row->created_at)->format('Y-m-d'),
+                    'total_debt_records' => (int) $row->total_debt_records,
+                    'total_debt_amount_formatted' => number_format($totalDebtAmount, 0, ',', '.'),
+                    'total_remaining_balance_formatted' => number_format($totalRemainingBalance, 0, ',', '.'),
+                    'active_debt_count' => (int) $row->active_debt_count,
+                    'paid_debt_count' => (int) $row->paid_debt_count,
+                    'latest_recorded_at' => Carbon::parse((string) $row->latest_recorded_at)->format('Y-m-d'),
                 ];
             })
             ->values()
             ->all();
-    }
-
-    private function statusLabel(string $statusValue): string
-    {
-        return match ($statusValue) {
-            'unpaid' => 'Belum Lunas',
-            'paid' => 'Lunas',
-            default => ucfirst($statusValue),
-        };
     }
 }
