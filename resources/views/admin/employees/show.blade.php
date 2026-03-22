@@ -153,7 +153,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Riwayat Pembayaran Hutang</h4>
                         <p class="mb-0 text-muted">Semua pembayaran hutang yang pernah dicatat untuk karyawan ini.</p>
@@ -191,6 +191,78 @@
                                         <tr>
                                             <td colspan="5" class="text-center text-muted py-4">
                                                 Belum ada riwayat pembayaran hutang untuk karyawan ini.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Ringkasan Riwayat Gaji</h4>
+                        <p class="mb-0 text-muted">Posisi histori pencairan gaji yang sudah dicatat untuk karyawan ini.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <small class="text-muted d-block mb-1">Total Record Payroll</small>
+                                    <strong>{{ $detail['payroll']['summary']['total_payroll_records'] }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <small class="text-muted d-block mb-1">Total Pencairan</small>
+                                    <strong>Rp{{ $detail['payroll']['summary']['total_disbursed_amount_formatted'] }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <small class="text-muted d-block mb-1">Pencairan Terakhir</small>
+                                    <strong>{{ $detail['payroll']['summary']['latest_disbursement_date'] ?? '-' }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Riwayat Gaji</h4>
+                        <p class="mb-0 text-muted">Daftar pencairan gaji yang pernah dicatat untuk karyawan ini.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr class="text-nowrap">
+                                        <th style="width: 64px;">No</th>
+                                        <th>Tanggal Cair</th>
+                                        <th>Nominal</th>
+                                        <th>Mode</th>
+                                        <th>Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($detail['payroll']['records'] as $record)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $record['disbursement_date'] }}</td>
+                                            <td>Rp{{ $record['amount_formatted'] }}</td>
+                                            <td>{{ $record['mode_label'] }}</td>
+                                            <td>{{ $record['notes'] ?? '-' }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                Belum ada riwayat gaji untuk karyawan ini.
                                             </td>
                                         </tr>
                                     @endforelse

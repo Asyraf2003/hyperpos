@@ -12,6 +12,8 @@ final class DatabaseEmployeeDetailPageQuery
         private DatabaseEmployeeDebtSummaryByEmployeeQuery $debtSummaryQuery,
         private DatabaseEmployeeDebtRecordListByEmployeeQuery $debtRecordListQuery,
         private DatabaseEmployeeDebtPaymentListByEmployeeQuery $debtPaymentListQuery,
+        private DatabaseEmployeePayrollSummaryByEmployeeQuery $payrollSummaryQuery,
+        private DatabaseEmployeePayrollHistoryByEmployeeQuery $payrollHistoryQuery,
     ) {
     }
 
@@ -46,6 +48,10 @@ final class DatabaseEmployeeDetailPageQuery
                 'summary' => $this->debtSummaryQuery->findByEmployeeId($employeeId),
                 'records' => $this->debtRecordListQuery->findByEmployeeId($employeeId),
                 'payments' => $this->debtPaymentListQuery->findByEmployeeId($employeeId),
+            ],
+            'payroll' => [
+                'summary' => $this->payrollSummaryQuery->findByEmployeeId($employeeId),
+                'records' => $this->payrollHistoryQuery->findByEmployeeId($employeeId),
             ],
         ];
     }

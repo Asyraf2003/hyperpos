@@ -45,6 +45,8 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Ringkasan Hutang Karyawan');
         $response->assertSee('Riwayat Hutang');
         $response->assertSee('Riwayat Pembayaran Hutang');
+        $response->assertSee('Ringkasan Riwayat Gaji');
+        $response->assertSee('Riwayat Gaji');
         $response->assertSee('Edit Karyawan');
     }
 
@@ -79,7 +81,6 @@ final class EmployeeDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Total Record Hutang');
-        $response->assertSee('1');
         $response->assertSee('Rp1.000.000');
         $response->assertSee('Rp250.000');
         $response->assertSee('1 aktif');
@@ -88,6 +89,46 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Belum Lunas');
         $response->assertSee('Potong gaji minggu ini');
         $response->assertSee('Buka Debt');
+    }
+
+    public function test_admin_can_see_employee_payroll_summary_and_history_on_detail_page(): void
+    {
+        $employeeId = $this->seedEmployee();
+
+        DB::table('payroll_disbursements')->insert([
+            [
+                'id' => (string) Str::uuid(),
+                'employee_id' => $employeeId,
+                'amount' => 1500000,
+                'disbursement_date' => '2026-03-20 08:00:00',
+                'mode' => 'weekly',
+                'notes' => 'Gaji minggu ke-3',
+                'created_at' => now()->subDays(2),
+                'updated_at' => now()->subDays(2),
+            ],
+            [
+                'id' => (string) Str::uuid(),
+                'employee_id' => $employeeId,
+                'amount' => 1500000,
+                'disbursement_date' => '2026-03-27 08:00:00',
+                'mode' => 'weekly',
+                'notes' => 'Gaji minggu ke-4',
+                'created_at' => now()->subDay(),
+                'updated_at' => now()->subDay(),
+            ],
+        ]);
+
+        $response = $this->actingAs($this->createUserWithRole('admin-employee-detail-payroll@example.test', 'admin'))
+            ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
+
+        $response->assertOk();
+        $response->assertSee('Total Record Payroll');
+        $response->assertSee('2');
+        $response->assertSee('Rp3.000.000');
+        $response->assertSee('2026-03-27');
+        $response->assertSee('Gaji minggu ke-3');
+        $response->assertSee('Gaji minggu ke-4');
+        $response->assertSee('Mingguan');
     }
 
     public function test_admin_is_redirected_to_index_when_employee_detail_is_missing(): void
