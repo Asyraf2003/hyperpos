@@ -249,11 +249,13 @@
                             </table>
                         </div>
 
-                        @if ($payrollRecords->hasPages())
-                            <div class="mt-3 d-flex justify-content-end">
-                                {{ $payrollRecords->onEachSide(1)->links() }}
-                            </div>
-                        @endif
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                            <small class="text-muted">
+                                Total: {{ $payrollRecords->total() }} riwayat gaji
+                            </small>
+
+                            @include('layouts.partials.pagination', ['paginator' => $payrollRecords])
+                        </div>
                     </div>
                 </div>
             </div>
