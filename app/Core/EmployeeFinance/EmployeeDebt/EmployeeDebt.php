@@ -51,7 +51,6 @@ class EmployeeDebt
         if ($this->status === DebtStatus::PAID) {
             throw new DomainException('Hutang ini sudah lunas, tidak dapat menerima pembayaran lagi.');
         }
-
         if ($payment->getAmount()->greaterThan($this->remainingBalance)) {
             throw new DomainException('Nominal pembayaran melebihi sisa hutang.');
         }
@@ -72,17 +71,14 @@ class EmployeeDebt
             $this->status = DebtStatus::UNPAID;
             return;
         }
-
         if ($type !== 'decrease') {
             throw new InvalidArgumentException('Tipe koreksi hutang tidak valid.');
         }
-
         if ($amount->greaterThan($this->remainingBalance)) {
             throw new DomainException('Koreksi pengurangan melebihi sisa hutang.');
         }
 
         $newTotalDebt = $this->totalDebt->subtract($amount);
-
         if ($newTotalDebt->isZero() || $newTotalDebt->isNegative()) {
             throw new DomainException('Koreksi tidak boleh membuat total hutang nol atau negatif.');
         }
@@ -98,7 +94,6 @@ class EmployeeDebt
     public function getRemainingBalance(): Money { return $this->remainingBalance; }
     public function getStatus(): DebtStatus { return $this->status; }
     public function getNotes(): ?string { return $this->notes; }
-
     /** @return array<string, DebtPayment> */
     public function getPayments(): array { return $this->payments; }
 }
