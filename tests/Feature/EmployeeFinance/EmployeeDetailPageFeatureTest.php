@@ -88,10 +88,10 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Pinjaman kebutuhan keluarga');
         $response->assertSee('Belum Lunas');
         $response->assertSee('Potong gaji minggu ini');
-        $response->assertSee('Buka Debt');
+        $response->assertSee('Buka Hutang');
     }
 
-    public function test_admin_can_see_employee_payroll_summary_and_history_on_detail_page(): void
+    public function test_admin_can_see_employee_payroll_summary_on_detail_page_and_payroll_rows_from_json_table_endpoint(): void
     {
         $employeeId = $this->seedEmployee();
 
@@ -118,7 +118,9 @@ final class EmployeeDetailPageFeatureTest extends TestCase
             ],
         ]);
 
-        $response = $this->actingAs($this->createUserWithRole('admin-employee-detail-payroll@example.test', 'admin'))
+        $admin = $this->createUserWithRole('admin-employee-detail-payroll@example.test', 'admin');
+
+        $response = $this->actingAs($admin)
             ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
 
         $response->assertOk();
@@ -126,9 +128,28 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('2');
         $response->assertSee('Rp3.000.000');
         $response->assertSee('2026-03-27');
-        $response->assertSee('Gaji minggu ke-3');
-        $response->assertSee('Gaji minggu ke-4');
-        $response->assertSee('Mingguan');
+        $response->assertSee('Riwayat Gaji');
+        $response->assertSee('employee-payroll-table-body', false);
+        $response->assertSee('employee-payroll-table-summary', false);
+        $response->assertSee('employee-payroll-table-pagination', false);
+        $response->assertSee('admin-employee-payroll-table.js');
+        $response->assertSee(json_encode(route('admin.employees.payroll-table', ['employeeId' => $employeeId])), false);
+
+        $tableResponse = $this->actingAs($admin)->getJson(route('admin.employees.payroll-table', [
+            'employeeId' => $employeeId,
+            'page' => 1,
+            'per_page' => 10,
+        ]));
+
+        $tableResponse->assertOk();
+        $tableResponse->assertJsonPath('success', true);
+        $tableResponse->assertJsonPath('data.meta.page', 1);
+        $tableResponse->assertJsonPath('data.meta.per_page', 10);
+        $tableResponse->assertJsonPath('data.meta.total', 2);
+        $tableResponse->assertJsonPath('data.meta.last_page', 1);
+        $tableResponse->assertJsonFragment(['notes' => 'Gaji minggu ke-3']);
+        $tableResponse->assertJsonFragment(['notes' => 'Gaji minggu ke-4']);
+        $tableResponse->assertJsonFragment(['mode_label' => 'Mingguan']);
     }
 
     public function test_admin_is_redirected_to_index_when_employee_detail_is_missing(): void

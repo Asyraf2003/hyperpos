@@ -73,23 +73,23 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
 
-        $response->assertSee('Policy State');
+        $response->assertSee('Status Kebijakan');
         $response->assertSee('Locked');
         $response->assertSee('Catat Pembayaran');
         $response->assertSee('Simpan Pembayaran');
         $response->assertSee('Bukti Pembayaran');
-        $response->assertSee('Upload Bukti');
-        $response->assertSee('Allowed Actions');
+        $response->assertSee('Unggah Bukti');
+        $response->assertSee('Aksi yang Diizinkan');
         $response->assertSee('Correction / reversal');
-        $response->assertSee('Lock Reasons');
+        $response->assertSee('Alasan Penguncian');
         $response->assertSee('Receipt sudah tercatat');
         $response->assertSee('Payment efektif sudah tercatat');
 
         $response->assertSee('Ringkasan Nota');
-        $response->assertSee('Line Invoice');
+        $response->assertSee('Rincian Nota');
 
         $response->assertSee('invoice-1');
-        $response->assertSee('Supplier Saat Ini');
+        $response->assertSee('Nama Pemasok Saat Ini');
         $response->assertSee('PT Supplier Baru');
         $response->assertSee('Nama Saat Nota Dibuat');
         $response->assertSee('PT Sumber Makmur');
@@ -98,9 +98,9 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertSee('Rp 150.000');
         $response->assertSee('Rp 75.000');
-        $response->assertSee('Receipt Count');
+        $response->assertSee('Jumlah Penerimaan');
         $response->assertSee('2');
-        $response->assertSee('Total Received Qty');
+        $response->assertSee('Total Kuantitas Diterima');
         $response->assertSee('3');
 
         $response->assertSee('KB-001');
@@ -136,16 +136,16 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
 
-        $response->assertSee('Policy State');
+        $response->assertSee('Status Kebijakan');
         $response->assertSee('Editable');
         $response->assertSee('Catat Pembayaran');
         $response->assertSee('Simpan Pembayaran');
         $response->assertSee('Bukti Pembayaran');
-        $response->assertSee('Belum ada pembayaran supplier.');
-        $response->assertSee('Allowed Actions');
+        $response->assertSee('Belum ada pembayaran pemasok.');
+        $response->assertSee('Aksi yang Diizinkan');
         $response->assertSee('Edit invoice');
         $response->assertSee('Void invoice');
-        $response->assertSee('Lock Reasons');
+        $response->assertSee('Alasan Penguncian');
         $response->assertSee('Belum ada efek turunan primer.');
     }
 

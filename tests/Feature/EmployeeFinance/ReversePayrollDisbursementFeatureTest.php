@@ -59,7 +59,7 @@ final class ReversePayrollDisbursementFeatureTest extends TestCase
         ]);
     }
 
-    public function test_reversed_payroll_is_excluded_from_employee_payroll_summary(): void
+    public function test_reversed_payroll_is_excluded_from_employee_payroll_summary_and_still_visible_in_payroll_table_endpoint(): void
     {
         $employeeId = (string) Str::uuid();
         $payrollId = (string) Str::uuid();
@@ -95,15 +95,31 @@ final class ReversePayrollDisbursementFeatureTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $response = $this->actingAs($this->user('admin-payroll-summary@example.test', 'admin'))
+        $admin = $this->user('admin-payroll-summary@example.test', 'admin');
+
+        $response = $this->actingAs($admin)
             ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
 
         $response->assertOk();
         $response->assertSee('Total Record Payroll');
         $response->assertSee('0');
         $response->assertSee('Rp0');
-        $response->assertSee('Direversal');
-        $response->assertSee('Koreksi payout payroll');
+        $response->assertSee('employee-payroll-table-body', false);
+        $response->assertSee('admin-employee-payroll-table.js');
+
+        $tableResponse = $this->actingAs($admin)->getJson(route('admin.employees.payroll-table', [
+            'employeeId' => $employeeId,
+            'page' => 1,
+            'per_page' => 10,
+        ]));
+
+        $tableResponse->assertOk();
+        $tableResponse->assertJsonPath('success', true);
+        $tableResponse->assertJsonPath('data.meta.total', 1);
+        $tableResponse->assertJsonFragment(['notes' => 'Gaji Maret']);
+        $tableResponse->assertJsonFragment(['is_reversed' => true]);
+        $tableResponse->assertJsonFragment(['reversal_reason' => 'Koreksi payout payroll']);
+        $tableResponse->assertJsonFragment(['mode_label' => 'Bulanan']);
     }
 
     private function user(string $email, string $role): User

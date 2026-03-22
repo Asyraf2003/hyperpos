@@ -36,9 +36,9 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
             ->get(route('admin.procurement.supplier-invoices.create'));
 
         $response->assertOk();
-        $response->assertSee('Line Nota');
-        $response->assertSee('Metadata Nota');
-        $response->assertSee('Cari product dengan mengetik nama, merek, ukuran, atau kode.');
+        $response->assertSee('Rincian Nota');
+        $response->assertSee('Informasi Nota');
+        $response->assertSee('Cari produk dengan mengetik nama, merek, ukuran, atau kode.');
         $response->assertSee('add-procurement-line', false);
         $response->assertSee('data-product-search', false);
         $response->assertSee('admin-procurement-create.js');
