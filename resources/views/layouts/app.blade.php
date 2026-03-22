@@ -24,14 +24,23 @@
         @endif
 
         <div id="main">
-            @include('layouts.partials.topbar')
 
             <div class="page-content">
                 @include('layouts.partials.alerts')
 
                 @hasSection('heading')
-                    <div class="page-heading">
-                        <h3>@yield('heading')</h3>
+                    <div class="page-heading d-flex justify-content-between align-items-center gap-3">
+                        <h3 class="mb-0">@yield('heading')</h3>
+
+                        @if (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))
+                            <button
+                                type="button"
+                                class="btn btn-light-secondary"
+                                onclick="window.history.back()"
+                            >
+                                Kembali
+                            </button>
+                        @endif
                     </div>
                 @endif
 
