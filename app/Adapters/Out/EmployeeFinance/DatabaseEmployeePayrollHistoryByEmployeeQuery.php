@@ -4,30 +4,37 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeePayrollHistoryByEmployeeQuery
 {
-    public function findByEmployeeId(string $employeeId): array
+    public function findByEmployeeId(string $employeeId): LengthAwarePaginator
     {
-        return DB::table('payroll_disbursements')
+        $paginator = DB::table('payroll_disbursements')
             ->leftJoin('payroll_disbursement_reversals', 'payroll_disbursements.id', '=', 'payroll_disbursement_reversals.payroll_disbursement_id')
-            ->select([
-                'payroll_disbursements.id',
-                'payroll_disbursements.amount',
-                'payroll_disbursements.disbursement_date',
-                'payroll_disbursements.mode',
-                'payroll_disbursements.notes',
-                'payroll_disbursement_reversals.id as reversal_id',
-                'payroll_disbursement_reversals.reason as reversal_reason',
-                'payroll_disbursement_reversals.created_at as reversal_created_at',
-            ])
             ->where('payroll_disbursements.employee_id', $employeeId)
             ->orderByDesc('payroll_disbursements.disbursement_date')
             ->orderByDesc('payroll_disbursements.created_at')
-            ->get()
-            ->map(function (object $row): array {
+            ->paginate(
+                null,
+                [
+                    'payroll_disbursements.id',
+                    'payroll_disbursements.amount',
+                    'payroll_disbursements.disbursement_date',
+                    'payroll_disbursements.mode',
+                    'payroll_disbursements.notes',
+                    'payroll_disbursement_reversals.id as reversal_id',
+                    'payroll_disbursement_reversals.reason as reversal_reason',
+                    'payroll_disbursement_reversals.created_at as reversal_created_at',
+                ],
+                'payroll_page'
+            )
+            ->withQueryString();
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map(function (object $row): array {
                 $amount = (int) $row->amount;
                 $modeValue = (string) $row->mode;
                 $isReversed = $row->reversal_id !== null;
@@ -47,8 +54,9 @@ final class DatabaseEmployeePayrollHistoryByEmployeeQuery
                         : null,
                 ];
             })
-            ->values()
-            ->all();
+        );
+
+        return $paginator;
     }
 
     private function modeLabel(string $value): string

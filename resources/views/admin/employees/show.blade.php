@@ -186,6 +186,11 @@
                     </div>
 
                     <div class="card-body">
+                        @php
+                            $payrollRecords = $detail['payroll']['records'];
+                            $payrollFirstItem = $payrollRecords->firstItem() ?? 1;
+                        @endphp
+
                         <div class="table-responsive">
                             <table class="table table-lg">
                                 <thead>
@@ -200,9 +205,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($detail['payroll']['records'] as $record)
+                                    @forelse ($payrollRecords as $record)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $payrollFirstItem + $loop->index }}</td>
                                             <td>{{ $record['disbursement_date'] }}</td>
                                             <td>Rp{{ $record['amount_formatted'] }}</td>
                                             <td>{{ $record['mode_label'] }}</td>
@@ -243,6 +248,12 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        @if ($payrollRecords->hasPages())
+                            <div class="mt-3 d-flex justify-content-end">
+                                {{ $payrollRecords->onEachSide(1)->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
