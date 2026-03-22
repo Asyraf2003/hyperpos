@@ -15,8 +15,8 @@ final class EmployeeTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_search_employee_table_with_multi_word_query(): void
     {
-        $this->seed('emp-1', 'Budi Santoso', '08121111', 5000000, 'weekly', 'active');
-        $this->seed('emp-2', 'Andi', '08999999', 4000000, 'monthly', 'inactive');
+        $this->seedEmployeeRow('emp-1', 'Budi Santoso', '08121111', 5000000, 'weekly', 'active');
+        $this->seedEmployeeRow('emp-2', 'Andi', '08999999', 4000000, 'monthly', 'inactive');
         $r = $this->actingAs($this->admin())->get(route('admin.employees.table', ['q' => 'Budi 0812']));
         $r->assertOk();
         $r->assertJsonCount(1, 'data.rows');
@@ -26,8 +26,8 @@ final class EmployeeTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_sort_employee_table_by_base_salary_desc(): void
     {
-        $this->seed('emp-1', 'Budi', '0812', 3000000, 'weekly', 'active');
-        $this->seed('emp-2', 'Andi', '0822', 6000000, 'monthly', 'active');
+        $this->seedEmployeeRow('emp-1', 'Budi', '0812', 3000000, 'weekly', 'active');
+        $this->seedEmployeeRow('emp-2', 'Andi', '0822', 6000000, 'monthly', 'active');
         $r = $this->actingAs($this->admin())->get(route('admin.employees.table', ['sort_by' => 'base_salary', 'sort_dir' => 'desc']));
         $r->assertOk();
         $r->assertJsonPath('data.rows.0.name', 'Andi');
@@ -36,7 +36,7 @@ final class EmployeeTableDataQueryFeatureTest extends TestCase
 
     public function test_admin_can_access_second_page_of_employee_table(): void
     {
-        for ($i = 1; $i <= 11; $i++) $this->seed('emp-'.$i, 'Employee '.str_pad((string) $i, 2, '0', STR_PAD_LEFT), '08'.$i, 1000000 + $i, 'monthly', 'active');
+        for ($i = 1; $i <= 11; $i++) $this->seedEmployeeRow('emp-'.$i, 'Employee '.str_pad((string) $i, 2, '0', STR_PAD_LEFT), '08'.$i, 1000000 + $i, 'monthly', 'active');
         $r = $this->actingAs($this->admin())->get(route('admin.employees.table', ['page' => 2]));
         $r->assertOk();
         $r->assertJsonPath('data.meta.page', 2);
@@ -51,7 +51,7 @@ final class EmployeeTableDataQueryFeatureTest extends TestCase
         return $user;
     }
 
-    private function seed(string $id, string $name, string $phone, int $salary, string $period, string $status): void
+    private function seedEmployeeRow(string $id, string $name, string $phone, int $salary, string $period, string $status): void
     {
         DB::table('employees')->insert(['id' => $id, 'name' => $name, 'phone' => $phone, 'base_salary' => $salary, 'pay_period' => $period, 'status' => $status]);
     }
