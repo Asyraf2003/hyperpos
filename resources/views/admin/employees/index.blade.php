@@ -11,6 +11,12 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="card">
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
@@ -36,6 +42,7 @@
                                 <th>Gaji Pokok</th>
                                 <th>Periode Gaji</th>
                                 <th>Status</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,10 +54,15 @@
                                     <td>Rp{{ $employee['base_salary_formatted'] }}</td>
                                     <td>{{ $employee['pay_period_label'] }}</td>
                                     <td>{{ $employee['status_label'] }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.employees.edit', ['employeeId' => $employee['id']]) }}" class="btn btn-sm btn-light-primary">
+                                            Edit
+                                        </a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">Belum ada data karyawan.</td>
+                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data karyawan.</td>
                                 </tr>
                             @endforelse
                         </tbody>

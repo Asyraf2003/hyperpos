@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Employee\CreateEmployeePageController;
+use App\Adapters\In\Http\Controllers\Admin\Employee\EditEmployeePageController;
 use App\Adapters\In\Http\Controllers\Admin\Employee\EmployeeIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Employee\StoreEmployeeController;
+use App\Adapters\In\Http\Controllers\Admin\Employee\UpdateEmployeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
@@ -16,4 +18,10 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::post('/admin/employees', StoreEmployeeController::class)
         ->name('admin.employees.store');
+
+    Route::get('/admin/employees/{employeeId}/edit', EditEmployeePageController::class)
+        ->name('admin.employees.edit');
+
+    Route::put('/admin/employees/{employeeId}', UpdateEmployeeController::class)
+        ->name('admin.employees.update');
 });

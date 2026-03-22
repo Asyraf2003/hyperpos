@@ -32,6 +32,15 @@ class Employee
         return new self($id, $name, $phone, $baseSalary, $payPeriod, EmployeeStatus::ACTIVE);
     }
 
+    public function updateProfile(string $name, ?string $phone, PayPeriod $payPeriod): void
+    {
+        $this->validateName($name);
+
+        $this->name = $name;
+        $this->phone = $phone !== null && trim($phone) === '' ? null : $phone;
+        $this->payPeriod = $payPeriod;
+    }
+
     public function updateBaseSalary(Money $newSalary, ?string $reason = null): void
     {
         $this->validateBaseSalary($newSalary);
@@ -41,6 +50,11 @@ class Employee
         }
 
         $this->baseSalary = $newSalary;
+    }
+
+    public function activate(): void
+    {
+        $this->status = EmployeeStatus::ACTIVE;
     }
 
     public function deactivate(): void
