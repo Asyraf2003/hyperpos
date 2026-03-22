@@ -5,11 +5,15 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\CreateEmployeeDebtPageController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\EmployeeDebtTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\StoreEmployeeDebtController;
 use App\Adapters\In\Http\Controllers\Admin\EmployeeDebt\StoreEmployeeDebtPaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
+    Route::get('/admin/employee-debts/table', EmployeeDebtTableDataController::class)
+        ->name('admin.employee-debts.table');
+
     Route::post('/admin/employee-debts/{debtId}/payments', StoreEmployeeDebtPaymentController::class)
         ->name('admin.employee-debts.payments.store');
 });

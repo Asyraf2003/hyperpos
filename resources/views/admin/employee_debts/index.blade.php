@@ -8,7 +8,6 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
@@ -18,10 +17,12 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Ringkasan Hutang Karyawan</h4>
-                        <p class="mb-0 text-muted">Entry list debt yang mengarah ke pusat detail karyawan.</p>
+                        <p class="mb-0 text-muted">Interactive table ringkasan hutang yang mengarah ke detail karyawan.</p>
                     </div>
-
-                    <div>
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="employee-debt-search-form" class="d-flex flex-column gap-1">
+                            <input type="text" id="employee-debt-search-input" class="form-control" placeholder="Cari nama karyawan" autocomplete="off">
+                        </form>
                         <a href="{{ route('admin.employee-debts.create') }}" class="btn btn-primary">Catat Hutang Karyawan</a>
                     </div>
                 </div>
@@ -29,47 +30,37 @@
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-lg">
+                    <table class="table table-lg" id="employee-debt-table">
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
-                                <th>Karyawan</th>
-                                <th>Terakhir Dicatat</th>
-                                <th>Total Record</th>
-                                <th>Total Hutang</th>
-                                <th>Total Sisa</th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="employee_name">Karyawan <span class="ms-1 text-muted" data-sort-indicator="employee_name">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="latest_recorded_at">Terakhir Dicatat <span class="ms-1 text-muted" data-sort-indicator="latest_recorded_at">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_debt_records">Total Record <span class="ms-1 text-muted" data-sort-indicator="total_debt_records">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_debt_amount">Total Hutang <span class="ms-1 text-muted" data-sort-indicator="total_debt_amount">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_remaining_balance">Total Sisa <span class="ms-1 text-muted" data-sort-indicator="total_remaining_balance">↕</span></button></th>
                                 <th>Status Record</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse ($rows as $row)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $row['employee_name'] }}</td>
-                                    <td>{{ $row['latest_recorded_at'] }}</td>
-                                    <td>{{ $row['total_debt_records'] }}</td>
-                                    <td>Rp{{ $row['total_debt_amount_formatted'] }}</td>
-                                    <td>Rp{{ $row['total_remaining_balance_formatted'] }}</td>
-                                    <td>{{ $row['active_debt_count'] }} aktif / {{ $row['paid_debt_count'] }} lunas</td>
-                                    <td class="text-center">
-                                        <a
-                                            href="{{ route('admin.employees.show', ['employeeId' => $row['employee_id']]) }}"
-                                            class="btn btn-sm btn-light-primary"
-                                        >
-                                            Buka Detail Karyawan
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">Belum ada data hutang karyawan.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+                        <tbody id="employee-debt-table-body"><tr><td colspan="8" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
                     </table>
+                </div>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                    <small id="employee-debt-table-summary" class="text-muted">Total: -</small>
+                    <div id="employee-debt-table-pagination"></div>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.employeeDebtTableConfig = {
+            endpoint: @json(route('admin.employee-debts.table')),
+            detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__']))
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-debts-table.js') }}"></script>
+@endpush

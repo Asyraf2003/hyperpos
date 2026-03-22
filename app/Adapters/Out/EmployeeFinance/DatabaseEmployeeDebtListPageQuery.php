@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Application\EmployeeFinance\DTO\EmployeeDebtTableQuery;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeDebtListPageQuery
 {
-    public function latest(): array
+    public function search(EmployeeDebtTableQuery $query): array
     {
-        return DB::table('employee_debts')
+        $builder = DB::table('employee_debts')
             ->join('employees', 'employees.id', '=', 'employee_debts.employee_id')
             ->select(['employee_debts.employee_id', 'employees.name as employee_name'])
             ->selectRaw('COUNT(*) as total_debt_records')
@@ -19,26 +20,47 @@ final class DatabaseEmployeeDebtListPageQuery
             ->selectRaw('SUM(employee_debts.remaining_balance) as total_remaining_balance')
             ->selectRaw("SUM(CASE WHEN employee_debts.status = 'unpaid' THEN 1 ELSE 0 END) as active_debt_count")
             ->selectRaw("SUM(CASE WHEN employee_debts.status = 'paid' THEN 1 ELSE 0 END) as paid_debt_count")
-            ->selectRaw('MAX(employee_debts.created_at) as latest_recorded_at')
-            ->groupBy('employee_debts.employee_id', 'employees.name')
-            ->orderByDesc('latest_recorded_at')
-            ->get()
-            ->map(function (object $row): array {
-                $totalDebtAmount = (int) $row->total_debt_amount;
-                $totalRemainingBalance = (int) $row->total_remaining_balance;
+            ->selectRaw('MAX(employee_debts.created_at) as latest_recorded_at');
 
-                return [
-                    'employee_id' => (string) $row->employee_id,
-                    'employee_name' => (string) $row->employee_name,
-                    'total_debt_records' => (int) $row->total_debt_records,
-                    'total_debt_amount_formatted' => number_format($totalDebtAmount, 0, ',', '.'),
-                    'total_remaining_balance_formatted' => number_format($totalRemainingBalance, 0, ',', '.'),
-                    'active_debt_count' => (int) $row->active_debt_count,
-                    'paid_debt_count' => (int) $row->paid_debt_count,
-                    'latest_recorded_at' => Carbon::parse((string) $row->latest_recorded_at)->format('Y-m-d'),
-                ];
-            })
-            ->values()
-            ->all();
+        if ($query->q() !== null) {
+            foreach (preg_split('/\s+/', $query->q()) ?: [] as $term) {
+                $builder->where('employees.name', 'like', '%'.$term.'%');
+            }
+        }
+
+        $column = match ($query->sortBy()) {
+            'employee_name' => 'employee_name',
+            'total_debt_records' => 'total_debt_records',
+            'total_debt_amount' => 'total_debt_amount',
+            'total_remaining_balance' => 'total_remaining_balance',
+            default => 'latest_recorded_at',
+        };
+
+        $paginator = $builder->groupBy('employee_debts.employee_id', 'employees.name')
+            ->orderBy($column, $query->sortDir())
+            ->orderBy('employee_name')
+            ->paginate($query->perPage(), ['*'], 'page', $query->page());
+
+        return [
+            'rows' => collect($paginator->items())->map(fn (object $row): array => [
+                'employee_id' => (string) $row->employee_id,
+                'employee_name' => (string) $row->employee_name,
+                'total_debt_records' => (int) $row->total_debt_records,
+                'total_debt_amount_formatted' => number_format((int) $row->total_debt_amount, 0, ',', '.'),
+                'total_remaining_balance_formatted' => number_format((int) $row->total_remaining_balance, 0, ',', '.'),
+                'active_debt_count' => (int) $row->active_debt_count,
+                'paid_debt_count' => (int) $row->paid_debt_count,
+                'latest_recorded_at' => Carbon::parse((string) $row->latest_recorded_at)->format('Y-m-d'),
+            ])->values()->all(),
+            'meta' => [
+                'page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'sort_by' => $query->sortBy(),
+                'sort_dir' => $query->sortDir(),
+                'filters' => ['q' => $query->q()],
+            ],
+        ];
     }
 }
