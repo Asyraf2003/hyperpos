@@ -7,6 +7,7 @@ use App\Adapters\In\Http\Controllers\Admin\Payroll\PayrollIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Payroll\PayrollTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Payroll\StorePayrollBatchController;
 use App\Adapters\In\Http\Controllers\Admin\Payroll\StorePayrollController;
+use App\Adapters\In\Http\Controllers\Admin\Payroll\StorePayrollReversalController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
@@ -15,6 +16,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/payrolls/batch', StorePayrollBatchController::class)
         ->name('admin.payrolls.batch.store');
+
+    Route::post('/admin/payrolls/{payrollId}/reverse', StorePayrollReversalController::class)
+        ->name('admin.payrolls.reverse.store');
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {

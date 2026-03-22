@@ -84,6 +84,7 @@ use App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
 use App\Ports\Out\EmployeeFinance\PayrollDisbursementWriterPort;
+use App\Ports\Out\EmployeeFinance\PayrollDisbursementReversalWriterPort;
 use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
 use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
 use App\Ports\Out\Expense\OperationalExpenseWriterPort;
@@ -222,6 +223,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(EmployeeDebtAdjustmentWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentWriterAdapter::class);
         $this->app->singleton(EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);
         $this->app->singleton(PayrollDisbursementWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter::class);
+        $this->app->singleton(PayrollDisbursementReversalWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementReversalWriterAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\PayrollTableReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollTableReaderAdapter::class);
 
         $this->app->singleton(ExpenseCategoryReaderPort::class, DatabaseExpenseCategoryReaderAdapter::class);

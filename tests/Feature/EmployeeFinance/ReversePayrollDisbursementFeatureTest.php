@@ -1,0 +1,124 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\EmployeeFinance;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\TestCase;
+
+final class ReversePayrollDisbursementFeatureTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_admin_can_reverse_payroll_disbursement(): void
+    {
+        $employeeId = (string) Str::uuid();
+        $payrollId = (string) Str::uuid();
+
+        DB::table('employees')->insert([
+            'id' => $employeeId,
+            'name' => 'Budi Payroll',
+            'phone' => '0812',
+            'base_salary' => 5000000,
+            'pay_period' => 'monthly',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('payroll_disbursements')->insert([
+            'id' => $payrollId,
+            'employee_id' => $employeeId,
+            'amount' => 5000000,
+            'disbursement_date' => '2026-03-25 00:00:00',
+            'mode' => 'monthly',
+            'notes' => 'Gaji Maret',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->user('admin-payroll-reverse@example.test', 'admin'))
+            ->post(route('admin.payrolls.reverse.store', ['payrollId' => $payrollId]), [
+                'reason' => 'Koreksi payout payroll',
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Reversal pencairan gaji berhasil dicatat.');
+
+        $this->assertDatabaseHas('payroll_disbursement_reversals', [
+            'payroll_disbursement_id' => $payrollId,
+            'reason' => 'Koreksi payout payroll',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'payroll_disbursement_reversed',
+        ]);
+    }
+
+    public function test_reversed_payroll_is_excluded_from_employee_payroll_summary(): void
+    {
+        $employeeId = (string) Str::uuid();
+        $payrollId = (string) Str::uuid();
+
+        DB::table('employees')->insert([
+            'id' => $employeeId,
+            'name' => 'Budi Payroll',
+            'phone' => '0812',
+            'base_salary' => 5000000,
+            'pay_period' => 'monthly',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('payroll_disbursements')->insert([
+            'id' => $payrollId,
+            'employee_id' => $employeeId,
+            'amount' => 5000000,
+            'disbursement_date' => '2026-03-25 00:00:00',
+            'mode' => 'monthly',
+            'notes' => 'Gaji Maret',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('payroll_disbursement_reversals')->insert([
+            'id' => (string) Str::uuid(),
+            'payroll_disbursement_id' => $payrollId,
+            'reason' => 'Koreksi payout payroll',
+            'performed_by_actor_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->user('admin-payroll-summary@example.test', 'admin'))
+            ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
+
+        $response->assertOk();
+        $response->assertSee('Total Record Payroll');
+        $response->assertSee('0');
+        $response->assertSee('Rp0');
+        $response->assertSee('Direversal');
+        $response->assertSee('Koreksi payout payroll');
+    }
+
+    private function user(string $email, string $role): User
+    {
+        $user = User::query()->create([
+            'name' => 'Test User',
+            'email' => $email,
+            'password' => 'password123',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => $role,
+        ]);
+
+        return $user;
+    }
+}

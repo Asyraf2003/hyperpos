@@ -189,7 +189,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-4">
+                                            <td colspan="7" class="text-center text-muted py-4">
                                                 Belum ada riwayat pembayaran hutang untuk karyawan ini.
                                             </td>
                                         </tr>
@@ -247,7 +247,9 @@
                                         <th>Tanggal Cair</th>
                                         <th>Nominal</th>
                                         <th>Mode</th>
+                                        <th>Status</th>
                                         <th>Catatan</th>
+                                        <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -257,7 +259,32 @@
                                             <td>{{ $record['disbursement_date'] }}</td>
                                             <td>Rp{{ $record['amount_formatted'] }}</td>
                                             <td>{{ $record['mode_label'] }}</td>
-                                            <td>{{ $record['notes'] ?? '-' }}</td>
+                                            <td>
+                                                @if ($record['is_reversed'])
+                                                    <span class="text-danger">Direversal</span>
+                                                @else
+                                                    <span class="text-success">Aktif</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $record['notes'] ?? '-' }}
+                                                @if ($record['is_reversed'] && $record['reversal_reason'] !== null)
+                                                    <div class="small text-danger mt-1">
+                                                        Reversal: {{ $record['reversal_reason'] }}
+                                                    </div>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">
+                                                @if (! $record['is_reversed'])
+                                                    <form action="{{ route('admin.payrolls.reverse.store', ['payrollId' => $record['id']]) }}" method="post" class="d-inline">
+                                                        @csrf
+                                                        <input type="hidden" name="reason" value="Koreksi payout payroll">
+                                                        <button type="submit" class="btn btn-sm btn-light-danger">Reverse</button>
+                                                    </form>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
