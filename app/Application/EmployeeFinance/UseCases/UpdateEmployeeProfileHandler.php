@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\EmployeeFinance\UseCases;
 
+use App\Core\EmployeeFinance\Employee\Employee;
 use App\Core\EmployeeFinance\Employee\EmployeeStatus;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
 use App\Core\Shared\Exceptions\DomainException;
@@ -50,16 +51,8 @@ final class UpdateEmployeeProfileHandler
 
             $before = $this->snapshot($employee);
 
-            $employee->updateProfile(
-                $name,
-                $phone,
-                PayPeriod::from($payPeriodValue),
-            );
-
-            $employee->updateBaseSalary(
-                Money::fromInt($baseSalaryAmount),
-                $changeReason,
-            );
+            $employee->updateProfile($name, $phone, PayPeriod::from($payPeriodValue));
+            $employee->updateBaseSalary(Money::fromInt($baseSalaryAmount), $changeReason);
 
             if ($statusValue === EmployeeStatus::INACTIVE->value) {
                 $employee->deactivate();
@@ -69,14 +62,12 @@ final class UpdateEmployeeProfileHandler
 
             $this->employeeWriter->save($employee);
 
-            $after = $this->snapshot($employee);
-
             $this->auditLog->record('employee_profile_updated', [
                 'employee_id' => $employeeId,
                 'performed_by_actor_id' => $performedByActorId,
                 'reason' => $changeReason,
                 'before' => $before,
-                'after' => $after,
+                'after' => $this->snapshot($employee),
             ]);
 
             $this->transactionManager->commit();
@@ -86,16 +77,7 @@ final class UpdateEmployeeProfileHandler
         }
     }
 
-    /**
-     * @return array{
-     *     name: string,
-     *     phone: ?string,
-     *     base_salary_amount: int,
-     *     pay_period_value: string,
-     *     status_value: string
-     * }
-     */
-    private function snapshot(object $employee): array
+    private function snapshot(Employee $employee): array
     {
         return [
             'name' => $employee->getName(),

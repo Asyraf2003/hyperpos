@@ -9,32 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeDebtDetailPageQuery
 {
-    /**
-     * @return array{
-     *     summary: array{
-     *         id: string,
-     *         employee_id: string,
-     *         employee_name: string,
-     *         total_debt: int,
-     *         total_debt_formatted: string,
-     *         remaining_balance: int,
-     *         remaining_balance_formatted: string,
-     *         total_paid_amount: int,
-     *         total_paid_amount_formatted: string,
-     *         status_value: string,
-     *         status_label: string,
-     *         notes: ?string,
-     *         recorded_at: string
-     *     },
-     *     payments: list<array{
-     *         id: string,
-     *         amount: int,
-     *         amount_formatted: string,
-     *         payment_date: string,
-     *         notes: ?string
-     *     }>
-     * }|null
-     */
     public function findById(string $debtId): ?array
     {
         $row = DB::table('employee_debts')
@@ -56,7 +30,15 @@ final class DatabaseEmployeeDebtDetailPageQuery
             return null;
         }
 
-        $paymentRows = DB::table('employee_debt_payments')
+        return [
+            'summary' => $this->summary($row),
+            'payments' => $this->payments($debtId),
+        ];
+    }
+
+    private function payments(string $debtId): array
+    {
+        return DB::table('employee_debt_payments')
             ->select(['id', 'amount', 'payment_date', 'notes'])
             ->where('employee_debt_id', $debtId)
             ->orderByDesc('payment_date')
@@ -75,29 +57,29 @@ final class DatabaseEmployeeDebtDetailPageQuery
             })
             ->values()
             ->all();
+    }
 
+    private function summary(object $row): array
+    {
         $totalDebt = (int) $row->total_debt;
         $remainingBalance = (int) $row->remaining_balance;
         $totalPaidAmount = $totalDebt - $remainingBalance;
         $statusValue = (string) $row->status;
 
         return [
-            'summary' => [
-                'id' => (string) $row->id,
-                'employee_id' => (string) $row->employee_id,
-                'employee_name' => (string) $row->employee_name,
-                'total_debt' => $totalDebt,
-                'total_debt_formatted' => number_format($totalDebt, 0, ',', '.'),
-                'remaining_balance' => $remainingBalance,
-                'remaining_balance_formatted' => number_format($remainingBalance, 0, ',', '.'),
-                'total_paid_amount' => $totalPaidAmount,
-                'total_paid_amount_formatted' => number_format($totalPaidAmount, 0, ',', '.'),
-                'status_value' => $statusValue,
-                'status_label' => $this->statusLabel($statusValue),
-                'notes' => $row->notes !== null ? (string) $row->notes : null,
-                'recorded_at' => Carbon::parse((string) $row->created_at)->format('Y-m-d'),
-            ],
-            'payments' => $paymentRows,
+            'id' => (string) $row->id,
+            'employee_id' => (string) $row->employee_id,
+            'employee_name' => (string) $row->employee_name,
+            'total_debt' => $totalDebt,
+            'total_debt_formatted' => number_format($totalDebt, 0, ',', '.'),
+            'remaining_balance' => $remainingBalance,
+            'remaining_balance_formatted' => number_format($remainingBalance, 0, ',', '.'),
+            'total_paid_amount' => $totalPaidAmount,
+            'total_paid_amount_formatted' => number_format($totalPaidAmount, 0, ',', '.'),
+            'status_value' => $statusValue,
+            'status_label' => $this->statusLabel($statusValue),
+            'notes' => $row->notes !== null ? (string) $row->notes : null,
+            'recorded_at' => Carbon::parse((string) $row->created_at)->format('Y-m-d'),
         ];
     }
 

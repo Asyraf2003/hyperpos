@@ -21,7 +21,7 @@ final class UpdateEmployeeProfileRequest extends FormRequest
             'base_salary_amount' => 'required|integer|min:1',
             'pay_period_value' => 'required|string|in:daily,weekly,monthly',
             'status_value' => 'required|string|in:active,inactive',
-            'change_reason' => 'required|string',
+            'change_reason' => 'present|nullable|string',
         ];
     }
 }
