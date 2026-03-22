@@ -8,6 +8,7 @@ use App\Adapters\Out\Audit\DatabaseAuditLogAdapter;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter;
 use App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter;
 use App\Application\EmployeeFinance\UseCases\DisbursePayrollBatchHandler;
+use App\Application\EmployeeFinance\UseCases\PayrollBatchRowProcessor;
 use App\Application\Shared\DTO\Result;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
@@ -36,12 +37,26 @@ final class DisbursePayrollBatchFeatureTest extends TestCase
         $this->assertInstanceOf(Result::class, $result);
         $this->assertTrue($result->isSuccess());
         $this->assertDatabaseCount('payroll_disbursements', 2);
-        $this->assertDatabaseHas('payroll_disbursements', ['id' => 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'mode' => 'monthly', 'notes' => 'Batch Maret']);
-        $this->assertDatabaseHas('payroll_disbursements', ['id' => 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'mode' => 'weekly', 'notes' => 'Override row']);
+        $this->assertDatabaseHas('payroll_disbursements', [
+            'id' => 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            'mode' => 'monthly',
+            'notes' => 'Batch Maret',
+        ]);
+        $this->assertDatabaseHas('payroll_disbursements', [
+            'id' => 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+            'mode' => 'weekly',
+            'notes' => 'Override row',
+        ]);
         $this->assertSame(2, DB::table('audit_logs')->where('event', 'payroll_disbursement_recorded')->count());
         $this->assertDatabaseHas('audit_logs', ['event' => 'payroll_batch_disbursement_recorded']);
 
-        $context = json_decode((string) DB::table('audit_logs')->where('event', 'payroll_batch_disbursement_recorded')->value('context'), true, 512, JSON_THROW_ON_ERROR);
+        $context = json_decode(
+            (string) DB::table('audit_logs')->where('event', 'payroll_batch_disbursement_recorded')->value('context'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
         $this->assertSame('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', $context['batch_id']);
         $this->assertSame('owner-1', $context['performed_by_actor_id']);
         $this->assertSame(2, $context['row_count']);
@@ -53,7 +68,10 @@ final class DisbursePayrollBatchFeatureTest extends TestCase
         $this->seedEmployee('11111111-1111-1111-1111-111111111111', 'Budi', 'active');
         $this->seedEmployee('22222222-2222-2222-2222-222222222222', 'Andi', 'inactive');
 
-        $result = $this->buildHandler(['aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'])->handle('owner-1', '2026-03-25', 'monthly', null, [
+        $result = $this->buildHandler([
+            'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        ])->handle('owner-1', '2026-03-25', 'monthly', null, [
             ['employee_id' => '11111111-1111-1111-1111-111111111111', 'amount' => 5000000],
             ['employee_id' => '22222222-2222-2222-2222-222222222222', 'amount' => 2500000],
         ]);
@@ -66,14 +84,32 @@ final class DisbursePayrollBatchFeatureTest extends TestCase
 
     private function buildHandler(array $ids): DisbursePayrollBatchHandler
     {
+        $uuid = new class ($ids) implements UuidPort {
+            public function __construct(private array $ids)
+            {
+            }
+
+            public function generate(): string
+            {
+                $next = array_shift($this->ids);
+
+                if (! is_string($next)) {
+                    throw new \RuntimeException('UUID test fixture exhausted.');
+                }
+
+                return $next;
+            }
+        };
+
         return new DisbursePayrollBatchHandler(
-            new DatabaseEmployeeReaderAdapter(),
-            new DatabasePayrollDisbursementWriterAdapter(),
+            new PayrollBatchRowProcessor(
+                new DatabaseEmployeeReaderAdapter(),
+                new DatabasePayrollDisbursementWriterAdapter(),
+                new DatabaseAuditLogAdapter(),
+                $uuid,
+            ),
             new DatabaseAuditLogAdapter(),
-            new class ($ids) implements UuidPort {
-                public function __construct(private array $ids) {}
-                public function generate(): string { return array_shift($this->ids); }
-            },
+            $uuid,
             new class () implements TransactionManagerPort {
                 public function begin(): void { DB::beginTransaction(); }
                 public function commit(): void { DB::commit(); }
@@ -85,8 +121,14 @@ final class DisbursePayrollBatchFeatureTest extends TestCase
     private function seedEmployee(string $id, string $name, string $status): void
     {
         DB::table('employees')->insert([
-            'id' => $id, 'name' => $name, 'phone' => '0812', 'base_salary' => 5000000,
-            'pay_period' => 'monthly', 'status' => $status, 'created_at' => now(), 'updated_at' => now(),
+            'id' => $id,
+            'name' => $name,
+            'phone' => '0812',
+            'base_salary' => 5000000,
+            'pay_period' => 'monthly',
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }
