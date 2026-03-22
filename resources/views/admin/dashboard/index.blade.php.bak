@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Admin Dashboard')
-@section('heading', 'Admin Dashboard')
+@section('title', 'Dashboard Admin')
+@section('heading', 'Dashboard Admin')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/extensions/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}">

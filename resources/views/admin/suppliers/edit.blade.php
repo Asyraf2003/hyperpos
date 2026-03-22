@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Ubah Pemasok')
-@section('heading', 'Ubah Pemasok')
+@section('title', 'Edit Supplier')
+@section('heading', 'Edit Supplier')
 
 @section('content')
     <section class="section">
@@ -11,7 +11,7 @@
                     <div class="card-header">
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Perbarui Pemasok</h4>
+                                <h4 class="card-title mb-1">Edit Supplier</h4>
                                 <p class="mb-0 text-muted">Ubah nama pemasok utama tanpa mengubah riwayat pengadaan.</p>
                             </div>
 

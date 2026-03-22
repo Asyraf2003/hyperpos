@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Ringkasan Pemasok</h4>
-                        <p class="mb-0 text-muted">Daftar ringkasan pemasok untuk admin.</p>
+                        <h4 class="card-title mb-1">Ringkasan supplier</h4>
+                        <p class="mb-0 text-muted">Supplier Summary List untuk admin.</p>
                     </div>
 
                     <form id="supplier-search-form" class="d-flex flex-column gap-1">
@@ -18,7 +18,7 @@
                             type="text"
                             id="supplier-search-input"
                             class="form-control"
-                            placeholder="Cari nama PT pengirim"
+                            placeholder="Cari nama supplier"
                             autocomplete="off"
                         >
                     </form>
@@ -39,19 +39,19 @@
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_count">
-                                        Jumlah Faktur
+                                        Jumlah Invoice
                                         <span class="ms-1 text-muted" data-sort-indicator="invoice_count">↕</span>
                                     </button>
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="outstanding_rupiah">
-                                        Sisa Tagihan
+                                        Outstanding
                                         <span class="ms-1 text-muted" data-sort-indicator="outstanding_rupiah">↕</span>
                                     </button>
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_unpaid_count">
-                                        Faktur Belum Lunas
+                                        Invoice Belum Lunas
                                         <span class="ms-1 text-muted" data-sort-indicator="invoice_unpaid_count">↕</span>
                                     </button>
                                 </th>

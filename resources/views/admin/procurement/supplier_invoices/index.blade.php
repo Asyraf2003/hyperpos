@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pembelian Stok')
-@section('heading', 'Pembelian Stok')
+@section('title', 'Nota Supplier')
+@section('heading', 'Nota Supplier')
 
 @section('content')
     <section class="section">
@@ -10,7 +10,7 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Daftar nota pemasok</h4>
-                        <p class="mb-0 text-muted">Interactive table pembelian stok untuk admin.</p>
+                        <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
@@ -26,7 +26,7 @@
 
                         <button type="button" id="open-procurement-filter" class="btn btn-primary">Filter</button>
                         <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
-                            Buat Nota Pemasok
+                            Buat Nota Supplier
                         </a>
                     </div>
                 </div>

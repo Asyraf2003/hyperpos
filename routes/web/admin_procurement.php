@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Adapters\In\Http\Controllers\Admin\Procurement\AttachSupplierPaymentProofController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\CreateSupplierInvoicePageController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProductLookupController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceDetailPageController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProofAttachmentController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
+    Route::get('/admin/procurement/supplier-invoices/table', ProcurementInvoiceTableDataController::class)
+        ->name('admin.procurement.supplier-invoices.table');
+
+    Route::get('/admin/procurement/products/lookup', ProductLookupController::class)
+        ->name('admin.procurement.products.lookup');
+
+    Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/payments', RecordSupplierPaymentController::class)
+        ->name('admin.procurement.supplier-invoices.payments.store');
+
+    Route::post('/admin/procurement/supplier-payments/{supplierPaymentId}/proof', AttachSupplierPaymentProofController::class)
+        ->name('admin.procurement.supplier-payments.proof.store');
+
+    Route::get('/admin/procurement/supplier-payment-proof-attachments/{attachmentId}', ServeSupplierPaymentProofAttachmentController::class)
+        ->name('admin.procurement.supplier-payment-proof-attachments.show');
+});
+
+Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
+    Route::get('/admin/procurement/supplier-invoices', ProcurementInvoiceIndexPageController::class)
+        ->name('admin.procurement.supplier-invoices.index');
+
+    Route::get('/admin/procurement/supplier-invoices/create', CreateSupplierInvoicePageController::class)
+        ->name('admin.procurement.supplier-invoices.create');
+
+    Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}', ProcurementInvoiceDetailPageController::class)
+        ->name('admin.procurement.supplier-invoices.show');
+
+    Route::post('/admin/procurement/supplier-invoices', StoreSupplierInvoiceController::class)
+        ->name('admin.procurement.supplier-invoices.store');
+});
