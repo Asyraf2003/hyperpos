@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ExpenseSeeder::class,
             WorkshopStressTestSeeder::class,        
             SupplierPaymentProofSeeder::class,
+            FinancialCorrectionSeeder::class,
         ]);
     }
 }
