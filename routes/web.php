@@ -10,6 +10,7 @@ require __DIR__.'/web/identity_access.php';
 require __DIR__.'/web/admin_products.php';
 require __DIR__.'/web/admin_suppliers.php';
 require __DIR__.'/web/admin_procurement.php';
+require __DIR__.'/web/admin_employees.php';
 
 require __DIR__.'/web/note.php';
 require __DIR__.'/web/product_catalog.php';
