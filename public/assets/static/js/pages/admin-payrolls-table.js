@@ -10,6 +10,7 @@
   const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
   const trim = (v) => String(v ?? '').trim();
   const intOr = (v, f) => { const n = Number.parseInt(String(v ?? ''), 10); return Number.isNaN(n) || n < 1 ? f : n; };
+  const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
 
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search), s = trim(p.get('sort_by')), d = trim(p.get('sort_dir'));
@@ -42,8 +43,13 @@
   };
 
   const renderRows = (rows, m) => {
-    if (!rows.length) { body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Belum ada pencairan gaji.</td></tr>'; return; }
-    body.innerHTML = rows.map((r, i) => `
+    if (!rows.length) { body.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada pencairan gaji.</td></tr>'; return; }
+    body.innerHTML = rows.map((r, i) => {
+      const actionHtml = r.employee_id
+        ? `<a href="${detailUrl(r.employee_id)}" class="btn btn-sm btn-light-primary">Detail Karyawan</a>`
+        : '<span class="text-muted">-</span>';
+
+      return `
       <tr>
         <td>${(m.page - 1) * m.per_page + i + 1}</td>
         <td>${esc(r.disbursement_date)}</td>
@@ -51,16 +57,18 @@
         <td>Rp${esc(r.amount_formatted)}</td>
         <td>${esc(r.mode_label)}</td>
         <td>${esc(r.notes ?? '-')}</td>
-      </tr>`).join('');
+        <td class="text-center">${actionHtml}</td>
+      </tr>`;
+    }).join('');
   };
 
   const load = async (replace = false) => {
     const current = ++req;
-    body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>';
+    body.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>';
     const res = await fetch(`${c.endpoint}?${paramsString()}`, { headers: { Accept: 'application/json' } });
     const json = await res.json();
     if (current !== req) return;
-    if (!res.ok || !json.success) { body.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>'; return; }
+    if (!res.ok || !json.success) { body.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>'; return; }
     renderRows(json.data.rows || [], json.data.meta || {});
     renderSummary(json.data.meta || {}); renderPager(json.data.meta || {}); renderSort(); q.value = s.q; updateUrl(replace);
   };

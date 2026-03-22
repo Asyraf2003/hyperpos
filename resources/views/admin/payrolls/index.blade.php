@@ -36,9 +36,10 @@
                                 <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="amount">Nominal <span class="ms-1 text-muted" data-sort-indicator="amount">↕</span></button></th>
                                 <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="mode">Mode Pencairan <span class="ms-1 text-muted" data-sort-indicator="mode">↕</span></button></th>
                                 <th>Catatan</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="payroll-table-body"><tr><td colspan="6" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
+                        <tbody id="payroll-table-body"><tr><td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
                     </table>
                 </div>
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
@@ -53,7 +54,8 @@
 @push('scripts')
     <script>
         window.payrollTableConfig = {
-            endpoint: @json(route('admin.payrolls.table'))
+            endpoint: @json(route('admin.payrolls.table')),
+            detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__']))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-payrolls-table.js') }}"></script>
