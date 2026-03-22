@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeePayrollHistoryByEmployeeQuery
 {
+    private const PER_PAGE = 10;
+
     public function findByEmployeeId(string $employeeId): LengthAwarePaginator
     {
         $paginator = DB::table('payroll_disbursements')
@@ -18,7 +20,7 @@ final class DatabaseEmployeePayrollHistoryByEmployeeQuery
             ->orderByDesc('payroll_disbursements.disbursement_date')
             ->orderByDesc('payroll_disbursements.created_at')
             ->paginate(
-                null,
+                self::PER_PAGE,
                 [
                     'payroll_disbursements.id',
                     'payroll_disbursements.amount',
