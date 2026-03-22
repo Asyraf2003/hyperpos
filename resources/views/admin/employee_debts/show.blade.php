@@ -5,12 +5,6 @@
 
 @section('content')
     <section class="section">
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="row">
             <div class="col-12 col-xl-5">
                 <div class="card">
