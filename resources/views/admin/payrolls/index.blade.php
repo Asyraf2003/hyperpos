@@ -6,9 +6,7 @@
 @section('content')
     <section class="section">
         @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         <div class="card">
@@ -16,10 +14,12 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Riwayat Pencairan Gaji</h4>
-                        <p class="mb-0 text-muted">Pencairan gaji manual yang sudah dicatat oleh admin.</p>
+                        <p class="mb-0 text-muted">Interactive table riwayat pencairan gaji manual.</p>
                     </div>
-
-                    <div>
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="payroll-search-form" class="d-flex flex-column gap-1">
+                            <input type="text" id="payroll-search-input" class="form-control" placeholder="Cari nama, catatan, mode, atau tanggal" autocomplete="off">
+                        </form>
                         <a href="{{ route('admin.payrolls.create') }}" class="btn btn-primary">Catat Pencairan Gaji</a>
                     </div>
                 </div>
@@ -27,36 +27,34 @@
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-lg">
+                    <table class="table table-lg" id="payroll-table">
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
-                                <th>Tanggal</th>
-                                <th>Nama Karyawan</th>
-                                <th>Nominal</th>
-                                <th>Mode</th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="disbursement_date">Tanggal <span class="ms-1 text-muted" data-sort-indicator="disbursement_date">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="employee_name">Nama Karyawan <span class="ms-1 text-muted" data-sort-indicator="employee_name">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="amount">Nominal <span class="ms-1 text-muted" data-sort-indicator="amount">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="mode">Mode Pencairan <span class="ms-1 text-muted" data-sort-indicator="mode">↕</span></button></th>
                                 <th>Catatan</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse ($rows as $row)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $row['disbursement_date'] }}</td>
-                                    <td>{{ $row['employee_name'] }}</td>
-                                    <td>Rp{{ $row['amount_formatted'] }}</td>
-                                    <td>{{ $row['mode_label'] }}</td>
-                                    <td>{{ $row['notes'] ?? '-' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted py-4">Belum ada pencairan gaji.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+                        <tbody id="payroll-table-body"><tr><td colspan="6" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
                     </table>
+                </div>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                    <small id="payroll-table-summary" class="text-muted">Total: -</small>
+                    <div id="payroll-table-pagination"></div>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.payrollTableConfig = {
+            endpoint: @json(route('admin.payrolls.table'))
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-payrolls-table.js') }}"></script>
+@endpush
