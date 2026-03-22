@@ -36,17 +36,11 @@ final class PayrollBatchRowProcessor
         $employee = $this->employeeReader->findById((string) $row['employee_id']);
 
         if ($employee === null) {
-            return ['error' => true, 'result' => \App\Application\Shared\DTO\Result::failure(
-                'Baris '.($index + 1).': karyawan tidak ditemukan.',
-                ['payroll_batch' => ['EMPLOYEE_NOT_FOUND']]
-            )];
+            return ['error' => true, 'result' => \App\Application\Shared\DTO\Result::failure('Baris '.($index + 1).': karyawan tidak ditemukan.', ['payroll_batch' => ['EMPLOYEE_NOT_FOUND']])];
         }
 
         if ($employee->getStatus() !== EmployeeStatus::ACTIVE) {
-            return ['error' => true, 'result' => \App\Application\Shared\DTO\Result::failure(
-                'Baris '.($index + 1).': karyawan nonaktif tidak boleh dicairkan.',
-                ['payroll_batch' => ['EMPLOYEE_INACTIVE']]
-            )];
+            return ['error' => true, 'result' => \App\Application\Shared\DTO\Result::failure('Baris '.($index + 1).': karyawan nonaktif tidak boleh dicairkan.', ['payroll_batch' => ['EMPLOYEE_INACTIVE']])];
         }
 
         $payrollId = $this->uuidPort->generate();
@@ -75,12 +69,7 @@ final class PayrollBatchRowProcessor
             'performed_by_actor_id' => $performedByActorId,
         ]);
 
-        return [
-            'error' => false,
-            'payroll_id' => $payrollId,
-            'employee_id' => $employee->getId(),
-            'amount' => $amount,
-        ];
+        return ['error' => false, 'payroll_id' => $payrollId, 'employee_id' => $employee->getId(), 'amount' => $amount];
     }
 
     private function resolveMode(array $row, DisbursementMode $defaultMode): DisbursementMode
