@@ -6,15 +6,10 @@
 @section('content')
     <section class="section">
         @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-
         @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         <div class="card">
@@ -22,10 +17,12 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Data Karyawan</h4>
-                        <p class="mb-0 text-muted">Master data karyawan untuk admin.</p>
+                        <p class="mb-0 text-muted">Interactive table data karyawan untuk admin.</p>
                     </div>
-
-                    <div>
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="employee-search-form" class="d-flex flex-column gap-1">
+                            <input type="text" id="employee-search-input" class="form-control" placeholder="Cari nama, telepon, periode, atau status" autocomplete="off">
+                        </form>
                         <a href="{{ route('admin.employees.create') }}" class="btn btn-primary">Tambah Data Karyawan</a>
                     </div>
                 </div>
@@ -33,42 +30,36 @@
 
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-lg">
+                    <table class="table table-lg" id="employee-table">
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
-                                <th>Nama</th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="name">Nama <span class="ms-1 text-muted" data-sort-indicator="name">↕</span></button></th>
                                 <th>Telepon</th>
-                                <th>Gaji Pokok</th>
-                                <th>Periode Gaji</th>
-                                <th>Status</th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="base_salary">Gaji Pokok <span class="ms-1 text-muted" data-sort-indicator="base_salary">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="pay_period">Periode Gaji <span class="ms-1 text-muted" data-sort-indicator="pay_period">↕</span></button></th>
+                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="status">Status <span class="ms-1 text-muted" data-sort-indicator="status">↕</span></button></th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse ($employees as $employee)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $employee['name'] }}</td>
-                                    <td>{{ $employee['phone'] ?? '-' }}</td>
-                                    <td>Rp{{ $employee['base_salary_formatted'] }}</td>
-                                    <td>{{ $employee['pay_period_label'] }}</td>
-                                    <td>{{ $employee['status_label'] }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('admin.employees.edit', ['employeeId' => $employee['id']]) }}" class="btn btn-sm btn-light-primary">
-                                            Edit
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted py-4">Belum ada data karyawan.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
+                        <tbody id="employee-table-body"><tr><td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
                     </table>
+                </div>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                    <small id="employee-table-summary" class="text-muted">Total: -</small>
+                    <div id="employee-table-pagination"></div>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.employeeTableConfig = {
+            endpoint: @json(route('admin.employees.table')),
+            editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__']))
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-employees-table.js') }}"></script>
+@endpush

@@ -20,52 +20,25 @@ final class EmployeeIndexPageFeatureTest extends TestCase
 
     public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_employee_index_page(): void
     {
-        $response = $this->actingAs($this->createUserWithRole('kasir-employee-index@example.test', 'kasir'))
-            ->get(route('admin.employees.index'));
-
+        $response = $this->actingAs($this->createUser('kasir', 'kasir-employee-index@example.test'))->get(route('admin.employees.index'));
         $response->assertRedirect(route('cashier.dashboard'));
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_employee_index_page_and_see_existing_employee_data(): void
+    public function test_admin_can_access_employee_index_shell_page(): void
     {
-        DB::table('employees')->insert([
-            'id' => 'employee-1',
-            'name' => 'Budi Santoso',
-            'phone' => '081234567890',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $response = $this->actingAs($this->createUserWithRole('admin-employee-index@example.test', 'admin'))
-            ->get(route('admin.employees.index'));
-
+        $response = $this->actingAs($this->createUser('admin', 'admin-employee-index@example.test'))->get(route('admin.employees.index'));
         $response->assertOk();
-        $response->assertSee('Master data karyawan untuk admin.');
-        $response->assertSee('Tambah Data Karyawan');
-        $response->assertSee('Budi Santoso');
-        $response->assertSee('081234567890');
-        $response->assertSee('Rp5.000.000');
-        $response->assertSee('Bulanan');
-        $response->assertSee('Aktif');
+        $response->assertSee('Interactive table data karyawan untuk admin.');
+        $response->assertSee('employee-search-form', false);
+        $response->assertSee('employee-table-body', false);
+        $response->assertSee('admin-employees-table.js');
     }
 
-    private function createUserWithRole(string $email, string $role): User
+    private function createUser(string $role, string $email): User
     {
-        $user = User::query()->create([
-            'name' => 'Test User',
-            'email' => $email,
-            'password' => 'password123',
-        ]);
-
-        DB::table('actor_accesses')->insert([
-            'actor_id' => (string) $user->getAuthIdentifier(),
-            'role' => $role,
-        ]);
-
+        $user = User::query()->create(['name' => 'Test User', 'email' => $email, 'password' => 'password123']);
+        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
         return $user;
     }
 }
