@@ -9,10 +9,12 @@ use App\Adapters\In\Http\Controllers\Admin\Employee\EmployeeIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Employee\EmployeeTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Employee\StoreEmployeeController;
 use App\Adapters\In\Http\Controllers\Admin\Employee\UpdateEmployeeController;
+use App\Adapters\In\Http\Controllers\Admin\Employee\EmployeePayrollTableDataController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
     Route::get('/admin/employees/table', EmployeeTableDataController::class)->name('admin.employees.table');
+    Route::get('/admin/employees/{employeeId}/payroll-table', EmployeePayrollTableDataController::class)->name('admin.employees.payroll-table');
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {

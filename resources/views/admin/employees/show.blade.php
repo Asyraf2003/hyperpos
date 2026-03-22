@@ -186,13 +186,8 @@
                     </div>
 
                     <div class="card-body">
-                        @php
-                            $payrollRecords = $detail['payroll']['records'];
-                            $payrollFirstItem = $payrollRecords->firstItem() ?? 1;
-                        @endphp
-
                         <div class="table-responsive">
-                            <table class="table table-lg">
+                            <table class="table table-lg" id="employee-payroll-table">
                                 <thead>
                                     <tr class="text-nowrap">
                                         <th style="width: 64px;">No</th>
@@ -204,57 +199,17 @@
                                         <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @forelse ($payrollRecords as $record)
-                                        <tr>
-                                            <td>{{ $payrollFirstItem + $loop->index }}</td>
-                                            <td>{{ $record['disbursement_date'] }}</td>
-                                            <td>Rp{{ $record['amount_formatted'] }}</td>
-                                            <td>{{ $record['mode_label'] }}</td>
-                                            <td>
-                                                @if ($record['is_reversed'])
-                                                    <span class="text-danger">Direversal</span>
-                                                @else
-                                                    <span class="text-success">Aktif</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                {{ $record['notes'] ?? '-' }}
-                                                @if ($record['is_reversed'] && $record['reversal_reason'] !== null)
-                                                    <div class="small text-danger mt-1">
-                                                        Reversal: {{ $record['reversal_reason'] }}
-                                                    </div>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                @if (! $record['is_reversed'])
-                                                    <form action="{{ route('admin.payrolls.reverse.store', ['payrollId' => $record['id']]) }}" method="post" class="d-inline">
-                                                        @csrf
-                                                        <input type="hidden" name="reason" value="Koreksi payout payroll">
-                                                        <button type="submit" class="btn btn-sm btn-light-danger">Reverse</button>
-                                                    </form>
-                                                @else
-                                                    <span class="text-muted">-</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                Belum ada riwayat gaji untuk karyawan ini.
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                                <tbody id="employee-payroll-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
-                            <small class="text-muted">
-                                Total: {{ $payrollRecords->total() }} riwayat gaji
-                            </small>
-
-                            @include('layouts.partials.pagination', ['paginator' => $payrollRecords])
+                            <small id="employee-payroll-table-summary" class="text-muted">Total: -</small>
+                            <div id="employee-payroll-table-pagination"></div>
                         </div>
                     </div>
                 </div>
@@ -303,3 +258,14 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.employeePayrollTableConfig = {
+            endpoint: @json(route('admin.employees.payroll-table', ['employeeId' => $detail['summary']['id']])),
+            reverseBaseUrl: @json(route('admin.payrolls.reverse.store', ['payrollId' => '__ID__'])),
+            csrfToken: @json(csrf_token())
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-payroll-table.js') }}"></script>
+@endpush
