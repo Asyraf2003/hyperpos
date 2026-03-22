@@ -45,14 +45,14 @@ final class CreatePayrollPageFeatureTest extends TestCase
             ->get(route('admin.payrolls.create'));
 
         $response->assertOk();
-        $response->assertSee('Cari Karyawan');
-        $response->assertSee('Informasi Karyawan Terpilih');
-        $response->assertSee('Periode Gaji Karyawan');
-        $response->assertSee('Mode Pencairan');
+        $response->assertSee('Pilih Karyawan');
+        $response->assertSee('Detail Batch Pencairan');
+        $response->assertSee('Mode Batch Default');
+        $response->assertSee('Karyawan Dipilih');
         $response->assertSee('admin-payroll-create.js');
     }
 
-    public function test_admin_can_store_payroll_from_create_page(): void
+    public function test_admin_can_store_batch_payroll_from_create_page(): void
     {
         $employeeId = (string) Str::uuid();
 
@@ -68,22 +68,26 @@ final class CreatePayrollPageFeatureTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->createUserWithRole('admin-payroll-store@example.test', 'admin'))
-            ->post(route('admin.payrolls.store'), [
-                'employee_id' => $employeeId,
-                'amount' => 5000000,
+            ->post(route('admin.payrolls.batch.store'), [
                 'disbursement_date_string' => '2026-03-25',
                 'mode_value' => 'monthly',
-                'notes' => 'Gaji Maret 2026',
+                'notes' => 'Batch Maret 2026',
+                'rows' => [
+                    [
+                        'employee_id' => $employeeId,
+                        'amount' => 5000000,
+                    ],
+                ],
             ]);
 
         $response->assertRedirect(route('admin.payrolls.index'));
-        $response->assertSessionHas('success', 'Pencairan gaji berhasil dicatat.');
+        $response->assertSessionHas('success', 'Batch payroll berhasil dicatat.');
 
         $this->assertDatabaseHas('payroll_disbursements', [
             'employee_id' => $employeeId,
             'amount' => 5000000,
             'mode' => 'monthly',
-            'notes' => 'Gaji Maret 2026',
+            'notes' => 'Batch Maret 2026',
         ]);
     }
 
