@@ -42,7 +42,11 @@ final class PayrollTableDataQueryFeatureTest extends TestCase
             $this->seedPayrollRow('Employee '.str_pad((string) $i, 2, '0', STR_PAD_LEFT), '2026-03-25 00:00:00', 1000000 + $i, 'monthly', 'Payroll '.$i);
         }
 
-        $r = $this->actingAs($this->admin())->get(route('admin.payrolls.table', ['page' => 2]));
+        $r = $this->actingAs($this->admin())->get(route('admin.payrolls.table', [
+            'page' => 2,
+            'sort_by' => 'employee_name',
+            'sort_dir' => 'asc',
+        ]));
         $r->assertOk();
         $r->assertJsonPath('data.meta.page', 2);
         $r->assertJsonPath('data.meta.last_page', 2);
