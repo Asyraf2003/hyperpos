@@ -1,59 +1,92 @@
 (() => {
-  const cfg = window.payrollTableConfig;
-  if (!cfg) return;
-  const el = {
-    q: document.getElementById('payroll-search-input'),
-    body: document.getElementById('payroll-table-body'),
-    sum: document.getElementById('payroll-table-summary'),
-    pag: document.getElementById('payroll-table-pagination'),
-  };
-  const s = { q: '', page: 1, sort_by: 'disbursement_date', sort_dir: 'desc' };
-  let timer = null;
+  const c = window.payrollTableConfig; if (!c) return;
+  const $ = (id) => document.getElementById(id);
+  const form = $('payroll-search-form'), q = $('payroll-search-input');
+  const body = $('payroll-table-body'), sum = $('payroll-table-summary'), pag = $('payroll-table-pagination');
+  const sortKeys = new Set(['disbursement_date', 'employee_name', 'amount', 'mode']);
+  const sortDirs = new Set(['asc', 'desc']);
+  let timer = null, req = 0;
 
-  const fetchRows = async () => {
-    const url = new URL(cfg.endpoint, window.location.origin);
-    Object.entries(s).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    const payload = await res.json();
-    render(payload.data);
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+  const trim = (v) => String(v ?? '').trim();
+  const intOr = (v, f) => { const n = Number.parseInt(String(v ?? ''), 10); return Number.isNaN(n) || n < 1 ? f : n; };
+
+  const stateFromUrl = () => {
+    const p = new URLSearchParams(window.location.search), s = trim(p.get('sort_by')), d = trim(p.get('sort_dir'));
+    return { q: trim(p.get('q')), page: intOr(p.get('page'), 1), sort_by: sortKeys.has(s) ? s : 'disbursement_date', sort_dir: sortDirs.has(d) ? d : 'desc' };
   };
 
-  const render = ({ rows, meta }) => {
-    el.sum.textContent = `Total: ${meta.total}`;
-    el.body.innerHTML = rows.length ? rows.map((row, i) => `
-      <tr>
-        <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
-        <td>${row.disbursement_date}</td>
-        <td>${row.employee_name}</td>
-        <td>Rp${row.amount_formatted}</td>
-        <td>${row.mode_label}</td>
-        <td>${row.notes ?? '-'}</td>
-      </tr>`).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">Belum ada pencairan gaji.</td></tr>';
-    el.pag.innerHTML = Array.from({ length: meta.last_page }, (_, i) => i + 1).map(page => `
-      <button type="button" class="btn btn-sm ${page === meta.page ? 'btn-primary' : 'btn-light'} me-1" data-page="${page}">${page}</button>`).join('');
-    document.querySelectorAll('[data-sort-indicator]').forEach((n) => n.textContent = '↕');
-    const active = document.querySelector(`[data-sort-indicator="${meta.sort_by}"]`);
-    if (active) active.textContent = meta.sort_dir === 'asc' ? '↑' : '↓';
+  const s = stateFromUrl();
+  const params = () => { const o = { page: String(s.page), per_page: '10', sort_by: s.sort_by, sort_dir: s.sort_dir }; if (s.q) o.q = s.q; return o; };
+  const paramsString = () => new URLSearchParams(params()).toString();
+  const updateUrl = (replace = false) => {
+    const url = new URL(window.location.href); url.search = paramsString();
+    replace ? window.history.replaceState(null, '', url) : window.history.pushState(null, '', url);
   };
 
-  el.q?.addEventListener('input', (e) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => { s.q = e.target.value.trim(); s.page = 1; fetchRows(); }, 300);
+  const renderSummary = (m) => { sum.textContent = `Total: ${m.total} pencairan`; };
+  const renderSort = () => document.querySelectorAll('[data-sort-indicator]').forEach((n) => {
+    const active = n.dataset.sortIndicator === s.sort_by;
+    n.textContent = active ? (s.sort_dir === 'asc' ? '↑' : '↓') : '↕';
+    n.classList.toggle('text-muted', !active);
   });
 
-  document.querySelectorAll('[data-sort-by]').forEach((btn) => btn.addEventListener('click', () => {
-    const sortBy = btn.dataset.sortBy;
-    s.sort_dir = s.sort_by === sortBy && s.sort_dir === 'asc' ? 'desc' : 'asc';
-    s.sort_by = sortBy;
-    fetchRows();
+  const renderPager = (m) => {
+    if (m.last_page <= 1) { pag.innerHTML = ''; return; }
+    const start = Math.max(1, m.page - 2), end = Math.min(m.last_page, m.page + 2);
+    let html = `<nav><ul class="pagination pagination-primary mb-0">`;
+    html += `<li class="page-item ${m.page === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${m.page - 1}"><i class="bi bi-chevron-left"></i></a></li>`;
+    for (let p = start; p <= end; p++) html += `<li class="page-item ${p === m.page ? 'active' : ''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+    html += `<li class="page-item ${m.page === m.last_page ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${m.page + 1}"><i class="bi bi-chevron-right"></i></a></li></ul></nav>`;
+    pag.innerHTML = html;
+  };
+
+  const renderRows = (rows, m) => {
+    if (!rows.length) { body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Belum ada pencairan gaji.</td></tr>'; return; }
+    body.innerHTML = rows.map((r, i) => `
+      <tr>
+        <td>${(m.page - 1) * m.per_page + i + 1}</td>
+        <td>${esc(r.disbursement_date)}</td>
+        <td>${esc(r.employee_name)}</td>
+        <td>Rp${esc(r.amount_formatted)}</td>
+        <td>${esc(r.mode_label)}</td>
+        <td>${esc(r.notes ?? '-')}</td>
+      </tr>`).join('');
+  };
+
+  const load = async (replace = false) => {
+    const current = ++req;
+    body.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>';
+    const res = await fetch(`${c.endpoint}?${paramsString()}`, { headers: { Accept: 'application/json' } });
+    const json = await res.json();
+    if (current !== req) return;
+    if (!res.ok || !json.success) { body.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>'; return; }
+    renderRows(json.data.rows || [], json.data.meta || {});
+    renderSummary(json.data.meta || {}); renderPager(json.data.meta || {}); renderSort(); q.value = s.q; updateUrl(replace);
+  };
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const value = trim(q.value);
+    if (value.length === 0) { s.q = ''; s.page = 1; load(); return; }
+    if (value.length >= 2) { s.q = value; s.page = 1; load(); }
+  });
+
+  q?.addEventListener('input', () => {
+    const value = trim(q.value); clearTimeout(timer);
+    if (value.length === 0) { s.q = ''; s.page = 1; timer = setTimeout(() => load(), 250); return; }
+    if (value.length < 2) return;
+    timer = setTimeout(() => { s.q = value; s.page = 1; load(); }, 300);
+  });
+
+  document.querySelectorAll('[data-sort-by]').forEach((b) => b.addEventListener('click', () => {
+    const key = b.dataset.sortBy; s.sort_dir = s.sort_by === key && s.sort_dir === 'asc' ? 'desc' : 'asc'; s.sort_by = key; load();
   }));
 
-  el.pag?.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-page]');
-    if (!btn) return;
-    s.page = Number(btn.dataset.page);
-    fetchRows();
+  pag?.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-page]'); if (!b) return;
+    s.page = Number(b.dataset.page); load();
   });
 
-  fetchRows();
+  load(true);
 })();
