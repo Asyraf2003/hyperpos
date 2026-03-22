@@ -161,15 +161,7 @@
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.payrollCreateConfig = {
-            employees: @json(array_map(static fn (array $employee): array => [
-                'id' => $employee['id'],
-                'name' => $employee['name'],
-                'phone' => $employee['phone'] ?? '',
-                'status_label' => $employee['status_label'],
-                'pay_period_value' => $employee['pay_period_value'],
-                'pay_period_label' => $employee['pay_period_label'],
-                'base_salary_formatted' => $employee['base_salary_formatted'],
-            ], $employees)),
+            employees: @json($employees),
             oldRows: @json(old('rows', [])),
         };
     </script>
