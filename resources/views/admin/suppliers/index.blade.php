@@ -39,19 +39,19 @@
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_count">
-                                        Jumlah Invoice
+                                        Jumlah Hutang
                                         <span class="ms-1 text-muted" data-sort-indicator="invoice_count">↕</span>
                                     </button>
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="outstanding_rupiah">
-                                        Outstanding
+                                        Sisa Hutang
                                         <span class="ms-1 text-muted" data-sort-indicator="outstanding_rupiah">↕</span>
                                     </button>
                                 </th>
                                 <th class="text-end">
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="invoice_unpaid_count">
-                                        Invoice Belum Lunas
+                                        Hutang Belum Lunas
                                         <span class="ms-1 text-muted" data-sort-indicator="invoice_unpaid_count">↕</span>
                                     </button>
                                 </th>

@@ -32,7 +32,7 @@
                                 <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_debt_records">Total Record <span class="ms-1 text-muted" data-sort-indicator="total_debt_records">↕</span></button></th>
                                 <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_debt_amount">Total Hutang <span class="ms-1 text-muted" data-sort-indicator="total_debt_amount">↕</span></button></th>
                                 <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="total_remaining_balance">Total Sisa <span class="ms-1 text-muted" data-sort-indicator="total_remaining_balance">↕</span></button></th>
-                                <th>Status Record</th>
+                                <th>Status Hutang</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>

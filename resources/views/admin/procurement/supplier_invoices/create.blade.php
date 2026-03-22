@@ -14,9 +14,9 @@
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center gap-2">
                                 <div>
-                                    <h4 class="card-title mb-1">Line Nota</h4>
+                                    <h4 class="card-title mb-1">Rincian Nota</h4>
                                     <p class="mb-0 text-muted">
-                                        Cari product dengan mengetik nama, merek, ukuran, atau kode.
+                                        Cari produk dengan mengetik nama, merek, ukuran, atau kode.
                                     </p>
                                 </div>
 
@@ -39,7 +39,7 @@
                                         <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                             <div>
                                                 <h6 class="mb-0">Rincian {{ $loop->iteration }}</h6>
-                                                <small class="text-muted">Isi Produk, Kuantitas dan Nilai rincian.</small>
+                                                <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
                                             </div>
 
                                             <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
@@ -63,7 +63,7 @@
                                                         type="text"
                                                         value="{{ $lineView['selected_label'] }}"
                                                         class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
-                                                        placeholder="Ketik minimal 2 huruf untuk cari produk"
+                                                        placeholder="Ketik minimal 2 huruf untuk mencari produk"
                                                         autocomplete="off"
                                                         data-product-search
                                                     >
@@ -82,7 +82,7 @@
 
                                             <div class="col-12 col-lg-4">
                                                 <div class="form-group mb-3">
-                                                    <label class="form-label">Kuantitas Pcs</label>
+                                                    <label class="form-label">Jumlah (Pcs)</label>
                                                     <input
                                                         type="text"
                                                         inputmode="numeric"
@@ -101,7 +101,7 @@
 
                                             <div class="col-12 col-lg-8">
                                                 <div class="form-group mb-3">
-                                                    <label class="form-label">Rincian Total Rupiah</label>
+                                                    <label class="form-label">Total Rincian (Rupiah)</label>
 
                                                     <input
                                                         type="hidden"
@@ -134,8 +134,8 @@
                                 <div class="border rounded p-3 mb-3" data-line-item>
                                     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                         <div>
-                                            <h6 class="mb-0">Line Baru</h6>
-                                            <small class="text-muted">Isi produk, kuantitas, dan nilai rincian.</small>
+                                            <h6 class="mb-0">Rincian Baru</h6>
+                                            <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
                                         </div>
 
                                         <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
@@ -153,7 +153,7 @@
                                                 <input
                                                     type="text"
                                                     class="form-control"
-                                                    placeholder="Ketik minimal 2 huruf untuk cari produk"
+                                                    placeholder="Ketik minimal 2 huruf untuk mencari produk"
                                                     autocomplete="off"
                                                     data-product-search
                                                 >
@@ -168,7 +168,7 @@
 
                                         <div class="col-12 col-lg-4">
                                             <div class="form-group mb-3">
-                                                <label class="form-label">Kuantitas Pcs</label>
+                                                <label class="form-label">Jumlah (Pcs)</label>
                                                 <input
                                                     type="text"
                                                     inputmode="numeric"
@@ -184,7 +184,7 @@
 
                                         <div class="col-12 col-lg-8">
                                             <div class="form-group mb-3">
-                                                <label class="form-label">Rincian Total Rupiah</label>
+                                                <label class="form-label">Total Rincian (Rupiah)</label>
 
                                                 <input
                                                     type="hidden"
@@ -214,7 +214,7 @@
                 <div class="col-12 col-xl-4">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title mb-1">Metadata Nota</h4>
+                            <h4 class="card-title mb-1">Informasi Nota</h4>
                             <p class="mb-0 text-muted">Informasi pemasok dan tanggal transaksi.</p>
                         </div>
 
@@ -251,7 +251,7 @@
                             </div>
 
                             <div class="form-group mb-4">
-                                <label for="tanggal_terima" class="form-label">Tanggal Terima</label>
+                                <label for="tanggal_terima" class="form-label">Tanggal Diterima</label>
                                 <input
                                     type="date"
                                     id="tanggal_terima"
@@ -260,7 +260,7 @@
                                     class="form-control @error('tanggal_terima') is-invalid @enderror"
                                 >
                                 <small class="text-muted">
-                                    Dipakai saat auto receive aktif. Jika kosong, backend akan memakai tanggal pengiriman.
+                                    Dipakai saat penerimaan otomatis aktif. Jika kosong, sistem akan memakai tanggal pengiriman.
                                 </small>
                                 @error('tanggal_terima')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -268,7 +268,7 @@
                             </div>
 
                             <div class="form-group mb-4">
-                                <label class="form-label d-block">Mode Receive</label>
+                                <label class="form-label d-block">Mode Penerimaan</label>
 
                                 <div class="border rounded p-3 mb-2">
                                     <div class="form-check">
@@ -281,11 +281,11 @@
                                             {{ old('auto_receive', '1') === '1' ? 'checked' : '' }}
                                         >
                                         <label class="form-check-label" for="auto_receive_yes">
-                                            Auto lunas
+                                            Terima barang otomatis
                                         </label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Nota langsung masuk alur terima barang setelah dibuat.
+                                        Nota langsung masuk ke alur penerimaan barang setelah dibuat.
                                     </small>
                                 </div>
 
@@ -304,7 +304,7 @@
                                         </label>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        Nota disimpan tanpa auto lunas.
+                                        Nota disimpan tanpa proses penerimaan barang otomatis.
                                     </small>
                                 </div>
                             </div>

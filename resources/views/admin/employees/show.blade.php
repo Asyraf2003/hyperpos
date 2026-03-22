@@ -6,47 +6,6 @@
 @section('content')
     <section class="section">
         <div class="row">
-            <div class="col-12 col-xl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="d-flex flex-row justify-content-between align-items-center gap-2">
-                            <div>
-                                <h4 class="card-title mb-1">Ringkasan Karyawan</h4>
-                                <p class="mb-0 text-muted">Profil dasar karyawan untuk pusat detail operasional.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <dl class="row mb-0">
-                            <dt class="col-sm-5">Nama</dt>
-                            <dd class="col-sm-7">{{ $detail['summary']['name'] }}</dd>
-
-                            <dt class="col-sm-5">Telepon</dt>
-                            <dd class="col-sm-7">{{ $detail['summary']['phone'] ?? '-' }}</dd>
-
-                            <dt class="col-sm-5">Gaji Pokok</dt>
-                            <dd class="col-sm-7">Rp{{ $detail['summary']['base_salary_formatted'] }}</dd>
-
-                            <dt class="col-sm-5">Periode Gaji</dt>
-                            <dd class="col-sm-7">{{ $detail['summary']['pay_period_label'] }}</dd>
-
-                            <dt class="col-sm-5">Status</dt>
-                            <dd class="col-sm-7">{{ $detail['summary']['status_label'] }}</dd>
-                        </dl>
-                    </div>
-
-                    <div class="card-footer">
-                        <a
-                            href="{{ route('admin.employees.edit', ['employeeId' => $detail['summary']['id']]) }}"
-                            class="btn btn-primary"
-                        >
-                            Edit Karyawan
-                        </a>
-                    </div>
-                </div>
-            </div>
-
             <div class="col-12 col-xl-8">
                 <div class="card mb-4">
                     <div class="card-header">
@@ -156,7 +115,7 @@
                                         <th>Tanggal Bayar</th>
                                         <th>Nominal</th>
                                         <th>Catatan</th>
-                                        <th class="text-center">Debt</th>
+                                        <th class="text-center">Hutang</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -171,13 +130,13 @@
                                                     href="{{ route('admin.employee-debts.show', ['debtId' => $payment['employee_debt_id']]) }}"
                                                     class="btn btn-sm btn-light-secondary"
                                                 >
-                                                    Buka Debt
+                                                    Buka Hutang
                                                 </a>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
+                                            <td colspan="5" class="text-center text-muted py-4">
                                                 Belum ada riwayat pembayaran hutang untuk karyawan ini.
                                             </td>
                                         </tr>
@@ -276,7 +235,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted py-4">
+                                            <td colspan="7" class="text-center text-muted py-4">
                                                 Belum ada riwayat gaji untuk karyawan ini.
                                             </td>
                                         </tr>
@@ -284,6 +243,47 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                            <div>
+                                <h4 class="card-title mb-1">Ringkasan Karyawan</h4>
+                                <p class="mb-0 text-muted">Profil dasar karyawan untuk pusat detail operasional.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Nama</dt>
+                            <dd class="col-sm-7">{{ $detail['summary']['name'] }}</dd>
+
+                            <dt class="col-sm-5">Telepon</dt>
+                            <dd class="col-sm-7">{{ $detail['summary']['phone'] ?? '-' }}</dd>
+
+                            <dt class="col-sm-5">Gaji Pokok</dt>
+                            <dd class="col-sm-7">Rp{{ $detail['summary']['base_salary_formatted'] }}</dd>
+
+                            <dt class="col-sm-5">Periode Gaji</dt>
+                            <dd class="col-sm-7">{{ $detail['summary']['pay_period_label'] }}</dd>
+
+                            <dt class="col-sm-5">Status</dt>
+                            <dd class="col-sm-7">{{ $detail['summary']['status_label'] }}</dd>
+                        </dl>
+                    </div>
+
+                    <div class="card-footer">
+                        <a
+                            href="{{ route('admin.employees.edit', ['employeeId' => $detail['summary']['id']]) }}"
+                            class="btn btn-primary"
+                        >
+                            Edit Karyawan
+                        </a>
                     </div>
                 </div>
             </div>
