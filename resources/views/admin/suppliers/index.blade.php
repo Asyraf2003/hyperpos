@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Ringkasan supplier</h4>
-                        <p class="mb-0 text-muted">Supplier Summary List untuk admin.</p>
+                        <h4 class="card-title mb-1">Ringkasan pemasok</h4>
+                        <p class="mb-0 text-muted">List data pemasok untuk admin.</p>
                     </div>
 
                     <form id="supplier-search-form" class="d-flex flex-column gap-1">

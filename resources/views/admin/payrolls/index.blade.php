@@ -10,7 +10,7 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Riwayat Pencairan Gaji</h4>
-                        <p class="mb-0 text-muted">Interactive table riwayat pencairan gaji manual.</p>
+                        <p class="mb-0 text-muted">Tabel riwayat pencairan gaji manual.</p>
                     </div>
                     <div class="d-flex flex-column flex-md-row gap-2">
                         <form id="payroll-search-form" class="d-flex flex-column gap-1">

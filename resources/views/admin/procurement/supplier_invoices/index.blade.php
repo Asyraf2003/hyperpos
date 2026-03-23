@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Nota Supplier')
-@section('heading', 'Nota Supplier')
+@section('title', 'Nota Pengadaan')
+@section('heading', 'Nota Pengadaan')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Daftar nota pemasok</h4>
-                        <p class="mb-0 text-muted">Interactive table procurement untuk admin.</p>
+                        <h4 class="card-title mb-1">Daftar nota pengadaan</h4>
+                        <p class="mb-0 text-muted">Tabel pengadaan interaktif untuk admin.</p>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">

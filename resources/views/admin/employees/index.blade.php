@@ -10,7 +10,7 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Data Karyawan</h4>
-                        <p class="mb-0 text-muted">Interactive table data karyawan untuk admin.</p>
+                        <p class="mb-0 text-muted">Tabel data karyawan interaktif untuk admin.</p>
                     </div>
                     <div class="d-flex flex-column flex-md-row gap-2">
                         <form id="employee-search-form" class="d-flex flex-column gap-1">
