@@ -7,67 +7,85 @@
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
-                    <div>
-                        <h4 class="card-title mb-1">Daftar Pengeluaran Operasional</h4>
-                        <p class="mb-0 text-muted">
-                            Daftar pengeluaran operasional bengkel.
-                        </p>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                        <div>
+                            <h4 class="card-title mb-1">Daftar Pengeluaran Operasional</h4>
+                            <p class="mb-0 text-muted">Daftar pengeluaran operasional bengkel.</p>
+                        </div>
+
+                        <div class="d-flex flex-column flex-md-row gap-2">
+                            <button type="button" id="open-expense-filter" class="btn btn-light-secondary">Filter</button>
+                            <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">Kelola Kategori</a>
+                            <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">Catat Pengeluaran</a>
+                        </div>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">
-                            Kelola Kategori
-                        </a>
-                        <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">
-                            Catat Pengeluaran
-                        </a>
-                    </div>
+                    <form id="expense-search-form" class="d-flex flex-column gap-1">
+                        <input
+                            type="text"
+                            id="expense-search-input"
+                            class="form-control"
+                            placeholder="Cari kategori, kode kategori, deskripsi, metode bayar"
+                            autocomplete="off"
+                        >
+                    </form>
                 </div>
             </div>
 
             <div class="card-body">
-                @if ($rows === [])
-                    <div class="text-center text-muted py-5">
-                        Belum ada pengeluaran operasional tercatat.
-                    </div>
-                @else
-                    <div class="table-responsive">
-                        <table class="table table-lg">
-                            <thead>
-                                <tr class="text-nowrap">
-                                    <th style="width: 64px;">No</th>
-                                    <th>Tanggal</th>
-                                    <th>Kategori</th>
-                                    <th>Deskripsi</th>
-                                    <th>Nominal</th>
-                                    <th>Metode Bayar</th>
-                                    <th>Referensi</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($rows as $index => $row)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $row['expense_date'] }}</td>
-                                        <td>{{ $row['category_name'] }} ({{ $row['category_code'] }})</td>
-                                        <td>{{ $row['description'] }}</td>
-                                        <td>Rp {{ number_format($row['amount_rupiah'], 0, ',', '.') }}</td>
-                                        <td>{{ $row['payment_method'] }}</td>
-                                        <td>{{ $row['reference_no'] ?? '-' }}</td>
-                                        <td>
-                                            <span class="badge {{ $row['status_badge_class'] }}">
-                                                {{ $row['status_label'] }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @endif
+                @include('admin.expenses.partials.filter_drawer')
+
+                <div class="table-responsive">
+                    <table class="table table-lg" id="expense-table">
+                        <thead>
+                            <tr class="text-nowrap">
+                                <th style="width: 64px;">No</th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="expense_date">
+                                        Tanggal
+                                        <span class="ms-1 text-muted" data-sort-indicator="expense_date">↕</span>
+                                    </button>
+                                </th>
+                                <th>Kategori</th>
+                                <th>Deskripsi</th>
+                                <th class="text-end">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="amount_rupiah">
+                                        Nominal
+                                        <span class="ms-1 text-muted" data-sort-indicator="amount_rupiah">↕</span>
+                                    </button>
+                                </th>
+                                <th>Metode Bayar</th>
+                                <th>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="status">
+                                        Status
+                                        <span class="ms-1 text-muted" data-sort-indicator="status">↕</span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="expense-table-body">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                    <small id="expense-table-summary" class="text-muted">Total: -</small>
+                    <div id="expense-table-pagination"></div>
+                </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.expenseTableConfig = {
+            endpoint: @json(route('admin.expenses.table'))
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-expenses-table.js') }}"></script>
+@endpush

@@ -15,49 +15,32 @@ final class ExpenseIndexPageFeatureTest extends TestCase
 
     public function test_guest_is_redirected_to_login_when_accessing_expense_index_page(): void
     {
-        $this->get(route('admin.expenses.index'))
-            ->assertRedirect(route('login'));
+        $this->get(route('admin.expenses.index'))->assertRedirect(route('login'));
     }
 
     public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_expense_index_page(): void
     {
-        $response = $this->actingAs($this->user('kasir'))
-            ->get(route('admin.expenses.index'));
+        $response = $this->actingAs($this->user('kasir'))->get(route('admin.expenses.index'));
 
         $response->assertRedirect(route('cashier.dashboard'));
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_expense_index_page(): void
+    public function test_admin_can_access_expense_index_shell_page(): void
     {
-        $this->seedExpenseCategory('expense-category-1', 'EXP-ELEC-NEW', 'Listrik Bengkel Baru', true, 'Kategori terbaru');
-        $this->seedOperationalExpense(
-            'expense-1',
-            'expense-category-1',
-            'EXP-ELEC',
-            'Listrik Bengkel',
-            250000,
-            '2026-03-23',
-            'Bayar token listrik workshop',
-            'cash',
-            'INV-EXP-001',
-            'posted',
-        );
+        $this->seedExpenseCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', true);
+        $this->seedExpenseCategory('expense-category-2', 'EXP-MISC', 'Lain-lain', false);
 
-        $response = $this->actingAs($this->user('admin'))
-            ->get(route('admin.expenses.index'));
+        $response = $this->actingAs($this->user('admin'))->get(route('admin.expenses.index'));
 
         $response->assertOk();
         $response->assertSee('Daftar Pengeluaran Operasional');
-        $response->assertSee('Catat Pengeluaran');
-        $response->assertSee('Kelola Kategori');
-        $response->assertSee('Listrik Bengkel');
-        $response->assertSee('(EXP-ELEC)');
-        $response->assertDontSee('Listrik Bengkel Baru');
-        $response->assertDontSee('EXP-ELEC-NEW');
-        $response->assertSee('Bayar token listrik workshop');
-        $response->assertSee('cash');
-        $response->assertSee('Posted');
+        $response->assertSee('expense-search-form', false);
+        $response->assertSee('expense-table-body', false);
+        $response->assertSee('admin-expenses-table.js');
+        $response->assertSee(route('admin.expenses.table'), false);
+        $response->assertSee('Listrik Bengkel (EXP-ELEC)');
+        $response->assertDontSee('Lain-lain (EXP-MISC)');
     }
 
     private function user(string $role): User
@@ -76,47 +59,14 @@ final class ExpenseIndexPageFeatureTest extends TestCase
         return $user;
     }
 
-    private function seedExpenseCategory(
-        string $id,
-        string $code,
-        string $name,
-        bool $isActive,
-        ?string $description = null,
-    ): void {
+    private function seedExpenseCategory(string $id, string $code, string $name, bool $isActive): void
+    {
         DB::table('expense_categories')->insert([
             'id' => $id,
             'code' => $code,
             'name' => $name,
-            'description' => $description,
+            'description' => null,
             'is_active' => $isActive,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    }
-
-    private function seedOperationalExpense(
-        string $id,
-        string $categoryId,
-        string $categoryCodeSnapshot,
-        string $categoryNameSnapshot,
-        int $amountRupiah,
-        string $expenseDate,
-        string $description,
-        string $paymentMethod,
-        ?string $referenceNo,
-        string $status,
-    ): void {
-        DB::table('operational_expenses')->insert([
-            'id' => $id,
-            'category_id' => $categoryId,
-            'category_code_snapshot' => $categoryCodeSnapshot,
-            'category_name_snapshot' => $categoryNameSnapshot,
-            'amount_rupiah' => $amountRupiah,
-            'expense_date' => $expenseDate,
-            'description' => $description,
-            'payment_method' => $paymentMethod,
-            'reference_no' => $referenceNo,
-            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
