@@ -18,6 +18,8 @@ final class DatabaseOperationalExpenseWriterAdapter implements OperationalExpens
         DB::table('operational_expenses')->insert([
             'id' => $operationalExpense->id(),
             'category_id' => $operationalExpense->categoryId(),
+            'category_code_snapshot' => $operationalExpense->categoryCodeSnapshot(),
+            'category_name_snapshot' => $operationalExpense->categoryNameSnapshot(),
             'amount_rupiah' => $operationalExpense->amountRupiah()->amount(),
             'expense_date' => $operationalExpense->expenseDate()->format('Y-m-d'),
             'description' => $operationalExpense->description(),

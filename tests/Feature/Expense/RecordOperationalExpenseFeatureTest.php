@@ -49,6 +49,8 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
         $this->assertDatabaseHas('operational_expenses', [
             'id' => 'expense-1',
             'category_id' => 'expense-category-1',
+            'category_code_snapshot' => 'LISTRIK',
+            'category_name_snapshot' => 'Listrik',
             'amount_rupiah' => 250000,
             'expense_date' => '2026-03-17',
             'description' => 'Bayar token listrik workshop',

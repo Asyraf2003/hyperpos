@@ -52,6 +52,8 @@ final class RecordOperationalExpenseHandler
             $operationalExpense = OperationalExpense::create(
                 $this->uuid->generate(),
                 $categoryId,
+                $category->code(),
+                $category->name(),
                 Money::fromInt($amountRupiah),
                 $this->parseExpenseDate($expenseDate),
                 $description,
@@ -73,6 +75,8 @@ final class RecordOperationalExpenseHandler
                 'expense' => [
                     'id' => $operationalExpense->id(),
                     'category_id' => $operationalExpense->categoryId(),
+                    'category_code_snapshot' => $operationalExpense->categoryCodeSnapshot(),
+                    'category_name_snapshot' => $operationalExpense->categoryNameSnapshot(),
                     'amount_rupiah' => $operationalExpense->amountRupiah()->amount(),
                     'expense_date' => $operationalExpense->expenseDate()->format('Y-m-d'),
                     'description' => $operationalExpense->description(),

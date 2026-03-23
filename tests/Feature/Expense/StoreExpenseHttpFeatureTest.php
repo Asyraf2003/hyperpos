@@ -39,6 +39,8 @@ final class StoreExpenseHttpFeatureTest extends TestCase
 
         $this->assertDatabaseHas('operational_expenses', [
             'category_id' => 'expense-category-1',
+            'category_code_snapshot' => 'EXP-ELEC',
+            'category_name_snapshot' => 'Listrik Bengkel',
             'amount_rupiah' => 250000,
             'expense_date' => '2026-03-23',
             'description' => 'Bayar token listrik workshop',

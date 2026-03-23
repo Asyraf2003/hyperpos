@@ -14,6 +14,8 @@ final class OperationalExpense
     private function __construct(
         private string $id,
         private string $categoryId,
+        private string $categoryCodeSnapshot,
+        private string $categoryNameSnapshot,
         private Money $amountRupiah,
         private DateTimeImmutable $expenseDate,
         private string $description,
@@ -26,6 +28,8 @@ final class OperationalExpense
     public static function create(
         string $id,
         string $categoryId,
+        string $categoryCodeSnapshot,
+        string $categoryNameSnapshot,
         Money $amountRupiah,
         DateTimeImmutable $expenseDate,
         string $description,
@@ -45,6 +49,8 @@ final class OperationalExpense
         return new self(
             trim($id),
             trim($categoryId),
+            trim($categoryCodeSnapshot),
+            trim($categoryNameSnapshot),
             $amountRupiah,
             $expenseDate,
             trim($description),
@@ -57,6 +63,8 @@ final class OperationalExpense
     public static function rehydrate(
         string $id,
         string $categoryId,
+        string $categoryCodeSnapshot,
+        string $categoryNameSnapshot,
         Money $amountRupiah,
         DateTimeImmutable $expenseDate,
         string $description,
@@ -76,6 +84,8 @@ final class OperationalExpense
         return new self(
             trim($id),
             trim($categoryId),
+            trim($categoryCodeSnapshot),
+            trim($categoryNameSnapshot),
             $amountRupiah,
             $expenseDate,
             trim($description),
@@ -87,6 +97,8 @@ final class OperationalExpense
 
     public function id(): string { return $this->id; }
     public function categoryId(): string { return $this->categoryId; }
+    public function categoryCodeSnapshot(): string { return $this->categoryCodeSnapshot; }
+    public function categoryNameSnapshot(): string { return $this->categoryNameSnapshot; }
     public function amountRupiah(): Money { return $this->amountRupiah; }
     public function expenseDate(): DateTimeImmutable { return $this->expenseDate; }
     public function description(): string { return $this->description; }
