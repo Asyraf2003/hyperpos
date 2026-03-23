@@ -7,6 +7,7 @@ use App\Adapters\In\Http\Controllers\Admin\Expense\CreateExpensePageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseCategoryIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\StoreExpenseCategoryController;
+use App\Adapters\In\Http\Controllers\Admin\Expense\StoreExpenseController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
@@ -15,6 +16,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/expenses/create', CreateExpensePageController::class)
         ->name('admin.expenses.create');
+
+    Route::post('/admin/expenses', StoreExpenseController::class)
+        ->name('admin.expenses.store');
 
     Route::get('/admin/expenses/categories', ExpenseCategoryIndexPageController::class)
         ->name('admin.expenses.categories.index');
