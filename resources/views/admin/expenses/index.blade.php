@@ -57,22 +57,9 @@
                                         <td>{{ $row['payment_method'] }}</td>
                                         <td>{{ $row['reference_no'] ?? '-' }}</td>
                                         <td>
-                                            @php
-                                                $status = $row['status'];
-                                                $statusLabel = match ($status) {
-                                                    'posted' => 'Posted',
-                                                    'draft' => 'Draft',
-                                                    'cancelled' => 'Cancelled',
-                                                    default => ucfirst($status),
-                                                };
-                                                $statusClass = match ($status) {
-                                                    'posted' => 'bg-light-success text-success',
-                                                    'draft' => 'bg-light-warning text-warning',
-                                                    'cancelled' => 'bg-light-danger text-danger',
-                                                    default => 'bg-light-secondary text-secondary',
-                                                };
-                                            @endphp
-                                            <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                            <span class="badge {{ $row['status_badge_class'] }}">
+                                                {{ $row['status_label'] }}
+                                            </span>
                                         </td>
                                     </tr>
                                 @endforeach

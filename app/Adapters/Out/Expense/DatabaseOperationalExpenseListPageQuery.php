@@ -19,7 +19,9 @@ final class DatabaseOperationalExpenseListPageQuery
      *   amount_rupiah:int,
      *   payment_method:string,
      *   reference_no:?string,
-     *   status:string
+     *   status:string,
+     *   status_label:string,
+     *   status_badge_class:string
      * }>
      */
     public function listRows(): array
@@ -27,7 +29,7 @@ final class DatabaseOperationalExpenseListPageQuery
         $rows = $this->applyOrdering($this->baseSelect())->get();
 
         return array_map(
-            static fn (object $row): array => [
+            fn (object $row): array => [
                 'id' => (string) $row->id,
                 'expense_date' => (string) $row->expense_date,
                 'category_name' => (string) $row->category_name,
@@ -37,6 +39,8 @@ final class DatabaseOperationalExpenseListPageQuery
                 'payment_method' => (string) $row->payment_method,
                 'reference_no' => $row->reference_no !== null ? (string) $row->reference_no : null,
                 'status' => (string) $row->status,
+                'status_label' => $this->statusLabel((string) $row->status),
+                'status_badge_class' => $this->statusBadgeClass((string) $row->status),
             ],
             $rows->all(),
         );
@@ -66,5 +70,25 @@ final class DatabaseOperationalExpenseListPageQuery
             ->orderByDesc('operational_expenses.expense_date')
             ->orderByDesc('operational_expenses.created_at')
             ->orderByDesc('operational_expenses.id');
+    }
+
+    private function statusLabel(string $status): string
+    {
+        return match ($status) {
+            'posted' => 'Posted',
+            'draft' => 'Draft',
+            'cancelled' => 'Cancelled',
+            default => ucfirst($status),
+        };
+    }
+
+    private function statusBadgeClass(string $status): string
+    {
+        return match ($status) {
+            'posted' => 'bg-light-success text-success',
+            'draft' => 'bg-light-warning text-warning',
+            'cancelled' => 'bg-light-danger text-danger',
+            default => 'bg-light-secondary text-secondary',
+        };
     }
 }
