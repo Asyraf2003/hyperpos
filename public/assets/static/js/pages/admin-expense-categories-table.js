@@ -68,20 +68,31 @@
 
     function buildPagination(meta) {
         if (meta.last_page <= 1) return '';
-        let html = '<div class="btn-group">';
-        html += `<button type="button" class="btn btn-sm btn-light-secondary" data-page="${Math.max(1, meta.page - 1)}" ${meta.page === 1 ? 'disabled' : ''}>Prev</button>`;
-        for (let p = 1; p <= meta.last_page; p += 1) {
-            html += `<button type="button" class="btn btn-sm ${p === meta.page ? 'btn-primary' : 'btn-light-secondary'}" data-page="${p}">${p}</button>`;
+        
+        const start = Math.max(1, meta.page - 2);
+        const end = Math.min(meta.last_page, meta.page + 2);
+
+        let html = '<nav><ul class="pagination pagination-primary mb-0">';
+        html += `<li class="page-item ${meta.page === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${Math.max(1, meta.page - 1)}"><i class="bi bi-chevron-left"></i></a></li>`;
+
+        for (let p = start; p <= end; p += 1) {
+            html += `<li class="page-item ${p === meta.page ? 'active' : ''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
         }
-        html += `<button type="button" class="btn btn-sm btn-light-secondary" data-page="${Math.min(meta.last_page, meta.page + 1)}" ${meta.page === meta.last_page ? 'disabled' : ''}>Next</button>`;
-        html += '</div>';
+
+        html += `<li class="page-item ${meta.page === meta.last_page ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${Math.min(meta.last_page, meta.page + 1)}"><i class="bi bi-chevron-right"></i></a></li>`;
+        html += '</ul></nav>';
+        
         return html;
     }
 
     function bindPagination() {
-        pagination.querySelectorAll('[data-page]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                state.page = Number(btn.getAttribute('data-page') || '1');
+        pagination.querySelectorAll('[data-page]').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parentItem = link.closest('.page-item');
+                if (parentItem && parentItem.classList.contains('disabled')) return;
+                
+                state.page = Number(link.getAttribute('data-page') || '1');
                 fetchTable();
             });
         });
