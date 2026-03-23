@@ -26,10 +26,7 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseOperationalExpenseWriterAdapter(),
             new class () implements UuidPort {
-                public function generate(): string
-                {
-                    return 'expense-1';
-                }
+                public function generate(): string { return 'expense-1'; }
             },
         );
 
@@ -39,7 +36,6 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             '2026-03-17',
             'Bayar token listrik workshop',
             'cash',
-            'INV-EXP-001',
             OperationalExpenseStatus::POSTED,
         );
 
@@ -55,7 +51,6 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             'expense_date' => '2026-03-17',
             'description' => 'Bayar token listrik workshop',
             'payment_method' => 'cash',
-            'reference_no' => 'INV-EXP-001',
             'status' => OperationalExpenseStatus::POSTED,
         ]);
     }
@@ -66,28 +61,15 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseOperationalExpenseWriterAdapter(),
             new class () implements UuidPort {
-                public function generate(): string
-                {
-                    return 'expense-1';
-                }
+                public function generate(): string { return 'expense-1'; }
             },
         );
 
-        $result = $handler->handle(
-            'missing-category',
-            250000,
-            '2026-03-17',
-            'Bayar token listrik workshop',
-            'cash',
-        );
+        $result = $handler->handle('missing-category', 250000, '2026-03-17', 'Bayar token listrik workshop', 'cash');
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertTrue($result->isFailure());
-        $this->assertSame(
-            ['expense' => ['EXPENSE_CATEGORY_NOT_FOUND']],
-            $result->errors(),
-        );
-
+        $this->assertSame(['expense' => ['EXPENSE_CATEGORY_NOT_FOUND']], $result->errors());
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
@@ -99,27 +81,14 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseOperationalExpenseWriterAdapter(),
             new class () implements UuidPort {
-                public function generate(): string
-                {
-                    return 'expense-1';
-                }
+                public function generate(): string { return 'expense-1'; }
             },
         );
 
-        $result = $handler->handle(
-            'expense-category-1',
-            250000,
-            '2026-03-17',
-            'Bayar token listrik workshop',
-            'cash',
-        );
+        $result = $handler->handle('expense-category-1', 250000, '2026-03-17', 'Bayar token listrik workshop', 'cash');
 
         $this->assertTrue($result->isFailure());
-        $this->assertSame(
-            ['expense' => ['EXPENSE_CATEGORY_INACTIVE']],
-            $result->errors(),
-        );
-
+        $this->assertSame(['expense' => ['EXPENSE_CATEGORY_INACTIVE']], $result->errors());
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
@@ -131,27 +100,14 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseOperationalExpenseWriterAdapter(),
             new class () implements UuidPort {
-                public function generate(): string
-                {
-                    return 'expense-1';
-                }
+                public function generate(): string { return 'expense-1'; }
             },
         );
 
-        $result = $handler->handle(
-            'expense-category-1',
-            0,
-            '2026-03-17',
-            'Bayar token listrik workshop',
-            'cash',
-        );
+        $result = $handler->handle('expense-category-1', 0, '2026-03-17', 'Bayar token listrik workshop', 'cash');
 
         $this->assertTrue($result->isFailure());
-        $this->assertSame(
-            ['expense' => ['INVALID_OPERATIONAL_EXPENSE']],
-            $result->errors(),
-        );
-
+        $this->assertSame(['expense' => ['INVALID_OPERATIONAL_EXPENSE']], $result->errors());
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
@@ -163,36 +119,19 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseOperationalExpenseWriterAdapter(),
             new class () implements UuidPort {
-                public function generate(): string
-                {
-                    return 'expense-1';
-                }
+                public function generate(): string { return 'expense-1'; }
             },
         );
 
-        $result = $handler->handle(
-            'expense-category-1',
-            250000,
-            '17-03-2026',
-            'Bayar token listrik workshop',
-            'cash',
-        );
+        $result = $handler->handle('expense-category-1', 250000, '17-03-2026', 'Bayar token listrik workshop', 'cash');
 
         $this->assertTrue($result->isFailure());
-        $this->assertSame(
-            ['expense' => ['INVALID_OPERATIONAL_EXPENSE']],
-            $result->errors(),
-        );
-
+        $this->assertSame(['expense' => ['INVALID_OPERATIONAL_EXPENSE']], $result->errors());
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
-    private function seedCategory(
-        string $id,
-        string $code,
-        string $name,
-        bool $isActive,
-    ): void {
+    private function seedCategory(string $id, string $code, string $name, bool $isActive): void
+    {
         DB::table('expense_categories')->insert([
             'id' => $id,
             'code' => $code,

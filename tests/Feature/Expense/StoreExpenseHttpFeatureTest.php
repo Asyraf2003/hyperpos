@@ -15,13 +15,7 @@ final class StoreExpenseHttpFeatureTest extends TestCase
 
     public function test_admin_can_store_operational_expense_from_create_page(): void
     {
-        $this->seedExpenseCategory(
-            'expense-category-1',
-            'EXP-ELEC',
-            'Listrik Bengkel',
-            true,
-            'Token atau tagihan listrik',
-        );
+        $this->seedExpenseCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', true, 'Token atau tagihan listrik');
 
         $response = $this->actingAs($this->user('admin'))
             ->post(route('admin.expenses.store'), [
@@ -30,7 +24,6 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'reference_no' => 'INV-EXP-001',
                 'status' => 'posted',
             ]);
 
@@ -45,20 +38,13 @@ final class StoreExpenseHttpFeatureTest extends TestCase
             'expense_date' => '2026-03-23',
             'description' => 'Bayar token listrik workshop',
             'payment_method' => 'cash',
-            'reference_no' => 'INV-EXP-001',
             'status' => 'posted',
         ]);
     }
 
     public function test_admin_store_operational_expense_returns_back_with_error_when_category_is_inactive(): void
     {
-        $this->seedExpenseCategory(
-            'expense-category-1',
-            'EXP-ELEC',
-            'Listrik Bengkel',
-            false,
-            'Token atau tagihan listrik',
-        );
+        $this->seedExpenseCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', false, 'Token atau tagihan listrik');
 
         $response = $this->from(route('admin.expenses.create'))
             ->actingAs($this->user('admin'))
@@ -68,27 +54,17 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'reference_no' => 'INV-EXP-001',
                 'status' => 'posted',
             ]);
 
         $response->assertRedirect(route('admin.expenses.create'));
-        $response->assertSessionHasErrors([
-            'expense' => 'Expense category tidak aktif.',
-        ]);
-
+        $response->assertSessionHasErrors(['expense' => 'Expense category tidak aktif.']);
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
     public function test_admin_store_operational_expense_returns_back_with_validation_error_when_amount_is_invalid(): void
     {
-        $this->seedExpenseCategory(
-            'expense-category-1',
-            'EXP-ELEC',
-            'Listrik Bengkel',
-            true,
-            'Token atau tagihan listrik',
-        );
+        $this->seedExpenseCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', true, 'Token atau tagihan listrik');
 
         $response = $this->from(route('admin.expenses.create'))
             ->actingAs($this->user('admin'))
@@ -98,13 +74,11 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'reference_no' => 'INV-EXP-001',
                 'status' => 'posted',
             ]);
 
         $response->assertRedirect(route('admin.expenses.create'));
         $response->assertSessionHasErrors(['amount_rupiah']);
-
         $this->assertDatabaseCount('operational_expenses', 0);
     }
 
@@ -124,13 +98,8 @@ final class StoreExpenseHttpFeatureTest extends TestCase
         return $user;
     }
 
-    private function seedExpenseCategory(
-        string $id,
-        string $code,
-        string $name,
-        bool $isActive,
-        ?string $description = null,
-    ): void {
+    private function seedExpenseCategory(string $id, string $code, string $name, bool $isActive, ?string $description): void
+    {
         DB::table('expense_categories')->insert([
             'id' => $id,
             'code' => $code,

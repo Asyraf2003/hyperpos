@@ -21,7 +21,6 @@ final class OperationalExpense
         private DateTimeImmutable $expenseDate,
         private string $description,
         private string $paymentMethod,
-        private ?string $referenceNo,
         private string $status,
     ) {}
 
@@ -34,7 +33,6 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        ?string $referenceNo = null,
         string $status = OperationalExpenseStatus::POSTED,
     ): self {
         return self::build(
@@ -46,7 +44,6 @@ final class OperationalExpense
             $expenseDate,
             $description,
             $paymentMethod,
-            $referenceNo,
             $status,
         );
     }
@@ -60,7 +57,6 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        ?string $referenceNo,
         string $status,
     ): self {
         return self::build(
@@ -72,7 +68,6 @@ final class OperationalExpense
             $expenseDate,
             $description,
             $paymentMethod,
-            $referenceNo,
             $status,
         );
     }
@@ -86,15 +81,13 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        ?string $referenceNo,
         string $status,
     ): self {
         self::assertValid($id, $categoryId, $amountRupiah, $description, $paymentMethod, $status);
 
         return new self(
             trim($id), trim($categoryId), trim($categoryCodeSnapshot), trim($categoryNameSnapshot),
-            $amountRupiah, $expenseDate, trim($description), trim($paymentMethod),
-            self::normalizeReferenceNo($referenceNo), $status,
+            $amountRupiah, $expenseDate, trim($description), trim($paymentMethod), $status,
         );
     }
 }

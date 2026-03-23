@@ -9,21 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseOperationalExpenseListPageQuery
 {
-    /**
-     * @return list<array{
-     * id:string,
-     * expense_date:string,
-     * category_name:string,
-     * category_code:string,
-     * description:string,
-     * amount_rupiah:int,
-     * payment_method:string,
-     * reference_no:?string,
-     * status:string,
-     * status_label:string,
-     * status_badge_class:string
-     * }>
-     */
     public function listRows(): array
     {
         $rows = $this->applyOrdering($this->baseSelect())->get();
@@ -37,7 +22,6 @@ final class DatabaseOperationalExpenseListPageQuery
                 'description' => (string) $row->description,
                 'amount_rupiah' => (int) $row->amount_rupiah,
                 'payment_method' => (string) $row->payment_method,
-                'reference_no' => $row->reference_no !== null ? (string) $row->reference_no : null,
                 'status' => (string) $row->status,
                 'status_label' => $this->statusLabel((string) $row->status),
                 'status_badge_class' => $this->statusBadgeClass((string) $row->status),
@@ -48,27 +32,22 @@ final class DatabaseOperationalExpenseListPageQuery
 
     private function baseSelect(): Builder
     {
-        return DB::table('operational_expenses')
-            ->select([
-                'id',
-                'expense_date',
-                'category_name_snapshot',
-                'category_code_snapshot',
-                'description',
-                'amount_rupiah',
-                'payment_method',
-                'reference_no',
-                'status',
-                'created_at',
-            ]);
+        return DB::table('operational_expenses')->select([
+            'id',
+            'expense_date',
+            'category_name_snapshot',
+            'category_code_snapshot',
+            'description',
+            'amount_rupiah',
+            'payment_method',
+            'status',
+            'created_at',
+        ]);
     }
 
     private function applyOrdering(Builder $query): Builder
     {
-        return $query
-            ->orderByDesc('expense_date')
-            ->orderByDesc('created_at')
-            ->orderByDesc('id');
+        return $query->orderByDesc('expense_date')->orderByDesc('created_at')->orderByDesc('id');
     }
 
     private function statusLabel(string $status): string

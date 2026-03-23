@@ -29,7 +29,6 @@ final class RecordOperationalExpenseHandler
         string $expenseDate,
         string $description,
         string $paymentMethod,
-        ?string $referenceNo = null,
         string $status = OperationalExpenseStatus::POSTED,
     ): Result {
         $category = $this->expenseCategoryReader->findById($categoryId);
@@ -52,7 +51,6 @@ final class RecordOperationalExpenseHandler
                 $this->parseExpenseDate($expenseDate),
                 $description,
                 $paymentMethod,
-                $referenceNo,
                 $status,
             );
         } catch (DomainException $e) {
@@ -71,7 +69,6 @@ final class RecordOperationalExpenseHandler
                 'expense_date' => $expense->expenseDate()->format('Y-m-d'),
                 'description' => $expense->description(),
                 'payment_method' => $expense->paymentMethod(),
-                'reference_no' => $expense->referenceNo(),
                 'status' => $expense->status(),
             ],
         ], 'Operational expense berhasil dicatat.');

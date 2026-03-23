@@ -88,7 +88,6 @@ final class ExpenseTableDataAccessFeatureTest extends TestCase
             'expense_date' => $date,
             'description' => $description,
             'payment_method' => $paymentMethod,
-            'reference_no' => null,
             'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
