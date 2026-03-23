@@ -11,6 +11,7 @@ use App\Adapters\Out\Auth\LaravelUuidAdapter;
 use App\Adapters\Out\Clock\SystemClockAdapter;
 use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
 use App\Adapters\Out\Expense\DatabaseExpenseCategoryWriterAdapter;
+use App\Adapters\Out\Expense\DatabaseExpenseCategoryTableReaderAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseTableReaderAdapter;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeePayrollTableReaderAdapter;
@@ -90,6 +91,7 @@ use App\Ports\Out\EmployeeFinance\PayrollDisbursementReversalWriterPort;
 use App\Ports\Out\EmployeeFinance\EmployeePayrollTableReaderPort;
 use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
 use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
+use App\Ports\Out\Expense\ExpenseCategoryTableReaderPort;
 use App\Ports\Out\Expense\OperationalExpenseWriterPort;
 use App\Ports\Out\Expense\OperationalExpenseTableReaderPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
@@ -233,6 +235,7 @@ class HexagonalServiceProvider extends ServiceProvider
 
         $this->app->singleton(ExpenseCategoryReaderPort::class, DatabaseExpenseCategoryReaderAdapter::class);
         $this->app->singleton(ExpenseCategoryWriterPort::class, DatabaseExpenseCategoryWriterAdapter::class);
+        $this->app->singleton(ExpenseCategoryTableReaderPort::class, DatabaseExpenseCategoryTableReaderAdapter::class);
         $this->app->singleton(OperationalExpenseWriterPort::class, DatabaseOperationalExpenseWriterAdapter::class);
         $this->app->singleton(OperationalExpenseTableReaderPort::class, DatabaseOperationalExpenseTableReaderAdapter::class);
     }

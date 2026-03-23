@@ -15,8 +15,8 @@
                         </div>
 
                         <div class="d-flex flex-column flex-md-row gap-2">
-                            <button type="button" id="open-expense-filter" class="btn btn-light-secondary">Filter</button>
-                            <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">Kelola Kategori</a>
+                            <button type="button" id="open-expense-filter" class="btn btn-primary">Filter</button>
+                            <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-primary">Kelola Kategori</a>
                             <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">Catat Pengeluaran</a>
                         </div>
                     </div>
