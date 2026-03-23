@@ -10,6 +10,7 @@ use DateTimeImmutable;
 final class OperationalExpense
 {
     use OperationalExpenseValidation;
+    use OperationalExpenseAccessors;
 
     private function __construct(
         private string $id,
@@ -104,15 +105,4 @@ final class OperationalExpense
             $status,
         );
     }
-
-    public function id(): string { return $this->id; }
-    public function categoryId(): string { return $this->categoryId; }
-    public function categoryCodeSnapshot(): string { return $this->categoryCodeSnapshot; }
-    public function categoryNameSnapshot(): string { return $this->categoryNameSnapshot; }
-    public function amountRupiah(): Money { return $this->amountRupiah; }
-    public function expenseDate(): DateTimeImmutable { return $this->expenseDate; }
-    public function description(): string { return $this->description; }
-    public function paymentMethod(): string { return $this->paymentMethod; }
-    public function referenceNo(): ?string { return $this->referenceNo; }
-    public function status(): string { return $this->status; }
 }
