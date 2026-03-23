@@ -23,8 +23,7 @@ final class OperationalExpense
         private string $paymentMethod,
         private ?string $referenceNo,
         private string $status,
-    ) {
-    }
+    ) {}
 
     public static function create(
         string $id,
@@ -93,16 +92,9 @@ final class OperationalExpense
         self::assertValid($id, $categoryId, $amountRupiah, $description, $paymentMethod, $status);
 
         return new self(
-            trim($id),
-            trim($categoryId),
-            trim($categoryCodeSnapshot),
-            trim($categoryNameSnapshot),
-            $amountRupiah,
-            $expenseDate,
-            trim($description),
-            trim($paymentMethod),
-            self::normalizeReferenceNo($referenceNo),
-            $status,
+            trim($id), trim($categoryId), trim($categoryCodeSnapshot), trim($categoryNameSnapshot),
+            $amountRupiah, $expenseDate, trim($description), trim($paymentMethod),
+            self::normalizeReferenceNo($referenceNo), $status,
         );
     }
 }
