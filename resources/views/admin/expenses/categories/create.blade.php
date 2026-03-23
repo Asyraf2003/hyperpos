@@ -1,0 +1,104 @@
+@extends('layouts.app')
+
+@section('title', 'Tambah Kategori Pengeluaran')
+@section('heading', 'Tambah Kategori Pengeluaran')
+
+@section('content')
+    <section class="section">
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                            <div>
+                                <h4 class="card-title mb-1">Tambah Kategori Pengeluaran</h4>
+                                <p class="mb-0 text-muted">
+                                    Isi master kategori biaya operasional.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="#" method="post" onsubmit="return false;">
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group mb-4">
+                                        <label for="code" class="form-label">Kode</label>
+                                        <input
+                                            type="text"
+                                            id="code"
+                                            name="code"
+                                            value="{{ old('code') }}"
+                                            class="form-control @error('code') is-invalid @enderror"
+                                            placeholder="Contoh: EXP-ELEC"
+                                            required
+                                        >
+                                        @error('code')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-4">
+                                        <label for="name" class="form-label">Nama</label>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="name"
+                                            value="{{ old('name') }}"
+                                            class="form-control @error('name') is-invalid @enderror"
+                                            placeholder="Contoh: Listrik Bengkel"
+                                            required
+                                        >
+                                        @error('name')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-4">
+                                        <label for="description" class="form-label">Deskripsi</label>
+                                        <textarea
+                                            id="description"
+                                            name="description"
+                                            class="form-control @error('description') is-invalid @enderror"
+                                            rows="4"
+                                            placeholder="Opsional"
+                                        >{{ old('description') }}</textarea>
+                                        @error('description')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-start gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    Simpan Kategori
+                                </button>
+                                <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">
+                                    Batal
+                                </a>
+                            </div>
+                        </form>
+
+                        <small class="d-block text-muted mt-3">
+                            Submit category akan diaktifkan pada batch berikutnya.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
