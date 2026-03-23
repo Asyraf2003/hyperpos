@@ -109,55 +109,54 @@
 
                 <li class="sidebar-title">Laporan</li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Laporan transaksi</span>
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Laporan Transaksi</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-journal-minus"></i>
                         <span>Laporan Hutang</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-graph-up-arrow"></i>
                         <span>Laporan Keuntungan</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-boxes"></i>
                         <span>Laporan Stok</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-bank"></i>
                         <span>Laporan Aset</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-clock-history"></i>
                         <span>Laporan Log Riwayat</span>
                     </a>
                 </li>
 
-                <li class="sidebar-item>
+                <li class="sidebar-item">
                     <a href="#" class="sidebar-link">
-                        <i class="bi bi-cash-coin"></i>
+                        <i class="bi bi-pie-chart"></i>
                         <span>Laporan Statistik</span>
                     </a>
                 </li>
-
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
