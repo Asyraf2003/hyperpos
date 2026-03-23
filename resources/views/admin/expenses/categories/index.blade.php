@@ -7,29 +7,26 @@
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex flex-column gap-3">
-                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
-                        <div>
-                            <h4 class="card-title mb-1">Master Kategori Pengeluaran</h4>
-                            <p class="mb-0 text-muted">Kategori biaya operasional yang dipakai saat pencatatan expense.</p>
-                        </div>
-
-                        <div class="d-flex flex-column flex-md-row gap-2">
-                            <button type="button" id="open-expense-category-filter" class="btn btn-light-secondary">Filter</button>
-                            <a href="{{ route('admin.expenses.index') }}" class="btn btn-light-secondary">Kembali ke Pengeluaran</a>
-                            <a href="{{ route('admin.expenses.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
-                        </div>
+                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                    <div>
+                        <h4 class="card-title mb-1">Master Kategori Pengeluaran</h4>
+                        <p class="mb-0 text-muted">Kategori biaya operasional yang dipakai saat pencatatan expense.</p>
                     </div>
 
-                    <form id="expense-category-search-form" class="d-flex flex-column gap-1">
-                        <input
-                            type="text"
-                            id="expense-category-search-input"
-                            class="form-control"
-                            placeholder="Cari kode, nama, atau deskripsi kategori"
-                            autocomplete="off"
-                        >
-                    </form>
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="expense-category-search-form" class="d-flex flex-column gap-1">
+                            <input
+                                type="text"
+                                id="expense-category-search-input"
+                                class="form-control"
+                                placeholder="Cari kode, nama, atau deskripsi kategori"
+                                autocomplete="off"
+                            >
+                        </form>
+
+                        <button type="button" id="open-expense-category-filter" class="btn btn-primary">Filter</button>
+                        <a href="{{ route('admin.expenses.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
+                    </div>
                 </div>
             </div>
 

@@ -15,21 +15,22 @@
                         </div>
 
                         <div class="d-flex flex-column flex-md-row gap-2">
+                            <form id="expense-search-form" class="d-flex flex-column gap-1">
+                                <input
+                                    type="text"
+                                    id="expense-search-input"
+                                    class="form-control"
+                                    placeholder="Cari kategori, kode kategori, deskripsi, metode bayar"
+                                    autocomplete="off"
+                                >
+                            </form>
+                            
                             <button type="button" id="open-expense-filter" class="btn btn-primary">Filter</button>
                             <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-primary">Kelola Kategori</a>
                             <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">Catat Pengeluaran</a>
                         </div>
                     </div>
 
-                    <form id="expense-search-form" class="d-flex flex-column gap-1">
-                        <input
-                            type="text"
-                            id="expense-search-input"
-                            class="form-control"
-                            placeholder="Cari kategori, kode kategori, deskripsi, metode bayar"
-                            autocomplete="off"
-                        >
-                    </form>
                 </div>
             </div>
 
