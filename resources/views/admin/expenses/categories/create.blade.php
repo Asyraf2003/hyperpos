@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="#" method="post" onsubmit="return false;">
+                        <form action="{{ route('admin.expenses.categories.store') }}" method="post">
                             @csrf
 
                             <div class="row">
@@ -93,9 +93,6 @@
                             </div>
                         </form>
 
-                        <small class="d-block text-muted mt-3">
-                            Submit category akan diaktifkan pada batch berikutnya.
-                        </small>
                     </div>
                 </div>
             </div>
