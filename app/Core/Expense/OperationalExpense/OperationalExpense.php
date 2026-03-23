@@ -37,25 +37,16 @@ final class OperationalExpense
         ?string $referenceNo = null,
         string $status = OperationalExpenseStatus::POSTED,
     ): self {
-        self::assertValid(
+        return self::build(
             $id,
             $categoryId,
-            $amountRupiah,
-            $description,
-            $paymentMethod,
-            $status,
-        );
-
-        return new self(
-            trim($id),
-            trim($categoryId),
-            trim($categoryCodeSnapshot),
-            trim($categoryNameSnapshot),
+            $categoryCodeSnapshot,
+            $categoryNameSnapshot,
             $amountRupiah,
             $expenseDate,
-            trim($description),
-            trim($paymentMethod),
-            self::normalizeReferenceNo($referenceNo),
+            $description,
+            $paymentMethod,
+            $referenceNo,
             $status,
         );
     }
@@ -72,14 +63,33 @@ final class OperationalExpense
         ?string $referenceNo,
         string $status,
     ): self {
-        self::assertValid(
+        return self::build(
             $id,
             $categoryId,
+            $categoryCodeSnapshot,
+            $categoryNameSnapshot,
             $amountRupiah,
+            $expenseDate,
             $description,
             $paymentMethod,
+            $referenceNo,
             $status,
         );
+    }
+
+    private static function build(
+        string $id,
+        string $categoryId,
+        string $categoryCodeSnapshot,
+        string $categoryNameSnapshot,
+        Money $amountRupiah,
+        DateTimeImmutable $expenseDate,
+        string $description,
+        string $paymentMethod,
+        ?string $referenceNo,
+        string $status,
+    ): self {
+        self::assertValid($id, $categoryId, $amountRupiah, $description, $paymentMethod, $status);
 
         return new self(
             trim($id),

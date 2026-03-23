@@ -35,21 +35,15 @@ final class RecordOperationalExpenseHandler
         $category = $this->expenseCategoryReader->findById($categoryId);
 
         if ($category === null) {
-            return Result::failure(
-                'Expense category tidak ditemukan.',
-                ['expense' => ['EXPENSE_CATEGORY_NOT_FOUND']],
-            );
+            return Result::failure('Expense category tidak ditemukan.', ['expense' => ['EXPENSE_CATEGORY_NOT_FOUND']]);
         }
 
         if ($category->isActive() === false) {
-            return Result::failure(
-                'Expense category tidak aktif.',
-                ['expense' => ['EXPENSE_CATEGORY_INACTIVE']],
-            );
+            return Result::failure('Expense category tidak aktif.', ['expense' => ['EXPENSE_CATEGORY_INACTIVE']]);
         }
 
         try {
-            $operationalExpense = OperationalExpense::create(
+            $expense = OperationalExpense::create(
                 $this->uuid->generate(),
                 $categoryId,
                 $category->code(),
@@ -62,31 +56,25 @@ final class RecordOperationalExpenseHandler
                 $status,
             );
         } catch (DomainException $e) {
-            return Result::failure(
-                $e->getMessage(),
-                ['expense' => ['INVALID_OPERATIONAL_EXPENSE']],
-            );
+            return Result::failure($e->getMessage(), ['expense' => ['INVALID_OPERATIONAL_EXPENSE']]);
         }
 
-        $this->operationalExpenseWriter->create($operationalExpense);
+        $this->operationalExpenseWriter->create($expense);
 
-        return Result::success(
-            [
-                'expense' => [
-                    'id' => $operationalExpense->id(),
-                    'category_id' => $operationalExpense->categoryId(),
-                    'category_code_snapshot' => $operationalExpense->categoryCodeSnapshot(),
-                    'category_name_snapshot' => $operationalExpense->categoryNameSnapshot(),
-                    'amount_rupiah' => $operationalExpense->amountRupiah()->amount(),
-                    'expense_date' => $operationalExpense->expenseDate()->format('Y-m-d'),
-                    'description' => $operationalExpense->description(),
-                    'payment_method' => $operationalExpense->paymentMethod(),
-                    'reference_no' => $operationalExpense->referenceNo(),
-                    'status' => $operationalExpense->status(),
-                ],
+        return Result::success([
+            'expense' => [
+                'id' => $expense->id(),
+                'category_id' => $expense->categoryId(),
+                'category_code_snapshot' => $expense->categoryCodeSnapshot(),
+                'category_name_snapshot' => $expense->categoryNameSnapshot(),
+                'amount_rupiah' => $expense->amountRupiah()->amount(),
+                'expense_date' => $expense->expenseDate()->format('Y-m-d'),
+                'description' => $expense->description(),
+                'payment_method' => $expense->paymentMethod(),
+                'reference_no' => $expense->referenceNo(),
+                'status' => $expense->status(),
             ],
-            'Operational expense berhasil dicatat.',
-        );
+        ], 'Operational expense berhasil dicatat.');
     }
 
     private function parseExpenseDate(string $expenseDate): DateTimeImmutable
