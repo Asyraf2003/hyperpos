@@ -33,7 +33,7 @@ final class PayrollIndexPageFeatureTest extends TestCase
             ->get(route('admin.payrolls.index'));
 
         $response->assertOk();
-        $response->assertSee('Interactive table riwayat pencairan gaji manual.');
+        $response->assertSee('Tabel riwayat pencairan gaji manual.');
         $response->assertSee('payroll-search-form', false);
         $response->assertSee('payroll-table-body', false);
         $response->assertSee('admin-payrolls-table.js');

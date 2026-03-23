@@ -34,7 +34,7 @@ final class ProcurementInvoiceIndexPageFeatureTest extends TestCase
             ->get(route('admin.procurement.supplier-invoices.index'));
 
         $response->assertOk();
-        $response->assertSee('Interactive table procurement untuk admin.');
+        $response->assertSee('Tabel pengadaan interaktif untuk admin.');
         $response->assertSee('procurement-search-form', false);
         $response->assertSee('procurement-filter-form', false);
         $response->assertSee('procurement-invoice-table-body', false);

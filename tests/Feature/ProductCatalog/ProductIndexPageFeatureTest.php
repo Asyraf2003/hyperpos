@@ -31,7 +31,7 @@ final class ProductIndexPageFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))->get(route('admin.products.index'));
 
         $response->assertOk();
-        $response->assertSee('Interactive table product untuk admin.');
+        $response->assertSee('Tabel produk interaktif untuk admin.');
         $response->assertSee('product-search-form', false);
         $response->assertSee('open-product-filter', false);
         $response->assertSee('product-table-body', false);

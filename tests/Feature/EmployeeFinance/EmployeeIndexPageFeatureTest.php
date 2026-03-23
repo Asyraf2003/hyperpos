@@ -29,7 +29,7 @@ final class EmployeeIndexPageFeatureTest extends TestCase
     {
         $response = $this->actingAs($this->createUser('admin', 'admin-employee-index@example.test'))->get(route('admin.employees.index'));
         $response->assertOk();
-        $response->assertSee('Interactive table data karyawan untuk admin.');
+        $response->assertSee('Tabel data karyawan interaktif untuk admin.');
         $response->assertSee('employee-search-form', false);
         $response->assertSee('employee-table-body', false);
         $response->assertSee('admin-employees-table.js');

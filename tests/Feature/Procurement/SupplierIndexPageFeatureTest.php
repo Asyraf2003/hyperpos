@@ -31,7 +31,7 @@ final class SupplierIndexPageFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))->get(route('admin.suppliers.index'));
 
         $response->assertOk();
-        $response->assertSee('Supplier Summary List untuk admin.');
+        $response->assertSee('List data pemasok untuk admin.');
         $response->assertSee('supplier-search-form', false);
         $response->assertSee('supplier-table-body', false);
         $response->assertSee('admin-suppliers-table.js');
