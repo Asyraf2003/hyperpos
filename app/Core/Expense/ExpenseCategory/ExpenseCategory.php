@@ -17,50 +17,31 @@ final class ExpenseCategory
     ) {
     }
 
-    public static function create(
-        string $id,
-        string $code,
-        string $name,
-        ?string $description = null,
-    ): self {
+    public static function create(string $id, string $code, string $name, ?string $description = null): self
+    {
         self::assertValid($id, $code, $name);
 
-        return new self(
-            trim($id),
-            trim($code),
-            trim($name),
-            self::normalizeDescription($description),
-            true,
-        );
+        return new self(trim($id), trim($code), trim($name), self::normalizeDescription($description), true);
     }
 
-    public static function rehydrate(
-        string $id,
-        string $code,
-        string $name,
-        ?string $description,
-        bool $isActive,
-    ): self {
+    public static function rehydrate(string $id, string $code, string $name, ?string $description, bool $isActive): self
+    {
         self::assertValid($id, $code, $name);
 
-        return new self(
-            trim($id),
-            trim($code),
-            trim($name),
-            self::normalizeDescription($description),
-            $isActive,
-        );
+        return new self(trim($id), trim($code), trim($name), self::normalizeDescription($description), $isActive);
     }
 
-    public function deactivate(): void
+    public function update(string $code, string $name, ?string $description): void
     {
-        $this->isActive = false;
+        self::assertValid($this->id, $code, $name);
+
+        $this->code = trim($code);
+        $this->name = trim($name);
+        $this->description = self::normalizeDescription($description);
     }
 
-    public function activate(): void
-    {
-        $this->isActive = true;
-    }
+    public function deactivate(): void { $this->isActive = false; }
+    public function activate(): void { $this->isActive = true; }
 
     public function id(): string { return $this->id; }
     public function code(): string { return $this->code; }

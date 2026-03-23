@@ -9,4 +9,5 @@ use App\Core\Expense\ExpenseCategory\ExpenseCategory;
 interface ExpenseCategoryWriterPort
 {
     public function create(ExpenseCategory $expenseCategory): void;
+    public function update(ExpenseCategory $expenseCategory): void;
 }

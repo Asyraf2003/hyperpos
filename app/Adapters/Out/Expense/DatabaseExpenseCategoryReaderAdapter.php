@@ -12,20 +12,22 @@ final class DatabaseExpenseCategoryReaderAdapter implements ExpenseCategoryReade
 {
     public function existsByCode(string $code): bool
     {
-        return DB::table('expense_categories')
-            ->where('code', trim($code))
-            ->exists();
+        return DB::table('expense_categories')->where('code', trim($code))->exists();
     }
 
     public function findById(string $id): ?ExpenseCategory
     {
-        $row = DB::table('expense_categories')
-            ->where('id', trim($id))
-            ->first();
+        return $this->mapRow(DB::table('expense_categories')->where('id', trim($id))->first());
+    }
 
-        if ($row === null) {
-            return null;
-        }
+    public function findByCode(string $code): ?ExpenseCategory
+    {
+        return $this->mapRow(DB::table('expense_categories')->where('code', trim($code))->first());
+    }
+
+    private function mapRow(?object $row): ?ExpenseCategory
+    {
+        if ($row === null) return null;
 
         return ExpenseCategory::rehydrate(
             $row->id,

@@ -25,4 +25,17 @@ final class DatabaseExpenseCategoryWriterAdapter implements ExpenseCategoryWrite
             'updated_at' => $now,
         ]);
     }
+
+    public function update(ExpenseCategory $expenseCategory): void
+    {
+        DB::table('expense_categories')
+            ->where('id', $expenseCategory->id())
+            ->update([
+                'code' => $expenseCategory->code(),
+                'name' => $expenseCategory->name(),
+                'description' => $expenseCategory->description(),
+                'is_active' => $expenseCategory->isActive(),
+                'updated_at' => Carbon::now(),
+            ]);
+    }
 }
