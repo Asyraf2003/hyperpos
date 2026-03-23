@@ -3,11 +3,19 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Expense\CreateExpenseCategoryPageController;
+use App\Adapters\In\Http\Controllers\Admin\Expense\CreateExpensePageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseCategoryIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\StoreExpenseCategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
+    Route::get('/admin/expenses', ExpenseIndexPageController::class)
+        ->name('admin.expenses.index');
+
+    Route::get('/admin/expenses/create', CreateExpensePageController::class)
+        ->name('admin.expenses.create');
+
     Route::get('/admin/expenses/categories', ExpenseCategoryIndexPageController::class)
         ->name('admin.expenses.categories.index');
 
