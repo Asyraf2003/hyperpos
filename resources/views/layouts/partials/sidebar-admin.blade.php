@@ -107,6 +107,59 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Laporan</li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan transaksi</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Hutang</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Keuntungan</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Stok</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Aset</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Log Riwayat</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item>
+                    <a href="#" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Laporan Statistik</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-title">Ganti Role</li>
+
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('cashier.*') ? 'active' : '' }}">
                         <a href="{{ route('cashier.dashboard') }}" class="sidebar-link">
