@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="#" method="post" onsubmit="return false;">
+                        <form action="{{ route('admin.expenses.store') }}" method="post">
                             @csrf
 
                             <div class="row">
@@ -55,7 +55,7 @@
                                             type="date"
                                             id="expense_date"
                                             name="expense_date"
-                                            value="{{ old('expense_date') }}"
+                                            value="{{ old('expense_date', now()->format('Y-m-d')) }}"
                                             class="form-control @error('expense_date') is-invalid @enderror"
                                             required
                                         >
@@ -144,25 +144,6 @@
 
                                 <div class="col-12">
                                     <div class="form-group mb-4">
-                                        <label for="reference_no" class="form-label">Referensi</label>
-                                        <input
-                                            type="text"
-                                            id="reference_no"
-                                            name="reference_no"
-                                            value="{{ old('reference_no') }}"
-                                            class="form-control @error('reference_no') is-invalid @enderror"
-                                            placeholder="Opsional"
-                                        >
-                                        @error('reference_no')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="form-group mb-4">
                                         <label for="description" class="form-label">Deskripsi</label>
                                         <textarea
                                             id="description"
@@ -190,10 +171,6 @@
                                 </a>
                             </div>
                         </form>
-
-                        <small class="d-block text-muted mt-3">
-                            Submit expense akan diaktifkan pada batch berikutnya.
-                        </small>
                     </div>
                 </div>
             </div>

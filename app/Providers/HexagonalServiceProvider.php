@@ -12,6 +12,7 @@ use App\Adapters\Out\Clock\SystemClockAdapter;
 use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
 use App\Adapters\Out\Expense\DatabaseExpenseCategoryWriterAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
+use App\Adapters\Out\Expense\DatabaseOperationalExpenseTableReaderAdapter;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeePayrollTableReaderAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseActorAccessReaderAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminCashierAreaAccessStateAdapter;
@@ -90,6 +91,7 @@ use App\Ports\Out\EmployeeFinance\EmployeePayrollTableReaderPort;
 use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
 use App\Ports\Out\Expense\ExpenseCategoryWriterPort;
 use App\Ports\Out\Expense\OperationalExpenseWriterPort;
+use App\Ports\Out\Expense\OperationalExpenseTableReaderPort;
 use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
 use App\Ports\Out\IdentityAccess\AdminCashierAreaAccessStatePort;
 use App\Ports\Out\IdentityAccess\AdminTransactionCapabilityStatePort;
@@ -232,5 +234,6 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(ExpenseCategoryReaderPort::class, DatabaseExpenseCategoryReaderAdapter::class);
         $this->app->singleton(ExpenseCategoryWriterPort::class, DatabaseExpenseCategoryWriterAdapter::class);
         $this->app->singleton(OperationalExpenseWriterPort::class, DatabaseOperationalExpenseWriterAdapter::class);
+        $this->app->singleton(OperationalExpenseTableReaderPort::class, DatabaseOperationalExpenseTableReaderAdapter::class);
     }
 }
