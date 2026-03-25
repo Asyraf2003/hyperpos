@@ -176,6 +176,7 @@
                                 <label for="adjusted_at" class="form-label">Tanggal Mutasi</label>
                                 <input
                                     type="date"
+                                    data-ui-date="single"
                                     id="adjusted_at"
                                     name="adjusted_at"
                                     value="{{ old('adjusted_at', now()->format('Y-m-d')) }}"

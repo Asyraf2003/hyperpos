@@ -70,6 +70,7 @@
       if (filterForm.elements["category_id"]) filterForm.elements["category_id"].value = s.category_id;
       if (filterForm.elements["date_from"]) filterForm.elements["date_from"].value = s.date_from;
       if (filterForm.elements["date_to"]) filterForm.elements["date_to"].value = s.date_to;
+      window.AdminDateInput?.refreshWithin(filterForm);
     }
   };
 

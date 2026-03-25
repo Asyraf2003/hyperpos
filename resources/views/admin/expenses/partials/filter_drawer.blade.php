@@ -18,20 +18,20 @@
                 </select>
             </div>
 
-            <div class="row">
-                <div class="col-6">
-                    <div class="form-group mb-3">
-                        <label class="form-label" for="filter-date-from">Tanggal Mulai</label>
-                        <input type="date" id="filter-date-from" name="date_from" class="form-control">
-                    </div>
-                </div>
-
-                <div class="col-6">
-                    <div class="form-group mb-4">
-                        <label class="form-label" for="filter-date-to">Tanggal Akhir</label>
-                        <input type="date" id="filter-date-to" name="date_to" class="form-control">
-                    </div>
-                </div>
+            <div class="form-group mb-4">
+                <label class="form-label" for="expense-date-range">Rentang Tanggal</label>
+                <input
+                    type="text"
+                    id="expense-date-range"
+                    class="form-control"
+                    data-ui-date="range-single"
+                    data-ui-date-placeholder="Pilih rentang tanggal"
+                    data-range-start-name="date_from"
+                    data-range-end-name="date_to"
+                    autocomplete="off"
+                >
+                <input type="hidden" id="filter-date-from" name="date_from" value="">
+                <input type="hidden" id="filter-date-to" name="date_to" value="">
             </div>
 
             <div class="d-grid gap-2">

@@ -239,6 +239,7 @@
                                 <label for="tanggal_pengiriman" class="form-label">Tanggal Pengiriman</label>
                                 <input
                                     type="date"
+                                    data-ui-date="single"
                                     id="tanggal_pengiriman"
                                     name="tanggal_pengiriman"
                                     value="{{ old('tanggal_pengiriman', now()->format('Y-m-d')) }}"
@@ -254,6 +255,7 @@
                                 <label for="tanggal_terima" class="form-label">Tanggal Diterima</label>
                                 <input
                                     type="date"
+                                    data-ui-date="single"
                                     id="tanggal_terima"
                                     name="tanggal_terima"
                                     value="{{ old('tanggal_terima', now()->format('Y-m-d')) }}"

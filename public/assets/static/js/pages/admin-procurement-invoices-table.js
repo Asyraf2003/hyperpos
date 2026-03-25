@@ -91,6 +91,7 @@
     searchInput.value = s.q;
     filterForm.elements["shipment_date_from"].value = s.shipment_date_from;
     filterForm.elements["shipment_date_to"].value = s.shipment_date_to;
+    window.AdminDateInput?.refreshWithin(filterForm);
   };
 
   const paramsObject = () => {

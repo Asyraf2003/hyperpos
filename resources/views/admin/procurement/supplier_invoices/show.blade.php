@@ -174,6 +174,7 @@
                                     <label for="payment_date" class="form-label">Tanggal Pembayaran</label>
                                     <input
                                         type="date"
+                                        data-ui-date="single"
                                         id="payment_date"
                                         name="payment_date"
                                         value="{{ old('payment_date', now()->format('Y-m-d')) }}"

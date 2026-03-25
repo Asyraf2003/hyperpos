@@ -53,6 +53,7 @@
                                         <label for="expense_date" class="form-label">Tanggal</label>
                                         <input
                                             type="date"
+                                            data-ui-date="single"
                                             id="expense_date"
                                             name="expense_date"
                                             value="{{ old('expense_date', now()->format('Y-m-d')) }}"

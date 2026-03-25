@@ -8,14 +8,20 @@
         </div>
 
         <form id="procurement-filter-form">
-            <div class="form-group mb-3">
-                <label class="form-label" for="filter-shipment-date-from">Tanggal Kirim Dari</label>
-                <input type="date" id="filter-shipment-date-from" name="shipment_date_from" class="form-control">
-            </div>
-
             <div class="form-group mb-4">
-                <label class="form-label" for="filter-shipment-date-to">Tanggal Kirim Sampai</label>
-                <input type="date" id="filter-shipment-date-to" name="shipment_date_to" class="form-control">
+                <label class="form-label" for="shipment-date-range">Rentang Tanggal Kirim</label>
+                <input
+                    type="text"
+                    id="shipment-date-range"
+                    class="form-control"
+                    data-ui-date="range-single"
+                    data-ui-date-placeholder="Pilih rentang tanggal kirim"
+                    data-range-start-name="shipment_date_from"
+                    data-range-end-name="shipment_date_to"
+                    autocomplete="off"
+                >
+                <input type="hidden" id="filter-shipment-date-from" name="shipment_date_from" value="">
+                <input type="hidden" id="filter-shipment-date-to" name="shipment_date_to" value="">
             </div>
 
             <div class="d-grid gap-2">

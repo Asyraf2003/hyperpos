@@ -53,6 +53,7 @@
                                         <label for="disbursement_date_string" class="form-label">Tanggal Pencairan</label>
                                         <input
                                             type="date"
+                                            data-ui-date="single"
                                             id="disbursement_date_string"
                                             name="disbursement_date_string"
                                             value="{{ old('disbursement_date_string', now()->format('Y-m-d')) }}"

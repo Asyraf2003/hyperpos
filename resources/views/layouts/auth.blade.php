@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app-dark.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/auth.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/extensions/flatpickr/flatpickr.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     @stack('styles')
 </head>
