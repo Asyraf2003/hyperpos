@@ -1,16 +1,18 @@
-<script id="ui-feedback-payload" type="application/json">{{ $uiFeedbackJson ?? 'null' }}</script>
+<script id="ui-feedback-payload" type="application/json">{!! $uiFeedbackJson ?? 'null' !!}</script>
 
 <script>
 (() => {
     const payloadElement = document.getElementById('ui-feedback-payload');
 
     if (!payloadElement) {
+        console.error('ui-feedback: payload element tidak ditemukan');
         return;
     }
 
     const rawPayload = (payloadElement.textContent || 'null').trim();
 
     if (rawPayload === '' || rawPayload === 'null') {
+        console.error('ui-feedback: payload kosong atau null', rawPayload);
         return;
     }
 
@@ -18,11 +20,13 @@
 
     try {
         feedback = JSON.parse(rawPayload);
-    } catch (_error) {
+    } catch (error) {
+        console.error('ui-feedback: JSON.parse gagal', { rawPayload, error });
         return;
     }
 
     if (!feedback || !feedback.type) {
+        console.error('ui-feedback: payload tidak punya type', feedback);
         return;
     }
 
@@ -108,7 +112,8 @@
                 timerProgressBar: true,
             });
         })
-        .catch(() => {
+        .catch((error) => {
+            console.error('ui-feedback: gagal load/render SweetAlert', error);
         });
 })();
 </script>

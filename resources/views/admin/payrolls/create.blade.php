@@ -44,12 +44,6 @@
                     </div>
 
                     <div class="card-body">
-                        @if ($errors->has('payroll_batch'))
-                            <div class="alert alert-danger">
-                                {{ $errors->first('payroll_batch') }}
-                            </div>
-                        @endif
-
                         <form action="{{ route('admin.payrolls.batch.store') }}" method="post">
                             @csrf
 
