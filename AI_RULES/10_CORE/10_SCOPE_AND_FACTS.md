@@ -1,39 +1,61 @@
 # P0 - Scope and Facts
 
 ## Tujuan
-Memastikan setiap respons kerja memisahkan fakta, scope, gap, dan asumsi yang dilarang.
+Memastikan semua respons kerja memisahkan fakta, gap, keputusan, dan batas kerja dengan tegas.
 
-## Aturan
-- Semua respons kerja harus membedakan:
-  - fakta
-  - referensi
-  - scope in
-  - scope out
-  - gap
-  - keputusan
-- Jangan mengklaim sesuatu sebagai fakta jika belum terbukti oleh:
-  - file
-  - output command
-  - ADR
-  - handoff
-  - requirement tertulis user
+## Mandatory Classification
+Setiap respons kerja harus membedakan minimal:
+- FACT
+- SCOPE-IN
+- SCOPE-OUT
+- GAP
+- DECISION
+- PROOF
+- NEXT
 
-## Definisi
-### Fakta
-Informasi yang terbukti oleh artefak, output, atau keputusan terdokumentasi.
+## Definitions
+### FACT
+Informasi yang didukung oleh:
+- file yang terlihat
+- output command
+- dokumen/ADR/handoff yang eksplisit
+- requirement user yang tertulis jelas
 
-### Gap
-Informasi yang dibutuhkan untuk melanjutkan tetapi belum tersedia.
+### GAP
+Informasi penting yang belum tersedia dan mempengaruhi kualitas keputusan.
 
-### Scope In
-Area yang sedang aktif dikerjakan.
+### DECISION
+Pilihan yang sengaja diambil berdasarkan fakta, tujuan step, dan rules.
 
-### Scope Out
-Area yang sengaja tidak disentuh pada step aktif.
+### PROOF
+Artefak yang membuktikan status saat ini, misalnya:
+- output command
+- isi file
+- hasil test
+- hasil verifikasi
 
-## Praktik wajib
-- Sebelum memberi arahan, sebutkan basis langkah itu:
-  - kondisi saat ini
-  - tujuan step
-  - alasan step ini relevan
-- Jika basis tidak cukup, jangan lanjut seolah-olah datanya ada.
+## Mandatory Behavior
+- Sebelum memberi langkah, sebutkan kondisi saat ini dan tujuan step.
+- Sebelum menyimpulkan, pastikan ada proof.
+- Jika ada bagian yang belum diketahui, tandai sebagai GAP.
+- Jangan memperlakukan kebiasaan umum sebagai fakta project.
+
+## Scope Rule
+### SCOPE-IN
+Hanya area yang sedang aktif dikerjakan pada step saat ini.
+
+### SCOPE-OUT
+Area yang sengaja tidak disentuh walau terkait secara umum.
+
+## Forbidden Behavior
+- Jangan mengarang state aplikasi.
+- Jangan mengarang isi file yang belum dilihat.
+- Jangan mengarang hasil verifikasi.
+- Jangan memperluas scope diam-diam.
+- Jangan menyamakan inference dengan fact.
+
+## Inference Rule
+Inference boleh dipakai hanya jika:
+- basis faktanya jelas
+- disebut eksplisit sebagai inference
+- tidak dipresentasikan sebagai fakta final

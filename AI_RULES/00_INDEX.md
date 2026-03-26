@@ -1,33 +1,57 @@
 # AI_RULES Index
 
+## Status
+Dokumen ini adalah entrypoint wajib untuk setiap GPT/AI assistant yang akan bekerja pada project ini.
+
 ## Tujuan
-AI_RULES adalah constitution modular untuk memastikan GPT/AI assistant bekerja konsisten dengan aturan project, preferensi user, batasan arsitektur, dan kontrak domain yang sudah dikunci.
+AI_RULES mengunci cara kerja AI agar:
+- tidak berasumsi
+- tidak keluar dari blueprint
+- tidak melompati step aktif
+- tidak mengarang fakta, status repo, hasil test, atau keputusan
+- tetap patuh pada contract domain dan architecture project
 
-## Urutan baca wajib
+## Mandatory Read Order
+Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
+
 1. `01_DECISION_POLICY.md`
-2. `10_CORE/`
-3. `20_WORKFLOW/`
-4. `40_ARCHITECTURE/`
-5. `50_DOMAIN_KASIR/`
-6. `60_STACK/`
-7. `30_OUTPUT/`
-8. `99_CHANGELOG.md`
+2. `10_CORE/10_SCOPE_AND_FACTS.md`
+3. `10_CORE/11_BLUEPRINT_FIRST.md`
+4. `10_CORE/12_STEP_BY_STEP_EXECUTION.md`
+5. `10_CORE/13_PROOF_AND_PROGRESS.md`
+6. `20_WORKFLOW/20_RESPONSE_STRUCTURE.md`
+7. `20_WORKFLOW/21_ACTIVE_STEP_POLICY.md`
+8. `40_ARCHITECTURE/`
+9. `50_DOMAIN_KASIR/`
+10. `60_STACK/`
+11. `30_OUTPUT/`
+12. `99_CHANGELOG.md`
 
-## Prinsip pakai
+## Constitution Summary
 - Jangan berasumsi.
-- Semua keputusan harus berbasis fakta, bukti, kondisi saat ini, dan tujuan step.
+- Semua arahan harus berbasis fakta, kondisi saat ini, tujuan step, dan bukti.
 - Mulai dari blueprint.
-- Eksekusi step-by-step.
-- Satu step aktif per respons kerja.
-- Tunggu feedback user sebelum melanjutkan.
-- Progres hanya naik jika ada bukti.
+- Setelah blueprint, susun workflow step-by-step.
+- Satu respons kerja hanya boleh punya satu step aktif.
+- Setelah satu step aktif selesai, tunggu feedback user.
+- Progres hanya boleh naik jika ada proof nyata.
+- Jangan buka ulang keputusan final domain tanpa konflik nyata dan bukti kuat.
 
-## Level prioritas
-- P0 = constitution inti, tidak boleh dilanggar tanpa keputusan eksplisit
-- P1 = workflow dan architecture enforcement
-- P2 = format output dan delivery preference
+## Priority Model
+- P0 = rule inti, tidak boleh dilanggar tanpa keputusan eksplisit
+- P1 = workflow enforcement dan architecture alignment
+- P2 = delivery format dan output preference
 
-## Daftar modul
+## Operational Bootstrap for GPT
+Sebelum menjawab, GPT wajib memastikan:
+1. apa fakta yang benar-benar ada
+2. apa tujuan step saat ini
+3. apa scope in dan scope out
+4. rule P0 apa yang mengikat
+5. apakah data cukup untuk melanjutkan
+6. bila data tidak cukup, berhenti di GAP
+
+## Module Map
 - `01_DECISION_POLICY.md`
 - `10_CORE/`
   - `10_SCOPE_AND_FACTS.md`
@@ -61,10 +85,16 @@ AI_RULES adalah constitution modular untuk memastikan GPT/AI assistant bekerja k
   - `62_AWS_BASELINE.md`
 - `99_CHANGELOG.md`
 
-## Catatan penggunaan untuk GPT lain
-Saat ada konflik aturan:
-1. Baca `01_DECISION_POLICY.md`
-2. Dahulukan P0 atas P1/P2
-3. Dahulukan aturan yang lebih spesifik
-4. Dahulukan aturan domain jika konflik menyangkut makna bisnis
-5. Jika data tidak cukup, tandai sebagai GAP dan jangan mengarang
+## Non-Negotiable Behavior
+- Dilarang mengarang fakta.
+- Dilarang mengklaim progress tanpa proof.
+- Dilarang langsung lompat ke implementasi bila blueprint belum jelas.
+- Dilarang menjadikan output formatting lebih penting daripada correctness domain.
+- Dilarang menyamakan proposal dengan eksekusi selesai.
+
+## Conflict Reminder
+Jika ada konflik, baca `01_DECISION_POLICY.md` lalu:
+1. dahulukan P0
+2. dahulukan aturan yang lebih spesifik
+3. dahulukan domain jika konflik menyangkut makna bisnis
+4. jika data kurang, berhenti di GAP
