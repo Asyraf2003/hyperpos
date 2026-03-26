@@ -37,3 +37,9 @@
 - Menguatkan `31_MARKDOWN_OUTPUT_RULE.md` agar penulisan file markdown mengikuti contract satu code block dengan outer fence `text`.
 - Menguatkan `32_BLADE_RULE.md` agar Blade tetap fokus pada presentasi dan menghindari inline PHP block.
 - Menguatkan `33_TERMINAL_COMMAND_DELIVERY.md` agar delivery command terminal dibagi batch bila perlu dan selalu punya konteks eksekusi serta verifikasi.
+
+## 2026-03-26 - add bootstrap and handoff support
+- Menambahkan `02_GPT_BOOTSTRAP_PROMPT.md` sebagai bootstrap operasional untuk GPT lain.
+- Menambahkan `03_SESSION_START_PROTOCOL.md` untuk standardisasi pembukaan sesi kerja.
+- Menambahkan `04_HANDOFF_TEMPLATE.md` untuk penutupan slice yang bisa diteruskan tanpa asumsi.
+- Memperbarui `00_INDEX.md` agar file bootstrap dan handoff masuk ke mandatory read order dan module map.
