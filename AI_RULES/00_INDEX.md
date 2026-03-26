@@ -28,7 +28,8 @@ Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 12. `60_STACK/`
 13. `30_OUTPUT/`
 14. `04_HANDOFF_TEMPLATE.md`
-15. `99_CHANGELOG.md`
+15. `05_FINAL_REVIEW_CHECKLIST.md`
+16. `99_CHANGELOG.md`
 
 ## Constitution Summary
 - Jangan berasumsi.
@@ -59,6 +60,7 @@ Sebelum menjawab, GPT wajib memastikan:
 - `02_GPT_BOOTSTRAP_PROMPT.md`
 - `03_SESSION_START_PROTOCOL.md`
 - `04_HANDOFF_TEMPLATE.md`
+- `05_FINAL_REVIEW_CHECKLIST.md`
 - `10_CORE/`
   - `10_SCOPE_AND_FACTS.md`
   - `11_BLUEPRINT_FIRST.md`

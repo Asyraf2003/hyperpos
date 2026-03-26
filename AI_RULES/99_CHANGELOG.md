@@ -43,3 +43,8 @@
 - Menambahkan `03_SESSION_START_PROTOCOL.md` untuk standardisasi pembukaan sesi kerja.
 - Menambahkan `04_HANDOFF_TEMPLATE.md` untuk penutupan slice yang bisa diteruskan tanpa asumsi.
 - Memperbarui `00_INDEX.md` agar file bootstrap dan handoff masuk ke mandatory read order dan module map.
+
+## 2026-03-26 - add final review support
+- Menambahkan `05_FINAL_REVIEW_CHECKLIST.md` untuk pemeriksaan akhir paket AI_RULES.
+- Menambahkan `scripts/audit_ai_rules.sh` sebagai helper audit ringan untuk memeriksa struktur file dan keyword penting.
+- Memperbarui `00_INDEX.md` agar final review checklist masuk ke mandatory read order dan module map.
