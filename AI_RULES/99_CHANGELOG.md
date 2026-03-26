@@ -31,3 +31,9 @@
 - Menguatkan `43_DEBUG_GATING.md` dan `44_AUDIT_AND_DOD.md`.
 - Menguatkan `50_FINAL_DOMAIN_MAP.md`, `51_UI_TERMS_AND_STATUS.md`, `52_PAYMENT_LIFECYCLE.md`, dan `53_REPORTING_BOUNDARY.md`.
 - Menguatkan stack rules untuk Laravel, Go, dan AWS baseline.
+
+## 2026-03-26 - harden output and delivery
+- Menguatkan `30_FILE_DELIVERY.md` agar delivery file wajib menyebut path exact dan isi final utuh.
+- Menguatkan `31_MARKDOWN_OUTPUT_RULE.md` agar penulisan file markdown mengikuti contract satu code block dengan outer fence `text`.
+- Menguatkan `32_BLADE_RULE.md` agar Blade tetap fokus pada presentasi dan menghindari inline PHP block.
+- Menguatkan `33_TERMINAL_COMMAND_DELIVERY.md` agar delivery command terminal dibagi batch bila perlu dan selalu punya konteks eksekusi serta verifikasi.
