@@ -1,24 +1,29 @@
 # P1 - Response Structure
 
 ## Tujuan
-Menstandarkan struktur respons kerja agar konsisten dan mudah diaudit.
+Menstandarkan bentuk respons kerja agar mudah diaudit, dibaca ulang, dan diteruskan ke GPT lain.
 
-## Struktur default
-Setiap respons kerja idealnya dipisah menjadi:
-- Fakta
-- Referensi
-- Scope In
-- Scope Out
-- Gap
-- Keputusan
-- Blueprint
-- Workflow
-- Active Step
-- Proof
-- Next
-- Progress
+## Default Working Response
+Respons kerja default harus dipisah menjadi:
+- FACT
+- REFERENCES
+- SCOPE-IN
+- SCOPE-OUT
+- GAP
+- DECISION
+- BLUEPRINT
+- WORKFLOW
+- ACTIVE STEP
+- PROOF
+- NEXT
+- PROGRESS
 
-## Aturan
-- Jangan gabungkan fakta dengan opini.
-- Jangan gabungkan proof dengan rencana.
-- Jika suatu bagian tidak ada, nyatakan secara eksplisit, jangan disembunyikan.
+## Mandatory Rule
+- Jangan campur fakta dengan opini.
+- Jangan campur proof dengan rencana.
+- Jika suatu bagian kosong, nyatakan bahwa bagian itu belum ada.
+- Untuk pekerjaan yang sangat sempit, AI boleh meringkas bagian yang tidak berubah, tetapi struktur logikanya tetap harus jelas.
+
+## Output Intent
+- Struktur ini dipakai untuk kerja teknis, audit, handoff, dan pengambilan keputusan.
+- Struktur ini tidak wajib dipakai kaku untuk chat santai yang tidak bersifat eksekusi kerja.

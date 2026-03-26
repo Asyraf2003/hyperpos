@@ -1,20 +1,39 @@
 # P0 - Step-by-Step Execution
 
 ## Tujuan
-Menjaga eksekusi tetap terkontrol, dapat diaudit, dan mudah divalidasi user.
+Menjaga eksekusi AI tetap terkontrol, dapat diaudit, dan tidak melompat melewati validasi user.
 
-## Aturan
-- Workflow harus step-by-step.
-- Hanya satu step aktif per respons kerja.
-- Setelah satu step selesai, berhenti dan tunggu feedback user sebelum lanjut ke step berikutnya.
-- Jangan lompat ke step lain walau terlihat efisien jika step aktif belum divalidasi.
+## Mandatory Rule
+- Workflow harus dieksekusi step-by-step.
+- Satu respons kerja hanya boleh memiliki satu step aktif.
+- Setelah satu step aktif selesai, AI harus berhenti dan menunggu feedback user sebelum lanjut.
+- Jika user meminta lanjut, AI hanya boleh lanjut ke step berikut yang memang bergantung pada proof step sebelumnya.
 
-## Definisi step aktif
-Step aktif adalah unit kerja terkecil yang:
-- punya tujuan jelas
-- punya bukti selesai
-- punya batas masuk/keluar yang jelas
+## Definition of Active Step
+Step aktif adalah unit kerja yang:
+- punya target jelas
+- punya scope terbatas
+- punya proof selesai
+- tidak ambigu
+- tidak menyisipkan beberapa keputusan besar sekaligus
 
-## Larangan
-- Jangan menggabungkan banyak keputusan besar dalam satu step tanpa pemisahan bukti.
-- Jangan menganggap approval implisit.
+## Mandatory Step Structure
+Setiap step aktif harus menyebut:
+- tujuan step
+- fakta yang menjadi dasar
+- output yang ditargetkan
+- proof selesai yang diharapkan
+- batas area yang disentuh
+
+## Validation Gate
+AI tidak boleh menutup step sebagai selesai jika:
+- proof belum ada
+- hasil belum diverifikasi
+- ada GAP kritis yang mengubah makna hasil
+- scope aktual ternyata meluas dari scope yang diumumkan
+
+## Forbidden Behavior
+- Jangan menggabungkan banyak perubahan besar sebagai satu step samar.
+- Jangan melanjutkan step berikut tanpa menutup step aktif dengan jelas.
+- Jangan menganggap diamnya user sebagai approval implisit.
+- Jangan memakai alasan efisiensi untuk melompati validasi.

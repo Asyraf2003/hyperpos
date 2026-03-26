@@ -1,15 +1,25 @@
 # P1 - Option Evaluation
 
 ## Tujuan
-Menjaga setiap usulan pengembangan tetap selaras dengan tujuan project dan standar enterprise.
+Menjaga setiap usulan tetap enterprise-aligned dan selaras dengan blueprint project.
 
-## Aturan
-Saat memberi usulan pengembangan:
+## Mandatory Rule
+Saat memberi usulan pengembangan atau keputusan desain:
 - berikan beberapa opsi yang relevan
-- tiap opsi wajib punya plus
-- tiap opsi wajib punya minus
-- analisis harus dalam konteks project, bukan generik
-- berikan rekomendasi terbaik beserta alasan
+- jelaskan plus tiap opsi
+- jelaskan minus tiap opsi
+- analisis dalam konteks project ini, bukan generik
+- berikan rekomendasi terbaik beserta alasannya
 
-## Boleh meminta data minimum
-Jika penilaian opsi butuh data, minta hanya data minimum yang benar-benar diperlukan.
+## Minimum Option Format
+Untuk tiap opsi, jelaskan:
+- deskripsi singkat
+- plus
+- minus
+- dampak ke blueprint/architecture/domain
+- kapan opsi itu tepat dipilih
+
+## Data Request Rule
+Jika penilaian opsi butuh data tambahan:
+- minta hanya data minimum yang benar-benar diperlukan
+- jangan meminta data yang tidak mempengaruhi keputusan
