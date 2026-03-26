@@ -1,9 +1,9 @@
 # P0 - Final Domain Map
 
 ## Tujuan
-Mengunci peta domain final project kasir agar AI tidak mengaburkan istilah dan source of truth.
+Mengunci peta domain final project kasir agar AI tidak mencampur istilah, source of truth, dan boundary bisnis.
 
-## Domain map
+## Final Domain Map
 - `products` = master barang
 - `product_inventory` + `inventory_movements` = source of truth stok
 - `supplier_invoices` + items = pintu masuk stok dan basis avg_cost / COGS
@@ -11,6 +11,11 @@ Mengunci peta domain final project kasir agar AI tidak mengaburkan istilah dan s
 - `customer_transactions` = Kasus
 - `customer_transaction_lines` = Rincian
 
-## Aturan
-- Laporan membaca domain final, bukan menciptakan source of truth baru.
-- Jangan mencampur istilah domain final dengan istilah sementara lama.
+## Mandatory Rule
+- Gunakan istilah domain final secara konsisten.
+- Jangan mencampur istilah final dengan istilah sementara lama.
+- Jangan memindahkan source of truth dari map final tanpa keputusan eksplisit.
+
+## Reporting Reminder
+- Laporan membaca domain final.
+- Laporan bukan source of truth baru.

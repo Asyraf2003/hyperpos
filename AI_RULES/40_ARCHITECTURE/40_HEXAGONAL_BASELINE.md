@@ -1,14 +1,27 @@
 # P0 - Hexagonal Baseline
 
 ## Tujuan
-Menetapkan hexagonal architecture sebagai baseline arsitektur.
+Menetapkan hexagonal architecture sebagai baseline wajib untuk struktur dan alur perubahan sistem.
 
-## Aturan
-- Gunakan hexagonal architecture untuk seluruh struktur utama.
-- Boundary harus jelas.
-- Flow mutasi harus melewati jalur yang sah menurut layer dan contract.
-- Jangan bypass use case/domain dari adapter atau controller secara sembarangan.
+## Mandatory Rule
+- Gunakan hexagonal architecture sebagai baseline utama.
+- Boundary antar layer harus jelas dan dijaga.
+- Mutasi bisnis harus melewati jalur resmi sesuai contract layer.
+- Controller, transport, persistence, dan UI tidak boleh mengambil alih keputusan domain inti.
 
-## Implikasi
-- Source of truth harus berada pada lapisan yang tepat.
-- Transport, persistence, dan UI tidak boleh menjadi tempat keputusan domain utama tanpa jalur resmi.
+## Allowed Flow Principle
+Flow yang sah harus menjaga pemisahan tanggung jawab:
+- input/transport hanya menerima dan meneruskan
+- use case mengorkestrasi
+- domain memegang aturan bisnis inti
+- adapter keluar menangani persistence/integration sesuai contract
+
+## Source of Truth Rule
+- Source of truth harus ditempatkan pada lapisan yang tepat.
+- Jangan membuat source of truth bayangan di UI, reporting, atau adapter teknis.
+- Jangan menjadikan convenience cache, view state, atau response shaping sebagai dasar kebenaran domain.
+
+## Forbidden Behavior
+- Jangan bypass use case untuk mutasi bisnis.
+- Jangan menaruh aturan domain utama di controller/view/query helper.
+- Jangan mengaburkan boundary demi kecepatan implementasi.

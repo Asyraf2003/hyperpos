@@ -23,3 +23,11 @@
 - Menguatkan `21_ACTIVE_STEP_POLICY.md` untuk disiplin satu step aktif.
 - Menguatkan `22_OPTION_EVALUATION.md` agar evaluasi opsi selalu kontekstual dan punya plus/minus.
 - Menguatkan `23_HANDOFF_POLICY.md` agar penutupan slice bisa diteruskan GPT lain tanpa asumsi.
+
+## 2026-03-26 - harden architecture domain and stack
+- Menguatkan `40_HEXAGONAL_BASELINE.md` dengan source of truth rule dan forbidden behavior.
+- Menguatkan `41_PUBLIC_CONTRACTS.md` dengan change gate untuk contract publik.
+- Menguatkan `42_ERROR_HANDLING_AND_REDACTION.md` dengan security principle dan larangan raw leak.
+- Menguatkan `43_DEBUG_GATING.md` dan `44_AUDIT_AND_DOD.md`.
+- Menguatkan `50_FINAL_DOMAIN_MAP.md`, `51_UI_TERMS_AND_STATUS.md`, `52_PAYMENT_LIFECYCLE.md`, dan `53_REPORTING_BOUNDARY.md`.
+- Menguatkan stack rules untuk Laravel, Go, dan AWS baseline.

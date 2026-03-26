@@ -1,19 +1,20 @@
 # P1 - UI Terms and Status
 
 ## Tujuan
-Menjaga bahasa UI konsisten dengan keputusan domain yang sudah dikunci.
+Menjaga bahasa UI tetap konsisten dengan keputusan domain yang sudah dikunci.
 
-## Istilah UI final
+## Final UI Terms
 - Nota
 - Kasus
 - Rincian
 
-## Status UI final
+## Final UI Status Mapping
 - `draft` = Belum Lunas
 - `paid` = Lunas
 - `canceled` = Batal
 - `refunded` = Refund
 
-## Aturan
+## Mandatory Rule
 - Jangan mengganti istilah final tanpa konflik nyata.
 - Jangan memperkenalkan label UI baru yang mengaburkan istilah final.
+- Jangan menyamakan istilah teknis internal dengan label UI jika contract UI final sudah terkunci.
