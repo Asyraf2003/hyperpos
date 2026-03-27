@@ -6,13 +6,13 @@ namespace App\Application\Note\Services;
 
 final class NotePaymentStatusResolver
 {
-    public function resolve(int $grandTotalRupiah, int $netSettlementRupiah): string
+    public function resolve(int $grandTotalRupiah, int $netPaidRupiah): string
     {
-        if ($grandTotalRupiah <= 0 || $netSettlementRupiah <= 0) {
+        if ($grandTotalRupiah <= 0 || $netPaidRupiah <= 0) {
             return 'unpaid';
         }
 
-        if ($netSettlementRupiah >= $grandTotalRupiah) {
+        if ($netPaidRupiah >= $grandTotalRupiah) {
             return 'paid';
         }
 

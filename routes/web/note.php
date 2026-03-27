@@ -18,12 +18,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
     ->prefix('cashier/notes')
     ->name('cashier.notes.')
     ->group(function (): void {
-        Route::get('/create', CreateNotePageController::class)
-            ->name('create');
-
-        Route::get('/{noteId}', NoteDetailPageController::class)
-            ->name('show');
-
-        Route::get('/prototype/{noteId}', NoteDetailPageController::class)
-            ->name('prototype.show');
+        Route::get('/create', CreateNotePageController::class)->name('create');
+        Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
+        Route::get('/prototype/{noteId}', NoteDetailPageController::class)->name('prototype.show');
     });

@@ -13,26 +13,12 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="customer_name" class="form-label">Nama Customer</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="customer_name"
-                            name="customer_name"
-                            value="{{ old('customer_name') }}"
-                            required
-                        >
+                        <input id="customer_name" name="customer_name" type="text" class="form-control" value="{{ old('customer_name') }}" required>
                     </div>
 
                     <div class="col-md-6">
                         <label for="transaction_date" class="form-label">Tanggal Nota</label>
-                        <input
-                            type="date"
-                            class="form-control"
-                            id="transaction_date"
-                            name="transaction_date"
-                            value="{{ old('transaction_date', $transactionDateDefault) }}"
-                            required
-                        >
+                        <input id="transaction_date" name="transaction_date" type="date" class="form-control" value="{{ old('transaction_date', $transactionDateDefault) }}" required>
                     </div>
                 </div>
 
@@ -55,8 +41,10 @@
         </div>
     </div>
 </div>
+
+<script id="note-create-config" type="application/json">@json(['oldRows' => $oldRows, 'productOptions' => $productOptions])</script>
 @endsection
 
 @push('scripts')
-    @include('cashier.notes.partials.create-script')
+<script src="{{ asset('assets/static/js/pages/cashier-note-create.js') }}"></script>
 @endpush

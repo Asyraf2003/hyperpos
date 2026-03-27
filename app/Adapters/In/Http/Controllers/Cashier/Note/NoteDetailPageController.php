@@ -6,8 +6,9 @@ namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
 use App\Application\Note\Services\NoteDetailPageDataBuilder;
 use Illuminate\Contracts\View\View;
+use Illuminate\Routing\Controller;
 
-final class NoteDetailPageController
+final class NoteDetailPageController extends Controller
 {
     public function __invoke(string $noteId, NoteDetailPageDataBuilder $builder): View
     {

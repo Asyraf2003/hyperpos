@@ -16,36 +16,28 @@ final class CreateNotePageDataBuilder
 
     /**
      * @return array{
-     * lineTypes:list<array{value:string,label:string}>,
-     * productOptions:list<array{id:string,label:string,price_rupiah:int}>
+     *   lineTypes:list<array{value:string,label:string}>,
+     *   productOptions:list<array{id:string,label:string,price_rupiah:int}>
      * }
      */
     public function build(): array
     {
+        $products = $this->products->findAll();
+        usort($products, fn (Product $a, Product $b): int => strcmp($a->namaBarang(), $b->namaBarang()));
+
         return [
             'lineTypes' => [
                 ['value' => 'product', 'label' => 'Produk'],
                 ['value' => 'service', 'label' => 'Servis'],
             ],
-            'productOptions' => $this->mapProducts($this->products->findAll()),
+            'productOptions' => array_map(
+                static fn (Product $product): array => [
+                    'id' => $product->id(),
+                    'label' => trim(($product->kodeBarang() ?? '-') . ' - ' . $product->namaBarang()),
+                    'price_rupiah' => $product->hargaJual()->amount(),
+                ],
+                $products
+            ),
         ];
-    }
-
-    /**
-     * @param array<int, Product> $products
-     * @return list<array{id:string,label:string,price_rupiah:int}>
-     */
-    private function mapProducts(array $products): array
-    {
-        usort($products, fn (Product $a, Product $b): int => strcmp($a->namaBarang(), $b->namaBarang()));
-
-        return array_map(
-            static fn (Product $product): array => [
-                'id' => $product->id(),
-                'label' => trim(($product->kodeBarang() ?? '-') . ' - ' . $product->namaBarang()),
-                'price_rupiah' => $product->hargaJual()->amount(),
-            ],
-            $products
-        );
     }
 }

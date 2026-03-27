@@ -15,7 +15,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteReaderPort $notes,
         private readonly PaymentAllocationReaderPort $allocations,
         private readonly CustomerRefundReaderPort $refunds,
-        private readonly NotePaymentStatusResolver $statusResolver,
+        private readonly NotePaymentStatusResolver $statuses,
     ) {
     }
 
@@ -30,25 +30,21 @@ final class NoteDetailPageDataBuilder
         $grandTotal = $note->totalRupiah()->amount();
         $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id())->amount();
         $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
-        $netSettlement = max($allocated - $refunded, 0);
-        $outstanding = max($grandTotal - $netSettlement, 0);
+        $netPaid = max($allocated - $refunded, 0);
+        $outstanding = max($grandTotal - $netPaid, 0);
 
         return [
             'pageTitle' => 'Detail Nota',
-            'noteId' => $note->id(),
             'note' => [
                 'id' => $note->id(),
-                'customer_name_current' => $note->customerName(),
-                'customer_name_original' => null,
-                'customer_phone_current' => null,
-                'customer_phone_original' => null,
+                'customer_name' => $note->customerName(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'grand_total_rupiah' => $grandTotal,
                 'total_allocated_rupiah' => $allocated,
                 'total_refunded_rupiah' => $refunded,
-                'net_paid_rupiah' => $netSettlement,
+                'net_paid_rupiah' => $netPaid,
                 'outstanding_rupiah' => $outstanding,
-                'payment_status' => $this->statusResolver->resolve($grandTotal, $netSettlement),
+                'payment_status' => $this->statuses->resolve($grandTotal, $netPaid),
                 'rows' => $this->mapRows($note->workItems()),
             ],
         ];
@@ -61,10 +57,9 @@ final class NoteDetailPageDataBuilder
     private function mapRows(array $rows): array
     {
         return array_map(
-            static fn (WorkItem $item): array => [
-                'id' => $item->id(),
+            fn (WorkItem $item): array => [
                 'line_no' => $item->lineNo(),
-                'transaction_type' => $item->transactionType(),
+                'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
                 'status' => $item->status(),
                 'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
             ],

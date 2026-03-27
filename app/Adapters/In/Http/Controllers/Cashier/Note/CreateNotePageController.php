@@ -16,7 +16,7 @@ final class CreateNotePageController extends Controller
             'pageTitle' => 'Buat Nota',
             'formAction' => route('notes.create'),
             'transactionDateDefault' => date('Y-m-d'),
-            ...$builder->build(),
-        ]);
+            'oldRows' => array_values(old('rows', [['line_type' => 'service']])),
+        ] + $builder->build());
     }
 }

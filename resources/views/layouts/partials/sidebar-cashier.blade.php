@@ -58,6 +58,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('cashier.notes.*') || request()->routeIs('notes.create') ? 'active' : '' }}">
+                    <a href="{{ route('cashier.notes.create') }}" class="sidebar-link">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        <span>Nota</span>
+                    </a>
+                </li>
+
                 @if (($appShell['is_admin_actor'] ?? false) === true)
                     <li class="sidebar-item {{ request()->routeIs('admin.*') ? 'active' : '' }}">
                         <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
