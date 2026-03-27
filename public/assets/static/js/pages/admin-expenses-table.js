@@ -238,7 +238,12 @@
   });
 
   const btnOpenFilter = $("open-expense-filter");
-  if (btnOpenFilter) btnOpenFilter.addEventListener("click", () => drawOpen(true));
+  if (btnOpenFilter) {
+    btnOpenFilter.addEventListener("click", () => {
+      drawOpen(true);
+      window.AdminDateInput?.refreshWithin(filterForm);
+    });
+  }
   
   const btnCloseFilter = $("close-expense-filter");
   if (btnCloseFilter) btnCloseFilter.addEventListener("click", () => drawOpen(false));
