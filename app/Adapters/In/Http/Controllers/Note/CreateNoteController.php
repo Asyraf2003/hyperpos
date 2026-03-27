@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Adapters\In\Http\Requests\Note\CreateNoteRequest;
-use App\Application\Note\UseCases\AddWorkItemHandler;
 use App\Application\Note\UseCases\CreateNoteHandler;
-use App\Core\Note\WorkItem\WorkItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
@@ -16,7 +14,7 @@ final class CreateNoteController extends Controller
     public function __invoke(
         CreateNoteRequest $request,
         CreateNoteHandler $createNote,
-        AddWorkItemHandler $addWorkItem,
+        CreateNoteRowsAction $addRows,
     ): RedirectResponse {
         $data = $request->validated();
 
@@ -26,50 +24,25 @@ final class CreateNoteController extends Controller
         );
 
         if ($createResult->isFailure()) {
-            return back()
-                ->withErrors([
-                    'note' => $createResult->message() ?? 'Nota gagal dibuat.',
-                ])
-                ->withInput();
+            return back()->withErrors([
+                'note' => $createResult->message() ?? 'Nota gagal dibuat.',
+            ])->withInput();
         }
 
-        /** @var array<string, mixed> $payload */
-        $payload = $createResult->data();
-        /** @var string $noteId */
-        $noteId = (string) ($payload['id'] ?? '');
+        $noteId = $this->extractNoteId($createResult->data());
 
-        if ($noteId === '') {
-            return back()
-                ->withErrors([
-                    'note' => 'ID nota tidak ditemukan setelah create.',
-                ])
-                ->withInput();
+        if ($noteId === null) {
+            return back()->withErrors([
+                'note' => 'ID nota tidak ditemukan setelah create.',
+            ])->withInput();
         }
 
-        $rows = $data['rows'] ?? [];
-        $lineNo = 1;
+        $rowFailure = $addRows->handle($noteId, $data['rows'] ?? []);
 
-        foreach ($rows as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-
-            $addResult = $this->addRow(
-                $addWorkItem,
-                $noteId,
-                $lineNo,
-                $row,
-            );
-
-            if ($addResult->isFailure()) {
-                return back()
-                    ->withErrors([
-                        'note' => $addResult->message() ?? "Baris nota ke-{$lineNo} gagal ditambahkan.",
-                    ])
-                    ->withInput();
-            }
-
-            $lineNo++;
+        if ($rowFailure !== null) {
+            return back()->withErrors([
+                'note' => $rowFailure->message() ?? 'Baris nota gagal ditambahkan.',
+            ])->withInput();
         }
 
         return redirect()
@@ -78,41 +51,16 @@ final class CreateNoteController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $row
+     * @param array<string, mixed> $payload
      */
-    private function addRow(
-        AddWorkItemHandler $addWorkItem,
-        string $noteId,
-        int $lineNo,
-        array $row,
-    ): \App\Application\Shared\DTO\Result {
-        $lineType = (string) ($row['line_type'] ?? '');
+    private function extractNoteId(array $payload): ?string
+    {
+        $noteId = $payload['id'] ?? null;
 
-        if ($lineType === 'product') {
-            return $addWorkItem->handle(
-                $noteId,
-                $lineNo,
-                WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
-                [],
-                [],
-                [[
-                    'product_id' => (string) ($row['product_id'] ?? ''),
-                    'qty' => (int) ($row['qty'] ?? 0),
-                    'line_total_rupiah' => 0,
-                ]]
-            );
+        if (! is_string($noteId) || $noteId === '') {
+            return null;
         }
 
-        return $addWorkItem->handle(
-            $noteId,
-            $lineNo,
-            WorkItem::TYPE_SERVICE_ONLY,
-            [
-                'service_name' => (string) ($row['service_name'] ?? ''),
-                'service_price_rupiah' => (int) ($row['service_price_rupiah'] ?? 0),
-            ],
-            [],
-            []
-        );
+        return $noteId;
     }
 }

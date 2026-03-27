@@ -123,40 +123,6 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <span>Laporan Keuntungan</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-boxes"></i>
-                        <span>Laporan Stok</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-bank"></i>
-                        <span>Laporan Aset</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-clock-history"></i>
-                        <span>Laporan Log Riwayat</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-pie-chart"></i>
-                        <span>Laporan Statistik</span>
-                    </a>
-                </li>
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)

@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
+use App\Application\Note\Services\NoteDetailPageDataBuilder;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 final class NoteDetailPageController
 {
-    public function __invoke(Request $request, string $noteId): View
+    public function __invoke(string $noteId, NoteDetailPageDataBuilder $builder): View
     {
-        return view('cashier.notes.show', [
-            'pageTitle' => 'Detail Nota',
-            'noteId' => $noteId,
-        ]);
+        $data = $builder->build($noteId);
+
+        abort_if($data === null, 404);
+
+        return view('cashier.notes.show', $data);
     }
 }
