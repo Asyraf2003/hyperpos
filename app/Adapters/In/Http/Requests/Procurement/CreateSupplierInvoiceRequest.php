@@ -16,14 +16,8 @@ final class CreateSupplierInvoiceRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $autoReceive = $this->input('auto_receive');
-
-        $this->merge([
-            'nama_pt_pengirim' => $this->trimOrNull($this->input('nama_pt_pengirim')),
-            'tanggal_pengiriman' => $this->trimOrNull($this->input('tanggal_pengiriman')),
-            'tanggal_terima' => $this->trimOrNull($this->input('tanggal_terima')),
-            'auto_receive' => is_bool($autoReceive) ? $autoReceive : $this->toNullableBool($autoReceive),
-        ]);
+        $normalizer = new CreateSupplierInvoiceInputNormalizer();
+        $this->merge($normalizer->normalize($this->all()));
     }
 
     /**
@@ -45,7 +39,8 @@ final class CreateSupplierInvoiceRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        $validator->after(fn (Validator $v) => $this->validateDates($v));
+        $postValidator = new CreateSupplierInvoicePostValidator();
+        $validator->after(fn (Validator $v) => $postValidator->validate($this, $v));
     }
 
     /**
@@ -89,46 +84,5 @@ final class CreateSupplierInvoiceRequest extends FormRequest
             'lines.*.qty_pcs' => 'jumlah pada rincian',
             'lines.*.line_total_rupiah' => 'total rincian',
         ];
-    }
-
-    private function validateDates(Validator $validator): void
-    {
-        $autoReceive = $this->input('auto_receive');
-        $tanggalTerima = $this->input('tanggal_terima');
-
-        if ($autoReceive === true && $tanggalTerima !== null && (string) $tanggalTerima < (string) $this->input('tanggal_pengiriman')) {
-            $validator->errors()->add(
-                'tanggal_terima',
-                'Tanggal terima tidak boleh lebih awal dari tanggal pengiriman.'
-            );
-        }
-    }
-
-    private function trimOrNull(mixed $value): ?string
-    {
-        if (! is_string($value)) {
-            return null;
-        }
-
-        $trimmed = trim($value);
-
-        return $trimmed === '' ? null : $trimmed;
-    }
-
-    private function toNullableBool(mixed $value): ?bool
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if ($value === 1 || $value === '1' || $value === true || $value === 'true') {
-            return true;
-        }
-
-        if ($value === 0 || $value === '0' || $value === false || $value === 'false') {
-            return false;
-        }
-
-        return null;
     }
 }

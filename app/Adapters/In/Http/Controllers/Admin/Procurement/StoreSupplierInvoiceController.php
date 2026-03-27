@@ -17,13 +17,8 @@ final class StoreSupplierInvoiceController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
-        $autoReceive = array_key_exists('auto_receive', $data)
-            ? (bool) $data['auto_receive']
-            : true;
-
-        $tanggalTerima = array_key_exists('tanggal_terima', $data) && $data['tanggal_terima'] !== null
-            ? (string) $data['tanggal_terima']
-            : null;
+        $autoReceive = $this->resolveAutoReceive($data);
+        $tanggalTerima = $this->resolveTanggalTerima($data);
 
         $result = $useCase->handle(
             (string) $data['nama_pt_pengirim'],
@@ -44,5 +39,29 @@ final class StoreSupplierInvoiceController extends Controller
         return redirect()
             ->route('admin.procurement.supplier-invoices.index')
             ->with('success', $result->message() ?? 'Nota supplier berhasil dibuat.');
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveAutoReceive(array $data): bool
+    {
+        if (! array_key_exists('auto_receive', $data) || $data['auto_receive'] === null) {
+            return true;
+        }
+
+        return (bool) $data['auto_receive'];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveTanggalTerima(array $data): ?string
+    {
+        if (! array_key_exists('tanggal_terima', $data) || $data['tanggal_terima'] === null) {
+            return null;
+        }
+
+        return (string) $data['tanggal_terima'];
     }
 }
