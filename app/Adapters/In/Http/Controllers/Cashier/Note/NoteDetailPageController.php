@@ -16,6 +16,9 @@ final class NoteDetailPageController extends Controller
 
         abort_if($data === null, 404);
 
-        return view('cashier.notes.show', $data);
+        return view('cashier.notes.show', $data + [
+            'paymentAction' => route('cashier.notes.payments.store', ['noteId' => $noteId]),
+            'paymentDateDefault' => date('Y-m-d'),
+        ]);
     }
 }

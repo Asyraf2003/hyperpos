@@ -22,6 +22,8 @@
         </div>
     </div>
 
+    @include('cashier.notes.partials.payment-form')
+
     <div class="card mt-3">
         <div class="card-body table-responsive">
             <table class="table table-striped mb-0">
@@ -41,3 +43,7 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('assets/static/js/pages/cashier-note-payment.js') }}"></script>
+@endpush

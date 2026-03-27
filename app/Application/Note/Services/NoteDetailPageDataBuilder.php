@@ -31,7 +31,6 @@ final class NoteDetailPageDataBuilder
         $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id())->amount();
         $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
         $netPaid = max($allocated - $refunded, 0);
-        $outstanding = max($grandTotal - $netPaid, 0);
 
         return [
             'pageTitle' => 'Detail Nota',
@@ -43,7 +42,7 @@ final class NoteDetailPageDataBuilder
                 'total_allocated_rupiah' => $allocated,
                 'total_refunded_rupiah' => $refunded,
                 'net_paid_rupiah' => $netPaid,
-                'outstanding_rupiah' => $outstanding,
+                'outstanding_rupiah' => max($grandTotal - $netPaid, 0),
                 'payment_status' => $this->statuses->resolve($grandTotal, $netPaid),
                 'rows' => $this->mapRows($note->workItems()),
             ],
@@ -58,6 +57,7 @@ final class NoteDetailPageDataBuilder
     {
         return array_map(
             fn (WorkItem $item): array => [
+                'id' => $item->id(),
                 'line_no' => $item->lineNo(),
                 'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
                 'status' => $item->status(),
