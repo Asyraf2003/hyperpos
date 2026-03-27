@@ -20,16 +20,46 @@
 
             <div class="form-group mb-4">
                 <label class="form-label" for="expense-date-range">Rentang Tanggal</label>
-                <input
-                    type="text"
-                    id="expense-date-range"
-                    class="form-control"
-                    data-ui-date="range-single"
-                    data-ui-date-placeholder="Pilih rentang tanggal"
-                    data-range-start-name="date_from"
-                    data-range-end-name="date_to"
-                    autocomplete="off"
-                >
+
+                <div id="expense-date-enhanced-wrap" class="d-none">
+                    <input
+                        type="text"
+                        id="expense-date-range"
+                        class="form-control"
+                        data-ui-date="range-single"
+                        data-ui-date-placeholder="Pilih rentang tanggal"
+                        data-range-start-name="date_from"
+                        data-range-end-name="date_to"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div id="expense-date-fallback-wrap" class="row g-2">
+                    <div class="col-6">
+                        <label class="form-label small text-muted" for="expense-date-fallback-from">Dari</label>
+                        <input
+                            type="date"
+                            id="expense-date-fallback-from"
+                            class="form-control"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="col-6">
+                        <label class="form-label small text-muted" for="expense-date-fallback-to">Sampai</label>
+                        <input
+                            type="date"
+                            id="expense-date-fallback-to"
+                            class="form-control"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <small class="text-muted">Fallback tanggal aktif bila kalender tidak tersedia.</small>
+                    </div>
+                </div>
+
                 <input type="hidden" id="filter-date-from" name="date_from" value="">
                 <input type="hidden" id="filter-date-to" name="date_to" value="">
             </div>

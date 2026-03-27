@@ -24,6 +24,13 @@
   const filterForm = $("expense-filter-form");
   const drawer = $("expense-filter-drawer");
   const backdrop = $("expense-filter-backdrop");
+  const enhancedWrap = $("expense-date-enhanced-wrap");
+  const enhancedInput = $("expense-date-range");
+  const fallbackWrap = $("expense-date-fallback-wrap");
+  const fallbackFromInput = $("expense-date-fallback-from");
+  const fallbackToInput = $("expense-date-fallback-to");
+  const hiddenFromInput = $("filter-date-from");
+  const hiddenToInput = $("filter-date-to");
 
   let searchDebounceTimer = null;
   let requestCounter = 0;
@@ -37,7 +44,6 @@
   }[m]));
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
-
   const trimValue = (v) => String(v ?? "").trim();
 
   const intOrDefault = (v, fallback) => {
@@ -47,7 +53,6 @@
 
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
-
     const sortBy = trimValue(p.get("sort_by"));
     const sortDir = trimValue(p.get("sort_dir"));
 
@@ -64,13 +69,45 @@
 
   const s = stateFromUrl();
 
+  const syncHiddenDatesFromState = () => {
+    if (hiddenFromInput) hiddenFromInput.value = s.date_from;
+    if (hiddenToInput) hiddenToInput.value = s.date_to;
+  };
+
+  const syncFallbackDatesFromState = () => {
+    if (fallbackFromInput) fallbackFromInput.value = s.date_from;
+    if (fallbackToInput) fallbackToInput.value = s.date_to;
+  };
+
+  const syncStateFromFallbackDates = () => {
+    s.date_from = trimValue(fallbackFromInput?.value);
+    s.date_to = trimValue(fallbackToInput?.value);
+    syncHiddenDatesFromState();
+  };
+
+  const updateDateUiMode = () => {
+    const enhancedReady = Boolean(enhancedInput && enhancedInput._flatpickr);
+
+    if (enhancedWrap) enhancedWrap.classList.toggle("d-none", !enhancedReady);
+    if (fallbackWrap) fallbackWrap.classList.toggle("d-none", enhancedReady);
+  };
+
+  const refreshDateUi = () => {
+    if (filterForm) window.AdminDateInput?.refreshWithin(filterForm);
+    updateDateUiMode();
+  };
+
   const syncInputsFromState = () => {
-    searchInput.value = s.q;
+    if (searchInput) searchInput.value = s.q;
+
     if (filterForm) {
-      if (filterForm.elements["category_id"]) filterForm.elements["category_id"].value = s.category_id;
-      if (filterForm.elements["date_from"]) filterForm.elements["date_from"].value = s.date_from;
-      if (filterForm.elements["date_to"]) filterForm.elements["date_to"].value = s.date_to;
-      window.AdminDateInput?.refreshWithin(filterForm);
+      if (filterForm.elements["category_id"]) {
+        filterForm.elements["category_id"].value = s.category_id;
+      }
+
+      syncHiddenDatesFromState();
+      syncFallbackDatesFromState();
+      refreshDateUi();
     }
   };
 
@@ -104,8 +141,8 @@
   };
 
   const drawOpen = (open) => {
-    drawer.classList.toggle("d-none", !open);
-    backdrop.classList.toggle("d-none", !open);
+    if (drawer) drawer.classList.toggle("d-none", !open);
+    if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
   const rowHtml = (r, i, meta) => `
@@ -169,7 +206,6 @@
 
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
-
     body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
@@ -178,9 +214,7 @@
 
     const json = await res.json();
 
-    if (currentRequest !== requestCounter) {
-      return;
-    }
+    if (currentRequest !== requestCounter) return;
 
     if (!res.ok || !json.success) {
       body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
@@ -198,7 +232,7 @@
   searchForm?.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const value = trimValue(searchInput.value);
+    const value = trimValue(searchInput?.value);
 
     if (value.length === 0) {
       s.q = "";
@@ -215,7 +249,7 @@
   });
 
   searchInput?.addEventListener("input", () => {
-    const value = trimValue(searchInput.value);
+    const value = trimValue(searchInput?.value);
 
     clearTimeout(searchDebounceTimer);
 
@@ -226,9 +260,7 @@
       return;
     }
 
-    if (value.length < 2) {
-      return;
-    }
+    if (value.length < 2) return;
 
     searchDebounceTimer = setTimeout(() => {
       s.q = value;
@@ -237,21 +269,34 @@
     }, 300);
   });
 
+  [fallbackFromInput, fallbackToInput].forEach((input) => {
+    input?.addEventListener("input", syncStateFromFallbackDates);
+    input?.addEventListener("change", syncStateFromFallbackDates);
+  });
+
   const btnOpenFilter = $("open-expense-filter");
   if (btnOpenFilter) {
     btnOpenFilter.addEventListener("click", () => {
       drawOpen(true);
-      window.AdminDateInput?.refreshWithin(filterForm);
+      refreshDateUi();
     });
   }
-  
+
   const btnCloseFilter = $("close-expense-filter");
-  if (btnCloseFilter) btnCloseFilter.addEventListener("click", () => drawOpen(false));
-  
-  if (backdrop) backdrop.addEventListener("click", () => drawOpen(false));
+  if (btnCloseFilter) {
+    btnCloseFilter.addEventListener("click", () => drawOpen(false));
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => drawOpen(false));
+  }
 
   filterForm?.addEventListener("submit", (e) => {
     e.preventDefault();
+
+    if (fallbackWrap && !fallbackWrap.classList.contains("d-none")) {
+      syncStateFromFallbackDates();
+    }
 
     const f = new FormData(filterForm);
 
@@ -267,12 +312,13 @@
   const btnResetFilter = $("reset-expense-filter");
   if (btnResetFilter) {
     btnResetFilter.addEventListener("click", () => {
-      filterForm.reset();
+      filterForm?.reset();
 
       ["category_id", "date_from", "date_to"].forEach((k) => {
         s[k] = "";
       });
 
+      syncInputsFromState();
       s.page = 1;
       drawOpen(false);
       load();

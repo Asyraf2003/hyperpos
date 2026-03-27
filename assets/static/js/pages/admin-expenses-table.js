@@ -1,126 +1,361 @@
 (() => {
-    const config = window.expenseTableConfig;
-    if (!config) return;
+  const c = window.expenseTableConfig;
+  if (!c) return;
 
-    const state = { q: '', page: 1, per_page: 10, sort_by: 'expense_date', sort_dir: 'desc', category_id: '', date_from: '', date_to: '' };
-    const $ = (id) => document.getElementById(id);
-    const body = $('expense-table-body'), summary = $('expense-table-summary'), pagination = $('expense-table-pagination');
-    const searchForm = $('expense-search-form'), searchInput = $('expense-search-input');
-    const filterForm = $('expense-filter-form'), categoryInput = $('filter-category-id'), dateFromInput = $('filter-date-from'), dateToInput = $('filter-date-to');
-    const drawer = $('expense-filter-drawer'), backdrop = $('expense-filter-backdrop');
-    const openBtn = $('open-expense-filter'), closeBtn = $('close-expense-filter'), resetBtn = $('reset-expense-filter');
-    let debounceId = null;
+  const defaults = {
+    q: "",
+    page: 1,
+    sort_by: "expense_date",
+    sort_dir: "desc",
+    category_id: "",
+    date_from: "",
+    date_to: ""
+  };
 
-    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
-    const rupiah = (v) => new Intl.NumberFormat('id-ID').format(Number(v || 0));
-    const params = () => new URLSearchParams(Object.entries(state).filter(([, v]) => v !== '' && v !== null && v !== undefined)).toString();
+  const allowedSortBy = new Set(["expense_date", "amount_rupiah", "status"]);
+  const allowedSortDir = new Set(["asc", "desc"]);
 
-    function toggleDrawer(show) {
-        drawer.classList.toggle('d-none', !show);
-        backdrop.classList.toggle('d-none', !show);
+  const $ = (id) => document.getElementById(id);
+  const body = $("expense-table-body");
+  const pager = $("expense-table-pagination");
+  const summary = $("expense-table-summary");
+  const searchForm = $("expense-search-form");
+  const searchInput = $("expense-search-input");
+  const filterForm = $("expense-filter-form");
+  const drawer = $("expense-filter-drawer");
+  const backdrop = $("expense-filter-backdrop");
+  const enhancedWrap = $("expense-date-enhanced-wrap");
+  const enhancedInput = $("expense-date-range");
+  const fallbackWrap = $("expense-date-fallback-wrap");
+  const fallbackFromInput = $("expense-date-fallback-from");
+  const fallbackToInput = $("expense-date-fallback-to");
+  const hiddenFromInput = $("filter-date-from");
+  const hiddenToInput = $("filter-date-to");
+
+  let searchDebounceTimer = null;
+  let requestCounter = 0;
+
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[m]));
+
+  const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
+  const trimValue = (v) => String(v ?? "").trim();
+
+  const intOrDefault = (v, fallback) => {
+    const n = Number.parseInt(String(v ?? ""), 10);
+    return Number.isNaN(n) || n < 1 ? fallback : n;
+  };
+
+  const stateFromUrl = () => {
+    const p = new URLSearchParams(window.location.search);
+    const sortBy = trimValue(p.get("sort_by"));
+    const sortDir = trimValue(p.get("sort_dir"));
+
+    return {
+      q: trimValue(p.get("q")),
+      page: intOrDefault(p.get("page"), 1),
+      sort_by: allowedSortBy.has(sortBy) ? sortBy : defaults.sort_by,
+      sort_dir: allowedSortDir.has(sortDir) ? sortDir : defaults.sort_dir,
+      category_id: trimValue(p.get("category_id")),
+      date_from: trimValue(p.get("date_from")),
+      date_to: trimValue(p.get("date_to"))
+    };
+  };
+
+  const s = stateFromUrl();
+
+  const syncHiddenDatesFromState = () => {
+    if (hiddenFromInput) hiddenFromInput.value = s.date_from;
+    if (hiddenToInput) hiddenToInput.value = s.date_to;
+  };
+
+  const syncFallbackDatesFromState = () => {
+    if (fallbackFromInput) fallbackFromInput.value = s.date_from;
+    if (fallbackToInput) fallbackToInput.value = s.date_to;
+  };
+
+  const syncStateFromFallbackDates = () => {
+    s.date_from = trimValue(fallbackFromInput?.value);
+    s.date_to = trimValue(fallbackToInput?.value);
+    syncHiddenDatesFromState();
+  };
+
+  const updateDateUiMode = () => {
+    const enhancedReady = Boolean(enhancedInput && enhancedInput._flatpickr);
+
+    if (enhancedWrap) enhancedWrap.classList.toggle("d-none", !enhancedReady);
+    if (fallbackWrap) fallbackWrap.classList.toggle("d-none", enhancedReady);
+  };
+
+  const refreshDateUi = () => {
+    if (filterForm) window.AdminDateInput?.refreshWithin(filterForm);
+    updateDateUiMode();
+  };
+
+  const syncInputsFromState = () => {
+    if (searchInput) searchInput.value = s.q;
+
+    if (filterForm) {
+      if (filterForm.elements["category_id"]) {
+        filterForm.elements["category_id"].value = s.category_id;
+      }
+
+      syncHiddenDatesFromState();
+      syncFallbackDatesFromState();
+      refreshDateUi();
     }
+  };
 
-    function syncSortIndicators() {
-        document.querySelectorAll('[data-sort-indicator]').forEach((el) => {
-            const key = el.getAttribute('data-sort-indicator');
-            el.textContent = key === state.sort_by ? (state.sort_dir === 'asc' ? '↑' : '↓') : '↕';
-        });
-    }
+  const paramsObject = () => {
+    const obj = {
+      page: String(s.page),
+      per_page: "10",
+      sort_by: s.sort_by,
+      sort_dir: s.sort_dir
+    };
 
-    function renderRows(rows, meta) {
-        if (!rows.length) {
-            body.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Belum ada data pengeluaran.</td></tr>';
-        } else {
-            body.innerHTML = rows.map((row, i) => `
-                <tr>
-                    <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
-                    <td>${esc(row.expense_date)}</td>
-                    <td>${esc(row.category_name)} (${esc(row.category_code)})</td>
-                    <td>${esc(row.description)}</td>
-                    <td class="text-end">Rp ${rupiah(row.amount_rupiah)}</td>
-                    <td>${esc(row.payment_method)}</td>
-                    <td><span class="badge ${esc(row.status_badge_class)}">${esc(row.status_label)}</span></td>
-                </tr>
-            `).join('');
-        }
-
-        summary.textContent = `Total: ${meta.total} data`;
-        pagination.innerHTML = buildPagination(meta);
-        syncSortIndicators();
-        bindPagination();
-    }
-
-    function buildPagination(meta) {
-        if (meta.last_page <= 1) return '';
-        let html = '<div class="btn-group">';
-        html += `<button type="button" class="btn btn-sm btn-light-secondary" data-page="${Math.max(1, meta.page - 1)}" ${meta.page === 1 ? 'disabled' : ''}>Prev</button>`;
-        for (let p = 1; p <= meta.last_page; p += 1) {
-            html += `<button type="button" class="btn btn-sm ${p === meta.page ? 'btn-primary' : 'btn-light-secondary'}" data-page="${p}">${p}</button>`;
-        }
-        html += `<button type="button" class="btn btn-sm btn-light-secondary" data-page="${Math.min(meta.last_page, meta.page + 1)}" ${meta.page === meta.last_page ? 'disabled' : ''}>Next</button>`;
-        html += '</div>';
-        return html;
-    }
-
-    function bindPagination() {
-        pagination.querySelectorAll('[data-page]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                state.page = Number(btn.getAttribute('data-page') || '1');
-                fetchTable();
-            });
-        });
-    }
-
-    async function fetchTable() {
-        body.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td></tr>';
-        try {
-            const response = await fetch(`${config.endpoint}?${params()}`, { headers: { Accept: 'application/json' } });
-            const payload = await response.json();
-            if (!response.ok || payload.success !== true) throw new Error('Gagal memuat data');
-            renderRows(payload.data.rows, payload.data.meta);
-        } catch (_error) {
-            body.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data pengeluaran.</td></tr>';
-            summary.textContent = 'Total: -';
-            pagination.innerHTML = '';
-        }
-    }
-
-    document.querySelectorAll('[data-sort-by]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const sortBy = btn.getAttribute('data-sort-by') || 'expense_date';
-            state.sort_dir = state.sort_by === sortBy && state.sort_dir === 'asc' ? 'desc' : 'asc';
-            state.sort_by = sortBy;
-            state.page = 1;
-            fetchTable();
-        });
+    ["q", "category_id", "date_from", "date_to"].forEach((k) => {
+      if (s[k]) obj[k] = s[k];
     });
 
-    searchForm?.addEventListener('submit', (e) => { e.preventDefault(); state.q = searchInput.value.trim(); state.page = 1; fetchTable(); });
-    searchInput?.addEventListener('input', () => {
-        clearTimeout(debounceId);
-        debounceId = setTimeout(() => { state.q = searchInput.value.trim(); state.page = 1; fetchTable(); }, 300);
+    return obj;
+  };
+
+  const paramsString = () => new URLSearchParams(paramsObject()).toString();
+
+  const updateUrl = (replace = false) => {
+    const url = new URL(window.location.href);
+    url.search = paramsString();
+
+    if (replace) {
+      window.history.replaceState(null, "", url);
+      return;
+    }
+
+    window.history.pushState(null, "", url);
+  };
+
+  const drawOpen = (open) => {
+    if (drawer) drawer.classList.toggle("d-none", !open);
+    if (backdrop) backdrop.classList.toggle("d-none", !open);
+  };
+
+  const rowHtml = (r, i, meta) => `
+    <tr>
+      <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
+      <td class="text-nowrap">${esc(r.expense_date)}</td>
+      <td>${esc(r.category_name)}<br><small class="text-muted">${esc(r.category_code)}</small></td>
+      <td>${esc(r.description)}</td>
+      <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>
+      <td>${esc(r.payment_method)}</td>
+      <td><span class="badge ${esc(r.status_badge_class)}">${esc(r.status_label)}</span></td>
+    </tr>
+  `;
+
+  const renderRows = (rows, meta) => {
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada pengeluaran yang cocok.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = rows.map((r, i) => rowHtml(r, i, meta)).join("");
+  };
+
+  const renderPager = (meta) => {
+    if (meta.last_page <= 1) {
+      pager.innerHTML = "";
+      return;
+    }
+
+    const start = Math.max(1, meta.page - 2);
+    const end = Math.min(meta.last_page, meta.page + 2);
+
+    let html = `<nav><ul class="pagination pagination-primary mb-0">`;
+    html += `<li class="page-item ${meta.page === 1 ? "disabled" : ""}"><a class="page-link" href="#" data-page="${meta.page - 1}"><i class="bi bi-chevron-left"></i></a></li>`;
+
+    for (let p = start; p <= end; p++) {
+      html += `<li class="page-item ${p === meta.page ? "active" : ""}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+    }
+
+    html += `<li class="page-item ${meta.page === meta.last_page ? "disabled" : ""}"><a class="page-link" href="#" data-page="${meta.page + 1}"><i class="bi bi-chevron-right"></i></a></li></ul></nav>`;
+    pager.innerHTML = html;
+  };
+
+  const renderSummary = (meta) => {
+    summary.textContent = `Total: ${meta.total} pengeluaran`;
+  };
+
+  const renderSortIndicators = () => {
+    document.querySelectorAll("[data-sort-indicator]").forEach((node) => {
+      const key = node.dataset.sortIndicator;
+
+      if (key === s.sort_by) {
+        node.textContent = s.sort_dir === "asc" ? "↑" : "↓";
+        node.classList.remove("text-muted");
+      } else {
+        node.textContent = "↕";
+        node.classList.add("text-muted");
+      }
+    });
+  };
+
+  const load = async (replaceUrl = false) => {
+    const currentRequest = ++requestCounter;
+    body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+
+    const res = await fetch(`${c.endpoint}?${paramsString()}`, {
+      headers: { Accept: "application/json" }
     });
 
-    openBtn?.addEventListener('click', () => toggleDrawer(true));
-    closeBtn?.addEventListener('click', () => toggleDrawer(false));
-    backdrop?.addEventListener('click', () => toggleDrawer(false));
+    const json = await res.json();
 
-    filterForm?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        state.category_id = categoryInput.value;
-        state.date_from = dateFromInput.value;
-        state.date_to = dateToInput.value;
-        state.page = 1;
-        toggleDrawer(false);
-        fetchTable();
+    if (currentRequest !== requestCounter) return;
+
+    if (!res.ok || !json.success) {
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      return;
+    }
+
+    renderRows(json.data.rows || [], json.data.meta || {});
+    renderSummary(json.data.meta || {});
+    renderPager(json.data.meta || {});
+    renderSortIndicators();
+    syncInputsFromState();
+    updateUrl(replaceUrl);
+  };
+
+  searchForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const value = trimValue(searchInput?.value);
+
+    if (value.length === 0) {
+      s.q = "";
+      s.page = 1;
+      load();
+      return;
+    }
+
+    if (value.length >= 2) {
+      s.q = value;
+      s.page = 1;
+      load();
+    }
+  });
+
+  searchInput?.addEventListener("input", () => {
+    const value = trimValue(searchInput?.value);
+
+    clearTimeout(searchDebounceTimer);
+
+    if (value.length === 0) {
+      s.q = "";
+      s.page = 1;
+      searchDebounceTimer = setTimeout(() => load(), 250);
+      return;
+    }
+
+    if (value.length < 2) return;
+
+    searchDebounceTimer = setTimeout(() => {
+      s.q = value;
+      s.page = 1;
+      load();
+    }, 300);
+  });
+
+  [fallbackFromInput, fallbackToInput].forEach((input) => {
+    input?.addEventListener("input", syncStateFromFallbackDates);
+    input?.addEventListener("change", syncStateFromFallbackDates);
+  });
+
+  const btnOpenFilter = $("open-expense-filter");
+  if (btnOpenFilter) {
+    btnOpenFilter.addEventListener("click", () => {
+      drawOpen(true);
+      refreshDateUi();
+    });
+  }
+
+  const btnCloseFilter = $("close-expense-filter");
+  if (btnCloseFilter) {
+    btnCloseFilter.addEventListener("click", () => drawOpen(false));
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener("click", () => drawOpen(false));
+  }
+
+  filterForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    if (fallbackWrap && !fallbackWrap.classList.contains("d-none")) {
+      syncStateFromFallbackDates();
+    }
+
+    const f = new FormData(filterForm);
+
+    ["category_id", "date_from", "date_to"].forEach((k) => {
+      s[k] = trimValue(f.get(k));
     });
 
-    resetBtn?.addEventListener('click', () => {
-        filterForm.reset();
-        state.category_id = ''; state.date_from = ''; state.date_to = ''; state.page = 1;
-        toggleDrawer(false);
-        fetchTable();
-    });
+    s.page = 1;
+    drawOpen(false);
+    load();
+  });
 
-    fetchTable();
+  const btnResetFilter = $("reset-expense-filter");
+  if (btnResetFilter) {
+    btnResetFilter.addEventListener("click", () => {
+      filterForm?.reset();
+
+      ["category_id", "date_from", "date_to"].forEach((k) => {
+        s[k] = "";
+      });
+
+      syncInputsFromState();
+      s.page = 1;
+      drawOpen(false);
+      load();
+    });
+  }
+
+  const tableHeader = document.querySelector("#expense-table thead");
+  if (tableHeader) {
+    tableHeader.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-sort-by]");
+      if (!btn) return;
+
+      const key = btn.dataset.sortBy;
+      s.sort_dir = s.sort_by === key && s.sort_dir === "asc" ? "desc" : "asc";
+      s.sort_by = key;
+      s.page = 1;
+      load();
+    });
+  }
+
+  pager?.addEventListener("click", (e) => {
+    const link = e.target.closest("[data-page]");
+    if (!link || link.parentElement.classList.contains("disabled")) return;
+
+    e.preventDefault();
+    s.page = Number(link.dataset.page || 1);
+    load();
+  });
+
+  window.addEventListener("popstate", () => {
+    Object.assign(s, stateFromUrl());
+    syncInputsFromState();
+    renderSortIndicators();
+    load(true);
+  });
+
+  syncInputsFromState();
+  renderSortIndicators();
+  load(true);
 })();
