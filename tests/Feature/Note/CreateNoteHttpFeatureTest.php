@@ -13,7 +13,7 @@ final class CreateNoteHttpFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_authenticated_cashier_can_create_note_via_transaction_entry_route(): void
+    public function test_authenticated_cashier_can_create_note_with_service_row_via_transaction_entry_route(): void
     {
         $this->loginAsKasir();
         $user = User::query()->create([
@@ -27,18 +27,43 @@ final class CreateNoteHttpFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
-        $response = $this->actingAs($user)->postJson('/notes/create', [
+        $response = $this->actingAs($user)->post('/notes/create', [
             'customer_name' => 'Budi Santoso',
+            'customer_phone' => '08123456789',
             'transaction_date' => '2026-03-14',
+            'rows' => [
+                [
+                    'line_type' => 'service',
+                    'service_name' => 'Servis Ringan',
+                    'service_price_rupiah' => 150000,
+                    'service_notes' => 'Ganti oli dan cek rem',
+                ],
+            ],
         ]);
 
-        $response->assertStatus(200);
-        $response->assertJsonPath('success', true);
+        $note = DB::table('notes')
+            ->where('customer_name', 'Budi Santoso')
+            ->where('transaction_date', '2026-03-14')
+            ->first();
+
+        $this->assertNotNull($note);
+
+        $response->assertRedirect(
+            route('cashier.notes.show', ['noteId' => (string) $note->id])
+        );
 
         $this->assertDatabaseHas('notes', [
+            'id' => (string) $note->id,
             'customer_name' => 'Budi Santoso',
             'transaction_date' => '2026-03-14',
-            'total_rupiah' => 0,
+            'total_rupiah' => 150000,
+        ]);
+
+        $this->assertDatabaseHas('work_items', [
+            'note_id' => (string) $note->id,
+            'line_no' => 1,
+            'transaction_type' => 'service_only',
+            'subtotal_rupiah' => 150000,
         ]);
     }
 }
