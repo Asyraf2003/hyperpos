@@ -272,6 +272,7 @@
       disableMobile: true,
       allowInput: false,
       monthSelectorType: 'static',
+      static: window.matchMedia?.('(pointer: coarse)').matches ?? false,
       onReady: (_selectedDates, _dateStr, fp) => {
         applyPlaceholder(fp, placeholder);
         syncRangeSingleVisibleFromHidden(fp.input);

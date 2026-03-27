@@ -25,6 +25,11 @@
         @endif
 
         <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
 
             <div class="page-content">
                 @include('layouts.partials.alerts')
@@ -32,7 +37,7 @@
                 @hasSection('heading')
                     <div class="page-heading d-flex justify-content-between align-items-center gap-3">
                         <h3 class="mb-0">@yield('heading')</h3>
-
+                        
                         @if (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))
                             <button
                                 type="button"
@@ -60,5 +65,4 @@
     <script src="{{ asset('assets/static/js/shared/admin-date-input.js') }}"></script>
     @stack('scripts')
 </body>
-
 </html>
