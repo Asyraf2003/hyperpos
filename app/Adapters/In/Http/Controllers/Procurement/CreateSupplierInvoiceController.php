@@ -18,20 +18,12 @@ final class CreateSupplierInvoiceController
     ): JsonResponse {
         $data = $request->validated();
 
-        $autoReceive = array_key_exists('auto_receive', $data)
-            ? (bool) $data['auto_receive']
-            : true;
-
-        $tanggalTerima = array_key_exists('tanggal_terima', $data)
-            ? (string) $data['tanggal_terima']
-            : null;
-
         $result = $useCase->handle(
             (string) $data['nama_pt_pengirim'],
             (string) $data['tanggal_pengiriman'],
             $data['lines'],
-            $autoReceive,
-            $tanggalTerima,
+            $this->resolveAutoReceive($data),
+            $this->resolveTanggalTerima($data),
         );
 
         if ($result->isFailure()) {
@@ -39,5 +31,29 @@ final class CreateSupplierInvoiceController
         }
 
         return $presenter->success($result);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveAutoReceive(array $data): bool
+    {
+        if (! array_key_exists('auto_receive', $data) || $data['auto_receive'] === null) {
+            return true;
+        }
+
+        return (bool) $data['auto_receive'];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveTanggalTerima(array $data): ?string
+    {
+        if (! array_key_exists('tanggal_terima', $data) || $data['tanggal_terima'] === null) {
+            return null;
+        }
+
+        return (string) $data['tanggal_terima'];
     }
 }

@@ -17,15 +17,12 @@ final class StoreSupplierInvoiceController extends Controller
     ): RedirectResponse {
         $data = $request->validated();
 
-        $autoReceive = $this->resolveAutoReceive($data);
-        $tanggalTerima = $this->resolveTanggalTerima($data);
-
         $result = $useCase->handle(
             (string) $data['nama_pt_pengirim'],
             (string) $data['tanggal_pengiriman'],
             $data['lines'],
-            $autoReceive,
-            $tanggalTerima,
+            $this->resolveAutoReceive($data),
+            $this->resolveTanggalTerima($data),
         );
 
         if ($result->isFailure()) {

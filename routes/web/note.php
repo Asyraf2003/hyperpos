@@ -14,7 +14,7 @@ Route::middleware(['web', 'transaction.entry'])->group(function (): void {
         ->name('notes.create');
 });
 
-Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntryAllowed::class])
+Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntryAllowed::class, 'app.shell'])
     ->prefix('cashier/notes')
     ->name('cashier.notes.')
     ->group(function (): void {

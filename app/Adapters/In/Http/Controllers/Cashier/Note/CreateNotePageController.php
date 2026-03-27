@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
+use App\Application\Note\Services\CreateNotePageDataBuilder;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
-final class CreateNotePageController
+final class CreateNotePageController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(CreateNotePageDataBuilder $builder): View
     {
         return view('cashier.notes.create', [
             'pageTitle' => 'Buat Nota',
-            'today' => now()->toDateString(),
-            'availableLineTypes' => [
-                ['value' => 'product', 'label' => 'Produk'],
-                ['value' => 'service', 'label' => 'Servis'],
-            ],
+            'formAction' => route('notes.create'),
+            'transactionDateDefault' => date('Y-m-d'),
+            ...$builder->build(),
         ]);
     }
 }
