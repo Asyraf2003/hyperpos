@@ -87,6 +87,16 @@
         window.expenseTableConfig = {
             endpoint: @json(route('admin.expenses.table'))
         };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('expense-inline-script-proof')) return;
+
+            const marker = document.createElement('div');
+            marker.id = 'expense-inline-script-proof';
+            marker.className = 'alert alert-danger m-3';
+            marker.textContent = 'INLINE SCRIPT EXPENSE BERJALAN';
+            document.body.prepend(marker);
+        });
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-expenses-table.js') }}"></script>
 @endpush
