@@ -4,7 +4,7 @@
 - Tanggal: 2026-03-25
 - Nama slice / topik: UI global feedback notification + standardisasi datepicker
 - Workflow step: UI consistency / global shared behavior hardening
-- Status: Selesai terverifikasi live
+- Status: Selesai dengan koreksi sinkronisasi implementasi mobile range-single
 - Progres: 100%
 
 ## Target halaman kerja
@@ -17,7 +17,8 @@ Menstandarkan 2 area UI lintas halaman:
 2. Date input global:
    - single date -> Flatpickr global
    - filter date range -> 1 visible range input mirip template, tetap menjaga canonical hidden fields existing
-   - desktop dan mobile sama-sama terverifikasi live
+   - desktop terverifikasi live
+  - mobile range-single bergantung pada patch `static/coarse-pointer` di file runtime final `public/assets/static/js/shared/admin-date-input.js`
 
 ## Referensi yang dipakai `[REF]`
 - Blueprint:
@@ -62,9 +63,10 @@ Menstandarkan 2 area UI lintas halaman:
   - 1 visible range input
   - 2 hidden canonical fields existing
   - kontrak existing query/filter tetap dipertahankan
-- Verifikasi live sudah berhasil:
+- Verifikasi yang benar-benar terkunci untuk slice ini:
   - desktop berhasil
-  - mobile berhasil setelah patch static/coarse-pointer untuk range-single
+  - mobile range-single memerlukan patch `static/coarse-pointer` pada `bindRangeSingle` di `public/assets/static/js/shared/admin-date-input.js`
+  - status mobile harus selalu dicocokkan dengan isi file runtime final, bukan handoff saja
 
 ## Scope yang dipakai
 ### `[SCOPE-IN]`
@@ -94,7 +96,7 @@ Menstandarkan 2 area UI lintas halaman:
 - Filter range memakai Opsi A:
   - 1 visible range input mirip template
   - hidden canonical existing tetap dipakai untuk submit/state/filter
-- Mobile range-single memakai render static untuk coarse pointer agar tidak gagal saat dibuka dalam drawer
+- Mobile range-single pada `bindRangeSingle` di `public/assets/static/js/shared/admin-date-input.js` wajib memakai render `static` untuk coarse pointer agar tidak gagal saat dibuka dalam drawer
 
 ## File yang dibuat/diubah `[FILES]`
 
@@ -158,10 +160,14 @@ Alur final:
 ### 5. Mobile hardening
 - Gejala awal mobile:
   - klik range field membuat layer/drawer terasa burem dan tidak usable
-- Solusi:
-  - mode range-single di mobile/coarse pointer dirender static
-- Hasil:
-  - mobile berhasil dipakai
+- Solusi final yang harus ada di runtime file:
+  - `bindRangeSingle` pada `public/assets/static/js/shared/admin-date-input.js`
+  - opsi Flatpickr `static: window.matchMedia?.('(pointer: coarse)').matches ?? false,`
+- Catatan sinkronisasi:
+  - status mobile tidak boleh dianggap final bila file runtime belum dicocokkan
+- Hasil verifikasi yang aman dicatat:
+  - desktop berhasil
+  - mobile range-single bergantung pada keberadaan patch runtime di atas
 
 ## Bukti verifikasi `[PROOF]`
 - command:
@@ -196,17 +202,21 @@ Alur final:
   - `grep -n 'AdminDateInput' public/assets/static/js/pages/admin-procurement-invoices-table.js`
   - hasil:
     - refresh hook terpasang
+- command:
+  - `grep -nA12 -B4 "const bindRangeSingle = (input) => {" public/assets/static/js/shared/admin-date-input.js`
+  - hasil:
+    - block `bindRangeSingle` harus memuat `static: window.matchMedia?.('(pointer: coarse)').matches ?? false,`
 - verifikasi live:
   - notification flow berhasil
   - validation Bahasa Indonesia berhasil
   - single date Flatpickr berhasil
   - range filter desktop berhasil
-  - range filter mobile berhasil setelah patch static mobile
+  - range filter mobile hanya boleh dinyatakan berhasil bila patch runtime `bindRangeSingle` di atas benar-benar ada
 
 ## Risiko / catatan lanjutan
 - `auth.blade.php` sempat tertinggal JS Flatpickr saat salah satu patch awal; pastikan final file sudah sinkron dengan kebutuhan auth page bila nanti ada date input di auth context
 - Masih ada kemungkinan titik `type="date"` lain di luar slice yang belum dimigrasikan bila muncul halaman baru atau bila grep baru menemukan area lain
-- Jika nanti target UI ingin 100% identik dengan template dalam semua kondisi mobile/desktop dan filter complex state, Opsi B masih bisa dipertimbangkan, tetapi belum diperlukan karena Opsi A sudah lolos live
+- Jika nanti target UI ingin 100% identik dengan template dalam semua kondisi mobile/desktop dan filter complex state, tetap wajib audit file runtime final karena handoff ini pernah tidak sinkron dengan `public/assets/static/js/shared/admin-date-input.js`
 
 ## Next yang direkomendasikan
 1. Audit semua titik `type="date"` baru setiap ada halaman baru, wajib pakai hook shared:
@@ -223,8 +233,9 @@ Alur final:
    - preload dari URL/state
 
 ## Status penutupan
-Slice ini boleh dianggap closed karena:
-- sudah ada bukti verifikasi live
-- desktop dan mobile sudah lolos
+Slice ini boleh dianggap closed dengan koreksi ini:
+- verifikasi desktop sudah kuat
+- mobile range-single hanya dianggap selesai bila file runtime final `public/assets/static/js/shared/admin-date-input.js` memang memuat patch `static/coarse-pointer` pada `bindRangeSingle`
 - kontrak existing tetap aman
 - pattern shared/global sudah terbentuk
+- audit handoff harus dicocokkan dengan file runtime final agar tidak terjadi mismatch dokumentasi vs implementasi
