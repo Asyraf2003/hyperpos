@@ -116,13 +116,6 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-journal-minus"></i>
-                        <span>Laporan Hutang</span>
-                    </a>
-                </li>
-
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
