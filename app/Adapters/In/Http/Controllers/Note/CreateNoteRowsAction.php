@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Application\Shared\DTO\Result;
+use App\Ports\Out\Note\NoteReaderPort;
 
 final class CreateNoteRowsAction
 {
     public function __construct(
+        private readonly NoteReaderPort $notes,
         private readonly CreateNoteProductRowAction $addProductRow,
         private readonly CreateNoteServiceRowAction $addServiceRow,
     ) {
@@ -19,7 +21,11 @@ final class CreateNoteRowsAction
      */
     public function handle(string $noteId, array $rows): ?Result
     {
-        $lineNo = 1;
+        $lineNo = $this->resolveStartingLineNo($noteId);
+
+        if ($lineNo === null) {
+            return Result::failure('Nota tidak ditemukan.', ['note' => ['NOTE_NOT_FOUND']]);
+        }
 
         foreach ($rows as $row) {
             $result = $this->addSingleRow($noteId, $lineNo, $row);
@@ -47,5 +53,22 @@ final class CreateNoteRowsAction
                 ['note' => ['INVALID_LINE_TYPE']]
             ),
         };
+    }
+
+    private function resolveStartingLineNo(string $noteId): ?int
+    {
+        $note = $this->notes->getById(trim($noteId));
+
+        if ($note === null) {
+            return null;
+        }
+
+        $maxLineNo = 0;
+
+        foreach ($note->workItems() as $item) {
+            $maxLineNo = max($maxLineNo, $item->lineNo());
+        }
+
+        return $maxLineNo + 1;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateNotePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
+use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CreateNoteController;
 use App\Adapters\In\Http\Controllers\Note\RecordNotePaymentController;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureCashierAreaAccess;
@@ -20,6 +21,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
     ->group(function (): void {
         Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
+        Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
         Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
         Route::get('/prototype/{noteId}', NoteDetailPageController::class)->name('prototype.show');
     });

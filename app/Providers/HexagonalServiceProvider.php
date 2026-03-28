@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Adapters\Out\Audit\DatabaseAuditLogAdapter;
+use App\Adapters\Out\Audit\DatabaseAuditLogReaderAdapter;
 use App\Adapters\Out\Auth\LaravelUuidAdapter;
 use App\Adapters\Out\Clock\SystemClockAdapter;
 use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
@@ -80,6 +81,7 @@ use App\Core\Inventory\Policies\NegativeStockPolicy;
 use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Ports\In\HealthCheckUseCase;
 use App\Ports\Out\AuditLogPort;
+use App\Ports\Out\AuditLogReaderPort;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtAdjustmentWriterPort;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtReaderPort;
@@ -151,6 +153,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(ClockPort::class, SystemClockAdapter::class);
         $this->app->singleton(UuidPort::class, LaravelUuidAdapter::class);
         $this->app->singleton(AuditLogPort::class, DatabaseAuditLogAdapter::class);
+        $this->app->singleton(AuditLogReaderPort::class, DatabaseAuditLogReaderAdapter::class);
         $this->app->singleton(TransactionManagerPort::class, DatabaseTransactionManagerAdapter::class);
 
         $this->app->singleton(NegativeStockPolicy::class, DefaultNegativeStockPolicy::class);

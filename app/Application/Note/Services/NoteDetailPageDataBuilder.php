@@ -16,21 +16,21 @@ final class NoteDetailPageDataBuilder
         private readonly PaymentAllocationReaderPort $allocations,
         private readonly CustomerRefundReaderPort $refunds,
         private readonly NotePaymentStatusResolver $statuses,
+        private readonly NoteProductOptionsBuilder $products,
+        private readonly NoteCorrectionHistoryBuilder $history,
     ) {
     }
 
     public function build(string $noteId): ?array
     {
         $note = $this->notes->getById(trim($noteId));
-
-        if ($note === null) {
-            return null;
-        }
+        if ($note === null) return null;
 
         $grandTotal = $note->totalRupiah()->amount();
         $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id())->amount();
         $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
         $netPaid = max($allocated - $refunded, 0);
+        $status = $this->statuses->resolve($grandTotal, $netPaid);
 
         return [
             'pageTitle' => 'Detail Nota',
@@ -43,9 +43,13 @@ final class NoteDetailPageDataBuilder
                 'total_refunded_rupiah' => $refunded,
                 'net_paid_rupiah' => $netPaid,
                 'outstanding_rupiah' => max($grandTotal - $netPaid, 0),
-                'payment_status' => $this->statuses->resolve($grandTotal, $netPaid),
+                'payment_status' => $status,
+                'can_add_rows' => $status !== 'paid',
+                'correction_notice' => $status === 'paid' ? 'Nota sudah lunas. Perubahan hanya boleh lewat correction flow.' : null,
                 'rows' => $this->mapRows($note->workItems()),
+                'correction_history' => $this->history->build($note->id()),
             ],
+            'productOptions' => $this->products->build(),
         ];
     }
 
