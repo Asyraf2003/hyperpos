@@ -7,6 +7,7 @@
 <div class="page-content">
     @include('cashier.notes.partials.note-overview')
     @include('cashier.notes.partials.correction-history')
+    @include('cashier.notes.partials.correction-actions')
     @include('cashier.notes.partials.add-rows-form')
     @include('cashier.notes.partials.payment-form')
     @include('cashier.notes.partials.note-rows-table')

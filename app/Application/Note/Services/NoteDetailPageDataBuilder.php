@@ -64,6 +64,8 @@ final class NoteDetailPageDataBuilder
                 'id' => $item->id(),
                 'line_no' => $item->lineNo(),
                 'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
+                'transaction_type' => $item->transactionType(),
+                'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
                 'status' => $item->status(),
                 'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
             ],
