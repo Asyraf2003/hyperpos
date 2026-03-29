@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateNotePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as CashierNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidServiceOnlyWorkItemController;
@@ -29,6 +30,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
     ->prefix('cashier/notes')
     ->name('cashier.notes.')
     ->group(function (): void {
+        Route::get('/table', NoteHistoryTableDataController::class)->name('table');
         Route::get('/', CashierNoteHistoryPageController::class)->name('index');
         Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get('/prototype/{noteId}', fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId]))->name('prototype.show');
