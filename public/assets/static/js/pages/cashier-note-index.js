@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         config = {};
     }
 
+    const endpoint = typeof config.endpoint === 'string' ? config.endpoint : '';
     const filters = typeof config.filters === 'object' && config.filters !== null
         ? config.filters
         : {};
@@ -31,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
         search: normalize(filters.search),
         payment_status: normalize(filters.payment_status),
         work_status: normalize(filters.work_status),
+        page: 1,
+        per_page: 10,
     };
 
     const fillControlsFromState = () => {
@@ -40,39 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         workStatusInput.value = state.work_status;
     };
 
-    const renderPlaceholder = () => {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="10" class="text-center text-muted py-4">
-                    Data riwayat kasir belum dihubungkan. Filter sudah siap dipakai untuk query string.
-                </td>
-            </tr>
-        `;
-    };
-
-    const buildSummary = () => {
-        const parts = [];
-
-        parts.push(`Tanggal acuan: ${state.date || '-'}`);
-        parts.push(`Pembayaran: ${state.payment_status || 'semua'}`);
-        parts.push(`Pengerjaan: ${state.work_status || 'semua'}`);
-
-        if (state.search !== '') {
-            parts.push(`Pencarian: "${state.search}"`);
-        }
-
-        return parts.join(' • ');
-    };
-
-    const renderSummary = () => {
-        summaryNode.textContent = buildSummary();
-        paginationNode.innerHTML = `
-            <span class="text-muted small">
-                Pagination akan aktif setelah endpoint riwayat kasir dihubungkan.
-            </span>
-        `;
-    };
-
     const syncStateFromControls = () => {
         state.date = normalize(dateInput.value);
         state.search = normalize(searchInput.value);
@@ -80,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.work_status = normalize(workStatusInput.value);
     };
 
-    const applyQueryString = () => {
+    const updateUrlState = () => {
         const url = new URL(window.location.href);
 
         ['date', 'search', 'payment_status', 'work_status'].forEach((key) => {
@@ -94,16 +64,123 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.set(key, value);
         });
 
-        window.location.assign(url.toString());
+        window.history.replaceState({}, '', url.toString());
+    };
+
+    const renderLoading = () => {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="10" class="text-center text-muted py-4">Sedang memuat riwayat nota...</td>
+            </tr>
+        `;
+        summaryNode.textContent = 'Memuat ringkasan riwayat kasir...';
+        paginationNode.innerHTML = '<span class="text-muted small">Memuat pagination...</span>';
+    };
+
+    const renderError = () => {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="10" class="text-center text-danger py-4">Riwayat nota gagal dimuat.</td>
+            </tr>
+        `;
+        summaryNode.textContent = 'Gagal memuat ringkasan riwayat kasir.';
+        paginationNode.innerHTML = '<span class="text-muted small">Pagination belum tersedia.</span>';
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+    const renderItems = (items, summaryLabel, pagination) => {
+        if (!Array.isArray(items) || items.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        ${escapeHtml(summaryLabel || 'Belum ada data riwayat kasir.')}
+                    </td>
+                </tr>
+            `;
+        } else {
+            tableBody.innerHTML = items.map((item, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${escapeHtml(item.transaction_date ?? '-')}</td>
+                    <td>${escapeHtml(item.note_number ?? '-')}</td>
+                    <td>${escapeHtml(item.customer_name ?? '-')}</td>
+                    <td class="text-end">${escapeHtml(item.grand_total_text ?? '-')}</td>
+                    <td class="text-end">${escapeHtml(item.total_paid_text ?? '-')}</td>
+                    <td class="text-end">${escapeHtml(item.outstanding_text ?? '-')}</td>
+                    <td>${escapeHtml(item.payment_status_label ?? '-')}</td>
+                    <td>${escapeHtml(item.work_status_label ?? '-')}</td>
+                    <td>${escapeHtml(item.action_label ?? '-')}</td>
+                </tr>
+            `).join('');
+        }
+
+        summaryNode.textContent = summaryLabel || 'Riwayat kasir siap.';
+        paginationNode.innerHTML = `
+            <span class="text-muted small">
+                Halaman ${pagination?.page ?? 1} dari ${pagination?.last_page ?? 1}
+            </span>
+        `;
+    };
+
+    const loadTable = async () => {
+        if (endpoint === '') {
+            renderError();
+            return;
+        }
+
+        renderLoading();
+
+        const url = new URL(endpoint, window.location.origin);
+
+        ['date', 'search', 'payment_status', 'work_status', 'page', 'per_page'].forEach((key) => {
+            const value = normalize(state[key]);
+            if (value !== '') {
+                url.searchParams.set(key, value);
+            }
+        });
+
+        try {
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const payload = await response.json();
+            const data = payload?.data ?? {};
+            const items = Array.isArray(data.items) ? data.items : [];
+            const summaryLabel = typeof data?.summary?.label === 'string'
+                ? data.summary.label
+                : 'Riwayat kasir siap.';
+            const pagination = typeof data.pagination === 'object' && data.pagination !== null
+                ? data.pagination
+                : { page: 1, last_page: 1 };
+
+            renderItems(items, summaryLabel, pagination);
+        } catch (_error) {
+            renderError();
+        }
     };
 
     let searchDebounceTimer = null;
 
-    const queueSearchApply = () => {
+    const queueReload = () => {
         window.clearTimeout(searchDebounceTimer);
         searchDebounceTimer = window.setTimeout(() => {
             syncStateFromControls();
-            applyQueryString();
+            updateUrlState();
+            loadTable();
         }, 400);
     };
 
@@ -114,21 +191,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         event.preventDefault();
         syncStateFromControls();
-        applyQueryString();
+        updateUrlState();
+        loadTable();
     });
 
     searchInput.addEventListener('input', () => {
-        queueSearchApply();
+        queueReload();
     });
 
     [dateInput, paymentStatusInput, workStatusInput].forEach((input) => {
         input.addEventListener('change', () => {
             syncStateFromControls();
-            applyQueryString();
+            updateUrlState();
+            loadTable();
         });
     });
 
     fillControlsFromState();
-    renderPlaceholder();
-    renderSummary();
+    loadTable();
 });

@@ -113,6 +113,7 @@
 </section>
 
 <script id="cashier-note-index-config" type="application/json">@json([
+    'endpoint' => route('cashier.notes.table'),
     'filters' => $filters,
 ])</script>
 @push('scripts')
