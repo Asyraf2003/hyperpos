@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('notes', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('customer_name');
+            $table->string('customer_phone')->nullable();
             $table->date('transaction_date');
             $table->integer('total_rupiah');
 
