@@ -23,6 +23,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
     ->prefix('cashier/notes')
     ->name('cashier.notes.')
     ->group(function (): void {
+        Route::get('/', fn (): RedirectResponse => redirect()->route('cashier.notes.create'))->name('index');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
         Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get('/prototype/{noteId}', fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId]))->name('prototype.show');
