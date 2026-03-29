@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
-use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
+use App\Application\Note\Services\NoteOutstandingPaymentAmountResolver;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -15,11 +15,13 @@ final class RecordNotePaymentController extends Controller
     public function __invoke(
         string $noteId,
         RecordNotePaymentRequest $request,
-        SelectedNoteRowsPaymentAmountResolver $resolver,
+        NoteOutstandingPaymentAmountResolver $resolver,
         RecordAndAllocateNotePaymentHandler $flow,
     ): RedirectResponse {
         $data = $request->validated();
-        $amountResult = $resolver->resolve($noteId, $data['selected_row_ids']);
+        $amountResult = ($data['payment_scope'] ?? 'full') === 'partial'
+            ? $resolver->resolvePartial($noteId, (int) ($data['amount_paid'] ?? 0))
+            : $resolver->resolveFull($noteId);
 
         if ($amountResult->isFailure()) {
             return back()->withErrors(['payment' => $amountResult->message() ?? 'Pembayaran gagal.'])->withInput();
