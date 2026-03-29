@@ -115,4 +115,8 @@
 <script id="cashier-note-index-config" type="application/json">@json([
     'filters' => $filters,
 ])</script>
+@push('scripts')
+<script src="{{ asset('assets/static/js/pages/cashier-note-index.js') }}"></script>
+@endpush
+
 @endsection
