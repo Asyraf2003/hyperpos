@@ -11,12 +11,13 @@
                 <div>
                     <h5 class="mb-1">Riwayat Nota Kasir</h5>
                     <p class="mb-0 text-muted">
-                        Halaman ini disiapkan untuk riwayat operasional kasir. Slice berikutnya akan
-                        mengisi daftar nota hari ini dan carry-over nota open dari kemarin.
+                        Halaman ini disiapkan untuk operasional kasir: menampilkan nota hari ini
+                        dan carry-over nota open atau belum selesai dari kemarin.
                     </p>
                 </div>
 
-                <div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-light-primary text-primary">Workspace Kasir</span>
                     <a href="{{ route('cashier.notes.create') }}" class="btn btn-primary">
                         Buat Nota
                     </a>
@@ -24,8 +25,8 @@
             </div>
 
             <div class="alert alert-light-secondary mt-4 mb-0">
-                Skeleton navigasi sudah aktif. Daftar nota, filter tanggal, paginate, dan status
-                operasional kasir akan diisi pada slice berikutnya.
+                Skeleton navigasi sudah aktif. Slice berikutnya akan mengisi daftar nota, filter tanggal,
+                paginate, status pembayaran, dan status operasional kasir dengan pola UI repo yang seragam.
             </div>
         </div>
     </div>
