@@ -44,6 +44,7 @@ final class NotePaidStatusPolicyTest extends TestCase
         $note = Note::rehydrate(
             'note-1',
             'Budi Santoso',
+            null,
             new DateTimeImmutable('2026-03-16'),
             Money::zero(),
             [],
@@ -82,6 +83,7 @@ final class NotePaidStatusPolicyTest extends TestCase
         $note = Note::rehydrate(
             'note-1',
             'Budi Santoso',
+            null,
             new DateTimeImmutable('2026-03-16'),
             Money::fromInt(30000),
             [],
@@ -120,6 +122,7 @@ final class NotePaidStatusPolicyTest extends TestCase
         $note = Note::rehydrate(
             'note-1',
             'Budi Santoso',
+            null,
             new DateTimeImmutable('2026-03-16'),
             Money::fromInt(50000),
             [],
