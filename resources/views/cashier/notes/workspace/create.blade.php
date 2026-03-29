@@ -6,12 +6,24 @@
 @section('content')
 <div class="page-content">
     <div class="alert alert-info">
-        Workspace baru sudah dipisah dari create lama.
-        Di step ini kita baru hidupkan shell UI dan state JS.
-        Submit sengaja belum aktif sampai store handler dan request baru selesai.
+        Workspace baru sudah bisa menyimpan nota dan item secara atomik.
+        Inline payment masih dikunci ke Skip pada step ini. Wiring pembayaran menyusul di step berikutnya.
     </div>
 
-    <form id="transaction-workspace-form" novalidate>
+    @if ($errors->has('workspace'))
+        <div class="alert alert-danger">
+            {{ $errors->first('workspace') }}
+        </div>
+    @endif
+
+    <form
+        id="transaction-workspace-form"
+        action="{{ route('notes.workspace.store') }}"
+        method="POST"
+        novalidate
+    >
+        @csrf
+
         <div class="row g-4">
             <div class="col-12 col-xl-8">
                 <div class="card">
@@ -117,7 +129,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Keputusan Pembayaran</h4>
-                        <p class="mb-0 text-muted">Shell payment panel note-level untuk step wiring berikutnya.</p>
+                        <p class="mb-0 text-muted">Step ini baru mengizinkan Skip. Wiring pay full/partial menyusul.</p>
                     </div>
 
                     <div class="card-body">
@@ -210,7 +222,7 @@
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="btn btn-primary" disabled>Simpan Nota</button>
+                    <button type="submit" class="btn btn-primary">Simpan Nota</button>
                     <button type="button" class="btn btn-outline-primary" disabled>Simpan + Bayar</button>
                 </div>
             </div>
