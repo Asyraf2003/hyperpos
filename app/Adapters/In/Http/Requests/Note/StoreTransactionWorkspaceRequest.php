@@ -91,6 +91,8 @@ final class StoreTransactionWorkspaceRequest extends FormRequest
 
                 $validator->errors()->add("items.$index.entry_mode", 'Tipe item workspace tidak valid.');
             }
+
+            $this->validateInlinePayment($validator);
         });
     }
 
@@ -158,6 +160,38 @@ final class StoreTransactionWorkspaceRequest extends FormRequest
             if ($this->integerValue($line['unit_cost_rupiah'] ?? null) <= 0) {
                 $validator->errors()->add("items.$index.external_purchase_lines.0.unit_cost_rupiah", 'Biaya satuan pembelian luar wajib lebih dari 0.');
             }
+        }
+    }
+
+    private function validateInlinePayment(Validator $validator): void
+    {
+        $payment = $this->input('inline_payment', []);
+
+        if (! is_array($payment)) {
+            $validator->errors()->add('inline_payment', 'Format pembayaran workspace tidak valid.');
+            return;
+        }
+
+        $decision = (string) ($payment['decision'] ?? 'skip');
+
+        if ($decision === 'skip') {
+            return;
+        }
+
+        if (! in_array((string) ($payment['payment_method'] ?? ''), ['cash', 'transfer'], true)) {
+            $validator->errors()->add('inline_payment.payment_method', 'Metode pembayaran workspace tidak valid.');
+        }
+
+        if ($this->blank($payment['paid_at'] ?? null)) {
+            $validator->errors()->add('inline_payment.paid_at', 'Tanggal bayar wajib diisi.');
+        }
+
+        if ($decision === 'pay_partial' && $this->integerValue($payment['amount_paid_rupiah'] ?? null) <= 0) {
+            $validator->errors()->add('inline_payment.amount_paid_rupiah', 'Nominal pembayaran sebagian wajib lebih dari 0.');
+        }
+
+        if (($payment['payment_method'] ?? null) === 'cash' && $this->integerValue($payment['amount_received_rupiah'] ?? null) <= 0) {
+            $validator->errors()->add('inline_payment.amount_received_rupiah', 'Uang masuk cash wajib lebih dari 0.');
         }
     }
 

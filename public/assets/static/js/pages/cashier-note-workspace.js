@@ -6,6 +6,8 @@
     const paidNowText = document.getElementById('workspace-paid-now-text');
     const outstandingText = document.getElementById('workspace-outstanding-text');
     const paidInput = document.getElementById('inline_payment_amount_paid_rupiah');
+    const receivedInput = document.getElementById('inline_payment_amount_received_rupiah');
+    const paymentMethodInput = document.getElementById('inline_payment_method');
     const decisionInputs = document.querySelectorAll('input[name="inline_payment[decision]"]');
 
     if (!configEl || !itemsRoot || !emptyState) {
@@ -63,7 +65,6 @@
 
     function formatRupiah(value) {
         const number = Number(value || 0);
-
         return new Intl.NumberFormat('id-ID').format(Number.isFinite(number) ? number : 0);
     }
 
@@ -73,7 +74,6 @@
         }
 
         const cleaned = value.replace(/[^0-9]/g, '');
-
         return cleaned === '' ? 0 : Number.parseInt(cleaned, 10);
     }
 
@@ -93,24 +93,45 @@
 
     function selectedDecision() {
         const checked = Array.from(decisionInputs).find((input) => input.checked);
-
         return checked ? checked.value : 'skip';
+    }
+
+    function amountPaidNow(grandTotal) {
+        const decision = selectedDecision();
+
+        if (decision === 'skip') {
+            return 0;
+        }
+
+        if (decision === 'pay_full') {
+            return grandTotal;
+        }
+
+        return Math.min(parseNumber(paidInput?.value || ''), grandTotal);
     }
 
     function updateSummary() {
         const grandTotal = items.reduce((total, item) => total + itemTotal(item), 0);
-        const paidNow = selectedDecision() === 'skip' ? 0 : parseNumber(paidInput?.value || '0');
+        const paidNow = amountPaidNow(grandTotal);
         const outstanding = Math.max(grandTotal - paidNow, 0);
 
         grandTotalText.textContent = formatRupiah(grandTotal);
         paidNowText.textContent = formatRupiah(paidNow);
         outstandingText.textContent = formatRupiah(outstanding);
+
+        if (paidInput) {
+            paidInput.disabled = selectedDecision() !== 'pay_partial';
+        }
+
+        if (receivedInput) {
+            const needsCash = selectedDecision() !== 'skip' && paymentMethodInput && paymentMethodInput.value === 'cash';
+            receivedInput.disabled = !needsCash;
+        }
     }
 
     function partSourceOptionsHtml(selected) {
         return partSourceOptions.map((option) => {
             const isSelected = option.value === selected ? 'selected' : '';
-
             return '<option value="' + option.value + '" ' + isSelected + '>' + option.label + '</option>';
         }).join('');
     }
@@ -317,30 +338,26 @@
     document.addEventListener('input', (event) => {
         const input = event.target.closest('[data-bind]');
 
-        if (!input) {
-            return;
+        if (input) {
+            const raw = input.getAttribute('data-bind') || '';
+            const dotIndex = raw.indexOf('.');
+
+            if (dotIndex >= 0) {
+                const itemIndex = Number(raw.slice(0, dotIndex));
+                const path = raw.slice(dotIndex + 1);
+
+                if (Number.isInteger(itemIndex) && items[itemIndex]) {
+                    setValue(items[itemIndex], path, input.value);
+
+                    if (path === 'part_source') {
+                        render();
+                        return;
+                    }
+                }
+            }
         }
 
-        const raw = input.getAttribute('data-bind') || '';
-        const dotIndex = raw.indexOf('.');
-
-        if (dotIndex < 0) {
-            return;
-        }
-
-        const itemIndex = Number(raw.slice(0, dotIndex));
-        const path = raw.slice(dotIndex + 1);
-
-        if (!Number.isInteger(itemIndex) || !items[itemIndex]) {
-            return;
-        }
-
-        setValue(items[itemIndex], path, input.value);
         updateSummary();
-
-        if (path === 'part_source') {
-            render();
-        }
     });
 
     document.addEventListener('change', (event) => {
@@ -361,19 +378,23 @@
                         render();
                         return;
                     }
-
-                    updateSummary();
                 }
             }
         }
 
-        if (event.target.matches('input[name="inline_payment[decision]"]')) {
-            updateSummary();
-        }
+        updateSummary();
     });
 
     if (paidInput) {
         paidInput.addEventListener('input', updateSummary);
+    }
+
+    if (receivedInput) {
+        receivedInput.addEventListener('input', updateSummary);
+    }
+
+    if (paymentMethodInput) {
+        paymentMethodInput.addEventListener('change', updateSummary);
     }
 
     render();

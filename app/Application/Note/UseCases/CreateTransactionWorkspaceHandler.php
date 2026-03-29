@@ -9,10 +9,16 @@ use App\Application\Note\Services\WorkItemFactory;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\Note\Note;
 use App\Core\Note\WorkItem\WorkItem;
+use App\Core\Payment\CustomerPayment\CustomerPayment;
+use App\Core\Payment\PaymentAllocation\PaymentAllocation;
+use App\Core\Payment\Policies\PaymentAllocationPolicy;
 use App\Core\Shared\Exceptions\DomainException;
+use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\Note\WorkItemWriterPort;
+use App\Ports\Out\Payment\CustomerPaymentWriterPort;
+use App\Ports\Out\Payment\PaymentAllocationWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
 use DateTimeImmutable;
@@ -28,6 +34,9 @@ final class CreateTransactionWorkspaceHandler
         private readonly WorkItemFactory $factory,
         private readonly AuditLogPort $audit,
         private readonly UuidPort $uuid,
+        private readonly CustomerPaymentWriterPort $payments,
+        private readonly PaymentAllocationWriterPort $allocations,
+        private readonly PaymentAllocationPolicy $allocationPolicy,
     ) {
     }
 
@@ -43,15 +52,6 @@ final class CreateTransactionWorkspaceHandler
         $started = false;
 
         try {
-            $decision = (string) ($payload['inline_payment']['decision'] ?? 'skip');
-
-            if ($decision !== 'skip') {
-                return Result::failure(
-                    'Inline payment workspace belum aktif pada step ini. Gunakan Skip dulu.',
-                    ['inline_payment' => ['WORKSPACE_PAYMENT_NOT_READY']]
-                );
-            }
-
             $this->transactions->begin();
             $started = true;
 
@@ -87,12 +87,15 @@ final class CreateTransactionWorkspaceHandler
 
             $this->notes->updateTotal($note);
 
+            $paymentSummary = $this->recordInlinePaymentIfNeeded($note, (array) ($payload['inline_payment'] ?? []));
+
             $this->audit->record('transaction_workspace_created', [
                 'note_id' => $note->id(),
                 'customer_name' => $note->customerName(),
                 'items_count' => count($payload['items'] ?? []),
                 'total_rupiah' => $note->totalRupiah()->amount(),
-                'payment_decision' => $decision,
+                'payment_decision' => $paymentSummary['decision'],
+                'amount_paid_rupiah' => $paymentSummary['amount_paid_rupiah'],
             ]);
 
             $this->transactions->commit();
@@ -105,8 +108,9 @@ final class CreateTransactionWorkspaceHandler
                         'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                         'total_rupiah' => $note->totalRupiah()->amount(),
                     ],
+                    'inline_payment' => $paymentSummary,
                 ],
-                'Nota workspace berhasil dibuat.'
+                $this->successMessage($paymentSummary)
             );
         } catch (DomainException $e) {
             if ($started) {
@@ -208,6 +212,104 @@ final class CreateTransactionWorkspaceHandler
     }
 
     /**
+     * @param array<string, mixed> $payment
+     * @return array{
+     * decision:string,
+     * amount_paid_rupiah:int,
+     * change_rupiah:int
+     * }
+     */
+    private function recordInlinePaymentIfNeeded(Note $note, array $payment): array
+    {
+        $decision = (string) ($payment['decision'] ?? 'skip');
+
+        if ($decision === 'skip') {
+            return [
+                'decision' => 'skip',
+                'amount_paid_rupiah' => 0,
+                'change_rupiah' => 0,
+            ];
+        }
+
+        $method = (string) ($payment['payment_method'] ?? '');
+
+        if (! in_array($method, ['cash', 'transfer'], true)) {
+            throw new DomainException('Metode pembayaran workspace tidak valid.');
+        }
+
+        $amount = match ($decision) {
+            'pay_full' => $note->totalRupiah()->amount(),
+            'pay_partial' => $this->resolvePartialAmount($note, $payment),
+            default => throw new DomainException('Keputusan pembayaran workspace tidak valid.'),
+        };
+
+        if ($amount <= 0) {
+            throw new DomainException('Nominal pembayaran workspace harus lebih dari 0.');
+        }
+
+        $received = (int) ($payment['amount_received_rupiah'] ?? 0);
+
+        if ($method === 'cash' && $received < $amount) {
+            throw new DomainException('Uang masuk cash tidak boleh kurang dari total yang dibayar.');
+        }
+
+        $paidAt = $this->parsePaidAt($payment['paid_at'] ?? null);
+        $money = Money::fromInt($amount);
+        $customerPayment = CustomerPayment::create($this->uuid->generate(), $money, $paidAt);
+
+        $this->allocationPolicy->assertAllocatable(
+            $money,
+            $customerPayment->amountRupiah(),
+            Money::zero(),
+            $note->totalRupiah(),
+            Money::zero()
+        );
+
+        $this->payments->create($customerPayment);
+
+        $allocation = PaymentAllocation::create(
+            $this->uuid->generate(),
+            $customerPayment->id(),
+            $note->id(),
+            $money
+        );
+
+        $this->allocations->create($allocation);
+
+        $this->audit->record('payment_allocated', [
+            'payment_id' => $customerPayment->id(),
+            'note_id' => $note->id(),
+            'amount' => $amount,
+            'source' => 'transaction_workspace',
+            'decision' => $decision,
+        ]);
+
+        return [
+            'decision' => $decision,
+            'amount_paid_rupiah' => $amount,
+            'change_rupiah' => $method === 'cash' ? max($received - $amount, 0) : 0,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payment
+     */
+    private function resolvePartialAmount(Note $note, array $payment): int
+    {
+        $amount = (int) ($payment['amount_paid_rupiah'] ?? 0);
+
+        if ($amount <= 0) {
+            throw new DomainException('Nominal pembayaran sebagian wajib lebih dari 0.');
+        }
+
+        if ($amount >= $note->totalRupiah()->amount()) {
+            throw new DomainException('Nominal pembayaran sebagian harus lebih kecil dari grand total nota.');
+        }
+
+        return $amount;
+    }
+
+    /**
      * @param mixed $value
      * @return array<string, mixed>
      */
@@ -254,5 +356,41 @@ final class CreateTransactionWorkspaceHandler
         }
 
         return $parsed;
+    }
+
+    private function parsePaidAt(mixed $value): DateTimeImmutable
+    {
+        if (! is_string($value)) {
+            throw new DomainException('Tanggal bayar wajib diisi.');
+        }
+
+        $normalized = trim($value);
+        $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $normalized);
+
+        if ($parsed === false || $parsed->format('Y-m-d') !== $normalized) {
+            throw new DomainException('Tanggal bayar wajib valid dengan format Y-m-d.');
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @param array{
+     * decision:string,
+     * amount_paid_rupiah:int,
+     * change_rupiah:int
+     * } $paymentSummary
+     */
+    private function successMessage(array $paymentSummary): string
+    {
+        if ($paymentSummary['decision'] === 'skip') {
+            return 'Nota workspace berhasil dibuat.';
+        }
+
+        if ($paymentSummary['change_rupiah'] > 0) {
+            return 'Nota dan pembayaran berhasil dicatat. Kembalian: ' . number_format($paymentSummary['change_rupiah'], 0, ',', '.');
+        }
+
+        return 'Nota dan pembayaran berhasil dicatat.';
     }
 }

@@ -6,8 +6,9 @@
 @section('content')
 <div class="page-content">
     <div class="alert alert-info">
-        Workspace baru sudah bisa menyimpan nota dan item secara atomik.
-        Inline payment masih dikunci ke Skip pada step ini. Wiring pembayaran menyusul di step berikutnya.
+        Workspace baru sekarang sudah bisa:
+        simpan nota saja, simpan + bayar penuh, atau simpan + bayar sebagian.
+        UI-nya memang masih seadanya. Yang penting utangnya berkurang dulu.
     </div>
 
     @if ($errors->has('workspace'))
@@ -129,7 +130,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Keputusan Pembayaran</h4>
-                        <p class="mb-0 text-muted">Step ini baru mengizinkan Skip. Wiring pay full/partial menyusul.</p>
+                        <p class="mb-0 text-muted">Skip, bayar penuh, atau bayar sebagian langsung dari workspace.</p>
                     </div>
 
                     <div class="card-body">
@@ -191,7 +192,7 @@
                                 inputmode="numeric"
                                 class="form-control"
                                 value="{{ $oldInlinePayment['amount_paid_rupiah'] ?? '' }}"
-                                placeholder="Contoh: 150000"
+                                placeholder="Isi untuk bayar sebagian"
                             >
                         </div>
 
@@ -204,7 +205,7 @@
                                 inputmode="numeric"
                                 class="form-control"
                                 value="{{ $oldInlinePayment['amount_received_rupiah'] ?? '' }}"
-                                placeholder="Contoh: 200000"
+                                placeholder="Wajib untuk cash"
                             >
                         </div>
 
@@ -222,8 +223,7 @@
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="submit" class="btn btn-primary">Simpan Nota</button>
-                    <button type="button" class="btn btn-outline-primary" disabled>Simpan + Bayar</button>
+                    <button type="submit" class="btn btn-primary">Simpan Workspace Nota</button>
                 </div>
             </div>
         </div>
