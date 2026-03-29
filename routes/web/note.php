@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
+use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateNotePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController;
@@ -19,6 +20,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'transaction.entry'])->group(function (): void {
     Route::post('/notes/create', CreateNoteController::class)->name('notes.create');
+});
+
+Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
+    Route::get('/admin/notes/table', AdminNoteHistoryTableDataController::class)
+        ->name('admin.notes.table');
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {

@@ -30,7 +30,7 @@
                             id="admin-note-date-from"
                             class="form-control"
                             data-ui-date="single"
-                            value="{{ date('Y-m-d') }}"
+                            value="{{ $filters['date_from'] }}"
                         >
                     </div>
 
@@ -41,7 +41,7 @@
                             id="admin-note-date-to"
                             class="form-control"
                             data-ui-date="single"
-                            value="{{ date('Y-m-d') }}"
+                            value="{{ $filters['date_to'] }}"
                         >
                     </div>
 
@@ -53,36 +53,37 @@
                             class="form-control"
                             placeholder="Cari no nota, customer, no telp"
                             autocomplete="off"
+                            value="{{ $filters['search'] }}"
                         >
                     </div>
 
                     <div class="col-md-4">
                         <label for="admin-note-payment-status" class="form-label">Status Pembayaran</label>
                         <select id="admin-note-payment-status" class="form-select">
-                            <option value="">Semua Status</option>
-                            <option value="unpaid">Belum Dibayar</option>
-                            <option value="partial">Dibayar Sebagian</option>
-                            <option value="paid">Lunas</option>
+                            <option value="" @selected($filters['payment_status'] === '')>Semua Status</option>
+                            <option value="unpaid" @selected($filters['payment_status'] === 'unpaid')>Belum Dibayar</option>
+                            <option value="partial" @selected($filters['payment_status'] === 'partial')>Dibayar Sebagian</option>
+                            <option value="paid" @selected($filters['payment_status'] === 'paid')>Lunas</option>
                         </select>
                     </div>
 
                     <div class="col-md-4">
                         <label for="admin-note-editability" class="form-label">Mode Edit</label>
                         <select id="admin-note-editability" class="form-select">
-                            <option value="">Semua Mode</option>
-                            <option value="editable_normal">Editable Normal</option>
-                            <option value="admin_strict">Admin Ketat</option>
-                            <option value="correction_only">Correction Only</option>
+                            <option value="" @selected($filters['editability'] === '')>Semua Mode</option>
+                            <option value="editable_normal" @selected($filters['editability'] === 'editable_normal')>Editable Normal</option>
+                            <option value="admin_strict" @selected($filters['editability'] === 'admin_strict')>Admin Ketat</option>
+                            <option value="correction_only" @selected($filters['editability'] === 'correction_only')>Correction Only</option>
                         </select>
                     </div>
 
                     <div class="col-md-4">
                         <label for="admin-note-work-summary" class="form-label">Ringkasan Pengerjaan</label>
                         <select id="admin-note-work-summary" class="form-select">
-                            <option value="">Semua Ringkasan</option>
-                            <option value="has_open">Ada Open</option>
-                            <option value="has_done">Ada Selesai</option>
-                            <option value="has_canceled">Ada Batal</option>
+                            <option value="" @selected($filters['work_summary'] === '')>Semua Ringkasan</option>
+                            <option value="has_open" @selected($filters['work_summary'] === 'has_open')>Ada Open</option>
+                            <option value="has_done" @selected($filters['work_summary'] === 'has_done')>Ada Selesai</option>
+                            <option value="has_canceled" @selected($filters['work_summary'] === 'has_canceled')>Ada Batal</option>
                         </select>
                     </div>
                 </div>
@@ -131,4 +132,12 @@
         </div>
     </div>
 </section>
+
+<script id="admin-note-index-config" type="application/json">@json([
+    'filters' => $filters,
+])</script>
+@push('scripts')
+<script src="{{ asset('assets/static/js/pages/admin-note-index.js') }}"></script>
+@endpush
+
 @endsection
