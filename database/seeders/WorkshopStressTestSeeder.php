@@ -76,7 +76,7 @@ final class WorkshopStressTestSeeder extends Seeder
 
     private function workshopFullCycle($createNote, $addItem, $recordPayment, $allocatePayment, $recordRefund, $kasirId, $adminId, $products, $date): void
     {
-        $resNote = $createNote->handle('Customer ' . rand(1, 2000), $date);
+        $resNote = $createNote->handle('Customer ' . rand(1, 2000), null, $date);
         if ($resNote->isFailure()) return;
         $noteId = $resNote->data()['id'];
 

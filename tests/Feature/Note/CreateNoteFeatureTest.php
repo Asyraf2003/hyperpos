@@ -20,6 +20,7 @@ final class CreateNoteFeatureTest extends TestCase
 
         $result = $handler->handle(
             'Budi Santoso',
+            null,
             '2026-03-14',
         );
 
@@ -42,6 +43,7 @@ final class CreateNoteFeatureTest extends TestCase
 
         $result = $handler->handle(
             '   ',
+            null,
             '2026-03-14',
         );
 
@@ -58,6 +60,7 @@ final class CreateNoteFeatureTest extends TestCase
 
         $result = $handler->handle(
             'Budi Santoso',
+            null,
             '14-03-2026',
         );
 
