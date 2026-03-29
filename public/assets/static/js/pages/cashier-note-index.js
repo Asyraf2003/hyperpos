@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.search = normalize(searchInput.value);
         state.payment_status = normalize(paymentStatusInput.value);
         state.work_status = normalize(workStatusInput.value);
+        state.page = 1;
     };
 
     const updateUrlState = () => {
@@ -94,6 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
 
+    const renderAction = (item) => {
+        if (typeof item.action_url === 'string' && item.action_url !== '') {
+            return `<a href="${escapeHtml(item.action_url)}" class="btn btn-sm btn-outline-primary">${escapeHtml(item.action_label ?? 'Buka')}</a>`;
+        }
+
+        return escapeHtml(item.action_label ?? '-');
+    };
+
     const renderItems = (items, summaryLabel, pagination) => {
         if (!Array.isArray(items) || items.length === 0) {
             tableBody.innerHTML = `
@@ -104,9 +113,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>
             `;
         } else {
+            const page = Number.parseInt(String(pagination?.page ?? 1), 10) || 1;
+            const perPage = Number.parseInt(String(pagination?.per_page ?? 10), 10) || 10;
+
             tableBody.innerHTML = items.map((item, index) => `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td>${((page - 1) * perPage) + index + 1}</td>
                     <td>${escapeHtml(item.transaction_date ?? '-')}</td>
                     <td>${escapeHtml(item.note_number ?? '-')}</td>
                     <td>${escapeHtml(item.customer_name ?? '-')}</td>
@@ -115,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="text-end">${escapeHtml(item.outstanding_text ?? '-')}</td>
                     <td>${escapeHtml(item.payment_status_label ?? '-')}</td>
                     <td>${escapeHtml(item.work_status_label ?? '-')}</td>
-                    <td>${escapeHtml(item.action_label ?? '-')}</td>
+                    <td>${renderAction(item)}</td>
                 </tr>
             `).join('');
         }
@@ -123,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryNode.textContent = summaryLabel || 'Riwayat kasir siap.';
         paginationNode.innerHTML = `
             <span class="text-muted small">
-                Halaman ${pagination?.page ?? 1} dari ${pagination?.last_page ?? 1}
+                Halaman ${pagination?.page ?? 1} dari ${pagination?.last_page ?? 1} • Total ${pagination?.total ?? 0} nota
             </span>
         `;
     };
@@ -165,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 : 'Riwayat kasir siap.';
             const pagination = typeof data.pagination === 'object' && data.pagination !== null
                 ? data.pagination
-                : { page: 1, last_page: 1 };
+                : { page: 1, per_page: 10, total: 0, last_page: 1 };
 
             renderItems(items, summaryLabel, pagination);
         } catch (_error) {

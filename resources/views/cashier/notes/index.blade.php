@@ -12,7 +12,7 @@
                     <div>
                         <h4 class="card-title mb-1">Riwayat Nota Kasir</h4>
                         <p class="mb-0 text-muted">
-                            Menampilkan nota hari ini dan carry-over nota open atau belum selesai dari kemarin.
+                            Menampilkan nota dalam window kasir hari ini dan kemarin.
                         </p>
                     </div>
 
@@ -70,7 +70,7 @@
 
                 <div class="alert alert-light-primary mb-0">
                     Workspace Kasir aktif. Slice berikutnya akan menghubungkan filter ini ke daftar nota,
-                    status pembayaran, status pengerjaan, dan pagination.
+                    status pembayaran, ringkasan pengerjaan per nota, dan pagination.
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
                             <th class="text-end">Sudah Dibayar</th>
                             <th class="text-end">Sisa Tagihan</th>
                             <th>Status Bayar</th>
-                            <th>Status Kerja</th>
+                            <th>Ringkasan Pengerjaan</th>
                             <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
@@ -104,7 +104,7 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="cashier-note-table-summary" class="text-muted">
-                    Scope default: hari ini + carry-over open dari kemarin.
+                    Scope default: window kasir hari ini dan kemarin.
                 </small>
                 <div id="cashier-note-table-pagination"></div>
             </div>
