@@ -13,13 +13,12 @@
                     <p class="mb-0 text-muted">
                         Halaman ini disiapkan sebagai workspace operasional admin untuk membuka nota,
                         memantau status pembayaran, dan nanti menangani editability sesuai policy.
+                        Admin tidak membuat transaksi dari halaman ini.
                     </p>
                 </div>
 
-                <div>
-                    <a href="{{ route('cashier.notes.create') }}" class="btn btn-outline-primary">
-                        Buka Create Nota
-                    </a>
+                <div class="text-lg-end">
+                    <span class="badge bg-light-secondary text-dark">Workspace Admin</span>
                 </div>
             </div>
 
