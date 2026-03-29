@@ -58,10 +58,17 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ request()->routeIs('cashier.notes.*') || request()->routeIs('notes.create') ? 'active' : '' }}">
+                <li class="sidebar-item {{ request()->routeIs('cashier.notes.create') || request()->routeIs('notes.create') ? 'active' : '' }}">
                     <a href="{{ route('cashier.notes.create') }}" class="sidebar-link">
                         <i class="bi bi-receipt-cutoff"></i>
-                        <span>Nota</span>
+                        <span>Buat Nota</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item {{ request()->routeIs('cashier.notes.index') || request()->routeIs('cashier.notes.show') || request()->routeIs('cashier.notes.rows.*') || request()->routeIs('cashier.notes.payments.*') || request()->routeIs('cashier.notes.corrections.*') ? 'active' : '' }}">
+                    <a href="{{ route('cashier.notes.index') }}" class="sidebar-link">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Riwayat Nota</span>
                     </a>
                 </li>
 

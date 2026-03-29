@@ -107,6 +107,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.notes.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.notes.index') }}" class="sidebar-link">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Riwayat Nota</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-title">Laporan</li>
 
                 <li class="sidebar-item">
