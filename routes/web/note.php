@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
-use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateNotePageController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\CreateTransactionWorkspacePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
-use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController;
-use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as CashierNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidServiceOnlyWorkItemController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidWorkItemStatusController;
@@ -22,22 +19,11 @@ Route::middleware(['web', 'transaction.entry'])->group(function (): void {
     Route::post('/notes/create', CreateNoteController::class)->name('notes.create');
 });
 
-Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
-    Route::get('/admin/notes/table', AdminNoteHistoryTableDataController::class)
-        ->name('admin.notes.table');
-});
-
-Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
-    Route::get('/admin/notes', AdminNoteHistoryPageController::class)
-        ->name('admin.notes.index');
-});
-
 Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntryAllowed::class, 'app.shell'])
     ->prefix('cashier/notes')
     ->name('cashier.notes.')
     ->group(function (): void {
-        Route::get('/table', NoteHistoryTableDataController::class)->name('table');
-        Route::get('/', CashierNoteHistoryPageController::class)->name('index');
+        Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
         Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get('/prototype/{noteId}', fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId]))->name('prototype.show');
         Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
