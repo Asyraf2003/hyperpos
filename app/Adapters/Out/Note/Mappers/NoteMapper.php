@@ -16,9 +16,14 @@ final class NoteMapper
      */
     public static function map(stdClass $row, array $items): Note
     {
+        $customerPhone = property_exists($row, 'customer_phone')
+            ? ($row->customer_phone === null ? null : (string) $row->customer_phone)
+            : null;
+
         return Note::rehydrate(
             (string) $row->id,
             (string) $row->customer_name,
+            $customerPhone,
             new DateTimeImmutable((string) $row->transaction_date),
             Money::fromInt((int) $row->total_rupiah),
             $items

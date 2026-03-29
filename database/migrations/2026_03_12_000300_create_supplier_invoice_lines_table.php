@@ -14,6 +14,10 @@ return new class extends Migration
             $table->string('id')->primary();
             $table->string('supplier_invoice_id');
             $table->string('product_id');
+            $table->string('product_kode_barang_snapshot')->nullable();
+            $table->string('product_nama_barang_snapshot')->nullable();
+            $table->string('product_merek_snapshot')->nullable();
+            $table->integer('product_ukuran_snapshot')->nullable();
             $table->integer('qty_pcs');
             $table->integer('line_total_rupiah');
             $table->integer('unit_cost_rupiah');

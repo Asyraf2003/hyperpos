@@ -1,5 +1,15 @@
 <div class="row g-3">
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Customer</div><div class="fw-bold">{{ $note['customer_name'] }}</div></div></div></div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-muted small">Customer</div>
+                <div class="fw-bold">{{ $note['customer_name'] }}</div>
+                @if (!empty($note['customer_phone']))
+                    <div class="small text-muted mt-1">Telp: {{ $note['customer_phone'] }}</div>
+                @endif
+            </div>
+        </div>
+    </div>
     <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tanggal</div><div class="fw-bold">{{ $note['transaction_date'] }}</div></div></div></div>
     <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Payment Status</div><div class="fw-bold text-uppercase">{{ $note['payment_status'] }}</div></div></div></div>
     <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Sisa Tagihan</div><div class="fw-bold">{{ number_format($note['outstanding_rupiah'], 0, ',', '.') }}</div></div></div></div>

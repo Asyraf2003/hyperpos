@@ -14,15 +14,40 @@ trait NoteState
     private function __construct(
         private string $id,
         private string $customerName,
+        private ?string $customerPhone,
         private DateTimeImmutable $transactionDate,
         private array $workItems,
         private Money $totalRupiah,
     ) {}
 
-    public function id(): string { return $this->id; }
-    public function customerName(): string { return $this->customerName; }
-    public function transactionDate(): DateTimeImmutable { return $this->transactionDate; }
+    public function id(): string
+    {
+        return $this->id;
+    }
+
+    public function customerName(): string
+    {
+        return $this->customerName;
+    }
+
+    public function customerPhone(): ?string
+    {
+        return $this->customerPhone;
+    }
+
+    public function transactionDate(): DateTimeImmutable
+    {
+        return $this->transactionDate;
+    }
+
     /** @return list<WorkItem> */
-    public function workItems(): array { return $this->workItems; }
-    public function totalRupiah(): Money { return $this->totalRupiah; }
+    public function workItems(): array
+    {
+        return $this->workItems;
+    }
+
+    public function totalRupiah(): Money
+    {
+        return $this->totalRupiah;
+    }
 }

@@ -20,6 +20,7 @@ final class CreateNoteController extends Controller
 
         $createResult = $createNote->handle(
             (string) $data['customer_name'],
+            is_string($data['customer_phone'] ?? null) ? $data['customer_phone'] : null,
             (string) $data['transaction_date'],
         );
 

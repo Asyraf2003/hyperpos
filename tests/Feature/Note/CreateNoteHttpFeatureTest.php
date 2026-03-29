@@ -55,6 +55,7 @@ final class CreateNoteHttpFeatureTest extends TestCase
         $this->assertDatabaseHas('notes', [
             'id' => (string) $note->id,
             'customer_name' => 'Budi Santoso',
+            'customer_phone' => '08123456789',
             'transaction_date' => '2026-03-14',
             'total_rupiah' => 150000,
         ]);

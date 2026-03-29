@@ -21,12 +21,14 @@ final class CreateNoteHandler
 
     public function handle(
         string $customerName,
+        ?string $customerPhone,
         string $transactionDate,
     ): Result {
         try {
             $note = Note::create(
                 $this->uuid->generate(),
                 trim($customerName),
+                $customerPhone,
                 $this->parseTransactionDate($transactionDate),
             );
         } catch (DomainException $e) {
@@ -42,6 +44,7 @@ final class CreateNoteHandler
             [
                 'id' => $note->id(),
                 'customer_name' => $note->customerName(),
+                'customer_phone' => $note->customerPhone(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'total_rupiah' => $note->totalRupiah()->amount(),
             ],

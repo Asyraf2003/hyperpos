@@ -37,6 +37,7 @@ final class NoteDetailPageDataBuilder
             'note' => [
                 'id' => $note->id(),
                 'customer_name' => $note->customerName(),
+                'customer_phone' => $note->customerPhone(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'grand_total_rupiah' => $grandTotal,
                 'total_allocated_rupiah' => $allocated,

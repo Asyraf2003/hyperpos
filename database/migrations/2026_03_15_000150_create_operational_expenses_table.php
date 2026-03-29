@@ -13,6 +13,8 @@ return new class extends Migration
         Schema::create('operational_expenses', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('category_id');
+            $table->string('category_code_snapshot')->nullable();
+            $table->string('category_name_snapshot')->nullable();
             $table->integer('amount_rupiah');
             $table->date('expense_date');
             $table->string('description');

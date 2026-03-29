@@ -21,6 +21,7 @@ final class NoteTest extends TestCase
         $note = Note::create(
             'note-1',
             'Budi Santoso',
+            '08123456789',
             new DateTimeImmutable('2026-03-14'),
         );
 
@@ -79,6 +80,7 @@ final class NoteTest extends TestCase
         $note->addWorkItem($storeStockSaleOnly);
 
         $this->assertCount(3, $note->workItems());
+        $this->assertSame('08123456789', $note->customerPhone());
         $this->assertSame(200000, $note->totalRupiah()->amount());
     }
 
@@ -87,6 +89,7 @@ final class NoteTest extends TestCase
         $note = Note::create(
             'note-1',
             'Budi Santoso',
+            null,
             new DateTimeImmutable('2026-03-14'),
         );
 
@@ -152,6 +155,7 @@ final class NoteTest extends TestCase
         Note::rehydrate(
             'note-1',
             'Budi Santoso',
+            null,
             new DateTimeImmutable('2026-03-14'),
             Money::fromInt(99999),
             $workItems,

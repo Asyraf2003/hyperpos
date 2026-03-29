@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('supplier_invoices', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('supplier_id');
+            $table->string('supplier_nama_pt_pengirim_snapshot')->nullable();
             $table->date('tanggal_pengiriman');
             $table->date('jatuh_tempo');
             $table->integer('grand_total_rupiah');

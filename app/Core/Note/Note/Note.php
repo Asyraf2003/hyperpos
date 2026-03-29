@@ -14,35 +14,67 @@ final class Note
     use NoteState;
     use NoteValidation;
 
-    public static function create(string $id, string $name, DateTimeImmutable $date): self
-    {
+    public static function create(
+        string $id,
+        string $name,
+        ?string $customerPhone,
+        DateTimeImmutable $date,
+    ): self {
         self::assertValidIdentity($id, $name);
-        return new self(trim($id), trim($name), $date, [], Money::zero());
+
+        return new self(
+            trim($id),
+            trim($name),
+            self::normalizeCustomerPhone($customerPhone),
+            $date,
+            [],
+            Money::zero(),
+        );
     }
 
     /** @param list<WorkItem> $workItems */
-    public static function rehydrate(string $id, string $name, DateTimeImmutable $date, Money $total, array $workItems = []): self
-    {
+    public static function rehydrate(
+        string $id,
+        string $name,
+        ?string $customerPhone,
+        DateTimeImmutable $date,
+        Money $total,
+        array $workItems = [],
+    ): self {
         self::assertValidIdentity($id, $name);
         self::assertValidWorkItems($workItems);
         $total->ensureNotNegative('Total note tidak boleh negatif.');
 
         if ($workItems !== []) {
-            if (!self::calculateTotalFromWorkItems($workItems)->equals($total)) {
+            if (! self::calculateTotalFromWorkItems($workItems)->equals($total)) {
                 throw new DomainException('Total note tidak konsisten dengan subtotal work item.');
             }
         }
 
-        return new self(trim($id), trim($name), $date, array_values($workItems), $total);
+        return new self(
+            trim($id),
+            trim($name),
+            self::normalizeCustomerPhone($customerPhone),
+            $date,
+            array_values($workItems),
+            $total,
+        );
     }
 
     public function addWorkItem(WorkItem $item): void
     {
-        if ($item->noteId() !== $this->id) throw new DomainException('Work item tidak belong ke note ini.');
+        if ($item->noteId() !== $this->id) {
+            throw new DomainException('Work item tidak belong ke note ini.');
+        }
 
         foreach ($this->workItems as $existing) {
-            if ($existing->id() === $item->id()) throw new DomainException('Work item ID duplikat.');
-            if ($existing->lineNo() === $item->lineNo()) throw new DomainException('Line number duplikat.');
+            if ($existing->id() === $item->id()) {
+                throw new DomainException('Work item ID duplikat.');
+            }
+
+            if ($existing->lineNo() === $item->lineNo()) {
+                throw new DomainException('Line number duplikat.');
+            }
         }
 
         $this->workItems[] = $item;
@@ -53,5 +85,16 @@ final class Note
     {
         $total->ensureNotNegative('Total note tidak boleh negatif.');
         $this->totalRupiah = $total;
+    }
+
+    private static function normalizeCustomerPhone(?string $customerPhone): ?string
+    {
+        if ($customerPhone === null) {
+            return null;
+        }
+
+        $normalized = trim($customerPhone);
+
+        return $normalized === '' ? null : $normalized;
     }
 }
