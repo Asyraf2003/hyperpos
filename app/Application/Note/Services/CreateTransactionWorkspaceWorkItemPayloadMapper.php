@@ -12,6 +12,7 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
     public function __construct(
         private readonly CreateTransactionWorkspaceStoreStockLineMapper $storeStock,
         private readonly CreateTransactionWorkspaceExternalPurchaseLineMapper $external,
+        private readonly CreateTransactionWorkspaceServiceWorkItemVariantResolver $variants,
     ) {
     }
 
@@ -22,10 +23,14 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
     public function map(array $item): array
     {
         $entryMode = (string) ($item['entry_mode'] ?? '');
-        $partSource = (string) ($item['part_source'] ?? 'none');
 
         if ($entryMode === 'product') {
-            return [WorkItem::TYPE_STORE_STOCK_SALE_ONLY, [], [], [$this->storeStock->map($item)]];
+            return [
+                WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+                [],
+                [],
+                [$this->storeStock->map($item)],
+            ];
         }
 
         if ($entryMode !== 'service') {
@@ -35,15 +40,18 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
         $service = [
             'service_name' => $this->requiredString($item['service']['name'] ?? null, 'Nama servis wajib diisi.'),
             'service_price_rupiah' => $this->requiredInt($item['service']['price_rupiah'] ?? null, 'Harga servis wajib diisi.'),
-            'part_source' => $partSource,
+            'part_source' => 'none',
         ];
 
-        return match ($partSource) {
-            'none', 'customer_owned' => [WorkItem::TYPE_SERVICE_ONLY, $service, [], []],
-            'store_stock' => [WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, $service, [], [$this->storeStock->map($item)]],
-            'external_purchase' => [WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, $service, [$this->external->map($item)], []],
-            default => throw new DomainException('Sumber part service tidak valid.'),
-        };
+        if ($this->variants->hasExternalPurchaseLines($item)) {
+            return [WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, $service, [$this->external->map($item)], []];
+        }
+
+        if ($this->variants->hasStoreStockLines($item)) {
+            return [WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, $service, [], [$this->storeStock->map($item)]];
+        }
+
+        return [WorkItem::TYPE_SERVICE_ONLY, $service, [], []];
     }
 
     private function requiredString(mixed $value, string $message): string
