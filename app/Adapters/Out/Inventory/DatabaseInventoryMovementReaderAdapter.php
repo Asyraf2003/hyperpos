@@ -8,6 +8,7 @@ use App\Core\Inventory\Movement\InventoryMovement;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Inventory\InventoryMovementReaderPort;
 use DateTimeImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -33,6 +34,40 @@ final class DatabaseInventoryMovementReaderAdapter implements InventoryMovementR
             ->orderBy('id')
             ->get();
 
+        return $this->mapRows($rows);
+    }
+
+    /**
+     * @return list<InventoryMovement>
+     */
+    public function getBySource(string $sourceType, string $sourceId): array
+    {
+        $rows = DB::table('inventory_movements')
+            ->select([
+                'id',
+                'product_id',
+                'movement_type',
+                'source_type',
+                'source_id',
+                'tanggal_mutasi',
+                'qty_delta',
+                'unit_cost_rupiah',
+            ])
+            ->where('source_type', $sourceType)
+            ->where('source_id', $sourceId)
+            ->orderBy('tanggal_mutasi')
+            ->orderBy('id')
+            ->get();
+
+        return $this->mapRows($rows);
+    }
+
+    /**
+     * @param Collection<int, object> $rows
+     * @return list<InventoryMovement>
+     */
+    private function mapRows(Collection $rows): array
+    {
         $movements = [];
 
         foreach ($rows as $row) {

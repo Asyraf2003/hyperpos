@@ -12,4 +12,9 @@ interface InventoryMovementReaderPort
      * @return list<InventoryMovement>
      */
     public function getAll(): array;
+
+    /**
+     * @return list<InventoryMovement>
+     */
+    public function getBySource(string $sourceType, string $sourceId): array;
 }
