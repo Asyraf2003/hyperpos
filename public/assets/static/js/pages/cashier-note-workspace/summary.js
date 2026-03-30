@@ -10,6 +10,14 @@
     const el = document.getElementById(id);
     if (el) el.classList.toggle("d-none", !show);
   };
+  const toggleFlex = (id, show) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle("d-none", !show);
+    el.classList.toggle("d-flex", show);
+  };
+
+  NS.paymentUiState = NS.paymentUiState || { cashStep: false };
 
   const rowTotal = (row) => {
     const type = row.dataset.itemType || "";
@@ -30,14 +38,73 @@
   const selectedDecision = () =>
     document.querySelector('input[name="inline_payment[decision]"]:checked')?.value || "skip";
 
-  const selectedMethod = () =>
-    document.getElementById("inline_payment_method")?.value || "cash";
-
   const paymentDecisionLabel = (value) =>
     ({ skip: "Skip", pay_full: "Bayar Penuh", pay_partial: "Bayar Sebagian" })[value] || "Skip";
 
   const paymentMethodLabel = (value) =>
-    ({ cash: "Cash", transfer: "Transfer" })[value] || "Belum diatur";
+    ({ cash: "Cash", transfer: "Transfer" })[value] || "Belum dipilih";
+
+  const getRawPaid = () => digits(document.getElementById("inline_payment_amount_paid_rupiah")?.value);
+  const getRawReceived = () => digits(document.getElementById("inline_payment_amount_received_rupiah")?.value);
+
+  const getPayableAmount = (grandTotal, decision) => {
+    if (decision === "pay_full") {
+      return grandTotal;
+    }
+
+    if (decision === "pay_partial") {
+      return Math.min(getRawPaid(), grandTotal);
+    }
+
+    return 0;
+  };
+
+  const syncHiddenPaidAt = () => {
+    const noteDate = document.getElementById("note_transaction_date")?.value || "";
+    const hiddenPaidAt = document.getElementById("inline_payment_paid_at_hidden");
+    if (hiddenPaidAt) hiddenPaidAt.value = noteDate;
+  };
+
+  const syncHiddenPaymentMethod = (value) => {
+    const hidden = document.getElementById("inline_payment_method_hidden");
+    if (hidden) hidden.value = value;
+  };
+
+  const updateFooterState = (decision, cashStep, partialAmount) => {
+    toggle("workspace-payment-submit-skip", decision === "skip" && !cashStep);
+    toggle("workspace-payment-submit-transfer", decision !== "skip" && !cashStep);
+    toggle("workspace-payment-open-cash", decision !== "skip" && !cashStep);
+    toggleFlex("workspace-payment-footer-default", !cashStep);
+    toggleFlex("workspace-payment-footer-cash", cashStep);
+
+    const transferButton = document.getElementById("workspace-payment-submit-transfer");
+    const openCashButton = document.getElementById("workspace-payment-open-cash");
+
+    const partialInvalid = decision === "pay_partial" && partialAmount <= 0;
+
+    if (transferButton) transferButton.disabled = partialInvalid;
+    if (openCashButton) openCashButton.disabled = partialInvalid;
+  };
+
+  const updatePanels = (decision, cashStep, grandTotal, paidNow, outstanding) => {
+    toggle("workspace-payment-panel-skip", decision === "skip" && !cashStep);
+    toggle("workspace-payment-panel-full", decision === "pay_full" && !cashStep);
+    toggle("workspace-payment-panel-partial", decision === "pay_partial" && !cashStep);
+    toggle("workspace-payment-panel-cash", cashStep);
+
+    const fullMethodText = document.getElementById("workspace-modal-full-method-text");
+    if (fullMethodText) {
+      fullMethodText.textContent = cashStep ? "Cash" : "Belum dipilih";
+    }
+
+    setText("workspace-modal-full-paid-text", grandTotal);
+    setText("workspace-modal-partial-before-text", grandTotal);
+    setText("workspace-modal-partial-paid-text", paidNow);
+    setText("workspace-modal-partial-after-text", outstanding);
+    setText("workspace-modal-cash-payable-text", paidNow);
+    setText("workspace-modal-cash-received-text", getRawReceived());
+    setText("workspace-modal-cash-change-text", Math.max(getRawReceived() - paidNow, 0));
+  };
 
   NS.syncQtyGuard = (row) => {
     const input = row.querySelector("[data-qty-input]");
@@ -55,20 +122,12 @@
   NS.updateSummary = () => {
     document.querySelectorAll("[data-line-item]").forEach((row) => NS.syncQtyGuard(row));
 
+    syncHiddenPaidAt();
+
     const grandTotal = Array.from(document.querySelectorAll("[data-line-item]")).reduce((sum, row) => sum + rowTotal(row), 0);
     const decision = selectedDecision();
-    const paidInput = document.getElementById("inline_payment_amount_paid_rupiah");
-    const receivedInput = document.getElementById("inline_payment_amount_received_rupiah");
-    const paidRaw = digits(paidInput?.value);
-    const receivedRaw = digits(receivedInput?.value);
-    const paidNow = decision === "pay_full" ? grandTotal : decision === "pay_partial" ? Math.min(paidRaw, grandTotal) : 0;
+    const paidNow = getPayableAmount(grandTotal, decision);
     const outstanding = Math.max(grandTotal - paidNow, 0);
-    const isSkip = decision === "skip";
-    const isFull = decision === "pay_full";
-    const isPartial = decision === "pay_partial";
-    const needsCash = !isSkip && selectedMethod() === "cash";
-
-    document.querySelectorAll("[data-line-item]").forEach((row) => NS.syncQtyGuard(row));
 
     [
       ["workspace-grand-total-text", grandTotal],
@@ -77,45 +136,86 @@
       ["workspace-modal-grand-total-text", grandTotal],
       ["workspace-modal-paid-now-text", paidNow],
       ["workspace-modal-outstanding-text", outstanding],
-      ["workspace-modal-full-paid-text", grandTotal],
-      ["workspace-modal-full-change-text", isFull && needsCash ? Math.max(receivedRaw - grandTotal, 0) : 0],
-      ["workspace-modal-partial-before-text", grandTotal],
-      ["workspace-modal-partial-paid-text", paidNow],
-      ["workspace-modal-partial-after-text", outstanding],
     ].forEach(([id, value]) => setText(id, value));
 
     const decisionText = paymentDecisionLabel(decision);
-    const methodText =
-      decision === "skip"
-        ? "Belum diatur"
-        : `${paymentMethodLabel(selectedMethod())}${decision === "pay_partial" ? " · nominal parsial" : ""}`;
+    const methodHiddenValue = document.getElementById("inline_payment_method_hidden")?.value || "";
+    const methodText = decision === "skip" ? "Belum diatur" : paymentMethodLabel(methodHiddenValue || "Belum dipilih");
 
-    const decisionTargets = [
-      document.getElementById("workspace-payment-decision-text"),
-      document.getElementById("workspace-modal-payment-decision-text"),
-    ];
-
-    const methodTargets = [
-      document.getElementById("workspace-payment-method-text"),
-      document.getElementById("workspace-modal-payment-method-text"),
-    ];
-
-    decisionTargets.forEach((el) => {
+    ["workspace-payment-decision-text", "workspace-modal-payment-decision-text"].forEach((id) => {
+      const el = document.getElementById(id);
       if (el) el.textContent = decisionText;
     });
 
-    methodTargets.forEach((el) => {
+    ["workspace-payment-method-text", "workspace-modal-payment-method-text"].forEach((id) => {
+      const el = document.getElementById(id);
       if (el) el.textContent = methodText;
     });
 
-    toggle("workspace-payment-panel-skip", isSkip);
-    toggle("workspace-payment-panel-full", isFull);
-    toggle("workspace-payment-panel-partial", isPartial);
-    toggle("workspace-modal-payment-fields", !isSkip);
-    toggle("workspace-modal-amount-paid-group", isPartial);
-    toggle("workspace-modal-amount-received-group", needsCash);
-
-    if (paidInput) paidInput.disabled = !isPartial;
-    if (receivedInput) receivedInput.disabled = !needsCash;
+    updatePanels(decision, NS.paymentUiState.cashStep, grandTotal, paidNow, outstanding);
+    updateFooterState(decision, NS.paymentUiState.cashStep, getRawPaid());
   };
+
+  document.addEventListener("change", (event) => {
+    if (event.target.matches('input[name="inline_payment[decision]"]')) {
+      NS.paymentUiState.cashStep = false;
+      syncHiddenPaymentMethod("");
+      NS.updateSummary();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const openCash = event.target.closest("#workspace-payment-open-cash");
+    if (openCash) {
+      NS.paymentUiState.cashStep = true;
+      syncHiddenPaymentMethod("cash");
+      NS.updateSummary();
+      return;
+    }
+
+    const backCash = event.target.closest("#workspace-payment-back-from-cash");
+    if (backCash) {
+      NS.paymentUiState.cashStep = false;
+      syncHiddenPaymentMethod("");
+      NS.updateSummary();
+      return;
+    }
+
+    const submitTransfer = event.target.closest("#workspace-payment-submit-transfer");
+    if (submitTransfer) {
+      syncHiddenPaymentMethod("transfer");
+      return;
+    }
+
+    const submitCash = event.target.closest("#workspace-payment-submit-cash");
+    if (submitCash) {
+      syncHiddenPaymentMethod("cash");
+      return;
+    }
+
+    const submitSkip = event.target.closest("#workspace-payment-submit-skip");
+    if (submitSkip) {
+      syncHiddenPaymentMethod("");
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    if (
+      event.target.id === "inline_payment_amount_paid_display" ||
+      event.target.id === "inline_payment_amount_received_display" ||
+      event.target.id === "note_transaction_date"
+    ) {
+      NS.updateSummary();
+    }
+  });
+
+  const bootScript = document.querySelector('script[src*="boot.js"]');
+  if (bootScript) {
+      const parent = bootScript.parentNode;
+      parent.removeChild(bootScript);
+      const newBoot = document.createElement('script');
+      newBoot.src = bootScript.src;
+      parent.appendChild(newBoot);
+  }
+
 })();

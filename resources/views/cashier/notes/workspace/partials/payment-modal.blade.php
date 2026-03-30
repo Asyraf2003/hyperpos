@@ -16,6 +16,19 @@
             </div>
 
             <div class="modal-body">
+                <input
+                    type="hidden"
+                    id="inline_payment_method_hidden"
+                    name="inline_payment[payment_method]"
+                    value="{{ ($oldInlinePayment['payment_method'] ?? '') === 'cash' ? 'cash' : (($oldInlinePayment['payment_method'] ?? '') === 'transfer' ? 'transfer' : '') }}"
+                >
+                <input
+                    type="hidden"
+                    id="inline_payment_paid_at_hidden"
+                    name="inline_payment[paid_at]"
+                    value="{{ $oldNote['transaction_date'] }}"
+                >
+
                 <div class="row g-3 mb-4">
                     <div class="col-12 col-md-4">
                         <div class="border rounded p-3 h-100">
@@ -66,18 +79,23 @@
                 </div>
 
                 <div id="workspace-payment-panel-full" class="d-none">
-                    <div class="row g-3 mb-4">
-                        <div class="col-12 col-md-6">
-                            <div class="border rounded p-3 h-100">
-                                <div class="small text-muted">Nominal Dibayar Otomatis</div>
-                                <div class="fs-5 fw-bold" id="workspace-modal-full-paid-text">0</div>
-                            </div>
+                    <div class="border rounded p-3 mb-4">
+                        <div class="fw-semibold mb-1">Bayar penuh</div>
+                        <div class="text-muted small mb-3">
+                            Pilih TF untuk langsung simpan sebagai pembayaran transfer, atau pilih Cash untuk masuk ke kalkulator.
                         </div>
-
-                        <div class="col-12 col-md-6">
-                            <div class="border rounded p-3 h-100">
-                                <div class="small text-muted">Kembalian Cash</div>
-                                <div class="fs-5 fw-bold" id="workspace-modal-full-change-text">0</div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="small text-muted">Nominal Dibayar Otomatis</div>
+                                    <div class="fs-5 fw-bold" id="workspace-modal-full-paid-text">0</div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="small text-muted">Metode Saat Ini</div>
+                                    <div class="fs-5 fw-bold" id="workspace-modal-full-method-text">Belum dipilih</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -106,66 +124,100 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-group mb-4" data-money-input-group>
+                        <label for="inline_payment_amount_paid_display" class="form-label">Nominal Dibayar</label>
+                        <input
+                            type="hidden"
+                            id="inline_payment_amount_paid_rupiah"
+                            name="inline_payment[amount_paid_rupiah]"
+                            value="{{ $oldInlinePayment['amount_paid_rupiah'] }}"
+                            data-money-raw
+                        >
+                        <input
+                            type="text"
+                            id="inline_payment_amount_paid_display"
+                            value="{{ $oldInlinePayment['amount_paid_rupiah'] }}"
+                            class="form-control"
+                            inputmode="numeric"
+                            placeholder="Masukkan nominal yang dibayar sekarang"
+                            data-money-display
+                        >
+                    </div>
                 </div>
 
-                <div id="workspace-modal-payment-fields" class="d-none">
-                    <div class="row">
-                        <div class="col-12 col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="inline_payment_method" class="form-label">Metode Bayar</label>
-                                <select id="inline_payment_method" name="inline_payment[payment_method]" class="form-select">
-                                    @foreach ($paymentMethodOptions as $option)
-                                        <option value="{{ $option['value'] }}" {{ ($oldInlinePayment['payment_method'] ?? 'cash') === $option['value'] ? 'selected' : '' }}>
-                                            {{ $option['label'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                <div id="workspace-payment-panel-cash" class="d-none">
+                    <div class="border rounded p-3 mb-4">
+                        <div class="fw-semibold mb-1">Kalkulator Cash</div>
+                        <div class="text-muted small">Masukkan uang dari pelanggan untuk menghitung kembalian.</div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted">Tagihan</div>
+                                <div class="fs-5 fw-bold" id="workspace-modal-cash-payable-text">0</div>
                             </div>
                         </div>
 
-                        <div class="col-12 col-md-6">
-                            <div class="form-group mb-3">
-                                <label for="inline_payment_paid_at" class="form-label">Tanggal Bayar</label>
-                                <input type="date" id="inline_payment_paid_at" name="inline_payment[paid_at]" value="{{ $oldInlinePayment['paid_at'] }}" class="form-control">
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted">Uang Dari Pelanggan</div>
+                                <div class="fs-5 fw-bold" id="workspace-modal-cash-received-text">0</div>
                             </div>
                         </div>
 
-                        <div class="col-12 col-md-6 d-none" id="workspace-modal-amount-paid-group">
-                            <div class="form-group mb-3">
-                                <label for="inline_payment_amount_paid_rupiah" class="form-label">Nominal Dibayar</label>
-                                <input
-                                    type="text"
-                                    id="inline_payment_amount_paid_rupiah"
-                                    name="inline_payment[amount_paid_rupiah]"
-                                    value="{{ $oldInlinePayment['amount_paid_rupiah'] }}"
-                                    class="form-control"
-                                    inputmode="numeric"
-                                    placeholder="Isi untuk bayar sebagian"
-                                >
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted">Kembalian</div>
+                                <div class="fs-5 fw-bold" id="workspace-modal-cash-change-text">0</div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-12 col-md-6 d-none" id="workspace-modal-amount-received-group">
-                            <div class="form-group mb-3">
-                                <label for="inline_payment_amount_received_rupiah" class="form-label">Uang Masuk</label>
-                                <input
-                                    type="text"
-                                    id="inline_payment_amount_received_rupiah"
-                                    name="inline_payment[amount_received_rupiah]"
-                                    value="{{ $oldInlinePayment['amount_received_rupiah'] }}"
-                                    class="form-control"
-                                    inputmode="numeric"
-                                    placeholder="Wajib untuk cash"
-                                >
-                            </div>
-                        </div>
+                    <div class="form-group mb-0" data-money-input-group>
+                        <label for="inline_payment_amount_received_display" class="form-label">Uang Dari Pelanggan</label>
+                        <input
+                            type="hidden"
+                            id="inline_payment_amount_received_rupiah"
+                            name="inline_payment[amount_received_rupiah]"
+                            value="{{ $oldInlinePayment['amount_received_rupiah'] }}"
+                            data-money-raw
+                        >
+                        <input
+                            type="text"
+                            id="inline_payment_amount_received_display"
+                            value="{{ $oldInlinePayment['amount_received_rupiah'] }}"
+                            class="form-control"
+                            inputmode="numeric"
+                            placeholder="Masukkan uang dari pelanggan"
+                            data-money-display
+                        >
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Gunakan Pengaturan Ini</button>
+                <div class="w-100 d-flex justify-content-between align-items-center gap-2" id="workspace-payment-footer-default">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary d-none" id="workspace-payment-submit-skip">Simpan Nota</button>
+
+                        <button type="submit" class="btn btn-outline-primary d-none" id="workspace-payment-submit-transfer">
+                            TF
+                        </button>
+
+                        <button type="button" class="btn btn-primary d-none" id="workspace-payment-open-cash">
+                            Cash
+                        </button>
+                    </div>
+                </div>
+
+                <div class="w-100 d-none justify-content-between align-items-center gap-2" id="workspace-payment-footer-cash">
+                    <button type="button" class="btn btn-light" id="workspace-payment-back-from-cash">Kembali</button>
+                    <button type="submit" class="btn btn-primary" id="workspace-payment-submit-cash">OK</button>
+                </div>
             </div>
         </div>
     </div>
