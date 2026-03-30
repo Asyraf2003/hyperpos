@@ -1,26 +1,72 @@
 <div class="row g-3">
-    <div class="col-md-3">
-        <div class="card">
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h4 class="card-title mb-1">Identitas Nota</h4>
+                <p class="mb-0 text-muted">Informasi utama nota pelanggan.</p>
+            </div>
+
             <div class="card-body">
-                <div class="text-muted small">Customer</div>
-                <div class="fw-bold">{{ $note['customer_name'] }}</div>
-                @if (!empty($note['customer_phone']))
-                    <div class="small text-muted mt-1">Telp: {{ $note['customer_phone'] }}</div>
-                @endif
+                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <div class="text-muted">Customer</div>
+                    <div class="text-end fw-semibold">{{ $note['customer_name'] }}</div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <div class="text-muted">No. Telp</div>
+                    <div class="text-end fw-semibold">
+                        {{ !empty($note['customer_phone']) ? $note['customer_phone'] : '-' }}
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <div class="text-muted">Tanggal Nota</div>
+                    <div class="text-end fw-semibold">{{ $note['transaction_date'] }}</div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <div class="text-muted">Status Pembayaran</div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark text-uppercase">{{ $note['payment_status'] }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start py-2">
+                    <div class="text-muted">Jumlah Rincian</div>
+                    <div class="text-end fw-semibold">{{ count($note['rows']) }}</div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tanggal</div><div class="fw-bold">{{ $note['transaction_date'] }}</div></div></div></div>
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Payment Status</div><div class="fw-bold text-uppercase">{{ $note['payment_status'] }}</div></div></div></div>
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Sisa Tagihan</div><div class="fw-bold">{{ number_format($note['outstanding_rupiah'], 0, ',', '.') }}</div></div></div></div>
-</div>
 
-<div class="card mt-3">
-    <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-4"><div class="text-muted small">Grand Total</div><div class="fw-bold">{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</div></div>
-            <div class="col-md-4"><div class="text-muted small">Total Dialokasikan</div><div class="fw-bold">{{ number_format($note['total_allocated_rupiah'], 0, ',', '.') }}</div></div>
-            <div class="col-md-4"><div class="text-muted small">Total Refund</div><div class="fw-bold">{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</div></div>
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h4 class="card-title mb-1">Ringkasan Pembayaran</h4>
+                <p class="mb-0 text-muted">Susunan angka dibuat menurun supaya lebih cepat dibaca kasir.</p>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Grand Total</span>
+                    <strong>{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Total Dialokasikan</span>
+                    <strong>{{ number_format($note['total_allocated_rupiah'], 0, ',', '.') }}</strong>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Total Refund</span>
+                    <strong>{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center py-3">
+                    <span class="fw-semibold">Sisa Tagihan</span>
+                    <strong class="fs-5">{{ number_format($note['outstanding_rupiah'], 0, ',', '.') }}</strong>
+                </div>
+            </div>
         </div>
     </div>
 </div>
