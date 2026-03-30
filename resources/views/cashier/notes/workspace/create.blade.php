@@ -18,13 +18,7 @@
         @include('cashier.notes.workspace.partials.payment-modal')
     </form>
 
-    <script id="cashier-note-workspace-config" type="application/json">
-        {!! json_encode([
-            'oldItems' => $oldItems,
-            'defaultCustomerName' => $defaultCustomerName,
-            'productLookupEndpoint' => $productLookupEndpoint,
-        ]) !!}
-    </script>
+    <script id="cashier-note-workspace-config" type="application/json">{!! $workspaceConfigJson !!}</script>
 </section>
 @endsection
 

@@ -17,10 +17,19 @@ final class CreateTransactionWorkspacePageController extends Controller
         $oldItems = old('items');
         $oldInlinePayment = old('inline_payment');
 
+        $defaultCustomerName = 'Pelanggan no 1';
+        $productLookupEndpoint = route('cashier.notes.products.lookup');
+
+        $workspaceConfigJson = json_encode([
+            'oldItems' => is_array($oldItems) ? array_values($oldItems) : [],
+            'defaultCustomerName' => $defaultCustomerName,
+            'productLookupEndpoint' => $productLookupEndpoint,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
         return view('cashier.notes.workspace.create', [
             'pageTitle' => 'Buat Nota',
             'oldNote' => is_array($oldNote) ? $oldNote : [
-                'customer_name' => 'Pelanggan no 1',
+                'customer_name' => $defaultCustomerName,
                 'customer_phone' => '',
                 'transaction_date' => date('Y-m-d'),
             ],
@@ -33,8 +42,9 @@ final class CreateTransactionWorkspacePageController extends Controller
                 'amount_received_rupiah' => '',
                 'notes' => '',
             ],
-            'defaultCustomerName' => 'Pelanggan no 1',
-            'productLookupEndpoint' => route('cashier.notes.products.lookup'),
+            'defaultCustomerName' => $defaultCustomerName,
+            'productLookupEndpoint' => $productLookupEndpoint,
+            'workspaceConfigJson' => is_string($workspaceConfigJson) ? $workspaceConfigJson : '{}',
         ] + $page);
     }
 }
