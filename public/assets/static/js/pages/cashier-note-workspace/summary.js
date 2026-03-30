@@ -2,11 +2,22 @@
   const NS = (window.CashierNoteWorkspace = window.CashierNoteWorkspace || {});
   const digits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
   const format = (value) => Number(value || 0).toLocaleString("id-ID");
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = format(value);
+  };
+  const toggle = (id, show) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("d-none", !show);
+  };
 
   const rowTotal = (row) => {
     const type = row.dataset.itemType || "";
     const service = digits(row.querySelector('[name$="[service][price_rupiah]"]')?.value);
-    const qty = digits(row.querySelector("[data-qty-input]")?.value || row.querySelector('input[name$="[external_purchase_lines][0][qty]"]')?.value);
+    const qty = digits(
+      row.querySelector("[data-qty-input]")?.value ||
+      row.querySelector('input[name$="[external_purchase_lines][0][qty]"]')?.value
+    );
     const product = digits(row.querySelector('input[name$="[product_lines][0][unit_price_rupiah]"]')?.value);
     const external = digits(row.querySelector('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]')?.value);
 
@@ -46,23 +57,32 @@
 
     const grandTotal = Array.from(document.querySelectorAll("[data-line-item]")).reduce((sum, row) => sum + rowTotal(row), 0);
     const decision = selectedDecision();
-    const paidRaw = digits(document.getElementById("inline_payment_amount_paid_rupiah")?.value);
+    const paidInput = document.getElementById("inline_payment_amount_paid_rupiah");
+    const receivedInput = document.getElementById("inline_payment_amount_received_rupiah");
+    const paidRaw = digits(paidInput?.value);
+    const receivedRaw = digits(receivedInput?.value);
     const paidNow = decision === "pay_full" ? grandTotal : decision === "pay_partial" ? Math.min(paidRaw, grandTotal) : 0;
     const outstanding = Math.max(grandTotal - paidNow, 0);
+    const isSkip = decision === "skip";
+    const isFull = decision === "pay_full";
+    const isPartial = decision === "pay_partial";
+    const needsCash = !isSkip && selectedMethod() === "cash";
 
-    const mappings = [
+    document.querySelectorAll("[data-line-item]").forEach((row) => NS.syncQtyGuard(row));
+
+    [
       ["workspace-grand-total-text", grandTotal],
       ["workspace-paid-now-text", paidNow],
       ["workspace-outstanding-text", outstanding],
       ["workspace-modal-grand-total-text", grandTotal],
       ["workspace-modal-paid-now-text", paidNow],
       ["workspace-modal-outstanding-text", outstanding],
-    ];
-
-    mappings.forEach(([id, value]) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = format(value);
-    });
+      ["workspace-modal-full-paid-text", grandTotal],
+      ["workspace-modal-full-change-text", isFull && needsCash ? Math.max(receivedRaw - grandTotal, 0) : 0],
+      ["workspace-modal-partial-before-text", grandTotal],
+      ["workspace-modal-partial-paid-text", paidNow],
+      ["workspace-modal-partial-after-text", outstanding],
+    ].forEach(([id, value]) => setText(id, value));
 
     const decisionText = paymentDecisionLabel(decision);
     const methodText =
@@ -87,5 +107,15 @@
     methodTargets.forEach((el) => {
       if (el) el.textContent = methodText;
     });
+
+    toggle("workspace-payment-panel-skip", isSkip);
+    toggle("workspace-payment-panel-full", isFull);
+    toggle("workspace-payment-panel-partial", isPartial);
+    toggle("workspace-modal-payment-fields", !isSkip);
+    toggle("workspace-modal-amount-paid-group", isPartial);
+    toggle("workspace-modal-amount-received-group", needsCash);
+
+    if (paidInput) paidInput.disabled = !isPartial;
+    if (receivedInput) receivedInput.disabled = !needsCash;
   };
 })();
