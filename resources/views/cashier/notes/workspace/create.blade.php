@@ -19,11 +19,11 @@
     </form>
 
     <script id="cashier-note-workspace-config" type="application/json">
-        @json([
+        {!! json_encode([
             'oldItems' => $oldItems,
             'defaultCustomerName' => $defaultCustomerName,
             'productLookupEndpoint' => $productLookupEndpoint,
-        ])
+        ]) !!}
     </script>
 </section>
 @endsection

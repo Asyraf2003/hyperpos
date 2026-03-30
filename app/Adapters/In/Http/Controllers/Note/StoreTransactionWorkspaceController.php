@@ -18,41 +18,15 @@ final class StoreTransactionWorkspaceController extends Controller
         $result = $handler->handle($request->validated());
 
         if ($result->isFailure()) {
-            return back()->withErrors([
-                'workspace' => $result->message() ?? 'Workspace nota gagal disimpan.',
-            ])->withInput();
-        }
-
-        $noteId = $this->extractNoteId($result->data());
-
-        if ($noteId === null) {
-            return back()->withErrors([
-                'workspace' => 'ID nota tidak ditemukan setelah penyimpanan workspace.',
-            ])->withInput();
+            return back()
+                ->withErrors([
+                    'workspace' => $result->message() ?? 'Workspace nota gagal disimpan.',
+                ])
+                ->withInput();
         }
 
         return redirect()
-            ->route('cashier.notes.show', ['noteId' => $noteId])
+            ->route('cashier.notes.index')
             ->with('success', $result->message() ?? 'Workspace nota berhasil disimpan.');
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function extractNoteId(array $payload): ?string
-    {
-        $note = $payload['note'] ?? null;
-
-        if (! is_array($note)) {
-            return null;
-        }
-
-        $noteId = $note['id'] ?? null;
-
-        if (! is_string($noteId) || trim($noteId) === '') {
-            return null;
-        }
-
-        return trim($noteId);
     }
 }
