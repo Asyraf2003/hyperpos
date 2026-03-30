@@ -58,6 +58,7 @@ final class CreateTransactionWorkspaceHandler
             $note = Note::create(
                 $this->uuid->generate(),
                 $this->requiredString($payload['note']['customer_name'] ?? null, 'Nama customer wajib diisi.'),
+                $this->nullableString($payload['note']['customer_phone'] ?? null),
                 $this->parseTransactionDate($payload['note']['transaction_date'] ?? null),
             );
 
@@ -331,6 +332,17 @@ final class CreateTransactionWorkspaceHandler
         }
 
         return trim($value);
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed === '' ? null : $trimmed;
     }
 
     private function requiredInt(mixed $value, string $message): int
