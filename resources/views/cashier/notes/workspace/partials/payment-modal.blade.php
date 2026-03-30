@@ -1,5 +1,5 @@
 <div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <input type="hidden" id="inline_payment_decision_hidden" name="inline_payment[decision]" value="skip">
             <input type="hidden" id="inline_payment_method_hidden" name="inline_payment[payment_method]" value="">
@@ -16,10 +16,10 @@
             </div>
 
             <div class="modal-body">
-                @include('cashier.notes.workspace.partials.payment-modal-summary')
-                @include('cashier.notes.workspace.partials.payment-modal-full')
-                @include('cashier.notes.workspace.partials.payment-modal-partial')
-                @include('cashier.notes.workspace.partials.payment-modal-cash')
+                <div class="row g-4">
+                    @include('cashier.notes.workspace.partials.payment-modal-left')
+                    @include('cashier.notes.workspace.partials.payment-modal-right')
+                </div>
             </div>
 
             @include('cashier.notes.workspace.partials.payment-modal-footer')

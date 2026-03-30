@@ -4,13 +4,9 @@
   const format = (value) => Number(value || 0).toLocaleString("id-ID");
   const byId = (id) => document.getElementById(id);
   const setText = (id, value) => { const el = byId(id); if (el) el.textContent = format(value); };
+  const setHtml = (id, value) => { const el = byId(id); if (el) el.innerHTML = value; };
   const toggle = (id, show) => { const el = byId(id); if (el) el.classList.toggle("d-none", !show); };
-  const toggleFlex = (id, show) => {
-    const el = byId(id);
-    if (!el) return;
-    el.classList.toggle("d-none", !show);
-    el.classList.toggle("d-flex", show);
-  };
+  const toggleFlex = (id, show) => { const el = byId(id); if (!el) return; el.classList.toggle("d-none", !show); el.classList.toggle("d-flex", show); };
 
   NS.paymentState = NS.paymentState || { mode: "skip", cashStep: false };
 
@@ -64,13 +60,8 @@
     const noteDate = byId("note_transaction_date")?.value || "";
     updateHidden("inline_payment_paid_at_hidden", noteDate);
 
-    if (NS.paymentState.mode !== "partial") {
-      clearPayNow();
-    }
-
-    if (NS.paymentState.mode === "partial") {
-      buildPartialList();
-    }
+    if (NS.paymentState.mode !== "partial") clearPayNow();
+    if (NS.paymentState.mode === "partial") buildPartialList();
 
     const payable = payableAmount(grandTotal);
     const remaining = Math.max(grandTotal - payable, 0);
@@ -84,13 +75,15 @@
     setText("workspace-cash-change-text", Math.max(received - payable, 0));
 
     const modeText = byId("workspace-payment-mode-text");
-    if (modeText) {
-      modeText.textContent = NS.paymentState.mode === "full" ? "Bayar Penuh" : "Bayar Sebagian";
-    }
+    if (modeText) modeText.textContent = NS.paymentState.mode === "full" ? "Bayar Penuh" : "Bayar Sebagian";
 
-    toggle("workspace-payment-panel-full", NS.paymentState.mode === "full" && !NS.paymentState.cashStep);
-    toggle("workspace-payment-panel-partial", NS.paymentState.mode === "partial" && !NS.paymentState.cashStep);
+    const cashBadge = byId("workspace-cash-status-badge");
+    if (cashBadge) cashBadge.textContent = NS.paymentState.cashStep ? "Aktif" : "Siaga";
+
+    toggle("workspace-payment-panel-full", NS.paymentState.mode === "full");
+    toggle("workspace-payment-panel-partial", NS.paymentState.mode === "partial");
     toggle("workspace-payment-panel-cash", NS.paymentState.cashStep);
+    toggle("workspace-cash-shell-hint", !NS.paymentState.cashStep);
     toggleFlex("workspace-payment-footer-main", !NS.paymentState.cashStep);
     toggleFlex("workspace-payment-footer-cash", NS.paymentState.cashStep);
 
