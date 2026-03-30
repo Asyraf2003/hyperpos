@@ -6,6 +6,7 @@ namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
 use App\Application\Note\Services\NoteOutstandingPaymentAmountResolver;
+use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -15,13 +16,18 @@ final class RecordNotePaymentController extends Controller
     public function __invoke(
         string $noteId,
         RecordNotePaymentRequest $request,
-        NoteOutstandingPaymentAmountResolver $resolver,
+        SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
+        NoteOutstandingPaymentAmountResolver $outstandingResolver,
         RecordAndAllocateNotePaymentHandler $flow,
     ): RedirectResponse {
         $data = $request->validated();
-        $amountResult = ($data['payment_scope'] ?? 'full') === 'partial'
-            ? $resolver->resolvePartial($noteId, (int) ($data['amount_paid'] ?? 0))
-            : $resolver->resolveFull($noteId);
+
+        $amountResult = $this->resolveAmount(
+            $noteId,
+            $data,
+            $selectedRowsResolver,
+            $outstandingResolver
+        );
 
         if ($amountResult->isFailure()) {
             return back()->withErrors(['payment' => $amountResult->message() ?? 'Pembayaran gagal.'])->withInput();
@@ -42,6 +48,30 @@ final class RecordNotePaymentController extends Controller
         return redirect()
             ->route('cashier.notes.show', ['noteId' => $noteId])
             ->with('success', $this->successMessage($data, $amount));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveAmount(
+        string $noteId,
+        array $data,
+        SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
+        NoteOutstandingPaymentAmountResolver $outstandingResolver,
+    ) {
+        $selectedRowIds = $data['selected_row_ids'] ?? [];
+
+        if (is_array($selectedRowIds) && $selectedRowIds !== []) {
+            return $selectedRowsResolver->resolve($noteId, $selectedRowIds);
+        }
+
+        $paymentScope = (string) ($data['payment_scope'] ?? 'full');
+
+        if ($paymentScope === 'partial') {
+            return $outstandingResolver->resolvePartial($noteId, (int) ($data['amount_paid'] ?? 0));
+        }
+
+        return $outstandingResolver->resolveFull($noteId);
     }
 
     /**
