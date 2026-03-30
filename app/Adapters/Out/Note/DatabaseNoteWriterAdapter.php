@@ -21,6 +21,17 @@ final class DatabaseNoteWriterAdapter implements NoteWriterPort
         ]);
     }
 
+    public function updateHeader(Note $note): void
+    {
+        DB::table('notes')
+            ->where('id', $note->id())
+            ->update([
+                'customer_name' => $note->customerName(),
+                'customer_phone' => $note->customerPhone(),
+                'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+            ]);
+    }
+
     public function updateTotal(Note $note): void
     {
         DB::table('notes')
