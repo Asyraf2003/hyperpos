@@ -7,6 +7,7 @@ namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 use App\Application\Note\Services\CreateTransactionWorkspacePageDataBuilder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 final class CreateTransactionWorkspacePageController extends Controller
 {
@@ -17,7 +18,7 @@ final class CreateTransactionWorkspacePageController extends Controller
         $oldItems = old('items');
         $oldInlinePayment = old('inline_payment');
 
-        $defaultCustomerName = 'Pelanggan no 1';
+        $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
         $productLookupEndpoint = route('cashier.notes.products.lookup');
 
         $workspaceConfigJson = json_encode([
