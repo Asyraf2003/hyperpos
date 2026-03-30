@@ -47,6 +47,7 @@
     };
 
     set('textarea[name$="[description]"]', item?.description || "");
+    set('[data-pay-now]', item?.pay_now || "0");
     set('input[name$="[service][name]"]', item?.service?.name || "");
     set('textarea[name$="[service][notes]"]', item?.service?.notes || "");
     set('[data-product-search]', item?.selected_label || "");
