@@ -50,7 +50,9 @@
                 <div class="form-group mb-3" data-money-input-group>
                     <label class="form-label">Harga Sparepart (Rupiah)</label>
                     <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw>
-                    <input type="text" inputmode="numeric" value="" class="form-control" placeholder="Contoh: 150.000" data-money-display>
+                    <input type="text" inputmode="numeric" value="" class="form-control" placeholder="Contoh: 150.000" data-money-display data-price-input>
+                    <small class="text-muted d-block mt-1" data-min-price-text>Harga minimum: -</small>
+                    <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
                 </div>
             </div>
 

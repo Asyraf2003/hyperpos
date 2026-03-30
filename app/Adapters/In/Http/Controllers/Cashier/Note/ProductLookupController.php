@@ -38,6 +38,8 @@ final class ProductLookupController extends Controller
                 continue;
             }
 
+            $floorPrice = $product->hargaJual()->amount();
+
             $parts = [
                 $product->namaBarang(),
                 $product->merek(),
@@ -57,7 +59,8 @@ final class ProductLookupController extends Controller
                 'id' => $product->id(),
                 'label' => $label,
                 'available_stock' => $availableStock,
-                'default_unit_price_rupiah' => $product->hargaJual()->amount(),
+                'default_unit_price_rupiah' => $floorPrice,
+                'minimum_unit_price_rupiah' => $floorPrice,
             ];
         }
 

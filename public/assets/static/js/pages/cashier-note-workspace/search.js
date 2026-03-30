@@ -4,6 +4,29 @@
 
   const parseDigits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
 
+  NS.syncFloorPriceGuard = (row) => {
+    const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
+    const display = row.querySelector("[data-price-input]");
+    const warning = row.querySelector("[data-min-price-warning]");
+    const text = row.querySelector("[data-min-price-text]");
+
+    const floor = parseDigits(row.dataset.minimumUnitPriceRupiah || "0");
+    const current = parseDigits(raw?.value || display?.value || "0");
+    const invalid = floor > 0 && current > 0 && current < floor;
+
+    if (text) {
+      text.textContent = floor > 0 ? `Harga minimum: ${floor.toLocaleString("id-ID")}` : "Harga minimum: -";
+    }
+
+    if (display) {
+      display.classList.toggle("is-invalid", invalid);
+    }
+
+    if (warning) {
+      warning.classList.toggle("d-none", !invalid);
+    }
+  };
+
   const renderResults = (row, rows) => {
     const results = row.querySelector("[data-product-results]");
     results.innerHTML = "";
@@ -23,13 +46,18 @@
     const search = row.querySelector("[data-product-search]");
     const hidden = row.querySelector("[data-product-id]");
     const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
-    const display = raw?.closest("[data-money-input-group]")?.querySelector("[data-money-display]");
+    const display = row.querySelector("[data-price-input]");
+
     search.value = item.label;
     hidden.value = item.id;
+    row.dataset.minimumUnitPriceRupiah = String(item.minimum_unit_price_rupiah || item.default_unit_price_rupiah || 0);
     NS.updateStockText(row, item.available_stock);
+
     if (raw && !parseDigits(raw.value)) raw.value = String(item.default_unit_price_rupiah || 0);
     if (display && !parseDigits(display.value)) display.value = String(item.default_unit_price_rupiah || 0);
+
     window.AdminMoneyInput?.bindBySelector?.(row);
+    NS.syncFloorPriceGuard?.(row);
     renderResults(row, []);
     NS.syncQtyGuard?.(row);
     NS.updateSummary?.();
@@ -37,6 +65,8 @@
 
   NS.bindProductSearch = (row) => {
     const input = row.querySelector("[data-product-search]");
+    const priceInput = row.querySelector("[data-price-input]");
+
     if (!input) return;
 
     input.addEventListener("input", () => {
@@ -53,6 +83,17 @@
         }, 250)
       );
     });
+
+    if (priceInput) {
+      priceInput.addEventListener("input", () => {
+        NS.syncFloorPriceGuard?.(row);
+        NS.updateSummary?.();
+      });
+
+      priceInput.addEventListener("blur", () => {
+        NS.syncFloorPriceGuard?.(row);
+      });
+    }
 
     document.addEventListener("click", (event) => {
       if (!row.contains(event.target)) renderResults(row, []);
