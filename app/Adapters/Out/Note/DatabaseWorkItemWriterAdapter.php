@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
 {
     use WorkItemLineInsertsTrait;
+    use WorkItemDeletesTrait;
 
     public function create(WorkItem $workItem): void
     {
@@ -38,41 +39,6 @@ final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
 
         $this->insertExternalPurchaseLines($workItem);
         $this->insertStoreStockLines($workItem);
-    }
-
-    public function deleteByNoteId(string $noteId): void
-    {
-        $normalized = trim($noteId);
-
-        if ($normalized === '') {
-            throw new DomainException('Note id pada penghapusan work item wajib ada.');
-        }
-
-        $workItemIds = DB::table('work_items')
-            ->where('note_id', $normalized)
-            ->pluck('id')
-            ->map(static fn ($id): string => (string) $id)
-            ->all();
-
-        if ($workItemIds === []) {
-            return;
-        }
-
-        DB::table('work_item_service_details')
-            ->whereIn('work_item_id', $workItemIds)
-            ->delete();
-
-        DB::table('work_item_external_purchase_lines')
-            ->whereIn('work_item_id', $workItemIds)
-            ->delete();
-
-        DB::table('work_item_store_stock_lines')
-            ->whereIn('work_item_id', $workItemIds)
-            ->delete();
-
-        DB::table('work_items')
-            ->whereIn('id', $workItemIds)
-            ->delete();
     }
 
     public function updateStatus(WorkItem $workItem): void
