@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Application\Note\Services;
+
+use App\Core\Note\WorkItem\WorkItem;
+use App\Core\Shared\Exceptions\DomainException;
+
+final class CreateTransactionWorkspaceWorkItemPayloadMapper
+{
+    public function __construct(
+        private readonly CreateTransactionWorkspaceStoreStockLineMapper $storeStock,
+        private readonly CreateTransactionWorkspaceExternalPurchaseLineMapper $external,
+    ) {
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     * @return array{0:string,1:array<string, mixed>,2:list<array<string, mixed>>,3:list<array<string, mixed>>}
+     */
+    public function map(array $item): array
+    {
+        $entryMode = (string) ($item['entry_mode'] ?? '');
+        $partSource = (string) ($item['part_source'] ?? 'none');
+
+        if ($entryMode === 'product') {
+            return [WorkItem::TYPE_STORE_STOCK_SALE_ONLY, [], [], [$this->storeStock->map($item)]];
+        }
+
+        if ($entryMode !== 'service') {
+            throw new DomainException('Tipe item workspace tidak didukung.');
+        }
+
+        $service = [
+            'service_name' => $this->requiredString($item['service']['name'] ?? null, 'Nama servis wajib diisi.'),
+            'service_price_rupiah' => $this->requiredInt($item['service']['price_rupiah'] ?? null, 'Harga servis wajib diisi.'),
+            'part_source' => $partSource,
+        ];
+
+        return match ($partSource) {
+            'none', 'customer_owned' => [WorkItem::TYPE_SERVICE_ONLY, $service, [], []],
+            'store_stock' => [WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, $service, [], [$this->storeStock->map($item)]],
+            'external_purchase' => [WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, $service, [$this->external->map($item)], []],
+            default => throw new DomainException('Sumber part service tidak valid.'),
+        };
+    }
+
+    private function requiredString(mixed $value, string $message): string
+    {
+        if (! is_string($value) || trim($value) === '') {
+            throw new DomainException($message);
+        }
+
+        return trim($value);
+    }
+
+    private function requiredInt(mixed $value, string $message): int
+    {
+        if (! is_int($value) || $value <= 0) {
+            throw new DomainException($message);
+        }
+
+        return $value;
+    }
+}
