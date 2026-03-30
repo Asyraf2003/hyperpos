@@ -15,6 +15,7 @@
             @include('cashier.notes.workspace.partials.rincian-card')
             @include('cashier.notes.workspace.partials.info-card')
         </div>
+        @include('cashier.notes.workspace.partials.payment-modal')
     </form>
 
     <script id="cashier-note-workspace-config" type="application/json">

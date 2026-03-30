@@ -52,57 +52,29 @@
                 <div class="fs-5 fw-semibold" id="workspace-paid-now-text">0</div>
             </div>
 
-            <div class="border rounded p-3 mb-4">
+            <div class="border rounded p-3 mb-3">
                 <div class="small text-muted">Sisa Tagihan</div>
                 <div class="fs-5 fw-semibold" id="workspace-outstanding-text">0</div>
             </div>
 
-            <div class="form-group mb-4">
-                <label class="form-label d-block">Keputusan Pembayaran</label>
-                @foreach ($paymentDecisionOptions as $option)
-                    <div class="form-check mb-2">
-                        <input
-                            class="form-check-input"
-                            type="radio"
-                            name="inline_payment[decision]"
-                            id="inline_payment_decision_{{ $option['value'] }}"
-                            value="{{ $option['value'] }}"
-                            {{ ($oldInlinePayment['decision'] ?? 'skip') === $option['value'] ? 'checked' : '' }}
-                        >
-                        <label class="form-check-label" for="inline_payment_decision_{{ $option['value'] }}">
-                            {{ $option['label'] }}
-                        </label>
-                    </div>
-                @endforeach
+            <div class="border rounded p-3 mb-4">
+                <div class="small text-muted mb-1">Status Pembayaran</div>
+                <div class="fw-semibold" id="workspace-payment-decision-text">Skip</div>
+                <div class="text-muted small" id="workspace-payment-method-text">Belum diatur</div>
             </div>
 
-            <div class="form-group mb-3">
-                <label for="inline_payment_method" class="form-label">Metode Bayar</label>
-                <select id="inline_payment_method" name="inline_payment[payment_method]" class="form-select">
-                    @foreach ($paymentMethodOptions as $option)
-                        <option value="{{ $option['value'] }}" {{ ($oldInlinePayment['payment_method'] ?? 'cash') === $option['value'] ? 'selected' : '' }}>
-                            {{ $option['label'] }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            <div class="d-grid gap-2">
+                <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#workspace-payment-modal"
+                >
+                    Atur Pembayaran
+                </button>
 
-            <div class="form-group mb-3">
-                <label for="inline_payment_paid_at" class="form-label">Tanggal Bayar</label>
-                <input type="date" id="inline_payment_paid_at" name="inline_payment[paid_at]" value="{{ $oldInlinePayment['paid_at'] }}" class="form-control">
+                <button type="submit" class="btn btn-primary">Simpan Nota</button>
             </div>
-
-            <div class="form-group mb-3">
-                <label for="inline_payment_amount_paid_rupiah" class="form-label">Nominal Dibayar</label>
-                <input type="text" id="inline_payment_amount_paid_rupiah" name="inline_payment[amount_paid_rupiah]" value="{{ $oldInlinePayment['amount_paid_rupiah'] }}" class="form-control" inputmode="numeric">
-            </div>
-
-            <div class="form-group mb-4">
-                <label for="inline_payment_amount_received_rupiah" class="form-label">Uang Masuk</label>
-                <input type="text" id="inline_payment_amount_received_rupiah" name="inline_payment[amount_received_rupiah]" value="{{ $oldInlinePayment['amount_received_rupiah'] }}" class="form-control" inputmode="numeric">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Simpan Nota</button>
         </div>
     </div>
 </div>
