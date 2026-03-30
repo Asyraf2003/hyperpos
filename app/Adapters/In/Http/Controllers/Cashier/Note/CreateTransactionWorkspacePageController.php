@@ -12,14 +12,15 @@ final class CreateTransactionWorkspacePageController extends Controller
 {
     public function __invoke(CreateTransactionWorkspacePageDataBuilder $builder): View
     {
+        $page = $builder->build();
         $oldNote = old('note');
         $oldItems = old('items');
         $oldInlinePayment = old('inline_payment');
 
         return view('cashier.notes.workspace.create', [
-            'pageTitle' => 'Workspace Nota',
+            'pageTitle' => 'Buat Nota',
             'oldNote' => is_array($oldNote) ? $oldNote : [
-                'customer_name' => '',
+                'customer_name' => 'Pelanggan no 1',
                 'customer_phone' => '',
                 'transaction_date' => date('Y-m-d'),
             ],
@@ -32,6 +33,8 @@ final class CreateTransactionWorkspacePageController extends Controller
                 'amount_received_rupiah' => '',
                 'notes' => '',
             ],
-        ] + $builder->build());
+            'defaultCustomerName' => 'Pelanggan no 1',
+            'productLookupEndpoint' => route('cashier.notes.products.lookup'),
+        ] + $page);
     }
 }

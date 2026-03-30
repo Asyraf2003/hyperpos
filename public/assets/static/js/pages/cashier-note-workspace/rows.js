@@ -1,0 +1,83 @@
+(() => {
+  const NS = (window.CashierNoteWorkspace = window.CashierNoteWorkspace || {});
+
+  const replaceIndex = (html, index) => html.replaceAll("__INDEX__", String(index));
+  const titleByType = (type, number) => `Rincian ${number} · ${NS.labelByType(type)}`;
+
+  NS.labelByType = (type) =>
+    ({
+      product: "Produk",
+      service: "Servis",
+      service_store_stock: "Servis + Sparepart Toko",
+      service_external: "Servis + Pembelian Luar",
+    })[type] || "Rincian";
+
+  NS.detectType = (item) => {
+    if ((item?.entry_mode || "") === "product") return "product";
+    if ((item?.part_source || "") === "store_stock") return "service_store_stock";
+    if ((item?.part_source || "") === "external_purchase") return "service_external";
+    return "service";
+  };
+
+  NS.addRow = (type, initial = {}) => {
+    const root = document.getElementById("workspace-line-items");
+    const template = document.getElementById(`workspace-template-${type}`);
+    const emptyState = document.getElementById("workspace-empty-state");
+    const index = Number(root.dataset.nextIndex || "0");
+    const wrapper = document.createElement("div");
+
+    wrapper.innerHTML = replaceIndex(template.innerHTML, index);
+    const row = wrapper.firstElementChild;
+    row.dataset.rowIndex = String(index);
+    root.appendChild(row);
+    root.dataset.nextIndex = String(index + 1);
+    emptyState.classList.add("d-none");
+
+    NS.applyInitialValues(row, type, initial);
+    window.AdminMoneyInput?.bindBySelector?.(row);
+    NS.bindProductSearch?.(row);
+    NS.renumberRows();
+    NS.updateSummary?.();
+  };
+
+  NS.applyInitialValues = (row, type, item) => {
+    const set = (selector, value) => {
+      const el = row.querySelector(selector);
+      if (el && value !== undefined && value !== null) el.value = String(value);
+    };
+
+    set('textarea[name$="[description]"]', item?.description || "");
+    set('input[name$="[service][name]"]', item?.service?.name || "");
+    set('textarea[name$="[service][notes]"]', item?.service?.notes || "");
+    set('[data-product-search]', item?.selected_label || "");
+    set('[data-product-id]', item?.product_lines?.[0]?.product_id || "");
+    set('input[name$="[external_purchase_lines][0][label]"]', item?.external_purchase_lines?.[0]?.label || "");
+    set('input[name$="[external_purchase_lines][0][qty]"]', item?.external_purchase_lines?.[0]?.qty || "1");
+    set('input[name$="[product_lines][0][qty]"]', item?.product_lines?.[0]?.qty || "1");
+    set('input[name$="[service][price_rupiah]"]', item?.service?.price_rupiah || "");
+    set('input[name$="[product_lines][0][unit_price_rupiah]"]', item?.product_lines?.[0]?.unit_price_rupiah || "");
+    set('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]', item?.external_purchase_lines?.[0]?.unit_cost_rupiah || "");
+    if (type === "product" || type === "service_store_stock") NS.updateStockText(row, item?.available_stock || 0);
+  };
+
+  NS.renumberRows = () => {
+    document.querySelectorAll("[data-line-item]").forEach((row, index) => {
+      const title = row.querySelector("[data-line-title]");
+      if (title) title.textContent = titleByType(row.dataset.itemType || "", index + 1);
+    });
+  };
+
+  NS.removeRow = (row) => {
+    row.remove();
+    const emptyState = document.getElementById("workspace-empty-state");
+    if (!document.querySelector("[data-line-item]")) emptyState.classList.remove("d-none");
+    NS.renumberRows();
+    NS.updateSummary?.();
+  };
+
+  NS.updateStockText = (row, stock) => {
+    const text = row.querySelector("[data-stock-text]");
+    if (text) text.textContent = `Stok tersedia: ${stock}`;
+    row.dataset.availableStock = String(stock || 0);
+  };
+})();
