@@ -58,8 +58,8 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ request()->routeIs('cashier.notes.create') || request()->routeIs('notes.create') ? 'active' : '' }}">
-                    <a href="{{ route('cashier.notes.create') }}" class="sidebar-link">
+                <li class="sidebar-item {{ request()->routeIs('cashier.notes.workspace.create') || request()->routeIs('notes.create') ? 'active' : '' }}">
+                    <a href="{{ route('cashier.notes.workspace.create') }}" class="sidebar-link">
                         <i class="bi bi-receipt-cutoff"></i>
                         <span>Buat Nota</span>
                     </a>
