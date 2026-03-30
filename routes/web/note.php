@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as CashierNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController as CashierNoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\ProductLookupController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\PaymentPrototypePageController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidServiceOnlyWorkItemController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidWorkItemStatusController;
@@ -43,6 +44,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
         Route::get('/table', CashierNoteHistoryTableDataController::class)->name('table');
 
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/ui-prototypes/payment/{variant}', PaymentPrototypePageController::class)->where('variant', 'a|b|c')->name('prototypes.payment');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
         Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get(
