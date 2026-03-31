@@ -92,23 +92,24 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
         $this->assertDatabaseCount('payment_allocations', 0);
     }
 
-    public function test_authenticated_cashier_cannot_record_note_payment_when_selected_rows_are_empty(): void
+    public function test_authenticated_cashier_cannot_record_note_level_payment_without_payment_scope(): void
     {
         $this->loginAsKasir();
-        $user = $this->createCashierUser('cashier-empty-rows@example.test');
+        $user = $this->createCashierUser('cashier-no-scope@example.test');
         $this->seedUnpaidNoteWithTwoRows();
 
         $response = $this->from(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->actingAs($user)
             ->post('/cashier/notes/note-1/payments', [
-                'selected_row_ids' => [],
                 'payment_method' => 'cash',
                 'paid_at' => '2026-03-15',
                 'amount_received' => 70000,
             ]);
 
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['selected_row_ids']);
+        $response->assertSessionHasErrors([
+            'payment_scope' => 'payment scope wajib diisi.',
+        ]);
 
         $this->assertDatabaseCount('customer_payments', 0);
         $this->assertDatabaseCount('payment_allocations', 0);
