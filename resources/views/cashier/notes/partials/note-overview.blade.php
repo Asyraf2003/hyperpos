@@ -1,9 +1,20 @@
 <div class="row g-3">
     <div class="col-12 col-xl-6">
         <div class="card h-100">
-            <div class="card-header">
-                <h4 class="card-title mb-1">Identitas Nota</h4>
-                <p class="mb-0 text-muted">Informasi utama nota pelanggan.</p>
+            <div class="card-header d-flex justify-content-between align-items-start gap-3">
+                <div>
+                    <h4 class="card-title mb-1">Identitas Nota</h4>
+                    <p class="mb-0 text-muted">Informasi utama nota pelanggan.</p>
+                </div>
+
+                @if (($note['total_allocated_rupiah'] ?? 0) === 0)
+                    <a
+                        href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
+                        class="btn btn-outline-primary btn-sm"
+                    >
+                        Edit Nota
+                    </a>
+                @endif
             </div>
 
             <div class="card-body">
