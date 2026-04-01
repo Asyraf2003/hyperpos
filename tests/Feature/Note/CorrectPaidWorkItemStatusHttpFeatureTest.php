@@ -78,7 +78,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['correction']);
+        $response->assertSessionHasErrors(['reason']);
 
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
