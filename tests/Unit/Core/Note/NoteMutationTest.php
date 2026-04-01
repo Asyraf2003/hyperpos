@@ -13,7 +13,7 @@ use App\Core\Shared\ValueObjects\Money;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
-final class NoteTest extends TestCase
+final class NoteMutationTest extends TestCase
 {
     public function test_it_updates_note_header(): void
     {
