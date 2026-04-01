@@ -26,8 +26,8 @@
                 <div class="form-group mb-3">
                     <label class="form-label">Qty</label>
                     <input type="text" inputmode="numeric" name="items[__INDEX__][product_lines][0][qty]" value="1" class="form-control" data-qty-input>
-                    <small class="text-muted d-block mt-1" data-stock-text>Stok tersedia: -</small>
-                    <small class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</small>
+                    <large class="text-muted d-block mt-1" data-stock-text>Stok tersedia: -</large>
+                    <large class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</large>
                 </div>
             </div>
 
@@ -36,8 +36,8 @@
                     <label class="form-label">Harga Jual (Rupiah)</label>
                     <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw>
                     <input type="text" inputmode="numeric" value="" class="form-control" placeholder="Contoh: 150.000" data-money-display data-price-input>
-                    <small class="text-muted d-block mt-1" data-min-price-text>Harga minimum: -</small>
-                    <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
+                    <large class="text-muted d-block mt-1" data-min-price-text>Harga minimum: -</large>
+                    <large class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</large>
                 </div>
             </div>
 
