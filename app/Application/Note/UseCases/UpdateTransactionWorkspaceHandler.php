@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\EditableWorkspaceNoteGuard;
+use App\Application\Note\Services\UpdateTransactionWorkspaceResultBuilder;
 use App\Application\Note\Services\UpdateTransactionWorkspaceWorkItemPersister;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
@@ -24,6 +25,7 @@ final class UpdateTransactionWorkspaceHandler
         private readonly UpdateTransactionWorkspaceWorkItemPersister $items,
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
+        private readonly UpdateTransactionWorkspaceResultBuilder $results,
     ) {
     }
 
@@ -42,7 +44,6 @@ final class UpdateTransactionWorkspaceHandler
             $started = true;
 
             $this->guard->assertEditable($noteId);
-
             $note = $this->notes->getById(trim($noteId));
 
             if ($note === null) {
@@ -57,36 +58,17 @@ final class UpdateTransactionWorkspaceHandler
             );
 
             $this->noteWriter->updateHeader($note);
-
-            $itemsCount = $this->items->persist(
-                $note,
-                $payload['items'] ?? [],
-                $note->transactionDate(),
-            );
-
+            $itemsCount = $this->items->persist($note, $payload['items'] ?? [], $note->transactionDate());
             $this->noteWriter->updateTotal($note);
 
-            $this->audit->record('transaction_workspace_updated', [
-                'note_id' => $note->id(),
-                'customer_name' => $note->customerName(),
-                'transaction_date' => $note->transactionDate()->format('Y-m-d'),
-                'items_count' => $itemsCount,
-                'total_rupiah' => $note->totalRupiah()->amount(),
-            ]);
+            $this->audit->record(
+                'transaction_workspace_updated',
+                $this->results->auditPayload($note, $itemsCount),
+            );
 
             $this->transactions->commit();
 
-            return Result::success(
-                [
-                    'note' => [
-                        'id' => $note->id(),
-                        'customer_name' => $note->customerName(),
-                        'transaction_date' => $note->transactionDate()->format('Y-m-d'),
-                        'total_rupiah' => $note->totalRupiah()->amount(),
-                    ],
-                ],
-                'Perubahan workspace nota berhasil disimpan.',
-            );
+            return $this->results->success($note);
         } catch (DomainException $e) {
             if ($started) {
                 $this->transactions->rollBack();
