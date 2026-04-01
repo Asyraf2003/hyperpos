@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Application\Procurement\UseCases\CreateSupplierInvoiceHandler;
+use App\Application\Procurement\UseCases\CreateSupplierInvoiceFlowHandler;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class SupplierInvoiceSeeder extends Seeder
 {
-    public function run(CreateSupplierInvoiceHandler $handler): void
+    public function run(CreateSupplierInvoiceFlowHandler $handler): void
     {
-        $products = DB::table('products')->get(); 
-        
+        $products = DB::table('products')->get();
+
         if ($products->isEmpty()) {
             return;
         }
 
-        // Daftar disamakan persis dengan SupplierSeeder
         $suppliers = [
             'PT. Astra Otoparts (Clutch Div)', 'PT. FCC Indonesia', 'PT. Exedy Manufacturing Indonesia',
             'PT. Faito Racing Indonesia', 'PT. TDR Industries', 'PT. Kawahara Racing',
@@ -35,7 +34,7 @@ final class SupplierInvoiceSeeder extends Seeder
             $lines = [];
 
             foreach ($selectedProducts as $p) {
-                $qty = rand(10, 30); 
+                $qty = rand(10, 30);
                 $hargaModalSatuan = (int) ($p->harga_jual * 0.8);
                 $lineTotal = $qty * $hargaModalSatuan;
 
@@ -46,14 +45,18 @@ final class SupplierInvoiceSeeder extends Seeder
                 ];
             }
 
+            $tglKirim = now()->subDays(rand(1, 15))->format('Y-m-d');
+
             $result = $handler->handle(
                 pt: $suppliers[array_rand($suppliers)],
-                tgl: now()->subDays(rand(1, 15))->format('Y-m-d'),
-                lines: $lines
+                tglKirim: $tglKirim,
+                lines: $lines,
+                autoRec: true,
+                tglTerima: $tglKirim
             );
 
             if ($result->isFailure()) {
-                Log::error("Gagal Seed Invoice: " . $result->message(), $result->errors());
+                Log::error('Gagal Seed Invoice Flow: ' . $result->message(), $result->errors());
             }
         }
     }
