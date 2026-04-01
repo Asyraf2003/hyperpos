@@ -9,12 +9,17 @@
         <div class="alert alert-danger">{{ $errors->first('workspace') }}</div>
     @endif
 
-    <form action="{{ route('notes.workspace.store') }}" method="POST" novalidate id="cashier-note-workspace-form">
+    <form action="{{ $formAction ?? route('notes.workspace.store') }}" method="POST" novalidate id="cashier-note-workspace-form">
         @csrf
+        @if (($workspaceMode ?? 'create') === 'edit')
+            @method('PATCH')
+        @endif
+
         <div class="row">
             @include('cashier.notes.workspace.partials.rincian-card')
             @include('cashier.notes.workspace.partials.info-card')
         </div>
+
         @include('cashier.notes.workspace.partials.payment-modal')
     </form>
 

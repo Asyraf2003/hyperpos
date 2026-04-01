@@ -1,8 +1,14 @@
 <div class="col-12 col-xl-4">
     <div class="card">
         <div class="card-header">
-            <h4 class="card-title mb-1">Informasi Nota</h4>
-            <p class="mb-0 text-muted">Header nota dan total biaya saja. Pembayaran diatur dari aksi bawah.</p>
+            <h4 class="card-title mb-1">{{ ($workspaceMode ?? 'create') === 'edit' ? 'Informasi Edit Nota' : 'Informasi Nota' }}</h4>
+            <p class="mb-0 text-muted">
+                {{
+                    ($workspaceMode ?? 'create') === 'edit'
+                        ? 'Perbarui header nota dan rincian pekerjaan. Pembayaran tidak diubah dari workspace edit.'
+                        : 'Header nota dan total biaya saja. Pembayaran diatur dari aksi bawah.'
+                }}
+            </p>
         </div>
 
         <div class="card-body">
@@ -47,11 +53,18 @@
                 <div class="fs-4 fw-bold" id="workspace-note-total-text">0</div>
             </div>
 
-            <div class="d-grid gap-2">
-                <button type="button" class="btn btn-light" id="workspace-submit-skip">Skip</button>
-                <button type="button" class="btn btn-outline-primary" data-open-payment="partial">Bayar Sebagian</button>
-                <button type="button" class="btn btn-primary" data-open-payment="full">Bayar Penuh</button>
-            </div>
+            @if (($workspaceMode ?? 'create') === 'edit')
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
+                </div>
+            @else
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-light" id="workspace-submit-skip">Skip</button>
+                    <button type="button" class="btn btn-outline-primary" data-open-payment="partial">Bayar Sebagian</button>
+                    <button type="button" class="btn btn-primary" data-open-payment="full">Bayar Penuh</button>
+                </div>
+            @endif
         </div>
     </div>
 </div>
