@@ -1,7 +1,7 @@
 @if ($note['payment_status'] === 'paid')
-    <div class="card mt-3">
+    <div class="card">
         <div class="card-body">
-            <div class="fw-bold mb-1">Correction Paid Note</div>
+            <div class="fw-bold mb-1">Koreksi Nota Lunas</div>
             <div class="text-muted small mb-3">
                 Gunakan koreksi hanya untuk nota yang sudah lunas. Pilih jenis koreksi yang sesuai agar perubahan tetap jelas.
             </div>
@@ -9,7 +9,7 @@
             <div class="row g-3">
                 <div class="col-12 col-xl-6">
                     <div class="border rounded p-3 h-100">
-                        <div class="fw-bold mb-1">Correction Status</div>
+                        <div class="fw-bold mb-1">Koreksi Status</div>
                         <div class="small text-muted mb-3">
                             Ubah status pekerjaan pada baris yang sudah dibayar tanpa mengubah nominal servis.
                         </div>
@@ -82,12 +82,12 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Alasan Correction</label>
+                                <label class="form-label">Alasan Koreksi</label>
                                 <textarea class="form-control" name="reason" rows="3" required>{{ old('_correction_form') === 'status' ? old('reason') : '' }}</textarea>
                             </div>
 
                             <button type="submit" class="btn btn-warning">
-                                Simpan Correction Status
+                                Simpan Koreksi Status
                             </button>
                         </form>
                     </div>
@@ -95,7 +95,7 @@
 
                 <div class="col-12 col-xl-6">
                     <div class="border rounded p-3 h-100">
-                        <div class="fw-bold mb-1">Correction Nominal Service Only</div>
+                        <div class="fw-bold mb-1">Koreksi Nominal Service Only</div>
                         <div class="small text-muted mb-3">
                             Gunakan hanya untuk baris service-only ketika nominal servis perlu disesuaikan setelah pembayaran.
                         </div>
@@ -181,7 +181,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Part Source</label>
+                                <label class="form-label">Sumber Part</label>
                                 <select class="form-select" name="part_source">
                                     @foreach ($partSourceOptions as $option)
                                         <option
@@ -200,12 +200,12 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label">Alasan Correction</label>
+                                <label class="form-label">Alasan Koreksi</label>
                                 <textarea class="form-control" name="reason" rows="3" required>{{ old('_correction_form') === 'service_only' ? old('reason') : '' }}</textarea>
                             </div>
 
                             <button type="submit" class="btn btn-warning">
-                                Simpan Correction Nominal
+                                Simpan Koreksi Nominal
                             </button>
                         </form>
                     </div>
