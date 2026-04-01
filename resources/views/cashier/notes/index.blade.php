@@ -28,7 +28,7 @@
                             >
                         </form>
 
-                        <a href="{{ route('cashier.notes.create') }}" class="btn btn-primary">
+                        <a href="{{ route('cashier.notes.workspace.create') }}" class="btn btn-primary">
                             Buat Nota
                         </a>
                     </div>

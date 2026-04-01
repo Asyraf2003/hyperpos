@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
-use App\Adapters\In\Http\Controllers\Cashier\Note\CreateNotePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateTransactionWorkspacePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\EditTransactionWorkspacePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
@@ -47,7 +46,6 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
         Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
-        Route::get('/create', CreateNotePageController::class)->name('create');
         Route::get(
             '/prototype/{noteId}',
             fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId])

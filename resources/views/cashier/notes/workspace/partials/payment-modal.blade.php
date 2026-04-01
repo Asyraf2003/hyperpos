@@ -10,12 +10,19 @@
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title mb-1">Pembayaran Nota</h5>
-                    <p class="mb-0 text-muted small">TF jalur cepat. Cash masuk kalkulator.</p>
+                    <p class="mb-0 text-muted small">Pilih metode dan isi nominal pembayaran sesuai transaksi.</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
 
             <div class="modal-body">
+                @if (($workspaceMode ?? 'create') === 'edit')
+                    <div class="alert alert-warning mb-4">
+                        Layout pembayaran tetap ditampilkan untuk menjaga konsistensi create dan edit.
+                        Aktivasi submit pembayaran dari workspace edit mengikuti status transaksi yang berlaku.
+                    </div>
+                @endif
+
                 <div class="row g-4">
                     @include('cashier.notes.workspace.partials.payment-modal-left')
                     @include('cashier.notes.workspace.partials.payment-modal-right')
