@@ -20,7 +20,9 @@
             @include('cashier.notes.workspace.partials.info-card')
         </div>
 
-        @include('cashier.notes.workspace.partials.payment-modal')
+        @if (($workspaceMode ?? 'create') === 'create')
+            @include('cashier.notes.workspace.partials.payment-modal')
+        @endif
     </form>
 
     <script id="cashier-note-workspace-config" type="application/json">{!! $workspaceConfigJson !!}</script>
@@ -32,6 +34,8 @@
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/rows.js') }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/search.js') }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/summary.js') }}"></script>
-    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}"></script>
+    @if (($workspaceMode ?? 'create') === 'create')
+        <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}"></script>
+    @endif
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/boot.js') }}"></script>
 @endpush
