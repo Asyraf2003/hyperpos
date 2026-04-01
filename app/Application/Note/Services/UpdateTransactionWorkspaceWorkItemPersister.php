@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Core\Note\Note\Note;
+use App\Ports\Out\Note\WorkItemWriterPort;
 use DateTimeImmutable;
 
 final class UpdateTransactionWorkspaceWorkItemPersister
 {
     public function __construct(
         private readonly ReverseIssuedInventoryByNoteService $reverseIssuedInventoryByNote,
+        private readonly WorkItemWriterPort $workItems,
         private readonly CreateTransactionWorkspaceWorkItemPersister $createPersister,
     ) {
     }
@@ -21,7 +23,7 @@ final class UpdateTransactionWorkspaceWorkItemPersister
     public function persist(Note $note, mixed $items, DateTimeImmutable $date): int
     {
         $this->reverseIssuedInventoryByNote->execute($note, $date);
-        $this->createPersister->workItems->deleteByNoteId($note->id());
+        $this->workItems->deleteByNoteId($note->id());
 
         $note->replaceWorkItems([]);
 
