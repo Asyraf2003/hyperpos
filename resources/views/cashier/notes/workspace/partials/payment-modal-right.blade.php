@@ -1,5 +1,5 @@
 <div class="col-12 col-xl-5">
-    <div class="border rounded p-3 h-100">
+    <div class="border rounded p-3 h-100 d-flex flex-column">
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
                 <div class="fw-semibold">Kalkulator Cash</div>
@@ -8,11 +8,18 @@
             <span class="badge bg-light text-dark" id="workspace-cash-status-badge">Siaga</span>
         </div>
 
+        @if (($workspaceMode ?? 'create') === 'edit')
+            <div class="alert alert-warning mb-3">
+                Layout pembayaran tetap ditampilkan agar posisi create dan edit konsisten.
+                Aktivasi pembayaran dari workspace edit mengikuti status transaksi.
+            </div>
+        @endif
+
         <div id="workspace-cash-shell-hint" class="alert alert-light border mb-3">
-            Pilih tombol <strong>Cash</strong> untuk mengaktifkan kalkulator.
+            Pilih tombol <strong>Bayar Cash</strong> untuk mengaktifkan kalkulator.
         </div>
 
-        <div id="workspace-payment-panel-cash" class="d-none">
+        <div id="workspace-payment-panel-cash" class="d-none mt-auto">
             <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <span class="text-muted">Tagihan</span>
                 <strong id="workspace-cash-payable-text">0</strong>

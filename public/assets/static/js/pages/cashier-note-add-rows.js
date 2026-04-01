@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const rowHtml = (index, row) => {
     const type = row.line_type === 'product' ? 'product' : 'service';
-    return `<div class="border rounded p-3 mb-3 bg-white" data-add-row>
+    return `<div class="border rounded p-3 mb-3 bg-body" data-add-row>
       <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
         <h6 class="mb-0">Baris Tambahan</h6>
         <button type="button" class="btn btn-sm btn-light-danger" data-remove-row>Hapus</button>

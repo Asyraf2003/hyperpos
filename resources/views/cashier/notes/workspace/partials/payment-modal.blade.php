@@ -16,13 +16,6 @@
             </div>
 
             <div class="modal-body">
-                @if (($workspaceMode ?? 'create') === 'edit')
-                    <div class="alert alert-warning mb-4">
-                        Layout pembayaran tetap ditampilkan untuk menjaga konsistensi create dan edit.
-                        Aktivasi submit pembayaran dari workspace edit mengikuti status transaksi yang berlaku.
-                    </div>
-                @endif
-
                 <div class="row g-4">
                     @include('cashier.notes.workspace.partials.payment-modal-left')
                     @include('cashier.notes.workspace.partials.payment-modal-right')
