@@ -27,6 +27,7 @@ use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryProjectionWriterAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryReaderAdapter;
 use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
+use App\Adapters\Out\Note\DatabaseNoteCorrectionHistoryReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteMutationEventWriterAdapter;
 use App\Adapters\Out\Note\DatabaseNoteMutationSnapshotWriterAdapter;
 use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
@@ -118,6 +119,7 @@ use App\Ports\Out\Inventory\ProductInventoryCostingWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryProjectionWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Inventory\ProductInventoryWriterPort;
+use App\Ports\Out\Note\NoteCorrectionHistoryReaderPort;
 use App\Ports\Out\Note\NoteMutationEventWriterPort;
 use App\Ports\Out\Note\NoteMutationSnapshotWriterPort;
 use App\Ports\Out\Note\NoteReaderPort;
@@ -234,6 +236,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(WorkItemWriterPort::class, DatabaseWorkItemWriterAdapter::class);
         $this->app->singleton(NoteMutationEventWriterPort::class, DatabaseNoteMutationEventWriterAdapter::class);
         $this->app->singleton(NoteMutationSnapshotWriterPort::class, DatabaseNoteMutationSnapshotWriterAdapter::class);
+        $this->app->singleton(NoteCorrectionHistoryReaderPort::class, DatabaseNoteCorrectionHistoryReaderAdapter::class);
 
         $this->app->singleton(CustomerPaymentWriterPort::class, DatabaseCustomerPaymentWriterAdapter::class);
         $this->app->singleton(CustomerPaymentReaderPort::class, DatabaseCustomerPaymentReaderAdapter::class);

@@ -32,6 +32,7 @@ final class PersistNoteMutationTimeline
         array $after,
         ?string $relatedCustomerPaymentId = null,
         ?string $relatedCustomerRefundId = null,
+        array $metadata = [],
     ): void {
         $event = NoteMutationEvent::create(
             $this->uuid->generate(),
@@ -47,19 +48,19 @@ final class PersistNoteMutationTimeline
 
         $this->events->create($event);
         $this->snapshots->createMany([
-            NoteMutationSnapshot::create(
-                $this->uuid->generate(),
-                $event->id(),
-                NoteMutationSnapshot::BEFORE,
-                $this->encode($before),
-            ),
-            NoteMutationSnapshot::create(
-                $this->uuid->generate(),
-                $event->id(),
-                NoteMutationSnapshot::AFTER,
-                $this->encode($after),
-            ),
+            NoteMutationSnapshot::create($this->uuid->generate(), $event->id(), NoteMutationSnapshot::BEFORE, $this->encode($this->withMeta($before, $metadata))),
+            NoteMutationSnapshot::create($this->uuid->generate(), $event->id(), NoteMutationSnapshot::AFTER, $this->encode($this->withMeta($after, $metadata))),
         ]);
+    }
+
+    private function withMeta(array $payload, array $metadata): array
+    {
+        if ($metadata === []) {
+            return $payload;
+        }
+
+        $payload['meta'] = $metadata;
+        return $payload;
     }
 
     private function encode(array $payload): string

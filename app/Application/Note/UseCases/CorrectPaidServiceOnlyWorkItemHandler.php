@@ -67,15 +67,8 @@ final class CorrectPaidServiceOnlyWorkItemHandler
             $before = $this->snapshots->build($note);
             $newServiceDetail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
             $correctedWorkItem = WorkItem::rehydrate(
-                $target->id(),
-                $target->noteId(),
-                $target->lineNo(),
-                $target->transactionType(),
-                $target->status(),
-                $newServiceDetail->servicePriceRupiah(),
-                $newServiceDetail,
-                [],
-                [],
+                $target->id(), $target->noteId(), $target->lineNo(), $target->transactionType(),
+                $target->status(), $newServiceDetail->servicePriceRupiah(), $newServiceDetail, [], [],
             );
 
             $newTotal = $note->totalRupiah()->subtract($target->subtotalRupiah())->add($correctedWorkItem->subtotalRupiah());
@@ -100,6 +93,7 @@ final class CorrectPaidServiceOnlyWorkItemHandler
                 $after,
                 null,
                 null,
+                ['refund_required_rupiah' => $refundReq],
             );
 
             $this->audit->record('paid_service_only_work_item_corrected', $this->formatAuditPayload(
