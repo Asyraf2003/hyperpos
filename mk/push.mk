@@ -9,5 +9,5 @@ git-push:
 	@# Menambahkan '|| true' agar Makefile tidak berhenti jika tidak ada yang perlu di-commit
 	@git commit -m "commit $(NEXT_COUNT)" || echo "Nothing new to commit, moving to push..."
 	@echo "Pushing to origin main..."
-	@git push origin main
+	@git push origin $(shell git rev-parse --abbrev-ref HEAD)
 	@echo "Done!"
