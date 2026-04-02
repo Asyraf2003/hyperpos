@@ -55,7 +55,7 @@
         const received = parseNumber(amountReceivedInput ? amountReceivedInput.value : '');
         const isCash = paymentMethod && paymentMethod.value === 'cash';
 
-        selectedPaymentTotal.value = formatNumber(paidNow);
+        selectedPaymentTotal.textContent = formatNumber(paidNow);
         paymentRemainingText.textContent = formatNumber(Math.max(outstanding - paidNow, 0));
         paymentChangeText.textContent = formatNumber(isCash ? Math.max(received - paidNow, 0) : 0);
 

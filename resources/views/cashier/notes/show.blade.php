@@ -26,6 +26,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('assets/static/js/pages/cashier-note-add-rows.js') }}"></script>
 <script src="{{ asset('assets/static/js/pages/cashier-note-payment.js') }}"></script>
 @endpush

@@ -17,7 +17,7 @@
             <p class="mt-2 mb-0 text-muted small">
                 {{
                     ($workspaceMode ?? 'create') === 'edit'
-                        ? 'Aksi pembayaran tetap ditampilkan di tempat yang sama. Aktivasi final mengikuti status transaksi.'
+                        ? 'Perubahan pembayaran tidak dilakukan dari workspace edit.'
                         : 'Gunakan aksi di bawah untuk simpan tanpa pembayaran atau lanjut ke pembayaran.'
                 }}
             </p>
@@ -68,19 +68,17 @@
             <div class="d-grid gap-2">
                 @if (($workspaceMode ?? 'create') === 'edit')
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
                 @else
                     <button type="button" class="btn btn-primary" id="workspace-submit-skip">Simpan Tanpa Pembayaran</button>
+                    <button type="button" class="btn btn-outline-primary" data-open-payment="partial">
+                        Bayar Sebagian
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-open-payment="full">
+                        Bayar Penuh
+                    </button>
+                    <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
                 @endif
-
-                <button type="button" class="btn btn-outline-primary" data-open-payment="partial">
-                    Bayar Sebagian
-                </button>
-
-                <button type="button" class="btn btn-outline-primary" data-open-payment="full">
-                    Bayar Penuh
-                </button>
-
-                <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
             </div>
         </div>
     </div>
