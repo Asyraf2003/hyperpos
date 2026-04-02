@@ -31,12 +31,12 @@ final class AllocateRefundAcrossComponents
     ): array {
         $remaining = $amount->amount();
         $allocations = [];
-        $paymentAllocations = $this->paymentAllocations($customerPaymentId, $noteId);
-        $alreadyRefunded = $this->alreadyRefunded($customerPaymentId, $noteId);
+        $paymentAllocations = RefundablePaymentAllocations::forPayment($this->payments, $customerPaymentId, $noteId);
+        $alreadyRefunded = RefundedComponentTotals::build($this->refunds, $customerPaymentId, $noteId);
         $priority = 1;
 
         foreach ($paymentAllocations as $paymentAllocation) {
-            $key = $this->key($paymentAllocation->componentType(), $paymentAllocation->componentRefId());
+            $key = ExistingPaymentComponentTotals::key($paymentAllocation->componentType(), $paymentAllocation->componentRefId());
             $allocated = $paymentAllocation->allocatedAmountRupiah()->amount();
             $refunded = $alreadyRefunded[$key] ?? 0;
             $available = max($allocated - $refunded, 0);
@@ -78,44 +78,6 @@ final class AllocateRefundAcrossComponents
         if ($remaining > 0) {
             throw new DomainException('Refund tidak bisa dialokasikan penuh ke komponen payment.');
         }
-
-        return $allocations;
-    }
-
-    private function key(string $componentType, string $componentRefId): string
-    {
-        return $componentType . '|' . $componentRefId;
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    private function alreadyRefunded(string $customerPaymentId, string $noteId): array
-    {
-        $totals = [];
-
-        foreach ($this->refunds->listByNoteId($noteId) as $allocation) {
-            if ($allocation->customerPaymentId() !== $customerPaymentId) {
-                continue;
-            }
-
-            $key = $this->key($allocation->componentType(), $allocation->componentRefId());
-            $totals[$key] = ($totals[$key] ?? 0) + $allocation->refundedAmountRupiah()->amount();
-        }
-
-        return $totals;
-    }
-
-    private function paymentAllocations(string $customerPaymentId, string $noteId): array
-    {
-        $allocations = array_filter(
-            $this->payments->listByNoteId($noteId),
-            static fn ($allocation): bool => $allocation->customerPaymentId() === $customerPaymentId
-        );
-
-        usort($allocations, static function ($left, $right): int {
-            return $right->allocationPriority() <=> $left->allocationPriority();
-        });
 
         return $allocations;
     }
