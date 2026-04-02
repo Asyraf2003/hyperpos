@@ -117,6 +117,6 @@ final class AllocateRefundAcrossComponents
             return $right->allocationPriority() <=> $left->allocationPriority();
         });
 
-        return array_values($allocations);
+        return $allocations;
     }
 }
