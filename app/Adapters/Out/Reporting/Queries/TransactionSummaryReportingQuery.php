@@ -10,17 +10,27 @@ final class TransactionSummaryReportingQuery
 {
     public function rows(string $fromTransactionDate, string $toTransactionDate): array
     {
-        $allocationTotals = DB::table('payment_component_allocations')
+        $componentAllocationTotals = DB::table('payment_component_allocations')
             ->selectRaw('note_id, SUM(allocated_amount_rupiah) as allocated_payment_rupiah')
             ->groupBy('note_id');
 
-        $refundTotals = DB::table('refund_component_allocations')
+        $legacyAllocationTotals = DB::table('payment_allocations')
+            ->selectRaw('note_id, SUM(amount_rupiah) as allocated_payment_rupiah')
+            ->groupBy('note_id');
+
+        $componentRefundTotals = DB::table('refund_component_allocations')
             ->selectRaw('note_id, SUM(refunded_amount_rupiah) as refunded_rupiah')
             ->groupBy('note_id');
 
+        $legacyRefundTotals = DB::table('customer_refunds')
+            ->selectRaw('note_id, SUM(amount_rupiah) as refunded_rupiah')
+            ->groupBy('note_id');
+
         return DB::table('notes')
-            ->leftJoinSub($allocationTotals, 'allocation_totals', fn ($join) => $join->on('allocation_totals.note_id', '=', 'notes.id'))
-            ->leftJoinSub($refundTotals, 'refund_totals', fn ($join) => $join->on('refund_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($componentAllocationTotals, 'component_allocation_totals', fn ($join) => $join->on('component_allocation_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($legacyAllocationTotals, 'legacy_allocation_totals', fn ($join) => $join->on('legacy_allocation_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($componentRefundTotals, 'component_refund_totals', fn ($join) => $join->on('component_refund_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($legacyRefundTotals, 'legacy_refund_totals', fn ($join) => $join->on('legacy_refund_totals.note_id', '=', 'notes.id'))
             ->whereBetween('notes.transaction_date', [$fromTransactionDate, $toTransactionDate])
             ->orderBy('notes.transaction_date')
             ->orderBy('notes.id')
@@ -29,8 +39,8 @@ final class TransactionSummaryReportingQuery
                 'notes.transaction_date',
                 'notes.customer_name',
                 'notes.total_rupiah as gross_transaction_rupiah',
-                DB::raw('COALESCE(allocation_totals.allocated_payment_rupiah, 0) as allocated_payment_rupiah'),
-                DB::raw('COALESCE(refund_totals.refunded_rupiah, 0) as refunded_rupiah'),
+                DB::raw('COALESCE(component_allocation_totals.allocated_payment_rupiah, legacy_allocation_totals.allocated_payment_rupiah, 0) as allocated_payment_rupiah'),
+                DB::raw('COALESCE(component_refund_totals.refunded_rupiah, legacy_refund_totals.refunded_rupiah, 0) as refunded_rupiah'),
             ])
             ->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
@@ -45,30 +55,13 @@ final class TransactionSummaryReportingQuery
 
     public function reconciliation(string $fromTransactionDate, string $toTransactionDate): array
     {
-        $filteredNotes = DB::table('notes')
-            ->select('id', 'total_rupiah')
-            ->whereBetween('transaction_date', [$fromTransactionDate, $toTransactionDate]);
-
-        $grossTotals = DB::query()
-            ->fromSub($filteredNotes, 'filtered_notes')
-            ->selectRaw('COUNT(*) as total_notes, COALESCE(SUM(total_rupiah), 0) as gross_transaction_rupiah')
-            ->first();
-
-        $allocationTotals = DB::table('payment_component_allocations')
-            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'payment_component_allocations.note_id'))
-            ->selectRaw('COALESCE(SUM(payment_component_allocations.allocated_amount_rupiah), 0) as allocated_payment_rupiah')
-            ->first();
-
-        $refundTotals = DB::table('refund_component_allocations')
-            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'refund_component_allocations.note_id'))
-            ->selectRaw('COALESCE(SUM(refund_component_allocations.refunded_amount_rupiah), 0) as refunded_rupiah')
-            ->first();
+        $rows = $this->rows($fromTransactionDate, $toTransactionDate);
 
         return [
-            'total_notes' => (int) ($grossTotals->total_notes ?? 0),
-            'gross_transaction_rupiah' => (int) ($grossTotals->gross_transaction_rupiah ?? 0),
-            'allocated_payment_rupiah' => (int) ($allocationTotals->allocated_payment_rupiah ?? 0),
-            'refunded_rupiah' => (int) ($refundTotals->refunded_rupiah ?? 0),
+            'total_notes' => count($rows),
+            'gross_transaction_rupiah' => array_sum(array_column($rows, 'gross_transaction_rupiah')),
+            'allocated_payment_rupiah' => array_sum(array_column($rows, 'allocated_payment_rupiah')),
+            'refunded_rupiah' => array_sum(array_column($rows, 'refunded_rupiah')),
         ];
     }
 }

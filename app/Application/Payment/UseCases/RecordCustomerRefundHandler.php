@@ -47,12 +47,8 @@ final class RecordCustomerRefundHandler
         string $reason,
         string $performedByActorId,
     ): Result {
-        if (trim($reason) === '') {
-            return Result::failure('Alasan refund wajib diisi.', ['refund' => ['AUDIT_REASON_REQUIRED']]);
-        }
-
+        if (trim($reason) === '') return Result::failure('Alasan refund wajib diisi.', ['refund' => ['AUDIT_REASON_REQUIRED']]);
         $started = false;
-
         try {
             if (trim($performedByActorId) === '') throw new DomainException('Actor refund wajib ada.');
 
@@ -89,11 +85,9 @@ final class RecordCustomerRefundHandler
             ));
 
             $this->transactions->commit();
-
-            return Result::success(array_merge(
-                $this->formatSuccessPayload($refund),
-                ['refund_allocation_count' => count($refundAllocations)],
-            ), 'Customer refund berhasil dicatat.');
+            return Result::success(array_merge($this->formatSuccessPayload($refund), [
+                'refund_allocation_count' => count($refundAllocations),
+            ]), 'Customer refund berhasil dicatat.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
             return $this->classify($e);
