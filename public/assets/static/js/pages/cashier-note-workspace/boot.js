@@ -4,6 +4,7 @@
   if (!configEl) return;
 
   NS.config = JSON.parse(configEl.textContent || "{}");
+
   const addButton = document.getElementById("workspace-add-button");
   const addMenu = document.getElementById("workspace-item-type-menu");
   const form = document.getElementById("cashier-note-workspace-form");
@@ -14,38 +15,45 @@
     customerName.value = NS.config.defaultCustomerName || "Pelanggan no 1";
   }
 
-  addButton?.addEventListener("click", () => addMenu.classList.toggle("d-none"));
+  addButton?.addEventListener("click", () => {
+    addMenu?.classList.toggle("d-none");
+  });
 
   document.addEventListener("click", (event) => {
-    if (!addMenu.contains(event.target) && event.target !== addButton) {
-      addMenu.classList.add("d-none");
+    if (addMenu && addButton) {
+      const clickedInsideMenu = addMenu.contains(event.target);
+      const clickedAddButton = event.target === addButton || event.target.closest("#workspace-add-button");
+
+      if (!clickedInsideMenu && !clickedAddButton) {
+        addMenu.classList.add("d-none");
+      }
     }
 
     const removeButton = event.target.closest("[data-remove-line]");
     if (removeButton) {
-      NS.removeRow(removeButton.closest("[data-line-item]"));
+      NS.removeRow?.(removeButton.closest("[data-line-item]"));
     }
 
     const typeButton = event.target.closest("[data-add-item-type]");
     if (typeButton) {
-      addMenu.classList.add("d-none");
-      NS.addRow(typeButton.dataset.addItemType || "service");
+      addMenu?.classList.add("d-none");
+      NS.addRow?.(typeButton.dataset.addItemType || "service");
     }
   });
 
   form?.addEventListener("input", (event) => {
     if (event.target.closest("[data-line-item]") || event.target.id === "note_transaction_date") {
-      NS.updateSummary();
+      NS.updateSummary?.();
     }
   });
 
   form?.addEventListener("change", (event) => {
     if (event.target.closest("[data-line-item]") || event.target.id === "note_transaction_date") {
-      NS.updateSummary();
+      NS.updateSummary?.();
     }
   });
 
-  (NS.config.oldItems || []).forEach((item) => NS.addRow(NS.detectType(item), item));
+  (NS.config.oldItems || []).forEach((item) => NS.addRow?.(NS.detectType(item), item));
 
   window.AdminMoneyInput?.bindBySelector?.(document);
 
@@ -56,5 +64,5 @@
     });
   }
 
-  NS.updateSummary();
+  NS.updateSummary?.();
 })();

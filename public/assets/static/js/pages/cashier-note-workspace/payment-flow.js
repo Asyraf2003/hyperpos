@@ -3,10 +3,20 @@
   const digits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
   const format = (value) => Number(value || 0).toLocaleString("id-ID");
   const byId = (id) => document.getElementById(id);
-  const setText = (id, value) => { const el = byId(id); if (el) el.textContent = format(value); };
-  const setHtml = (id, value) => { const el = byId(id); if (el) el.innerHTML = value; };
-  const toggle = (id, show) => { const el = byId(id); if (el) el.classList.toggle("d-none", !show); };
-  const toggleFlex = (id, show) => { const el = byId(id); if (!el) return; el.classList.toggle("d-none", !show); el.classList.toggle("d-flex", show); };
+  const setText = (id, value) => {
+    const el = byId(id);
+    if (el) el.textContent = format(value);
+  };
+  const toggle = (id, show) => {
+    const el = byId(id);
+    if (el) el.classList.toggle("d-none", !show);
+  };
+  const toggleFlex = (id, show) => {
+    const el = byId(id);
+    if (!el) return;
+    el.classList.toggle("d-none", !show);
+    el.classList.toggle("d-flex", show);
+  };
 
   NS.paymentState = NS.paymentState || { mode: "skip", cashStep: false };
 
@@ -15,6 +25,15 @@
     if (el) el.value = String(value ?? "");
   };
 
+  const currentRows = () => {
+    if (typeof NS.currentRows !== "function") return [];
+    const rows = NS.currentRows();
+    return Array.isArray(rows) ? rows : [];
+  };
+
+  const grandTotal = () =>
+    currentRows().reduce((sum, item) => sum + Number(item?.total || 0), 0);
+
   const clearPayNow = () => {
     document.querySelectorAll("[data-pay-now]").forEach((input) => {
       input.value = "0";
@@ -22,12 +41,12 @@
   };
 
   const totalSelected = () =>
-    NS.currentRows()
-      .filter(({ row }) => row.querySelector("[data-pay-now]")?.value === "1")
-      .reduce((sum, item) => sum + item.total, 0);
+    currentRows()
+      .filter(({ row }) => row?.querySelector("[data-pay-now]")?.value === "1")
+      .reduce((sum, item) => sum + Number(item?.total || 0), 0);
 
-  const payableAmount = (grandTotal) =>
-    NS.paymentState.mode === "full" ? grandTotal : totalSelected();
+  const payableAmount = (total) =>
+    NS.paymentState.mode === "full" ? total : totalSelected();
 
   const buildPartialList = () => {
     const root = byId("workspace-partial-selection-list");
@@ -35,8 +54,8 @@
 
     root.innerHTML = "";
 
-    NS.currentRows().forEach(({ row, index, title, total }) => {
-      const hidden = row.querySelector("[data-pay-now]");
+    currentRows().forEach(({ row, index, title, total }) => {
+      const hidden = row?.querySelector("[data-pay-now]");
       const checked = hidden?.value === "1";
 
       const wrapper = document.createElement("label");
@@ -56,18 +75,18 @@
     setText("workspace-partial-selected-total-text", selected);
   };
 
-  NS.refreshPaymentUi = (grandTotal = 0) => {
+  NS.refreshPaymentUi = (total = grandTotal()) => {
     const noteDate = byId("note_transaction_date")?.value || "";
     updateHidden("inline_payment_paid_at_hidden", noteDate);
 
     if (NS.paymentState.mode !== "partial") clearPayNow();
     if (NS.paymentState.mode === "partial") buildPartialList();
 
-    const payable = payableAmount(grandTotal);
-    const remaining = Math.max(grandTotal - payable, 0);
+    const payable = payableAmount(total);
+    const remaining = Math.max(total - payable, 0);
     const received = digits(byId("inline_payment_amount_received_rupiah")?.value);
 
-    setText("workspace-modal-total-text", grandTotal);
+    setText("workspace-modal-total-text", total);
     setText("workspace-modal-payable-text", payable);
     setText("workspace-modal-remaining-text", remaining);
     setText("workspace-cash-payable-text", payable);
@@ -96,6 +115,9 @@
   };
 
   NS.openPaymentModal = (mode) => {
+    const modalEl = byId("workspace-payment-modal");
+    if (!modalEl || typeof bootstrap === "undefined" || !bootstrap.Modal) return;
+
     NS.paymentState.mode = mode;
     NS.paymentState.cashStep = false;
 
@@ -106,8 +128,8 @@
     const receivedDisplay = byId("inline_payment_amount_received_display");
     if (receivedDisplay) receivedDisplay.value = "";
 
-    NS.refreshPaymentUi(NS.currentRows().reduce((sum, item) => sum + item.total, 0));
-    new bootstrap.Modal(byId("workspace-payment-modal")).show();
+    NS.refreshPaymentUi();
+    new bootstrap.Modal(modalEl).show();
   };
 
   document.addEventListener("click", (event) => {
@@ -135,14 +157,14 @@
     if (event.target.closest("#workspace-payment-open-cash")) {
       NS.paymentState.cashStep = true;
       updateHidden("inline_payment_method_hidden", "cash");
-      NS.refreshPaymentUi(NS.currentRows().reduce((sum, item) => sum + item.total, 0));
+      NS.refreshPaymentUi();
       return;
     }
 
     if (event.target.closest("#workspace-payment-back-cash")) {
       NS.paymentState.cashStep = false;
       updateHidden("inline_payment_method_hidden", "");
-      NS.refreshPaymentUi(NS.currentRows().reduce((sum, item) => sum + item.total, 0));
+      NS.refreshPaymentUi();
       return;
     }
 
@@ -151,14 +173,14 @@
       const row = document.querySelector('[data-row-index="' + checkbox.dataset.partialCheck + '"]');
       const hidden = row?.querySelector("[data-pay-now]");
       if (hidden) hidden.value = checkbox.checked ? "1" : "0";
-      NS.refreshPaymentUi(NS.currentRows().reduce((sum, item) => sum + item.total, 0));
+      NS.refreshPaymentUi();
     }
   });
 
   document.addEventListener("input", (event) => {
     if (event.target.id === "inline_payment_amount_received_display" || event.target.id === "note_transaction_date") {
       updateHidden("inline_payment_amount_received_rupiah", digits(byId("inline_payment_amount_received_display")?.value || ""));
-      NS.refreshPaymentUi(NS.currentRows().reduce((sum, item) => sum + item.total, 0));
+      NS.refreshPaymentUi();
     }
   });
 })();
