@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core\Payment\RefundComponentAllocation;
 
-use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
-use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 
 final class RefundComponentAllocation
@@ -34,7 +32,7 @@ final class RefundComponentAllocation
         Money $refundedAmountRupiah,
         int $refundPriority,
     ): self {
-        self::assertValid(
+        RefundComponentAllocationGuard::assertValid(
             $id,
             $customerRefundId,
             $customerPaymentId,
@@ -92,33 +90,4 @@ final class RefundComponentAllocation
     public function componentRefId(): string { return $this->componentRefId; }
     public function refundedAmountRupiah(): Money { return $this->refundedAmountRupiah; }
     public function refundPriority(): int { return $this->refundPriority; }
-
-    private static function assertValid(
-        string $id,
-        string $customerRefundId,
-        string $customerPaymentId,
-        string $noteId,
-        string $workItemId,
-        string $componentType,
-        string $componentRefId,
-        Money $refundedAmountRupiah,
-        int $refundPriority,
-    ): void {
-        if (trim($id) === '') throw new DomainException('Refund component allocation id wajib ada.');
-        if (trim($customerRefundId) === '') throw new DomainException('Customer refund id wajib ada.');
-        if (trim($customerPaymentId) === '') throw new DomainException('Customer payment id wajib ada.');
-        if (trim($noteId) === '') throw new DomainException('Note id wajib ada.');
-        if (trim($workItemId) === '') throw new DomainException('Work item id wajib ada.');
-        if (trim($componentRefId) === '') throw new DomainException('Component ref id wajib ada.');
-
-        PaymentComponentType::assertValid($componentType);
-
-        if (!$refundedAmountRupiah->greaterThan(Money::zero())) {
-            throw new DomainException('Refunded amount harus lebih besar dari nol.');
-        }
-
-        if ($refundPriority <= 0) {
-            throw new DomainException('Refund priority harus lebih besar dari nol.');
-        }
-    }
 }

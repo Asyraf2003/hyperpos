@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core\Note\Mutation;
 
-use App\Core\Shared\Exceptions\DomainException;
 use DateTimeImmutable;
 
 final class NoteMutationEvent
@@ -33,7 +32,7 @@ final class NoteMutationEvent
         ?string $relatedCustomerPaymentId = null,
         ?string $relatedCustomerRefundId = null,
     ): self {
-        self::assertValid($id, $noteId, $mutationType, $actorId, $actorRole, $reason);
+        NoteMutationEventGuard::assertValid($id, $noteId, $mutationType, $actorId, $actorRole, $reason);
 
         return new self(
             trim($id),
@@ -81,22 +80,6 @@ final class NoteMutationEvent
     public function occurredAt(): DateTimeImmutable { return $this->occurredAt; }
     public function relatedCustomerPaymentId(): ?string { return $this->relatedCustomerPaymentId; }
     public function relatedCustomerRefundId(): ?string { return $this->relatedCustomerRefundId; }
-
-    private static function assertValid(
-        string $id,
-        string $noteId,
-        string $mutationType,
-        string $actorId,
-        string $actorRole,
-        string $reason,
-    ): void {
-        if (trim($id) === '') throw new DomainException('Note mutation event id wajib ada.');
-        if (trim($noteId) === '') throw new DomainException('Note id wajib ada.');
-        if (trim($mutationType) === '') throw new DomainException('Mutation type wajib ada.');
-        if (trim($actorId) === '') throw new DomainException('Actor id wajib ada.');
-        if (trim($actorRole) === '') throw new DomainException('Actor role wajib ada.');
-        if (trim($reason) === '') throw new DomainException('Reason wajib ada.');
-    }
 
     private static function normalizeNullable(?string $value): ?string
     {
