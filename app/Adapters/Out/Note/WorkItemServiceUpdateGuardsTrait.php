@@ -65,4 +65,27 @@ trait WorkItemServiceUpdateGuardsTrait
 
         return $serviceDetail;
     }
+
+    private function assertServiceWithExternalPurchaseFeeOnlyUpdatable(WorkItem $workItem): ServiceDetail
+    {
+        if ($workItem->transactionType() !== WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE) {
+            throw new DomainException('Update service fee only hanya boleh untuk work item service_with_external_purchase.');
+        }
+
+        $serviceDetail = $workItem->serviceDetail();
+
+        if (!$serviceDetail instanceof ServiceDetail) {
+            throw new DomainException('Service detail wajib ada untuk update service_with_external_purchase.');
+        }
+
+        if ($workItem->externalPurchaseLines() === []) {
+            throw new DomainException('Work item service_with_external_purchase wajib memiliki external purchase lines.');
+        }
+
+        if ($workItem->storeStockLines() !== []) {
+            throw new DomainException('Work item service_with_external_purchase tidak boleh memiliki store stock lines.');
+        }
+
+        return $serviceDetail;
+    }
 }

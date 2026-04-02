@@ -56,4 +56,9 @@ final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
     {
         $this->updateSubtotalAndServiceDetail($workItem, $this->assertServiceWithStoreStockPartFeeOnlyUpdatable($workItem));
     }
+
+    public function updateServiceWithExternalPurchaseServiceFeeOnly(WorkItem $workItem): void
+    {
+        $this->updateSubtotalAndServiceDetail($workItem, $this->assertServiceWithExternalPurchaseFeeOnlyUpdatable($workItem));
+    }
 }
