@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Payment\UseCases;
 
 use App\Application\Payment\Services\AllocateRefundAcrossComponents;
+use App\Application\Payment\Services\RefundPairLimitGuard;
 use App\Application\Shared\DTO\Result;
 use App\Core\Payment\CustomerRefund\CustomerRefund;
 use App\Core\Shared\Exceptions\DomainException;
@@ -63,12 +64,11 @@ final class RecordCustomerRefundHandler
             if ($payment === null || $note === null) throw new DomainException('Target refund tidak ditemukan.');
 
             $amount = Money::fromInt($amountRupiah);
-            $pairAllocated = $this->allocations->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id());
-            $pairRefunded = $this->refunds->getTotalRefundedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id());
-
-            if ($pairRefunded->add($amount)->greaterThan($pairAllocated)) {
-                throw new DomainException('Refund melebihi total allocation untuk payment-note pair.');
-            }
+            RefundPairLimitGuard::assertWithinAllocated(
+                $this->allocations->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id()),
+                $this->refunds->getTotalRefundedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id()),
+                $amount,
+            );
 
             $refund = CustomerRefund::create(
                 $this->uuid->generate(),
