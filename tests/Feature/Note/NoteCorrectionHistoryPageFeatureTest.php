@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
-use App\Core\Note\WorkItem\ServiceDetail;
-use App\Core\Note\WorkItem\WorkItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -15,27 +13,55 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_paid_note_detail_page_shows_correction_history_from_audit_log(): void
+    public function test_paid_note_detail_page_shows_correction_history_from_native_mutation_timeline(): void
     {
         $this->loginAsKasir();
-        $user = User::query()->create(['name' => 'Kasir', 'email' => 'cashier@example.test', 'password' => 'password']);
-        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
-        DB::table('notes')->insert(['id' => 'note-1', 'customer_name' => 'Budi', 'transaction_date' => '2026-03-14', 'total_rupiah' => 50000]);
-        DB::table('work_items')->insert(['id' => 'wi-1', 'note_id' => 'note-1', 'line_no' => 1, 'transaction_type' => WorkItem::TYPE_SERVICE_ONLY, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 50000]);
-        DB::table('work_item_service_details')->insert(['work_item_id' => 'wi-1', 'service_name' => 'Servis A', 'service_price_rupiah' => 50000, 'part_source' => ServiceDetail::PART_SOURCE_NONE]);
-        DB::table('customer_payments')->insert(['id' => 'cp-1', 'amount_rupiah' => 50000, 'paid_at' => '2026-03-14']);
-        DB::table('payment_allocations')->insert(['id' => 'pa-1', 'customer_payment_id' => 'cp-1', 'note_id' => 'note-1', 'amount_rupiah' => 50000]);
 
-        DB::table('audit_logs')->insert([
-            'event' => 'paid_service_only_work_item_corrected',
-            'context' => json_encode([
-                'note_id' => 'note-1',
-                'performed_by_actor_id' => 'actor-1',
-                'reason' => 'Harga salah input',
-                'refund_required_rupiah' => 10000,
-                'before' => ['note' => ['total_rupiah' => 50000]],
-                'after' => ['note' => ['total_rupiah' => 40000]],
-            ], JSON_THROW_ON_ERROR),
+        $user = User::query()->create([
+            'name' => 'Kasir',
+            'email' => 'cashier@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('notes')->insert([
+            'id' => 'note-1',
+            'customer_name' => 'Budi',
+            'transaction_date' => '2026-03-14',
+            'total_rupiah' => 40000,
+        ]);
+
+        DB::table('note_mutation_events')->insert([
+            'id' => 'evt-1',
+            'note_id' => 'note-1',
+            'mutation_type' => 'paid_service_only_work_item_corrected',
+            'actor_id' => 'actor-1',
+            'actor_role' => 'admin',
+            'reason' => 'Harga salah input',
+            'occurred_at' => '2026-03-14 10:00:00',
+            'related_customer_payment_id' => null,
+            'related_customer_refund_id' => null,
+        ]);
+
+        DB::table('note_mutation_snapshots')->insert([
+            [
+                'id' => 'snap-1',
+                'note_mutation_event_id' => 'evt-1',
+                'snapshot_kind' => 'before',
+                'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":10000}}',
+                'created_at' => '2026-03-14 10:00:00',
+            ],
+            [
+                'id' => 'snap-2',
+                'note_mutation_event_id' => 'evt-1',
+                'snapshot_kind' => 'after',
+                'payload_json' => '{"note":{"total_rupiah":40000},"meta":{"refund_required_rupiah":10000}}',
+                'created_at' => '2026-03-14 10:00:00',
+            ],
         ]);
 
         $response = $this->actingAs($user)->get('/cashier/notes/note-1');
@@ -45,5 +71,8 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
         $response->assertSee('Correction Nominal Service');
         $response->assertSee('Harga salah input');
         $response->assertSee('actor-1');
+        $response->assertSee('50.000', false);
+        $response->assertSee('40.000', false);
+        $response->assertSee('10.000', false);
     }
 }

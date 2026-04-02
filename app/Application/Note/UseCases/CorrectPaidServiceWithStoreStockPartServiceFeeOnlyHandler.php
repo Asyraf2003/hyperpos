@@ -7,6 +7,7 @@ namespace App\Application\Note\UseCases;
 use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Application\Note\Services\NoteCorrectionSnapshotBuilder;
 use App\Application\Note\Services\PersistNoteMutationTimeline;
+use App\Application\Note\Services\StoreStockLinesSubtotal;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
@@ -41,15 +42,8 @@ final class CorrectPaidServiceWithStoreStockPartServiceFeeOnlyHandler
     ) {
     }
 
-    public function handle(
-        string $noteId,
-        int $lineNo,
-        string $serviceName,
-        int $servicePriceRupiah,
-        string $partSource,
-        string $reason,
-        string $performedByActorId,
-    ): Result {
+    public function handle(string $noteId, int $lineNo, string $serviceName, int $servicePriceRupiah, string $partSource, string $reason, string $performedByActorId): Result
+    {
         $started = false;
 
         try {
@@ -64,24 +58,12 @@ final class CorrectPaidServiceWithStoreStockPartServiceFeeOnlyHandler
             $this->paidStatus->assertPaidForCorrection($note);
 
             $target = $this->findWorkItem($note, $lineNo);
-            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART) {
-                throw new DomainException('Correction slice ini hanya mendukung work item service_with_store_stock_part.');
-            }
+            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART) throw new DomainException('Correction slice ini hanya mendukung work item service_with_store_stock_part.');
 
             $before = $this->snapshots->build($note);
             $detail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
-            $corrected = WorkItem::rehydrate(
-                $target->id(),
-                $target->noteId(),
-                $target->lineNo(),
-                $target->transactionType(),
-                $target->status(),
-                $this->sumSubtotal($detail->servicePriceRupiah(), $target),
-                $detail,
-                [],
-                $target->storeStockLines(),
-            );
-
+            $subtotal = $detail->servicePriceRupiah()->add(StoreStockLinesSubtotal::sum($target->storeStockLines()));
+            $corrected = WorkItem::rehydrate($target->id(), $target->noteId(), $target->lineNo(), $target->transactionType(), $target->status(), $subtotal, $detail, [], $target->storeStockLines());
             $newTotal = $note->totalRupiah()->subtract($target->subtotalRupiah())->add($corrected->subtotalRupiah());
             $newTotal->ensureNotNegative('Total note hasil correction tidak boleh negatif.');
 
@@ -93,36 +75,11 @@ final class CorrectPaidServiceWithStoreStockPartServiceFeeOnlyHandler
             $after = $this->snapshots->build($afterNote);
             $refundReq = $this->calculateRefundRequired($this->allocations, $this->refunds, $note->id(), $afterNote->totalRupiah());
 
-            $this->timeline->record(
-                $note->id(),
-                'paid_service_with_store_stock_part_service_fee_only_corrected',
-                $performedByActorId,
-                'admin',
-                $reason,
-                $this->clock->now(),
-                $before,
-                $after,
-                null,
-                null,
-                ['refund_required_rupiah' => $refundReq],
-            );
-
-            $this->audit->record('paid_service_with_store_stock_part_service_fee_only_corrected', $this->formatAuditPayload(
-                $performedByActorId,
-                $note->id(),
-                $lineNo,
-                $reason,
-                $refundReq,
-                $before,
-                $after,
-            ));
+            $this->timeline->record($note->id(), 'paid_service_with_store_stock_part_service_fee_only_corrected', $performedByActorId, 'admin', $reason, $this->clock->now(), $before, $after, null, null, ['refund_required_rupiah' => $refundReq]);
+            $this->audit->record('paid_service_with_store_stock_part_service_fee_only_corrected', $this->formatAuditPayload($performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after));
 
             $this->transactions->commit();
-
-            return Result::success(
-                $this->formatSuccessPayload($afterNote, $corrected, $refundReq),
-                'Correction service_with_store_stock_part service fee only berhasil disimpan.'
-            );
+            return Result::success($this->formatSuccessPayload($afterNote, $corrected, $refundReq), 'Correction service_with_store_stock_part service fee only berhasil disimpan.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
             return Result::failure($e->getMessage(), ['work_item' => ['INVALID_WORK_ITEM_STATE']]);
@@ -130,16 +87,5 @@ final class CorrectPaidServiceWithStoreStockPartServiceFeeOnlyHandler
             if ($started) $this->transactions->rollBack();
             throw $e;
         }
-    }
-
-    private function sumSubtotal(Money $servicePrice, WorkItem $target): Money
-    {
-        $subtotal = $servicePrice;
-
-        foreach ($target->storeStockLines() as $line) {
-            $subtotal = $subtotal->add($line->lineTotalRupiah());
-        }
-
-        return $subtotal;
     }
 }

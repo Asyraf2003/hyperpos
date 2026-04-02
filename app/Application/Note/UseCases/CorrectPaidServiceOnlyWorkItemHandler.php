@@ -41,11 +41,8 @@ final class CorrectPaidServiceOnlyWorkItemHandler
     ) {
     }
 
-    public function handle(
-        string $noteId, int $lineNo, string $serviceName,
-        int $servicePriceRupiah, string $partSource,
-        string $reason, string $performedByActorId,
-    ): Result {
+    public function handle(string $noteId, int $lineNo, string $serviceName, int $servicePriceRupiah, string $partSource, string $reason, string $performedByActorId): Result
+    {
         $started = false;
 
         try {
@@ -60,52 +57,27 @@ final class CorrectPaidServiceOnlyWorkItemHandler
             $this->paidStatus->assertPaidForCorrection($note);
 
             $target = $this->findWorkItem($note, $lineNo);
-            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_ONLY) {
-                throw new DomainException('Correction nominal slice ini hanya mendukung work item service_only.');
-            }
+            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_ONLY) throw new DomainException('Correction nominal slice ini hanya mendukung work item service_only.');
 
             $before = $this->snapshots->build($note);
-            $newServiceDetail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
-            $correctedWorkItem = WorkItem::rehydrate(
-                $target->id(), $target->noteId(), $target->lineNo(), $target->transactionType(),
-                $target->status(), $newServiceDetail->servicePriceRupiah(), $newServiceDetail, [], [],
-            );
-
-            $newTotal = $note->totalRupiah()->subtract($target->subtotalRupiah())->add($correctedWorkItem->subtotalRupiah());
+            $detail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
+            $corrected = WorkItem::rehydrate($target->id(), $target->noteId(), $target->lineNo(), $target->transactionType(), $target->status(), $detail->servicePriceRupiah(), $detail, [], []);
+            $newTotal = $note->totalRupiah()->subtract($target->subtotalRupiah())->add($corrected->subtotalRupiah());
             $newTotal->ensureNotNegative('Total note hasil correction tidak boleh negatif.');
 
             $note->syncTotalRupiah($newTotal);
-            $this->workItems->updateServiceOnly($correctedWorkItem);
+            $this->workItems->updateServiceOnly($corrected);
             $this->noteWriter->updateTotal($note);
 
             $afterNote = $this->notes->getById($note->id()) ?? throw new DomainException('Note tidak ditemukan setelah correction.');
             $after = $this->snapshots->build($afterNote);
             $refundReq = $this->calculateRefundRequired($this->allocations, $this->refunds, $note->id(), $afterNote->totalRupiah());
 
-            $this->timeline->record(
-                $note->id(),
-                'paid_service_only_work_item_corrected',
-                $performedByActorId,
-                'admin',
-                $reason,
-                $this->clock->now(),
-                $before,
-                $after,
-                null,
-                null,
-                ['refund_required_rupiah' => $refundReq],
-            );
-
-            $this->audit->record('paid_service_only_work_item_corrected', $this->formatAuditPayload(
-                $performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after
-            ));
+            $this->timeline->record($note->id(), 'paid_service_only_work_item_corrected', $performedByActorId, 'admin', $reason, $this->clock->now(), $before, $after, null, null, ['refund_required_rupiah' => $refundReq]);
+            $this->audit->record('paid_service_only_work_item_corrected', $this->formatAuditPayload($performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after));
 
             $this->transactions->commit();
-
-            return Result::success(
-                $this->formatSuccessPayload($afterNote, $correctedWorkItem, $refundReq),
-                'Correction nominal service_only berhasil disimpan.'
-            );
+            return Result::success($this->formatSuccessPayload($afterNote, $corrected, $refundReq), 'Correction nominal service_only berhasil disimpan.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
             return Result::failure($e->getMessage(), ['work_item' => ['INVALID_WORK_ITEM_STATE']]);
