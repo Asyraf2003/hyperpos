@@ -10,12 +10,12 @@ final class TransactionSummaryReportingQuery
 {
     public function rows(string $fromTransactionDate, string $toTransactionDate): array
     {
-        $allocationTotals = DB::table('payment_allocations')
-            ->selectRaw('note_id, SUM(amount_rupiah) as allocated_payment_rupiah')
+        $allocationTotals = DB::table('payment_component_allocations')
+            ->selectRaw('note_id, SUM(allocated_amount_rupiah) as allocated_payment_rupiah')
             ->groupBy('note_id');
 
-        $refundTotals = DB::table('customer_refunds')
-            ->selectRaw('note_id, SUM(amount_rupiah) as refunded_rupiah')
+        $refundTotals = DB::table('refund_component_allocations')
+            ->selectRaw('note_id, SUM(refunded_amount_rupiah) as refunded_rupiah')
             ->groupBy('note_id');
 
         return DB::table('notes')
@@ -54,14 +54,14 @@ final class TransactionSummaryReportingQuery
             ->selectRaw('COUNT(*) as total_notes, COALESCE(SUM(total_rupiah), 0) as gross_transaction_rupiah')
             ->first();
 
-        $allocationTotals = DB::table('payment_allocations')
-            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'payment_allocations.note_id'))
-            ->selectRaw('COALESCE(SUM(payment_allocations.amount_rupiah), 0) as allocated_payment_rupiah')
+        $allocationTotals = DB::table('payment_component_allocations')
+            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'payment_component_allocations.note_id'))
+            ->selectRaw('COALESCE(SUM(payment_component_allocations.allocated_amount_rupiah), 0) as allocated_payment_rupiah')
             ->first();
 
-        $refundTotals = DB::table('customer_refunds')
-            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'customer_refunds.note_id'))
-            ->selectRaw('COALESCE(SUM(customer_refunds.amount_rupiah), 0) as refunded_rupiah')
+        $refundTotals = DB::table('refund_component_allocations')
+            ->joinSub($filteredNotes, 'filtered_notes', fn ($join) => $join->on('filtered_notes.id', '=', 'refund_component_allocations.note_id'))
+            ->selectRaw('COALESCE(SUM(refund_component_allocations.refunded_amount_rupiah), 0) as refunded_rupiah')
             ->first();
 
         return [
