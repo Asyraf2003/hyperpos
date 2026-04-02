@@ -10,9 +10,9 @@ interface WorkItemWriterPort
 {
     public function create(WorkItem $workItem): void;
 
-    public function deleteByNoteId(string $noteId): void;
-
     public function updateStatus(WorkItem $workItem): void;
 
     public function updateServiceOnly(WorkItem $workItem): void;
+
+    public function updateServiceWithStoreStockPartServiceFeeOnly(WorkItem $workItem): void;
 }
