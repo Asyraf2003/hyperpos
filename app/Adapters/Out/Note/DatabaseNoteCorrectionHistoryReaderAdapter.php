@@ -47,6 +47,7 @@ final class DatabaseNoteCorrectionHistoryReaderAdapter implements NoteCorrection
         return match ($mutationType) {
             'paid_service_only_work_item_corrected' => 'Correction Nominal Service',
             'paid_service_with_store_stock_part_service_fee_only_corrected' => 'Correction Fee Service + Part Toko',
+            'paid_service_with_external_purchase_service_fee_only_corrected' => 'Correction Fee Service + Part External',
             default => 'Correction Status Work Item',
         };
     }
