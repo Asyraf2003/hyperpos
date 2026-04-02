@@ -6,6 +6,7 @@ namespace App\Application\Payment\UseCases;
 
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
+use App\Application\Payment\Services\PaymentDateParser;
 use App\Application\Payment\Services\ResolveNotePayableComponents;
 use App\Application\Shared\DTO\Result;
 use App\Core\Payment\CustomerPayment\CustomerPayment;
@@ -19,7 +20,6 @@ use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
-use DateTimeImmutable;
 use Throwable;
 
 final class RecordAndAllocateNotePaymentHandler
@@ -51,7 +51,11 @@ final class RecordAndAllocateNotePaymentHandler
                 ?? throw new DomainException('Target payment allocation tidak ditemukan.');
 
             $amount = Money::fromInt($amountRupiah);
-            $payment = CustomerPayment::create($this->uuid->generate(), $amount, $this->parsePaidAt($paidAt));
+            $payment = CustomerPayment::create(
+                $this->uuid->generate(),
+                $amount,
+                PaymentDateParser::parseYmd($paidAt, 'Paid at pada customer payment wajib berupa tanggal yang valid dengan format Y-m-d.'),
+            );
 
             $this->policy->assertAllocatable(
                 $amount,
@@ -61,54 +65,34 @@ final class RecordAndAllocateNotePaymentHandler
                 $this->allocations->getTotalAllocatedAmountByNoteId($note->id()),
             );
 
-            $payableComponents = $this->components->fromNote($note);
-            $componentAllocations = $this->allocator->allocate(
+            $allocations = $this->allocator->allocate(
                 $payment->id(),
                 $note->id(),
                 $amount,
-                $payableComponents,
+                $this->components->fromNote($note),
             );
 
             $this->payments->create($payment);
-            $this->allocationWriter->createMany($componentAllocations);
-
+            $this->allocationWriter->createMany($allocations);
             $this->audit->record('payment_allocated', [
                 'payment_id' => $payment->id(),
                 'note_id' => $note->id(),
                 'amount' => $amountRupiah,
-                'allocation_count' => count($componentAllocations),
+                'allocation_count' => count($allocations),
             ]);
 
             $this->transactions->commit();
 
             return Result::success([
                 'payment_id' => $payment->id(),
-                'allocation_count' => count($componentAllocations),
+                'allocation_count' => count($allocations),
             ], 'Pembayaran berhasil dicatat.');
         } catch (DomainException $e) {
-            if ($started) {
-                $this->transactions->rollBack();
-            }
-
+            if ($started) $this->transactions->rollBack();
             return $this->errors->classify($e);
         } catch (Throwable $e) {
-            if ($started) {
-                $this->transactions->rollBack();
-            }
-
+            if ($started) $this->transactions->rollBack();
             throw $e;
         }
-    }
-
-    private function parsePaidAt(string $paidAt): DateTimeImmutable
-    {
-        $normalized = trim($paidAt);
-        $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $normalized);
-
-        if ($parsed === false || $parsed->format('Y-m-d') !== $normalized) {
-            throw new DomainException('Paid at pada customer payment wajib berupa tanggal yang valid dengan format Y-m-d.');
-        }
-
-        return $parsed;
     }
 }

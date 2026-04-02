@@ -63,7 +63,6 @@ final class RecordCustomerRefundHandler
             if ($payment === null || $note === null) throw new DomainException('Target refund tidak ditemukan.');
 
             $amount = Money::fromInt($amountRupiah);
-            $refunded = $this->parseRefundedAt($refundedAt);
             $pairAllocated = $this->allocations->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id());
             $pairRefunded = $this->refunds->getTotalRefundedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id());
 
@@ -76,30 +75,24 @@ final class RecordCustomerRefundHandler
                 $payment->id(),
                 $note->id(),
                 $amount,
-                $refunded,
+                $this->parseRefundedAt($refundedAt),
                 trim($reason),
             );
 
-            $refundAllocations = $this->refundAllocator->allocate(
-                $refund->id(),
-                $payment->id(),
-                $note->id(),
-                $amount,
-            );
+            $refundAllocations = $this->refundAllocator->allocate($refund->id(), $payment->id(), $note->id(), $amount);
 
             $this->refundWriter->create($refund);
             $this->refundAllocationWriter->createMany($refundAllocations);
-
             $this->audit->record('customer_refund_recorded', array_merge(
                 $this->formatAuditPayload($refund, $performedByActorId),
-                ['refund_allocation_count' => count($refundAllocations)]
+                ['refund_allocation_count' => count($refundAllocations)],
             ));
 
             $this->transactions->commit();
 
             return Result::success(array_merge(
                 $this->formatSuccessPayload($refund),
-                ['refund_allocation_count' => count($refundAllocations)]
+                ['refund_allocation_count' => count($refundAllocations)],
             ), 'Customer refund berhasil dicatat.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
