@@ -1,6 +1,7 @@
 (() => {
   const NS = (window.CashierNoteWorkspace = window.CashierNoteWorkspace || {});
   const timers = new WeakMap();
+  const requestTokens = new WeakMap();
 
   const parseDigits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
 
@@ -29,6 +30,8 @@
 
   const renderResults = (row, rows) => {
     const results = row.querySelector("[data-product-results]");
+    if (!results) return;
+
     results.innerHTML = "";
     results.classList.toggle("d-none", rows.length === 0);
 
@@ -48,10 +51,12 @@
     const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
     const display = row.querySelector("[data-price-input]");
 
+    if (!search || !hidden) return;
+
     search.value = item.label;
     hidden.value = item.id;
     row.dataset.minimumUnitPriceRupiah = String(item.minimum_unit_price_rupiah || item.default_unit_price_rupiah || 0);
-    NS.updateStockText(row, item.available_stock);
+    NS.updateStockText?.(row, item.available_stock);
 
     if (raw && !parseDigits(raw.value)) raw.value = String(item.default_unit_price_rupiah || 0);
     if (display && !parseDigits(display.value)) display.value = String(item.default_unit_price_rupiah || 0);
@@ -68,18 +73,48 @@
     const priceInput = row.querySelector("[data-price-input]");
 
     if (!input) return;
+    if (input.dataset.searchBound === "1") return;
+    input.dataset.searchBound = "1";
 
     input.addEventListener("input", () => {
       clearTimeout(timers.get(input));
+
       timers.set(
         input,
         setTimeout(async () => {
           const query = input.value.trim();
-          if (query.length < 2) return renderResults(row, []);
-          const url = `${NS.config.productLookupEndpoint}?q=${encodeURIComponent(query)}`;
-          const response = await fetch(url, { headers: { Accept: "application/json" } });
-          const payload = await response.json();
-          renderResults(row, payload?.data?.rows || []);
+          const endpoint = NS.config?.productLookupEndpoint;
+
+          if (query.length < 2 || !endpoint) {
+            renderResults(row, []);
+            return;
+          }
+
+          const token = Symbol("product-search");
+          requestTokens.set(input, token);
+
+          try {
+            const url = `${endpoint}?q=${encodeURIComponent(query)}`;
+            const response = await fetch(url, { headers: { Accept: "application/json" } });
+
+            if (!response.ok) {
+              throw new Error(`Product lookup failed with status ${response.status}`);
+            }
+
+            const payload = await response.json();
+
+            if (requestTokens.get(input) !== token) {
+              return;
+            }
+
+            renderResults(row, payload?.data?.rows || []);
+          } catch {
+            if (requestTokens.get(input) !== token) {
+              return;
+            }
+
+            renderResults(row, []);
+          }
         }, 250)
       );
     });
@@ -95,8 +130,14 @@
       });
     }
 
-    document.addEventListener("click", (event) => {
-      if (!row.contains(event.target)) renderResults(row, []);
-    });
+    if (row.dataset.searchOutsideBound !== "1") {
+      row.dataset.searchOutsideBound = "1";
+
+      document.addEventListener("click", (event) => {
+        if (!row.contains(event.target)) {
+          renderResults(row, []);
+        }
+      });
+    }
   };
 })();
