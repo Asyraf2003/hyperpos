@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Core\Note\Mutation\NoteMutationEvent;
 use App\Core\Shared\Exceptions\DomainException;
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 final class NoteMutationEventTest extends TestCase

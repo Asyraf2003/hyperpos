@@ -44,11 +44,19 @@ final class DatabaseCustomerPaymentReaderAdapter implements CustomerPaymentReade
             throw new DomainException('Customer payment id wajib ada.');
         }
 
-        $totalAllocated = (int) DB::table('payment_allocations')
+        $componentTotal = (int) DB::table('payment_component_allocations')
+            ->where('customer_payment_id', $normalizedId)
+            ->sum('allocated_amount_rupiah');
+
+        if ($componentTotal > 0) {
+            return Money::fromInt($componentTotal);
+        }
+
+        $legacyTotal = (int) DB::table('payment_allocations')
             ->where('customer_payment_id', $normalizedId)
             ->sum('amount_rupiah');
 
-        return Money::fromInt($totalAllocated);
+        return Money::fromInt($legacyTotal);
     }
 
     private function parseDate(string $value): DateTimeImmutable

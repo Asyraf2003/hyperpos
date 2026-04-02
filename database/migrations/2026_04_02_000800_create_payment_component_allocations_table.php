@@ -21,8 +21,8 @@ return new class extends Migration
             $table->integer('allocated_amount_rupiah');
             $table->integer('allocation_priority');
 
-            $table->index(['note_id', 'work_item_id']);
-            $table->index(['note_id', 'component_type', 'component_ref_id']);
+            $table->index(['note_id', 'work_item_id'], 'pca_note_work_item_idx');
+            $table->index(['note_id', 'component_type', 'component_ref_id'], 'pca_note_component_idx');
             $table->unique(['customer_payment_id', 'component_type', 'component_ref_id'], 'payment_component_allocations_unique_payment_component');
         });
     }

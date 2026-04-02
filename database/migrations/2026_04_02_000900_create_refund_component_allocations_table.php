@@ -21,9 +21,9 @@ return new class extends Migration
             $table->integer('refunded_amount_rupiah');
             $table->integer('refund_priority');
 
-            $table->index(['note_id', 'work_item_id']);
-            $table->index(['customer_payment_id', 'note_id']);
-            $table->index(['note_id', 'component_type', 'component_ref_id']);
+            $table->index(['note_id', 'work_item_id'], 'rca_note_work_item_idx');
+            $table->index(['customer_payment_id', 'note_id'], 'rca_payment_note_idx');
+            $table->index(['note_id', 'component_type', 'component_ref_id'], 'rca_note_component_idx');
             $table->unique(['customer_refund_id', 'component_type', 'component_ref_id'], 'refund_component_allocations_unique_refund_component');
         });
     }

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\UseCases;
 
+use App\Application\Payment\Services\AllocateRefundAcrossComponents;
 use App\Application\Shared\DTO\Result;
 use App\Core\Payment\CustomerRefund\CustomerRefund;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Note\NoteReaderPort;
-use App\Ports\Out\Payment\{CustomerPaymentReaderPort, CustomerRefundReaderPort, CustomerRefundWriterPort, PaymentAllocationReaderPort};
+use App\Ports\Out\Payment\CustomerPaymentReaderPort;
+use App\Ports\Out\Payment\CustomerRefundReaderPort;
+use App\Ports\Out\Payment\CustomerRefundWriterPort;
+use App\Ports\Out\Payment\PaymentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
 use Throwable;
@@ -24,6 +29,8 @@ final class RecordCustomerRefundHandler
         private readonly CustomerRefundReaderPort $refunds,
         private readonly CustomerRefundWriterPort $refundWriter,
         private readonly PaymentAllocationReaderPort $allocations,
+        private readonly RefundComponentAllocationWriterPort $refundAllocationWriter,
+        private readonly AllocateRefundAcrossComponents $refundAllocator,
         private readonly NoteReaderPort $notes,
         private readonly TransactionManagerPort $transactions,
         private readonly UuidPort $uuid,
@@ -73,13 +80,27 @@ final class RecordCustomerRefundHandler
                 trim($reason),
             );
 
-            $this->refundWriter->create($refund);
+            $refundAllocations = $this->refundAllocator->allocate(
+                $refund->id(),
+                $payment->id(),
+                $note->id(),
+                $amount,
+            );
 
-            $this->audit->record('customer_refund_recorded', $this->formatAuditPayload($refund, $performedByActorId));
+            $this->refundWriter->create($refund);
+            $this->refundAllocationWriter->createMany($refundAllocations);
+
+            $this->audit->record('customer_refund_recorded', array_merge(
+                $this->formatAuditPayload($refund, $performedByActorId),
+                ['refund_allocation_count' => count($refundAllocations)]
+            ));
 
             $this->transactions->commit();
 
-            return Result::success($this->formatSuccessPayload($refund), 'Customer refund berhasil dicatat.');
+            return Result::success(array_merge(
+                $this->formatSuccessPayload($refund),
+                ['refund_allocation_count' => count($refundAllocations)]
+            ), 'Customer refund berhasil dicatat.');
         } catch (DomainException $e) {
             if ($started) $this->transactions->rollBack();
             return $this->classify($e);

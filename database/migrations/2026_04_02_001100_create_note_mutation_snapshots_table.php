@@ -17,7 +17,7 @@ return new class extends Migration
             $table->longText('payload_json');
             $table->dateTime('created_at');
 
-            $table->index('note_mutation_event_id');
+            $table->index('note_mutation_event_id', 'nms_event_idx');
             $table->index('snapshot_kind');
             $table->unique(['note_mutation_event_id', 'snapshot_kind'], 'note_mutation_snapshots_unique_event_kind');
         });
