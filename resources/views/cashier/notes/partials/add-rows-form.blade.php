@@ -1,26 +1,35 @@
-@if ($note['can_add_rows'])
-    <div class="card mt-3">
-        <div class="card-body">
-            <div class="fw-bold mb-2">Tambah Baris Nota</div>
-
-            <form method="POST" action="{{ $addRowsAction }}" id="note-add-rows-form">
-                @csrf
-
-                <div class="d-flex flex-wrap gap-2 mb-3">
-                    <button type="button" class="btn btn-outline-primary" id="detail-add-service-row">Tambah Servis</button>
-                    <button type="button" class="btn btn-outline-secondary" id="detail-add-product-row">Tambah Produk</button>
-                </div>
-
-                <div id="detail-note-rows"></div>
-
-                <div class="mt-3">
-                    <button type="submit" class="btn btn-primary">Simpan Baris Baru</button>
-                </div>
-            </form>
-
-            <script id="note-add-rows-config" type="application/json">@json(['oldRows' => $oldRows, 'productOptions' => $productOptions])</script>
+<div class="card">
+    <div class="card-body">
+        <div class="fw-bold mb-1">Kelola Nota</div>
+        <div class="text-muted small mb-3">
+            Perubahan rincian dilakukan dari workspace agar posisi edit tetap sama seperti halaman buat transaksi.
         </div>
+
+        @if ($note['can_add_rows'])
+            <div class="d-grid gap-2">
+                <a
+                    href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
+                    class="btn btn-primary"
+                >
+                    Edit Nota
+                </a>
+
+                <div class="small text-muted">
+                    Tambah servis, produk, dan ubah rincian dilakukan dari halaman edit workspace.
+                </div>
+            </div>
+        @else
+            <div class="border rounded p-3 bg-light">
+                <div class="fw-semibold mb-1">Nota tidak bisa diedit bebas</div>
+
+                @if ($note['correction_notice'] !== null)
+                    <div class="text-muted small">{{ $note['correction_notice'] }}</div>
+                @else
+                    <div class="text-muted small">
+                        Gunakan alur koreksi atau pembayaran sesuai status transaksi saat ini.
+                    </div>
+                @endif
+            </div>
+        @endif
     </div>
-@elseif ($note['correction_notice'] !== null)
-    <div class="alert alert-warning mt-3 mb-0">{{ $note['correction_notice'] }}</div>
-@endif
+</div>
