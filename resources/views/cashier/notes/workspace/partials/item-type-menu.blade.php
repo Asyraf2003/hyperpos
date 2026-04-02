@@ -7,11 +7,11 @@
         @foreach ($itemTypeOptions as $option)
             <button
                 type="button"
-                class="btn btn-light w-100 text-start mb-2"
+                class="btn btn-light w-100 text-start mb-2 text-dark"
                 data-add-item-type="{{ $option['type'] }}"
             >
-                <span class="fw-semibold d-block">{{ $option['label'] }}</span>
-                <small class="text-muted">{{ $option['help'] }}</small>
+                <span class="fw-semibold d-block text-dark">{{ $option['label'] }}</span>
+                <small class="text-black-50">{{ $option['help'] }}</small>
             </button>
         @endforeach
     </div>

@@ -67,11 +67,6 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="alert alert-light-primary mb-0">
-                    Workspace Kasir aktif. Slice berikutnya akan menghubungkan filter ini ke daftar nota,
-                    status pembayaran, ringkasan pengerjaan per nota, dan pagination.
-                </div>
             </div>
         </div>
 
