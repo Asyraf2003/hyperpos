@@ -74,6 +74,7 @@ use App\Application\Note\Policies\NoteAddabilityPolicy;
 use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Application\Note\Services\AddWorkItemErrorClassifier;
 use App\Application\Note\Services\NoteCorrectionSnapshotBuilder;
+use App\Application\Note\Services\NoteRowSettlementSummaryBuilder;
 use App\Application\Note\Services\WorkItemFactory;
 use App\Application\Note\Services\WorkItemStatusTransitionService;
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
@@ -180,6 +181,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(WorkItemStatusTransitionService::class);
         $this->app->singleton(AddWorkItemErrorClassifier::class);
         $this->app->singleton(NoteCorrectionSnapshotBuilder::class);
+        $this->app->singleton(NoteRowSettlementSummaryBuilder::class);
         $this->app->singleton(AllocatePaymentErrorClassifier::class);
         $this->app->singleton(ResolveNotePayableComponents::class);
         $this->app->singleton(AllocatePaymentAcrossComponents::class);

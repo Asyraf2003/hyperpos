@@ -16,6 +16,7 @@ final class NoteDetailPageDataBuilder
         private readonly PaymentAllocationReaderPort $allocations,
         private readonly CustomerRefundReaderPort $refunds,
         private readonly NotePaymentStatusResolver $statuses,
+        private readonly NoteRowSettlementSummaryBuilder $rowSettlements,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
     ) {
@@ -32,6 +33,8 @@ final class NoteDetailPageDataBuilder
         $netPaid = max($allocated - $refunded, 0);
         $status = $this->statuses->resolve($grandTotal, $netPaid);
 
+        $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
+
         return [
             'pageTitle' => 'Detail Nota',
             'note' => [
@@ -47,7 +50,7 @@ final class NoteDetailPageDataBuilder
                 'payment_status' => $status,
                 'can_add_rows' => $status !== 'paid',
                 'correction_notice' => $status === 'paid' ? 'Nota sudah lunas. Perubahan hanya boleh lewat correction flow.' : null,
-                'rows' => $this->mapRows($note->workItems()),
+                'rows' => $this->mapRows($note->workItems(), $rowSettlements),
                 'correction_history' => $this->history->build($note->id()),
             ],
             'productOptions' => $this->products->build(),
@@ -58,18 +61,33 @@ final class NoteDetailPageDataBuilder
      * @param array<int, WorkItem> $rows
      * @return list<array<string, mixed>>
      */
-    private function mapRows(array $rows): array
+    private function mapRows(array $rows, array $settlements): array
     {
         return array_map(
-            fn (WorkItem $item): array => [
-                'id' => $item->id(),
-                'line_no' => $item->lineNo(),
-                'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
-                'transaction_type' => $item->transactionType(),
-                'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
-                'status' => $item->status(),
-                'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
-            ],
+            function (WorkItem $item) use ($settlements): array {
+                $settlement = $settlements[$item->id()] ?? [
+                    'allocated_rupiah' => 0,
+                    'refunded_rupiah' => 0,
+                    'net_paid_rupiah' => 0,
+                    'outstanding_rupiah' => $item->subtotalRupiah()->amount(),
+                    'settlement_label' => 'hutang',
+                ];
+
+                return [
+                    'id' => $item->id(),
+                    'line_no' => $item->lineNo(),
+                    'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
+                    'transaction_type' => $item->transactionType(),
+                    'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
+                    'status' => $item->status(),
+                    'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
+                    'allocated_rupiah' => $settlement['allocated_rupiah'],
+                    'refunded_rupiah' => $settlement['refunded_rupiah'],
+                    'net_paid_rupiah' => $settlement['net_paid_rupiah'],
+                    'outstanding_rupiah' => $settlement['outstanding_rupiah'],
+                    'settlement_label' => $settlement['settlement_label'],
+                ];
+            },
             $rows
         );
     }
