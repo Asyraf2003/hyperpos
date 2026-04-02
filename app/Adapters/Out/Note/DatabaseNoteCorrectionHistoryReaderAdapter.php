@@ -31,9 +31,7 @@ final class DatabaseNoteCorrectionHistoryReaderAdapter implements NoteCorrection
         $meta = is_array($after['meta'] ?? null) ? $after['meta'] : (is_array($before['meta'] ?? null) ? $before['meta'] : []);
 
         return [
-            'event_label' => (string) $row->mutation_type === 'paid_service_only_work_item_corrected'
-                ? 'Correction Nominal Service'
-                : 'Correction Status Work Item',
+            'event_label' => $this->eventLabel((string) $row->mutation_type),
             'created_at' => (string) $row->occurred_at,
             'reason' => $row->reason !== null ? (string) $row->reason : null,
             'performed_by_actor_id' => $row->actor_id !== null ? (string) $row->actor_id : null,
@@ -42,6 +40,15 @@ final class DatabaseNoteCorrectionHistoryReaderAdapter implements NoteCorrection
             'before_total_rupiah' => $before['note']['total_rupiah'] ?? null,
             'after_total_rupiah' => $after['note']['total_rupiah'] ?? null,
         ];
+    }
+
+    private function eventLabel(string $mutationType): string
+    {
+        return match ($mutationType) {
+            'paid_service_only_work_item_corrected' => 'Correction Nominal Service',
+            'paid_service_with_store_stock_part_service_fee_only_corrected' => 'Correction Fee Service + Part Toko',
+            default => 'Correction Status Work Item',
+        };
     }
 
     /**
