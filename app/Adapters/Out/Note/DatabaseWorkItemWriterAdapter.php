@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
 {
+    use WorkItemDeletesTrait;
     use WorkItemLineInsertsTrait;
     use WorkItemServiceUpdateGuardsTrait;
 
