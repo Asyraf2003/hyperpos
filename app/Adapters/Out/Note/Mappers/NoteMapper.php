@@ -11,14 +11,12 @@ use stdClass;
 
 final class NoteMapper
 {
-    /**
-     * @param list<\App\Core\Note\WorkItem\WorkItem> $items
-     */
+    /** @param list<\App\Core\Note\WorkItem\WorkItem> $items */
     public static function map(stdClass $row, array $items): Note
     {
-        $customerPhone = property_exists($row, 'customer_phone')
-            ? ($row->customer_phone === null ? null : (string) $row->customer_phone)
-            : null;
+        $customerPhone = property_exists($row, 'customer_phone') ? ($row->customer_phone === null ? null : (string) $row->customer_phone) : null;
+        $closedAt = property_exists($row, 'closed_at') && $row->closed_at !== null ? new DateTimeImmutable((string) $row->closed_at) : null;
+        $reopenedAt = property_exists($row, 'reopened_at') && $row->reopened_at !== null ? new DateTimeImmutable((string) $row->reopened_at) : null;
 
         return Note::rehydrate(
             (string) $row->id,
@@ -26,7 +24,12 @@ final class NoteMapper
             $customerPhone,
             new DateTimeImmutable((string) $row->transaction_date),
             Money::fromInt((int) $row->total_rupiah),
-            $items
+            $items,
+            property_exists($row, 'note_state') ? (string) $row->note_state : Note::STATE_OPEN,
+            $closedAt,
+            property_exists($row, 'closed_by_actor_id') ? ($row->closed_by_actor_id === null ? null : (string) $row->closed_by_actor_id) : null,
+            $reopenedAt,
+            property_exists($row, 'reopened_by_actor_id') ? ($row->reopened_by_actor_id === null ? null : (string) $row->reopened_by_actor_id) : null,
         );
     }
 }

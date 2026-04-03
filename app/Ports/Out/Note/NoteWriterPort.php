@@ -13,4 +13,6 @@ interface NoteWriterPort
     public function updateHeader(Note $note): void;
 
     public function updateTotal(Note $note): void;
+
+    public function updateOperationalState(Note $note): void;
 }
