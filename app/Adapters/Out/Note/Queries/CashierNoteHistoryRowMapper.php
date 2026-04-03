@@ -30,9 +30,10 @@ final class CashierNoteHistoryRowMapper
             $outstanding = max($grandTotal - $netPaid, 0);
             $paymentStatus = $this->paymentStatuses->resolve($grandTotal, $netPaid);
             $transactionDate = (string) $row->transaction_date;
+            $noteState = (string) ($row->note_state ?? 'open');
 
             $isAnchorDate = $transactionDate === $criteria->anchorDateText;
-            $isPreviousOpen = $transactionDate === $criteria->previousDateText && $paymentStatus !== 'paid';
+            $isPreviousOpen = $transactionDate === $criteria->previousDateText && $noteState === 'open';
 
             if (! $isAnchorDate && ! $isPreviousOpen) {
                 continue;

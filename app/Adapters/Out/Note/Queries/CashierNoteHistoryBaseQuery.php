@@ -13,11 +13,19 @@ final class CashierNoteHistoryBaseQuery
      */
     public function fetch(CashierNoteHistoryCriteria $criteria): array
     {
-        $allocationTotals = DB::table('payment_allocations')
+        $componentAllocationTotals = DB::table('payment_component_allocations')
+            ->selectRaw('note_id, COALESCE(SUM(allocated_amount_rupiah), 0) as allocated_rupiah')
+            ->groupBy('note_id');
+
+        $legacyAllocationTotals = DB::table('payment_allocations')
             ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as allocated_rupiah')
             ->groupBy('note_id');
 
-        $refundTotals = DB::table('customer_refunds')
+        $componentRefundTotals = DB::table('refund_component_allocations')
+            ->selectRaw('note_id, COALESCE(SUM(refunded_amount_rupiah), 0) as refunded_rupiah')
+            ->groupBy('note_id');
+
+        $legacyRefundTotals = DB::table('customer_refunds')
             ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as refunded_rupiah')
             ->groupBy('note_id');
 
@@ -31,9 +39,12 @@ final class CashierNoteHistoryBaseQuery
             ->groupBy('note_id');
 
         return DB::table('notes')
-            ->leftJoinSub($allocationTotals, 'allocation_totals', fn ($join) => $join->on('allocation_totals.note_id', '=', 'notes.id'))
-            ->leftJoinSub($refundTotals, 'refund_totals', fn ($join) => $join->on('refund_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($componentAllocationTotals, 'component_allocation_totals', fn ($join) => $join->on('component_allocation_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($legacyAllocationTotals, 'legacy_allocation_totals', fn ($join) => $join->on('legacy_allocation_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($componentRefundTotals, 'component_refund_totals', fn ($join) => $join->on('component_refund_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($legacyRefundTotals, 'legacy_refund_totals', fn ($join) => $join->on('legacy_refund_totals.note_id', '=', 'notes.id'))
             ->leftJoinSub($workSummary, 'work_summary', fn ($join) => $join->on('work_summary.note_id', '=', 'notes.id'))
+            ->where('notes.note_state', 'open')
             ->whereBetween('notes.transaction_date', [$criteria->previousDateText, $criteria->anchorDateText])
             ->when($criteria->search !== '', function ($query) use ($criteria): void {
                 $query->where(function ($subQuery) use ($criteria): void {
@@ -47,9 +58,10 @@ final class CashierNoteHistoryBaseQuery
                 'notes.customer_name',
                 'notes.customer_phone',
                 'notes.transaction_date',
+                'notes.note_state',
                 'notes.total_rupiah',
-                DB::raw('COALESCE(allocation_totals.allocated_rupiah, 0) as allocated_rupiah'),
-                DB::raw('COALESCE(refund_totals.refunded_rupiah, 0) as refunded_rupiah'),
+                DB::raw('COALESCE(component_allocation_totals.allocated_rupiah, legacy_allocation_totals.allocated_rupiah, 0) as allocated_rupiah'),
+                DB::raw('COALESCE(component_refund_totals.refunded_rupiah, legacy_refund_totals.refunded_rupiah, 0) as refunded_rupiah'),
                 DB::raw('COALESCE(work_summary.open_count, 0) as open_count'),
                 DB::raw('COALESCE(work_summary.done_count, 0) as done_count'),
                 DB::raw('COALESCE(work_summary.canceled_count, 0) as canceled_count'),
