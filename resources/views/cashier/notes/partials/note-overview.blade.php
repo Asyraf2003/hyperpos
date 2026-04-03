@@ -7,7 +7,7 @@
                     <p class="mb-0 text-muted">Informasi utama nota pelanggan.</p>
                 </div>
 
-                @if (($note['total_allocated_rupiah'] ?? 0) === 0)
+                @if ($note['can_show_edit_actions'] && ($note['total_allocated_rupiah'] ?? 0) === 0)
                     <a
                         href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
                         class="btn btn-outline-primary btn-sm"
@@ -33,6 +33,15 @@
                 <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
                     <div class="text-muted">Tanggal Nota</div>
                     <div class="text-end fw-semibold">{{ $note['transaction_date'] }}</div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <div class="text-muted">Status Nota</div>
+                    <div class="text-end">
+                        <span class="badge bg-light text-dark text-uppercase">
+                            {{ $note['is_closed'] ? 'closed' : 'open' }}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
