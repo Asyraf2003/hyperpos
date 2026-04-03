@@ -5,7 +5,7 @@
             Perubahan rincian dilakukan dari workspace agar posisi edit tetap sama seperti halaman buat transaksi.
         </div>
 
-        @if ($note['can_add_rows'])
+        @if ($note['can_show_edit_actions'] && $note['can_add_rows'])
             <div class="d-grid gap-2">
                 <a
                     href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
@@ -22,7 +22,11 @@
             <div class="border rounded p-3 bg-light">
                 <div class="fw-semibold mb-1">Nota tidak bisa diedit bebas</div>
 
-                @if ($note['correction_notice'] !== null)
+                @if ($note['is_closed'])
+                    <div class="text-muted small">
+                        Nota sudah ditutup. Perubahan hanya bisa dilanjutkan setelah dibuka ulang oleh admin.
+                    </div>
+                @elseif ($note['correction_notice'] !== null)
                     <div class="text-muted small">{{ $note['correction_notice'] }}</div>
                 @else
                     <div class="text-muted small">
