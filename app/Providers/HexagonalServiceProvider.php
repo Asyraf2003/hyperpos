@@ -74,6 +74,7 @@ use App\Application\Inventory\Services\InventoryProjectionBuilder;
 use App\Application\Inventory\Services\InventoryProjectionService;
 use App\Application\Inventory\Services\IssueInventoryOperation;
 use App\Application\Note\Policies\NoteAddabilityPolicy;
+use App\Application\Note\Policies\CashierNoteAccessGuard;
 use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Application\Note\Services\AddWorkItemErrorClassifier;
 use App\Application\Note\Services\AutoCloseNoteWhenFullyPaid;
@@ -181,6 +182,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(MinSellingPricePolicy::class);
         $this->app->singleton(NotePaidStatusPolicy::class);
         $this->app->singleton(NoteAddabilityPolicy::class);
+        $this->app->singleton(CashierNoteAccessGuard::class);
 
         $this->app->singleton(InventoryProjectionService::class);
         $this->app->singleton(IssueInventoryOperation::class);
