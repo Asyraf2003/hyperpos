@@ -1,4 +1,4 @@
-@if ($note['outstanding_rupiah'] > 0)
+@if ($note['can_show_payment_form'])
     <div class="card">
         <div class="card-body">
             <form method="POST" action="{{ $paymentAction }}" id="note-payment-form">
@@ -134,13 +134,24 @@
     <div class="card">
         <div class="card-body">
             <div class="fw-bold mb-1">Pembayaran Nota</div>
-            <div class="text-muted small mb-3">
-                Status pembayaran sudah selesai untuk nota ini.
-            </div>
 
-            <div class="border rounded p-3 bg-light">
-                <span class="fw-semibold">Nota sudah lunas.</span>
-            </div>
+            @if ($note['is_closed'])
+                <div class="text-muted small mb-3">
+                    Nota sudah ditutup. Pembayaran tidak bisa dicatat dari halaman kasir ini.
+                </div>
+
+                <div class="border rounded p-3 bg-light">
+                    <span class="fw-semibold">Nota sudah ditutup.</span>
+                </div>
+            @else
+                <div class="text-muted small mb-3">
+                    Status pembayaran sudah selesai untuk nota ini.
+                </div>
+
+                <div class="border rounded p-3 bg-light">
+                    <span class="fw-semibold">Nota sudah lunas.</span>
+                </div>
+            @endif
         </div>
     </div>
 @endif
