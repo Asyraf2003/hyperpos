@@ -19,6 +19,7 @@ final class NoteCorrectionSnapshotBuilder
                 'id' => $note->id(),
                 'customer_name' => $note->customerName(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+                'note_state' => $note->noteState(),
                 'total_rupiah' => $note->totalRupiah()->amount(),
             ],
             'work_items' => array_map(

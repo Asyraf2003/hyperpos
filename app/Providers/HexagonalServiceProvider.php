@@ -76,6 +76,7 @@ use App\Application\Inventory\Services\IssueInventoryOperation;
 use App\Application\Note\Policies\NoteAddabilityPolicy;
 use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Application\Note\Services\AddWorkItemErrorClassifier;
+use App\Application\Note\Services\AutoCloseNoteWhenFullyPaid;
 use App\Application\Note\Services\NoteCorrectionSnapshotBuilder;
 use App\Application\Note\Services\NoteRowSettlementSummaryBuilder;
 use App\Application\Note\Services\PersistNoteMutationTimeline;
@@ -188,6 +189,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(WorkItemFactory::class);
         $this->app->singleton(WorkItemStatusTransitionService::class);
         $this->app->singleton(AddWorkItemErrorClassifier::class);
+        $this->app->singleton(AutoCloseNoteWhenFullyPaid::class);
         $this->app->singleton(NoteCorrectionSnapshotBuilder::class);
         $this->app->singleton(NoteRowSettlementSummaryBuilder::class);
         $this->app->singleton(PersistNoteMutationTimeline::class);

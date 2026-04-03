@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\UseCases;
 
+use App\Application\Note\Services\AutoCloseNoteWhenFullyPaid;
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
 use App\Application\Payment\Services\PaymentDateParser;
@@ -32,6 +33,7 @@ final class RecordAndAllocateNotePaymentHandler
         private readonly PaymentAllocationPolicy $policy,
         private readonly ResolveNotePayableComponents $components,
         private readonly AllocatePaymentAcrossComponents $allocator,
+        private readonly AutoCloseNoteWhenFullyPaid $autoClose,
         private readonly TransactionManagerPort $transactions,
         private readonly UuidPort $uuid,
         private readonly AllocatePaymentErrorClassifier $errors,
@@ -65,15 +67,12 @@ final class RecordAndAllocateNotePaymentHandler
                 $this->allocations->getTotalAllocatedAmountByNoteId($note->id()),
             );
 
-            $allocations = $this->allocator->allocate(
-                $payment->id(),
-                $note->id(),
-                $amount,
-                $this->components->fromNote($note),
-            );
+            $allocations = $this->allocator->allocate($payment->id(), $note->id(), $amount, $this->components->fromNote($note));
 
             $this->payments->create($payment);
             $this->allocationWriter->createMany($allocations);
+            $this->autoClose->closeIfEligible($note, $payment->id());
+
             $this->audit->record('payment_allocated', [
                 'payment_id' => $payment->id(),
                 'note_id' => $note->id(),
