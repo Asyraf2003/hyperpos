@@ -30,11 +30,14 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
+        $today = date('Y-m-d');
+
         DB::table('notes')->insert([
             'id' => 'note-entry-1',
             'customer_name' => 'Budi Entry',
             'customer_phone' => '0812000001',
-            'transaction_date' => '2026-04-05',
+            'transaction_date' => $today,
+            'note_state' => 'open',
             'total_rupiah' => 50000,
         ]);
 
@@ -77,11 +80,14 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
+        $today = date('Y-m-d');
+
         DB::table('notes')->insert([
             'id' => 'note-entry-2',
             'customer_name' => 'Budi Paid',
             'customer_phone' => '0812000002',
-            'transaction_date' => '2026-04-05',
+            'transaction_date' => $today,
+            'note_state' => 'open',
             'total_rupiah' => 50000,
         ]);
 
@@ -104,7 +110,7 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
         DB::table('customer_payments')->insert([
             'id' => 'payment-entry-1',
             'amount_rupiah' => 50000,
-            'paid_at' => '2026-04-05',
+            'paid_at' => $today,
         ]);
 
         DB::table('payment_allocations')->insert([

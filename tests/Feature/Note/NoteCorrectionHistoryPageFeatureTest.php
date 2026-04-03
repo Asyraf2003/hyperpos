@@ -28,10 +28,14 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
+        $today = date('Y-m-d');
+        $now = $today . ' 10:00:00';
+
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => $today,
+            'note_state' => 'open',
             'total_rupiah' => 40000,
         ]);
 
@@ -42,7 +46,7 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
             'actor_id' => 'actor-1',
             'actor_role' => 'admin',
             'reason' => 'Harga salah input',
-            'occurred_at' => '2026-03-14 10:00:00',
+            'occurred_at' => $now,
             'related_customer_payment_id' => null,
             'related_customer_refund_id' => null,
         ]);
@@ -53,14 +57,14 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'before',
                 'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":10000}}',
-                'created_at' => '2026-03-14 10:00:00',
+                'created_at' => $now,
             ],
             [
                 'id' => 'snap-2',
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'after',
                 'payload_json' => '{"note":{"total_rupiah":40000},"meta":{"refund_required_rupiah":10000}}',
-                'created_at' => '2026-03-14 10:00:00',
+                'created_at' => $now,
             ],
         ]);
 
