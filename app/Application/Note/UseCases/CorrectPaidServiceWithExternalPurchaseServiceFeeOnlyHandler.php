@@ -45,20 +45,15 @@ final class CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyHandler
 
             $this->transactions->begin();
             $started = true;
-
             $note = $this->notes->getById(trim($noteId)) ?? throw new DomainException('Note tidak ditemukan.');
             $this->paidStatus->assertPaidForCorrection($note);
-
             $target = $this->findWorkItem($note, $lineNo);
 
             if ($target->transactionType() !== WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE) throw new DomainException('Correction slice ini hanya mendukung work item service_with_external_purchase.');
 
             $before = $this->snapshots->build($note);
-
             $detail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
-            
             $subtotal = $detail->servicePriceRupiah()->add(ExternalPurchaseLinesSubtotal::sum($target->externalPurchaseLines()));
-
             $corrected = WorkItem::rehydrate(
                 $target->id(),
                 $target->noteId(),

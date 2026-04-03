@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Core\Note\Note;
+
+use App\Core\Shared\Exceptions\DomainException;
+use DateTimeImmutable;
+
+trait NoteOperationalStateMutations
+{
+    public function close(string $actorId, DateTimeImmutable $occurredAt): void
+    {
+        $actor = trim($actorId);
+
+        if ($actor === '') {
+            throw new DomainException('Actor close note wajib ada.');
+        }
+
+        if ($this->noteState !== Note::STATE_OPEN) {
+            throw new DomainException('Hanya note open yang boleh ditutup.');
+        }
+
+        $this->noteState = Note::STATE_CLOSED;
+        $this->closedAt = $occurredAt;
+        $this->closedByActorId = $actor;
+    }
+
+    public function reopen(string $actorId, DateTimeImmutable $occurredAt): void
+    {
+        $actor = trim($actorId);
+
+        if ($actor === '') {
+            throw new DomainException('Actor reopen note wajib ada.');
+        }
+
+        if ($this->noteState !== Note::STATE_CLOSED) {
+            throw new DomainException('Hanya note closed yang boleh dibuka kembali.');
+        }
+
+        $this->noteState = Note::STATE_OPEN;
+        $this->reopenedAt = $occurredAt;
+        $this->reopenedByActorId = $actor;
+    }
+}
