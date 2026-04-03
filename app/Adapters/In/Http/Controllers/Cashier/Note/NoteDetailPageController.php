@@ -7,7 +7,9 @@ namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 use App\Application\Note\Policies\CashierNoteAccessGuard;
 use App\Application\Note\Services\NoteCorrectionUiOptionsBuilder;
 use App\Application\Note\Services\NoteDetailPageDataBuilder;
+use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\ClockPort;
+use App\Ports\Out\Note\NoteReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\Controller;
 
@@ -15,15 +17,23 @@ final class NoteDetailPageController extends Controller
 {
     public function __invoke(
         string $noteId,
+        NoteReaderPort $notes,
         NoteDetailPageDataBuilder $builder,
         NoteCorrectionUiOptionsBuilder $options,
         CashierNoteAccessGuard $guard,
         ClockPort $clock,
     ): View {
+        $note = $notes->getById($noteId);
+        abort_if($note === null, 404);
+
+        try {
+            $guard->assertCanAccess($note, $clock->now());
+        } catch (DomainException $e) {
+            abort(403, $e->getMessage());
+        }
+
         $data = $builder->build($noteId);
         abort_if($data === null, 404);
-
-        $guard->assertCanAccess($data['note'], $clock->now());
 
         return view('cashier.notes.show', $data + [
             'addRowsAction' => route('cashier.notes.rows.store', ['noteId' => $noteId]),
