@@ -29,10 +29,13 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
+        $today = date('Y-m-d');
+
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => $today,
+            'note_state' => 'open',
             'total_rupiah' => 150000,
         ]);
 
@@ -49,14 +52,14 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
         $response = $this->actingAs($user)->post('/cashier/notes/note-1/payments', [
             'selected_row_ids' => ['wi-1'],
             'payment_method' => 'cash',
-            'paid_at' => '2026-03-15',
+            'paid_at' => $today,
             'amount_received' => 70000,
         ]);
 
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
         $this->assertDatabaseHas('customer_payments', [
             'amount_rupiah' => 50000,
-            'paid_at' => '2026-03-15',
+            'paid_at' => $today,
         ]);
 
         $paymentId = (string) DB::table('customer_payments')->value('id');

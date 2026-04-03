@@ -20,6 +20,7 @@ use App\Adapters\In\Http\Controllers\Note\UpdateTransactionWorkspaceController;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureAdminPageAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureCashierAreaAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureTransactionEntryAllowed;
+use App\Adapters\In\Http\Middleware\Note\EnsureCashierNoteAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
 
@@ -45,16 +46,19 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
 
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
-        Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
-        Route::get(
-            '/prototype/{noteId}',
-            fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId])
-        )->name('prototype.show');
 
-        Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
-        Route::patch('/{noteId}/workspace', UpdateTransactionWorkspaceController::class)->name('workspace.update');
-        Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
-        Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
-        Route::post('/{noteId}/corrections/status', CorrectPaidWorkItemStatusController::class)->name('corrections.status.store');
-        Route::post('/{noteId}/corrections/service-only', CorrectPaidServiceOnlyWorkItemController::class)->name('corrections.service-only.store');
+        Route::middleware(EnsureCashierNoteAccess::class)->group(function (): void {
+            Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
+            Route::get(
+                '/prototype/{noteId}',
+                fn (string $noteId): RedirectResponse => redirect()->route('cashier.notes.show', ['noteId' => $noteId])
+            )->name('prototype.show');
+
+            Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
+            Route::patch('/{noteId}/workspace', UpdateTransactionWorkspaceController::class)->name('workspace.update');
+            Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
+            Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
+            Route::post('/{noteId}/corrections/status', CorrectPaidWorkItemStatusController::class)->name('corrections.status.store');
+            Route::post('/{noteId}/corrections/service-only', CorrectPaidServiceOnlyWorkItemController::class)->name('corrections.service-only.store');
+        });
     });
