@@ -32,6 +32,8 @@ final class NoteDetailPageDataBuilder
         $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
         $netPaid = max($allocated - $refunded, 0);
         $status = $this->statuses->resolve($grandTotal, $netPaid);
+        $isOpen = $note->isOpen();
+        $isClosed = $note->isClosed();
 
         $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
 
@@ -42,6 +44,9 @@ final class NoteDetailPageDataBuilder
                 'customer_name' => $note->customerName(),
                 'customer_phone' => $note->customerPhone(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+                'note_state' => $note->noteState(),
+                'is_open' => $isOpen,
+                'is_closed' => $isClosed,
                 'grand_total_rupiah' => $grandTotal,
                 'total_allocated_rupiah' => $allocated,
                 'total_refunded_rupiah' => $refunded,
@@ -49,6 +54,9 @@ final class NoteDetailPageDataBuilder
                 'outstanding_rupiah' => max($grandTotal - $netPaid, 0),
                 'payment_status' => $status,
                 'can_add_rows' => $status !== 'paid',
+                'can_show_edit_actions' => $isOpen,
+                'can_show_payment_form' => $isOpen && max($grandTotal - $netPaid, 0) > 0,
+                'can_show_correction_actions' => $isOpen && $status === 'paid',
                 'correction_notice' => $status === 'paid' ? 'Nota sudah lunas. Perubahan hanya boleh lewat correction flow.' : null,
                 'rows' => $this->mapRows($note->workItems(), $rowSettlements),
                 'correction_history' => $this->history->build($note->id()),
