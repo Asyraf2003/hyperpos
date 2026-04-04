@@ -26,7 +26,6 @@ final class NoteDetailPageDataBuilder
     {
         $note = $this->notes->getById(trim($noteId));
         if ($note === null) return null;
-
         $grandTotal = $note->totalRupiah()->amount();
         $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id())->amount();
         $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
@@ -34,7 +33,6 @@ final class NoteDetailPageDataBuilder
         $status = $this->statuses->resolve($grandTotal, $netPaid);
         $isOpen = $note->isOpen();
         $isClosed = $note->isClosed();
-
         $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
 
         return [

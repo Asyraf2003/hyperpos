@@ -1,4 +1,4 @@
-@if ($note['payment_status'] === 'paid')
+@if ($note['can_show_correction_actions'])
     <div class="card">
         <div class="card-body">
             <div class="fw-bold mb-1">Koreksi Nota Lunas</div>

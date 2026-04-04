@@ -13,7 +13,7 @@ final class NotePrototypeRedirectFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_prototype_route_redirects_to_final_note_detail_route(): void
+    public function test_cashier_prototype_route_is_not_available_anymore(): void
     {
         $this->loginAsKasir();
 
@@ -30,6 +30,6 @@ final class NotePrototypeRedirectFeatureTest extends TestCase
 
         $response = $this->actingAs($user)->get('/cashier/notes/prototype/note-123');
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-123']));
+        $response->assertNotFound();
     }
 }

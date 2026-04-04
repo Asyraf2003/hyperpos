@@ -15,7 +15,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_correct_paid_service_only_work_item_via_http(): void
+    public function test_cashier_cannot_correct_closed_paid_service_only_work_item_via_http(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier@example.test');
@@ -29,23 +29,23 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
             'reason' => 'Harga awal terlalu tinggi.',
         ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_item_service_details', [
             'work_item_id' => 'wi-1',
-            'service_name' => 'Servis Koreksi',
-            'service_price_rupiah' => 40000,
-            'part_source' => ServiceDetail::PART_SOURCE_CUSTOMER_OWNED,
+            'service_name' => 'Servis A',
+            'service_price_rupiah' => 50000,
+            'part_source' => ServiceDetail::PART_SOURCE_NONE,
         ]);
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'total_rupiah' => 40000,
+            'total_rupiah' => 50000,
         ]);
-        $this->assertDatabaseHas('audit_logs', [
+        $this->assertDatabaseMissing('audit_logs', [
             'event' => 'paid_service_only_work_item_corrected',
         ]);
     }
 
-    public function test_cashier_cannot_correct_paid_service_only_work_item_with_invalid_part_source(): void
+    public function test_cashier_cannot_access_closed_paid_service_only_validation_flow(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier-invalid-part-source@example.test');
@@ -61,9 +61,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
                 'reason' => 'Part source tidak valid.',
             ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['part_source']);
-
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_item_service_details', [
             'work_item_id' => 'wi-1',
             'service_name' => 'Servis A',
@@ -104,7 +102,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         ]);
     }
 
-    public function test_cashier_cannot_correct_non_service_only_work_item_via_http(): void
+    public function test_cashier_cannot_access_closed_paid_non_service_only_correction_flow(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier-non-service-only@example.test');
@@ -120,9 +118,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
                 'reason' => 'Tidak boleh untuk tipe lain.',
             ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['correction']);
-
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
             'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
@@ -154,8 +150,9 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => now()->toDateString(),
             'total_rupiah' => $subtotalRupiah,
+            'note_state' => 'closed',
         ]);
 
         DB::table('work_items')->insert([
@@ -177,7 +174,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         DB::table('customer_payments')->insert([
             'id' => 'cp-1',
             'amount_rupiah' => $subtotalRupiah,
-            'paid_at' => '2026-03-14',
+            'paid_at' => now()->toDateString(),
         ]);
 
         DB::table('payment_allocations')->insert([
@@ -193,8 +190,9 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => now()->toDateString(),
             'total_rupiah' => $subtotalRupiah,
+            'note_state' => 'open',
         ]);
 
         DB::table('work_items')->insert([
@@ -219,8 +217,9 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => now()->toDateString(),
             'total_rupiah' => $subtotalRupiah,
+            'note_state' => 'closed',
         ]);
 
         DB::table('work_items')->insert([
@@ -243,7 +242,7 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
         DB::table('customer_payments')->insert([
             'id' => 'cp-1',
             'amount_rupiah' => $subtotalRupiah,
-            'paid_at' => '2026-03-14',
+            'paid_at' => now()->toDateString(),
         ]);
 
         DB::table('payment_allocations')->insert([

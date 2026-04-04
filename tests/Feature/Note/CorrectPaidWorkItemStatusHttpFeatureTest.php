@@ -15,7 +15,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_correct_paid_work_item_status_via_http(): void
+    public function test_cashier_cannot_correct_closed_paid_work_item_status_via_http(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier@example.test');
@@ -27,17 +27,17 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
             'reason' => 'Servis sudah selesai.',
         ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
-            'status' => WorkItem::STATUS_DONE,
+            'status' => WorkItem::STATUS_OPEN,
         ]);
-        $this->assertDatabaseHas('audit_logs', [
+        $this->assertDatabaseMissing('audit_logs', [
             'event' => 'paid_work_item_status_corrected',
         ]);
     }
 
-    public function test_cashier_cannot_correct_paid_work_item_status_with_invalid_target_status(): void
+    public function test_cashier_cannot_access_closed_paid_work_item_status_validation_flow(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier-invalid-status@example.test');
@@ -51,9 +51,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
                 'reason' => 'Status tidak valid.',
             ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['target_status']);
-
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
             'status' => WorkItem::STATUS_OPEN,
@@ -63,7 +61,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
         ]);
     }
 
-    public function test_cashier_cannot_correct_paid_work_item_status_with_blank_reason(): void
+    public function test_cashier_cannot_access_closed_paid_work_item_status_blank_reason_flow(): void
     {
         $this->loginAsKasir();
         $user = $this->createCashierUser('cashier-blank-reason@example.test');
@@ -77,9 +75,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
                 'reason' => '   ',
             ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors(['reason']);
-
+        $response->assertForbidden();
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
             'status' => WorkItem::STATUS_OPEN,
@@ -136,8 +132,9 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => now()->toDateString(),
             'total_rupiah' => $subtotalRupiah,
+            'note_state' => 'closed',
         ]);
 
         DB::table('work_items')->insert([
@@ -159,7 +156,7 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
         DB::table('customer_payments')->insert([
             'id' => 'cp-1',
             'amount_rupiah' => $subtotalRupiah,
-            'paid_at' => '2026-03-14',
+            'paid_at' => now()->toDateString(),
         ]);
 
         DB::table('payment_allocations')->insert([
@@ -175,8 +172,9 @@ final class CorrectPaidWorkItemStatusHttpFeatureTest extends TestCase
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-03-14',
+            'transaction_date' => now()->toDateString(),
             'total_rupiah' => $subtotalRupiah,
+            'note_state' => 'open',
         ]);
 
         DB::table('work_items')->insert([
