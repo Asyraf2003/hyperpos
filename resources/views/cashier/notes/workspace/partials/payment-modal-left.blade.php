@@ -34,14 +34,27 @@
 
     <div id="workspace-payment-panel-partial" class="d-none">
         <div class="border rounded p-3 mb-3">
-            <div class="fw-semibold mb-1">Pilih rincian yang mau dibayar</div>
-            <div class="text-muted small">Centang rincian yang dibayar sekarang. Total akan dihitung otomatis.</div>
+            <div class="fw-semibold mb-1">Isi nominal pembayaran sebagian</div>
+            <div class="text-muted small">
+                Masukkan nominal yang dibayar sekarang. Partial payment tidak lagi dipilih per rincian.
+            </div>
         </div>
 
-        <div id="workspace-partial-selection-list" class="d-flex flex-column gap-2 mb-3"></div>
+        <div class="form-group mb-3">
+            <label for="inline_payment_amount_paid_display" class="form-label">Nominal Dibayar Sekarang</label>
+            <input
+                type="text"
+                id="inline_payment_amount_paid_display"
+                value="{{ !empty($oldInlinePayment['amount_paid_rupiah']) ? number_format((int) $oldInlinePayment['amount_paid_rupiah'], 0, ',', '.') : '' }}"
+                class="form-control"
+                inputmode="numeric"
+                placeholder="Masukkan nominal pembayaran sebagian"
+            >
+            <div class="form-text">Nominal akan dibatasi maksimal sebesar total nota.</div>
+        </div>
 
         <div class="border rounded p-3">
-            <div class="small text-muted">Total Rincian Terpilih</div>
+            <div class="small text-muted">Nominal Tercatat</div>
             <div class="fs-5 fw-bold" id="workspace-partial-selected-total-text">0</div>
         </div>
     </div>

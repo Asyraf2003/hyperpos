@@ -1,11 +1,36 @@
 <div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
-            <input type="hidden" id="inline_payment_decision_hidden" name="inline_payment[decision]" value="skip">
-            <input type="hidden" id="inline_payment_method_hidden" name="inline_payment[payment_method]" value="">
-            <input type="hidden" id="inline_payment_paid_at_hidden" name="inline_payment[paid_at]" value="{{ $oldNote['transaction_date'] }}">
-            <input type="hidden" id="inline_payment_amount_paid_rupiah" name="inline_payment[amount_paid_rupiah]" value="">
-            <input type="hidden" id="inline_payment_amount_received_rupiah" name="inline_payment[amount_received_rupiah]" value="">
+            <input
+                type="hidden"
+                id="inline_payment_decision_hidden"
+                name="inline_payment[decision]"
+                value="{{ $oldInlinePayment['decision'] ?? 'skip' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_method_hidden"
+                name="inline_payment[payment_method]"
+                value="{{ $oldInlinePayment['payment_method'] ?? '' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_paid_at_hidden"
+                name="inline_payment[paid_at]"
+                value="{{ $oldInlinePayment['paid_at'] ?? $oldNote['transaction_date'] }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_amount_paid_rupiah"
+                name="inline_payment[amount_paid_rupiah]"
+                value="{{ $oldInlinePayment['amount_paid_rupiah'] ?? '' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_amount_received_rupiah"
+                name="inline_payment[amount_received_rupiah]"
+                value="{{ $oldInlinePayment['amount_received_rupiah'] ?? '' }}"
+            >
 
             <div class="modal-header">
                 <div>

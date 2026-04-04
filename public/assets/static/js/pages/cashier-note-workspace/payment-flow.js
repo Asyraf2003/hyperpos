@@ -25,62 +25,51 @@
     if (el) el.value = String(value ?? "");
   };
 
-  const currentRows = () => {
-    if (typeof NS.currentRows !== "function") return [];
+  const grandTotal = () => {
+    if (typeof NS.currentRows !== "function") return 0;
     const rows = NS.currentRows();
-    return Array.isArray(rows) ? rows : [];
+    if (!Array.isArray(rows)) return 0;
+
+    return rows.reduce((sum, item) => sum + Number(item?.total || 0), 0);
   };
 
-  const grandTotal = () =>
-    currentRows().reduce((sum, item) => sum + Number(item?.total || 0), 0);
+  const partialAmountInput = () => byId("inline_payment_amount_paid_display");
 
-  const clearPayNow = () => {
-    document.querySelectorAll("[data-pay-now]").forEach((input) => {
-      input.value = "0";
-    });
+  const partialAmount = (total) => {
+    const inputValue = digits(partialAmountInput()?.value || byId("inline_payment_amount_paid_rupiah")?.value || "");
+    return Math.min(inputValue, total);
   };
 
-  const totalSelected = () =>
-    currentRows()
-      .filter(({ row }) => row?.querySelector("[data-pay-now]")?.value === "1")
-      .reduce((sum, item) => sum + Number(item?.total || 0), 0);
+  const payableAmount = (total) => (
+    NS.paymentState.mode === "full"
+      ? total
+      : partialAmount(total)
+  );
 
-  const payableAmount = (total) =>
-    NS.paymentState.mode === "full" ? total : totalSelected();
+  const syncPartialAmount = (total) => {
+    const amount = partialAmount(total);
+    updateHidden("inline_payment_amount_paid_rupiah", amount > 0 ? amount : "");
 
-  const buildPartialList = () => {
-    const root = byId("workspace-partial-selection-list");
-    if (!root) return;
+    const input = partialAmountInput();
+    if (input && document.activeElement !== input) {
+      input.value = amount > 0 ? format(amount) : "";
+    }
 
-    root.innerHTML = "";
-
-    currentRows().forEach(({ row, index, title, total }) => {
-      const hidden = row?.querySelector("[data-pay-now]");
-      const checked = hidden?.value === "1";
-
-      const wrapper = document.createElement("label");
-      wrapper.className = "border rounded p-3 d-flex justify-content-between align-items-center gap-3";
-      wrapper.innerHTML =
-        '<span class="d-flex align-items-center gap-2">' +
-          '<input type="checkbox" class="form-check-input mt-0" data-partial-check="' + index + '"' + (checked ? " checked" : "") + ">" +
-          '<span><span class="fw-semibold d-block">' + title + '</span><small class="text-muted">Pilih untuk dibayar sekarang</small></span>' +
-        '</span>' +
-        '<span class="fw-semibold">' + format(total) + '</span>';
-
-      root.appendChild(wrapper);
-    });
-
-    const selected = totalSelected();
-    updateHidden("inline_payment_amount_paid_rupiah", selected > 0 ? selected : "");
-    setText("workspace-partial-selected-total-text", selected);
+    setText("workspace-partial-selected-total-text", amount);
   };
 
   NS.refreshPaymentUi = (total = grandTotal()) => {
     const noteDate = byId("note_transaction_date")?.value || "";
     updateHidden("inline_payment_paid_at_hidden", noteDate);
 
-    if (NS.paymentState.mode !== "partial") clearPayNow();
-    if (NS.paymentState.mode === "partial") buildPartialList();
+    if (NS.paymentState.mode !== "partial") {
+      updateHidden("inline_payment_amount_paid_rupiah", "");
+      const input = partialAmountInput();
+      if (input && document.activeElement !== input) input.value = "";
+      setText("workspace-partial-selected-total-text", 0);
+    } else {
+      syncPartialAmount(total);
+    }
 
     const payable = payableAmount(total);
     const remaining = Math.max(total - payable, 0);
@@ -140,11 +129,12 @@
     }
 
     if (event.target.closest("#workspace-submit-skip")) {
-      clearPayNow();
       updateHidden("inline_payment_decision_hidden", "skip");
       updateHidden("inline_payment_method_hidden", "");
       updateHidden("inline_payment_amount_paid_rupiah", "");
       updateHidden("inline_payment_amount_received_rupiah", "");
+      const partialInput = partialAmountInput();
+      if (partialInput) partialInput.value = "";
       byId("cashier-note-workspace-form")?.requestSubmit();
       return;
     }
@@ -165,20 +155,15 @@
       NS.paymentState.cashStep = false;
       updateHidden("inline_payment_method_hidden", "");
       NS.refreshPaymentUi();
-      return;
-    }
-
-    const checkbox = event.target.closest("[data-partial-check]");
-    if (checkbox) {
-      const row = document.querySelector('[data-row-index="' + checkbox.dataset.partialCheck + '"]');
-      const hidden = row?.querySelector("[data-pay-now]");
-      if (hidden) hidden.value = checkbox.checked ? "1" : "0";
-      NS.refreshPaymentUi();
     }
   });
 
   document.addEventListener("input", (event) => {
-    if (event.target.id === "inline_payment_amount_received_display" || event.target.id === "note_transaction_date") {
+    if (
+      event.target.id === "inline_payment_amount_paid_display"
+      || event.target.id === "inline_payment_amount_received_display"
+      || event.target.id === "note_transaction_date"
+    ) {
       updateHidden("inline_payment_amount_received_rupiah", digits(byId("inline_payment_amount_received_display")?.value || ""));
       NS.refreshPaymentUi();
     }
