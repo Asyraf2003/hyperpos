@@ -16,32 +16,13 @@
     NS.config = config;
   };
 
-  const hasServerOldState = (config) => {
-    const items = Array.isArray(config.oldItems) ? config.oldItems : [];
-    const payment = typeof config.oldInlinePayment === "object" && config.oldInlinePayment !== null
-      ? config.oldInlinePayment
-      : {};
-    const note = typeof config.oldNote === "object" && config.oldNote !== null
-      ? config.oldNote
-      : {};
-
-    return items.length > 0
-      || (payment.decision && payment.decision !== "skip")
-      || Boolean(note.customer_name || note.customer_phone || note.transaction_date);
-  };
-
-  const workspaceKey = (config) => {
-    const mode = String(config.workspaceMode || "create");
-    const noteId = String(config.noteId || "").trim();
-
-    return mode === "edit" ? `edit:${noteId}` : "create";
-  };
+  const hasBlockingServerOldInput = (config) => config?.hasOldInput === true;
 
   const restoreFromServer = async () => {
     const config = parseConfig();
     writeConfig(config);
 
-    if (hasServerOldState(config)) {
+    if (hasBlockingServerOldInput(config)) {
       return config;
     }
 
@@ -77,11 +58,6 @@
         return config;
       }
 
-      const shouldRestore = window.confirm("Ditemukan draft workspace di server. Pulihkan draft ini?");
-      if (!shouldRestore) {
-        return config;
-      }
-
       const merged = {
         ...config,
         oldNote: typeof draftPayload.note === "object" && draftPayload.note !== null ? draftPayload.note : {},
@@ -92,7 +68,7 @@
         draftMeta: {
           restored_at: new Date().toISOString(),
           updated_at: draft.updated_at || null,
-          workspace_key: payload?.data?.workspace_key || workspaceKey(config),
+          workspace_key: payload?.data?.workspace_key || null,
         },
       };
 
@@ -229,16 +205,23 @@
     }
   };
 
-  const initAutosave = () => {
+  const initAutosave = async () => {
+    if (NS.workspaceConfigReady instanceof Promise) {
+      await NS.workspaceConfigReady;
+    }
+
     const form = document.getElementById("cashier-note-workspace-form");
     if (!form) return;
 
     let timer = null;
+    let hasInteracted = false;
+
     const queueSave = () => {
+      hasInteracted = true;
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         void saveDraftToServer(false);
-      }, 400);
+      }, 1200);
     };
 
     form.addEventListener("input", queueSave);
@@ -257,19 +240,21 @@
     });
 
     window.addEventListener("beforeunload", () => {
+      if (!hasInteracted) {
+        return;
+      }
+
       void saveDraftToServer(true);
     });
-
-    window.setTimeout(() => {
-      void saveDraftToServer(false);
-    }, 0);
   };
 
   NS.workspaceConfigReady = restoreFromServer();
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initAutosave);
+    document.addEventListener("DOMContentLoaded", () => {
+      void initAutosave();
+    });
   } else {
-    initAutosave();
+    void initAutosave();
   }
 })();
