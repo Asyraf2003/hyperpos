@@ -5,47 +5,83 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
 use App\Application\Note\Services\CreateTransactionWorkspacePageDataBuilder;
+use App\Ports\Out\Note\TransactionWorkspaceDraftReaderPort;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 
 final class CreateTransactionWorkspacePageController extends Controller
 {
-    public function __invoke(CreateTransactionWorkspacePageDataBuilder $builder): View
-    {
+    public function __invoke(
+        Request $request,
+        CreateTransactionWorkspacePageDataBuilder $builder,
+        TransactionWorkspaceDraftReaderPort $drafts,
+    ): View {
         $page = $builder->build();
+        $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
+        $productLookupEndpoint = route('cashier.notes.products.lookup');
+
+        $sessionHasOldInput = !empty($request->session()->getOldInput());
+        $draftPayload = $this->loadDraftPayload($request, $drafts, $sessionHasOldInput);
+
         $oldNote = old('note');
         $oldItems = old('items');
         $oldInlinePayment = old('inline_payment');
 
-        $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
-        $productLookupEndpoint = route('cashier.notes.products.lookup');
+        $noteFromDraft = is_array($draftPayload['note'] ?? null) ? $draftPayload['note'] : [];
+        $itemsFromDraft = is_array($draftPayload['items'] ?? null) ? array_values($draftPayload['items']) : [];
+        $inlinePaymentFromDraft = is_array($draftPayload['inline_payment'] ?? null) ? $draftPayload['inline_payment'] : [];
 
-        $workspaceConfigJson = json_encode([
-            'oldItems' => is_array($oldItems) ? array_values($oldItems) : [],
-            'defaultCustomerName' => $defaultCustomerName,
-            'productLookupEndpoint' => $productLookupEndpoint,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $resolvedNote = is_array($oldNote) ? $oldNote : array_filter([
+            'customer_name' => $noteFromDraft['customer_name'] ?? $defaultCustomerName,
+            'customer_phone' => $noteFromDraft['customer_phone'] ?? '',
+            'transaction_date' => $noteFromDraft['transaction_date'] ?? date('Y-m-d'),
+        ], static fn ($value) => $value !== null);
+
+        $resolvedItems = is_array($oldItems) ? array_values($oldItems) : $itemsFromDraft;
+
+        $resolvedInlinePayment = is_array($oldInlinePayment) ? $oldInlinePayment : [
+            'decision' => $inlinePaymentFromDraft['decision'] ?? 'skip',
+            'payment_method' => $inlinePaymentFromDraft['payment_method'] ?? 'cash',
+            'paid_at' => $inlinePaymentFromDraft['paid_at'] ?? date('Y-m-d'),
+            'amount_paid_rupiah' => $inlinePaymentFromDraft['amount_paid_rupiah'] ?? '',
+            'amount_received_rupiah' => $inlinePaymentFromDraft['amount_received_rupiah'] ?? '',
+            'notes' => $inlinePaymentFromDraft['notes'] ?? '',
+        ];
 
         return view('cashier.notes.workspace.create', [
             'pageTitle' => 'Buat Nota',
-            'oldNote' => is_array($oldNote) ? $oldNote : [
-                'customer_name' => $defaultCustomerName,
-                'customer_phone' => '',
-                'transaction_date' => date('Y-m-d'),
-            ],
-            'oldItems' => is_array($oldItems) ? array_values($oldItems) : [],
-            'oldInlinePayment' => is_array($oldInlinePayment) ? $oldInlinePayment : [
-                'decision' => 'skip',
-                'payment_method' => 'cash',
-                'paid_at' => date('Y-m-d'),
-                'amount_paid_rupiah' => '',
-                'amount_received_rupiah' => '',
-                'notes' => '',
-            ],
+            'oldNote' => $resolvedNote,
+            'oldItems' => $resolvedItems,
+            'oldInlinePayment' => $resolvedInlinePayment,
             'defaultCustomerName' => $defaultCustomerName,
             'productLookupEndpoint' => $productLookupEndpoint,
-            'workspaceConfigJson' => is_string($workspaceConfigJson) ? $workspaceConfigJson : '{}',
+            'hasOldInput' => $sessionHasOldInput || $draftPayload !== [],
         ] + $page);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadDraftPayload(
+        Request $request,
+        TransactionWorkspaceDraftReaderPort $drafts,
+        bool $sessionHasOldInput,
+    ): array {
+        if ($sessionHasOldInput) {
+            return [];
+        }
+
+        $actorId = $request->user()?->getAuthIdentifier();
+
+        if ($actorId === null) {
+            return [];
+        }
+
+        $draft = $drafts->findByActorAndWorkspaceKey((string) $actorId, 'create');
+        $payload = $draft['payload'] ?? null;
+
+        return is_array($payload) ? $payload : [];
     }
 }
