@@ -11,66 +11,96 @@
     }
   };
 
-  const hasServerOldState = (config) => {
-    const items = Array.isArray(config.oldItems) ? config.oldItems : [];
-    const payment = typeof config.oldInlinePayment === "object" && config.oldInlinePayment !== null
-      ? config.oldInlinePayment
-      : {};
-
-    return items.length > 0 || (payment.decision && payment.decision !== "skip");
-  };
-
-  const draftKey = (config) => {
-    const mode = String(config.workspaceMode || "create");
-    const noteId = String(config.noteId || window.location.pathname);
-    return `cashier-note-workspace-draft:${mode}:${noteId}`;
-  };
-
-  const readDraft = (key) => {
-    try {
-      const raw = window.localStorage.getItem(key);
-      if (!raw) return null;
-
-      const parsed = JSON.parse(raw);
-      return typeof parsed === "object" && parsed !== null ? parsed : null;
-    } catch (_error) {
-      return null;
-    }
-  };
-
   const writeConfig = (config) => {
     configEl.textContent = JSON.stringify(config);
     NS.config = config;
   };
 
-  const maybeRestoreDraftToConfig = () => {
+  const hasServerOldState = (config) => {
+    const items = Array.isArray(config.oldItems) ? config.oldItems : [];
+    const payment = typeof config.oldInlinePayment === "object" && config.oldInlinePayment !== null
+      ? config.oldInlinePayment
+      : {};
+    const note = typeof config.oldNote === "object" && config.oldNote !== null
+      ? config.oldNote
+      : {};
+
+    return items.length > 0
+      || (payment.decision && payment.decision !== "skip")
+      || Boolean(note.customer_name || note.customer_phone || note.transaction_date);
+  };
+
+  const workspaceKey = (config) => {
+    const mode = String(config.workspaceMode || "create");
+    const noteId = String(config.noteId || "").trim();
+
+    return mode === "edit" ? `edit:${noteId}` : "create";
+  };
+
+  const restoreFromServer = async () => {
     const config = parseConfig();
-    const key = draftKey(config);
-    const draft = readDraft(key);
+    writeConfig(config);
 
-    if (!draft || hasServerOldState(config)) {
-      writeConfig(config);
-      return;
+    if (hasServerOldState(config)) {
+      return config;
     }
 
-    const shouldRestore = window.confirm("Ditemukan draft workspace terakhir. Pulihkan draft ini?");
-    if (!shouldRestore) {
-      writeConfig(config);
-      return;
+    const endpoint = String(config.draftLoadEndpoint || "").trim();
+    if (!endpoint) {
+      return config;
     }
 
-    const merged = {
-      ...config,
-      oldNote: draft.note || config.oldNote || {},
-      oldItems: Array.isArray(draft.items) ? draft.items : (config.oldItems || []),
-      oldInlinePayment: draft.inline_payment || config.oldInlinePayment || {},
-      draftMeta: {
-        restored_at: new Date().toISOString(),
-        saved_at: draft.saved_at || null,
-      },
-    };
+    const url = new URL(endpoint, window.location.origin);
+    url.searchParams.set("workspace_mode", String(config.workspaceMode || "create"));
+    if (config.noteId) {
+      url.searchParams.set("note_id", String(config.noteId));
+    }
 
-    writeConfig(merged);
+    try {
+      const response = await fetch(url.toString(), {
+        headers: {
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        credentials: "same-origin",
+      });
+
+      const payload = await response.json();
+      if (!response.ok || payload?.success !== true) {
+        return config;
+      }
+
+      const draft = payload?.data?.draft;
+      const draftPayload = draft?.payload;
+
+      if (!draftPayload || typeof draftPayload !== "object") {
+        return config;
+      }
+
+      const shouldRestore = window.confirm("Ditemukan draft workspace di server. Pulihkan draft ini?");
+      if (!shouldRestore) {
+        return config;
+      }
+
+      const merged = {
+        ...config,
+        oldNote: typeof draftPayload.note === "object" && draftPayload.note !== null ? draftPayload.note : {},
+        oldItems: Array.isArray(draftPayload.items) ? draftPayload.items : [],
+        oldInlinePayment: typeof draftPayload.inline_payment === "object" && draftPayload.inline_payment !== null
+          ? draftPayload.inline_payment
+          : {},
+        draftMeta: {
+          restored_at: new Date().toISOString(),
+          updated_at: draft.updated_at || null,
+          workspace_key: payload?.data?.workspace_key || workspaceKey(config),
+        },
+      };
+
+      writeConfig(merged);
+      return merged;
+    } catch (_error) {
+      return config;
+    }
   };
 
   const numberText = (value) => String(value ?? "").replace(/\D+/g, "");
@@ -171,16 +201,29 @@
         amount_paid_rupiah: numberText(valueOf("#inline_payment_amount_paid_rupiah")),
         amount_received_rupiah: numberText(valueOf("#inline_payment_amount_received_rupiah")),
       },
-      saved_at: new Date().toISOString(),
     };
   };
 
-  const saveDraft = () => {
+  const saveDraftToServer = async (keepalive = false) => {
     const config = parseConfig();
-    const key = draftKey(config);
+    const endpoint = String(config.draftSaveEndpoint || "").trim();
+    if (!endpoint) {
+      return;
+    }
 
     try {
-      window.localStorage.setItem(key, JSON.stringify(serializeDraft()));
+      await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRF-TOKEN": String(config.csrfToken || ""),
+        },
+        credentials: "same-origin",
+        keepalive,
+        body: JSON.stringify(serializeDraft()),
+      });
     } catch (_error) {
       // noop
     }
@@ -193,7 +236,9 @@
     let timer = null;
     const queueSave = () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(saveDraft, 300);
+      timer = window.setTimeout(() => {
+        void saveDraftToServer(false);
+      }, 400);
     };
 
     form.addEventListener("input", queueSave);
@@ -211,11 +256,16 @@
       }
     });
 
-    window.addEventListener("beforeunload", saveDraft);
-    window.setTimeout(saveDraft, 0);
+    window.addEventListener("beforeunload", () => {
+      void saveDraftToServer(true);
+    });
+
+    window.setTimeout(() => {
+      void saveDraftToServer(false);
+    }, 0);
   };
 
-  maybeRestoreDraftToConfig();
+  NS.workspaceConfigReady = restoreFromServer();
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAutosave);
