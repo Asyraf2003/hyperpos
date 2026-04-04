@@ -7,68 +7,34 @@
 <section class="section">
     <div class="card">
         <div class="card-header">
-            <div class="d-flex flex-column gap-3">
-                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
-                    <div>
-                        <h4 class="card-title mb-1">Riwayat Nota Kasir</h4>
-                        <p class="mb-0 text-muted">
-                            Menampilkan hanya note open dalam window kasir hari ini dan kemarin.
-                            Note yang sudah closed tidak ditampilkan di area kasir.
-                        </p>
-                    </div>
-
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form class="d-flex flex-column gap-1" id="cashier-note-search-form">
-                            <input
-                                type="text"
-                                id="cashier-note-search-input"
-                                class="form-control"
-                                placeholder="Cari no nota, nama customer, atau no telp"
-                                autocomplete="off"
-                                value="{{ $filters['search'] }}"
-                            >
-                        </form>
-
-                        <a href="{{ route('cashier.notes.workspace.create') }}" class="btn btn-primary">
-                            Buat Nota
-                        </a>
-                    </div>
+            <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                <div>
+                    <h4 class="card-title mb-1">Riwayat Nota Kasir</h4>
+                    <p class="mb-0 text-muted">
+                        Menampilkan hanya note open dalam window kasir hari ini dan kemarin.
+                        Note yang sudah closed tidak ditampilkan di area kasir.
+                    </p>
                 </div>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="cashier-note-date" class="form-label">Tanggal Acuan</label>
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <form class="d-flex flex-column gap-1" id="cashier-note-search-form">
                         <input
-                            type="date"
-                            id="cashier-note-date"
+                            type="text"
+                            id="cashier-note-search-input"
                             class="form-control"
-                            value="{{ $filters['date'] }}"
-                            data-ui-date="single"
+                            placeholder="Cari no nota, nama customer, atau no telp"
+                            autocomplete="off"
+                            value="{{ $filters['search'] }}"
                         >
-                        <div class="form-text">
-                            Riwayat kasir memakai acuan hari ini, dengan jangkauan hari ini dan kemarin untuk note yang masih open.
-                        </div>
-                    </div>
+                    </form>
 
-                    <div class="col-md-4">
-                        <label for="cashier-note-payment-status" class="form-label">Status Pembayaran</label>
-                        <select id="cashier-note-payment-status" class="form-select">
-                            <option value="" @selected($filters['payment_status'] === '')>Semua Status</option>
-                            <option value="unpaid" @selected($filters['payment_status'] === 'unpaid')>Belum Dibayar</option>
-                            <option value="partial" @selected($filters['payment_status'] === 'partial')>Dibayar Sebagian</option>
-                            <option value="paid" @selected($filters['payment_status'] === 'paid')>Lunas</option>
-                        </select>
-                    </div>
+                    <button type="button" id="open-cashier-note-filter" class="btn btn-primary">
+                        Filter
+                    </button>
 
-                    <div class="col-md-4">
-                        <label for="cashier-note-work-status" class="form-label">Status Pengerjaan</label>
-                        <select id="cashier-note-work-status" class="form-select">
-                            <option value="" @selected($filters['work_status'] === '')>Semua Status</option>
-                            <option value="open" @selected($filters['work_status'] === 'open')>Open</option>
-                            <option value="done" @selected($filters['work_status'] === 'done')>Selesai</option>
-                            <option value="canceled" @selected($filters['work_status'] === 'canceled')>Batal</option>
-                        </select>
-                    </div>
+                    <a href="{{ route('cashier.notes.workspace.create') }}" class="btn btn-primary">
+                        Buat Nota
+                    </a>
                 </div>
             </div>
         </div>
@@ -93,7 +59,7 @@
                     <tbody id="cashier-note-table-body">
                         <tr>
                             <td colspan="10" class="text-center text-muted py-4">
-                                Skeleton riwayat kasir siap. Data akan dihubungkan pada slice berikutnya.
+                                Sedang menyiapkan riwayat nota kasir...
                             </td>
                         </tr>
                     </tbody>
@@ -102,12 +68,14 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="cashier-note-table-summary" class="text-muted">
-                    Scope kasir: hanya note open untuk hari ini dan kemarin.
+                    Memuat ringkasan riwayat kasir...
                 </small>
                 <div id="cashier-note-table-pagination"></div>
             </div>
         </div>
     </div>
+
+    @include('cashier.notes.partials.filter-drawer')
 </section>
 
 <script id="cashier-note-index-config" type="application/json">@json([
