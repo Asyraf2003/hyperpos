@@ -58,28 +58,12 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ request()->routeIs('cashier.notes.workspace.create') || request()->routeIs('notes.create') ? 'active' : '' }}">
-                    <a href="{{ route('cashier.notes.workspace.create') }}" class="sidebar-link">
-                        <i class="bi bi-receipt-cutoff"></i>
-                        <span>Buat Nota</span>
-                    </a>
-                </li>
-
                 <li class="sidebar-item {{ request()->routeIs('cashier.notes.index') || request()->routeIs('cashier.notes.show') || request()->routeIs('cashier.notes.workspace.edit') || request()->routeIs('cashier.notes.rows.*') || request()->routeIs('cashier.notes.payments.*') || request()->routeIs('cashier.notes.corrections.*') ? 'active' : '' }}">
                     <a href="{{ route('cashier.notes.index') }}" class="sidebar-link">
                         <i class="bi bi-clock-history"></i>
                         <span>Riwayat Nota</span>
                     </a>
                 </li>
-
-                @if (($appShell['is_admin_actor'] ?? false) === true)
-                    <li class="sidebar-item {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                        <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
-                            <i class="bi bi-arrow-return-left"></i>
-                            <span>Kembali ke Admin</span>
-                        </a>
-                    </li>
-                @endif
             </ul>
         </div>
     </div>
