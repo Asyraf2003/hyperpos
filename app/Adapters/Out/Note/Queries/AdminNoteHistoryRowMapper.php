@@ -30,26 +30,20 @@ final class AdminNoteHistoryRowMapper
             $outstanding = max($grandTotal - $netPaid, 0);
             $paymentStatus = $this->paymentStatuses->resolve($grandTotal, $netPaid);
             $noteState = (string) ($row->note_state ?? 'open');
-
             $openCount = (int) ($row->open_count ?? 0);
             $doneCount = (int) ($row->done_count ?? 0);
             $canceledCount = (int) ($row->canceled_count ?? 0);
-
             $editabilityKey = $this->resolveEditabilityKey($noteState, $paymentStatus);
             $editabilityLabel = $this->editabilityLabel($editabilityKey);
-
             if ($criteria->paymentStatus !== '' && $paymentStatus !== $criteria->paymentStatus) {
                 continue;
             }
-
             if ($criteria->editability !== '' && $editabilityKey !== $criteria->editability) {
                 continue;
             }
-
             if (! $this->matchesWorkSummaryFilter($criteria->workSummary, $openCount, $doneCount, $canceledCount)) {
                 continue;
             }
-
             $items[] = [
                 'note_id' => (string) $row->id,
                 'transaction_date' => (string) $row->transaction_date,
@@ -69,10 +63,8 @@ final class AdminNoteHistoryRowMapper
                 'action_url' => route('admin.notes.show', ['noteId' => (string) $row->id]),
             ];
         }
-
         return $items;
     }
-
     private function resolveEditabilityKey(string $noteState, string $paymentStatus): string
     {
         if ($noteState === 'closed') {
