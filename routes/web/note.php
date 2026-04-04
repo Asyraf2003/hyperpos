@@ -11,6 +11,7 @@ use App\Adapters\In\Http\Controllers\Cashier\Note\EditTransactionWorkspacePageCo
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as CashierNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController as CashierNoteHistoryTableDataController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\GetTransactionWorkspaceDraftController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\ProductLookupController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\SaveTransactionWorkspaceDraftController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
@@ -50,6 +51,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
         Route::get('/table', CashierNoteHistoryTableDataController::class)->name('table');
 
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/workspace/draft', GetTransactionWorkspaceDraftController::class)->name('workspace.draft.show');
         Route::post('/workspace/draft', SaveTransactionWorkspaceDraftController::class)->name('workspace.draft.save');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
 
