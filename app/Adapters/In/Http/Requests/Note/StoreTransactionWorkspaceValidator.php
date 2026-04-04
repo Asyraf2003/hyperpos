@@ -28,6 +28,6 @@ final class StoreTransactionWorkspaceValidator
             StoreTransactionWorkspaceItemValidator::validate($item, (int) $index, $validator);
         }
 
-        StoreTransactionWorkspacePaymentValidator::validate($payload['inline_payment'] ?? [], $validator);
+        StoreTransactionWorkspacePaymentValidator::validate($payload, $validator);
     }
 }
