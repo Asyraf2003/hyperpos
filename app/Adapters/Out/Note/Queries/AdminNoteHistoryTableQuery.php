@@ -6,6 +6,12 @@ namespace App\Adapters\Out\Note\Queries;
 
 final class AdminNoteHistoryTableQuery
 {
+    public function __construct(
+        private readonly AdminNoteHistoryBaseQuery $baseQuery,
+        private readonly AdminNoteHistoryRowMapper $rowMapper,
+    ) {
+    }
+
     /**
      * @param array<string, mixed> $filters
      * @return array{
@@ -17,24 +23,38 @@ final class AdminNoteHistoryTableQuery
      */
     public function get(array $filters): array
     {
+        $criteria = AdminNoteHistoryCriteria::fromFilters($filters);
+        $rows = $this->baseQuery->fetch($criteria);
+        $items = $this->rowMapper->map($rows, $criteria);
+
+        $total = count($items);
+        $lastPage = max((int) ceil($total / $criteria->perPage), 1);
+        $page = min($criteria->page, $lastPage);
+        $offset = ($page - 1) * $criteria->perPage;
+        $pagedItems = array_values(array_slice($items, $offset, $criteria->perPage));
+
         return [
             'filters' => [
-                'date_from' => $filters['date_from'] ?? date('Y-m-d'),
-                'date_to' => $filters['date_to'] ?? date('Y-m-d'),
-                'search' => $filters['search'] ?? '',
-                'payment_status' => $filters['payment_status'] ?? '',
-                'editability' => $filters['editability'] ?? '',
-                'work_summary' => $filters['work_summary'] ?? '',
+                'date_from' => $criteria->dateFromText,
+                'date_to' => $criteria->dateToText,
+                'search' => $criteria->search,
+                'payment_status' => $criteria->paymentStatus,
+                'editability' => $criteria->editability,
+                'work_summary' => $criteria->workSummary,
             ],
-            'items' => [],
+            'items' => $pagedItems,
             'pagination' => [
-                'page' => (int) ($filters['page'] ?? 1),
-                'per_page' => (int) ($filters['per_page'] ?? 10),
-                'total' => 0,
-                'last_page' => 1,
+                'page' => $page,
+                'per_page' => $criteria->perPage,
+                'total' => $total,
+                'last_page' => $lastPage,
             ],
             'summary' => [
-                'label' => 'Riwayat admin placeholder belum terhubung ke query database.',
+                'label' => sprintf(
+                    'Riwayat admin %s sampai %s.',
+                    $criteria->dateFromText,
+                    $criteria->dateToText,
+                ),
             ],
         ];
     }
