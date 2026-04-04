@@ -13,7 +13,7 @@
                         <h4 class="card-title mb-1">Riwayat Nota Admin</h4>
                         <p class="mb-0 text-muted">
                             Workspace operasional admin untuk membuka nota, memantau status pembayaran,
-                            melihat histori perubahan, dan nanti menangani editability sesuai policy.
+                            melihat histori perubahan, dan menangani mode edit sesuai policy.
                         </p>
                     </div>
 
@@ -87,11 +87,6 @@
                         </select>
                     </div>
                 </div>
-
-                <div class="alert alert-light-secondary mb-0">
-                    Admin tidak membuat transaksi dari halaman ini. Slice berikutnya akan menghubungkan
-                    filter, daftar nota, histori perubahan, dan aksi admin sesuai policy edit.
-                </div>
             </div>
         </div>
 
@@ -116,7 +111,7 @@
                     <tbody id="admin-note-table-body">
                         <tr>
                             <td colspan="11" class="text-center text-muted py-4">
-                                Skeleton riwayat admin siap. Data akan dihubungkan pada slice berikutnya.
+                                Sedang menyiapkan riwayat nota admin...
                             </td>
                         </tr>
                     </tbody>
@@ -125,7 +120,7 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="admin-note-table-summary" class="text-muted">
-                    Scope admin: riwayat operasional note terpisah dari laporan.
+                    Memuat ringkasan riwayat admin...
                 </small>
                 <div id="admin-note-table-pagination"></div>
             </div>
@@ -134,6 +129,7 @@
 </section>
 
 <script id="admin-note-index-config" type="application/json">@json([
+    'endpoint' => route('admin.notes.table'),
     'filters' => $filters,
 ])</script>
 @push('scripts')
