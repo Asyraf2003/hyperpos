@@ -2,6 +2,7 @@
 
 @section('title', $pageTitle)
 @section('heading', $pageTitle)
+@section('back_url', route('admin.notes.index'))
 
 @section('content')
 <div class="page-content">

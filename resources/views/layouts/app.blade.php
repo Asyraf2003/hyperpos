@@ -37,13 +37,12 @@
                         <h3 class="mb-0">@yield('heading')</h3>
                         
                         @if (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))
-                            <button
-                                type="button"
+                            <a
+                                href="@yield('back_url', url()->previous())"
                                 class="btn btn-light-secondary"
-                                onclick="window.history.back()"
                             >
                                 Kembali
-                            </button>
+                            </a>
                         @endif
                     </div>
                 @endif
