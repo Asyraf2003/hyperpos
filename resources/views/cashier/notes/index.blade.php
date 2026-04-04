@@ -12,7 +12,8 @@
                     <div>
                         <h4 class="card-title mb-1">Riwayat Nota Kasir</h4>
                         <p class="mb-0 text-muted">
-                            Menampilkan nota dalam window kasir hari ini dan kemarin.
+                            Menampilkan hanya note open dalam window kasir hari ini dan kemarin.
+                            Note yang sudah closed tidak ditampilkan di area kasir.
                         </p>
                     </div>
 
@@ -44,7 +45,9 @@
                             value="{{ $filters['date'] }}"
                             data-ui-date="single"
                         >
-                        <div class="form-text">Default riwayat kasir dimulai dari tanggal hari ini.</div>
+                        <div class="form-text">
+                            Riwayat kasir memakai acuan hari ini, dengan jangkauan hari ini dan kemarin untuk note yang masih open.
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -99,7 +102,7 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="cashier-note-table-summary" class="text-muted">
-                    Scope default: window kasir hari ini dan kemarin.
+                    Scope kasir: hanya note open untuk hari ini dan kemarin.
                 </small>
                 <div id="cashier-note-table-pagination"></div>
             </div>
