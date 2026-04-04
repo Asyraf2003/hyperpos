@@ -65,7 +65,7 @@
                     </a>
                 </li>
 
-                <li class="sidebar-item {{ request()->routeIs('cashier.notes.index') || request()->routeIs('cashier.notes.show') || request()->routeIs('cashier.notes.rows.*') || request()->routeIs('cashier.notes.payments.*') || request()->routeIs('cashier.notes.corrections.*') ? 'active' : '' }}">
+                <li class="sidebar-item {{ request()->routeIs('cashier.notes.index') || request()->routeIs('cashier.notes.show') || request()->routeIs('cashier.notes.workspace.edit') || request()->routeIs('cashier.notes.rows.*') || request()->routeIs('cashier.notes.payments.*') || request()->routeIs('cashier.notes.corrections.*') ? 'active' : '' }}">
                     <a href="{{ route('cashier.notes.index') }}" class="sidebar-link">
                         <i class="bi bi-clock-history"></i>
                         <span>Riwayat Nota</span>
