@@ -6,6 +6,7 @@ namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Adapters\In\Http\Requests\Note\UpdateTransactionWorkspaceRequest;
 use App\Application\Note\UseCases\UpdateTransactionWorkspaceHandler;
+use App\Ports\Out\Note\TransactionWorkspaceDraftDeleterPort;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
@@ -15,6 +16,7 @@ final class UpdateTransactionWorkspaceController extends Controller
         string $noteId,
         UpdateTransactionWorkspaceRequest $request,
         UpdateTransactionWorkspaceHandler $handler,
+        TransactionWorkspaceDraftDeleterPort $drafts,
     ): RedirectResponse {
         $result = $handler->handle($noteId, $request->validated());
 
@@ -24,6 +26,12 @@ final class UpdateTransactionWorkspaceController extends Controller
                     'workspace' => $result->message() ?? 'Perubahan workspace nota gagal disimpan.',
                 ])
                 ->withInput();
+        }
+
+        $actorId = $request->user()?->getAuthIdentifier();
+
+        if ($actorId !== null) {
+            $drafts->deleteByActorAndWorkspaceKey((string) $actorId, 'edit:' . trim($noteId));
         }
 
         return redirect()
