@@ -9,11 +9,49 @@
   const addMenu = document.getElementById("workspace-item-type-menu");
   const form = document.getElementById("cashier-note-workspace-form");
   const customerName = document.getElementById("note_customer_name");
+  const customerPhone = document.getElementById("note_customer_phone");
+  const transactionDate = document.getElementById("note_transaction_date");
   const paymentModal = document.getElementById("workspace-payment-modal");
 
-  if (customerName && !customerName.value.trim()) {
-    customerName.value = NS.config.defaultCustomerName || "Pelanggan no 1";
-  }
+  const hydrateNoteFields = () => {
+    const note = typeof NS.config.oldNote === "object" && NS.config.oldNote !== null
+      ? NS.config.oldNote
+      : {};
+
+    if (customerName && typeof note.customer_name === "string") {
+      customerName.value = note.customer_name;
+    }
+
+    if (customerPhone && typeof note.customer_phone === "string") {
+      customerPhone.value = note.customer_phone;
+    }
+
+    if (transactionDate && typeof note.transaction_date === "string" && note.transaction_date !== "") {
+      transactionDate.value = note.transaction_date;
+    }
+
+    if (customerName && !customerName.value.trim()) {
+      customerName.value = NS.config.defaultCustomerName || "Pelanggan no 1";
+    }
+  };
+
+  const hydratePaymentFields = () => {
+    const payment = typeof NS.config.oldInlinePayment === "object" && NS.config.oldInlinePayment !== null
+      ? NS.config.oldInlinePayment
+      : {};
+
+    const setValue = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el || value === undefined || value === null) return;
+      el.value = String(value);
+    };
+
+    setValue("inline_payment_decision_hidden", payment.decision || "skip");
+    setValue("inline_payment_method_hidden", payment.payment_method || "");
+    setValue("inline_payment_paid_at_hidden", payment.paid_at || transactionDate?.value || "");
+    setValue("inline_payment_amount_paid_rupiah", payment.amount_paid_rupiah || "");
+    setValue("inline_payment_amount_received_rupiah", payment.amount_received_rupiah || "");
+  };
 
   addButton?.addEventListener("click", () => {
     addMenu?.classList.toggle("d-none");
@@ -52,6 +90,9 @@
       NS.updateSummary?.();
     }
   });
+
+  hydrateNoteFields();
+  hydratePaymentFields();
 
   (NS.config.oldItems || []).forEach((item) => NS.addRow?.(NS.detectType(item), item));
 
