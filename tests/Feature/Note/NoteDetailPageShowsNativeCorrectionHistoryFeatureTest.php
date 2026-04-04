@@ -28,11 +28,15 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
             'role' => 'kasir',
         ]);
 
+        $today = now()->toDateString();
+        $eventAt = now()->format('Y-m-d H:i:s');
+
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-04-02',
+            'transaction_date' => $today,
             'total_rupiah' => 45000,
+            'note_state' => 'open',
         ]);
 
         DB::table('note_mutation_events')->insert([
@@ -42,7 +46,7 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
             'actor_id' => 'actor-1',
             'actor_role' => 'admin',
             'reason' => 'Koreksi nominal',
-            'occurred_at' => '2026-04-02 10:00:00',
+            'occurred_at' => $eventAt,
             'related_customer_payment_id' => null,
             'related_customer_refund_id' => null,
         ]);
@@ -53,14 +57,14 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'before',
                 'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":5000}}',
-                'created_at' => '2026-04-02 10:00:00',
+                'created_at' => $eventAt,
             ],
             [
                 'id' => 'snap-2',
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'after',
                 'payload_json' => '{"note":{"total_rupiah":45000},"meta":{"refund_required_rupiah":5000}}',
-                'created_at' => '2026-04-02 10:00:00',
+                'created_at' => $eventAt,
             ],
         ]);
 

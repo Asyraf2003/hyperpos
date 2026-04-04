@@ -29,11 +29,14 @@ final class NoteDetailPageFeatureTest extends TestCase
             'role' => 'kasir',
         ]);
 
+        $today = now()->toDateString();
+
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',
-            'transaction_date' => '2026-04-02',
+            'transaction_date' => $today,
             'total_rupiah' => 26000,
+            'note_state' => 'open',
         ]);
 
         DB::table('work_items')->insert([
@@ -55,7 +58,7 @@ final class NoteDetailPageFeatureTest extends TestCase
         DB::table('customer_payments')->insert([
             'id' => 'pay-1',
             'amount_rupiah' => 8000,
-            'paid_at' => '2026-04-02',
+            'paid_at' => $today,
         ]);
 
         DB::table('payment_component_allocations')->insert([
