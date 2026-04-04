@@ -11,6 +11,8 @@ final class AdminNoteHistoryRowMapper
     public function __construct(
         private readonly NotePaymentStatusResolver $paymentStatuses,
         private readonly CashierNoteHistoryValueFormatter $formatter,
+        private readonly AdminNoteHistoryEditabilityResolver $editability,
+        private readonly AdminNoteHistoryWorkSummaryFilter $workSummaryFilter,
     ) {
     }
 
@@ -33,17 +35,20 @@ final class AdminNoteHistoryRowMapper
             $openCount = (int) ($row->open_count ?? 0);
             $doneCount = (int) ($row->done_count ?? 0);
             $canceledCount = (int) ($row->canceled_count ?? 0);
-            $editabilityKey = $this->resolveEditabilityKey($noteState, $paymentStatus);
-            $editabilityLabel = $this->editabilityLabel($editabilityKey);
+            $editabilityKey = $this->editability->key($noteState, $paymentStatus);
+
             if ($criteria->paymentStatus !== '' && $paymentStatus !== $criteria->paymentStatus) {
                 continue;
             }
+
             if ($criteria->editability !== '' && $editabilityKey !== $criteria->editability) {
                 continue;
             }
-            if (! $this->matchesWorkSummaryFilter($criteria->workSummary, $openCount, $doneCount, $canceledCount)) {
+
+            if (! $this->workSummaryFilter->matches($criteria->workSummary, $openCount, $doneCount, $canceledCount)) {
                 continue;
             }
+
             $items[] = [
                 'note_id' => (string) $row->id,
                 'transaction_date' => (string) $row->transaction_date,
@@ -58,43 +63,12 @@ final class AdminNoteHistoryRowMapper
                 'payment_status_label' => $this->formatter->paymentStatusLabel($paymentStatus),
                 'work_status_label' => $this->formatter->workSummary($openCount, $doneCount, $canceledCount),
                 'editability_key' => $editabilityKey,
-                'editability_label' => $editabilityLabel,
+                'editability_label' => $this->editability->label($editabilityKey),
                 'action_label' => 'Buka Detail',
                 'action_url' => route('admin.notes.show', ['noteId' => (string) $row->id]),
             ];
         }
+
         return $items;
-    }
-    private function resolveEditabilityKey(string $noteState, string $paymentStatus): string
-    {
-        if ($noteState === 'closed') {
-            return 'admin_strict';
-        }
-
-        if ($paymentStatus === 'paid') {
-            return 'correction_only';
-        }
-
-        return 'editable_normal';
-    }
-
-    private function editabilityLabel(string $key): string
-    {
-        return match ($key) {
-            'admin_strict' => 'Admin Ketat',
-            'correction_only' => 'Correction Only',
-            default => 'Editable Normal',
-        };
-    }
-
-    private function matchesWorkSummaryFilter(string $filter, int $openCount, int $doneCount, int $canceledCount): bool
-    {
-        return match ($filter) {
-            'has_open' => $openCount > 0,
-            'has_done' => $doneCount > 0,
-            'has_canceled' => $canceledCount > 0,
-            '' => true,
-            default => true,
-        };
     }
 }
