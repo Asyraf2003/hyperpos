@@ -48,8 +48,8 @@ final class WorkshopStressTestSeeder extends Seeder
             ['active' => true]
         );
 
-        $totalDays = 365;
-        $txPerDay = 50;
+        $totalDays = 30;
+        $txPerDay = 10;
         $bar = $this->command->getOutput()->createProgressBar($totalDays);
         $bar->start();
 
