@@ -133,7 +133,7 @@
     'filters' => $filters,
 ])</script>
 @push('scripts')
-<script src="{{ asset('assets/static/js/pages/admin-note-index.js') }}"></script>
+<script src="{{ asset('assets/static/js/pages/admin-note-index.js') }}?v={{ filemtime(public_path('assets/static/js/pages/admin-note-index.js')) }}"></script>
 @endpush
 
 @endsection

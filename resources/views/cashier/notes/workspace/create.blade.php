@@ -30,12 +30,12 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
-    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/rows.js') }}"></script>
-    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/search.js') }}"></script>
-    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/summary.js') }}"></script>
+    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}?v={{ filemtime(public_path('assets/static/js/shared/admin-money-input.js')) }}"></script>
+    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/rows.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/rows.js')) }}"></script>
+    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/search.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/search.js')) }}"></script>
+    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/summary.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/summary.js')) }}"></script>
     @if (($workspaceMode ?? 'create') === 'create')
-        <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}"></script>
+        <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/payment-flow.js')) }}"></script>
     @endif
-    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/boot.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/boot.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/boot.js')) }}"></script>
 @endpush
