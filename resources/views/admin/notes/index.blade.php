@@ -7,46 +7,17 @@
 <section class="section">
     <div class="card">
         <div class="card-header">
-            <div class="d-flex flex-column gap-3">
-                <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
-                    <div>
-                        <h4 class="card-title mb-1">Riwayat Nota Admin</h4>
-                        <p class="mb-0 text-muted">
-                            Workspace operasional admin untuk membuka nota, memantau status pembayaran,
-                            melihat histori perubahan, dan menangani mode edit sesuai policy.
-                        </p>
-                    </div>
-
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light-secondary text-dark">Workspace Admin</span>
-                    </div>
+            <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                <div>
+                    <h4 class="card-title mb-1">Riwayat Nota Admin</h4>
+                    <p class="mb-0 text-muted">
+                        Workspace operasional admin untuk membuka nota, memantau status pembayaran,
+                        melihat histori perubahan, dan menangani mode edit sesuai policy.
+                    </p>
                 </div>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="admin-note-date-from" class="form-label">Tanggal Mulai</label>
-                        <input
-                            type="date"
-                            id="admin-note-date-from"
-                            class="form-control"
-                            data-ui-date="single"
-                            value="{{ $filters['date_from'] }}"
-                        >
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="admin-note-date-to" class="form-label">Tanggal Akhir</label>
-                        <input
-                            type="date"
-                            id="admin-note-date-to"
-                            class="form-control"
-                            data-ui-date="single"
-                            value="{{ $filters['date_to'] }}"
-                        >
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="admin-note-search-input" class="form-label">Pencarian</label>
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <form class="d-flex flex-column gap-1" id="admin-note-search-form">
                         <input
                             type="text"
                             id="admin-note-search-input"
@@ -55,37 +26,11 @@
                             autocomplete="off"
                             value="{{ $filters['search'] }}"
                         >
-                    </div>
+                    </form>
 
-                    <div class="col-md-4">
-                        <label for="admin-note-payment-status" class="form-label">Status Pembayaran</label>
-                        <select id="admin-note-payment-status" class="form-select">
-                            <option value="" @selected($filters['payment_status'] === '')>Semua Status</option>
-                            <option value="unpaid" @selected($filters['payment_status'] === 'unpaid')>Belum Dibayar</option>
-                            <option value="partial" @selected($filters['payment_status'] === 'partial')>Dibayar Sebagian</option>
-                            <option value="paid" @selected($filters['payment_status'] === 'paid')>Lunas</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="admin-note-editability" class="form-label">Mode Edit</label>
-                        <select id="admin-note-editability" class="form-select">
-                            <option value="" @selected($filters['editability'] === '')>Semua Mode</option>
-                            <option value="editable_normal" @selected($filters['editability'] === 'editable_normal')>Editable Normal</option>
-                            <option value="admin_strict" @selected($filters['editability'] === 'admin_strict')>Admin Ketat</option>
-                            <option value="correction_only" @selected($filters['editability'] === 'correction_only')>Correction Only</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="admin-note-work-summary" class="form-label">Ringkasan Pengerjaan</label>
-                        <select id="admin-note-work-summary" class="form-select">
-                            <option value="" @selected($filters['work_summary'] === '')>Semua Ringkasan</option>
-                            <option value="has_open" @selected($filters['work_summary'] === 'has_open')>Ada Open</option>
-                            <option value="has_done" @selected($filters['work_summary'] === 'has_done')>Ada Selesai</option>
-                            <option value="has_canceled" @selected($filters['work_summary'] === 'has_canceled')>Ada Batal</option>
-                        </select>
-                    </div>
+                    <button type="button" id="open-admin-note-filter" class="btn btn-primary">
+                        Filter
+                    </button>
                 </div>
             </div>
         </div>
@@ -126,6 +71,8 @@
             </div>
         </div>
     </div>
+
+    @include('admin.notes.partials.filter-drawer')
 </section>
 
 <script id="admin-note-index-config" type="application/json">@json([
