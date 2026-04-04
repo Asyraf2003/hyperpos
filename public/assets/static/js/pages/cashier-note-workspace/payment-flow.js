@@ -25,6 +25,10 @@
     if (el) el.value = String(value ?? "");
   };
 
+  const hiddenValue = (id) => byId(id)?.value || "";
+  const partialAmountInput = () => byId("inline_payment_amount_paid_display");
+  const receivedAmountInput = () => byId("inline_payment_amount_received_display");
+
   const grandTotal = () => {
     if (typeof NS.currentRows !== "function") return 0;
     const rows = NS.currentRows();
@@ -33,10 +37,8 @@
     return rows.reduce((sum, item) => sum + Number(item?.total || 0), 0);
   };
 
-  const partialAmountInput = () => byId("inline_payment_amount_paid_display");
-
   const partialAmount = (total) => {
-    const inputValue = digits(partialAmountInput()?.value || byId("inline_payment_amount_paid_rupiah")?.value || "");
+    const inputValue = digits(partialAmountInput()?.value || hiddenValue("inline_payment_amount_paid_rupiah"));
     return Math.min(inputValue, total);
   };
 
@@ -58,6 +60,23 @@
     setText("workspace-partial-selected-total-text", amount);
   };
 
+  const syncReceivedAmount = () => {
+    const hidden = digits(hiddenValue("inline_payment_amount_received_rupiah"));
+    const input = receivedAmountInput();
+
+    if (input && document.activeElement !== input) {
+      input.value = hidden > 0 ? format(hidden) : "";
+    }
+  };
+
+  const hydrateStateFromHidden = () => {
+    const decision = hiddenValue("inline_payment_decision_hidden");
+    const paymentMethod = hiddenValue("inline_payment_method_hidden");
+
+    NS.paymentState.mode = decision === "pay_partial" ? "partial" : (decision === "pay_full" ? "full" : "skip");
+    NS.paymentState.cashStep = paymentMethod === "cash";
+  };
+
   NS.refreshPaymentUi = (total = grandTotal()) => {
     const noteDate = byId("note_transaction_date")?.value || "";
     updateHidden("inline_payment_paid_at_hidden", noteDate);
@@ -71,9 +90,11 @@
       syncPartialAmount(total);
     }
 
+    syncReceivedAmount();
+
     const payable = payableAmount(total);
     const remaining = Math.max(total - payable, 0);
-    const received = digits(byId("inline_payment_amount_received_rupiah")?.value);
+    const received = digits(hiddenValue("inline_payment_amount_received_rupiah"));
 
     setText("workspace-modal-total-text", total);
     setText("workspace-modal-payable-text", payable);
@@ -103,6 +124,20 @@
     if (cashButton) cashButton.disabled = partialInvalid;
   };
 
+  const reopenModalIfNeeded = () => {
+    const modalEl = byId("workspace-payment-modal");
+    if (!modalEl || typeof bootstrap === "undefined" || !bootstrap.Modal) return;
+
+    const decision = hiddenValue("inline_payment_decision_hidden");
+    if (!["pay_full", "pay_partial"].includes(decision)) return;
+
+    hydrateStateFromHidden();
+    NS.refreshPaymentUi();
+
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  };
+
   NS.openPaymentModal = (mode) => {
     const modalEl = byId("workspace-payment-modal");
     if (!modalEl || typeof bootstrap === "undefined" || !bootstrap.Modal) return;
@@ -114,7 +149,7 @@
     updateHidden("inline_payment_method_hidden", "");
     updateHidden("inline_payment_amount_received_rupiah", "");
 
-    const receivedDisplay = byId("inline_payment_amount_received_display");
+    const receivedDisplay = receivedAmountInput();
     if (receivedDisplay) receivedDisplay.value = "";
 
     NS.refreshPaymentUi();
@@ -135,6 +170,8 @@
       updateHidden("inline_payment_amount_received_rupiah", "");
       const partialInput = partialAmountInput();
       if (partialInput) partialInput.value = "";
+      const receivedInput = receivedAmountInput();
+      if (receivedInput) receivedInput.value = "";
       byId("cashier-note-workspace-form")?.requestSubmit();
       return;
     }
@@ -164,8 +201,13 @@
       || event.target.id === "inline_payment_amount_received_display"
       || event.target.id === "note_transaction_date"
     ) {
-      updateHidden("inline_payment_amount_received_rupiah", digits(byId("inline_payment_amount_received_display")?.value || ""));
+      updateHidden("inline_payment_amount_received_rupiah", digits(receivedAmountInput()?.value || ""));
       NS.refreshPaymentUi();
     }
   });
+
+  hydrateStateFromHidden();
+  NS.refreshPaymentUi();
+  document.addEventListener("DOMContentLoaded", reopenModalIfNeeded);
+  reopenModalIfNeeded();
 })();
