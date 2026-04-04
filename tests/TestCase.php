@@ -18,7 +18,7 @@ abstract class TestCase extends BaseTestCase
 
         DB::table('actor_accesses')->insert([
             'actor_id' => $user->getAuthIdentifier(),
-            'role' => 'kasir', // Nilai sesuai kontrak domain Role::KASIR
+            'role' => 'kasir',
         ]);
 
         $this->actingAs($user);
@@ -27,7 +27,7 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Menciptakan Admin yang memiliki kapabilitas transaksi (Blueprint 1.3.1 - Keputusan aktif v1)
+     * Menciptakan Admin yang memiliki kapabilitas transaksi aktif.
      */
     protected function loginAsAuthorizedAdmin(): User
     {
@@ -38,13 +38,10 @@ abstract class TestCase extends BaseTestCase
             'role' => 'admin',
         ]);
 
-        // Admin butuh record di capability states agar isInactive() bernilai false
-        DB::table('admin_transaction_capability_states')->insert([
-            'actor_id' => $user->getAuthIdentifier(),
-            'is_active' => true,
-            'capability_key' => 'transaction_entry',
-            'updated_at' => now(),
-        ]);
+        DB::table('admin_transaction_capability_states')->updateOrInsert(
+            ['actor_id' => (string) $user->getAuthIdentifier()],
+            ['active' => true],
+        );
 
         $this->actingAs($user);
 
