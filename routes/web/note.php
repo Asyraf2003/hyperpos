@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\Note\ReopenClosedNoteController as AdminReopenClosedNoteController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteDetailPageController as AdminNoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateTransactionWorkspacePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\EditTransactionWorkspacePageController;
@@ -37,6 +38,7 @@ Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
         Route::get('/', AdminNoteHistoryPageController::class)->name('index');
         Route::get('/table', AdminNoteHistoryTableDataController::class)->name('table');
         Route::get('/{noteId}', AdminNoteDetailPageController::class)->name('show');
+        Route::post('/{noteId}/reopen', AdminReopenClosedNoteController::class)->name('reopen');
     });
 
 Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntryAllowed::class, 'app.shell'])

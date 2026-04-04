@@ -57,16 +57,60 @@
                     </div>
                 </div>
 
-                @if ($note['is_closed'])
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="fw-bold mb-1">Status Operasional</div>
-                            <div class="text-muted small">
-                                Nota ini sedang ditutup. Step berikutnya akan menambahkan affordance admin untuk membuka ulang note dari halaman ini.
+                <div class="card">
+                    <div class="card-body">
+                        <div class="fw-bold mb-1">Status Operasional</div>
+
+                        @if (session('success'))
+                            <div class="alert alert-success py-2 px-3 mt-3 mb-3">
+                                {{ session('success') }}
                             </div>
-                        </div>
+                        @endif
+
+                        @if ($errors->has('reopen'))
+                            <div class="alert alert-danger py-2 px-3 mt-3 mb-3">
+                                {{ $errors->first('reopen') }}
+                            </div>
+                        @endif
+
+                        @if ($errors->has('reason'))
+                            <div class="alert alert-danger py-2 px-3 mt-3 mb-3">
+                                {{ $errors->first('reason') }}
+                            </div>
+                        @endif
+
+                        @if ($note['is_closed'])
+                            <div class="text-muted small mb-3">
+                                Nota ini sedang ditutup. Admin wajib memberi alasan sebelum membuka ulang note.
+                            </div>
+
+                            <form method="POST" action="{{ route('admin.notes.reopen', ['noteId' => $note['id']]) }}">
+                                @csrf
+
+                                <div class="mb-3">
+                                    <label for="reopen-reason" class="form-label">Alasan Reopen</label>
+                                    <textarea
+                                        id="reopen-reason"
+                                        name="reason"
+                                        rows="3"
+                                        class="form-control"
+                                        required
+                                    >{{ old('reason') }}</textarea>
+                                </div>
+
+                                <div class="d-grid d-sm-flex">
+                                    <button type="submit" class="btn btn-warning">
+                                        Buka Ulang Note
+                                    </button>
+                                </div>
+                            </form>
+                        @else
+                            <div class="text-muted small">
+                                Nota ini sedang terbuka. Reopen tidak diperlukan.
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
 
                 @include('cashier.notes.partials.correction-history')
             </div>
