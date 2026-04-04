@@ -161,6 +161,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return escapeHtml(item.action_label ?? '-');
     };
 
+    const renderPager = (pagination) => {
+        const page = Number.parseInt(String(pagination?.page ?? 1), 10) || 1;
+        const lastPage = Number.parseInt(String(pagination?.last_page ?? 1), 10) || 1;
+
+        if (lastPage <= 1) {
+            paginationNode.innerHTML = '';
+            return;
+        }
+
+        const start = Math.max(1, page - 2);
+        const end = Math.min(lastPage, page + 2);
+
+        let html = '<nav><ul class="pagination pagination-primary mb-0">';
+        html += `<li class="page-item ${page === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${page - 1}"><i class="bi bi-chevron-left"></i></a></li>`;
+
+        for (let p = start; p <= end; p += 1) {
+            html += `<li class="page-item ${p === page ? 'active' : ''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+        }
+
+        html += `<li class="page-item ${page === lastPage ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${page + 1}"><i class="bi bi-chevron-right"></i></a></li>`;
+        html += '</ul></nav>';
+
+        paginationNode.innerHTML = html;
+    };
+
     const renderItems = (items, summaryLabel, pagination) => {
         if (!Array.isArray(items) || items.length === 0) {
             tableBody.innerHTML = `
@@ -191,11 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         summaryNode.textContent = summaryLabel || 'Riwayat kasir siap.';
-        paginationNode.innerHTML = `
-            <span class="text-muted small">
-                Halaman ${pagination?.page ?? 1} dari ${pagination?.last_page ?? 1} • Total ${pagination?.total ?? 0} nota
-            </span>
-        `;
+        renderPager(pagination);
     };
 
     const loadTable = async (replaceUrl = false) => {

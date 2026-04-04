@@ -67,14 +67,12 @@
 
                 <li class="sidebar-title">Ganti Role</li>
 
-                @if (($appShell['can_access_admin_page'] ?? false) === true)
-                    <li class="sidebar-item {{ request()->routeIs('admin.*') ? 'active' : '' }}">
-                        <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
-                            <i class="bi bi-arrow-left-right"></i>
-                            <span>Masuk ke Area Admin</span>
-                        </a>
-                    </li>
-                @endif
+                <li class="sidebar-item {{ request()->routeIs('admin.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-link">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Masuk ke Area Admin</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
