@@ -16,13 +16,21 @@
       return;
     }
 
+    if (display.dataset.moneyBound === "1") {
+      return;
+    }
+
     const sync = () => {
-      raw.value = digitsOnly(display.value);
-      display.value = formatThousands(display.value);
+      const sourceValue = display.value !== "" ? display.value : raw.value;
+      const digits = digitsOnly(sourceValue);
+
+      raw.value = digits;
+      display.value = formatThousands(digits);
     };
 
     display.addEventListener("input", sync);
     display.addEventListener("blur", sync);
+    display.dataset.moneyBound = "1";
     sync();
   };
 
