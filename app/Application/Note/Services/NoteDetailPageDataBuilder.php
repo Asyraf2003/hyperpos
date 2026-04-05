@@ -53,6 +53,7 @@ final class NoteDetailPageDataBuilder
                 'payment_status' => $status,
                 'can_add_rows' => $status !== 'paid',
                 'can_show_edit_actions' => $isOpen,
+                'can_edit_workspace' => $isOpen && $allocated === 0,
                 'can_show_payment_form' => $isOpen && max($grandTotal - $netPaid, 0) > 0,
                 'can_show_correction_actions' => $isOpen && $status === 'paid',
                 'correction_notice' => $status === 'paid' ? 'Nota sudah lunas. Perubahan hanya boleh lewat correction flow.' : null,

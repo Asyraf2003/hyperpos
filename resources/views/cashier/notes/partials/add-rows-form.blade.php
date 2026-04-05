@@ -5,7 +5,7 @@
             Perubahan rincian dilakukan dari workspace agar posisi edit tetap sama seperti halaman buat transaksi.
         </div>
 
-        @if ($note['can_show_edit_actions'] && $note['can_add_rows'])
+        @if (($note['can_edit_workspace'] ?? false) && $note['can_add_rows'])
             <div class="d-grid gap-2">
                 <a
                     href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"

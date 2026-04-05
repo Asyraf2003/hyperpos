@@ -34,7 +34,7 @@ final class StoreTransactionWorkspacePaymentValidator
             $validator->errors()->add('inline_payment.paid_at', 'Tanggal bayar wajib diisi.');
         }
 
-        $grandTotal = self::grandTotal($payload['items'] ?? []);
+        $grandTotal = StoreTransactionWorkspaceGrandTotalCalculator::calculate($payload['items'] ?? []);
         $amountPaid = self::intValue($payment['amount_paid_rupiah'] ?? null);
 
         if ($decision === 'pay_partial') {
@@ -49,98 +49,19 @@ final class StoreTransactionWorkspacePaymentValidator
 
         $targetAmount = $decision === 'pay_full' ? $grandTotal : $amountPaid;
 
-        if (($payment['payment_method'] ?? null) === 'cash') {
-            $received = self::intValue($payment['amount_received_rupiah'] ?? null);
-
-            if ($received <= 0) {
-                $validator->errors()->add('inline_payment.amount_received_rupiah', 'Uang masuk cash wajib lebih dari 0.');
-            }
-
-            if ($targetAmount > 0 && $received < $targetAmount) {
-                $validator->errors()->add('inline_payment.amount_received_rupiah', 'Uang masuk cash tidak boleh kurang dari total yang dibayar.');
-            }
-        }
-    }
-
-    /**
-     * @param mixed $items
-     */
-    private static function grandTotal(mixed $items): int
-    {
-        if (! is_array($items)) {
-            return 0;
+        if (($payment['payment_method'] ?? null) !== 'cash') {
+            return;
         }
 
-        $total = 0;
+        $received = self::intValue($payment['amount_received_rupiah'] ?? null);
 
-        foreach ($items as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            $entryMode = (string) ($item['entry_mode'] ?? '');
-            $partSource = (string) ($item['part_source'] ?? 'none');
-
-            if ($entryMode === 'product') {
-                $total += self::productLineTotal($item['product_lines'] ?? []);
-                continue;
-            }
-
-            if ($entryMode !== 'service') {
-                continue;
-            }
-
-            $servicePrice = self::intValue($item['service']['price_rupiah'] ?? null);
-
-            if ($partSource === 'store_stock') {
-                $total += $servicePrice + self::productLineTotal($item['product_lines'] ?? []);
-                continue;
-            }
-
-            if ($partSource === 'external_purchase') {
-                $total += $servicePrice + self::externalLineTotal($item['external_purchase_lines'] ?? []);
-                continue;
-            }
-
-            $total += $servicePrice;
+        if ($received <= 0) {
+            $validator->errors()->add('inline_payment.amount_received_rupiah', 'Uang masuk cash wajib lebih dari 0.');
         }
 
-        return $total;
-    }
-
-    /**
-     * @param mixed $lines
-     */
-    private static function productLineTotal(mixed $lines): int
-    {
-        $line = self::firstLine($lines);
-
-        return self::intValue($line['qty'] ?? null) * self::intValue($line['unit_price_rupiah'] ?? null);
-    }
-
-    /**
-     * @param mixed $lines
-     */
-    private static function externalLineTotal(mixed $lines): int
-    {
-        $line = self::firstLine($lines);
-
-        return self::intValue($line['qty'] ?? null) * self::intValue($line['unit_cost_rupiah'] ?? null);
-    }
-
-    /**
-     * @param mixed $value
-     * @return array<string, mixed>
-     */
-    private static function firstLine(mixed $value): array
-    {
-        if (! is_array($value)) {
-            return [];
+        if ($targetAmount > 0 && $received < $targetAmount) {
+            $validator->errors()->add('inline_payment.amount_received_rupiah', 'Uang masuk cash tidak boleh kurang dari total yang dibayar.');
         }
-
-        $first = array_values($value)[0] ?? [];
-
-        return is_array($first) ? $first : [];
     }
 
     private static function intValue(mixed $value): int

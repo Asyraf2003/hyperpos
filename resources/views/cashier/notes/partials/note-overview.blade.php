@@ -7,7 +7,7 @@
                     <p class="mb-0 text-muted">Informasi utama nota pelanggan.</p>
                 </div>
 
-                @if ($note['can_show_edit_actions'] && ($note['total_allocated_rupiah'] ?? 0) === 0)
+                @if ($note['can_edit_workspace'] ?? false)
                     <a
                         href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
                         class="btn btn-outline-primary btn-sm"
