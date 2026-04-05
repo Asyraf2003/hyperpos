@@ -7,6 +7,9 @@ use App\Adapters\In\Http\Middleware\IdentityAccess\ShareAppShellData;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\TokenMismatchException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,5 +26,35 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (Throwable $e, $request) {
+            $status = match (true) {
+                $e instanceof TokenMismatchException => 419,
+                $e instanceof HttpExceptionInterface => $e->getStatusCode(),
+                default => 500,
+            };
+
+            if ($request->expectsJson()) {
+                $message = match ($status) {
+                    403 => 'Akses ditolak.',
+                    404 => 'Halaman atau data tidak ditemukan.',
+                    419 => 'Sesi Anda sudah berakhir. Silakan muat ulang halaman.',
+                    429 => 'Terlalu banyak permintaan. Coba lagi sebentar.',
+                    503 => 'Layanan sedang tidak tersedia sementara.',
+                    default => 'Terjadi gangguan pada sistem.',
+                };
+
+                return response()->json([
+                    'message' => $message,
+                    'status' => $status,
+                ], $status);
+            }
+
+            if (!in_array($status, [403, 404, 419, 429, 500, 503], true)) {
+                $status = 500;
+            }
+
+            return response()->view("errors.$status", [
+                'statusCode' => $status,
+            ], $status);
+        });
     })->create();
