@@ -79,7 +79,6 @@ final class NoteDetailPageDataBuilder
                     'outstanding_rupiah' => $item->subtotalRupiah()->amount(),
                     'settlement_label' => 'hutang',
                 ];
-
                 return [
                     'id' => $item->id(),
                     'line_no' => $item->lineNo(),

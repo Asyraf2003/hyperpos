@@ -34,7 +34,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'id' => 'note-update-1',
             'customer_name' => 'Budi Lama',
             'customer_phone' => '0811111111',
-            'transaction_date' => '2026-04-03',
+            'transaction_date' => date('Y-m-d'),
             'total_rupiah' => 50000,
         ]);
 
@@ -60,7 +60,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 'note' => [
                     'customer_name' => 'Budi Baru',
                     'customer_phone' => '0822222222',
-                    'transaction_date' => '2026-04-04',
+                    'transaction_date' => date('Y-m-d'),
                 ],
                 'items' => [
                     [
@@ -86,7 +86,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'id' => 'note-update-1',
             'customer_name' => 'Budi Baru',
             'customer_phone' => '0822222222',
-            'transaction_date' => '2026-04-04',
+            'transaction_date' => date('Y-m-d'),
             'total_rupiah' => 70000,
         ]);
 

@@ -89,9 +89,10 @@ final class NoteDetailPageFeatureTest extends TestCase
         $response = $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk();
-        $response->assertSee('lunas');
-        $response->assertSee('dp');
-        $response->assertSee('hutang');
+        $response->assertSee('Sudah Dibayar');
+        $response->assertSee('Sisa Tagihan');
+        $response->assertSee('8.000', false);
+        $response->assertSee('18.000', false);
         $response->assertSee('3.000', false);
         $response->assertSee('13.000', false);
     }

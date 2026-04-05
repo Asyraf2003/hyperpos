@@ -48,7 +48,7 @@ final class WebPageAccessFeatureTest extends TestCase
             ->get(route('cashier.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Kasir Dashboard');
+        $response->assertSee('Buat Nota Baru');
     }
 
     public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_admin_dashboard(): void
@@ -89,7 +89,7 @@ final class WebPageAccessFeatureTest extends TestCase
             ->get(route('cashier.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Kasir Dashboard');
+        $response->assertSee('Buat Nota Baru');
     }
 
     public function test_authenticated_user_without_actor_access_is_redirected_to_login_from_admin_dashboard(): void

@@ -34,7 +34,7 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
             'id' => 'note-edit-1',
             'customer_name' => 'Budi Santoso',
             'customer_phone' => '08123456789',
-            'transaction_date' => '2026-04-03',
+            'transaction_date' => date('Y-m-d'),
             'total_rupiah' => 50000,
         ]);
 
