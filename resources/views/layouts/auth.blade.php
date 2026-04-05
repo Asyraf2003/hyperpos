@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="{{ asset('assets/extensions/flatpickr/flatpickr.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     @stack('styles')
+
+    <style>
+        #auth-right {
+            background: url('{{ asset('assets/compiled/webp/bengkel-motor.webp') }}') center center / cover no-repeat !important;
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body>
     <script src="{{ asset('assets/static/js/initTheme.js') }}"></script>

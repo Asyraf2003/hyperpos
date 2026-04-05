@@ -1,0 +1,250 @@
+tests/Feature/Reporting/GetEmployeeDebtSummaryFeatureTest.php:140:        DB::table('employee_debt_payments')->insert([
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php:129:        DB::table('products')->insert([
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php:23:        DB::table('inventory_movements')->insert([
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php:70:        DB::table('product_inventory')->insert([
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php:76:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Reporting/GetOperationalExpenseSummaryFeatureTest.php:122:        DB::table('expense_categories')->insert([
+tests/Feature/Reporting/GetOperationalExpenseSummaryFeatureTest.php:143:        DB::table('operational_expenses')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:104:        DB::table('expense_categories')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:22:        DB::table('notes')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:28:        DB::table('work_items')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:34:        DB::table('work_item_external_purchase_lines')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:39:        DB::table('customer_refunds')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:44:        DB::table('inventory_movements')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:50:        DB::table('operational_expenses')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:56:        DB::table('payroll_disbursements')->insert([
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:90:        DB::table('employees')->insert([
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php:108:        DB::table('supplier_payments')->insert([
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php:123:        DB::table('supplier_receipts')->insert([
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php:136:        DB::table('supplier_receipt_lines')->insert([
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php:78:        DB::table('suppliers')->insert([
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php:92:        DB::table('supplier_invoices')->insert([
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:112:        DB::table('customer_refunds')->insert([
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:77:        DB::table('notes')->insert([
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:87:        DB::table('customer_payments')->insert([
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:96:        DB::table('payment_allocations')->insert([
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:102:        DB::table('customer_refunds')->insert([
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:67:        DB::table('notes')->insert([
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:77:        DB::table('customer_payments')->insert([
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:86:        DB::table('payment_allocations')->insert([
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:18:        DB::table('customer_payments')->insert([
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:23:        DB::table('customer_refunds')->insert([
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:27:        DB::table('payment_component_allocations')->insert([
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:33:        DB::table('refund_component_allocations')->insert([
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:18:        DB::table('notes')->insert([
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:23:        DB::table('payment_component_allocations')->insert([
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:29:        DB::table('refund_component_allocations')->insert([
+tests/TestCase.php:19:        DB::table('actor_accesses')->insert([
+tests/TestCase.php:36:        DB::table('actor_accesses')->insert([
+tests/TestCase.php:41:        DB::table('admin_transaction_capability_states')->updateOrInsert(
+
+===== TEST FILE LIST =====
+tests/Arch/.gitkeep
+tests/Arch/HexagonalDependencyTest.php
+tests/Feature/Auth/WebAuthenticationFeatureTest.php
+tests/Feature/Auth/WebPageAccessFeatureTest.php
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php
+tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php
+tests/Feature/Expense/CreateExpensePageFeatureTest.php
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataValidationFeatureTest.php
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataValidationFeatureTest.php
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Foundation/ErrorJsonFallbackFeatureTest.php
+tests/Feature/Foundation/ErrorPageHtmlFeatureTest.php
+tests/Feature/Http/.gitkeep
+tests/Feature/Http/HealthCheckTest.php
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php
+tests/Feature/IdentityAccess/TransactionEntryMiddlewareFeatureTest.php
+tests/Feature/Inventory/IssueInventoryFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryPageFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryTableClosurePolicyFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php
+tests/Feature/Note/CreateNoteFeatureTest.php
+tests/Feature/Note/CreateNoteHttpFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php
+tests/Feature/Note/EditableWorkspaceNoteGuardFeatureTest.php
+tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php
+tests/Feature/Note/NoteDetailPageFeatureTest.php
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php
+tests/Feature/Note/NoteOperationalStatePersistenceFeatureTest.php
+tests/Feature/Note/NotePrototypeRedirectFeatureTest.php
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php
+tests/Feature/Payment/AllocateCustomerPaymentFeatureTest.php
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php
+tests/Feature/Procurement/CreateSupplierInvoicePageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceIndexPageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataAccessFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataValidationFeatureTest.php
+tests/Feature/Procurement/ProductLookupFeatureTest.php
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php
+tests/Feature/Procurement/ServeSupplierPaymentProofAttachmentFeatureTest.php
+tests/Feature/Procurement/SupplierEditPageFeatureTest.php
+tests/Feature/Procurement/SupplierIndexPageFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataAccessFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataQueryFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataValidationFeatureTest.php
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php
+tests/Feature/ProductCatalog/CreateProductFeatureTest.php
+tests/Feature/ProductCatalog/ProductCreatePageFeatureTest.php
+tests/Feature/ProductCatalog/ProductEditPageFeatureTest.php
+tests/Feature/ProductCatalog/ProductIndexPageFeatureTest.php
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataAccessFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataQueryFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataValidationFeatureTest.php
+tests/Feature/ProductCatalog/UpdateProductFeatureTest.php
+tests/Feature/Reporting/GetEmployeeDebtSummaryFeatureTest.php
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php
+tests/Feature/Reporting/GetOperationalExpenseSummaryFeatureTest.php
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php
+tests/Feature/Reporting/ReportingReadModelContractFeatureTest.php
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php
+tests/Pest.php
+tests/Support/Architecture/.gitkeep
+tests/TestCase.php
+tests/Unit/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowedTest.php
+tests/Unit/Adapters/In/Http/Presenters/JsonPresenterTest.php
+tests/Unit/Adapters/In/Http/Presenters/Response/JsonResultResponderTest.php
+tests/Unit/Application/.gitkeep
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php
+tests/Unit/Application/Note/Policies/NotePaidStatusPolicyTest.php
+tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php
+tests/Unit/Application/Payment/Services/AllocateRefundAcrossComponentsTest.php
+tests/Unit/Application/Payment/Services/ResolveNotePayableComponentsTest.php
+tests/Unit/Application/Shared/DTO/ResultTest.php
+tests/Unit/Core/.gitkeep
+tests/Unit/Core/Note/Mutation/NoteMutationEventTest.php
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php
+tests/Unit/Core/Note/NoteMutationTest.php
+tests/Unit/Core/Note/NoteOperationalStateTransitionsTest.php
+tests/Unit/Core/Note/NoteTest.php
+tests/Unit/Core/Note/WorkItem/ExternalPurchaseLineTest.php
+tests/Unit/Core/Note/WorkItem/ServiceDetailTest.php
+tests/Unit/Core/Note/WorkItem/StoreStockLineTest.php
+tests/Unit/Core/Note/WorkItem/WorkItemTest.php
+tests/Unit/Core/Payment/CustomerPayment/CustomerPaymentTest.php
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php
+tests/Unit/Core/Payment/PaymentAllocation/PaymentAllocationTest.php
+tests/Unit/Core/Payment/PaymentComponentAllocation/PaymentComponentAllocationTest.php
+tests/Unit/Core/Payment/PaymentComponentAllocation/PaymentComponentTypeTest.php
+tests/Unit/Core/Payment/Policies/PaymentAllocationPolicyTest.php
+tests/Unit/Core/Payment/RefundComponentAllocation/RefundComponentAllocationTest.php
+tests/Unit/Core/Shared/ValueObjects/MoneyTest.php
+
+===== TEST SIGNALS =====
+tests/Arch/HexagonalDependencyTest.php:11:    public function test_hexagonal_audit_script_passes(): void
+tests/Arch/HexagonalDependencyTest.php:13:        $command = PHP_BINARY . ' scripts/audit-hex.php 2>&1';
+tests/Arch/HexagonalDependencyTest.php:23:            "Hexagonal audit failed:\n" . implode("\n", $output)
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:111:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:25:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:47:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebPageAccessFeatureTest.php:122:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebPageAccessFeatureTest.php:83:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:112:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:25:                'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:31:        $this->assertDatabaseHas('employee_debt_adjustments', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:35:            'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:38:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:45:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:59:            'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:60:            'performed_by_actor_id' => '1',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:61:            'before_total_debt' => 1000000,

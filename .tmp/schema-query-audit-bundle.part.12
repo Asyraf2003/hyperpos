@@ -1,0 +1,250 @@
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:52:    public function test_authorized_admin_cannot_reopen_closed_note_without_reason(): void
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:64:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:69:                'reason' => '',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:73:        $response->assertSessionHasErrors(['reason']);
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:75:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:80:        $this->assertDatabaseMissing('note_mutation_events', [
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:68:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierNoteHistoryPageFeatureTest.php:40:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php:89:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:55:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:108:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:113:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:140:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:44:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:49:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:58:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:65:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:69:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:74:        $this->assertNotNull($audit);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:76:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:78:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:81:        $this->assertSame('Salah input harga jasa.', $context['reason']);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:88:    public function test_correct_paid_service_only_work_item_handler_rejects_blank_reason(): void
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:100:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:118:                'reason' => 'Tidak boleh untuk tipe lain.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:122:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:127:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:141:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:29:            'reason' => 'Harga awal terlalu tinggi.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:33:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:39:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:43:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:61:                'reason' => 'Part source tidak valid.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:65:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:71:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:89:                'reason' => 'Tidak boleh untuk note unpaid.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:95:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:18:    public function test_it_writes_native_mutation_event_and_before_after_snapshots(): void
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:56:            'component_amount_rupiah_snapshot' => 50000,
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:72:        $this->assertDatabaseCount('note_mutation_events', 1);
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:73:        $this->assertDatabaseCount('note_mutation_snapshots', 2);
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:77:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:81:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:82:            'actor_role' => 'admin',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:83:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:86:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:88:            'snapshot_kind' => 'before',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:91:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:93:            'snapshot_kind' => 'after',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:101:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:106:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:113:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:122:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:125:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:126:            'reason' => 'Koreksi fee jasa external',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:66:                'component_amount_rupiah_snapshot' => 2000,
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:77:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:96:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:100:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:105:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:112:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:120:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:123:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:124:            'reason' => 'Koreksi fee jasa',
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:65:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:76:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:95:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:121:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:126:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:19:    public function test_correct_paid_work_item_status_handler_updates_status_with_reason_and_audit(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:37:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:44:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:48:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:53:        $this->assertNotNull($audit);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:55:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:57:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:61:        $this->assertSame('Salah input status, seharusnya sudah selesai.', $context['reason']);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:67:    public function test_correct_paid_work_item_status_handler_rejects_blank_reason(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:89:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:94:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:105:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:109:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:123:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:27:            'reason' => 'Servis sudah selesai.',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:31:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:35:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:51:                'reason' => 'Status tidak valid.',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:55:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:59:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:64:    public function test_cashier_cannot_access_closed_paid_work_item_status_blank_reason_flow(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:67:        $user = $this->createCashierUser('cashier-blank-reason@example.test');
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:75:                'reason' => '   ',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:79:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:83:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:99:                'reason' => 'Harusnya tidak boleh untuk note unpaid.',
+tests/Feature/Note/CreateNoteFeatureTest.php:30:        $this->assertDatabaseCount('notes', 1);
+tests/Feature/Note/CreateNoteFeatureTest.php:32:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateNoteFeatureTest.php:53:        $this->assertDatabaseCount('notes', 0);
+tests/Feature/Note/CreateNoteFeatureTest.php:70:        $this->assertDatabaseCount('notes', 0);
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:26:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:55:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:63:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php:16:    public function test_workspace_create_uses_next_default_customer_name_after_one_note_exists(): void
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php:34:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 150000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:34:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 150000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:36:        $this->assertDatabaseHas('payment_allocations', ['customer_payment_id' => $paymentId, 'amount_rupiah' => 150000]);
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php:32:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 50000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:65:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:69:        $this->assertDatabaseCount('work_item_service_details', 1);
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:70:        $this->assertDatabaseCount('work_item_external_purchase_lines', 1);
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:89:        $this->assertDatabaseCount('work_item_service_details', 1);
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:90:        $this->assertDatabaseCount('work_item_store_stock_lines', 1);
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php:34:        $this->assertDatabaseHas('notes', ['customer_name' => 'Budi', 'total_rupiah' => 50000]);
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php:35:        $this->assertDatabaseCount('customer_payments', 0);
+tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:22:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:23:            'actor_role' => 'admin',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:24:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:25:            'occurred_at' => '2026-04-02 10:00:00',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:30:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:34:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:35:                'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":5000}}',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:41:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:42:                'payload_json' => '{"note":{"total_rupiah":45000},"meta":{"refund_required_rupiah":5000}}',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:52:        $this->assertSame('Koreksi nominal', $history[0]['reason']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:53:        $this->assertSame('actor-1', $history[0]['performed_by_actor_id']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:54:        $this->assertSame(50000, $history[0]['before_total_rupiah']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:55:        $this->assertSame(45000, $history[0]['after_total_rupiah']);
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:47:            'actor_role' => 'admin',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:48:            'reason' => 'Harga salah input',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:49:            'occurred_at' => $now,
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:59:                'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":10000}}',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:66:                'payload_json' => '{"note":{"total_rupiah":40000},"meta":{"refund_required_rupiah":10000}}',
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php:79:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageFeatureTest.php:28:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageFeatureTest.php:72:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/NoteDetailPageFeatureTest.php:83:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:47:            'actor_role' => 'admin',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:48:            'reason' => 'Koreksi fee jasa external',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:49:            'occurred_at' => $eventAt,
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:59:                'payload_json' => '{"note":{"total_rupiah":7000},"meta":{"refund_required_rupiah":1000}}',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:66:                'payload_json' => '{"note":{"total_rupiah":6000},"meta":{"refund_required_rupiah":1000}}',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:47:            'actor_role' => 'admin',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:48:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:49:            'occurred_at' => $eventAt,
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:59:                'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":5000}}',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:66:                'payload_json' => '{"note":{"total_rupiah":45000},"meta":{"refund_required_rupiah":5000}}',
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:18:        $this->assertTrue(Schema::hasColumn('notes', 'note_state'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:19:        $this->assertTrue(Schema::hasColumn('notes', 'closed_at'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:20:        $this->assertTrue(Schema::hasColumn('notes', 'closed_by_actor_id'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:21:        $this->assertTrue(Schema::hasColumn('notes', 'reopened_at'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:22:        $this->assertTrue(Schema::hasColumn('notes', 'reopened_by_actor_id'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:37:        $this->assertNull($row->closed_by_actor_id);
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:39:        $this->assertNull($row->reopened_by_actor_id);
+tests/Feature/Note/NotePrototypeRedirectFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:112:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:117:        $this->assertDatabaseCount('work_items', 4);
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:118:        $this->assertDatabaseCount('work_item_service_details', 3);
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:119:        $this->assertDatabaseCount('work_item_external_purchase_lines', 2);
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:120:        $this->assertDatabaseCount('work_item_store_stock_lines', 2);
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:122:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:127:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:28:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:60:        $this->assertDatabaseHas('customer_payments', [
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:68:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:24:            'closed_by_actor_id' => 'system',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:36:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:39:            'reopened_by_actor_id' => 'admin-1',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:42:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:45:            'actor_id' => 'admin-1',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:46:            'actor_role' => 'admin',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:47:            'reason' => 'Perlu koreksi setelah review admin',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:55:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:57:            'snapshot_kind' => 'before',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:60:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:62:            'snapshot_kind' => 'after',
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:64:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:69:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:76:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:62:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:67:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:74:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:111:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:118:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:93:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:97:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:100:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:161:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:167:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:209:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:255:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:88:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:94:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Payment/AllocateCustomerPaymentFeatureTest.php:37:        $this->assertDatabaseHas('payment_allocations', ['id' => 'allocation-1', 'amount_rupiah' => 40000]);
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:50:        $this->assertDatabaseHas('notes', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:53:            'closed_by_actor_id' => 'system',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:56:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:59:            'actor_id' => 'system',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:60:            'actor_role' => 'system',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:61:            'reason' => 'AUTO_CLOSE_ON_FULL_PAYMENT',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:70:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:72:            'snapshot_kind' => 'before',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:75:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:77:            'snapshot_kind' => 'after',
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:137:        int $snapshot,
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:148:            'component_amount_rupiah_snapshot' => $snapshot,
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:19:    public function test_it_allocates_to_all_product_buckets_before_any_service_fee(): void
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:27:        $this->assertDatabaseCount('payment_component_allocations', 3);
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:31:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:39:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:47:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:55:        $this->assertDatabaseMissing('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:61:    public function test_it_moves_to_service_fee_only_after_product_buckets_are_fully_covered(): void
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:77:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php:38:        $this->assertDatabaseCount('customer_payments', 1);
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php:40:        $this->assertDatabaseHas('customer_payments', [
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php:71:        $this->assertDatabaseCount('customer_payments', 0);
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php:98:        $this->assertDatabaseCount('customer_payments', 0);
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:102:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:113:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:124:                'component_amount_rupiah_snapshot' => 2000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:135:                'component_amount_rupiah_snapshot' => 4000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:33:        $this->assertDatabaseHas('refund_component_allocations', [

@@ -1,0 +1,250 @@
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:62:            'after_total_debt' => 900000,
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:63:            'before_remaining_balance' => 1000000,
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:64:            'after_remaining_balance' => 900000,
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:78:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:96:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php:56:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php:74:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:103:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:86:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:23:    public function test_handler_stores_atomic_batch_and_writes_summary_and_row_audit_logs(): void
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:39:        $this->assertDatabaseCount('payroll_disbursements', 2);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:40:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:45:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:50:        $this->assertSame(2, DB::table('audit_logs')->where('event', 'payroll_disbursement_recorded')->count());
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:51:        $this->assertDatabaseHas('audit_logs', ['event' => 'payroll_batch_disbursement_recorded']);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:54:            (string) DB::table('audit_logs')->where('event', 'payroll_batch_disbursement_recorded')->value('context'),
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:61:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:81:        $this->assertDatabaseCount('payroll_disbursements', 0);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:82:        $this->assertDatabaseCount('audit_logs', 0);
+tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php:45:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:102:        $this->assertDatabaseHas('employee_debt_payments', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:108:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:124:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeDebtIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php:43:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php:53:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:191:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:106:    public function test_admin_cannot_update_employee_when_change_reason_is_blank(): void
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:118:                'change_reason' => '   ',
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:126:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:135:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:167:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:54:    public function test_admin_can_update_employee_and_write_audit_log(): void
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:67:                'change_reason' => 'Cuti panjang sementara.',
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:73:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:82:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:86:        $audit = DB::table('audit_logs')
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:91:        $this->assertNotNull($audit);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:93:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:96:        $this->assertSame((string) $admin->getAuthIdentifier(), $context['performed_by_actor_id']);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:97:        $this->assertSame('Cuti panjang sementara.', $context['reason']);
+tests/Feature/EmployeeFinance/EmployeeIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php:50:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:50:        $this->assertDatabaseHas('employee_debt_payments', [
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:57:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php:51:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php:58:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php:59:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayrollTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php:38:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php:61:        $this->assertDatabaseCount('employee_debts', 0);
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php:28:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php:51:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:121:        $tableResponse->assertJsonFragment(['reversal_reason' => 'Koreksi payout payroll']);
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:134:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:46:                'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:52:        $this->assertDatabaseHas('payroll_disbursement_reversals', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:54:            'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:57:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:92:            'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:93:            'performed_by_actor_id' => '1',
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:45:        $this->assertDatabaseCount('payroll_disbursements', 2);
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:46:        $this->assertDatabaseHas('audit_logs', ['event' => 'payroll_batch_disbursement_recorded']);
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:52:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:36:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:42:    public function test_update_employee_base_salary_handler_requires_reason_for_salary_reduction(): void
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:19:    public function test_activate_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 1]);
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:33:        $this->assertDatabaseHas('audit_logs', ['event' => 'expense_category_activated']);
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:26:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 1]);
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:38:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php:116:        $this->assertDatabaseCount('expense_categories', 0);
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php:42:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php:87:        $this->assertDatabaseCount('expense_categories', 1);
+tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php:53:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/CreateExpensePageFeatureTest.php:66:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:19:    public function test_deactivate_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 0]);
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:33:        $this->assertDatabaseHas('audit_logs', ['event' => 'expense_category_deactivated']);
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:26:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 0]);
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:38:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php:62:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php:54:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php:50:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php:77:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataValidationFeatureTest.php:33:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php:55:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:51:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:85:            'category_code_snapshot' => $categoryCodeSnapshot,
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:86:            'category_name_snapshot' => $categoryNameSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:122:            'category_code_snapshot' => $categoryCodeSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:123:            'category_name_snapshot' => $categoryNameSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:88:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataValidationFeatureTest.php:36:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:111:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:130:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:45:        $this->assertDatabaseHas('operational_expenses', [
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:48:            'category_code_snapshot' => 'LISTRIK',
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:49:            'category_name_snapshot' => 'Listrik',
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:73:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:92:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:28:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:59:        $this->assertDatabaseCount('expense_categories', 1);
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:75:        $this->assertDatabaseCount('expense_categories', 0);
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:87:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:33:        $this->assertDatabaseHas('operational_expenses', [
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:35:            'category_code_snapshot' => 'EXP-ELEC',
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:36:            'category_name_snapshot' => 'Listrik Bengkel',
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:62:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:82:        $this->assertDatabaseCount('operational_expenses', 0);
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:94:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:19:    public function test_update_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:40:        $log = DB::table('audit_logs')->where('event', 'expense_category_updated')->first();
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:44:        $this->assertSame('admin-1', $context['performed_by_actor_id']);
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:64:        $this->assertDatabaseCount('audit_logs', 0);
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:30:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:66:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Foundation/ErrorPageHtmlFeatureTest.php:41:        $this->get('/__launch-audit-404__')
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:15:    public function test_disable_capability_endpoint_updates_state_and_writes_audit_log(): void
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:18:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:23:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:28:            'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:29:            'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:34:        $this->assertDatabaseHas('admin_transaction_capability_states', [
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:35:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:39:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:42:                'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:43:                'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:15:    public function test_enable_capability_endpoint_updates_state_and_writes_audit_log(): void
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:18:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:23:            'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:24:            'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:29:        $this->assertDatabaseHas('admin_transaction_capability_states', [
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:30:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:34:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:37:                'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:38:                'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/TransactionEntryMiddlewareFeatureTest.php:42:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:43:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:54:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:59:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:92:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:94:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:99:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:110:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:111:        $this->assertDatabaseCount('product_inventory_costing', 0);
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:71:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:77:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:83:        $this->assertDatabaseMissing('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:87:        $this->assertDatabaseCount('product_inventory_costing', 2);
+tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php:47:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:106:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:107:        $this->assertDatabaseCount('product_inventory', 0);
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:69:        $this->assertDatabaseCount('inventory_movements', 3);
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:71:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:76:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:81:        $this->assertDatabaseMissing('product_inventory', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:85:        $this->assertDatabaseCount('product_inventory', 2);
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:46:        $this->assertDatabaseHas('product_inventory', ['product_id' => 'product-1', 'qty_on_hand' => 5]);
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:47:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:52:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:69:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:74:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:80:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:102:        $this->assertDatabaseCount('work_item_external_purchase_lines', 2);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:103:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:104:        $this->assertDatabaseCount('product_inventory', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:105:        $this->assertDatabaseCount('product_inventory_costing', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:135:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:140:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:141:        $this->assertDatabaseCount('work_item_service_details', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:142:        $this->assertDatabaseCount('work_item_external_purchase_lines', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:143:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:59:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:64:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:79:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:86:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:94:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:139:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:66:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:72:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:89:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:118:        $this->assertDatabaseCount('work_items', 1);
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:119:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:45:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:50:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:65:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:72:        $this->assertDatabaseCount('work_item_external_purchase_lines', 0);
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:73:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:105:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:110:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:116:        $this->assertDatabaseCount('work_item_external_purchase_lines', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:155:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:160:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:161:        $this->assertDatabaseCount('work_item_service_details', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:162:        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:163:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:165:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:170:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:213:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:218:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:219:        $this->assertDatabaseCount('work_item_service_details', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:220:        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:221:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:223:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:228:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:53:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:58:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:73:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:80:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:94:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:102:        $this->assertDatabaseCount('work_item_service_details', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:103:        $this->assertDatabaseCount('work_item_external_purchase_lines', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:138:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:143:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:144:        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:145:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:147:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:152:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:191:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:196:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:197:        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:198:        $this->assertDatabaseCount('inventory_movements', 0);
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:200:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:205:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:46:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:51:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:66:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:80:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:91:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:96:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:46:        $this->assertDatabaseCount('work_items', 0);
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:48:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:75:        $this->assertDatabaseCount('work_items', 1);
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:77:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php:27:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:27:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:31:            'reason' => 'Perlu edit lanjutan oleh admin.',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:37:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:40:            'reopened_by_actor_id' => (string) $admin->getAuthIdentifier(),
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:43:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:46:            'actor_id' => (string) $admin->getAuthIdentifier(),
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:47:            'actor_role' => 'admin',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:48:            'reason' => 'Perlu edit lanjutan oleh admin.',
