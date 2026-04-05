@@ -39,15 +39,15 @@ return Application::configure(basePath: dirname(__DIR__))
             };
 
             if ($request->expectsJson()) {
-                if ($status === 419) {
+                if ($e instanceof HttpExceptionInterface && $status >= 400 && $status < 500) {
+                    return null;
+                }
+
+                if ($e instanceof TokenMismatchException) {
                     return response()->json([
                         'message' => 'Sesi Anda sudah berakhir. Silakan muat ulang halaman.',
                         'status' => 419,
                     ], 419);
-                }
-
-                if ($e instanceof HttpExceptionInterface && $status >= 400 && $status < 500) {
-                    return null;
                 }
 
                 return response()->json([
