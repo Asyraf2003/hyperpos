@@ -1,0 +1,250 @@
+database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php:23:            $table->index('actor_id');
+database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php:24:            $table->index('workspace_mode');
+database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php:25:            $table->index('note_id');
+database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php:26:            $table->unique(['actor_id', 'workspace_key'], 'twd_actor_workspace_key_unique');
+
+===== APP QUERY SIGNALS =====
+app/Adapters/In/Http/Controllers/Admin/Procurement/ServeSupplierPaymentProofAttachmentController.php:27:        abort_unless($disk->exists($path), 404);
+app/Adapters/In/Http/Controllers/Cashier/Note/CreateTransactionWorkspacePageController.php:22:        $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
+app/Adapters/Out/Audit/DatabaseAuditLogAdapter.php:17:        DB::table('audit_logs')->insert([
+app/Adapters/Out/Audit/DatabaseAuditLogReaderAdapter.php:19:        $rows = DB::table('audit_logs')
+app/Adapters/Out/Audit/DatabaseAuditLogReaderAdapter.php:20:            ->whereIn('event', self::EVENTS)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtAdjustmentListQuery.php:14:        return DB::table('employee_debt_adjustments')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtAdjustmentListQuery.php:16:            ->where('employee_debt_id', $debtId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtAdjustmentWriterAdapter.php:17:        DB::table('employee_debt_adjustments')->insert(array_merge($record, [
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtDetailPageQuery.php:14:        $row = DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtDetailPageQuery.php:15:            ->join('employees', 'employees.id', '=', 'employee_debts.employee_id')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtDetailPageQuery.php:26:            ->where('employee_debts.id', $debtId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtDetailPageQuery.php:41:        return DB::table('employee_debt_payments')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtDetailPageQuery.php:43:            ->where('employee_debt_id', $debtId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:15:        $builder = DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:16:            ->join('employees', 'employees.id', '=', 'employee_debts.employee_id')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:18:            ->selectRaw('COUNT(*) as total_debt_records')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:19:            ->selectRaw('SUM(employee_debts.total_debt) as total_debt_amount')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:20:            ->selectRaw('SUM(employee_debts.remaining_balance) as total_remaining_balance')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:21:            ->selectRaw("SUM(CASE WHEN employee_debts.status = 'unpaid' THEN 1 ELSE 0 END) as active_debt_count")
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:22:            ->selectRaw("SUM(CASE WHEN employee_debts.status = 'paid' THEN 1 ELSE 0 END) as paid_debt_count")
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:23:            ->selectRaw('MAX(employee_debts.created_at) as latest_recorded_at');
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:27:                $builder->where('employees.name', 'like', '%'.$term.'%');
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:39:        $paginator = $builder->groupBy('employee_debts.employee_id', 'employees.name')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:40:            ->orderBy($column, $query->sortDir())
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtListPageQuery.php:41:            ->orderBy('employee_name')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtPaymentListByEmployeeQuery.php:14:        return DB::table('employee_debt_payments')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtPaymentListByEmployeeQuery.php:15:            ->join('employee_debts', 'employee_debts.id', '=', 'employee_debt_payments.employee_debt_id')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtPaymentListByEmployeeQuery.php:23:            ->where('employee_debts.employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtReaderAdapter.php:19:        $row = DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtReaderAdapter.php:21:            ->where('id', $id)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtReaderAdapter.php:28:        $paymentRows = DB::table('employee_debt_payments')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtReaderAdapter.php:30:            ->where('employee_debt_id', $id)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtRecordListByEmployeeQuery.php:14:        return DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtRecordListByEmployeeQuery.php:16:            ->where('employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:13:        $row = DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:14:            ->selectRaw('COUNT(*) as total_debt_records')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:15:            ->selectRaw('SUM(total_debt) as total_debt_amount')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:16:            ->selectRaw('SUM(remaining_balance) as total_remaining_balance')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:17:            ->selectRaw("SUM(CASE WHEN status = 'unpaid' THEN 1 ELSE 0 END) as active_debt_count")
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:18:            ->selectRaw("SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as paid_debt_count")
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtSummaryByEmployeeQuery.php:19:            ->where('employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:27:        DB::table('employee_debts')->updateOrInsert(
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:32:        DB::table('employee_debts')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:33:            ->where('id', $debt->getId())
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:34:            ->whereNull('created_at')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:47:            DB::table('employee_debt_payments')->updateOrInsert(
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:52:            DB::table('employee_debt_payments')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:53:                ->where('id', $payment->getId())
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDebtWriterAdapter.php:54:                ->whereNull('created_at')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDetailPageQuery.php:22:        $row = DB::table('employees')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeDetailPageQuery.php:24:            ->where('id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeListPageQuery.php:26:        return DB::table('employees')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeListPageQuery.php:28:            ->orderBy('name')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeListPageQuery.php:29:            ->orderBy('created_at')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollHistoryByEmployeeQuery.php:17:        $paginator = DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollHistoryByEmployeeQuery.php:18:            ->leftJoin('payroll_disbursement_reversals', 'payroll_disbursements.id', '=', 'payroll_disbursement_reversals.payroll_disbursement_id')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollHistoryByEmployeeQuery.php:19:            ->where('payroll_disbursements.employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:14:        $row = DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:15:            ->leftJoin('payroll_disbursement_reversals', 'payroll_disbursements.id', '=', 'payroll_disbursement_reversals.payroll_disbursement_id')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:16:            ->selectRaw('COUNT(CASE WHEN payroll_disbursement_reversals.id IS NULL THEN 1 END) as total_payroll_records')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:17:            ->selectRaw('COALESCE(SUM(CASE WHEN payroll_disbursement_reversals.id IS NULL THEN payroll_disbursements.amount ELSE 0 END), 0) as total_disbursed_amount')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:18:            ->selectRaw('MAX(CASE WHEN payroll_disbursement_reversals.id IS NULL THEN payroll_disbursements.disbursement_date END) as latest_disbursement_date')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollSummaryByEmployeeQuery.php:19:            ->where('payroll_disbursements.employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollTableReaderAdapter.php:16:        $paginator = DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollTableReaderAdapter.php:17:            ->leftJoin(
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeePayrollTableReaderAdapter.php:33:            ->where('payroll_disbursements.employee_id', $employeeId)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeReaderAdapter.php:18:        $row = DB::table('employees')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeReaderAdapter.php:20:            ->where('id', $id)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeTableReaderAdapter.php:15:        $builder = DB::table('employees')->select(['id', 'name', 'phone', 'base_salary', 'pay_period', 'status']);
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeTableReaderAdapter.php:19:                $builder->where(function ($where) use ($term): void {
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeTableReaderAdapter.php:21:                    $where->where('name', 'like', $like)->orWhere('phone', 'like', $like)
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeTableReaderAdapter.php:27:        $paginator = $builder->orderBy($query->sortBy(), $query->sortDir())
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeWriterAdapter.php:19:        DB::table('employees')->updateOrInsert(
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeWriterAdapter.php:27:        DB::table('employees')
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeWriterAdapter.php:28:            ->where('id', $employee->getId())
+app/Adapters/Out/EmployeeFinance/DatabaseEmployeeWriterAdapter.php:29:            ->whereNull('created_at')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollDisbursementReversalWriterAdapter.php:17:        DB::table('payroll_disbursement_reversals')->insert(array_merge($record, [
+app/Adapters/Out/EmployeeFinance/DatabasePayrollDisbursementWriterAdapter.php:27:        DB::table('payroll_disbursements')->updateOrInsert(
+app/Adapters/Out/EmployeeFinance/DatabasePayrollDisbursementWriterAdapter.php:32:        DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollDisbursementWriterAdapter.php:33:            ->where('id', $payroll->getId())
+app/Adapters/Out/EmployeeFinance/DatabasePayrollDisbursementWriterAdapter.php:34:            ->whereNull('created_at')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollListPageQuery.php:27:        return DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollListPageQuery.php:28:            ->join('employees', 'employees.id', '=', 'payroll_disbursements.employee_id')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollTableReaderAdapter.php:16:        $builder = DB::table('payroll_disbursements')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollTableReaderAdapter.php:17:            ->join('employees', 'employees.id', '=', 'payroll_disbursements.employee_id')
+app/Adapters/Out/EmployeeFinance/DatabasePayrollTableReaderAdapter.php:30:                $builder->where(function ($where) use ($term): void {
+app/Adapters/Out/EmployeeFinance/DatabasePayrollTableReaderAdapter.php:32:                    $where->where('employees.name', 'like', $like)
+app/Adapters/Out/EmployeeFinance/DatabasePayrollTableReaderAdapter.php:47:        $paginator = $builder->orderBy($column, $query->sortDir())
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableBaseQuery.php:14:        return DB::table('expense_categories')->select([
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableFilters.php:17:            $builder->where(function (Builder $q) use ($keyword): void {
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableFilters.php:18:                $q->where('code', 'like', '%' . $keyword . '%')
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableFilters.php:25:            $builder->where('is_active', $query->isActive());
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableOrdering.php:19:            ->orderBy($sortBy, $sortDir)
+app/Adapters/Out/Expense/Concerns/ExpenseCategoryTableOrdering.php:21:            ->orderBy('id');
+app/Adapters/Out/Expense/Concerns/OperationalExpenseTableBaseQuery.php:14:        return DB::table('operational_expenses')->select([
+app/Adapters/Out/Expense/Concerns/OperationalExpenseTableFilters.php:17:            $builder->where(function (Builder $q) use ($keyword): void {
+app/Adapters/Out/Expense/Concerns/OperationalExpenseTableFilters.php:18:                $q->where('category_name_snapshot', 'like', '%' . $keyword . '%')
+app/Adapters/Out/Expense/Concerns/OperationalExpenseTableFilters.php:26:            $builder->where('category_id', $query->categoryId());
+app/Adapters/Out/Expense/Concerns/OperationalExpenseTableOrdering.php:19:            ->orderBy($sortBy, $sortDir)
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:36:        $rows = DB::table('expense_categories')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:38:            ->where('is_active', true)
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:39:            ->orderBy('name')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:40:            ->orderBy('code')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:41:            ->orderBy('id')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:55:        return DB::table('expense_categories')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:63:            ->orderBy('name')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:64:            ->orderBy('code')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryListPageQuery.php:65:            ->orderBy('id');
+app/Adapters/Out/Expense/DatabaseExpenseCategoryReaderAdapter.php:15:        return DB::table('expense_categories')->where('code', trim($code))->exists();
+app/Adapters/Out/Expense/DatabaseExpenseCategoryReaderAdapter.php:20:        return $this->mapRow(DB::table('expense_categories')->where('id', trim($id))->first());
+app/Adapters/Out/Expense/DatabaseExpenseCategoryReaderAdapter.php:25:        return $this->mapRow(DB::table('expense_categories')->where('code', trim($code))->first());
+app/Adapters/Out/Expense/DatabaseExpenseCategoryWriterAdapter.php:18:        DB::table('expense_categories')->insert([
+app/Adapters/Out/Expense/DatabaseExpenseCategoryWriterAdapter.php:31:        DB::table('expense_categories')
+app/Adapters/Out/Expense/DatabaseExpenseCategoryWriterAdapter.php:32:            ->where('id', $expenseCategory->id())
+app/Adapters/Out/Expense/DatabaseOperationalExpenseListPageQuery.php:35:        return DB::table('operational_expenses')->select([
+app/Adapters/Out/Expense/DatabaseOperationalExpenseWriterAdapter.php:18:        DB::table('operational_expenses')->insert([
+app/Adapters/Out/IdentityAccess/DatabaseActorAccessReaderAdapter.php:16:        $row = DB::table('actor_accesses')
+app/Adapters/Out/IdentityAccess/DatabaseActorAccessReaderAdapter.php:18:            ->where('actor_id', $actorId)
+app/Adapters/Out/IdentityAccess/DatabaseAdminCashierAreaAccessStateAdapter.php:15:        $row = DB::table('admin_cashier_area_access_states')
+app/Adapters/Out/IdentityAccess/DatabaseAdminCashierAreaAccessStateAdapter.php:17:            ->where('actor_id', $actorId)
+app/Adapters/Out/IdentityAccess/DatabaseAdminCashierAreaAccessStateAdapter.php:31:        DB::table('admin_cashier_area_access_states')->updateOrInsert(
+app/Adapters/Out/IdentityAccess/DatabaseAdminCashierAreaAccessStateAdapter.php:39:        DB::table('admin_cashier_area_access_states')->updateOrInsert(
+app/Adapters/Out/IdentityAccess/DatabaseAdminTransactionCapabilityStateAdapter.php:15:        $row = DB::table('admin_transaction_capability_states')
+app/Adapters/Out/IdentityAccess/DatabaseAdminTransactionCapabilityStateAdapter.php:17:            ->where('actor_id', $actorId)
+app/Adapters/Out/IdentityAccess/DatabaseAdminTransactionCapabilityStateAdapter.php:31:        DB::table('admin_transaction_capability_states')->updateOrInsert(
+app/Adapters/Out/IdentityAccess/DatabaseAdminTransactionCapabilityStateAdapter.php:39:        DB::table('admin_transaction_capability_states')->updateOrInsert(
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:22:        $rows = DB::table('inventory_movements')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:33:            ->orderBy('tanggal_mutasi')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:34:            ->orderBy('id')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:45:        $rows = DB::table('inventory_movements')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:56:            ->where('source_type', $sourceType)
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:57:            ->where('source_id', $sourceId)
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:58:            ->orderBy('tanggal_mutasi')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementReaderAdapter.php:59:            ->orderBy('id')
+app/Adapters/Out/Inventory/DatabaseInventoryMovementWriterAdapter.php:22:        DB::table('inventory_movements')->insert(
+app/Adapters/Out/Inventory/DatabaseProductInventoryCostingProjectionWriterAdapter.php:18:        DB::table('product_inventory_costing')->delete();
+app/Adapters/Out/Inventory/DatabaseProductInventoryCostingProjectionWriterAdapter.php:24:        DB::table('product_inventory_costing')->insert(
+app/Adapters/Out/Inventory/DatabaseProductInventoryCostingReaderAdapter.php:16:        $row = DB::table('product_inventory_costing')
+app/Adapters/Out/Inventory/DatabaseProductInventoryCostingReaderAdapter.php:22:            ->where('product_id', $productId)
+app/Adapters/Out/Inventory/DatabaseProductInventoryCostingWriterAdapter.php:15:        DB::table('product_inventory_costing')->updateOrInsert(
+app/Adapters/Out/Inventory/DatabaseProductInventoryProjectionWriterAdapter.php:18:        DB::table('product_inventory')->delete();
+app/Adapters/Out/Inventory/DatabaseProductInventoryProjectionWriterAdapter.php:24:        DB::table('product_inventory')->insert(
+app/Adapters/Out/Inventory/DatabaseProductInventoryReaderAdapter.php:15:        $row = DB::table('product_inventory')
+app/Adapters/Out/Inventory/DatabaseProductInventoryReaderAdapter.php:17:            ->where('product_id', $productId)
+app/Adapters/Out/Inventory/DatabaseProductInventoryWriterAdapter.php:15:        DB::table('product_inventory')->updateOrInsert(
+app/Adapters/Out/Note/DatabaseNoteCorrectionHistoryReaderAdapter.php:15:        $events = DB::table('note_mutation_events')
+app/Adapters/Out/Note/DatabaseNoteCorrectionHistoryReaderAdapter.php:16:            ->where('note_id', trim($noteId))
+app/Adapters/Out/Note/DatabaseNoteCorrectionHistoryReaderAdapter.php:66:        $rows = DB::table('note_mutation_snapshots')
+app/Adapters/Out/Note/DatabaseNoteCorrectionHistoryReaderAdapter.php:67:            ->whereIn('note_mutation_event_id', $eventIds)
+app/Adapters/Out/Note/DatabaseNoteMutationEventWriterAdapter.php:15:        DB::table('note_mutation_events')->insert([
+app/Adapters/Out/Note/DatabaseNoteMutationSnapshotWriterAdapter.php:18:        DB::table('note_mutation_snapshots')->insert(array_map(
+app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php:18:        $noteRow = DB::table('notes')->where('id', trim($id))->first();
+app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php:21:        $itemRows = DB::table('work_items')->where('note_id', $noteRow->id)->orderBy('line_no')->get()->all();
+app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php:38:        foreach (DB::table('work_item_service_details')->whereIn('work_item_id', $ids)->get() as $r) {
+app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php:46:        foreach (DB::table('work_item_external_purchase_lines')->whereIn('work_item_id', $ids)->orderBy('id')->get() as $r) {
+app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php:54:        foreach (DB::table('work_item_store_stock_lines')->whereIn('work_item_id', $ids)->orderBy('id')->get() as $r) {
+app/Adapters/Out/Note/DatabaseNoteWriterAdapter.php:15:        DB::table('notes')->insert([
+app/Adapters/Out/Note/DatabaseNoteWriterAdapter.php:31:        DB::table('notes')->where('id', $note->id())->update([
+app/Adapters/Out/Note/DatabaseNoteWriterAdapter.php:40:        DB::table('notes')->where('id', $note->id())->update([
+app/Adapters/Out/Note/DatabaseNoteWriterAdapter.php:47:        DB::table('notes')->where('id', $note->id())->update([
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftDeleterAdapter.php:14:        DB::table('transaction_workspace_drafts')
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftDeleterAdapter.php:15:            ->where('actor_id', trim($actorId))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftDeleterAdapter.php:16:            ->where('workspace_key', trim($workspaceKey))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftReaderAdapter.php:15:        $row = DB::table('transaction_workspace_drafts')
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftReaderAdapter.php:16:            ->where('actor_id', trim($actorId))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftReaderAdapter.php:17:            ->where('workspace_key', trim($workspaceKey))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:23:        $exists = DB::table('transaction_workspace_drafts')
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:24:            ->where('actor_id', trim($actorId))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:25:            ->where('workspace_key', trim($workspaceKey))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:26:            ->exists();
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:29:            DB::table('transaction_workspace_drafts')
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:30:                ->where('actor_id', trim($actorId))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:31:                ->where('workspace_key', trim($workspaceKey))
+app/Adapters/Out/Note/DatabaseTransactionWorkspaceDraftWriterAdapter.php:42:        DB::table('transaction_workspace_drafts')->insert([
+app/Adapters/Out/Note/DatabaseWorkItemWriterAdapter.php:19:        DB::table('work_items')->insert([
+app/Adapters/Out/Note/DatabaseWorkItemWriterAdapter.php:31:            DB::table('work_item_service_details')->insert([
+app/Adapters/Out/Note/DatabaseWorkItemWriterAdapter.php:45:        DB::table('work_items')->where('id', $workItem->id())->update([
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:16:        $componentAllocationTotals = DB::table('payment_component_allocations')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:17:            ->selectRaw('note_id, COALESCE(SUM(allocated_amount_rupiah), 0) as allocated_rupiah')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:18:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:20:        $legacyAllocationTotals = DB::table('payment_allocations')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:21:            ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as allocated_rupiah')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:22:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:24:        $componentRefundTotals = DB::table('refund_component_allocations')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:25:            ->selectRaw('note_id, COALESCE(SUM(refunded_amount_rupiah), 0) as refunded_rupiah')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:26:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:28:        $legacyRefundTotals = DB::table('customer_refunds')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:29:            ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as refunded_rupiah')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:30:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:32:        $workSummary = DB::table('work_items')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:33:            ->selectRaw("
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:39:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:41:        return DB::table('notes')
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:49:                $query->where(function ($subQuery) use ($criteria): void {
+app/Adapters/Out/Note/Queries/AdminNoteHistoryBaseQuery.php:50:                    $subQuery->where('notes.id', 'like', '%' . $criteria->search . '%')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:16:        $componentAllocationTotals = DB::table('payment_component_allocations')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:17:            ->selectRaw('note_id, COALESCE(SUM(allocated_amount_rupiah), 0) as allocated_rupiah')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:18:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:20:        $legacyAllocationTotals = DB::table('payment_allocations')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:21:            ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as allocated_rupiah')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:22:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:24:        $componentRefundTotals = DB::table('refund_component_allocations')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:25:            ->selectRaw('note_id, COALESCE(SUM(refunded_amount_rupiah), 0) as refunded_rupiah')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:26:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:28:        $legacyRefundTotals = DB::table('customer_refunds')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:29:            ->selectRaw('note_id, COALESCE(SUM(amount_rupiah), 0) as refunded_rupiah')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:30:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:32:        $workSummary = DB::table('work_items')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:33:            ->selectRaw("
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:39:            ->groupBy('note_id');
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:41:        return DB::table('notes')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:47:            ->where('notes.note_state', 'open')
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:50:                $query->where(function ($subQuery) use ($criteria): void {
+app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php:51:                    $subQuery->where('notes.id', 'like', '%' . $criteria->search . '%')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:20:        $workItemIds = DB::table('work_items')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:21:            ->where('note_id', $normalized)
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:30:        DB::table('work_item_service_details')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:31:            ->whereIn('work_item_id', $workItemIds)
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:34:        DB::table('work_item_external_purchase_lines')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:35:            ->whereIn('work_item_id', $workItemIds)
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:38:        DB::table('work_item_store_stock_lines')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:39:            ->whereIn('work_item_id', $workItemIds)
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:42:        DB::table('work_items')
+app/Adapters/Out/Note/WorkItemDeletesTrait.php:43:            ->whereIn('id', $workItemIds)
+app/Adapters/Out/Note/WorkItemLineInsertsTrait.php:22:        DB::table('work_item_external_purchase_lines')->insert(
+app/Adapters/Out/Note/WorkItemLineInsertsTrait.php:45:        DB::table('work_item_store_stock_lines')->insert(
+app/Adapters/Out/Note/WorkItemServiceUpdateGuardsTrait.php:16:        DB::table('work_items')->where('id', $workItem->id())->update([
+app/Adapters/Out/Note/WorkItemServiceUpdateGuardsTrait.php:20:        DB::table('work_item_service_details')->where('work_item_id', $workItem->id())->update([
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:24:        $row = DB::table('customer_payments')
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:25:            ->where('id', $normalizedId)
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:47:        $componentTotal = (int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:48:            ->where('customer_payment_id', $normalizedId)
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:55:        $legacyTotal = (int) DB::table('payment_allocations')
+app/Adapters/Out/Payment/DatabaseCustomerPaymentReaderAdapter.php:56:            ->where('customer_payment_id', $normalizedId)
+app/Adapters/Out/Payment/DatabaseCustomerPaymentWriterAdapter.php:15:        DB::table('customer_payments')->insert([
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:17:        $componentTotal = (int) DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:18:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:25:        return Money::fromInt((int) DB::table('customer_refunds')
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:26:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:34:        $componentTotal = (int) DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:35:            ->where('customer_payment_id', $paymentId)
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:36:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:43:        return Money::fromInt((int) DB::table('customer_refunds')
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:44:            ->where('customer_payment_id', $paymentId)

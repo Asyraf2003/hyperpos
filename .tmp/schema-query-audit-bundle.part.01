@@ -1,0 +1,250 @@
+    public function up(): void
+    {
+        Schema::create('audit_logs', function (Blueprint $table): void {
+            $table->id();
+            $table->string('event');
+            $table->json('context');
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('audit_logs');
+    }
+};
+
+----- FILE: database/migrations/2026_03_11_000100_create_products_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('kode_barang')->nullable();
+            $table->string('nama_barang');
+            $table->string('merek');
+            $table->integer('ukuran')->nullable();
+            $table->integer('harga_jual');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000100_create_suppliers_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('suppliers', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('nama_pt_pengirim');
+            $table->string('nama_pt_pengirim_normalized');
+
+            $table->index('nama_pt_pengirim_normalized');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('suppliers');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000200_create_supplier_invoices_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_invoices', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_id');
+            $table->string('supplier_nama_pt_pengirim_snapshot')->nullable();
+            $table->date('tanggal_pengiriman');
+            $table->date('jatuh_tempo');
+            $table->integer('grand_total_rupiah');
+
+            $table->index('supplier_id');
+            $table->index('tanggal_pengiriman');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_invoices');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000300_create_supplier_invoice_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_invoice_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_invoice_id');
+            $table->string('product_id');
+            $table->string('product_kode_barang_snapshot')->nullable();
+            $table->string('product_nama_barang_snapshot')->nullable();
+            $table->string('product_merek_snapshot')->nullable();
+            $table->integer('product_ukuran_snapshot')->nullable();
+            $table->integer('qty_pcs');
+            $table->integer('line_total_rupiah');
+            $table->integer('unit_cost_rupiah');
+
+            $table->index('supplier_invoice_id');
+            $table->index('product_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_invoice_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000400_create_supplier_receipts_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_receipts', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_invoice_id');
+            $table->date('tanggal_terima');
+
+            $table->index('supplier_invoice_id');
+            $table->index('tanggal_terima');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_receipts');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000500_create_supplier_receipt_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_receipt_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_receipt_id');
+            $table->string('supplier_invoice_line_id');
+            $table->integer('qty_diterima');
+
+            $table->index('supplier_receipt_id');
+            $table->index('supplier_invoice_line_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_receipt_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000600_create_inventory_movements_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventory_movements', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('product_id');
+            $table->string('movement_type');
+            $table->string('source_type');
+            $table->string('source_id');
+            $table->date('tanggal_mutasi');
+            $table->integer('qty_delta');
+            $table->integer('unit_cost_rupiah');
+            $table->integer('total_cost_rupiah');
+
+            $table->index('product_id');
+            $table->index(['source_type', 'source_id']);
+            $table->index('tanggal_mutasi');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventory_movements');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000700_create_product_inventory_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('product_inventory', function (Blueprint $table): void {

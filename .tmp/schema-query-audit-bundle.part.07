@@ -1,0 +1,250 @@
+app/Adapters/Out/Payment/DatabaseCustomerRefundReaderAdapter.php:45:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabaseCustomerRefundWriterAdapter.php:15:        DB::table('customer_refunds')->insert([
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:17:        $componentTotal = (int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:18:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:25:        $legacyTotal = (int) DB::table('payment_allocations')
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:26:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:37:        $componentTotal = (int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:38:            ->where('customer_payment_id', $paymentId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:39:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:46:        $legacyTotal = (int) DB::table('payment_allocations')
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:47:            ->where('customer_payment_id', $paymentId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php:48:            ->where('note_id', $normalizedNoteId)
+app/Adapters/Out/Payment/DatabasePaymentAllocationWriterAdapter.php:15:        DB::table('payment_allocations')->insert([
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:17:        return Money::fromInt((int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:18:            ->where('note_id', $this->normalize($noteId, 'Note id pada payment component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:26:        return Money::fromInt((int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:27:            ->where('customer_payment_id', $this->normalize($customerPaymentId, 'Customer payment id wajib ada.'))
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:28:            ->where('note_id', $this->normalize($noteId, 'Note id pada payment component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:34:        return Money::fromInt((int) DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:35:            ->where('work_item_id', $this->normalize($workItemId, 'Work item id pada payment component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:41:        return DB::table('payment_component_allocations')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:42:            ->where('note_id', $this->normalize($noteId, 'Note id pada payment component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:43:            ->orderBy('allocation_priority')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php:44:            ->orderBy('id')
+app/Adapters/Out/Payment/DatabasePaymentComponentAllocationWriterAdapter.php:18:        DB::table('payment_component_allocations')->insert(array_map(
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:17:        return Money::fromInt((int) DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:18:            ->where('note_id', $this->normalize($noteId, 'Note id pada refund component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:26:        return Money::fromInt((int) DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:27:            ->where('customer_payment_id', $this->normalize($customerPaymentId, 'Customer payment id wajib ada.'))
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:28:            ->where('note_id', $this->normalize($noteId, 'Note id pada refund component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:34:        return Money::fromInt((int) DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:35:            ->where('work_item_id', $this->normalize($workItemId, 'Work item id pada refund component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:41:        return DB::table('refund_component_allocations')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:42:            ->where('note_id', $this->normalize($noteId, 'Note id pada refund component allocation wajib ada.'))
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:43:            ->orderBy('refund_priority')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationReaderAdapter.php:44:            ->orderBy('id')
+app/Adapters/Out/Payment/DatabaseRefundComponentAllocationWriterAdapter.php:18:        DB::table('refund_component_allocations')->insert(array_map(
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailLinesQuery.php:27:        return DB::table('supplier_invoice_lines')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailLinesQuery.php:28:            ->where('supplier_invoice_lines.supplier_invoice_id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailLinesQuery.php:29:            ->orderBy('supplier_invoice_lines.id')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:13:        $paymentTotalsSubquery = DB::table('supplier_payments')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:14:            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:15:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:17:        $receiptCountSubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:18:            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:19:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:21:        $receivedQtySubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:22:            ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:23:            ->selectRaw(
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:26:            ->groupBy('supplier_receipts.supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:28:        return DB::table('supplier_invoices')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:29:            ->leftJoin('suppliers', 'suppliers.id', '=', 'supplier_invoices.supplier_id')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceDetailSummaryQuery.php:39:            ->where('supplier_invoices.id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:14:        $paymentTotalsSubquery = DB::table('supplier_payments')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:15:            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:16:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:18:        $receiptCountSubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:19:            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:20:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:22:        $receivedQtySubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:23:            ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:24:            ->selectRaw(
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:27:            ->groupBy('supplier_receipts.supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:29:        return DB::table('supplier_invoices')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:30:            ->leftJoin('suppliers', 'suppliers.id', '=', 'supplier_invoices.supplier_id')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:48:            ->selectRaw('COALESCE(payment_totals.total_paid_rupiah, 0) as total_paid_rupiah')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:49:            ->selectRaw('supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) as outstanding_rupiah')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:50:            ->selectRaw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableBaseQuery.php:51:            ->selectRaw('COALESCE(received_qty_totals.total_received_qty, 0) as total_received_qty');
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableFilters.php:17:            $query->where(function (Builder $builder) use ($keyword): void {
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableFilters.php:19:                    ->where('supplier_invoices.id', 'like', '%' . $keyword . '%')
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableFilters.php:26:            $query->where('supplier_invoices.tanggal_pengiriman', '>=', $filters->shipmentDateFrom());
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableFilters.php:30:            $query->where('supplier_invoices.tanggal_pengiriman', '<=', $filters->shipmentDateTo());
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableOrdering.php:26:            ->orderBy($sortColumn, $filters->sortDir())
+app/Adapters/Out/Procurement/Concerns/ProcurementInvoiceTableOrdering.php:27:            ->orderBy('supplier_invoices.id');
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:14:        $paymentTotalsSubquery = DB::table('supplier_payments')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:15:            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:16:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:18:        $supplierInvoiceSummarySubquery = DB::table('supplier_invoices')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:23:            ->selectRaw('COUNT(*) as invoice_count')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:24:            ->selectRaw(
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:27:            ->selectRaw(
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:30:            ->selectRaw('MAX(supplier_invoices.tanggal_pengiriman) as last_shipment_date')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:31:            ->groupBy('supplier_invoices.supplier_id');
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:33:        return DB::table('suppliers')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:41:            ->selectRaw('COALESCE(supplier_invoice_summaries.invoice_count, 0) as invoice_count')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:42:            ->selectRaw('COALESCE(supplier_invoice_summaries.outstanding_rupiah, 0) as outstanding_rupiah')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:43:            ->selectRaw('COALESCE(supplier_invoice_summaries.invoice_unpaid_count, 0) as invoice_unpaid_count')
+app/Adapters/Out/Procurement/Concerns/SupplierTableBaseQuery.php:44:            ->selectRaw('supplier_invoice_summaries.last_shipment_date as last_shipment_date');
+app/Adapters/Out/Procurement/Concerns/SupplierTableFilters.php:17:            $query->where('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%');
+app/Adapters/Out/Procurement/Concerns/SupplierTableOrdering.php:17:                ->orderBy('last_shipment_date', $filters->sortDir())
+app/Adapters/Out/Procurement/Concerns/SupplierTableOrdering.php:18:                ->orderBy('suppliers.id');
+app/Adapters/Out/Procurement/Concerns/SupplierTableOrdering.php:29:            ->orderBy($sortColumn, $filters->sortDir())
+app/Adapters/Out/Procurement/Concerns/SupplierTableOrdering.php:30:            ->orderBy('suppliers.id');
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceLineReaderAdapter.php:24:        $rows = DB::table('supplier_invoice_lines')
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceLineReaderAdapter.php:33:            ->where('supplier_invoice_id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceLineReaderAdapter.php:34:            ->orderBy('id')
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceReaderAdapter.php:18:        $invoiceRow = DB::table('supplier_invoices')
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceReaderAdapter.php:25:            ->where('id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceReaderAdapter.php:32:        $lineRows = DB::table('supplier_invoice_lines')
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceReaderAdapter.php:44:            ->where('supplier_invoice_id', (string) $invoiceRow->id)
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceWriterAdapter.php:16:        DB::table('supplier_invoices')->insert($this->toInvoiceRecord($supplierInvoice));
+app/Adapters/Out/Procurement/DatabaseSupplierInvoiceWriterAdapter.php:18:        DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice));
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:16:        $row = DB::table('supplier_payment_proof_attachments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:17:            ->where('id', $attachmentId)
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:34:        return DB::table('supplier_payment_proof_attachments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:35:            ->where('supplier_payment_id', $supplierPaymentId)
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:36:            ->orderBy('uploaded_at')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php:37:            ->orderBy('id')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentWriterAdapter.php:19:        DB::table('supplier_payment_proof_attachments')->insert(
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:17:        $totalPaid = (int) DB::table('supplier_payments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:18:            ->where('supplier_invoice_id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:26:        $row = DB::table('supplier_payments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:27:            ->where('id', $supplierPaymentId)
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:42:        return DB::table('supplier_payments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:43:            ->where('supplier_invoice_id', $supplierInvoiceId)
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:44:            ->orderBy('paid_at')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentReaderAdapter.php:45:            ->orderBy('id')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentWriterAdapter.php:15:        DB::table('supplier_payments')->insert($this->toRecord($supplierPayment));
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentWriterAdapter.php:20:        DB::table('supplier_payments')
+app/Adapters/Out/Procurement/DatabaseSupplierPaymentWriterAdapter.php:21:            ->where('id', $supplierPayment->id())
+app/Adapters/Out/Procurement/DatabaseSupplierReaderAdapter.php:15:        $row = DB::table('suppliers')
+app/Adapters/Out/Procurement/DatabaseSupplierReaderAdapter.php:17:            ->where('id', $supplierId)
+app/Adapters/Out/Procurement/DatabaseSupplierReaderAdapter.php:32:        $row = DB::table('suppliers')
+app/Adapters/Out/Procurement/DatabaseSupplierReaderAdapter.php:34:            ->where('nama_pt_pengirim_normalized', $namaPtPengirimNormalized)
+app/Adapters/Out/Procurement/DatabaseSupplierReceiptLineReaderAdapter.php:14:        return (int) DB::table('supplier_receipt_lines')
+app/Adapters/Out/Procurement/DatabaseSupplierReceiptLineReaderAdapter.php:15:            ->where('supplier_invoice_line_id', $supplierInvoiceLineId)
+app/Adapters/Out/Procurement/DatabaseSupplierReceiptWriterAdapter.php:16:        DB::table('supplier_receipts')->insert($this->toReceiptRecord($supplierReceipt));
+app/Adapters/Out/Procurement/DatabaseSupplierReceiptWriterAdapter.php:18:        DB::table('supplier_receipt_lines')->insert($this->toReceiptLineRecords($supplierReceipt));
+app/Adapters/Out/Procurement/DatabaseSupplierWriterAdapter.php:15:        DB::table('suppliers')->insert($this->toRecord($supplier));
+app/Adapters/Out/Procurement/DatabaseSupplierWriterAdapter.php:20:        DB::table('suppliers')
+app/Adapters/Out/Procurement/DatabaseSupplierWriterAdapter.php:21:            ->where('id', $supplier->id())
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:14:        return DB::table('products')
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:20:        return $query->where(function (Builder $builder) use ($keyword): void {
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:22:                ->where('kode_barang', 'like', '%' . $keyword . '%')
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:31:            ->orderBy('nama_barang')
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:32:            ->orderBy('merek')
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:33:            ->orderBy('ukuran')
+app/Adapters/Out/ProductCatalog/Concerns/ProductListQuery.php:34:            ->orderBy('id');
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableBaseQuery.php:14:        return DB::table('products')
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableBaseQuery.php:15:            ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'products.id')
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableBaseQuery.php:24:            ->selectRaw('COALESCE(product_inventory.qty_on_hand, 0) as stok_saat_ini');
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:17:            $query->where(function (Builder $builder) use ($keyword): void {
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:19:                    ->where('products.kode_barang', 'like', '%' . $keyword . '%')
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:26:            $query->where('products.merek', $filters->merek());
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:30:            $query->where('products.ukuran', '>=', $filters->ukuranMin());
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:34:            $query->where('products.ukuran', '<=', $filters->ukuranMax());
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:38:            $query->where('products.harga_jual', '>=', $filters->hargaMin());
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableFilters.php:42:            $query->where('products.harga_jual', '<=', $filters->hargaMax());
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableOrdering.php:23:            ->orderBy($sortColumn, $filters->sortDir())
+app/Adapters/Out/ProductCatalog/Concerns/ProductTableOrdering.php:24:            ->orderBy('products.id');
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:42:            ->where('id', '!=', $productId)
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:61:        $query = DB::table('products')
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:62:            ->where('nama_barang', $namaBarang)
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:63:            ->where('merek', $merek);
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:66:            $query->whereNull('ukuran');
+app/Adapters/Out/ProductCatalog/DatabaseProductDuplicateCheckerAdapter.php:71:        return $query->where('ukuran', $ukuran);
+app/Adapters/Out/ProductCatalog/DatabaseProductReaderAdapter.php:20:        $row = $this->baseSelect()->where('id', $productId)->first();
+app/Adapters/Out/ProductCatalog/DatabaseProductWriterAdapter.php:15:        DB::table('products')->insert($this->toRecord($product));
+app/Adapters/Out/ProductCatalog/DatabaseProductWriterAdapter.php:20:        DB::table('products')
+app/Adapters/Out/ProductCatalog/DatabaseProductWriterAdapter.php:21:            ->where('id', $product->id())
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:16:        $paymentTotalsSubquery = DB::table('employee_debt_payments')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:17:            ->selectRaw('employee_debt_id, COALESCE(SUM(amount), 0) as total_paid_amount')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:18:            ->groupBy('employee_debt_id');
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:20:        return DB::table('employee_debts')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:28:            ->orderBy('employee_debts.created_at')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:29:            ->orderBy('employee_debts.id')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:57:        $filteredDebtsSubquery = DB::table('employee_debts')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:66:            ->selectRaw(
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:73:        $paymentTotals = DB::table('employee_debt_payments')
+app/Adapters/Out/Reporting/DatabaseEmployeeDebtReportingSourceReaderAdapter.php:77:            ->selectRaw('COALESCE(SUM(employee_debt_payments.amount), 0) as total_paid_amount')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:16:        return DB::table('inventory_movements')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:17:            ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'inventory_movements.product_id')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:18:            ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'inventory_movements.product_id')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:20:            ->groupBy(
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:26:            ->orderBy('inventory_movements.product_id')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:58:        $totals = DB::table('inventory_movements')
+app/Adapters/Out/Reporting/DatabaseInventoryMovementReportingSourceReaderAdapter.php:60:            ->selectRaw(
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:16:        return DB::table('operational_expenses')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:17:            ->join('expense_categories', 'expense_categories.id', '=', 'operational_expenses.category_id')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:18:            ->where('operational_expenses.status', 'posted')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:20:            ->orderBy('operational_expenses.expense_date')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:21:            ->orderBy('operational_expenses.id')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:53:        $totals = DB::table('operational_expenses')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:54:            ->where('status', 'posted')
+app/Adapters/Out/Reporting/DatabaseOperationalExpenseReportingSourceReaderAdapter.php:56:            ->selectRaw('COUNT(*) as total_rows, COALESCE(SUM(amount_rupiah), 0) as total_amount_rupiah')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:16:        $paymentTotalsSubquery = DB::table('supplier_payments')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:17:            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:18:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:20:        $receiptCountSubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:21:            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:22:            ->groupBy('supplier_invoice_id');
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:24:        $receivedQtySubquery = DB::table('supplier_receipts')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:25:            ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:26:            ->selectRaw('supplier_receipts.supplier_invoice_id, COALESCE(SUM(supplier_receipt_lines.qty_diterima), 0) as total_received_qty')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:27:            ->groupBy('supplier_receipts.supplier_invoice_id');
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:29:        return DB::table('supplier_invoices')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:40:            ->orderBy('supplier_invoices.tanggal_pengiriman')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:41:            ->orderBy('supplier_invoices.id')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:69:        $filteredInvoicesSubquery = DB::table('supplier_invoices')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:75:            ->selectRaw(
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:80:        $paymentTotals = DB::table('supplier_payments')
+app/Adapters/Out/Reporting/DatabaseSupplierPayableReportingSourceReaderAdapter.php:84:            ->selectRaw('COALESCE(SUM(supplier_payments.amount_rupiah), 0) as total_paid_rupiah')
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:41:        return (int) (DB::table('notes')->whereBetween('transaction_date', [$fromDate, $toDate])->sum('total_rupiah') ?? 0);
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:46:        return (int) (DB::table('customer_refunds')->whereBetween(DB::raw('DATE(refunded_at)'), [$fromDate, $toDate])->sum('amount_rupiah') ?? 0);
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:51:        return (int) (DB::table('work_item_external_purchase_lines')
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:52:            ->join('work_items', 'work_items.id', '=', 'work_item_external_purchase_lines.work_item_id')
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:53:            ->join('notes', 'notes.id', '=', 'work_items.note_id')
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:60:        return (int) (DB::table('inventory_movements')->where('movement_type', 'stock_out')->where('source_type', 'work_item_store_stock_line')->whereBetween('tanggal_mutasi', [$fromDate, $toDate])->sum(DB::raw('ABS(total_cost_rupiah)')) ?? 0);
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:65:        return (int) (DB::table('operational_expenses')->where('status', 'posted')->whereBetween('expense_date', [$fromDate, $toDate])->sum('amount_rupiah') ?? 0);
+app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php:70:        return (int) (DB::table('payroll_disbursements')->whereBetween(DB::raw('DATE(disbursement_date)'), [$fromDate, $toDate])->sum('amount') ?? 0);
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php:14:        $componentRows = DB::table('payment_component_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php:15:            ->join('customer_payments', 'customer_payments.id', '=', 'payment_component_allocations.customer_payment_id')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php:17:            ->groupBy(
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php:41:        return DB::table('payment_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php:42:            ->join('customer_payments', 'customer_payments.id', '=', 'payment_allocations.customer_payment_id')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerRefundRowsQuery.php:14:        $componentRows = DB::table('refund_component_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerRefundRowsQuery.php:15:            ->join('customer_refunds', 'customer_refunds.id', '=', 'refund_component_allocations.customer_refund_id')
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerRefundRowsQuery.php:17:            ->groupBy(
+app/Adapters/Out/Reporting/Queries/TransactionCashLedgerRefundRowsQuery.php:41:        return DB::table('customer_refunds')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:13:        $componentAllocationTotals = DB::table('payment_component_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:14:            ->selectRaw('note_id, SUM(allocated_amount_rupiah) as allocated_payment_rupiah')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:15:            ->groupBy('note_id');
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:17:        $legacyAllocationTotals = DB::table('payment_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:18:            ->selectRaw('note_id, SUM(amount_rupiah) as allocated_payment_rupiah')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:19:            ->groupBy('note_id');
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:21:        $componentRefundTotals = DB::table('refund_component_allocations')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:22:            ->selectRaw('note_id, SUM(refunded_amount_rupiah) as refunded_rupiah')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:23:            ->groupBy('note_id');
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:25:        $legacyRefundTotals = DB::table('customer_refunds')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:26:            ->selectRaw('note_id, SUM(amount_rupiah) as refunded_rupiah')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:27:            ->groupBy('note_id');
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:29:        return DB::table('notes')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:35:            ->orderBy('notes.transaction_date')
+app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php:36:            ->orderBy('notes.id')
+app/Application/EmployeeFinance/UseCases/ReversePayrollDisbursementHandler.php:35:            $payroll = DB::table('payroll_disbursements')
+app/Application/EmployeeFinance/UseCases/ReversePayrollDisbursementHandler.php:37:                ->where('id', $payrollId)
+app/Application/EmployeeFinance/UseCases/ReversePayrollDisbursementHandler.php:44:            $alreadyReversed = DB::table('payroll_disbursement_reversals')
+app/Application/EmployeeFinance/UseCases/ReversePayrollDisbursementHandler.php:45:                ->where('payroll_disbursement_id', $payrollId)
+app/Application/EmployeeFinance/UseCases/ReversePayrollDisbursementHandler.php:46:                ->exists();
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:110:        DB::table('actor_accesses')->insert([
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:24:        DB::table('actor_accesses')->insert([
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:46:        DB::table('actor_accesses')->insert([
+tests/Feature/Auth/WebPageAccessFeatureTest.php:121:        DB::table('actor_accesses')->insert([
+tests/Feature/Auth/WebPageAccessFeatureTest.php:82:        DB::table('admin_cashier_area_access_states')->insert([
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:112:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:54:        DB::table('employee_debt_adjustments')->insert([
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:84:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:95:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:33:        DB::table('employees')->insert([

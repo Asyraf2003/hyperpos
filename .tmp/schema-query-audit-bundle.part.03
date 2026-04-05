@@ -1,0 +1,250 @@
+    {
+        Schema::create('work_item_store_stock_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('work_item_id');
+            $table->string('product_id');
+            $table->integer('qty');
+            $table->integer('line_total_rupiah');
+
+            $table->index('work_item_id');
+            $table->index('product_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('work_item_store_stock_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000600_create_customer_payments_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('customer_payments', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->integer('amount_rupiah');
+            $table->date('paid_at');
+
+            $table->index('paid_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('customer_payments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000700_create_payment_allocations_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payment_allocations', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->integer('amount_rupiah');
+
+            $table->index('customer_payment_id');
+            $table->index('note_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payment_allocations');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000100_create_customer_refunds_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('customer_refunds', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->integer('amount_rupiah');
+            $table->date('refunded_at');
+            $table->text('reason');
+
+            $table->index('customer_payment_id');
+            $table->index('note_id');
+            $table->index('refunded_at');
+            $table->index(['customer_payment_id', 'note_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('customer_refunds');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000100_create_employees_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employees', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->string('phone')->nullable();
+            $table->bigInteger('base_salary'); // Presisi mutlak integer rupiah
+            $table->string('pay_period', 20); // 'weekly', 'monthly'
+            $table->string('status', 20); // 'active', 'inactive'
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employees');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000110_create_employee_debts_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employee_debts', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_id')->constrained('employees')->restrictOnDelete();
+            $table->bigInteger('total_debt');
+            $table->bigInteger('remaining_balance');
+            $table->string('status', 20); // 'unpaid', 'paid'
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employee_debts');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000120_create_employee_debt_payments_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employee_debt_payments', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_debt_id')->constrained('employee_debts')->restrictOnDelete();
+            $table->bigInteger('amount');
+            $table->dateTime('payment_date');
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employee_debt_payments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000130_create_payroll_disbursements_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payroll_disbursements', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_id')->constrained('employees')->restrictOnDelete();
+            $table->bigInteger('amount');
+            $table->dateTime('disbursement_date');
+            $table->string('mode', 20); // 'daily', 'weekly', 'monthly'
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payroll_disbursements');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000140_create_expense_categories_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('expense_categories', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->index('is_active');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('expense_categories');

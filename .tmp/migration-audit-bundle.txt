@@ -1,0 +1,2148 @@
+===== MIGRATION FILE LIST =====
+database/migrations/0001_01_01_000000_create_users_table.php
+database/migrations/0001_01_01_000001_create_cache_table.php
+database/migrations/0001_01_01_000002_create_jobs_table.php
+database/migrations/2026_03_10_000100_create_actor_accesses_table.php
+database/migrations/2026_03_10_000200_create_admin_transaction_capability_states_table.php
+database/migrations/2026_03_10_000300_create_audit_logs_table.php
+database/migrations/2026_03_11_000100_create_products_table.php
+database/migrations/2026_03_12_000100_create_suppliers_table.php
+database/migrations/2026_03_12_000200_create_supplier_invoices_table.php
+database/migrations/2026_03_12_000300_create_supplier_invoice_lines_table.php
+database/migrations/2026_03_12_000400_create_supplier_receipts_table.php
+database/migrations/2026_03_12_000500_create_supplier_receipt_lines_table.php
+database/migrations/2026_03_12_000600_create_inventory_movements_table.php
+database/migrations/2026_03_12_000700_create_product_inventory_table.php
+database/migrations/2026_03_12_000800_create_supplier_payments_table.php
+database/migrations/2026_03_13_000100_create_product_inventory_costing_table.php
+database/migrations/2026_03_14_000100_create_notes_table.php
+database/migrations/2026_03_14_000200_create_work_items_table.php
+database/migrations/2026_03_14_000300_create_work_item_service_details_table.php
+database/migrations/2026_03_14_000400_create_work_item_external_purchase_lines_table.php
+database/migrations/2026_03_14_000500_create_work_item_store_stock_lines_table.php
+database/migrations/2026_03_14_000600_create_customer_payments_table.php
+database/migrations/2026_03_14_000700_create_payment_allocations_table.php
+database/migrations/2026_03_15_000100_create_customer_refunds_table.php
+database/migrations/2026_03_15_000100_create_employees_table.php
+database/migrations/2026_03_15_000110_create_employee_debts_table.php
+database/migrations/2026_03_15_000120_create_employee_debt_payments_table.php
+database/migrations/2026_03_15_000130_create_payroll_disbursements_table.php
+database/migrations/2026_03_15_000140_create_expense_categories_table.php
+database/migrations/2026_03_15_000150_create_operational_expenses_table.php
+database/migrations/2026_03_16_000100_create_admin_cashier_area_access_states_table.php
+database/migrations/2026_03_16_000110_create_supplier_payment_proof_attachments_table.php
+database/migrations/2026_03_16_000130_create_employee_debt_adjustments_table.php
+database/migrations/2026_03_16_000140_create_payroll_disbursement_reversals_table.php
+database/migrations/2026_04_02_000800_create_payment_component_allocations_table.php
+database/migrations/2026_04_02_000900_create_refund_component_allocations_table.php
+database/migrations/2026_04_02_001000_create_note_mutation_events_table.php
+database/migrations/2026_04_02_001100_create_note_mutation_snapshots_table.php
+database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php
+
+===== FULL MIGRATION CONTENT =====
+----- FILE: database/migrations/0001_01_01_000000_create_users_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+
+----- FILE: database/migrations/0001_01_01_000001_create_cache_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->integer('expiration')->index();
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->integer('expiration')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+
+----- FILE: database/migrations/0001_01_01_000002_create_jobs_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+
+----- FILE: database/migrations/2026_03_10_000100_create_actor_accesses_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('actor_accesses', function (Blueprint $table): void {
+            $table->string('actor_id')->primary();
+            $table->string('role');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('actor_accesses');
+    }
+};
+
+----- FILE: database/migrations/2026_03_10_000200_create_admin_transaction_capability_states_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('admin_transaction_capability_states', function (Blueprint $table): void {
+            $table->string('actor_id')->primary();
+            $table->boolean('active');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('admin_transaction_capability_states');
+    }
+};
+
+----- FILE: database/migrations/2026_03_10_000300_create_audit_logs_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('audit_logs', function (Blueprint $table): void {
+            $table->id();
+            $table->string('event');
+            $table->json('context');
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('audit_logs');
+    }
+};
+
+----- FILE: database/migrations/2026_03_11_000100_create_products_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('kode_barang')->nullable();
+            $table->string('nama_barang');
+            $table->string('merek');
+            $table->integer('ukuran')->nullable();
+            $table->integer('harga_jual');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000100_create_suppliers_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('suppliers', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('nama_pt_pengirim');
+            $table->string('nama_pt_pengirim_normalized');
+
+            $table->index('nama_pt_pengirim_normalized');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('suppliers');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000200_create_supplier_invoices_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_invoices', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_id');
+            $table->string('supplier_nama_pt_pengirim_snapshot')->nullable();
+            $table->date('tanggal_pengiriman');
+            $table->date('jatuh_tempo');
+            $table->integer('grand_total_rupiah');
+
+            $table->index('supplier_id');
+            $table->index('tanggal_pengiriman');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_invoices');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000300_create_supplier_invoice_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_invoice_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_invoice_id');
+            $table->string('product_id');
+            $table->string('product_kode_barang_snapshot')->nullable();
+            $table->string('product_nama_barang_snapshot')->nullable();
+            $table->string('product_merek_snapshot')->nullable();
+            $table->integer('product_ukuran_snapshot')->nullable();
+            $table->integer('qty_pcs');
+            $table->integer('line_total_rupiah');
+            $table->integer('unit_cost_rupiah');
+
+            $table->index('supplier_invoice_id');
+            $table->index('product_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_invoice_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000400_create_supplier_receipts_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_receipts', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_invoice_id');
+            $table->date('tanggal_terima');
+
+            $table->index('supplier_invoice_id');
+            $table->index('tanggal_terima');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_receipts');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000500_create_supplier_receipt_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_receipt_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_receipt_id');
+            $table->string('supplier_invoice_line_id');
+            $table->integer('qty_diterima');
+
+            $table->index('supplier_receipt_id');
+            $table->index('supplier_invoice_line_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_receipt_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000600_create_inventory_movements_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('inventory_movements', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('product_id');
+            $table->string('movement_type');
+            $table->string('source_type');
+            $table->string('source_id');
+            $table->date('tanggal_mutasi');
+            $table->integer('qty_delta');
+            $table->integer('unit_cost_rupiah');
+            $table->integer('total_cost_rupiah');
+
+            $table->index('product_id');
+            $table->index(['source_type', 'source_id']);
+            $table->index('tanggal_mutasi');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('inventory_movements');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000700_create_product_inventory_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('product_inventory', function (Blueprint $table): void {
+            $table->string('product_id')->primary();
+            $table->integer('qty_on_hand');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('product_inventory');
+    }
+};
+
+----- FILE: database/migrations/2026_03_12_000800_create_supplier_payments_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_payments', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_invoice_id');
+            $table->integer('amount_rupiah');
+            $table->date('paid_at');
+            $table->string('proof_status');
+            $table->string('proof_storage_path')->nullable();
+
+            $table->index('supplier_invoice_id');
+            $table->index('paid_at');
+            $table->index('proof_status');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_payments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_13_000100_create_product_inventory_costing_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('product_inventory_costing', function (Blueprint $table): void {
+            $table->string('product_id')->primary();
+            $table->integer('avg_cost_rupiah');
+            $table->integer('inventory_value_rupiah');
+        });
+
+        $rows = DB::table('inventory_movements')
+            ->selectRaw('product_id, SUM(qty_delta) as total_qty, SUM(total_cost_rupiah) as total_inventory_value_rupiah')
+            ->where('movement_type', 'stock_in')
+            ->groupBy('product_id')
+            ->orderBy('product_id')
+            ->get();
+
+        $records = [];
+
+        foreach ($rows as $row) {
+            $totalQty = (int) $row->total_qty;
+            $totalInventoryValueRupiah = (int) $row->total_inventory_value_rupiah;
+
+            if ($totalQty <= 0) {
+                continue;
+            }
+
+            $records[] = [
+                'product_id' => (string) $row->product_id,
+                'avg_cost_rupiah' => intdiv($totalInventoryValueRupiah, $totalQty),
+                'inventory_value_rupiah' => $totalInventoryValueRupiah,
+            ];
+        }
+
+        if ($records !== []) {
+            DB::table('product_inventory_costing')->insert($records);
+        }
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('product_inventory_costing');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000100_create_notes_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('notes', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_name');
+            $table->string('customer_phone')->nullable();
+            $table->date('transaction_date');
+ 
+            $table->string('note_state')->default('open');
+            $table->dateTime('closed_at')->nullable();
+            $table->string('closed_by_actor_id')->nullable();
+            $table->dateTime('reopened_at')->nullable();
+            $table->string('reopened_by_actor_id')->nullable();
+ 
+            $table->integer('total_rupiah');
+
+            $table->index('transaction_date');
+            $table->index('customer_name');
+            $table->index('note_state');
+            $table->index('closed_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('notes');
+    }
+};
+----- FILE: database/migrations/2026_03_14_000200_create_work_items_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('work_items', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('note_id');
+            $table->integer('line_no');
+            $table->string('transaction_type');
+            $table->string('status');
+            $table->integer('subtotal_rupiah');
+
+            $table->index('note_id');
+            $table->index(['note_id', 'line_no']);
+            $table->index('transaction_type');
+            $table->index('status');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('work_items');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000300_create_work_item_service_details_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('work_item_service_details', function (Blueprint $table): void {
+            $table->string('work_item_id')->primary();
+            $table->string('service_name');
+            $table->integer('service_price_rupiah');
+            $table->string('part_source');
+
+            $table->index('part_source');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('work_item_service_details');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000400_create_work_item_external_purchase_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('work_item_external_purchase_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('work_item_id');
+            $table->string('cost_description');
+            $table->integer('unit_cost_rupiah');
+            $table->integer('qty');
+            $table->integer('line_total_rupiah');
+
+            $table->index('work_item_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('work_item_external_purchase_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000500_create_work_item_store_stock_lines_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('work_item_store_stock_lines', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('work_item_id');
+            $table->string('product_id');
+            $table->integer('qty');
+            $table->integer('line_total_rupiah');
+
+            $table->index('work_item_id');
+            $table->index('product_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('work_item_store_stock_lines');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000600_create_customer_payments_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('customer_payments', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->integer('amount_rupiah');
+            $table->date('paid_at');
+
+            $table->index('paid_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('customer_payments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_14_000700_create_payment_allocations_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payment_allocations', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->integer('amount_rupiah');
+
+            $table->index('customer_payment_id');
+            $table->index('note_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payment_allocations');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000100_create_customer_refunds_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('customer_refunds', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->integer('amount_rupiah');
+            $table->date('refunded_at');
+            $table->text('reason');
+
+            $table->index('customer_payment_id');
+            $table->index('note_id');
+            $table->index('refunded_at');
+            $table->index(['customer_payment_id', 'note_id']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('customer_refunds');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000100_create_employees_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employees', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->string('phone')->nullable();
+            $table->bigInteger('base_salary'); // Presisi mutlak integer rupiah
+            $table->string('pay_period', 20); // 'weekly', 'monthly'
+            $table->string('status', 20); // 'active', 'inactive'
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employees');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000110_create_employee_debts_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employee_debts', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_id')->constrained('employees')->restrictOnDelete();
+            $table->bigInteger('total_debt');
+            $table->bigInteger('remaining_balance');
+            $table->string('status', 20); // 'unpaid', 'paid'
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employee_debts');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000120_create_employee_debt_payments_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employee_debt_payments', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_debt_id')->constrained('employee_debts')->restrictOnDelete();
+            $table->bigInteger('amount');
+            $table->dateTime('payment_date');
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employee_debt_payments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000130_create_payroll_disbursements_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payroll_disbursements', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_id')->constrained('employees')->restrictOnDelete();
+            $table->bigInteger('amount');
+            $table->dateTime('disbursement_date');
+            $table->string('mode', 20); // 'daily', 'weekly', 'monthly'
+            $table->text('notes')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payroll_disbursements');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000140_create_expense_categories_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('expense_categories', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+
+            $table->index('is_active');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('expense_categories');
+    }
+};
+
+----- FILE: database/migrations/2026_03_15_000150_create_operational_expenses_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('operational_expenses', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('category_id');
+            $table->string('category_code_snapshot')->nullable();
+            $table->string('category_name_snapshot')->nullable();
+            $table->integer('amount_rupiah');
+            $table->date('expense_date');
+            $table->string('description');
+            $table->string('payment_method');
+            $table->string('reference_no')->nullable();
+            $table->string('status', 20);
+            $table->timestamps();
+
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('expense_categories')
+                ->restrictOnDelete();
+
+            $table->index('expense_date');
+            $table->index('status');
+            $table->index('category_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('operational_expenses');
+    }
+};
+
+----- FILE: database/migrations/2026_03_16_000100_create_admin_cashier_area_access_states_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('admin_cashier_area_access_states', function (Blueprint $table): void {
+            $table->string('actor_id')->primary();
+            $table->boolean('active');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('admin_cashier_area_access_states');
+    }
+};
+----- FILE: database/migrations/2026_03_16_000110_create_supplier_payment_proof_attachments_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('supplier_payment_proof_attachments', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('supplier_payment_id');
+            $table->string('storage_path');
+            $table->string('original_filename');
+            $table->string('mime_type', 100);
+            $table->unsignedBigInteger('file_size_bytes');
+            $table->timestamp('uploaded_at');
+            $table->string('uploaded_by_actor_id');
+
+            $table->index('supplier_payment_id', 'sp_pa_payment_idx');
+            $table->index('uploaded_at', 'sp_pa_uploaded_idx');
+            $table->index(
+                ['supplier_payment_id', 'uploaded_at'],
+                'sp_pa_payment_uploaded_idx'
+            );
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('supplier_payment_proof_attachments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_16_000130_create_employee_debt_adjustments_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('employee_debt_adjustments', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('employee_debt_id')->constrained('employee_debts')->restrictOnDelete();
+            $table->string('adjustment_type', 20);
+            $table->bigInteger('amount');
+            $table->text('reason');
+            $table->string('performed_by_actor_id', 64);
+            $table->bigInteger('before_total_debt');
+            $table->bigInteger('after_total_debt');
+            $table->bigInteger('before_remaining_balance');
+            $table->bigInteger('after_remaining_balance');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('employee_debt_adjustments');
+    }
+};
+
+----- FILE: database/migrations/2026_03_16_000140_create_payroll_disbursement_reversals_table.php -----
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payroll_disbursement_reversals', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('payroll_disbursement_id')->constrained('payroll_disbursements')->restrictOnDelete();
+            $table->text('reason');
+            $table->string('performed_by_actor_id', 64);
+            $table->timestamps();
+
+            $table->unique('payroll_disbursement_id');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payroll_disbursement_reversals');
+    }
+};
+
+----- FILE: database/migrations/2026_04_02_000800_create_payment_component_allocations_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('payment_component_allocations', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->string('work_item_id');
+            $table->string('component_type');
+            $table->string('component_ref_id');
+            $table->integer('component_amount_rupiah_snapshot');
+            $table->integer('allocated_amount_rupiah');
+            $table->integer('allocation_priority');
+
+            $table->index(['note_id', 'work_item_id'], 'pca_note_work_item_idx');
+            $table->index(['note_id', 'component_type', 'component_ref_id'], 'pca_note_component_idx');
+            $table->unique(['customer_payment_id', 'component_type', 'component_ref_id'], 'payment_component_allocations_unique_payment_component');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('payment_component_allocations');
+    }
+};
+
+----- FILE: database/migrations/2026_04_02_000900_create_refund_component_allocations_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('refund_component_allocations', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('customer_refund_id');
+            $table->string('customer_payment_id');
+            $table->string('note_id');
+            $table->string('work_item_id');
+            $table->string('component_type');
+            $table->string('component_ref_id');
+            $table->integer('refunded_amount_rupiah');
+            $table->integer('refund_priority');
+
+            $table->index(['note_id', 'work_item_id'], 'rca_note_work_item_idx');
+            $table->index(['customer_payment_id', 'note_id'], 'rca_payment_note_idx');
+            $table->index(['note_id', 'component_type', 'component_ref_id'], 'rca_note_component_idx');
+            $table->unique(['customer_refund_id', 'component_type', 'component_ref_id'], 'refund_component_allocations_unique_refund_component');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('refund_component_allocations');
+    }
+};
+
+----- FILE: database/migrations/2026_04_02_001000_create_note_mutation_events_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('note_mutation_events', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('note_id');
+            $table->string('mutation_type');
+            $table->string('actor_id');
+            $table->string('actor_role');
+            $table->text('reason');
+            $table->dateTime('occurred_at');
+            $table->string('related_customer_payment_id')->nullable();
+            $table->string('related_customer_refund_id')->nullable();
+
+            $table->index('note_id');
+            $table->index('mutation_type');
+            $table->index('actor_id');
+            $table->index('actor_role');
+            $table->index('occurred_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('note_mutation_events');
+    }
+};
+
+----- FILE: database/migrations/2026_04_02_001100_create_note_mutation_snapshots_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('note_mutation_snapshots', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('note_mutation_event_id');
+            $table->string('snapshot_kind');
+            $table->longText('payload_json');
+            $table->dateTime('created_at');
+
+            $table->index('note_mutation_event_id', 'nms_event_idx');
+            $table->index('snapshot_kind');
+            $table->unique(['note_mutation_event_id', 'snapshot_kind'], 'note_mutation_snapshots_unique_event_kind');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('note_mutation_snapshots');
+    }
+};
+
+----- FILE: database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php -----
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('transaction_workspace_drafts', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->string('actor_id');
+            $table->string('workspace_mode');
+            $table->string('workspace_key');
+            $table->string('note_id')->nullable();
+            $table->longText('payload_json');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
+
+            $table->index('actor_id');
+            $table->index('workspace_mode');
+            $table->index('note_id');
+            $table->unique(['actor_id', 'workspace_key'], 'twd_actor_workspace_key_unique');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('transaction_workspace_drafts');
+    }
+};
+
+===== MIGRATION SIGNALS =====
+
+===== TEST FILE LIST =====
+tests/Arch/.gitkeep
+tests/Arch/HexagonalDependencyTest.php
+tests/Feature/Auth/WebAuthenticationFeatureTest.php
+tests/Feature/Auth/WebPageAccessFeatureTest.php
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php
+tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/EmployeeTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php
+tests/Feature/EmployeeFinance/PayrollTableDataValidationFeatureTest.php
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php
+tests/Feature/Expense/CreateExpensePageFeatureTest.php
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php
+tests/Feature/Expense/ExpenseCategoryTableDataValidationFeatureTest.php
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php
+tests/Feature/Expense/ExpenseTableDataValidationFeatureTest.php
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php
+tests/Feature/Foundation/ErrorJsonFallbackFeatureTest.php
+tests/Feature/Foundation/ErrorPageHtmlFeatureTest.php
+tests/Feature/Http/.gitkeep
+tests/Feature/Http/HealthCheckTest.php
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php
+tests/Feature/IdentityAccess/TransactionEntryMiddlewareFeatureTest.php
+tests/Feature/Inventory/IssueInventoryFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryPageFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryTableClosurePolicyFeatureTest.php
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php
+tests/Feature/Note/CreateNoteFeatureTest.php
+tests/Feature/Note/CreateNoteHttpFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php
+tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php
+tests/Feature/Note/EditableWorkspaceNoteGuardFeatureTest.php
+tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php
+tests/Feature/Note/NoteDetailPageFeatureTest.php
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php
+tests/Feature/Note/NoteOperationalStatePersistenceFeatureTest.php
+tests/Feature/Note/NotePrototypeRedirectFeatureTest.php
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php
+tests/Feature/Payment/AllocateCustomerPaymentFeatureTest.php
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php
+tests/Feature/Procurement/CreateSupplierInvoicePageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceIndexPageFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataAccessFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php
+tests/Feature/Procurement/ProcurementInvoiceTableDataValidationFeatureTest.php
+tests/Feature/Procurement/ProductLookupFeatureTest.php
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php
+tests/Feature/Procurement/ServeSupplierPaymentProofAttachmentFeatureTest.php
+tests/Feature/Procurement/SupplierEditPageFeatureTest.php
+tests/Feature/Procurement/SupplierIndexPageFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataAccessFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataQueryFeatureTest.php
+tests/Feature/Procurement/SupplierTableDataValidationFeatureTest.php
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php
+tests/Feature/ProductCatalog/CreateProductFeatureTest.php
+tests/Feature/ProductCatalog/ProductCreatePageFeatureTest.php
+tests/Feature/ProductCatalog/ProductEditPageFeatureTest.php
+tests/Feature/ProductCatalog/ProductIndexPageFeatureTest.php
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataAccessFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataQueryFeatureTest.php
+tests/Feature/ProductCatalog/ProductTableDataValidationFeatureTest.php
+tests/Feature/ProductCatalog/UpdateProductFeatureTest.php
+tests/Feature/Reporting/GetEmployeeDebtSummaryFeatureTest.php
+tests/Feature/Reporting/GetInventoryMovementSummaryFeatureTest.php
+tests/Feature/Reporting/GetOperationalExpenseSummaryFeatureTest.php
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php
+tests/Feature/Reporting/GetSupplierPayableSummaryFeatureTest.php
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php
+tests/Feature/Reporting/ReportingReadModelContractFeatureTest.php
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php
+tests/Pest.php
+tests/Support/Architecture/.gitkeep
+tests/TestCase.php
+tests/Unit/Adapters/In/Http/Middleware/IdentityAccess/EnsureTransactionEntryAllowedTest.php
+tests/Unit/Adapters/In/Http/Presenters/JsonPresenterTest.php
+tests/Unit/Adapters/In/Http/Presenters/Response/JsonResultResponderTest.php
+tests/Unit/Application/.gitkeep
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php
+tests/Unit/Application/Note/Policies/NotePaidStatusPolicyTest.php
+tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php
+tests/Unit/Application/Payment/Services/AllocateRefundAcrossComponentsTest.php
+tests/Unit/Application/Payment/Services/ResolveNotePayableComponentsTest.php
+tests/Unit/Application/Shared/DTO/ResultTest.php
+tests/Unit/Core/.gitkeep
+tests/Unit/Core/Note/Mutation/NoteMutationEventTest.php
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php
+tests/Unit/Core/Note/NoteMutationTest.php
+tests/Unit/Core/Note/NoteOperationalStateTransitionsTest.php
+tests/Unit/Core/Note/NoteTest.php
+tests/Unit/Core/Note/WorkItem/ExternalPurchaseLineTest.php
+tests/Unit/Core/Note/WorkItem/ServiceDetailTest.php
+tests/Unit/Core/Note/WorkItem/StoreStockLineTest.php
+tests/Unit/Core/Note/WorkItem/WorkItemTest.php
+tests/Unit/Core/Payment/CustomerPayment/CustomerPaymentTest.php
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php
+tests/Unit/Core/Payment/PaymentAllocation/PaymentAllocationTest.php
+tests/Unit/Core/Payment/PaymentComponentAllocation/PaymentComponentAllocationTest.php
+tests/Unit/Core/Payment/PaymentComponentAllocation/PaymentComponentTypeTest.php
+tests/Unit/Core/Payment/Policies/PaymentAllocationPolicyTest.php
+tests/Unit/Core/Payment/RefundComponentAllocation/RefundComponentAllocationTest.php
+tests/Unit/Core/Shared/ValueObjects/MoneyTest.php
+
+===== TEST SIGNALS =====
+tests/Arch/HexagonalDependencyTest.php:11:    public function test_hexagonal_audit_script_passes(): void
+tests/Arch/HexagonalDependencyTest.php:13:        $command = PHP_BINARY . ' scripts/audit-hex.php 2>&1';
+tests/Arch/HexagonalDependencyTest.php:23:            "Hexagonal audit failed:\n" . implode("\n", $output)
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:111:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:25:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebAuthenticationFeatureTest.php:47:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebPageAccessFeatureTest.php:122:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Auth/WebPageAccessFeatureTest.php:83:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:112:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:25:                'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:31:        $this->assertDatabaseHas('employee_debt_adjustments', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:35:            'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:38:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:45:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:59:            'reason' => 'Koreksi pencatatan awal',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:60:            'performed_by_actor_id' => '1',
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:61:            'before_total_debt' => 1000000,
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:62:            'after_total_debt' => 900000,
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:63:            'before_remaining_balance' => 1000000,
+tests/Feature/EmployeeFinance/AdjustEmployeeDebtFeatureTest.php:64:            'after_remaining_balance' => 900000,
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:78:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:96:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php:56:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php:74:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:103:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:86:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:23:    public function test_handler_stores_atomic_batch_and_writes_summary_and_row_audit_logs(): void
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:40:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:45:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:50:        $this->assertSame(2, DB::table('audit_logs')->where('event', 'payroll_disbursement_recorded')->count());
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:51:        $this->assertDatabaseHas('audit_logs', ['event' => 'payroll_batch_disbursement_recorded']);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:54:            (string) DB::table('audit_logs')->where('event', 'payroll_batch_disbursement_recorded')->value('context'),
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:61:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:82:        $this->assertDatabaseCount('audit_logs', 0);
+tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php:45:        $this->assertDatabaseHas('payroll_disbursements', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:102:        $this->assertDatabaseHas('employee_debt_payments', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:108:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:124:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeDebtIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php:43:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php:53:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:191:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:106:    public function test_admin_cannot_update_employee_when_change_reason_is_blank(): void
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:118:                'change_reason' => '   ',
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:126:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:135:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:167:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:54:    public function test_admin_can_update_employee_and_write_audit_log(): void
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:67:                'change_reason' => 'Cuti panjang sementara.',
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:73:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:82:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:86:        $audit = DB::table('audit_logs')
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:91:        $this->assertNotNull($audit);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:93:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:96:        $this->assertSame((string) $admin->getAuthIdentifier(), $context['performed_by_actor_id']);
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:97:        $this->assertSame('Cuti panjang sementara.', $context['reason']);
+tests/Feature/EmployeeFinance/EmployeeIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php:50:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:50:        $this->assertDatabaseHas('employee_debt_payments', [
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:57:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php:51:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php:58:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php:59:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayrollTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php:38:        $this->assertDatabaseHas('employee_debts', [
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php:28:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/RegisterEmployeeFeatureTest.php:51:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:121:        $tableResponse->assertJsonFragment(['reversal_reason' => 'Koreksi payout payroll']);
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:134:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:46:                'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:52:        $this->assertDatabaseHas('payroll_disbursement_reversals', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:54:            'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:57:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:92:            'reason' => 'Koreksi payout payroll',
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:93:            'performed_by_actor_id' => '1',
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:46:        $this->assertDatabaseHas('audit_logs', ['event' => 'payroll_batch_disbursement_recorded']);
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:52:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:36:        $this->assertDatabaseHas('employees', [
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:42:    public function test_update_employee_base_salary_handler_requires_reason_for_salary_reduction(): void
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:19:    public function test_activate_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 1]);
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:33:        $this->assertDatabaseHas('audit_logs', ['event' => 'expense_category_activated']);
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:26:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 1]);
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:38:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php:42:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php:53:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/CreateExpensePageFeatureTest.php:66:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:19:    public function test_deactivate_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 0]);
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:33:        $this->assertDatabaseHas('audit_logs', ['event' => 'expense_category_deactivated']);
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:26:        $this->assertDatabaseHas('expense_categories', ['id' => 'cat-1', 'is_active' => 0]);
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:38:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php:62:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php:54:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php:50:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php:77:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseCategoryTableDataValidationFeatureTest.php:33:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php:55:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:51:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:85:            'category_code_snapshot' => $categoryCodeSnapshot,
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:86:            'category_name_snapshot' => $categoryNameSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:122:            'category_code_snapshot' => $categoryCodeSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:123:            'category_name_snapshot' => $categoryNameSnapshot,
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:88:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/ExpenseTableDataValidationFeatureTest.php:36:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:45:        $this->assertDatabaseHas('operational_expenses', [
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:48:            'category_code_snapshot' => 'LISTRIK',
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:49:            'category_name_snapshot' => 'Listrik',
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:28:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:87:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:33:        $this->assertDatabaseHas('operational_expenses', [
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:35:            'category_code_snapshot' => 'EXP-ELEC',
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:36:            'category_name_snapshot' => 'Listrik Bengkel',
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:94:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:19:    public function test_update_expense_category_updates_row_and_records_audit(): void
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:32:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:40:        $log = DB::table('audit_logs')->where('event', 'expense_category_updated')->first();
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:44:        $this->assertSame('admin-1', $context['performed_by_actor_id']);
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:64:        $this->assertDatabaseCount('audit_logs', 0);
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:30:        $this->assertDatabaseHas('expense_categories', [
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:66:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Foundation/ErrorPageHtmlFeatureTest.php:41:        $this->get('/__launch-audit-404__')
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:15:    public function test_disable_capability_endpoint_updates_state_and_writes_audit_log(): void
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:18:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:23:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:28:            'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:29:            'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:34:        $this->assertDatabaseHas('admin_transaction_capability_states', [
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:35:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:39:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:42:                'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:43:                'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:15:    public function test_enable_capability_endpoint_updates_state_and_writes_audit_log(): void
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:18:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:23:            'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:24:            'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:29:        $this->assertDatabaseHas('admin_transaction_capability_states', [
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:30:            'actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:34:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:37:                'target_actor_id' => 'admin-1',
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:38:                'performed_by_actor_id' => 'owner-1',
+tests/Feature/IdentityAccess/TransactionEntryMiddlewareFeatureTest.php:42:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:43:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:54:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:59:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:94:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:99:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:71:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:77:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:83:        $this->assertDatabaseMissing('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php:47:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:71:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:76:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:81:        $this->assertDatabaseMissing('product_inventory', [
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:46:        $this->assertDatabaseHas('product_inventory', ['product_id' => 'product-1', 'qty_on_hand' => 5]);
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:47:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:52:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:69:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:74:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:80:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:135:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:59:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:64:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:79:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:86:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:94:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:139:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:66:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:72:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:89:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:119:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:45:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:50:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:65:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:105:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:110:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:155:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:165:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:170:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:213:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:223:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:228:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:53:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:58:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:73:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:80:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:94:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:138:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:147:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:152:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:191:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:200:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:205:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:46:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:51:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:66:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:80:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:91:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:96:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:48:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:77:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php:27:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:27:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:31:            'reason' => 'Perlu edit lanjutan oleh admin.',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:37:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:40:            'reopened_by_actor_id' => (string) $admin->getAuthIdentifier(),
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:43:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:46:            'actor_id' => (string) $admin->getAuthIdentifier(),
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:48:            'reason' => 'Perlu edit lanjutan oleh admin.',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:52:    public function test_authorized_admin_cannot_reopen_closed_note_without_reason(): void
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:64:            'closed_by_actor_id' => 'admin-legacy',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:69:                'reason' => '',
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:73:        $response->assertSessionHasErrors(['reason']);
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:75:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:80:        $this->assertDatabaseMissing('note_mutation_events', [
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:68:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierNoteHistoryPageFeatureTest.php:40:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php:89:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:55:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:108:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:113:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:140:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:44:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:49:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:58:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:65:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:69:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:74:        $this->assertNotNull($audit);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:76:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:78:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:81:        $this->assertSame('Salah input harga jasa.', $context['reason']);
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:88:    public function test_correct_paid_service_only_work_item_handler_rejects_blank_reason(): void
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:100:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:118:                'reason' => 'Tidak boleh untuk tipe lain.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:122:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:127:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:141:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:29:            'reason' => 'Harga awal terlalu tinggi.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:33:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:39:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:43:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:61:                'reason' => 'Part source tidak valid.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:65:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:71:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:89:                'reason' => 'Tidak boleh untuk note unpaid.',
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:95:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:18:    public function test_it_writes_native_mutation_event_and_before_after_snapshots(): void
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:56:            'component_amount_rupiah_snapshot' => 50000,
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:73:        $this->assertDatabaseCount('note_mutation_snapshots', 2);
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:77:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:81:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:83:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:86:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:88:            'snapshot_kind' => 'before',
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:91:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:93:            'snapshot_kind' => 'after',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:101:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:106:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:113:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:122:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:125:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:126:            'reason' => 'Koreksi fee jasa external',
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:66:                'component_amount_rupiah_snapshot' => 2000,
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:77:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:96:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:100:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:105:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:112:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:120:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:123:            'actor_id' => 'actor-1',
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:124:            'reason' => 'Koreksi fee jasa',
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:65:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:76:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:95:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:121:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:126:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:19:    public function test_correct_paid_work_item_status_handler_updates_status_with_reason_and_audit(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:37:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:44:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:48:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:53:        $this->assertNotNull($audit);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:55:        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:57:        $this->assertSame('owner-1', $context['performed_by_actor_id']);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:61:        $this->assertSame('Salah input status, seharusnya sudah selesai.', $context['reason']);
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:67:    public function test_correct_paid_work_item_status_handler_rejects_blank_reason(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:89:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:94:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:105:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:109:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:123:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:27:            'reason' => 'Servis sudah selesai.',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:31:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:35:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:51:                'reason' => 'Status tidak valid.',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:55:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:59:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:64:    public function test_cashier_cannot_access_closed_paid_work_item_status_blank_reason_flow(): void
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:67:        $user = $this->createCashierUser('cashier-blank-reason@example.test');
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:75:                'reason' => '   ',
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:79:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:83:        $this->assertDatabaseMissing('audit_logs', [
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:99:                'reason' => 'Harusnya tidak boleh untuk note unpaid.',
+tests/Feature/Note/CreateNoteFeatureTest.php:32:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:26:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:55:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateNoteHttpFeatureTest.php:63:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php:16:    public function test_workspace_create_uses_next_default_customer_name_after_one_note_exists(): void
+tests/Feature/Note/CreateTransactionWorkspaceDefaultCustomerNameFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceFullCashFeatureTest.php:34:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 150000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:34:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 150000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceFullTransferFeatureTest.php:36:        $this->assertDatabaseHas('payment_allocations', ['customer_payment_id' => $paymentId, 'amount_rupiah' => 150000]);
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspacePartialTransferFeatureTest.php:32:        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 50000, 'paid_at' => '2026-03-15']);
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php:65:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php:20:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'kasir']);
+tests/Feature/Note/CreateTransactionWorkspaceSkipFeatureTest.php:34:        $this->assertDatabaseHas('notes', ['customer_name' => 'Budi', 'total_rupiah' => 50000]);
+tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:22:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:24:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:30:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:34:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:41:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:52:        $this->assertSame('Koreksi nominal', $history[0]['reason']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:53:        $this->assertSame('actor-1', $history[0]['performed_by_actor_id']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:54:        $this->assertSame(50000, $history[0]['before_total_rupiah']);
+tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php:55:        $this->assertSame(45000, $history[0]['after_total_rupiah']);
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:48:            'reason' => 'Harga salah input',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailEditEntryFeatureTest.php:79:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageFeatureTest.php:28:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageFeatureTest.php:72:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Note/NoteDetailPageFeatureTest.php:83:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:48:            'reason' => 'Koreksi fee jasa external',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:46:            'actor_id' => 'actor-1',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:48:            'reason' => 'Koreksi nominal',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:54:        DB::table('note_mutation_snapshots')->insert([
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:58:                'snapshot_kind' => 'before',
+tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php:65:                'snapshot_kind' => 'after',
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:18:        $this->assertTrue(Schema::hasColumn('notes', 'note_state'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:19:        $this->assertTrue(Schema::hasColumn('notes', 'closed_at'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:20:        $this->assertTrue(Schema::hasColumn('notes', 'closed_by_actor_id'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:21:        $this->assertTrue(Schema::hasColumn('notes', 'reopened_at'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:22:        $this->assertTrue(Schema::hasColumn('notes', 'reopened_by_actor_id'));
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:37:        $this->assertNull($row->closed_by_actor_id);
+tests/Feature/Note/NoteOperationalStateColumnsMigrationFeatureTest.php:39:        $this->assertNull($row->reopened_by_actor_id);
+tests/Feature/Note/NotePrototypeRedirectFeatureTest.php:27:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:112:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:122:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Note/ReadNoteMultiItemFeatureTest.php:127:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:28:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:60:        $this->assertDatabaseHas('customer_payments', [
+tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php:68:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:24:            'closed_by_actor_id' => 'system',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:36:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:39:            'reopened_by_actor_id' => 'admin-1',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:42:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:45:            'actor_id' => 'admin-1',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:47:            'reason' => 'Perlu koreksi setelah review admin',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:55:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:57:            'snapshot_kind' => 'before',
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:60:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Note/ReopenClosedNoteFeatureTest.php:62:            'snapshot_kind' => 'after',
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:64:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:69:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateServiceWithExternalPurchaseServiceFeeOnlyWriterFeatureTest.php:76:        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:62:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:67:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateServiceWithStoreStockPartServiceFeeOnlyWriterFeatureTest.php:74:        $this->assertDatabaseHas('work_item_store_stock_lines', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:111:        $this->assertDatabaseHas('work_item_service_details', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:118:        $this->assertDatabaseHas('audit_logs', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:29:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:85:        $this->assertDatabaseHas('notes', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:93:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php:97:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:100:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:161:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:167:        $this->assertDatabaseMissing('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:209:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:255:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:88:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php:94:        $this->assertDatabaseHas('work_items', [
+tests/Feature/Payment/AllocateCustomerPaymentFeatureTest.php:37:        $this->assertDatabaseHas('payment_allocations', ['id' => 'allocation-1', 'amount_rupiah' => 40000]);
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:50:        $this->assertDatabaseHas('notes', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:53:            'closed_by_actor_id' => 'system',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:56:        $this->assertDatabaseHas('note_mutation_events', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:59:            'actor_id' => 'system',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:61:            'reason' => 'AUTO_CLOSE_ON_FULL_PAYMENT',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:70:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:72:            'snapshot_kind' => 'before',
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:75:        $this->assertDatabaseHas('note_mutation_snapshots', [
+tests/Feature/Payment/AutoClosePaidNoteOnFullPaymentFeatureTest.php:77:            'snapshot_kind' => 'after',
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:137:        int $snapshot,
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:148:            'component_amount_rupiah_snapshot' => $snapshot,
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:19:    public function test_it_allocates_to_all_product_buckets_before_any_service_fee(): void
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:31:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:39:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:47:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:55:        $this->assertDatabaseMissing('payment_component_allocations', [
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:61:    public function test_it_moves_to_service_fee_only_after_product_buckets_are_fully_covered(): void
+tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php:77:        $this->assertDatabaseHas('payment_component_allocations', [
+tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php:40:        $this->assertDatabaseHas('customer_payments', [
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:102:                'component_amount_rupiah_snapshot' => 5000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:113:                'component_amount_rupiah_snapshot' => 3000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:124:                'component_amount_rupiah_snapshot' => 2000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:135:                'component_amount_rupiah_snapshot' => 4000,
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:33:        $this->assertDatabaseHas('refund_component_allocations', [
+tests/Feature/Payment/RecordCustomerRefundFeatureTest.php:42:        $this->assertDatabaseMissing('refund_component_allocations', [
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:124:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:167:            'uploaded_by_actor_id' => $uploadedByActorId,
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:37:        $this->assertDatabaseHas('supplier_payments', [
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:56:        $context = (string) DB::table('audit_logs')
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:64:    public function test_admin_can_append_more_proofs_to_same_supplier_payment_after_first_upload(): void
+tests/Feature/Procurement/AttachSupplierPaymentProofFeatureTest.php:95:        $this->assertDatabaseHas('supplier_payments', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:109:        $this->assertDatabaseHas('supplier_receipt_lines', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:115:        $this->assertDatabaseHas('supplier_receipt_lines', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:134:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:145:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:156:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:161:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:166:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:172:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:226:            'product_kode_barang_snapshot' => 'KB-001',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:227:            'product_nama_barang_snapshot' => 'Ban Luar',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:228:            'product_merek_snapshot' => 'Federal',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:229:            'product_ukuran_snapshot' => 100,
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:274:            'product_kode_barang_snapshot' => 'KB-001',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:275:            'product_nama_barang_snapshot' => 'Ban Luar',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:276:            'product_merek_snapshot' => 'Federal',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:277:            'product_ukuran_snapshot' => 100,
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:288:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:294:        $this->assertDatabaseHas('supplier_invoices', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:296:            'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:42:            'product_kode_barang_snapshot' => 'KB-001',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:43:            'product_nama_barang_snapshot' => 'Ban Luar',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:44:            'product_merek_snapshot' => 'Federal',
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:45:            'product_ukuran_snapshot' => 100,
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:59:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:70:        $this->assertDatabaseHas('supplier_invoices', [
+tests/Feature/Procurement/CreateSupplierInvoiceFeatureTest.php:98:        $this->assertDatabaseHas('supplier_receipts', [
+tests/Feature/Procurement/CreateSupplierInvoicePageFeatureTest.php:57:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:161:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:209:            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:232:            'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:233:            'product_nama_barang_snapshot' => $productNamaBarangSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:234:            'product_merek_snapshot' => $productMerekSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:235:            'product_ukuran_snapshot' => $productUkuranSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php:278:            'uploaded_by_actor_id' => $uploadedByActorId,
+tests/Feature/Procurement/ProcurementInvoiceIndexPageFeatureTest.php:53:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProcurementInvoiceTableDataAccessFeatureTest.php:46:        $response->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_snapshot', 'PT Federal Abadi');
+tests/Feature/Procurement/ProcurementInvoiceTableDataAccessFeatureTest.php:62:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProcurementInvoiceTableDataAccessFeatureTest.php:89:            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php:158:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php:185:            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php:33:    public function test_admin_can_search_procurement_invoice_table_by_current_or_snapshot_supplier_name(): void
+tests/Feature/Procurement/ProcurementInvoiceTableDataQueryFeatureTest.php:47:        $responseCurrent->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_snapshot', 'PT Federal Abadi');
+tests/Feature/Procurement/ProcurementInvoiceTableDataValidationFeatureTest.php:56:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ProductLookupFeatureTest.php:81:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:145:    public function test_receive_supplier_invoice_endpoint_rejects_over_receive_after_previous_receipts(): void
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:226:            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:249:            'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:250:            'product_nama_barang_snapshot' => $productNamaBarangSnapshot,
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:251:            'product_merek_snapshot' => $productMerekSnapshot,
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:252:            'product_ukuran_snapshot' => $productUkuranSnapshot,
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:46:        $this->assertDatabaseHas('supplier_receipts', [
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:57:        $this->assertDatabaseHas('supplier_receipt_lines', [
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:70:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:81:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/Procurement/ReceiveSupplierInvoiceFeatureTest.php:86:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:102:            'supplier_nama_pt_pengirim_snapshot' => 'PT Supplier Test',
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:112:            'product_kode_barang_snapshot' => 'KB-001',
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:113:            'product_nama_barang_snapshot' => 'Ban Luar',
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:114:            'product_merek_snapshot' => 'Federal',
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:115:            'product_ukuran_snapshot' => 100,
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:46:        $this->assertDatabaseHas('supplier_payments', [
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:54:        $context = (string) DB::table('audit_logs')
+tests/Feature/Procurement/RecordSupplierPaymentFeatureTest.php:90:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/ServeSupplierPaymentProofAttachmentFeatureTest.php:109:            'uploaded_by_actor_id' => 'actor-1',
+tests/Feature/Procurement/ServeSupplierPaymentProofAttachmentFeatureTest.php:75:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/SupplierEditPageFeatureTest.php:58:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/SupplierEditPageFeatureTest.php:91:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/SupplierIndexPageFeatureTest.php:51:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/SupplierTableDataAccessFeatureTest.php:55:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/SupplierTableDataQueryFeatureTest.php:128:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/SupplierTableDataValidationFeatureTest.php:41:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:25:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:42:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:57:    public function test_update_supplier_handler_does_not_change_procurement_history_snapshot(): void
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:64:            'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:74:        $this->assertDatabaseHas('suppliers', [
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:80:        $this->assertDatabaseHas('supplier_invoices', [
+tests/Feature/Procurement/UpdateSupplierFeatureTest.php:83:            'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
+tests/Feature/ProductCatalog/CreateProductFeatureTest.php:106:        $this->assertDatabaseMissing('products', [
+tests/Feature/ProductCatalog/CreateProductFeatureTest.php:28:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/CreateProductFeatureTest.php:84:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/ProductCreatePageFeatureTest.php:117:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/ProductCatalog/ProductCreatePageFeatureTest.php:67:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/ProductEditPageFeatureTest.php:145:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/ProductEditPageFeatureTest.php:181:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/ProductCatalog/ProductEditPageFeatureTest.php:97:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/ProductIndexPageFeatureTest.php:44:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:42:                'reason' => 'Rusak rak display',
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:48:        $this->assertDatabaseHas('inventory_movements', [
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:58:        $this->assertDatabaseHas('product_inventory', [
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:63:        $this->assertDatabaseHas('product_inventory_costing', [
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:69:        $context = (string) DB::table('audit_logs')
+tests/Feature/ProductCatalog/ProductStockAdjustmentFeatureTest.php:86:            'actor_id' => (string) $user->getAuthIdentifier(),
+tests/Feature/ProductCatalog/ProductTableDataAccessFeatureTest.php:48:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/ProductCatalog/ProductTableDataQueryFeatureTest.php:57:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/ProductCatalog/ProductTableDataValidationFeatureTest.php:35:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/ProductCatalog/UpdateProductFeatureTest.php:37:        $this->assertDatabaseHas('products', [
+tests/Feature/ProductCatalog/UpdateProductFeatureTest.php:78:        $this->assertDatabaseHas('products', [
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:40:            ['id' => 'refund-1', 'customer_payment_id' => 'payment-1', 'note_id' => 'note-1', 'amount_rupiah' => 10000, 'refunded_at' => '2026-03-16 10:00:00', 'reason' => 'Koreksi'],
+tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php:41:            ['id' => 'refund-2', 'customer_payment_id' => 'payment-2', 'note_id' => 'note-3', 'amount_rupiah' => 999999, 'refunded_at' => '2026-03-18 10:00:00', 'reason' => 'Luar scope'],
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:110:        string $reason,
+tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php:118:            'reason' => $reason,
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:100:        string $reason,
+tests/Feature/Reporting/GetTransactionSummaryPerNoteFeatureTest.php:108:            'reason' => $reason,
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:24:            ['id' => 'ref-1', 'customer_payment_id' => 'pay-1', 'note_id' => 'note-1', 'amount_rupiah' => 1000, 'refunded_at' => '2026-04-04', 'reason' => 'Refund'],
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:28:            ['id' => 'p1', 'customer_payment_id' => 'pay-1', 'note_id' => 'note-1', 'work_item_id' => 'wi-1', 'component_type' => 'product_only_work_item', 'component_ref_id' => 'wi-1', 'component_amount_rupiah_snapshot' => 5000, 'allocated_amount_rupiah' => 5000, 'allocation_priority' => 1],
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:29:            ['id' => 'p2', 'customer_payment_id' => 'pay-1', 'note_id' => 'note-1', 'work_item_id' => 'wi-2', 'component_type' => 'service_store_stock_part', 'component_ref_id' => 'sto-2', 'component_amount_rupiah_snapshot' => 3000, 'allocated_amount_rupiah' => 3000, 'allocation_priority' => 2],
+tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php:30:            ['id' => 'p3', 'customer_payment_id' => 'pay-2', 'note_id' => 'note-2', 'work_item_id' => 'wi-3', 'component_type' => 'service_fee', 'component_ref_id' => 'wi-3', 'component_amount_rupiah_snapshot' => 10000, 'allocated_amount_rupiah' => 4000, 'allocation_priority' => 1],
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:24:            ['id' => 'p1', 'customer_payment_id' => 'pay-1', 'note_id' => 'note-1', 'work_item_id' => 'wi-1', 'component_type' => 'product_only_work_item', 'component_ref_id' => 'wi-1', 'component_amount_rupiah_snapshot' => 5000, 'allocated_amount_rupiah' => 5000, 'allocation_priority' => 1],
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:25:            ['id' => 'p2', 'customer_payment_id' => 'pay-1', 'note_id' => 'note-1', 'work_item_id' => 'wi-2', 'component_type' => 'service_store_stock_part', 'component_ref_id' => 'sto-2', 'component_amount_rupiah_snapshot' => 3000, 'allocated_amount_rupiah' => 3000, 'allocation_priority' => 2],
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php:26:            ['id' => 'p3', 'customer_payment_id' => 'pay-2', 'note_id' => 'note-2', 'work_item_id' => 'wi-3', 'component_type' => 'service_fee', 'component_ref_id' => 'wi-3', 'component_amount_rupiah_snapshot' => 10000, 'allocated_amount_rupiah' => 4000, 'allocation_priority' => 1],
+tests/TestCase.php:20:            'actor_id' => $user->getAuthIdentifier(),
+tests/TestCase.php:37:            'actor_id' => $user->getAuthIdentifier(),
+tests/TestCase.php:42:            ['actor_id' => (string) $user->getAuthIdentifier()],
+tests/Unit/Adapters/In/Http/Presenters/JsonPresenterTest.php:19:            Result::success(['actor_id' => 'admin-1'], 'OK'),
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:24:        $audit = new SpyAuditLogPort();
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:26:        $policy = new TransactionEntryPolicy($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:34:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:45:        $audit = new SpyAuditLogPort();
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:47:        $policy = new TransactionEntryPolicy($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:53:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:56:    public function test_admin_with_active_capability_is_allowed_and_audited(): void
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:64:        $audit = new SpyAuditLogPort();
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:66:        $policy = new TransactionEntryPolicy($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:75:        self::assertCount(1, $audit->records);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:76:        self::assertSame('admin_transaction_capability_used', $audit->records[0]['event']);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:77:        self::assertSame('admin-1', $audit->records[0]['context']['actor_id']);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:78:        self::assertSame(['note_id' => 'NOTE-001'], $audit->records[0]['context']['context']);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:85:        $audit = new SpyAuditLogPort();
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:87:        $policy = new TransactionEntryPolicy($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/Policies/TransactionEntryPolicyTest.php:93:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:18:    public function test_disable_capability_for_admin_succeeds_and_is_audited(): void
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:26:        $audit = new DisableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:28:        $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:36:        self::assertCount(1, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:37:        self::assertSame('admin_transaction_capability_disabled', $audit->records[0]['event']);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:46:        $audit = new DisableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:48:        $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:54:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:61:        $audit = new DisableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:63:        $handler = new DisableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/DisableAdminTransactionCapabilityHandlerTest.php:69:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:18:    public function test_enable_capability_for_admin_succeeds_and_is_audited(): void
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:24:        $audit = new EnableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:26:        $handler = new EnableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:34:        self::assertCount(1, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:35:        self::assertSame('admin_transaction_capability_enabled', $audit->records[0]['event']);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:44:        $audit = new EnableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:46:        $handler = new EnableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:52:        self::assertCount(0, $audit->records);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:59:        $audit = new EnableAuditLogSpy();
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:61:        $handler = new EnableAdminTransactionCapabilityHandler($actors, $capabilities, $audit);
+tests/Unit/Application/IdentityAccess/UseCases/EnableAdminTransactionCapabilityHandlerTest.php:67:        self::assertCount(0, $audit->records);
+tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php:18:    public function test_it_prioritizes_product_components_before_service_fee(): void
+tests/Unit/Core/Note/Mutation/NoteMutationEventTest.php:30:        $this->assertSame('Perbaikan nominal jasa.', $event->reason());
+tests/Unit/Core/Note/Mutation/NoteMutationEventTest.php:35:    public function test_rejects_empty_reason(): void
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:11:    public function test_can_create_valid_before_snapshot(): void
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:13:        $snapshot = NoteMutationSnapshot::create(
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:14:            'snapshot-1',
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:20:        $this->assertSame('snapshot-1', $snapshot->id());
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:21:        $this->assertSame('mutation-1', $snapshot->noteMutationEventId());
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:22:        $this->assertSame(NoteMutationSnapshot::BEFORE, $snapshot->snapshotKind());
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:23:        $this->assertSame('{"note_id":"note-1","status":"before"}', $snapshot->payloadJson());
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:26:    public function test_rejects_invalid_snapshot_kind(): void
+tests/Unit/Core/Note/Mutation/NoteMutationSnapshotTest.php:31:            'snapshot-1',
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php:24:        $this->assertSame('Salah input total.', $refund->reason());
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php:36:        $this->assertSame('Koreksi pembayaran.', $refund->reason());
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php:45:    public function test_it_rejects_blank_payment_note_or_reason(): void
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php:53:        foreach ($cases as [$id, $paymentId, $noteId, $reason]) {
+tests/Unit/Core/Payment/CustomerRefund/CustomerRefundTest.php:55:                CustomerRefund::create($id, $paymentId, $noteId, Money::fromInt(10000), new DateTimeImmutable('2026-03-16'), $reason);
+tests/Unit/Core/Payment/PaymentComponentAllocation/PaymentComponentAllocationTest.php:37:    public function test_rejects_allocated_amount_larger_than_snapshot(): void

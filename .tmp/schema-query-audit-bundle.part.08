@@ -1,0 +1,250 @@
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:57:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/CreateEmployeeDebtPageFeatureTest.php:95:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/CreateEmployeePageFeatureTest.php:73:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:102:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:33:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/CreatePayrollPageFeatureTest.php:59:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:123:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:50:        $this->assertSame(2, DB::table('audit_logs')->where('event', 'payroll_disbursement_recorded')->count());
+tests/Feature/EmployeeFinance/DisbursePayrollBatchFeatureTest.php:54:            (string) DB::table('audit_logs')->where('event', 'payroll_batch_disbursement_recorded')->value('context'),
+tests/Feature/EmployeeFinance/DisbursePayrollFeatureTest.php:22:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:123:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:22:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:33:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:44:        DB::table('employee_debt_payments')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:71:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtDetailPageFeatureTest.php:82:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/EmployeeDebtIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php:30:        DB::table('employees')->insert(['id' => 'emp-1', 'name' => 'Budi', 'phone' => '0812', 'base_salary' => 5000000, 'pay_period' => 'weekly', 'status' => 'active']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php:31:        DB::table('employee_debts')->insert(['id' => 'debt-1', 'employee_id' => 'emp-1', 'total_debt' => 1000000, 'remaining_balance' => 750000, 'status' => 'unpaid', 'created_at' => '2026-03-25 00:00:00']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataAccessFeatureTest.php:43:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php:53:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php:60:        DB::table('employees')->insert(['id' => $employeeId, 'name' => $name, 'phone' => '0812', 'base_salary' => 5000000, 'pay_period' => 'monthly', 'status' => 'active']);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataQueryFeatureTest.php:61:        DB::table('employee_debts')->insert(['id' => (string) Str::uuid(), 'employee_id' => $employeeId, 'total_debt' => $total, 'remaining_balance' => $remaining, 'status' => $status, 'created_at' => $createdAt]);
+tests/Feature/EmployeeFinance/EmployeeDebtTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:168:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:190:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:58:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:69:        DB::table('employee_debt_payments')->insert([
+tests/Feature/EmployeeFinance/EmployeeDetailPageFeatureTest.php:98:        DB::table('payroll_disbursements')->insert([
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:144:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:166:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:86:        $audit = DB::table('audit_logs')
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:87:            ->where('event', 'employee_profile_updated')
+tests/Feature/EmployeeFinance/EmployeeEditPageFeatureTest.php:88:            ->latest('id')
+tests/Feature/EmployeeFinance/EmployeeIndexPageFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php:30:        DB::table('employees')->insert(['id' => 'emp-1', 'name' => 'Budi', 'phone' => '0812', 'base_salary' => 5000000, 'pay_period' => 'weekly', 'status' => 'active']);
+tests/Feature/EmployeeFinance/EmployeeTableDataAccessFeatureTest.php:41:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php:50:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/EmployeeTableDataQueryFeatureTest.php:56:        DB::table('employees')->insert(['id' => $id, 'name' => $name, 'phone' => $phone, 'base_salary' => $salary, 'pay_period' => $period, 'status' => $status]);
+tests/Feature/EmployeeFinance/EmployeeTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:23:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:34:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:69:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/PayEmployeeDebtFeatureTest.php:80:        DB::table('employee_debts')->insert([
+tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php:50:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php:30:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php:39:        DB::table('payroll_disbursements')->insert([
+tests/Feature/EmployeeFinance/PayrollTableDataAccessFeatureTest.php:58:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php:59:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php:68:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/PayrollTableDataQueryFeatureTest.php:77:        DB::table('payroll_disbursements')->insert([
+tests/Feature/EmployeeFinance/PayrollTableDataValidationFeatureTest.php:29:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => 'admin']);
+tests/Feature/EmployeeFinance/RecordEmployeeDebtFeatureTest.php:20:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:133:        DB::table('actor_accesses')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:22:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:33:        DB::table('payroll_disbursements')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:67:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:78:        DB::table('payroll_disbursements')->insert([
+tests/Feature/EmployeeFinance/ReversePayrollDisbursementFeatureTest.php:89:        DB::table('payroll_disbursement_reversals')->insert([
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:52:        DB::table('actor_accesses')->insert(['actor_id' => (string) $user->getAuthIdentifier(), 'role' => $role]);
+tests/Feature/EmployeeFinance/StorePayrollBatchFeatureTest.php:58:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:21:        DB::table('employees')->insert([
+tests/Feature/EmployeeFinance/UpdateEmployeeBaseSalaryFeatureTest.php:46:        DB::table('employees')->insert([
+tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php:38:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:37:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php:47:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/CreateExpenseCategoryFeatureTest.php:53:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php:52:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/CreateExpensePageFeatureTest.php:65:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/CreateExpensePageFeatureTest.php:80:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php:38:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:37:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php:47:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php:61:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseCategoryEditPageFeatureTest.php:71:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php:53:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php:49:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseCategoryTableDataAccessFeatureTest.php:59:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php:76:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseCategoryTableDataQueryFeatureTest.php:86:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseCategoryTableDataValidationFeatureTest.php:32:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php:54:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseIndexPageFeatureTest.php:64:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:50:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:60:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseTableDataAccessFeatureTest.php:82:        DB::table('operational_expenses')->insert([
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:119:        DB::table('operational_expenses')->insert([
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:87:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/ExpenseTableDataQueryFeatureTest.php:97:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/ExpenseTableDataValidationFeatureTest.php:35:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/RecordOperationalExpenseFeatureTest.php:135:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:101:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php:86:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:103:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/StoreExpenseHttpFeatureTest.php:93:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:40:        $log = DB::table('audit_logs')->where('event', 'expense_category_updated')->first();
+tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php:69:        DB::table('expense_categories')->insert([
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:65:        DB::table('actor_accesses')->insert([
+tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php:75:        DB::table('expense_categories')->insert([
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:17:        DB::table('actor_accesses')->insert([
+tests/Feature/IdentityAccess/DisableAdminTransactionCapabilityFeatureTest.php:22:        DB::table('admin_transaction_capability_states')->insert([
+tests/Feature/IdentityAccess/EnableAdminTransactionCapabilityFeatureTest.php:17:        DB::table('actor_accesses')->insert([
+tests/Feature/IdentityAccess/TransactionEntryMiddlewareFeatureTest.php:41:        DB::table('actor_accesses')->insert([
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:19:        DB::table('product_inventory')->insert([
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:24:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:68:        DB::table('product_inventory')->insert([
+tests/Feature/Inventory/IssueInventoryFeatureTest.php:73:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:124:        DB::table('inventory_movements')->insert([
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:52:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/RebuildInventoryCostingProjectionFeatureTest.php:92:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php:18:        DB::table('inventory_movements')->insert([
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:120:        DB::table('inventory_movements')->insert([
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:52:        DB::table('product_inventory')->insert([
+tests/Feature/Inventory/RebuildInventoryProjectionFeatureTest.php:90:        DB::table('product_inventory')->insert([
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:18:        DB::table('product_inventory')->insert(['product_id' => 'product-1', 'qty_on_hand' => 3]);
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:19:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php:25:        DB::table('inventory_movements')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:18:        DB::table('notes')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:26:        DB::table('work_items')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:35:        DB::table('work_item_store_stock_lines')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:43:        DB::table('product_inventory')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:48:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Inventory/ReverseNoteStoreStockInventoryOperationFeatureTest.php:54:        DB::table('inventory_movements')->insert([
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:111:        DB::table('notes')->insert([
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:22:        DB::table('notes')->insert([
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:72:        $workItem = DB::table('work_items')
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:73:            ->where('note_id', 'note-1')
+tests/Feature/Note/AddExternalPurchaseWorkItemFeatureTest.php:74:            ->where('line_no', 1)
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:101:        DB::table('work_items')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:110:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:117:        DB::table('customer_payments')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:123:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:28:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:33:        DB::table('notes')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:41:        DB::table('work_items')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:50:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:88:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/AddNoteRowsHttpFeatureTest.php:93:        DB::table('notes')->insert([
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:22:        DB::table('notes')->insert([
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:58:        $workItem = DB::table('work_items')
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:59:            ->where('note_id', 'note-1')
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:60:            ->where('line_no', 1)
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:79:        DB::table('notes')->insert([
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:86:        DB::table('work_items')->insert([
+tests/Feature/Note/AddServiceOnlyWorkItemFeatureTest.php:95:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:241:        DB::table('notes')->insert([
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:257:        DB::table('products')->insert([
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:269:        DB::table('product_inventory')->insert([
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:280:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:66:        $workItem = DB::table('work_items')
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:67:            ->where('note_id', 'note-1')
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:68:            ->where('line_no', 1)
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:87:        $storeStockLine = DB::table('work_item_store_stock_lines')
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:88:            ->where('work_item_id', (string) $workItem->id)
+tests/Feature/Note/AddServiceWithStoreStockPartWorkItemFeatureTest.php:89:            ->where('product_id', 'product-1')
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:218:        DB::table('notes')->insert([
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:234:        DB::table('products')->insert([
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:246:        DB::table('product_inventory')->insert([
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:257:        DB::table('product_inventory_costing')->insert([
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:59:        $workItem = DB::table('work_items')
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:60:            ->where('note_id', 'note-1')
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:61:            ->where('line_no', 1)
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:73:        $storeStockLine = DB::table('work_item_store_stock_lines')
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:74:            ->where('work_item_id', (string) $workItem->id)
+tests/Feature/Note/AddStoreStockSaleOnlyWorkItemFeatureTest.php:75:            ->where('product_id', 'product-1')
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:110:        DB::table('customer_payments')->insert([
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:123:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php:97:        DB::table('notes')->insert([
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php:19:        DB::table('notes')->insert([
+tests/Feature/Note/AdminNoteDetailPageFeatureTest.php:43:        DB::table('notes')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:101:        DB::table('work_items')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:110:        DB::table('customer_payments')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:116:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:71:        DB::table('notes')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:80:        DB::table('work_items')->insert([
+tests/Feature/Note/AdminNoteHistoryTableDataFeatureTest.php:92:        DB::table('notes')->insert([
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:20:        DB::table('notes')->insert([
+tests/Feature/Note/AdminReopenClosedNoteHttpFeatureTest.php:57:        DB::table('notes')->insert([
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:67:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:77:        DB::table('notes')->insert([
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:85:        DB::table('work_items')->insert([
+tests/Feature/Note/CashierNoteDetailAccessGuardFeatureTest.php:94:        DB::table('work_item_store_stock_lines')->insert([
+tests/Feature/Note/CashierNoteHistoryPageFeatureTest.php:39:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CashierNoteHistoryTableClosurePolicyFeatureTest.php:46:        DB::table('notes')->insert([
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php:21:        DB::table('notes')->insert([
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php:38:        DB::table('work_items')->insert([
+tests/Feature/Note/CashierNoteHistoryTableFeatureTest.php:88:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:54:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:64:        DB::table('notes')->insert([
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:72:        DB::table('work_items')->insert([
+tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php:81:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:169:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:176:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:185:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:192:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:198:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:208:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:215:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:224:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:234:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:241:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:250:        DB::table('work_item_store_stock_lines')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:258:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:264:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:69:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:70:            ->where('event', 'paid_service_only_work_item_corrected')
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemFeatureTest.php:71:            ->latest('id')
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:140:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:150:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:158:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:167:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:174:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:180:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:190:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:198:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:207:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:217:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:225:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:234:        DB::table('work_item_store_stock_lines')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:242:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWorkItemHttpFeatureTest.php:248:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:20:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:27:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:36:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:43:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:49:        DB::table('payment_component_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceOnlyWritesMutationTimelineFeatureTest.php:75:        $eventId = (string) DB::table('note_mutation_events')->value('id');
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:20:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:27:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:36:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:43:        DB::table('work_item_external_purchase_lines')->insert([
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:52:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceWithExternalPurchaseServiceFeeOnlyFeatureTest.php:58:        DB::table('payment_component_allocations')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:20:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:27:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:36:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:43:        DB::table('work_item_store_stock_lines')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:51:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.php:57:        DB::table('payment_component_allocations')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:151:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:166:        DB::table('work_items')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:175:        DB::table('work_item_service_details')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:188:        DB::table('customer_payments')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:201:        DB::table('payment_allocations')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:48:        $audit = DB::table('audit_logs')
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:49:            ->where('event', 'paid_work_item_status_corrected')
+tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php:50:            ->latest('id')
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:122:        DB::table('actor_accesses')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:132:        DB::table('notes')->insert([
+tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php:140:        DB::table('work_items')->insert([
