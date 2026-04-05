@@ -47,5 +47,10 @@ final class UserSeeder extends Seeder
                 'active' => true,
             ],
         ], ['actor_id'], ['active']);
+
+        DB::table('admin_transaction_capability_states')->updateOrInsert(
+            ['actor_id' => (string)$admin->id],
+            ['active' => true]
+        );
     }
 }
