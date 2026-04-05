@@ -4,15 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Terjadi Gangguan')</title>
+
+    @if (file_exists(public_path('assets/compiled/svg/favicon.svg')))
+        <link rel="shortcut icon" href="{{ asset('assets/compiled/svg/favicon.svg') }}" type="image/x-icon">
+    @endif
+
+    @if (file_exists(public_path('assets/compiled/css/app.css')))
+        <link rel="stylesheet" href="{{ asset('assets/compiled/css/app.css') }}">
+    @endif
+
+    @if (file_exists(public_path('assets/compiled/css/error.css')))
+        <link rel="stylesheet" href="{{ asset('assets/compiled/css/error.css') }}">
+    @endif
+
     <style>
         :root {
             color-scheme: light;
-            --bg: #f7f7f9;
-            --surface: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --primary: #111827;
+            --error-bg: #f2f7ff;
+            --error-card-bg: #ffffff;
+            --error-text: #25396f;
+            --error-muted: #607080;
+            --error-border: #dce7f7;
+            --error-primary: #435ebe;
+            --error-primary-hover: #334b9b;
+            --error-outline-bg: #ffffff;
+            --error-shadow: 0 18px 50px rgba(67, 94, 190, 0.08);
         }
 
         * {
@@ -22,107 +38,184 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--error-bg);
+            color: var(--error-text);
+            font-family: Inter, Arial, Helvetica, sans-serif;
+        }
+
+        #error {
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
         }
 
-        .error-shell {
+        .error-page {
             width: 100%;
-            max-width: 640px;
+            max-width: 880px;
         }
 
         .error-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
+            background: var(--error-card-bg);
+            border: 1px solid var(--error-border);
+            border-radius: 24px;
+            box-shadow: var(--error-shadow);
+            padding: 40px 28px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .img-error {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto 24px;
+        }
+
+        .error-title {
+            margin: 0 0 12px;
+            font-size: clamp(2rem, 3.2vw, 3.6rem);
+            line-height: 1.1;
+            font-weight: 700;
+            color: var(--error-text);
+        }
+
+        .error-message {
+            margin: 0 auto;
+            max-width: 620px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: var(--error-muted);
         }
 
         .error-code {
             display: inline-block;
-            font-size: 13px;
-            line-height: 1;
-            padding: 8px 10px;
+            margin-bottom: 18px;
+            padding: 8px 12px;
             border-radius: 999px;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            margin-bottom: 16px;
-        }
-
-        h1 {
-            margin: 0 0 12px;
-            font-size: 28px;
-            line-height: 1.2;
-        }
-
-        p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .error-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 24px;
-        }
-
-        .btn {
-            appearance: none;
-            border: 0;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 44px;
-            padding: 0 16px;
-            border-radius: 10px;
+            border: 1px solid var(--error-border);
+            background: #f8fbff;
+            color: var(--error-muted);
+            font-size: 0.875rem;
             font-weight: 600;
         }
 
-        .btn-primary {
-            background: var(--primary);
-            color: #ffffff;
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: var(--text);
-            border: 1px solid var(--border);
+        .error-actions {
+            margin-top: 28px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .error-note {
             margin-top: 18px;
-            font-size: 14px;
-            color: var(--muted);
+            color: var(--error-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            appearance: none;
+            border: 1px solid transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+            padding: 0 20px;
+            border-radius: 0.7rem;
+            font-weight: 700;
+            line-height: 1;
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+
+        .btn-lg {
+            min-height: 54px;
+            padding: 0 24px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--error-primary);
+            border-color: var(--error-primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--error-primary-hover);
+            border-color: var(--error-primary-hover);
+            color: #ffffff;
+        }
+
+        .btn-outline-primary {
+            background: var(--error-outline-bg);
+            border-color: var(--error-primary);
+            color: var(--error-primary);
+        }
+
+        .btn-outline-primary:hover {
+            background: #eef3ff;
+            color: var(--error-primary-hover);
+            border-color: var(--error-primary-hover);
+        }
+
+        @media (max-width: 576px) {
+            .error-card {
+                padding: 28px 20px;
+                border-radius: 18px;
+            }
+
+            .img-error {
+                max-width: 260px;
+                margin-bottom: 20px;
+            }
+
+            .error-actions {
+                flex-direction: column;
+            }
+
+            .error-actions .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
-    <main class="error-shell">
-        <section class="error-card">
-            <div class="error-code">Error {{ $statusCode ?? '500' }}</div>
-            <h1>@yield('heading')</h1>
-            <p>@yield('message')</p>
+    @if (file_exists(public_path('assets/static/js/initTheme.js')))
+        <script src="{{ asset('assets/static/js/initTheme.js') }}"></script>
+    @endif
 
-            <div class="error-actions">
-                @yield('actions')
-            </div>
+    <div id="error">
+        <div class="error-page">
+            <div class="error-card">
+                <div class="text-center">
+                    <div class="error-code">Error {{ $statusCode ?? '500' }}</div>
 
-            @hasSection('note')
-                <div class="error-note">
-                    @yield('note')
+                    @hasSection('image_asset')
+                        <img class="img-error" src="@yield('image_asset')" alt="@yield('image_alt', 'Error')">
+                    @endif
+
+                    <h1 class="error-title">@yield('heading')</h1>
+                    <p class="error-message">@yield('message')</p>
+
+                    <div class="error-actions">
+                        @yield('actions')
+                    </div>
+
+                    @hasSection('note')
+                        <div class="error-note">
+                            @yield('note')
+                        </div>
+                    @endif
                 </div>
-            @endif
-        </section>
-    </main>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
