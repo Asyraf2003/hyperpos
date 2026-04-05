@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@include('layouts.partials.date-picker-assets')
 
 @section('title', 'Detail Nota Pemasok')
 @section('heading', 'Detail Nota Pemasok')

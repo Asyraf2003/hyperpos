@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app.css') }}?v={{ filemtime(public_path('assets/compiled/css/app.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app-dark.css') }}?v={{ filemtime(public_path('assets/compiled/css/app-dark.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/iconly.css') }}?v={{ filemtime(public_path('assets/compiled/css/iconly.css')) }}">
-    <link rel="stylesheet" href="{{ asset('assets/extensions/flatpickr/flatpickr.css') }}?v={{ filemtime(public_path('assets/extensions/flatpickr/flatpickr.css')) }}">
     @stack('styles')
 </head>
 
@@ -57,9 +56,6 @@
     <script src="{{ asset('assets/static/js/components/dark.js') }}?v={{ filemtime(public_path('assets/static/js/components/dark.js')) }}"></script>
     <script src="{{ asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}?v={{ filemtime(public_path('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')) }}"></script>
     <script src="{{ asset('assets/compiled/js/app.js') }}?v={{ filemtime(public_path('assets/compiled/js/app.js')) }}"></script>
-    <script src="{{ asset('assets/extensions/flatpickr/flatpickr.js') }}?v={{ filemtime(public_path('assets/extensions/flatpickr/flatpickr.js')) }}"></script>
-    <script src="{{ asset('assets/extensions/flatpickr/l10n/id.js') }}?v={{ filemtime(public_path('assets/extensions/flatpickr/l10n/id.js')) }}"></script>
-    <script src="{{ asset('assets/static/js/shared/admin-date-input.js') }}?v={{ filemtime(public_path('assets/static/js/shared/admin-date-input.js')) }}"></script>
     <script src="{{ asset('assets/static/js/shared/page-freshness.js') }}?v={{ filemtime(public_path('assets/static/js/shared/page-freshness.js')) }}"></script>
     @stack('scripts')
 </body>

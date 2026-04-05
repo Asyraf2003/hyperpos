@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@include('layouts.partials.date-picker-assets')
 
 @section('title', 'Catat Pengeluaran Operasional')
 @section('heading', 'Catat Pengeluaran Operasional')
