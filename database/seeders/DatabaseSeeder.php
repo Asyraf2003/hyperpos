@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
 
-            ProductSeeder::class, SupplierSeeder::class, EmployeeFinanceSeeder::class, SupplierInvoiceSeeder::class, ExpenseSeeder::class, WorkshopStressTestSeeder::class, SupplierPaymentProofSeeder::class, FinancialCorrectionSeeder::class,
+            // ProductSeeder::class, SupplierSeeder::class, EmployeeFinanceSeeder::class, SupplierInvoiceSeeder::class, ExpenseSeeder::class, WorkshopStressTestSeeder::class, SupplierPaymentProofSeeder::class, FinancialCorrectionSeeder::class,
         ]);
     }
 }
