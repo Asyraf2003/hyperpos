@@ -8,9 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Session\TokenMismatchException;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -35,26 +33,17 @@ return Application::configure(basePath: dirname(__DIR__))
             };
 
             if ($request->expectsJson()) {
-                if ($e instanceof ValidationException) {
-                    return null;
-                }
-
-                if ($e instanceof HttpExceptionInterface && $status >= 400 && $status < 500) {
-                    return null;
-                }
-
-                if ($e instanceof TokenMismatchException) {
-                    return response()->json([
-                        'message' => 'Sesi Anda sudah berakhir. Silakan muat ulang halaman.',
-                        'status' => 419,
-                    ], 419);
-                }
+                $message = match ($status) {
+                    403 => 'Akses ditolak.',
+                    404 => 'Halaman atau data tidak ditemukan.',
+                    419 => 'Sesi Anda sudah berakhir. Silakan muat ulang halaman.',
+                    429 => 'Terlalu banyak permintaan. Coba lagi sebentar.',
+                    503 => 'Layanan sedang tidak tersedia sementara.',
+                    default => 'Terjadi gangguan pada sistem.',
+                };
 
                 return response()->json([
-                    'message' => match ($status) {
-                        503 => 'Layanan sedang tidak tersedia sementara.',
-                        default => 'Terjadi gangguan pada sistem.',
-                    },
+                    'message' => $message,
                     'status' => $status,
                 ], $status);
             }
