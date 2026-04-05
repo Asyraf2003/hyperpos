@@ -151,7 +151,7 @@
       <td class="text-nowrap">${esc(r.expense_date)}</td>
       <td>${esc(r.category_name)}<br><small class="text-muted">${esc(r.category_code)}</small></td>
       <td>${esc(r.description)}</td>
-      <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>
+      <td class="text-nowrap fw-bold text-end">${rupiah(r.amount_rupiah)}</td>
       <td>${esc(r.payment_method)}</td>
       <td><span class="badge ${esc(r.status_badge_class)}">${esc(r.status_label)}</span></td>
     </tr>

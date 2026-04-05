@@ -51,8 +51,12 @@
                                 </th>
                                 <th>Kategori</th>
                                 <th>Deskripsi</th>
-                                <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="amount_rupiah">
+                                <th class="text-end">
+                                    <button
+                                        type="button"
+                                        class="btn btn-link p-0 text-decoration-none w-100 text-end"
+                                        data-sort-by="amount_rupiah"
+                                    >
                                         Nominal
                                         <span class="ms-1 text-muted" data-sort-indicator="amount_rupiah">↕</span>
                                     </button>
