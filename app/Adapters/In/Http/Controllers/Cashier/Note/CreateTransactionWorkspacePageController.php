@@ -22,7 +22,7 @@ final class CreateTransactionWorkspacePageController extends Controller
         $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
         $productLookupEndpoint = route('cashier.notes.products.lookup');
 
-        $sessionHasOldInput = !empty($request->session()->getOldInput());
+        $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];
         $draftPayload = $this->loadDraftPayload($request, $drafts, $sessionHasOldInput);
 
         $oldNote = old('note');

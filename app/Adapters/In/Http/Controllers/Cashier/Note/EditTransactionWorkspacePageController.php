@@ -19,7 +19,7 @@ final class EditTransactionWorkspacePageController extends Controller
         TransactionWorkspaceDraftReaderPort $drafts,
     ): View {
         $page = $builder->build($noteId);
-        $sessionHasOldInput = !empty($request->session()->getOldInput());
+        $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];
         $draftPayload = $this->loadDraftPayload($request, $drafts, $noteId, $sessionHasOldInput);
 
         $oldNote = old('note');
