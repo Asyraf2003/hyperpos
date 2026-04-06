@@ -10,11 +10,13 @@ use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class RecordAndAllocateNotePaymentFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
     public function test_it_allocates_to_all_product_buckets_before_any_service_fee(): void
     {
@@ -61,7 +63,7 @@ final class RecordAndAllocateNotePaymentFeatureTest extends TestCase
     public function test_it_moves_to_service_fee_only_after_product_buckets_are_fully_covered(): void
     {
         $this->seedMixedNote();
-        $this->seedCustomerPayment('payment-old', 10000, '2026-04-01');
+        $this->seedCustomerPaymentBase('payment-old', 10000, '2026-04-01');
         $this->seedComponentAllocation('alloc-old-1', 'payment-old', 'note-1', 'wi-1', 'product_only_work_item', 'wi-1', 5000, 5000, 1);
         $this->seedComponentAllocation('alloc-old-2', 'payment-old', 'note-1', 'wi-2', 'service_store_stock_part', 'sto-2', 3000, 3000, 2);
         $this->seedComponentAllocation('alloc-old-3', 'payment-old', 'note-1', 'wi-3', 'service_external_purchase_part', 'ext-1', 2000, 2000, 3);
@@ -85,28 +87,20 @@ final class RecordAndAllocateNotePaymentFeatureTest extends TestCase
 
     private function seedMixedNote(): void
     {
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi Santoso',
-            'transaction_date' => '2026-04-02',
-            'total_rupiah' => 24000,
-        ]);
+        $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 5000);
+        $this->seedNotePaymentProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 3000);
 
-        DB::table('work_items')->insert([
-            ['id' => 'wi-1', 'note_id' => 'note-1', 'line_no' => 1, 'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 5000],
-            ['id' => 'wi-2', 'note_id' => 'note-1', 'line_no' => 2, 'transaction_type' => WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 8000],
-            ['id' => 'wi-3', 'note_id' => 'note-1', 'line_no' => 3, 'transaction_type' => WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 11000],
-        ]);
+        $this->seedNoteBase('note-1', 'Budi Santoso', '2026-04-02', 24000);
 
-        DB::table('work_item_service_details')->insert([
-            ['work_item_id' => 'wi-2', 'service_name' => 'Servis A', 'service_price_rupiah' => 5000, 'part_source' => ServiceDetail::PART_SOURCE_NONE],
-            ['work_item_id' => 'wi-3', 'service_name' => 'Servis B', 'service_price_rupiah' => 9000, 'part_source' => ServiceDetail::PART_SOURCE_NONE],
-        ]);
+        $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 5000);
+        $this->seedWorkItemBase('wi-2', 'note-1', 2, WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, WorkItem::STATUS_OPEN, 8000);
+        $this->seedWorkItemBase('wi-3', 'note-1', 3, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 11000);
 
-        DB::table('work_item_store_stock_lines')->insert([
-            ['id' => 'sto-1', 'work_item_id' => 'wi-1', 'product_id' => 'product-1', 'qty' => 1, 'line_total_rupiah' => 5000],
-            ['id' => 'sto-2', 'work_item_id' => 'wi-2', 'product_id' => 'product-2', 'qty' => 1, 'line_total_rupiah' => 3000],
-        ]);
+        $this->seedServiceDetailBase('wi-2', 'Servis A', 5000, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedServiceDetailBase('wi-3', 'Servis B', 9000, ServiceDetail::PART_SOURCE_NONE);
+
+        $this->seedStoreStockLineBase('sto-1', 'wi-1', 'product-1', 1, 5000);
+        $this->seedStoreStockLineBase('sto-2', 'wi-2', 'product-2', 1, 3000);
 
         DB::table('work_item_external_purchase_lines')->insert([
             'id' => 'ext-1',
@@ -115,15 +109,6 @@ final class RecordAndAllocateNotePaymentFeatureTest extends TestCase
             'unit_cost_rupiah' => 2000,
             'qty' => 1,
             'line_total_rupiah' => 2000,
-        ]);
-    }
-
-    private function seedCustomerPayment(string $id, int $amount, string $paidAt): void
-    {
-        DB::table('customer_payments')->insert([
-            'id' => $id,
-            'amount_rupiah' => $amount,
-            'paid_at' => $paidAt,
         ]);
     }
 

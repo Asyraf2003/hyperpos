@@ -9,15 +9,18 @@ use App\Core\Note\WorkItem\WorkItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class NoteDetailPageFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
     public function test_cashier_can_see_row_settlement_labels_and_outstanding_values(): void
     {
         $this->loginAsKasir();
+
         $user = User::query()->create([
             'name' => 'Kasir Detail',
             'email' => 'cashier-note-detail@example.test',
@@ -31,35 +34,22 @@ final class NoteDetailPageFeatureTest extends TestCase
 
         $today = now()->toDateString();
 
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi',
-            'transaction_date' => $today,
-            'total_rupiah' => 26000,
-            'note_state' => 'open',
-        ]);
+        $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 5000);
+        $this->seedNotePaymentProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 3000);
 
-        DB::table('work_items')->insert([
-            ['id' => 'wi-1', 'note_id' => 'note-1', 'line_no' => 1, 'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 5000],
-            ['id' => 'wi-2', 'note_id' => 'note-1', 'line_no' => 2, 'transaction_type' => WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 8000],
-            ['id' => 'wi-3', 'note_id' => 'note-1', 'line_no' => 3, 'transaction_type' => WorkItem::TYPE_SERVICE_ONLY, 'status' => WorkItem::STATUS_OPEN, 'subtotal_rupiah' => 13000],
-        ]);
+        $this->seedNoteBase('note-1', 'Budi', $today, 26000, 'open');
 
-        DB::table('work_item_service_details')->insert([
-            ['work_item_id' => 'wi-2', 'service_name' => 'Servis A', 'service_price_rupiah' => 5000, 'part_source' => ServiceDetail::PART_SOURCE_NONE],
-            ['work_item_id' => 'wi-3', 'service_name' => 'Servis B', 'service_price_rupiah' => 13000, 'part_source' => ServiceDetail::PART_SOURCE_NONE],
-        ]);
+        $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 5000);
+        $this->seedWorkItemBase('wi-2', 'note-1', 2, WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, WorkItem::STATUS_OPEN, 8000);
+        $this->seedWorkItemBase('wi-3', 'note-1', 3, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 13000);
 
-        DB::table('work_item_store_stock_lines')->insert([
-            ['id' => 'sto-1', 'work_item_id' => 'wi-1', 'product_id' => 'product-1', 'qty' => 1, 'line_total_rupiah' => 5000],
-            ['id' => 'sto-2', 'work_item_id' => 'wi-2', 'product_id' => 'product-2', 'qty' => 1, 'line_total_rupiah' => 3000],
-        ]);
+        $this->seedServiceDetailBase('wi-2', 'Servis A', 5000, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedServiceDetailBase('wi-3', 'Servis B', 13000, ServiceDetail::PART_SOURCE_NONE);
 
-        DB::table('customer_payments')->insert([
-            'id' => 'pay-1',
-            'amount_rupiah' => 8000,
-            'paid_at' => $today,
-        ]);
+        $this->seedStoreStockLineBase('sto-1', 'wi-1', 'product-1', 1, 5000);
+        $this->seedStoreStockLineBase('sto-2', 'wi-2', 'product-2', 1, 3000);
+
+        $this->seedCustomerPaymentBase('pay-1', 8000, $today);
 
         DB::table('payment_component_allocations')->insert([
             [
