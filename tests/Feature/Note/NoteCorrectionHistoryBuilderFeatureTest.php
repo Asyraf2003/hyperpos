@@ -7,14 +7,18 @@ namespace Tests\Feature\Note;
 use App\Application\Note\Services\NoteCorrectionHistoryBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class NoteCorrectionHistoryBuilderFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
     public function test_it_reads_correction_history_from_native_mutation_timeline(): void
     {
+        $this->seedNoteBase('note-1', 'Budi', '2026-04-02', 45000);
+
         DB::table('note_mutation_events')->insert([
             'id' => 'evt-1',
             'note_id' => 'note-1',

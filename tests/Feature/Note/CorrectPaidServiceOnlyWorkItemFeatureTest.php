@@ -10,11 +10,13 @@ use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class CorrectPaidServiceOnlyWorkItemFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
     public function test_correct_paid_service_only_work_item_handler_updates_service_detail_total_and_refund_requirement(): void
     {
@@ -166,106 +168,27 @@ final class CorrectPaidServiceOnlyWorkItemFeatureTest extends TestCase
 
     private function seedPaidServiceOnlyNote(): void
     {
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi Santoso',
-            'transaction_date' => '2026-03-14',
-            'total_rupiah' => 50000,
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => 'work-item-1',
-            'note_id' => 'note-1',
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => 50000,
-        ]);
-
-        DB::table('work_item_service_details')->insert([
-            'work_item_id' => 'work-item-1',
-            'service_name' => 'Servis Karburator',
-            'service_price_rupiah' => 50000,
-            'part_source' => ServiceDetail::PART_SOURCE_CUSTOMER_OWNED,
-        ]);
-
-        DB::table('customer_payments')->insert([
-            'id' => 'payment-1',
-            'amount_rupiah' => 50000,
-            'paid_at' => '2026-03-15',
-        ]);
-
-        DB::table('payment_allocations')->insert([
-            'id' => 'allocation-1',
-            'customer_payment_id' => 'payment-1',
-            'note_id' => 'note-1',
-            'amount_rupiah' => 50000,
-        ]);
+        $this->seedNoteBase('note-1', 'Budi Santoso', '2026-03-14', 50000);
+        $this->seedWorkItemBase('work-item-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('work-item-1', 'Servis Karburator', 50000, ServiceDetail::PART_SOURCE_CUSTOMER_OWNED);
+        $this->seedCustomerPaymentBase('payment-1', 50000, '2026-03-15');
+        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 50000);
     }
 
     private function seedUnpaidServiceOnlyNote(): void
     {
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi Santoso',
-            'transaction_date' => '2026-03-14',
-            'total_rupiah' => 50000,
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => 'work-item-1',
-            'note_id' => 'note-1',
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => 50000,
-        ]);
-
-        DB::table('work_item_service_details')->insert([
-            'work_item_id' => 'work-item-1',
-            'service_name' => 'Servis Karburator',
-            'service_price_rupiah' => 50000,
-            'part_source' => ServiceDetail::PART_SOURCE_CUSTOMER_OWNED,
-        ]);
+        $this->seedNoteBase('note-1', 'Budi Santoso', '2026-03-14', 50000);
+        $this->seedWorkItemBase('work-item-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('work-item-1', 'Servis Karburator', 50000, ServiceDetail::PART_SOURCE_CUSTOMER_OWNED);
     }
 
     private function seedPaidStoreStockOnlyNote(): void
     {
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi Santoso',
-            'transaction_date' => '2026-03-14',
-            'total_rupiah' => 40000,
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => 'work-item-1',
-            'note_id' => 'note-1',
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => 40000,
-        ]);
-
-        DB::table('work_item_store_stock_lines')->insert([
-            'id' => 'store-line-1',
-            'work_item_id' => 'work-item-1',
-            'product_id' => 'product-1',
-            'qty' => 1,
-            'line_total_rupiah' => 40000,
-        ]);
-
-        DB::table('customer_payments')->insert([
-            'id' => 'payment-1',
-            'amount_rupiah' => 40000,
-            'paid_at' => '2026-03-15',
-        ]);
-
-        DB::table('payment_allocations')->insert([
-            'id' => 'allocation-1',
-            'customer_payment_id' => 'payment-1',
-            'note_id' => 'note-1',
-            'amount_rupiah' => 40000,
-        ]);
+        $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 40000);
+        $this->seedNoteBase('note-1', 'Budi Santoso', '2026-03-14', 40000);
+        $this->seedWorkItemBase('work-item-1', 'note-1', 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 40000);
+        $this->seedStoreStockLineBase('store-line-1', 'work-item-1', 'product-1', 1, 40000);
+        $this->seedCustomerPaymentBase('payment-1', 40000, '2026-03-15');
+        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 40000);
     }
 }

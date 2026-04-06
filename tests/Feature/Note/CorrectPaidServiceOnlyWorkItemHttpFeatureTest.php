@@ -9,11 +9,13 @@ use App\Core\Note\WorkItem\WorkItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
     public function test_cashier_cannot_correct_closed_paid_service_only_work_item_via_http(): void
     {
@@ -147,109 +149,27 @@ final class CorrectPaidServiceOnlyWorkItemHttpFeatureTest extends TestCase
 
     private function seedPaidServiceOnlyNote(string $noteId, string $workItemId, int $subtotalRupiah): void
     {
-        DB::table('notes')->insert([
-            'id' => $noteId,
-            'customer_name' => 'Budi',
-            'transaction_date' => now()->toDateString(),
-            'total_rupiah' => $subtotalRupiah,
-            'note_state' => 'closed',
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => $workItemId,
-            'note_id' => $noteId,
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => $subtotalRupiah,
-        ]);
-
-        DB::table('work_item_service_details')->insert([
-            'work_item_id' => $workItemId,
-            'service_name' => 'Servis A',
-            'service_price_rupiah' => $subtotalRupiah,
-            'part_source' => ServiceDetail::PART_SOURCE_NONE,
-        ]);
-
-        DB::table('customer_payments')->insert([
-            'id' => 'cp-1',
-            'amount_rupiah' => $subtotalRupiah,
-            'paid_at' => now()->toDateString(),
-        ]);
-
-        DB::table('payment_allocations')->insert([
-            'id' => 'pa-1',
-            'customer_payment_id' => 'cp-1',
-            'note_id' => $noteId,
-            'amount_rupiah' => $subtotalRupiah,
-        ]);
+        $this->seedNoteBase($noteId, 'Budi', now()->toDateString(), $subtotalRupiah, 'closed');
+        $this->seedWorkItemBase($workItemId, $noteId, 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, $subtotalRupiah);
+        $this->seedServiceDetailBase($workItemId, 'Servis A', $subtotalRupiah, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedCustomerPaymentBase('cp-1', $subtotalRupiah, now()->toDateString());
+        $this->seedPaymentAllocationBase('pa-1', 'cp-1', $noteId, $subtotalRupiah);
     }
 
     private function seedUnpaidServiceOnlyNote(string $noteId, string $workItemId, int $subtotalRupiah): void
     {
-        DB::table('notes')->insert([
-            'id' => $noteId,
-            'customer_name' => 'Budi',
-            'transaction_date' => now()->toDateString(),
-            'total_rupiah' => $subtotalRupiah,
-            'note_state' => 'open',
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => $workItemId,
-            'note_id' => $noteId,
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => $subtotalRupiah,
-        ]);
-
-        DB::table('work_item_service_details')->insert([
-            'work_item_id' => $workItemId,
-            'service_name' => 'Servis A',
-            'service_price_rupiah' => $subtotalRupiah,
-            'part_source' => ServiceDetail::PART_SOURCE_NONE,
-        ]);
+        $this->seedNoteBase($noteId, 'Budi', now()->toDateString(), $subtotalRupiah, 'open');
+        $this->seedWorkItemBase($workItemId, $noteId, 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, $subtotalRupiah);
+        $this->seedServiceDetailBase($workItemId, 'Servis A', $subtotalRupiah, ServiceDetail::PART_SOURCE_NONE);
     }
 
     private function seedPaidStoreStockOnlyNote(string $noteId, string $workItemId, int $subtotalRupiah): void
     {
-        DB::table('notes')->insert([
-            'id' => $noteId,
-            'customer_name' => 'Budi',
-            'transaction_date' => now()->toDateString(),
-            'total_rupiah' => $subtotalRupiah,
-            'note_state' => 'closed',
-        ]);
-
-        DB::table('work_items')->insert([
-            'id' => $workItemId,
-            'note_id' => $noteId,
-            'line_no' => 1,
-            'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
-            'subtotal_rupiah' => $subtotalRupiah,
-        ]);
-
-        DB::table('work_item_store_stock_lines')->insert([
-            'id' => 'store-line-1',
-            'work_item_id' => $workItemId,
-            'product_id' => 'product-1',
-            'qty' => 1,
-            'line_total_rupiah' => $subtotalRupiah,
-        ]);
-
-        DB::table('customer_payments')->insert([
-            'id' => 'cp-1',
-            'amount_rupiah' => $subtotalRupiah,
-            'paid_at' => now()->toDateString(),
-        ]);
-
-        DB::table('payment_allocations')->insert([
-            'id' => 'pa-1',
-            'customer_payment_id' => 'cp-1',
-            'note_id' => $noteId,
-            'amount_rupiah' => $subtotalRupiah,
-        ]);
+        $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, $subtotalRupiah);
+        $this->seedNoteBase($noteId, 'Budi', now()->toDateString(), $subtotalRupiah, 'closed');
+        $this->seedWorkItemBase($workItemId, $noteId, 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, $subtotalRupiah);
+        $this->seedStoreStockLineBase('store-line-1', $workItemId, 'product-1', 1, $subtotalRupiah);
+        $this->seedCustomerPaymentBase('cp-1', $subtotalRupiah, now()->toDateString());
+        $this->seedPaymentAllocationBase('pa-1', 'cp-1', $noteId, $subtotalRupiah);
     }
 }
