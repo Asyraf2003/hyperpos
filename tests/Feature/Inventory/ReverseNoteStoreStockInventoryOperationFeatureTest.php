@@ -7,14 +7,18 @@ namespace Tests\Feature\Inventory;
 use App\Application\Inventory\Services\ReverseNoteStoreStockInventoryOperation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalInventoryProductFixture;
 use Tests\TestCase;
 
 final class ReverseNoteStoreStockInventoryOperationFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalInventoryProductFixture;
 
     public function test_it_reverses_all_store_stock_movements_for_a_note(): void
     {
+        $this->seedInventoryProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 12000);
+
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',

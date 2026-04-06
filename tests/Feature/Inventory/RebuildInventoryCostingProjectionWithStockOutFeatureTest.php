@@ -7,14 +7,18 @@ namespace Tests\Feature\Inventory;
 use App\Application\Inventory\UseCases\RebuildInventoryCostingProjectionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalInventoryProductFixture;
 use Tests\TestCase;
 
 final class RebuildInventoryCostingProjectionWithStockOutFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalInventoryProductFixture;
 
     public function test_rebuild_costing_projection_handles_stock_out(): void
     {
+        $this->seedInventoryProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 12000);
+
         DB::table('inventory_movements')->insert([
             [
                 'id' => 'm1',

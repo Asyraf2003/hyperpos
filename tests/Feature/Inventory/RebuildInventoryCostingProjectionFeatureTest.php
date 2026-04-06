@@ -8,14 +8,20 @@ use App\Application\Inventory\UseCases\RebuildInventoryCostingProjectionHandler;
 use App\Application\Shared\DTO\Result;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalInventoryProductFixture;
 use Tests\TestCase;
 
 final class RebuildInventoryCostingProjectionFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalInventoryProductFixture;
 
     public function test_rebuild_inventory_costing_projection_handler_replaces_stale_projection_from_official_ledger(): void
     {
+        $this->seedInventoryProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 12000);
+        $this->seedInventoryProduct('product-2', 'KB-002', 'Ban Dalam', 'Federal', 90, 15000);
+        $this->seedInventoryProduct('product-legacy', 'KB-LEG', 'Produk Legacy', 'Legacy', 80, 9000);
+
         $this->seedInventoryMovement(
             'movement-1',
             'product-1',
@@ -89,6 +95,9 @@ final class RebuildInventoryCostingProjectionFeatureTest extends TestCase
 
     public function test_rebuild_inventory_costing_projection_handler_clears_stale_projection_when_ledger_is_empty(): void
     {
+        $this->seedInventoryProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 12000);
+        $this->seedInventoryProduct('product-2', 'KB-002', 'Ban Dalam', 'Federal', 90, 15000);
+
         DB::table('product_inventory_costing')->insert([
             [
                 'product_id' => 'product-1',
@@ -109,28 +118,5 @@ final class RebuildInventoryCostingProjectionFeatureTest extends TestCase
         $this->assertInstanceOf(Result::class, $result);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory_costing', 0);
-    }
-
-    private function seedInventoryMovement(
-        string $id,
-        string $productId,
-        string $movementType,
-        string $sourceType,
-        string $sourceId,
-        string $tanggalMutasi,
-        int $qtyDelta,
-        int $unitCostRupiah,
-    ): void {
-        DB::table('inventory_movements')->insert([
-            'id' => $id,
-            'product_id' => $productId,
-            'movement_type' => $movementType,
-            'source_type' => $sourceType,
-            'source_id' => $sourceId,
-            'tanggal_mutasi' => $tanggalMutasi,
-            'qty_delta' => $qtyDelta,
-            'unit_cost_rupiah' => $unitCostRupiah,
-            'total_cost_rupiah' => $qtyDelta * $unitCostRupiah,
-        ]);
     }
 }

@@ -7,15 +7,23 @@ namespace Tests\Feature\Inventory;
 use App\Application\Inventory\Services\ReverseIssuedInventoryOperation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalInventoryProductFixture;
 use Tests\TestCase;
 
 final class ReverseIssuedInventoryOperationFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalInventoryProductFixture;
 
     public function test_it_reverses_previous_stock_out_movements_for_a_source(): void
     {
-        DB::table('product_inventory')->insert(['product_id' => 'product-1', 'qty_on_hand' => 3]);
+        $this->seedInventoryProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 12000);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-1',
+            'qty_on_hand' => 3,
+        ]);
+
         DB::table('product_inventory_costing')->insert([
             'product_id' => 'product-1',
             'avg_cost_rupiah' => 10000,
