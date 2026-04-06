@@ -6,19 +6,21 @@ namespace Tests\Feature\Procurement;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class ReceiveSupplierInvoiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_receive_supplier_invoice_endpoint_stores_receipt_movements_and_updates_inventory_projection(): void
     {
         $this->loginAsKasir();
-        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
-        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 100000);
-        $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 10, 100000, 10000);
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+        $this->seedMinimalSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 100000);
+        $this->seedMinimalSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 10, 100000, 10000);
 
         DB::table('product_inventory')->insert([
             'product_id' => 'product-1',
@@ -93,6 +95,7 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
     public function test_receive_supplier_invoice_endpoint_rejects_unknown_supplier_invoice(): void
     {
         $this->loginAsKasir();
+
         $response = $this->postJson('/procurement/supplier-invoices/unknown-invoice/receive', [
             'tanggal_terima' => '2026-03-13',
             'lines' => [
@@ -115,13 +118,13 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
     public function test_receive_supplier_invoice_endpoint_rejects_line_that_does_not_belong_to_target_invoice(): void
     {
         $this->loginAsKasir();
-        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
-        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
 
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 50000);
-        $this->seedSupplierInvoice('invoice-2', 'supplier-1', '2026-03-12', '2026-04-12', 50000);
+        $this->seedMinimalSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 50000);
+        $this->seedMinimalSupplierInvoice('invoice-2', 'supplier-1', '2026-03-12', '2026-04-12', 50000);
 
-        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-2', 'product-1', 5, 50000, 10000);
+        $this->seedMinimalSupplierInvoiceLine('invoice-line-2', 'invoice-2', 'product-1', 5, 50000, 10000);
 
         $response = $this->postJson('/procurement/supplier-invoices/invoice-1/receive', [
             'tanggal_terima' => '2026-03-13',
@@ -145,23 +148,13 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
     public function test_receive_supplier_invoice_endpoint_rejects_over_receive_after_previous_receipts(): void
     {
         $this->loginAsKasir();
-        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
-        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 100000);
-        $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 10, 100000, 10000);
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+        $this->seedMinimalSupplierInvoice('invoice-1', 'supplier-1', '2026-03-12', '2026-04-12', 100000);
+        $this->seedMinimalSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 10, 100000, 10000);
 
-        DB::table('supplier_receipts')->insert([
-            'id' => 'receipt-1',
-            'supplier_invoice_id' => 'invoice-1',
-            'tanggal_terima' => '2026-03-13',
-        ]);
-
-        DB::table('supplier_receipt_lines')->insert([
-            'id' => 'receipt-line-1',
-            'supplier_receipt_id' => 'receipt-1',
-            'supplier_invoice_line_id' => 'invoice-line-1',
-            'qty_diterima' => 7,
-        ]);
+        $this->seedMinimalSupplierReceipt('receipt-1', 'invoice-1', '2026-03-13');
+        $this->seedMinimalSupplierReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-1', 7);
 
         $response = $this->postJson('/procurement/supplier-invoices/invoice-1/receive', [
             'tanggal_terima' => '2026-03-14',
@@ -180,79 +173,5 @@ final class ReceiveSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
         $this->assertDatabaseCount('product_inventory_costing', 0);
-    }
-
-    private function seedProduct(
-        string $id,
-        ?string $kodeBarang,
-        string $namaBarang,
-        string $merek,
-        ?int $ukuran,
-        int $hargaJual,
-    ): void {
-        DB::table('products')->insert([
-            'id' => $id,
-            'kode_barang' => $kodeBarang,
-            'nama_barang' => $namaBarang,
-            'merek' => $merek,
-            'ukuran' => $ukuran,
-            'harga_jual' => $hargaJual,
-        ]);
-    }
-
-    private function seedSupplier(
-        string $id,
-        string $namaPtPengirim,
-        string $namaPtPengirimNormalized,
-    ): void {
-        DB::table('suppliers')->insert([
-            'id' => $id,
-            'nama_pt_pengirim' => $namaPtPengirim,
-            'nama_pt_pengirim_normalized' => $namaPtPengirimNormalized,
-        ]);
-    }
-
-    private function seedSupplierInvoice(
-        string $id,
-        string $supplierId,
-        string $tanggalPengiriman,
-        string $jatuhTempo,
-        int $grandTotalRupiah,
-        string $supplierNamaPtPengirimSnapshot = 'PT Sumber Makmur',
-    ): void {
-        DB::table('supplier_invoices')->insert([
-            'id' => $id,
-            'supplier_id' => $supplierId,
-            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
-            'tanggal_pengiriman' => $tanggalPengiriman,
-            'jatuh_tempo' => $jatuhTempo,
-            'grand_total_rupiah' => $grandTotalRupiah,
-        ]);
-    }
-
-    private function seedSupplierInvoiceLine(
-        string $id,
-        string $supplierInvoiceId,
-        string $productId,
-        int $qtyPcs,
-        int $lineTotalRupiah,
-        int $unitCostRupiah,
-        ?string $productKodeBarangSnapshot = 'KB-001',
-        string $productNamaBarangSnapshot = 'Supra',
-        string $productMerekSnapshot = 'Federal',
-        ?int $productUkuranSnapshot = 100,
-    ): void {
-        DB::table('supplier_invoice_lines')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $supplierInvoiceId,
-            'product_id' => $productId,
-            'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
-            'product_nama_barang_snapshot' => $productNamaBarangSnapshot,
-            'product_merek_snapshot' => $productMerekSnapshot,
-            'product_ukuran_snapshot' => $productUkuranSnapshot,
-            'qty_pcs' => $qtyPcs,
-            'line_total_rupiah' => $lineTotalRupiah,
-            'unit_cost_rupiah' => $unitCostRupiah,
-        ]);
     }
 }

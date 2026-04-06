@@ -6,32 +6,20 @@ namespace Tests\Feature\Procurement;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class CreateSupplierInvoiceFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_create_supplier_invoice_endpoint_auto_receives_by_default_and_updates_inventory_without_auto_recording_payment(): void
     {
         $this->loginAsKasir();
-        DB::table('products')->insert([
-            'id' => 'product-1',
-            'kode_barang' => 'KB-001',
-            'nama_barang' => 'Supra',
-            'merek' => 'Federal',
-            'ukuran' => 100,
-            'harga_jual' => 15000,
-        ]);
 
-        DB::table('products')->insert([
-            'id' => 'product-2',
-            'kode_barang' => 'KB-002',
-            'nama_barang' => 'Vario',
-            'merek' => 'Federal',
-            'ukuran' => 90,
-            'harga_jual' => 17000,
-        ]);
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000);
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
             'nama_pt_pengirim' => '  PT Sumber Makmur  ',
@@ -39,10 +27,10 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             'lines' => [
                 [
                     'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
+                    'product_kode_barang_snapshot' => 'KB-001',
+                    'product_nama_barang_snapshot' => 'Ban Luar',
+                    'product_merek_snapshot' => 'Federal',
+                    'product_ukuran_snapshot' => 100,
                     'qty_pcs' => 2,
                     'line_total_rupiah' => 20000,
                 ],
@@ -208,14 +196,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
     public function test_create_supplier_invoice_endpoint_rejects_line_total_that_is_not_evenly_divisible_by_qty(): void
     {
         $this->loginAsKasir();
-        DB::table('products')->insert([
-            'id' => 'product-1',
-            'kode_barang' => 'KB-001',
-            'nama_barang' => 'Supra',
-            'merek' => 'Federal',
-            'ukuran' => 100,
-            'harga_jual' => 15000,
-        ]);
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
             'nama_pt_pengirim' => 'PT Sumber Makmur',
@@ -223,10 +204,10 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             'lines' => [
                 [
                     'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
+                    'product_kode_barang_snapshot' => 'KB-001',
+                    'product_nama_barang_snapshot' => 'Ban Luar',
+                    'product_merek_snapshot' => 'Federal',
+                    'product_ukuran_snapshot' => 100,
                     'qty_pcs' => 3,
                     'line_total_rupiah' => 10000,
                 ],
@@ -249,20 +230,8 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
     public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier_without_auto_recording_payment(): void
     {
         $this->loginAsKasir();
-        DB::table('products')->insert([
-            'id' => 'product-1',
-            'kode_barang' => 'KB-001',
-            'nama_barang' => 'Supra',
-            'merek' => 'Federal',
-            'ukuran' => 100,
-            'harga_jual' => 15000,
-        ]);
-
-        DB::table('suppliers')->insert([
-            'id' => 'supplier-1',
-            'nama_pt_pengirim' => 'PT Sumber Makmur',
-            'nama_pt_pengirim_normalized' => 'pt sumber makmur',
-        ]);
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
             'nama_pt_pengirim' => '  pt   sumber    makmur ',
@@ -271,10 +240,10 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             'lines' => [
                 [
                     'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
+                    'product_kode_barang_snapshot' => 'KB-001',
+                    'product_nama_barang_snapshot' => 'Ban Luar',
+                    'product_merek_snapshot' => 'Federal',
+                    'product_ukuran_snapshot' => 100,
                     'qty_pcs' => 2,
                     'line_total_rupiah' => 20000,
                 ],
@@ -306,7 +275,6 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertNotNull($invoice);
 
         $this->assertDatabaseCount('supplier_payments', 0);
-
         $this->assertDatabaseCount('supplier_receipts', 0);
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);

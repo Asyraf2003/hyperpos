@@ -7,11 +7,13 @@ namespace Tests\Feature\Procurement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class RecordSupplierPaymentFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_guest_is_redirected_to_login_when_recording_supplier_payment(): void
     {
@@ -62,7 +64,7 @@ final class RecordSupplierPaymentFeatureTest extends TestCase
     public function test_admin_cannot_pay_more_than_outstanding(): void
     {
         $this->seedSupplierInvoiceFixture();
-        $this->seedSupplierPayment('payment-1', 'invoice-1', 90000, '2026-03-18', 'pending');
+        $this->seedMinimalSupplierPayment('payment-1', 'invoice-1', 90000, '2026-03-18', 'pending');
 
         $response = $this
             ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
@@ -96,43 +98,29 @@ final class RecordSupplierPaymentFeatureTest extends TestCase
 
     private function seedSupplierInvoiceFixture(): void
     {
-        DB::table('supplier_invoices')->insert([
-            'id' => 'invoice-1',
-            'supplier_id' => 'supplier-1',
-            'supplier_nama_pt_pengirim_snapshot' => 'PT Supplier Test',
-            'tanggal_pengiriman' => '2026-03-15',
-            'jatuh_tempo' => '2026-04-15',
-            'grand_total_rupiah' => 100000,
-        ]);
+        $this->seedMinimalSupplier('supplier-1', 'PT Supplier Test', 'pt supplier test');
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 75000);
 
-        DB::table('supplier_invoice_lines')->insert([
-            'id' => 'invoice-line-1',
-            'supplier_invoice_id' => 'invoice-1',
-            'product_id' => 'product-1',
-            'product_kode_barang_snapshot' => 'KB-001',
-            'product_nama_barang_snapshot' => 'Ban Luar',
-            'product_merek_snapshot' => 'Federal',
-            'product_ukuran_snapshot' => 100,
-            'qty_pcs' => 2,
-            'line_total_rupiah' => 100000,
-            'unit_cost_rupiah' => 50000,
-        ]);
-    }
+        $this->seedMinimalSupplierInvoice(
+            'invoice-1',
+            'supplier-1',
+            '2026-03-15',
+            '2026-04-15',
+            100000,
+            'PT Supplier Test'
+        );
 
-    private function seedSupplierPayment(
-        string $id,
-        string $supplierInvoiceId,
-        int $amountRupiah,
-        string $paidAt,
-        string $proofStatus
-    ): void {
-        DB::table('supplier_payments')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $supplierInvoiceId,
-            'amount_rupiah' => $amountRupiah,
-            'paid_at' => $paidAt,
-            'proof_status' => $proofStatus,
-            'proof_storage_path' => null,
-        ]);
+        $this->seedMinimalSupplierInvoiceLine(
+            'invoice-line-1',
+            'invoice-1',
+            'product-1',
+            2,
+            100000,
+            50000,
+            'KB-001',
+            'Ban Luar',
+            'Federal',
+            100
+        );
     }
 }
