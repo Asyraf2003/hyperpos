@@ -19,6 +19,10 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         $this->seedEmployee('11111111-1111-1111-1111-111111111111', 'Montir A');
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
 
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 50000);
+        $this->seedProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 100000);
+        $this->seedProduct('product-3', 'KB-003', 'Produk Scope', 'Federal', 80, 999999);
+
         DB::table('notes')->insert([
             ['id' => 'note-1', 'customer_name' => 'Budi', 'transaction_date' => '2026-03-15', 'total_rupiah' => 200000],
             ['id' => 'note-2', 'customer_name' => 'Siti', 'transaction_date' => '2026-03-16', 'total_rupiah' => 100000],
@@ -34,6 +38,11 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         DB::table('work_item_external_purchase_lines')->insert([
             ['id' => 'epl-1', 'work_item_id' => 'wi-1', 'cost_description' => 'Part luar', 'unit_cost_rupiah' => 50000, 'qty' => 1, 'line_total_rupiah' => 50000],
             ['id' => 'epl-2', 'work_item_id' => 'wi-3', 'cost_description' => 'Luar scope', 'unit_cost_rupiah' => 999999, 'qty' => 1, 'line_total_rupiah' => 999999],
+        ]);
+
+        DB::table('customer_payments')->insert([
+            ['id' => 'payment-1', 'amount_rupiah' => 200000, 'paid_at' => '2026-03-15'],
+            ['id' => 'payment-2', 'amount_rupiah' => 999999, 'paid_at' => '2026-03-18'],
         ]);
 
         DB::table('customer_refunds')->insert([
@@ -109,6 +118,29 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
             'is_active' => true,
             'created_at' => now(),
             'updated_at' => now(),
+        ]);
+    }
+
+    private function seedProduct(
+        string $id,
+        ?string $kodeBarang,
+        string $namaBarang,
+        string $merek,
+        ?int $ukuran,
+        int $hargaJual
+    ): void {
+        DB::table('products')->insert([
+            'id' => $id,
+            'kode_barang' => $kodeBarang,
+            'nama_barang' => $namaBarang,
+            'nama_barang_normalized' => mb_strtolower(trim($namaBarang)),
+            'merek' => $merek,
+            'merek_normalized' => mb_strtolower(trim($merek)),
+            'ukuran' => $ukuran,
+            'harga_jual' => $hargaJual,
+            'deleted_at' => null,
+            'deleted_by_actor_id' => null,
+            'delete_reason' => null,
         ]);
     }
 }

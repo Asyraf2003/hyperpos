@@ -16,12 +16,18 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
 
     public function test_get_supplier_payable_summary_handler_returns_invoice_level_rows_and_passes_reconciliation(): void
     {
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 50000);
+
         $this->seedSupplier('supplier-1', 'PT Sumber Makmur');
         $this->seedSupplier('supplier-2', 'PT Sentosa Jaya');
 
         $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
         $this->seedSupplierInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 50000);
         $this->seedSupplierInvoice('invoice-3', 'supplier-1', '2026-03-18', '2026-04-18', 30000);
+
+        $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 100000, 50000);
+        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-1', 1, 50000, 50000);
+        $this->seedSupplierInvoiceLine('invoice-line-3', 'invoice-2', 'product-1', 5, 50000, 10000);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 60000, '2026-03-15', 'pending');
         $this->seedSupplierPayment('payment-2', 'invoice-1', 10000, '2026-03-20', 'uploaded');
@@ -73,12 +79,38 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         ], $data['rows']);
     }
 
+    private function seedProduct(
+        string $id,
+        ?string $kodeBarang,
+        string $namaBarang,
+        string $merek,
+        ?int $ukuran,
+        int $hargaJual
+    ): void {
+        DB::table('products')->insert([
+            'id' => $id,
+            'kode_barang' => $kodeBarang,
+            'nama_barang' => $namaBarang,
+            'nama_barang_normalized' => mb_strtolower(trim($namaBarang)),
+            'merek' => $merek,
+            'merek_normalized' => mb_strtolower(trim($merek)),
+            'ukuran' => $ukuran,
+            'harga_jual' => $hargaJual,
+            'deleted_at' => null,
+            'deleted_by_actor_id' => null,
+            'delete_reason' => null,
+        ]);
+    }
+
     private function seedSupplier(string $id, string $namaPtPengirim): void
     {
         DB::table('suppliers')->insert([
             'id' => $id,
             'nama_pt_pengirim' => $namaPtPengirim,
             'nama_pt_pengirim_normalized' => strtolower($namaPtPengirim),
+            'deleted_at' => null,
+            'deleted_by_actor_id' => null,
+            'delete_reason' => null,
         ]);
     }
 
@@ -87,14 +119,37 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         string $supplierId,
         string $shipmentDate,
         string $dueDate,
-        int $grandTotalRupiah,
+        int $grandTotalRupiah
     ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
             'supplier_id' => $supplierId,
+            'supplier_nama_pt_pengirim_snapshot' => DB::table('suppliers')->where('id', $supplierId)->value('nama_pt_pengirim'),
             'tanggal_pengiriman' => $shipmentDate,
             'jatuh_tempo' => $dueDate,
             'grand_total_rupiah' => $grandTotalRupiah,
+        ]);
+    }
+
+    private function seedSupplierInvoiceLine(
+        string $id,
+        string $supplierInvoiceId,
+        string $productId,
+        int $qtyPcs,
+        int $lineTotalRupiah,
+        int $unitCostRupiah
+    ): void {
+        DB::table('supplier_invoice_lines')->insert([
+            'id' => $id,
+            'supplier_invoice_id' => $supplierInvoiceId,
+            'product_id' => $productId,
+            'product_kode_barang_snapshot' => (string) DB::table('products')->where('id', $productId)->value('kode_barang'),
+            'product_nama_barang_snapshot' => (string) DB::table('products')->where('id', $productId)->value('nama_barang'),
+            'product_merek_snapshot' => (string) DB::table('products')->where('id', $productId)->value('merek'),
+            'product_ukuran_snapshot' => DB::table('products')->where('id', $productId)->value('ukuran'),
+            'qty_pcs' => $qtyPcs,
+            'line_total_rupiah' => $lineTotalRupiah,
+            'unit_cost_rupiah' => $unitCostRupiah,
         ]);
     }
 
@@ -103,7 +158,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         string $supplierInvoiceId,
         int $amountRupiah,
         string $paidAt,
-        string $proofStatus,
+        string $proofStatus
     ): void {
         DB::table('supplier_payments')->insert([
             'id' => $id,
@@ -118,7 +173,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
     private function seedSupplierReceipt(
         string $id,
         string $supplierInvoiceId,
-        string $tanggalTerima,
+        string $tanggalTerima
     ): void {
         DB::table('supplier_receipts')->insert([
             'id' => $id,
@@ -131,7 +186,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         string $id,
         string $supplierReceiptId,
         string $supplierInvoiceLineId,
-        int $qtyDiterima,
+        int $qtyDiterima
     ): void {
         DB::table('supplier_receipt_lines')->insert([
             'id' => $id,
