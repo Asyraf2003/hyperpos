@@ -8,14 +8,25 @@ use App\Application\Inventory\UseCases\IssueInventoryHandler;
 use App\Application\Shared\DTO\Result;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProductFixture;
 use Tests\TestCase;
 
 final class IssueInventoryFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProductFixture;
 
     public function test_issue_inventory_handler_creates_stock_out_movement_and_updates_projections(): void
     {
+        $this->seedMinimalProduct(
+            id: 'product-1',
+            kodeBarang: 'KB-001',
+            namaBarang: 'Ban Luar',
+            merek: 'Federal',
+            ukuran: 100,
+            hargaJual: 12000,
+        );
+
         DB::table('product_inventory')->insert([
             'product_id' => 'product-1',
             'qty_on_hand' => 7,
@@ -65,6 +76,15 @@ final class IssueInventoryFeatureTest extends TestCase
 
     public function test_issue_inventory_handler_rejects_when_stock_is_insufficient(): void
     {
+        $this->seedMinimalProduct(
+            id: 'product-1',
+            kodeBarang: 'KB-001',
+            namaBarang: 'Ban Luar',
+            merek: 'Federal',
+            ukuran: 100,
+            hargaJual: 12000,
+        );
+
         DB::table('product_inventory')->insert([
             'product_id' => 'product-1',
             'qty_on_hand' => 2,

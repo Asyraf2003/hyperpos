@@ -8,11 +8,13 @@ use App\Core\Note\WorkItem\WorkItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProductFixture;
 use Tests\TestCase;
 
 final class CashierNoteDetailAccessGuardFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProductFixture;
 
     public function test_cashier_can_access_open_note_for_today(): void
     {
@@ -74,6 +76,15 @@ final class CashierNoteDetailAccessGuardFeatureTest extends TestCase
 
     private function seedMinimalNote(string $noteId, string $transactionDate, string $noteState): void
     {
+        $this->seedMinimalProduct(
+            id: 'product-1',
+            kodeBarang: 'KB-001',
+            namaBarang: 'Ban Luar',
+            merek: 'Federal',
+            ukuran: 100,
+            hargaJual: 10000,
+        );
+
         DB::table('notes')->insert([
             'id' => $noteId,
             'customer_name' => 'Budi',
