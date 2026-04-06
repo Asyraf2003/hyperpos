@@ -7,11 +7,13 @@ namespace Tests\Feature\Procurement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_admin_can_search_procurement_invoice_table_by_supplier_name(): void
     {
@@ -130,7 +132,11 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
     public function test_admin_can_view_receipt_aggregations_in_procurement_invoice_table(): void
     {
         $this->seedSupplier('supplier-1', 'PT Makmur');
+        $this->seedProductFixture();
         $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Makmur');
+
+        $this->seedInvoiceLine('line-1', 'invoice-1', 5, 50000, 10000);
+        $this->seedInvoiceLine('line-2', 'invoice-1', 10, 50000, 5000);
 
         $this->seedReceipt('receipt-1', 'invoice-1', '2026-03-16');
         $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'line-1', 5);
@@ -164,11 +170,12 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
 
     private function seedSupplier(string $id, string $namaPtPengirim): void
     {
-        DB::table('suppliers')->insert([
-            'id' => $id,
-            'nama_pt_pengirim' => $namaPtPengirim,
-            'nama_pt_pengirim_normalized' => mb_strtolower($namaPtPengirim),
-        ]);
+        $this->seedMinimalSupplier($id, $namaPtPengirim, mb_strtolower($namaPtPengirim));
+    }
+
+    private function seedProductFixture(): void
+    {
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 75000);
     }
 
     private function seedInvoice(
@@ -179,45 +186,49 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         int $grandTotal,
         string $supplierNamaPtPengirimSnapshot
     ): void {
-        DB::table('supplier_invoices')->insert([
-            'id' => $id,
-            'supplier_id' => $supplierId,
-            'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
-            'tanggal_pengiriman' => $shipmentDate,
-            'jatuh_tempo' => $dueDate,
-            'grand_total_rupiah' => $grandTotal,
-        ]);
+        $this->seedMinimalSupplierInvoice(
+            $id,
+            $supplierId,
+            $shipmentDate,
+            $dueDate,
+            $grandTotal,
+            $supplierNamaPtPengirimSnapshot
+        );
+    }
+
+    private function seedInvoiceLine(
+        string $id,
+        string $invoiceId,
+        int $qtyPcs,
+        int $lineTotalRupiah,
+        int $unitCostRupiah
+    ): void {
+        $this->seedMinimalSupplierInvoiceLine(
+            $id,
+            $invoiceId,
+            'product-1',
+            $qtyPcs,
+            $lineTotalRupiah,
+            $unitCostRupiah,
+            'KB-001',
+            'Ban Luar',
+            'Federal',
+            100
+        );
     }
 
     private function seedPayment(string $id, string $invoiceId, int $amount, string $paidAt, string $proofStatus): void
     {
-        DB::table('supplier_payments')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $invoiceId,
-            'amount_rupiah' => $amount,
-            'paid_at' => $paidAt,
-            'proof_status' => $proofStatus,
-            'proof_storage_path' => null,
-        ]);
+        $this->seedMinimalSupplierPayment($id, $invoiceId, $amount, $paidAt, $proofStatus);
     }
-
 
     private function seedReceipt(string $id, string $invoiceId, string $tanggalTerima): void
     {
-        DB::table('supplier_receipts')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $invoiceId,
-            'tanggal_terima' => $tanggalTerima,
-        ]);
+        $this->seedMinimalSupplierReceipt($id, $invoiceId, $tanggalTerima);
     }
 
     private function seedReceiptLine(string $id, string $receiptId, string $invoiceLineId, int $qtyDiterima): void
     {
-        DB::table('supplier_receipt_lines')->insert([
-            'id' => $id,
-            'supplier_receipt_id' => $receiptId,
-            'supplier_invoice_line_id' => $invoiceLineId,
-            'qty_diterima' => $qtyDiterima,
-        ]);
+        $this->seedMinimalSupplierReceiptLine($id, $receiptId, $invoiceLineId, $qtyDiterima);
     }
 }
