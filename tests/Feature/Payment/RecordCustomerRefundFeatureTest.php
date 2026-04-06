@@ -62,6 +62,7 @@ final class RecordCustomerRefundFeatureTest extends TestCase
             'Refund jasa',
             'actor-1',
         );
+
         $this->assertTrue($first->isSuccess());
 
         $second = app(RecordCustomerRefundHandler::class)->handle(
@@ -82,14 +83,14 @@ final class RecordCustomerRefundFeatureTest extends TestCase
         $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 5000);
         $this->seedNotePaymentProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 3000);
 
-        $this->seedNoteBase('note-1', 'Budi', '2026-04-02', 14000);
+        $this->seedNoteBase('note-1', 'Budi', '2026-04-02', 23000);
 
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 5000);
         $this->seedWorkItemBase('wi-2', 'note-1', 2, WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, WorkItem::STATUS_OPEN, 7000);
-        $this->seedWorkItemBase('wi-3', 'note-1', 3, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 2000);
+        $this->seedWorkItemBase('wi-3', 'note-1', 3, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 11000);
 
         $this->seedServiceDetailBase('wi-2', 'Servis A', 4000, ServiceDetail::PART_SOURCE_NONE);
-        $this->seedServiceDetailBase('wi-3', 'Servis B', 0, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedServiceDetailBase('wi-3', 'Servis B', 9000, ServiceDetail::PART_SOURCE_NONE);
 
         $this->seedStoreStockLineBase('sto-1', 'wi-1', 'product-1', 1, 5000);
         $this->seedStoreStockLineBase('sto-2', 'wi-2', 'product-2', 1, 3000);

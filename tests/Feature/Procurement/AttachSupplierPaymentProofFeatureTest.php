@@ -9,17 +9,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class AttachSupplierPaymentProofFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_admin_can_attach_multiple_proofs_to_pending_supplier_payment(): void
     {
         Storage::fake('local');
 
-        $this->seedPayment('payment-1', 'invoice-1', 30000, '2026-03-20', 'pending', null);
+        $this->seedPaymentFixture('payment-1', 'invoice-1', 'pending', null);
 
         $response = $this
             ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
@@ -65,7 +67,7 @@ final class AttachSupplierPaymentProofFeatureTest extends TestCase
     {
         Storage::fake('local');
 
-        $this->seedPayment('payment-1', 'invoice-1', 30000, '2026-03-20', 'uploaded', null);
+        $this->seedPaymentFixture('payment-1', 'invoice-1', 'uploaded', null);
         $this->seedAttachment(
             'attachment-1',
             'payment-1',
@@ -128,22 +130,42 @@ final class AttachSupplierPaymentProofFeatureTest extends TestCase
         return $user;
     }
 
-    private function seedPayment(
-        string $id,
+    private function seedPaymentFixture(
+        string $paymentId,
         string $invoiceId,
-        int $amount,
-        string $paidAt,
         string $proofStatus,
         ?string $proofPath
     ): void {
-        DB::table('supplier_payments')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $invoiceId,
-            'amount_rupiah' => $amount,
-            'paid_at' => $paidAt,
-            'proof_status' => $proofStatus,
-            'proof_storage_path' => $proofPath,
-        ]);
+        $this->seedMinimalSupplier('supplier-1', 'PT Supplier Test', 'pt supplier test');
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 75000);
+        $this->seedMinimalSupplierInvoice(
+            $invoiceId,
+            'supplier-1',
+            '2026-03-15',
+            '2026-04-15',
+            100000,
+            'PT Supplier Test'
+        );
+        $this->seedMinimalSupplierInvoiceLine(
+            'invoice-line-1',
+            $invoiceId,
+            'product-1',
+            2,
+            100000,
+            50000,
+            'KB-001',
+            'Ban Luar',
+            'Federal',
+            100
+        );
+        $this->seedMinimalSupplierPayment(
+            $paymentId,
+            $invoiceId,
+            30000,
+            '2026-03-20',
+            $proofStatus,
+            $proofPath
+        );
     }
 
     private function seedAttachment(
