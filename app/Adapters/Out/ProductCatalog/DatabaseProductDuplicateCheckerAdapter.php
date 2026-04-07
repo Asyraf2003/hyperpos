@@ -59,10 +59,29 @@ final class DatabaseProductDuplicateCheckerAdapter implements ProductDuplicateCh
 
     private function baseQuery(string $namaBarang, string $merek, ?int $ukuran): Builder
     {
+        $normalizedNamaBarang = $this->normalizeForSearch($namaBarang);
+        $normalizedMerek = $this->normalizeForSearch($merek);
+
         $query = DB::table('products')
             ->whereNull('deleted_at')
-            ->where('nama_barang_normalized', $this->normalizeForSearch($namaBarang))
-            ->where('merek_normalized', $this->normalizeForSearch($merek));
+            ->where(function (Builder $builder) use ($namaBarang, $normalizedNamaBarang): void {
+                $builder
+                    ->where('nama_barang_normalized', $normalizedNamaBarang)
+                    ->orWhere(function (Builder $fallback) use ($namaBarang): void {
+                        $fallback
+                            ->whereNull('nama_barang_normalized')
+                            ->where('nama_barang', $namaBarang);
+                    });
+            })
+            ->where(function (Builder $builder) use ($merek, $normalizedMerek): void {
+                $builder
+                    ->where('merek_normalized', $normalizedMerek)
+                    ->orWhere(function (Builder $fallback) use ($merek): void {
+                        $fallback
+                            ->whereNull('merek_normalized')
+                            ->where('merek', $merek);
+                    });
+            });
 
         if ($ukuran === null) {
             $query->whereNull('ukuran');

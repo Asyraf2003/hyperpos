@@ -18,16 +18,22 @@ trait ProductTableFilters
             $query->where(function (Builder $builder) use ($rawKeyword, $normalizedKeyword): void {
                 $builder
                     ->where('products.kode_barang', 'like', '%' . $rawKeyword . '%')
+                    ->orWhere('products.nama_barang', 'like', '%' . $rawKeyword . '%')
+                    ->orWhere('products.merek', 'like', '%' . $rawKeyword . '%')
                     ->orWhere('products.nama_barang_normalized', 'like', '%' . $normalizedKeyword . '%')
                     ->orWhere('products.merek_normalized', 'like', '%' . $normalizedKeyword . '%');
             });
         }
 
         if ($filters->merek() !== null) {
-            $query->where(
-                'products.merek_normalized',
-                $this->normalizeForSearch($filters->merek())
-            );
+            $rawMerek = $filters->merek();
+            $normalizedMerek = $this->normalizeForSearch($rawMerek);
+
+            $query->where(function (Builder $builder) use ($rawMerek, $normalizedMerek): void {
+                $builder
+                    ->where('products.merek', $rawMerek)
+                    ->orWhere('products.merek_normalized', $normalizedMerek);
+            });
         }
 
         if ($filters->ukuranMin() !== null) {

@@ -24,6 +24,8 @@ trait ProductListQuery
         return $query->where(function (Builder $builder) use ($rawKeyword, $normalizedKeyword): void {
             $builder
                 ->where('kode_barang', 'like', '%' . $rawKeyword . '%')
+                ->orWhere('nama_barang', 'like', '%' . $rawKeyword . '%')
+                ->orWhere('merek', 'like', '%' . $rawKeyword . '%')
                 ->orWhere('nama_barang_normalized', 'like', '%' . $normalizedKeyword . '%')
                 ->orWhere('merek_normalized', 'like', '%' . $normalizedKeyword . '%');
         });
