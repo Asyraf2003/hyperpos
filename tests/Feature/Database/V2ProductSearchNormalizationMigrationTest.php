@@ -38,13 +38,13 @@ final class V2ProductSearchNormalizationMigrationTest extends TestCase
         $this->assertIndexColumns(
             'products',
             'products_kode_barang_unique',
-            ['kode_barang']
+            ['kode_barang', 'active_unique_marker']
         );
 
         $this->assertIndexColumns(
             'products',
             'products_business_identity_unique',
-            ['nama_barang_normalized', 'merek_normalized', 'ukuran']
+            ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker']
         );
     }
 
