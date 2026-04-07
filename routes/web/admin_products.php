@@ -8,6 +8,7 @@ use App\Adapters\In\Http\Controllers\Admin\Product\EditProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Product\RecordProductStockAdjustmentController;
+use App\Adapters\In\Http\Controllers\Admin\Product\ShowProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\UpdateProductController as WebUpdateProductController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::post('/admin/products', StoreProductController::class)
         ->name('admin.products.store');
+
+    Route::get('/admin/products/{productId}', ShowProductPageController::class)
+        ->name('admin.products.show');
 
     Route::get('/admin/products/{productId}/edit', EditProductPageController::class)
         ->name('admin.products.edit');
