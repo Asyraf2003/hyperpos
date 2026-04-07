@@ -12,16 +12,20 @@ trait ProductListQuery
     private function baseSelect(): Builder
     {
         return DB::table('products')
+            ->whereNull('deleted_at')
             ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual']);
     }
 
     private function applySearch(Builder $query, string $keyword): Builder
     {
-        return $query->where(function (Builder $builder) use ($keyword): void {
+        $rawKeyword = $keyword;
+        $normalizedKeyword = $this->normalizeForSearch($keyword);
+
+        return $query->where(function (Builder $builder) use ($rawKeyword, $normalizedKeyword): void {
             $builder
-                ->where('kode_barang', 'like', '%' . $keyword . '%')
-                ->orWhere('nama_barang', 'like', '%' . $keyword . '%')
-                ->orWhere('merek', 'like', '%' . $keyword . '%');
+                ->where('kode_barang', 'like', '%' . $rawKeyword . '%')
+                ->orWhere('nama_barang_normalized', 'like', '%' . $normalizedKeyword . '%')
+                ->orWhere('merek_normalized', 'like', '%' . $normalizedKeyword . '%');
         });
     }
 
@@ -32,5 +36,12 @@ trait ProductListQuery
             ->orderBy('merek')
             ->orderBy('ukuran')
             ->orderBy('id');
+    }
+
+    private function normalizeForSearch(string $value): string
+    {
+        $normalized = preg_replace('/\s+/', ' ', trim($value)) ?? trim($value);
+
+        return mb_strtolower($normalized);
     }
 }

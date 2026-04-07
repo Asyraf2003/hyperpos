@@ -66,6 +66,7 @@ use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
+use App\Adapters\Out\ProductCatalog\DatabaseVersionedProductWriterAdapter;
 use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
@@ -218,7 +219,7 @@ class HexagonalServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProductReaderPort::class, DatabaseProductReaderAdapter::class);
         $this->app->singleton(ProductTableReaderPort::class, DatabaseProductTableReaderAdapter::class);
-        $this->app->singleton(ProductWriterPort::class, DatabaseProductWriterAdapter::class);
+        $this->app->scoped(ProductWriterPort::class, DatabaseVersionedProductWriterAdapter::class);
         $this->app->singleton(ProductDuplicateCheckerPort::class, DatabaseProductDuplicateCheckerAdapter::class);
 
         $this->app->singleton(SupplierReaderPort::class, DatabaseSupplierReaderAdapter::class);

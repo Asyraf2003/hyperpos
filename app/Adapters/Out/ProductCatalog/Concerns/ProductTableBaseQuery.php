@@ -13,6 +13,7 @@ trait ProductTableBaseQuery
     {
         return DB::table('products')
             ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
             ->select([
                 'products.id',
                 'products.kode_barang',

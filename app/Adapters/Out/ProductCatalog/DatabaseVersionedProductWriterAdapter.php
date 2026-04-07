@@ -102,7 +102,9 @@ final class DatabaseVersionedProductWriterAdapter implements ProductWriterPort
             'id' => $product->id(),
             'kode_barang' => $product->kodeBarang(),
             'nama_barang' => $product->namaBarang(),
+            'nama_barang_normalized' => $this->normalizeForSearch($product->namaBarang()),
             'merek' => $product->merek(),
+            'merek_normalized' => $this->normalizeForSearch($product->merek()),
             'ukuran' => $product->ukuran(),
             'harga_jual' => $product->hargaJual()->amount(),
         ];
@@ -137,5 +139,12 @@ final class DatabaseVersionedProductWriterAdapter implements ProductWriterPort
             ->max('revision_no');
 
         return ((int) ($current ?? 0)) + 1;
+    }
+
+    private function normalizeForSearch(string $value): string
+    {
+        $normalized = preg_replace('/\s+/', ' ', trim($value)) ?? trim($value);
+
+        return mb_strtolower($normalized);
     }
 }
