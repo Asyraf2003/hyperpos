@@ -92,45 +92,69 @@
             aria-labelledby="product-action-modal-title"
             aria-hidden="true"
         >
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <div>
-                            <h5 class="modal-title" id="product-action-modal-title">Aksi Produk</h5>
-                            <p class="mb-0 text-muted small" id="product-action-modal-subtitle">Pilih tindakan untuk produk.</p>
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="product-action-modal-title">Aksi Produk</h3>
+                            <p class="mb-0 text-muted fs-6" id="product-action-modal-subtitle">
+                                Pilih tindakan untuk produk.
+                            </p>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                     </div>
 
-                    <div class="modal-body d-grid gap-2">
-                        <a
-                            href="#"
-                            id="product-action-edit-link"
-                            class="btn btn-outline-primary text-start"
-                        >
-                            Edit identitas barang
-                        </a>
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="product-action-detail-link"
+                                    class="btn btn-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Detail</div>
+                                    <div class="small opacity-75">Lihat ringkasan dan riwayat versi produk.</div>
+                                </a>
+                            </div>
 
-                        <a
-                            href="#"
-                            id="product-action-stock-link"
-                            class="btn btn-outline-warning text-start"
-                        >
-                            Ubah stok
-                        </a>
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="product-action-edit-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Edit identitas barang</div>
+                                    <div class="small opacity-75">Ubah kode, nama, merek, ukuran, dan harga jual.</div>
+                                </a>
+                            </div>
 
-                        <form id="product-action-delete-form" method="post" class="d-grid">
-                            @csrf
-                            @method('DELETE')
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="product-action-stock-link"
+                                    class="btn btn-outline-info w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Ubah stok</div>
+                                    <div class="small opacity-75">Masuk ke form penyesuaian stok keluar.</div>
+                                </a>
+                            </div>
 
-                            <button
-                                type="submit"
-                                id="product-action-delete-button"
-                                class="btn btn-outline-danger text-start"
-                            >
-                                Soft delete
-                            </button>
-                        </form>
+                            <div class="col-12 col-md-6">
+                                <form id="product-action-delete-form" method="post" class="h-100">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button
+                                        type="submit"
+                                        id="product-action-delete-button"
+                                        class="btn btn-outline-danger w-100 text-start py-3 px-4 h-100"
+                                    >
+                                        <div class="fw-bold fs-5 mb-1">Soft delete</div>
+                                        <div class="small opacity-75">Sembunyikan dari daftar aktif tanpa menghapus histori.</div>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -142,6 +166,7 @@
     <script>
         window.productTableConfig = {
             endpoint: @json(route('admin.products.table')),
+            showBaseUrl: @json(route('admin.products.show', ['productId' => '__ID__'])),
             editBaseUrl: @json(route('admin.products.edit', ['productId' => '__ID__'])),
             deleteBaseUrl: @json(route('admin.products.delete', ['productId' => '__ID__'])),
             editIdentityAnchor: '#product-master-form',
