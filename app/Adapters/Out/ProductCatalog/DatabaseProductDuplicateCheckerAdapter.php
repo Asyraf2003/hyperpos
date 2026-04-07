@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\Out\ProductCatalog;
 
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseProductDuplicateCheckerAdapter implements ProductDuplicateCheckerPort
@@ -56,11 +57,12 @@ final class DatabaseProductDuplicateCheckerAdapter implements ProductDuplicateCh
         return false;
     }
 
-    private function baseQuery(string $namaBarang, string $merek, ?int $ukuran)
+    private function baseQuery(string $namaBarang, string $merek, ?int $ukuran): Builder
     {
         $query = DB::table('products')
-            ->where('nama_barang', $namaBarang)
-            ->where('merek', $merek);
+            ->whereNull('deleted_at')
+            ->where('nama_barang_normalized', $this->normalizeForSearch($namaBarang))
+            ->where('merek_normalized', $this->normalizeForSearch($merek));
 
         if ($ukuran === null) {
             $query->whereNull('ukuran');
@@ -80,5 +82,12 @@ final class DatabaseProductDuplicateCheckerAdapter implements ProductDuplicateCh
         }
 
         return $candidateKodeBarang !== $existingKodeBarang;
+    }
+
+    private function normalizeForSearch(string $value): string
+    {
+        $normalized = preg_replace('/\s+/', ' ', trim($value)) ?? trim($value);
+
+        return mb_strtolower($normalized);
     }
 }
