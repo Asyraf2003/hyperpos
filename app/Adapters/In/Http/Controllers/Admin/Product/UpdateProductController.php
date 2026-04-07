@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Product;
 
+use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Adapters\In\Http\Requests\ProductCatalog\UpdateProductRequest;
 use App\Application\ProductCatalog\UseCases\UpdateProductHandler;
 use Illuminate\Http\RedirectResponse;
@@ -14,9 +15,20 @@ final class UpdateProductController extends Controller
     public function __invoke(
         UpdateProductRequest $request,
         UpdateProductHandler $useCase,
+        ProductChangeContext $changeContext,
         string $productId,
     ): RedirectResponse {
         $data = $request->validated();
+
+        $user = $request->user();
+        $actorId = $user?->getAuthIdentifier();
+
+        $changeContext->set(
+            $actorId !== null ? (string) $actorId : null,
+            null,
+            'web_admin',
+            null,
+        );
 
         $result = $useCase->handle(
             $productId,

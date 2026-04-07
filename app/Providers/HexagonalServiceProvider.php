@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Adapters\Out\Audit\DatabaseAuditLogAdapter;
 use App\Adapters\Out\Audit\DatabaseAuditLogReaderAdapter;
 use App\Adapters\Out\Auth\LaravelUuidAdapter;
@@ -176,6 +177,7 @@ class HexagonalServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->scoped(ProductChangeContext::class, fn (): ProductChangeContext => new ProductChangeContext());
         $this->app->bind(HealthCheckUseCase::class, HealthCheckHandler::class);
 
         $this->app->singleton(ClockPort::class, SystemClockAdapter::class);

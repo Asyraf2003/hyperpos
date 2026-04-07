@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Product;
 
+use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Adapters\In\Http\Requests\ProductCatalog\CreateProductRequest;
 use App\Application\ProductCatalog\UseCases\CreateProductHandler;
 use Illuminate\Http\RedirectResponse;
@@ -14,8 +15,19 @@ final class StoreProductController extends Controller
     public function __invoke(
         CreateProductRequest $request,
         CreateProductHandler $useCase,
+        ProductChangeContext $changeContext,
     ): RedirectResponse {
         $data = $request->validated();
+
+        $user = $request->user();
+        $actorId = $user?->getAuthIdentifier();
+
+        $changeContext->set(
+            $actorId !== null ? (string) $actorId : null,
+            null,
+            'web_admin',
+            null,
+        );
 
         $result = $useCase->handle(
             isset($data['kode_barang']) ? (string) $data['kode_barang'] : null,
