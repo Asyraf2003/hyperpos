@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Product\CreateProductPageController;
+use App\Adapters\In\Http\Controllers\Admin\Product\DeleteProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\EditProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
@@ -34,4 +35,8 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::put('/admin/products/{productId}', WebUpdateProductController::class)
         ->name('admin.products.update');
+
+    Route::delete('/admin/products/{productId}', DeleteProductController::class)
+        ->name('admin.products.delete');
+
 });
