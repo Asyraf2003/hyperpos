@@ -27,6 +27,16 @@
   const drawer = $("product-filter-drawer");
   const backdrop = $("product-filter-backdrop");
 
+  const actionModalElement = $("product-action-modal");
+  const actionModalSubtitle = $("product-action-modal-subtitle");
+  const actionEditLink = $("product-action-edit-link");
+  const actionStockLink = $("product-action-stock-link");
+  const actionDeleteForm = $("product-action-delete-form");
+
+  const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(actionModalElement)
+    : null;
+
   let searchDebounceTimer = null;
   let requestCounter = 0;
 
@@ -40,6 +50,9 @@
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const editUrl = (id) => c.editBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const deleteUrl = (id) => c.deleteBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const editIdentityUrl = (id) => `${editUrl(id)}${c.editIdentityAnchor || ""}`;
+  const stockAdjustmentUrl = (id) => `${editUrl(id)}${c.stockAdjustmentAnchor || ""}`;
 
   const trimValue = (v) => String(v ?? "").trim();
 
@@ -112,6 +125,17 @@
     backdrop.classList.toggle("d-none", !open);
   };
 
+  const configureActionModal = (product) => {
+    if (!actionEditLink || !actionStockLink || !actionDeleteForm || !actionModalSubtitle) {
+      return;
+    }
+
+    actionModalSubtitle.textContent = `${product.nama_barang} • ${product.kode_barang || "-"}`;
+    actionEditLink.href = editIdentityUrl(product.id);
+    actionStockLink.href = stockAdjustmentUrl(product.id);
+    actionDeleteForm.action = deleteUrl(product.id);
+  };
+
   const rowHtml = (r, i, meta) => `
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
@@ -122,7 +146,16 @@
       <td>${rupiah(r.harga_jual)}</td>
       <td>${esc(r.stok_saat_ini)}</td>
       <td class="text-center">
-        <a href="${editUrl(r.id)}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          data-product-action="open"
+          data-product-id="${esc(r.id)}"
+          data-product-kode="${esc(r.kode_barang || "")}"
+          data-product-nama="${esc(r.nama_barang)}"
+        >
+          Aksi
+        </button>
       </td>
     </tr>
   `;
@@ -283,6 +316,26 @@
     s.sort_by = key;
     s.page = 1;
     load();
+  });
+
+  body.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-product-action='open']");
+    if (!btn) return;
+
+    const product = {
+      id: btn.dataset.productId,
+      kode_barang: btn.dataset.productKode || "",
+      nama_barang: btn.dataset.productNama || ""
+    };
+
+    configureActionModal(product);
+
+    if (actionModal) {
+      actionModal.show();
+      return;
+    }
+
+    window.location.href = editIdentityUrl(product.id);
   });
 
   pager.addEventListener("click", (e) => {

@@ -84,6 +84,57 @@
         </div>
 
         @include('admin.products.partials.filter_drawer')
+
+        <div
+            class="modal fade"
+            id="product-action-modal"
+            tabindex="-1"
+            aria-labelledby="product-action-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title" id="product-action-modal-title">Aksi Produk</h5>
+                            <p class="mb-0 text-muted small" id="product-action-modal-subtitle">Pilih tindakan untuk produk.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body d-grid gap-2">
+                        <a
+                            href="#"
+                            id="product-action-edit-link"
+                            class="btn btn-outline-primary text-start"
+                        >
+                            Edit identitas barang
+                        </a>
+
+                        <a
+                            href="#"
+                            id="product-action-stock-link"
+                            class="btn btn-outline-warning text-start"
+                        >
+                            Ubah stok
+                        </a>
+
+                        <form id="product-action-delete-form" method="post" class="d-grid">
+                            @csrf
+                            @method('DELETE')
+
+                            <button
+                                type="submit"
+                                id="product-action-delete-button"
+                                class="btn btn-outline-danger text-start"
+                            >
+                                Soft delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
@@ -91,7 +142,10 @@
     <script>
         window.productTableConfig = {
             endpoint: @json(route('admin.products.table')),
-            editBaseUrl: @json(route('admin.products.edit', ['productId' => '__ID__']))
+            editBaseUrl: @json(route('admin.products.edit', ['productId' => '__ID__'])),
+            deleteBaseUrl: @json(route('admin.products.delete', ['productId' => '__ID__'])),
+            editIdentityAnchor: '#product-master-form',
+            stockAdjustmentAnchor: '#product-stock-adjustment-form',
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-products-table.js') }}"></script>
