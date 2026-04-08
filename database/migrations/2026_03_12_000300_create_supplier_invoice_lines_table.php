@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('supplier_invoice_lines', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('supplier_invoice_id');
+            $table->integer('line_no');
             $table->string('product_id');
             $table->string('product_kode_barang_snapshot')->nullable();
             $table->string('product_nama_barang_snapshot')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration
 
             $table->index('supplier_invoice_id');
             $table->index('product_id');
+            $table->unique(['supplier_invoice_id', 'line_no'], 'sil_supplier_invoice_line_no_unique');
         });
     }
 
