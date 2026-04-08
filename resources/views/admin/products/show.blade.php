@@ -56,46 +56,54 @@
                     </div>
                 </div>
 
-                @if ($page['initial_identity'] !== null)
+                @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
                     <div class="card mt-4">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center gap-2">
-                                <h5 class="card-title mb-0">Identitas Awal</h5>
-                                <span class="badge bg-light-{{ $page['identity_change_badge']['tone'] }} text-{{ $page['identity_change_badge']['tone'] }}">
-                                    {{ $page['identity_change_badge']['label'] }}
+                                <h5 class="card-title mb-0">{{ $page['initial_identity_meta']['title'] }}</h5>
+                                <span class="badge bg-light-{{ $page['initial_identity_meta']['badge_tone'] }} text-{{ $page['initial_identity_meta']['badge_tone'] }}">
+                                    {{ $page['initial_identity_meta']['badge_label'] }}
                                 </span>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Kode Barang Awal</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['kode_barang'] }}</div>
-                            </div>
+                            @if ($page['initial_identity_meta']['note'] !== null)
+                                <div class="alert alert-light-{{ $page['initial_identity_meta']['badge_tone'] }} mb-4">
+                                    {{ $page['initial_identity_meta']['note'] }}
+                                </div>
+                            @endif
 
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Nama Barang Awal</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['nama_barang'] }}</div>
-                            </div>
+                            @if ($page['initial_identity'] !== null)
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Kode Barang</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['kode_barang'] }}</div>
+                                </div>
 
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Merek Awal</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['merek'] }}</div>
-                            </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Nama Barang</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['nama_barang'] }}</div>
+                                </div>
 
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Ukuran Awal</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['ukuran'] }}</div>
-                            </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Merek</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['merek'] }}</div>
+                                </div>
 
-                            <div class="mb-3">
-                                <small class="text-muted d-block">Harga Jual Awal</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['harga_jual_label'] }}</div>
-                            </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Ukuran</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['ukuran'] }}</div>
+                                </div>
 
-                            <div>
-                                <small class="text-muted d-block">Tercatat Pada</small>
-                                <div class="fw-semibold">{{ $page['initial_identity']['changed_at'] }}</div>
-                            </div>
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Harga Jual</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['harga_jual_label'] }}</div>
+                                </div>
+
+                                <div>
+                                    <small class="text-muted d-block">Tercatat Pada</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['changed_at'] }}</div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @endif
