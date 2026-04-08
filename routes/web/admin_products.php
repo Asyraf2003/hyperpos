@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\Admin\Product\CreateProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\DeleteProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\EditProductPageController;
+use App\Adapters\In\Http\Controllers\Admin\Product\EditProductStockPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Product\RecordProductStockAdjustmentController;
@@ -36,6 +37,10 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/products/{productId}/edit', EditProductPageController::class)
         ->name('admin.products.edit');
+
+
+    Route::get('/admin/products/{productId}/stock', EditProductStockPageController::class)
+        ->name('admin.products.stock.edit');
 
     Route::put('/admin/products/{productId}', WebUpdateProductController::class)
         ->name('admin.products.update');
