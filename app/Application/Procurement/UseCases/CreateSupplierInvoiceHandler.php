@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Application\Procurement\Services\SupplierInvoiceFactory;
 use App\Application\Procurement\Services\SupplierService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
@@ -24,12 +24,19 @@ final class CreateSupplierInvoiceHandler
         private UuidPort $uuid,
         private SupplierService $supplierService,
         private SupplierInvoiceFactory $invoiceFactory,
-        private AuditLogPort $audit
+        private SupplierInvoiceChangeContext $changeContext,
     ) {
     }
 
-    public function handle(string $pt, string $tgl, array $lines): Result
-    {
+    public function handle(
+        string $nomorFaktur,
+        string $pt,
+        string $tgl,
+        array $lines,
+        ?string $performedByActorId = null,
+        ?string $performedByActorRole = null,
+        string $sourceChannel = 'http',
+    ): Result {
         $started = false;
 
         try {
@@ -42,21 +49,24 @@ final class CreateSupplierInvoiceHandler
             $started = true;
 
             $supplier = $this->supplierService->resolve($pt);
+
+            $this->changeContext->set(
+                $performedByActorId,
+                $performedByActorRole,
+                $sourceChannel,
+                'supplier_invoice_created',
+            );
+
             $invoice = SupplierInvoice::create(
                 $this->uuid->generate(),
                 $supplier->id(),
                 $supplier->namaPtPengirim(),
+                trim($nomorFaktur),
                 $date,
                 $invoiceLines
             );
 
             $this->writer->create($invoice);
-
-            $this->audit->record('supplier_invoice_created', [
-                'invoice_id' => $invoice->id(),
-                'supplier_id' => $supplier->id(),
-                'total' => $invoice->grandTotalRupiah()->amount(),
-            ]);
 
             $this->transactions->commit();
 
@@ -79,6 +89,8 @@ final class CreateSupplierInvoiceHandler
             }
 
             throw $e;
+        } finally {
+            $this->changeContext->clear();
         }
     }
 }
