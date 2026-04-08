@@ -27,8 +27,39 @@ final class ProductDetailPagePresenter
             ],
             'current_identity' => $this->currentIdentity($product),
             'initial_identity' => $this->initialIdentity($detail['initial_identity']),
-            'identity_change_badge' => $this->identityChangeBadge($detail['has_identity_changes']),
+            'initial_identity_meta' => $this->initialIdentityMeta(
+                $detail['initial_identity_source'] ?? 'unavailable',
+                $detail['has_identity_changes']
+            ),
             'timeline' => $this->timeline($payload['timeline']),
+        ];
+    }
+
+    private function initialIdentityMeta(string $source, bool $hasIdentityChanges): array
+    {
+        if ($source === 'created_version') {
+            return [
+                'title' => 'Identitas Awal',
+                'badge_label' => $hasIdentityChanges ? 'Pernah berubah' : 'Belum berubah',
+                'badge_tone' => $hasIdentityChanges ? 'warning' : 'secondary',
+                'note' => null,
+            ];
+        }
+
+        if ($source === 'first_recorded_version') {
+            return [
+                'title' => 'Versi Pertama yang Tercatat',
+                'badge_label' => 'Histori awal tidak lengkap',
+                'badge_tone' => 'danger',
+                'note' => 'Data ini bukan identitas awal asli, melainkan versi paling awal yang tersedia di histori.',
+            ];
+        }
+
+        return [
+            'title' => 'Riwayat Awal Tidak Tersedia',
+            'badge_label' => 'Belum ada histori',
+            'badge_tone' => 'secondary',
+            'note' => 'Sistem belum memiliki versi awal yang bisa ditampilkan.',
         ];
     }
 }
