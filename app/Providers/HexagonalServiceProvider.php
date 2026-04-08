@@ -51,6 +51,8 @@ use App\Adapters\Out\Persistence\DatabaseTransactionManagerAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceLineReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceWriterAdapter;
+use App\Adapters\Out\Procurement\DatabaseVersionedSupplierInvoiceWriterAdapter;
+use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Adapters\Out\Procurement\DatabaseProcurementInvoiceDetailReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentWriterAdapter;
@@ -215,6 +217,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierService::class);
         $this->app->singleton(SupplierInvoiceFactory::class);
         $this->app->singleton(SupplierReceiptFactory::class);
+        $this->app->scoped(SupplierInvoiceChangeContext::class, fn (): SupplierInvoiceChangeContext => new SupplierInvoiceChangeContext());
 
         $this->app->singleton(ActorAccessReaderPort::class, DatabaseActorAccessReaderAdapter::class);
         $this->app->singleton(AdminTransactionCapabilityStatePort::class, DatabaseAdminTransactionCapabilityStateAdapter::class);
@@ -231,7 +234,8 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierWriterPort::class, DatabaseSupplierWriterAdapter::class);
         $this->app->singleton(ProcurementInvoiceTableReaderPort::class, DatabaseProcurementInvoiceTableReaderAdapter::class);
         $this->app->singleton(SupplierTableReaderPort::class, DatabaseSupplierTableReaderAdapter::class);
-        $this->app->singleton(SupplierInvoiceWriterPort::class, DatabaseSupplierInvoiceWriterAdapter::class);
+        $this->app->scoped(SupplierInvoiceWriterPort::class, DatabaseVersionedSupplierInvoiceWriterAdapter::class);
+        $this->app->scoped(SupplierInvoiceLifecyclePort::class, DatabaseVersionedSupplierInvoiceWriterAdapter::class);
         $this->app->singleton(SupplierInvoiceReaderPort::class, DatabaseSupplierInvoiceReaderAdapter::class);
         $this->app->singleton(ProcurementInvoiceDetailReaderPort::class, DatabaseProcurementInvoiceDetailReaderAdapter::class);
         $this->app->singleton(SupplierInvoiceLineReaderPort::class, DatabaseSupplierInvoiceLineReaderAdapter::class);
