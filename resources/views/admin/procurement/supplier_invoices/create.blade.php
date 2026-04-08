@@ -221,6 +221,22 @@
 
                         <div class="card-body">
                             <div class="form-group mb-4">
+                                <label for="nomor_faktur" class="form-label">Nomor Faktur</label>
+                                <input
+                                    type="text"
+                                    id="nomor_faktur"
+                                    name="nomor_faktur"
+                                    value="{{ old('nomor_faktur') }}"
+                                    class="form-control @error('nomor_faktur') is-invalid @enderror"
+                                    placeholder="Contoh: INV-SUP-2026-0001"
+                                    required
+                                >
+                                @error('nomor_faktur')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4">
                                 <label for="nama_pt_pengirim" class="form-label">Nama PT Pengirim</label>
                                 <input
                                     type="text"

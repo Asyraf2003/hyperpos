@@ -19,6 +19,7 @@ final class CreateSupplierInvoiceController
         $data = $request->validated();
 
         $result = $useCase->handle(
+            (string) $data['nomor_faktur'],
             (string) $data['nama_pt_pengirim'],
             (string) $data['tanggal_pengiriman'],
             $data['lines'],

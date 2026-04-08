@@ -26,6 +26,7 @@ final class CreateSupplierInvoiceRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nomor_faktur' => ['required', 'string'],
             'nama_pt_pengirim' => ['required', 'string'],
             'tanggal_pengiriman' => ['required', 'date_format:Y-m-d'],
             'auto_receive' => ['nullable', 'boolean'],
@@ -49,6 +50,8 @@ final class CreateSupplierInvoiceRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'nomor_faktur.required' => 'Nomor faktur wajib diisi.',
+            'nomor_faktur.string' => 'Nomor faktur harus berupa teks.',
             'nama_pt_pengirim.required' => 'Nama PT pengirim wajib diisi.',
             'nama_pt_pengirim.string' => 'Nama PT pengirim harus berupa teks.',
             'tanggal_pengiriman.required' => 'Tanggal pengiriman wajib diisi.',
@@ -75,6 +78,7 @@ final class CreateSupplierInvoiceRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'nomor_faktur' => 'nomor faktur',
             'nama_pt_pengirim' => 'nama PT pengirim',
             'tanggal_pengiriman' => 'tanggal pengiriman',
             'auto_receive' => 'auto receive',

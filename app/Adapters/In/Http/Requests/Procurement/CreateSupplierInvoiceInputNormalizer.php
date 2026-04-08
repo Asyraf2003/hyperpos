@@ -15,6 +15,7 @@ final class CreateSupplierInvoiceInputNormalizer
         $autoReceive = $input['auto_receive'] ?? null;
 
         return [
+            'nomor_faktur' => $this->trimOrNull($input['nomor_faktur'] ?? null),
             'nama_pt_pengirim' => $this->trimOrNull($input['nama_pt_pengirim'] ?? null),
             'tanggal_pengiriman' => $this->trimOrNull($input['tanggal_pengiriman'] ?? null),
             'tanggal_terima' => $this->trimOrNull($input['tanggal_terima'] ?? null),
