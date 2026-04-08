@@ -51,10 +51,9 @@
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const showUrl = (id) => c.showBaseUrl.replace("__ID__", encodeURIComponent(id));
-  const editUrl = (id) => c.editBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const editIdentityUrl = (id) => c.editBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const stockAdjustmentUrl = (id) => c.stockEditBaseUrl.replace("__ID__", encodeURIComponent(id));
   const deleteUrl = (id) => c.deleteBaseUrl.replace("__ID__", encodeURIComponent(id));
-  const editIdentityUrl = (id) => `${editUrl(id)}${c.editIdentityAnchor || ""}`;
-  const stockAdjustmentUrl = (id) => `${editUrl(id)}${c.stockAdjustmentAnchor || ""}`;
 
   const trimValue = (v) => String(v ?? "").trim();
 

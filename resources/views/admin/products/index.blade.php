@@ -168,9 +168,8 @@
             endpoint: @json(route('admin.products.table')),
             showBaseUrl: @json(route('admin.products.show', ['productId' => '__ID__'])),
             editBaseUrl: @json(route('admin.products.edit', ['productId' => '__ID__'])),
+            stockEditBaseUrl: @json(route('admin.products.stock.edit', ['productId' => '__ID__'])),
             deleteBaseUrl: @json(route('admin.products.delete', ['productId' => '__ID__'])),
-            editIdentityAnchor: '#product-master-form',
-            stockAdjustmentAnchor: '#product-stock-adjustment-form',
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-products-table.js') }}"></script>
