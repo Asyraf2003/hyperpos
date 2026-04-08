@@ -9,6 +9,15 @@
 
         <form id="product-filter-form">
             <div class="form-group mb-3">
+                <label class="form-label" for="filter-status">Status Produk</label>
+                <select id="filter-status" name="status" class="form-select">
+                    <option value="active">Aktif</option>
+                    <option value="deleted">Soft Deleted</option>
+                    <option value="all">Semua</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
                 <label class="form-label" for="filter-merek">Merek</label>
                 <input type="text" id="filter-merek" name="merek" class="form-control" placeholder="Contoh: Federal">
             </div>
