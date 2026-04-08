@@ -25,7 +25,7 @@ final class UserSeeder extends Seeder
         $kasir = User::query()->updateOrCreate(
             ['email' => 'kasir@gmail.com'],
             [
-                'name' => 'Liya',
+                'name' => 'kasir',
                 'password' => Hash::make('12345678'),
             ],
         );
