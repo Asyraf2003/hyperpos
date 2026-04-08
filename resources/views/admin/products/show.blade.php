@@ -12,7 +12,6 @@
             </div>
 
             <div class="d-flex flex-column flex-sm-row gap-2">
-                <a href="{{ $page['actions']['back_url'] }}" class="btn btn-light-secondary">Kembali</a>
                 <a href="{{ $page['actions']['edit_identity_url'] }}" class="btn btn-primary">
                     Edit Identitas
                 </a>
@@ -73,7 +72,7 @@
                                 </div>
                             @endif
 
-                            @if ($page['initial_identity'] !== null)
+                            @if ($page['initial_identity_meta']['show_values'] && $page['initial_identity'] !== null)
                                 <div class="mb-3">
                                     <small class="text-muted d-block">Kode Barang</small>
                                     <div class="fw-semibold">{{ $page['initial_identity']['kode_barang'] }}</div>

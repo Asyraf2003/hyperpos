@@ -21,9 +21,6 @@
                                 <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-warning">
                                     Ubah Stok
                                 </a>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
-                                    Kembali
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -150,9 +147,6 @@
                                 <button type="submit" class="btn btn-primary">
                                     Simpan Perubahan
                                 </button>
-                                <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-warning">
-                                    Ubah Stok
-                                </a>
                                 <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
                                     Batal
                                 </a>

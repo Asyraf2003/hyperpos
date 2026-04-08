@@ -16,6 +16,7 @@ final class ProductDetailPagePresenter
     {
         $detail = $payload['detail'];
         $product = $detail['product'];
+        $initialIdentitySource = $detail['initial_identity_source'] ?? 'unavailable';
 
         return [
             'heading' => $product['nama_barang'],
@@ -23,12 +24,14 @@ final class ProductDetailPagePresenter
             'actions' => [
                 'back_url' => route('admin.products.index'),
                 'edit_identity_url' => route('admin.products.edit', ['productId' => $product['id']]) . '#product-master-form',
-                'stock_adjustment_url' => route('admin.products.edit', ['productId' => $product['id']]) . '#product-stock-adjustment-form',
+                'stock_adjustment_url' => route('admin.products.stock.edit', ['productId' => $product['id']]),
             ],
             'current_identity' => $this->currentIdentity($product),
-            'initial_identity' => $this->initialIdentity($detail['initial_identity']),
+            'initial_identity' => $initialIdentitySource === 'created_version'
+                ? $this->initialIdentity($detail['initial_identity'])
+                : null,
             'initial_identity_meta' => $this->initialIdentityMeta(
-                $detail['initial_identity_source'] ?? 'unavailable',
+                $initialIdentitySource,
                 $detail['has_identity_changes']
             ),
             'timeline' => $this->timeline($payload['timeline']),
@@ -43,15 +46,17 @@ final class ProductDetailPagePresenter
                 'badge_label' => $hasIdentityChanges ? 'Pernah berubah' : 'Belum berubah',
                 'badge_tone' => $hasIdentityChanges ? 'warning' : 'secondary',
                 'note' => null,
+                'show_values' => true,
             ];
         }
 
         if ($source === 'first_recorded_version') {
             return [
-                'title' => 'Versi Pertama yang Tercatat',
-                'badge_label' => 'Histori awal tidak lengkap',
+                'title' => 'Histori Awal Tidak Lengkap',
+                'badge_label' => 'Data awal asli tidak tersedia',
                 'badge_tone' => 'danger',
-                'note' => 'Data ini bukan identitas awal asli, melainkan versi paling awal yang tersedia di histori.',
+                'note' => 'Sistem hanya memiliki versi pertama yang sempat tercatat, bukan identitas awal asli produk.',
+                'show_values' => false,
             ];
         }
 
@@ -60,6 +65,7 @@ final class ProductDetailPagePresenter
             'badge_label' => 'Belum ada histori',
             'badge_tone' => 'secondary',
             'note' => 'Sistem belum memiliki versi awal yang bisa ditampilkan.',
+            'show_values' => false,
         ];
     }
 }

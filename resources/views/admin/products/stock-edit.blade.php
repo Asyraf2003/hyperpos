@@ -42,7 +42,6 @@
                     </div>
 
                     <div class="card-footer d-flex gap-2">
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">Kembali</a>
                         <a href="{{ route('admin.products.edit', ['productId' => $product->id()]) }}" class="btn btn-primary">
                             Edit Identitas
                         </a>
