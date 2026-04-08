@@ -110,7 +110,7 @@
                                 <a
                                     href="#"
                                     id="product-action-detail-link"
-                                    class="btn btn-primary w-100 text-start py-3 px-4"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail</div>
                                     <div class="small opacity-75">Lihat ringkasan dan riwayat versi produk.</div>
@@ -132,7 +132,7 @@
                                 <a
                                     href="#"
                                     id="product-action-stock-link"
-                                    class="btn btn-outline-info w-100 text-start py-3 px-4"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Ubah stok</div>
                                     <div class="small opacity-75">Masuk ke form penyesuaian stok keluar.</div>
