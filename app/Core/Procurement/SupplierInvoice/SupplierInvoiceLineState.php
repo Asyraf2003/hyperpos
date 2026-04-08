@@ -10,6 +10,7 @@ trait SupplierInvoiceLineState
 {
     private function __construct(
         private string $id,
+        private int $lineNo,
         private string $productId,
         private ?string $productKodeBarangSnapshot,
         private string $productNamaBarangSnapshot,
@@ -22,6 +23,7 @@ trait SupplierInvoiceLineState
     }
 
     public function id(): string { return $this->id; }
+    public function lineNo(): int { return $this->lineNo; }
     public function productId(): string { return $this->productId; }
     public function productKodeBarangSnapshot(): ?string { return $this->productKodeBarangSnapshot; }
     public function productNamaBarangSnapshot(): string { return $this->productNamaBarangSnapshot; }
@@ -30,4 +32,15 @@ trait SupplierInvoiceLineState
     public function qtyPcs(): int { return $this->qtyPcs; }
     public function lineTotalRupiah(): Money { return $this->lineTotalRupiah; }
     public function unitCostRupiah(): Money { return $this->unitCostRupiah; }
+
+    private static function normalizeNullableString(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed === '' ? null : $trimmed;
+    }
 }

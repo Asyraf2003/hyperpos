@@ -11,31 +11,52 @@ use DateTimeImmutable;
 trait SupplierInvoiceValidation
 {
     /** @param list<SupplierInvoiceLine> $lines */
-    private static function assertValid(string $id, string $sId, string $supplierNamaPtPengirimSnapshot, array $lines): void
-    {
+    private static function assertValid(
+        string $id,
+        string $supplierId,
+        string $supplierNamaPtPengirimSnapshot,
+        string $nomorFaktur,
+        array $lines
+    ): void {
         if (trim($id) === '') throw new DomainException('ID wajib ada.');
-        if (trim($sId) === '') throw new DomainException('Supplier ID wajib ada.');
+        if (trim($supplierId) === '') throw new DomainException('Supplier ID wajib ada.');
         if (trim($supplierNamaPtPengirimSnapshot) === '') throw new DomainException('Snapshot nama supplier wajib ada.');
+        if (trim($nomorFaktur) === '') throw new DomainException('Nomor faktur wajib ada.');
         if ($lines === []) throw new DomainException('Minimal 1 line.');
-        foreach ($lines as $l) {
-            if (!$l instanceof SupplierInvoiceLine) throw new DomainException('Line tidak valid.');
+
+        foreach ($lines as $line) {
+            if (!$line instanceof SupplierInvoiceLine) {
+                throw new DomainException('Line tidak valid.');
+            }
         }
     }
 
-    private static function calculateJatuhTempo(DateTimeImmutable $tgl): DateTimeImmutable
+    private static function calculateJatuhTempo(DateTimeImmutable $tanggalPengiriman): DateTimeImmutable
     {
-        $m = (int)$tgl->format('n') + 1;
-        $y = (int)$tgl->format('Y');
-        if ($m > 12) { $m = 1; $y++; }
-        $last = (int)(new DateTimeImmutable(sprintf('%04d-%02d-01', $y, $m)))->modify('last day of this month')->format('j');
-        return $tgl->setDate($y, $m, min((int)$tgl->format('j'), $last));
+        $month = (int) $tanggalPengiriman->format('n') + 1;
+        $year = (int) $tanggalPengiriman->format('Y');
+
+        if ($month > 12) {
+            $month = 1;
+            $year++;
+        }
+
+        $lastDay = (int) (new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))
+            ->modify('last day of this month')
+            ->format('j');
+
+        return $tanggalPengiriman->setDate($year, $month, min((int) $tanggalPengiriman->format('j'), $lastDay));
     }
 
     /** @param list<SupplierInvoiceLine> $lines */
     private static function calculateGrandTotalRupiah(array $lines): Money
     {
         $total = Money::zero();
-        foreach ($lines as $l) $total = $total->add($l->lineTotalRupiah());
+
+        foreach ($lines as $line) {
+            $total = $total->add($line->lineTotalRupiah());
+        }
+
         return $total;
     }
 }

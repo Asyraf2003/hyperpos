@@ -14,19 +14,25 @@ final class SupplierInvoice
     /** @param list<SupplierInvoiceLine> $lines */
     public static function create(
         string $id,
-        string $sId,
+        string $supplierId,
         string $supplierNamaPtPengirimSnapshot,
-        DateTimeImmutable $tgl,
+        string $nomorFaktur,
+        DateTimeImmutable $tanggalPengiriman,
         array $lines
     ): self {
-        self::assertValid($id, $sId, $supplierNamaPtPengirimSnapshot, $lines);
+        self::assertValid($id, $supplierId, $supplierNamaPtPengirimSnapshot, $nomorFaktur, $lines);
 
         return new self(
             trim($id),
-            trim($sId),
+            trim($supplierId),
             trim($supplierNamaPtPengirimSnapshot),
-            $tgl,
-            self::calculateJatuhTempo($tgl),
+            trim($nomorFaktur),
+            'invoice',
+            'active',
+            null,
+            null,
+            $tanggalPengiriman,
+            self::calculateJatuhTempo($tanggalPengiriman),
             array_values($lines),
             self::calculateGrandTotalRupiah($lines)
         );
@@ -35,19 +41,30 @@ final class SupplierInvoice
     /** @param list<SupplierInvoiceLine> $lines */
     public static function rehydrate(
         string $id,
-        string $sId,
+        string $supplierId,
         string $supplierNamaPtPengirimSnapshot,
-        DateTimeImmutable $tgl,
+        string $nomorFaktur,
+        string $documentKind,
+        string $lifecycleStatus,
+        ?string $originSupplierInvoiceId,
+        ?string $supersededBySupplierInvoiceId,
+        DateTimeImmutable $tanggalPengiriman,
+        DateTimeImmutable $jatuhTempo,
         array $lines
     ): self {
-        self::assertValid($id, $sId, $supplierNamaPtPengirimSnapshot, $lines);
+        self::assertValid($id, $supplierId, $supplierNamaPtPengirimSnapshot, $nomorFaktur, $lines);
 
         return new self(
             trim($id),
-            trim($sId),
+            trim($supplierId),
             trim($supplierNamaPtPengirimSnapshot),
-            $tgl,
-            self::calculateJatuhTempo($tgl),
+            trim($nomorFaktur),
+            trim($documentKind),
+            trim($lifecycleStatus),
+            self::normalizeNullableString($originSupplierInvoiceId),
+            self::normalizeNullableString($supersededBySupplierInvoiceId),
+            $tanggalPengiriman,
+            $jatuhTempo,
             array_values($lines),
             self::calculateGrandTotalRupiah($lines)
         );

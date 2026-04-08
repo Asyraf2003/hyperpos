@@ -11,29 +11,22 @@ trait SupplierInvoiceLineValidation
 {
     private static function assertValid(
         string $id,
-        string $pId,
+        int $lineNo,
+        string $productId,
         string $productNamaBarangSnapshot,
         string $productMerekSnapshot,
-        int $qty,
-        Money $total
+        int $qtyPcs,
+        Money $lineTotalRupiah
     ): void {
-        if (trim($id) === '') throw new DomainException('ID wajib ada.');
-        if (trim($pId) === '') throw new DomainException('Product ID wajib ada.');
+        if (trim($id) === '') throw new DomainException('ID line wajib ada.');
+        if ($lineNo < 1) throw new DomainException('Nomor baris wajib >= 1.');
+        if (trim($productId) === '') throw new DomainException('Product ID wajib ada.');
         if (trim($productNamaBarangSnapshot) === '') throw new DomainException('Snapshot nama barang wajib ada.');
         if (trim($productMerekSnapshot) === '') throw new DomainException('Snapshot merek wajib ada.');
-        if ($qty <= 0) throw new DomainException('Qty harus > 0.');
-        if (!$total->greaterThan(Money::zero())) throw new DomainException('Total harus > 0.');
-        if ($total->amount() % $qty !== 0) throw new DomainException('Total harus habis dibagi qty.');
-    }
-
-    private static function normalizeNullableString(?string $value): ?string
-    {
-        if ($value === null) {
-            return null;
+        if ($qtyPcs < 1) throw new DomainException('Qty wajib lebih dari 0.');
+        if ($lineTotalRupiah->amount() < 1) throw new DomainException('Total line wajib lebih dari 0.');
+        if ($lineTotalRupiah->amount() % $qtyPcs !== 0) {
+            throw new DomainException('Total line harus habis dibagi qty.');
         }
-
-        $normalized = trim($value);
-
-        return $normalized === '' ? null : $normalized;
     }
 }

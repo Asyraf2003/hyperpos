@@ -13,49 +13,62 @@ final class SupplierInvoiceLine
 
     public static function create(
         string $id,
-        string $pId,
+        int $lineNo,
+        string $productId,
         ?string $productKodeBarangSnapshot,
         string $productNamaBarangSnapshot,
         string $productMerekSnapshot,
         ?int $productUkuranSnapshot,
-        int $qty,
-        Money $total
+        int $qtyPcs,
+        Money $lineTotalRupiah
     ): self {
-        self::assertValid($id, $pId, $productNamaBarangSnapshot, $productMerekSnapshot, $qty, $total);
-        $unitCost = Money::fromInt(intdiv($total->amount(), $qty));
+        self::assertValid(
+            $id,
+            $lineNo,
+            $productId,
+            $productNamaBarangSnapshot,
+            $productMerekSnapshot,
+            $qtyPcs,
+            $lineTotalRupiah
+        );
+
+        $unitCostRupiah = Money::fromInt(intdiv($lineTotalRupiah->amount(), $qtyPcs));
 
         return new self(
             trim($id),
-            trim($pId),
+            $lineNo,
+            trim($productId),
             self::normalizeNullableString($productKodeBarangSnapshot),
             trim($productNamaBarangSnapshot),
             trim($productMerekSnapshot),
             $productUkuranSnapshot,
-            $qty,
-            $total,
-            $unitCost
+            $qtyPcs,
+            $lineTotalRupiah,
+            $unitCostRupiah
         );
     }
 
     public static function rehydrate(
         string $id,
-        string $pId,
+        int $lineNo,
+        string $productId,
         ?string $productKodeBarangSnapshot,
         string $productNamaBarangSnapshot,
         string $productMerekSnapshot,
         ?int $productUkuranSnapshot,
-        int $qty,
-        Money $total
+        int $qtyPcs,
+        Money $lineTotalRupiah
     ): self {
         return self::create(
             $id,
-            $pId,
+            $lineNo,
+            $productId,
             $productKodeBarangSnapshot,
             $productNamaBarangSnapshot,
             $productMerekSnapshot,
             $productUkuranSnapshot,
-            $qty,
-            $total
+            $qtyPcs,
+            $lineTotalRupiah
         );
     }
 }

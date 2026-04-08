@@ -20,26 +20,31 @@ final class SupplierInvoiceFactory
 
     public function makeLines(array $lines): array
     {
-        if ($lines === []) throw new DomainException('Invoice minimal 1 line.');
+        if ($lines === []) {
+            throw new DomainException('Invoice minimal 1 line.');
+        }
 
-        return array_map(function ($l) {
-            $pId = trim((string)($l['product_id'] ?? ''));
-            $product = $pId !== '' ? $this->products->getById($pId) : null;
+        return array_map(function ($line, int $index) {
+            $productId = trim((string) ($line['product_id'] ?? ''));
+            $product = $productId !== '' ? $this->products->getById($productId) : null;
 
             if ($product === null) {
                 throw new DomainException('Product tidak ditemukan.');
             }
 
+            $lineNo = isset($line['line_no']) ? (int) $line['line_no'] : ($index + 1);
+
             return SupplierInvoiceLine::create(
                 $this->uuid->generate(),
-                $pId,
+                $lineNo,
+                $productId,
                 $product->kodeBarang(),
                 $product->namaBarang(),
                 $product->merek(),
                 $product->ukuran(),
-                (int)($l['qty_pcs'] ?? 0),
-                Money::fromInt((int)($l['line_total_rupiah'] ?? 0))
+                (int) ($line['qty_pcs'] ?? 0),
+                Money::fromInt((int) ($line['line_total_rupiah'] ?? 0))
             );
-        }, $lines);
+        }, $lines, array_keys($lines));
     }
 }
