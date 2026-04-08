@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="{{ route('admin.products.update', ['productId' => $product->id()]) }}" method="post">
+                        <form action="{{ route('admin.products.update', ['productId' => $product->id()]) }}" method="post" id="product-master-form" data-product-master-form="1">
                             @csrf
                             @method('PUT')
 
@@ -170,7 +170,7 @@
                             <strong>{{ $currentStock }}</strong>
                         </div>
 
-                        <form action="{{ route('admin.products.stock-adjustments.store', ['productId' => $product->id()]) }}" method="post">
+                        <form action="{{ route('admin.products.stock-adjustments.store', ['productId' => $product->id()]) }}" method="post" id="product-stock-adjustment-form" data-product-stock-adjustment-form="1">
                             @csrf
 
                             <div class="form-group mb-4">
@@ -235,6 +235,7 @@
 
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-product-master-form.js') }}"></script>
     <script>
         window.AdminMoneyInput?.bindBySelector(document);
     </script>

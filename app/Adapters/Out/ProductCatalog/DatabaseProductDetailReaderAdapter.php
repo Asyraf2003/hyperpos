@@ -19,17 +19,26 @@ final class DatabaseProductDetailReaderAdapter implements ProductDetailReaderPor
             return null;
         }
 
-        $initialVersion = DB::table('product_versions')
+        $createdVersion = DB::table('product_versions')
+            ->where('product_id', $productId)
+            ->where('event_name', 'product_created')
+            ->orderBy('revision_no')
+            ->first(['event_name', 'changed_at', 'snapshot_json']);
+
+        $firstRecordedVersion = DB::table('product_versions')
             ->where('product_id', $productId)
             ->orderBy('revision_no')
-            ->first(['changed_at', 'snapshot_json']);
+            ->first(['event_name', 'changed_at', 'snapshot_json']);
 
         $current = $this->mapCurrentProduct($product);
-        $initial = $initialVersion === null ? null : $this->mapInitialIdentity($initialVersion);
+
+        $initialSource = $createdVersion ?? $firstRecordedVersion;
+        $initial = $initialSource === null ? null : $this->mapInitialIdentity($initialSource);
 
         return [
             'product' => $current,
             'initial_identity' => $initial,
+            'initial_identity_source' => $this->initialIdentitySourceLabel($createdVersion, $firstRecordedVersion),
             'has_identity_changes' => $initial !== null && $this->identityChanged($current, $initial),
         ];
     }
@@ -75,6 +84,19 @@ final class DatabaseProductDetailReaderAdapter implements ProductDetailReaderPor
             'harga_jual' => isset($snapshot['harga_jual']) ? (int) $snapshot['harga_jual'] : 0,
             'changed_at' => (string) $version->changed_at,
         ];
+    }
+
+    private function initialIdentitySourceLabel(?object $createdVersion, ?object $firstRecordedVersion): string
+    {
+        if ($createdVersion !== null) {
+            return 'created_version';
+        }
+
+        if ($firstRecordedVersion !== null) {
+            return 'first_recorded_version';
+        }
+
+        return 'unavailable';
     }
 
     private function identityChanged(array $current, array $initial): bool

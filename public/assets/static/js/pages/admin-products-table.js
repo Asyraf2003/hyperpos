@@ -29,6 +29,7 @@
 
   const actionModalElement = $("product-action-modal");
   const actionModalSubtitle = $("product-action-modal-subtitle");
+  const actionDetailLink = $("product-action-detail-link");
   const actionEditLink = $("product-action-edit-link");
   const actionStockLink = $("product-action-stock-link");
   const actionDeleteForm = $("product-action-delete-form");
@@ -49,6 +50,7 @@
   }[m]));
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
+  const showUrl = (id) => c.showBaseUrl.replace("__ID__", encodeURIComponent(id));
   const editUrl = (id) => c.editBaseUrl.replace("__ID__", encodeURIComponent(id));
   const deleteUrl = (id) => c.deleteBaseUrl.replace("__ID__", encodeURIComponent(id));
   const editIdentityUrl = (id) => `${editUrl(id)}${c.editIdentityAnchor || ""}`;
@@ -126,11 +128,12 @@
   };
 
   const configureActionModal = (product) => {
-    if (!actionEditLink || !actionStockLink || !actionDeleteForm || !actionModalSubtitle) {
+    if (!actionDetailLink || !actionEditLink || !actionStockLink || !actionDeleteForm || !actionModalSubtitle) {
       return;
     }
 
     actionModalSubtitle.textContent = `${product.nama_barang} • ${product.kode_barang || "-"}`;
+    actionDetailLink.href = showUrl(product.id);
     actionEditLink.href = editIdentityUrl(product.id);
     actionStockLink.href = stockAdjustmentUrl(product.id);
     actionDeleteForm.action = deleteUrl(product.id);
@@ -148,7 +151,7 @@
       <td class="text-center">
         <button
           type="button"
-          class="btn btn-sm btn-outline-secondary"
+          class="btn btn-sm btn-outline-primary"
           data-product-action="open"
           data-product-id="${esc(r.id)}"
           data-product-kode="${esc(r.kode_barang || "")}"
@@ -335,7 +338,7 @@
       return;
     }
 
-    window.location.href = editIdentityUrl(product.id);
+    window.location.href = showUrl(product.id);
   });
 
   pager.addEventListener("click", (e) => {
