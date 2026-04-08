@@ -11,54 +11,79 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table): void {
-            $table->dropUnique('products_kode_barang_unique');
-            $table->dropUnique('products_business_identity_unique');
-        });
+        $this->dropUniqueIfExists('products', 'products_kode_barang_unique');
+        $this->dropUniqueIfExists('products', 'products_business_identity_unique');
 
-        DB::statement(
-            "ALTER TABLE products
-            ADD COLUMN active_unique_marker TINYINT(1)
-            GENERATED ALWAYS AS (
-                CASE
-                    WHEN deleted_at IS NULL THEN 1
-                    ELSE NULL
-                END
-            ) STORED
-            AFTER delete_reason"
+        if (! Schema::hasColumn('products', 'active_unique_marker')) {
+            DB::statement(
+                "ALTER TABLE products
+                ADD COLUMN active_unique_marker TINYINT(1)
+                GENERATED ALWAYS AS (
+                    CASE
+                        WHEN deleted_at IS NULL THEN 1
+                        ELSE NULL
+                    END
+                ) STORED
+                AFTER delete_reason"
+            );
+        }
+
+        $this->createUniqueIfMissing(
+            'products',
+            ['kode_barang', 'active_unique_marker'],
+            'products_kode_barang_active_unique'
         );
 
-        Schema::table('products', function (Blueprint $table): void {
-            $table->unique(
-                ['kode_barang', 'active_unique_marker'],
-                'products_kode_barang_active_unique'
-            );
-
-            $table->unique(
-                ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
-                'products_business_identity_active_unique'
-            );
-        });
+        $this->createUniqueIfMissing(
+            'products',
+            ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
+            'products_business_identity_active_unique'
+        );
     }
 
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table): void {
-            $table->dropUnique('products_kode_barang_active_unique');
-            $table->dropUnique('products_business_identity_active_unique');
-        });
+        $this->dropUniqueIfExists('products', 'products_kode_barang_active_unique');
+        $this->dropUniqueIfExists('products', 'products_business_identity_active_unique');
 
-        DB::statement(
-            "ALTER TABLE products DROP COLUMN active_unique_marker"
+        $this->createUniqueIfMissing('products', ['kode_barang'], 'products_kode_barang_unique');
+        $this->createUniqueIfMissing(
+            'products',
+            ['nama_barang_normalized', 'merek_normalized', 'ukuran'],
+            'products_business_identity_unique'
         );
+    }
 
-        Schema::table('products', function (Blueprint $table): void {
-            $table->unique('kode_barang', 'products_kode_barang_unique');
+    private function dropUniqueIfExists(string $table, string $index): void
+    {
+        if (! $this->hasIndex($table, $index)) {
+            return;
+        }
 
-            $table->unique(
-                ['nama_barang_normalized', 'merek_normalized', 'ukuran'],
-                'products_business_identity_unique'
-            );
+        Schema::table($table, function (Blueprint $blueprint) use ($index): void {
+            $blueprint->dropUnique($index);
         });
+    }
+
+    private function createUniqueIfMissing(string $table, array $columns, string $index): void
+    {
+        if ($this->hasIndex($table, $index)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($columns, $index): void {
+            $blueprint->unique($columns, $index);
+        });
+    }
+
+    private function hasIndex(string $table, string $index): bool
+    {
+        foreach (DB::select("SHOW INDEX FROM `{$table}`") as $row) {
+            if (($row->Key_name ?? null) === $index) {
+                return true;
+            }
+        }
+
+        return false;
     }
 };

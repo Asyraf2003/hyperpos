@@ -4,43 +4,77 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('products', function (Blueprint $table): void {
-            $table->dropUnique('products_kode_barang_active_unique');
-            $table->dropUnique('products_business_identity_active_unique');
+        $this->dropUniqueIfExists('products', 'products_kode_barang_active_unique');
+        $this->dropUniqueIfExists('products', 'products_business_identity_active_unique');
 
-            $table->unique(
-                ['kode_barang', 'active_unique_marker'],
-                'products_kode_barang_unique'
-            );
+        $this->createUniqueIfMissing(
+            'products',
+            ['kode_barang', 'active_unique_marker'],
+            'products_kode_barang_unique'
+        );
 
-            $table->unique(
-                ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
-                'products_business_identity_unique'
-            );
-        });
+        $this->createUniqueIfMissing(
+            'products',
+            ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
+            'products_business_identity_unique'
+        );
     }
 
     public function down(): void
     {
-        Schema::table('products', function (Blueprint $table): void {
-            $table->dropUnique('products_kode_barang_unique');
-            $table->dropUnique('products_business_identity_unique');
+        $this->dropUniqueIfExists('products', 'products_kode_barang_unique');
+        $this->dropUniqueIfExists('products', 'products_business_identity_unique');
 
-            $table->unique(
-                ['kode_barang', 'active_unique_marker'],
-                'products_kode_barang_active_unique'
-            );
+        $this->createUniqueIfMissing(
+            'products',
+            ['kode_barang', 'active_unique_marker'],
+            'products_kode_barang_active_unique'
+        );
 
-            $table->unique(
-                ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
-                'products_business_identity_active_unique'
-            );
+        $this->createUniqueIfMissing(
+            'products',
+            ['nama_barang_normalized', 'merek_normalized', 'ukuran', 'active_unique_marker'],
+            'products_business_identity_active_unique'
+        );
+    }
+
+    private function dropUniqueIfExists(string $table, string $index): void
+    {
+        if (! $this->hasIndex($table, $index)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($index): void {
+            $blueprint->dropUnique($index);
         });
+    }
+
+    private function createUniqueIfMissing(string $table, array $columns, string $index): void
+    {
+        if ($this->hasIndex($table, $index)) {
+            return;
+        }
+
+        Schema::table($table, function (Blueprint $blueprint) use ($columns, $index): void {
+            $blueprint->unique($columns, $index);
+        });
+    }
+
+    private function hasIndex(string $table, string $index): bool
+    {
+        foreach (DB::select("SHOW INDEX FROM `{$table}`") as $row) {
+            if (($row->Key_name ?? null) === $index) {
+                return true;
+            }
+        }
+
+        return false;
     }
 };

@@ -68,11 +68,11 @@ final class ProductSeedCatalog
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-003', 'name' => 'Busi Nmax',                 'brand' => 'NGK',     'size' => null, 'price' => 70000],
-                    'update' => ['code' => 'PRD-EDT-003', 'name' => 'Busi Iridium NMAX',        'brand' => 'NGK',     'size' => null, 'price' => 95000],
+                    'update' => ['code' => 'PRD-EDT-003', 'name' => 'Busi Iridium NMAX Turbo',  'brand' => 'NGK',     'size' => null, 'price' => 95000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-004', 'name' => 'V Belt Pcx',                'brand' => 'Bando',   'size' => 125,  'price' => 165000],
-                    'update' => ['code' => 'PRD-EDT-004', 'name' => 'V Belt PCX',                'brand' => 'Bando',   'size' => 150,  'price' => 185000],
+                    'update' => ['code' => 'PRD-EDT-004', 'name' => 'V Belt PCX ABS',            'brand' => 'Bando',   'size' => 150,  'price' => 185000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-005', 'name' => 'Roller Mio Sporty',         'brand' => 'Yamaha',  'size' => 90,   'price' => 49000],
@@ -80,23 +80,23 @@ final class ProductSeedCatalog
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-006', 'name' => 'Rantai Satria',             'brand' => 'DID',     'size' => 420,  'price' => 185000],
-                    'update' => ['code' => 'PRD-EDT-006', 'name' => 'Rantai Satria FU',          'brand' => 'DID',     'size' => 428,  'price' => 210000],
+                    'update' => ['code' => 'PRD-EDT-006', 'name' => 'Rantai Satria FU Racing',   'brand' => 'DID',     'size' => 428,  'price' => 210000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-007', 'name' => 'Shockbreaker Aerox Old',    'brand' => 'KYB',     'size' => 280,  'price' => 390000],
-                    'update' => ['code' => 'PRD-EDT-007', 'name' => 'Shockbreaker Aerox',        'brand' => 'KYB',     'size' => 300,  'price' => 425000],
+                    'update' => ['code' => 'PRD-EDT-007', 'name' => 'Shockbreaker Aerox Pro',    'brand' => 'KYB',     'size' => 300,  'price' => 425000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-008', 'name' => 'Seal Shock Nmax',           'brand' => 'Showa',   'size' => 31,   'price' => 68000],
-                    'update' => ['code' => 'PRD-EDT-008', 'name' => 'Seal Shock NMAX',           'brand' => 'Showa',   'size' => 33,   'price' => 74000],
+                    'update' => ['code' => 'PRD-EDT-008', 'name' => 'Seal Shock NMAX Depan',     'brand' => 'Showa',   'size' => 33,   'price' => 74000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-009', 'name' => 'Spion Scoopy Merah',        'brand' => 'Astra',   'size' => null, 'price' => 82000],
-                    'update' => ['code' => 'PRD-EDT-009', 'name' => 'Spion Scoopy',              'brand' => 'Astra',   'size' => null, 'price' => 88000],
+                    'update' => ['code' => 'PRD-EDT-009', 'name' => 'Spion Scoopy Kiri',         'brand' => 'Astra',   'size' => null, 'price' => 88000],
                 ],
                 [
                     'create' => ['code' => 'PRD-EDT-010', 'name' => 'CDI F1ZR',                  'brand' => 'BRT',     'size' => null, 'price' => 290000],
-                    'update' => ['code' => 'PRD-EDT-010', 'name' => 'CDI FizR',                  'brand' => 'BRT',     'size' => null, 'price' => 315000],
+                    'update' => ['code' => 'PRD-EDT-010', 'name' => 'CDI FizR Racing',           'brand' => 'BRT',     'size' => null, 'price' => 315000],
                 ],
             ],
             'soft_deleted' => [
