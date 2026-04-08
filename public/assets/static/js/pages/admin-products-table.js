@@ -64,6 +64,8 @@
     return Number.isNaN(n) || n < 1 ? fallback : n;
   };
 
+  const filterField = (name) => filterForm ? filterForm.elements[name] : null;
+
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
 
@@ -88,13 +90,27 @@
   const s = stateFromUrl();
 
   const syncInputsFromState = () => {
-    searchInput.value = s.q;
-    filterForm.elements["status"].value = s.status;
-    filterForm.elements["merek"].value = s.merek;
-    filterForm.elements["ukuran_min"].value = s.ukuran_min;
-    filterForm.elements["ukuran_max"].value = s.ukuran_max;
-    filterForm.elements["harga_min"].value = s.harga_min;
-    filterForm.elements["harga_max"].value = s.harga_max;
+    if (searchInput) {
+      searchInput.value = s.q;
+    }
+
+    const statusField = filterField("status");
+    if (statusField) statusField.value = s.status;
+
+    const merekField = filterField("merek");
+    if (merekField) merekField.value = s.merek;
+
+    const ukuranMinField = filterField("ukuran_min");
+    if (ukuranMinField) ukuranMinField.value = s.ukuran_min;
+
+    const ukuranMaxField = filterField("ukuran_max");
+    if (ukuranMaxField) ukuranMaxField.value = s.ukuran_max;
+
+    const hargaMinField = filterField("harga_min");
+    if (hargaMinField) hargaMinField.value = s.harga_min;
+
+    const hargaMaxField = filterField("harga_max");
+    if (hargaMaxField) hargaMaxField.value = s.harga_max;
   };
 
   const paramsObject = () => {
@@ -128,8 +144,8 @@
   };
 
   const drawOpen = (open) => {
-    drawer.classList.toggle("d-none", !open);
-    backdrop.classList.toggle("d-none", !open);
+    if (drawer) drawer.classList.toggle("d-none", !open);
+    if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
   const configureActionModal = (product) => {
@@ -254,70 +270,77 @@
     updateUrl(replaceUrl);
   };
 
-  searchForm.addEventListener("submit", (e) => {
-    e.preventDefault();
+  if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-    const value = trimValue(searchInput.value);
+      const value = trimValue(searchInput?.value);
 
-    if (value.length === 0) {
-      s.q = "";
-      s.page = 1;
-      load();
-      return;
-    }
+      if (value.length === 0) {
+        s.q = "";
+        s.page = 1;
+        load();
+        return;
+      }
 
-    if (value.length >= 2) {
-      s.q = value;
-      s.page = 1;
-      load();
-    }
-  });
-
-  searchInput.addEventListener("input", () => {
-    const value = trimValue(searchInput.value);
-
-    clearTimeout(searchDebounceTimer);
-
-    if (value.length === 0) {
-      s.q = "";
-      s.page = 1;
-      searchDebounceTimer = setTimeout(() => load(), 250);
-      return;
-    }
-
-    if (value.length < 2) {
-      return;
-    }
-
-    searchDebounceTimer = setTimeout(() => {
-      s.q = value;
-      s.page = 1;
-      load();
-    }, 300);
-  });
-
-  $("open-product-filter").addEventListener("click", () => drawOpen(true));
-  $("close-product-filter").addEventListener("click", () => drawOpen(false));
-  backdrop.addEventListener("click", () => drawOpen(false));
-
-  filterForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const f = new FormData(filterForm);
-
-    s.status = allowedStatus.has(trimValue(f.get("status"))) ? trimValue(f.get("status")) : "active";
-
-    ["merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
-      s[k] = trimValue(f.get(k));
+      if (value.length >= 2) {
+        s.q = value;
+        s.page = 1;
+        load();
+      }
     });
+  }
 
-    s.page = 1;
-    drawOpen(false);
-    load();
-  });
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      const value = trimValue(searchInput.value);
 
-  $("reset-product-filter").addEventListener("click", () => {
-    filterForm.reset();
+      clearTimeout(searchDebounceTimer);
+
+      if (value.length === 0) {
+        s.q = "";
+        s.page = 1;
+        searchDebounceTimer = setTimeout(() => load(), 250);
+        return;
+      }
+
+      if (value.length < 2) {
+        return;
+      }
+
+      searchDebounceTimer = setTimeout(() => {
+        s.q = value;
+        s.page = 1;
+        load();
+      }, 300);
+    });
+  }
+
+  $("open-product-filter")?.addEventListener("click", () => drawOpen(true));
+  $("close-product-filter")?.addEventListener("click", () => drawOpen(false));
+  backdrop?.addEventListener("click", () => drawOpen(false));
+
+  if (filterForm) {
+    filterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const f = new FormData(filterForm);
+      const statusValue = trimValue(f.get("status"));
+
+      s.status = allowedStatus.has(statusValue) ? statusValue : "active";
+
+      ["merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
+        s[k] = trimValue(f.get(k));
+      });
+
+      s.page = 1;
+      drawOpen(false);
+      load();
+    });
+  }
+
+  $("reset-product-filter")?.addEventListener("click", () => {
+    filterForm?.reset();
 
     s.status = "active";
 
@@ -330,7 +353,7 @@
     load();
   });
 
-  document.querySelector("#product-table thead").addEventListener("click", (e) => {
+  document.querySelector("#product-table thead")?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-sort-by]");
     if (!btn) return;
 
@@ -341,7 +364,7 @@
     load();
   });
 
-  body.addEventListener("click", (e) => {
+  body?.addEventListener("click", (e) => {
     const btn = e.target.closest("[data-product-action='open']");
     if (!btn) return;
 
@@ -361,7 +384,7 @@
     window.location.href = showUrl(product.id);
   });
 
-  pager.addEventListener("click", (e) => {
+  pager?.addEventListener("click", (e) => {
     const link = e.target.closest("[data-page]");
     if (!link || link.parentElement.classList.contains("disabled")) return;
 

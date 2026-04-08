@@ -25,6 +25,7 @@ trait ProductTablePayload
             'ukuran' => $row->ukuran !== null ? (int) $row->ukuran : null,
             'harga_jual' => (int) $row->harga_jual,
             'stok_saat_ini' => (int) $row->stok_saat_ini,
+            'deleted_at' => $row->deleted_at !== null ? (string) $row->deleted_at : null,
         ], $paginator->items());
 
         return [
@@ -38,6 +39,7 @@ trait ProductTablePayload
                 'sort_dir' => $query->sortDir(),
                 'filters' => [
                     'q' => $query->q(),
+                    'status' => $query->status(),
                     'merek' => $query->merek(),
                     'ukuran_min' => $query->ukuranMin(),
                     'ukuran_max' => $query->ukuranMax(),
