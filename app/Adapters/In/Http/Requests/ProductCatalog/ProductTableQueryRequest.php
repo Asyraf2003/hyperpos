@@ -18,6 +18,7 @@ final class ProductTableQueryRequest extends FormRequest
             'merek' => $this->trimOrNull('merek'),
             'sort_by' => $this->trimOrNull('sort_by'),
             'sort_dir' => $this->trimOrNull('sort_dir'),
+            'status' => $this->trimOrNull('status') ?? 'active',
         ]);
     }
 
@@ -29,6 +30,7 @@ final class ProductTableQueryRequest extends FormRequest
             'per_page' => ['nullable', 'integer', 'in:10'],
             'sort_by' => ['nullable', 'in:nama_barang,merek,ukuran,harga_jual,stok_saat_ini'],
             'sort_dir' => ['nullable', 'in:asc,desc'],
+            'status' => ['nullable', 'in:active,deleted,all'],
             'merek' => ['nullable', 'string'],
             'ukuran_min' => ['nullable', 'integer', 'min:0'],
             'ukuran_max' => ['nullable', 'integer', 'min:0'],

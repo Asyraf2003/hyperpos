@@ -13,7 +13,6 @@ trait ProductTableBaseQuery
     {
         return DB::table('products')
             ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'products.id')
-            ->whereNull('products.deleted_at')
             ->select([
                 'products.id',
                 'products.kode_barang',
@@ -21,6 +20,7 @@ trait ProductTableBaseQuery
                 'products.merek',
                 'products.ukuran',
                 'products.harga_jual',
+                'products.deleted_at',
             ])
             ->selectRaw('COALESCE(product_inventory.qty_on_hand, 0) as stok_saat_ini');
     }

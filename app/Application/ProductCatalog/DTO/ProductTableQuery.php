@@ -12,6 +12,7 @@ final class ProductTableQuery
         private readonly int $perPage,
         private readonly string $sortBy,
         private readonly string $sortDir,
+        private readonly string $status,
         private readonly ?string $merek,
         private readonly ?int $ukuranMin,
         private readonly ?int $ukuranMax,
@@ -31,6 +32,7 @@ final class ProductTableQuery
             isset($data['per_page']) ? (int) $data['per_page'] : 10,
             isset($data['sort_by']) ? (string) $data['sort_by'] : 'nama_barang',
             isset($data['sort_dir']) ? (string) $data['sort_dir'] : 'asc',
+            isset($data['status']) ? (string) $data['status'] : 'active',
             self::nullableString($data['merek'] ?? null),
             isset($data['ukuran_min']) ? (int) $data['ukuran_min'] : null,
             isset($data['ukuran_max']) ? (int) $data['ukuran_max'] : null,
@@ -44,6 +46,7 @@ final class ProductTableQuery
     public function perPage(): int { return $this->perPage; }
     public function sortBy(): string { return $this->sortBy; }
     public function sortDir(): string { return $this->sortDir; }
+    public function status(): string { return $this->status; }
     public function merek(): ?string { return $this->merek; }
     public function ukuranMin(): ?int { return $this->ukuranMin; }
     public function ukuranMax(): ?int { return $this->ukuranMax; }

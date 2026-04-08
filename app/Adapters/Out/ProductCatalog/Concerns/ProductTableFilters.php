@@ -11,6 +11,14 @@ trait ProductTableFilters
 {
     private function applyTableFilters(Builder $query, ProductTableQuery $filters): Builder
     {
+        if ($filters->status() === 'active') {
+            $query->whereNull('products.deleted_at');
+        }
+
+        if ($filters->status() === 'deleted') {
+            $query->whereNotNull('products.deleted_at');
+        }
+
         if ($filters->q() !== null) {
             $rawKeyword = $filters->q();
             $normalizedKeyword = $this->normalizeForSearch($rawKeyword);

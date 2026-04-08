@@ -7,6 +7,7 @@
     page: 1,
     sort_by: "nama_barang",
     sort_dir: "asc",
+    status: "active",
     merek: "",
     ukuran_min: "",
     ukuran_max: "",
@@ -16,6 +17,7 @@
 
   const allowedSortBy = new Set(["nama_barang", "merek", "ukuran", "harga_jual", "stok_saat_ini"]);
   const allowedSortDir = new Set(["asc", "desc"]);
+  const allowedStatus = new Set(["active", "deleted", "all"]);
 
   const $ = (id) => document.getElementById(id);
   const body = $("product-table-body");
@@ -67,12 +69,14 @@
 
     const sortBy = trimValue(p.get("sort_by"));
     const sortDir = trimValue(p.get("sort_dir"));
+    const status = trimValue(p.get("status"));
 
     return {
       q: trimValue(p.get("q")),
       page: intOrDefault(p.get("page"), 1),
       sort_by: allowedSortBy.has(sortBy) ? sortBy : defaults.sort_by,
       sort_dir: allowedSortDir.has(sortDir) ? sortDir : defaults.sort_dir,
+      status: allowedStatus.has(status) ? status : defaults.status,
       merek: trimValue(p.get("merek")),
       ukuran_min: trimValue(p.get("ukuran_min")),
       ukuran_max: trimValue(p.get("ukuran_max")),
@@ -85,6 +89,7 @@
 
   const syncInputsFromState = () => {
     searchInput.value = s.q;
+    filterForm.elements["status"].value = s.status;
     filterForm.elements["merek"].value = s.merek;
     filterForm.elements["ukuran_min"].value = s.ukuran_min;
     filterForm.elements["ukuran_max"].value = s.ukuran_max;
@@ -97,7 +102,8 @@
       page: String(s.page),
       per_page: "10",
       sort_by: s.sort_by,
-      sort_dir: s.sort_dir
+      sort_dir: s.sort_dir,
+      status: s.status
     };
 
     ["q", "merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
@@ -138,10 +144,21 @@
     actionDeleteForm.action = deleteUrl(product.id);
   };
 
+  const rowStatusBadge = (r) => {
+    if (!r.deleted_at) {
+      return "";
+    }
+
+    return `<div class="mt-1"><span class="badge bg-light-danger text-danger">Soft Deleted</span></div>`;
+  };
+
   const rowHtml = (r, i, meta) => `
-    <tr>
+    <tr class="${r.deleted_at ? "table-secondary" : ""}">
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
-      <td>${esc(r.kode_barang || "-")}</td>
+      <td>
+        ${esc(r.kode_barang || "-")}
+        ${rowStatusBadge(r)}
+      </td>
       <td>${esc(r.nama_barang)}</td>
       <td>${esc(r.merek)}</td>
       <td>${esc(r.ukuran ?? "-")}</td>
@@ -288,6 +305,8 @@
 
     const f = new FormData(filterForm);
 
+    s.status = allowedStatus.has(trimValue(f.get("status"))) ? trimValue(f.get("status")) : "active";
+
     ["merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
       s[k] = trimValue(f.get(k));
     });
@@ -299,6 +318,8 @@
 
   $("reset-product-filter").addEventListener("click", () => {
     filterForm.reset();
+
+    s.status = "active";
 
     ["merek", "ukuran_min", "ukuran_max", "harga_min", "harga_max"].forEach((k) => {
       s[k] = "";
