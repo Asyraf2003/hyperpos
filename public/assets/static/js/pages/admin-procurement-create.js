@@ -207,27 +207,51 @@
     }
   };
 
-  const appendLine = (lineData = null) => {
-    const html = buildLineHtml(nextIndex, lineItems().length + 1);
-    container.insertAdjacentHTML("beforeend", html);
-    nextIndex += 1;
+  const mountLineItem = (item, lineData = null) => {
+    initLineItem(item);
 
-    const items = lineItems();
-    const lastItem = items[items.length - 1];
-
-    if (lastItem) {
-      initLineItem(lastItem);
-
-      if (lineData) {
-        populateLineItem(lastItem, lineData);
-      }
-
-      syncLineNumbers();
-      updateRemoveButtons();
-      setActiveLine(lastItem);
+    if (lineData) {
+      populateLineItem(item, lineData);
     }
 
-    return lastItem;
+    syncLineNumbers();
+    updateRemoveButtons();
+    setActiveLine(item);
+
+    return item;
+  };
+
+  const insertLine = (lineData = null, position = "bottom") => {
+    const html = buildLineHtml(nextIndex, lineItems().length + 1);
+
+    if (position === "top" && container.firstElementChild) {
+      container.insertAdjacentHTML("afterbegin", html);
+    } else {
+      container.insertAdjacentHTML("beforeend", html);
+    }
+
+    nextIndex += 1;
+
+    const item = position === "top"
+      ? container.querySelector("[data-line-item]")
+      : lineItems()[lineItems().length - 1];
+
+    if (!item) return null;
+
+    return mountLineItem(item, lineData);
+  };
+
+  const getTopLine = () => lineItems()[0] || null;
+
+  const ensureTopWorkingLine = () => {
+    const topLine = getTopLine();
+
+    if (topLine && isLineCompletelyEmpty(topLine)) {
+      setActiveLine(topLine);
+      return topLine;
+    }
+
+    return insertLine(null, "top");
   };
 
   const removeCurrentLineIfEmpty = (item) => {
@@ -266,20 +290,16 @@
     }
 
     if (direction > 0) {
-      const firstLine = activeLineItem || lineItems()[0];
-      if (!firstLine) return;
+      const workingLine = ensureTopWorkingLine();
+      if (!workingLine) return;
 
-      setActiveLine(firstLine);
-      focusField(getLineFields(firstLine).product);
+      setActiveLine(workingLine);
+      focusField(getLineFields(workingLine).product);
+      scheduleDraftSave();
     }
   };
 
   const moveLineFocus = (item, fieldName, direction) => {
-    const items = lineItems();
-    const itemIndex = items.indexOf(item);
-
-    if (itemIndex === -1) return;
-
     const fields = getLineFields(item);
     const order = ["product", "qty", "total"];
     const currentIndex = order.indexOf(fieldName);
@@ -304,14 +324,13 @@
       return;
     }
 
-    const nextItem = items[itemIndex + 1] || appendLine();
-    if (!nextItem) return;
+    const workingLine = ensureTopWorkingLine();
+    if (!workingLine) return;
 
-    setActiveLine(nextItem);
-    focusField(getLineFields(nextItem).product);
+    setActiveLine(workingLine);
+    focusField(getLineFields(workingLine).product);
+    scheduleDraftSave();
   };
-
-  const draftStatus = null;
 
   const readDraft = () => {
     try {
@@ -378,7 +397,7 @@
       payload.header.nama_pt_pengirim.trim() !== "";
 
     if (!hasMeaningfulHeader && payload.lines.length === 0) {
-      clearDraft("Belum ada draft lokal tersimpan.");
+      clearDraft();
       return;
     }
 
@@ -394,7 +413,7 @@
   const restoreDraft = () => {
     const draft = readDraft();
     if (!draft) {
-      updateDraftPanelState("Draft lokal tidak ditemukan.");
+      updateDraftPanelState();
       return;
     }
 
@@ -421,24 +440,28 @@
     nextIndex = 0;
 
     if (lines.length === 0) {
-      appendLine();
+      insertLine(null, "bottom");
     } else {
-      lines.forEach((line) => appendLine(line));
+      lines.forEach((line) => insertLine(line, "bottom"));
     }
 
-    syncLineNumbers();
-    updateRemoveButtons();
     updateTanggalTerimaState();
+    updateDraftPanelState();
 
-    const firstLine = lineItems()[0];
-    if (firstLine) {
-      setActiveLine(firstLine);
+    const topLine = getTopLine();
+    if (topLine && !isLineCompletelyEmpty(topLine)) {
+      const workingLine = insertLine(null, "top");
+      if (workingLine) {
+        focusField(getLineFields(workingLine).product);
+        return;
+      }
     }
 
-    updateDraftPanelState();
-    focusField(document.getElementById("nomor_faktur"));
+    const firstHeader = headerFields()[0];
+    if (firstHeader) {
+      focusField(firstHeader);
+    }
   };
-
 
   const attachSharedShortcuts = (field, item, fieldName) => {
     if (!field) return;
@@ -454,9 +477,9 @@
 
       if (event.ctrlKey && event.key === "Enter") {
         event.preventDefault();
-        const newItem = appendLine();
-        if (newItem) {
-          focusField(getLineFields(newItem).product);
+        const workingLine = ensureTopWorkingLine();
+        if (workingLine) {
+          focusField(getLineFields(workingLine).product);
         }
         scheduleDraftSave();
         return;
@@ -612,9 +635,9 @@
 
       if (event.ctrlKey && event.key === "Enter") {
         event.preventDefault();
-        const newItem = appendLine();
-        if (newItem) {
-          focusField(getLineFields(newItem).product);
+        const workingLine = ensureTopWorkingLine();
+        if (workingLine) {
+          focusField(getLineFields(workingLine).product);
         }
         scheduleDraftSave();
         return;
@@ -707,9 +730,9 @@
   });
 
   addButton.addEventListener("click", () => {
-    const newItem = appendLine();
-    if (newItem) {
-      focusField(getLineFields(newItem).product);
+    const workingLine = ensureTopWorkingLine();
+    if (workingLine) {
+      focusField(getLineFields(workingLine).product);
     }
     scheduleDraftSave();
   });
@@ -728,9 +751,9 @@
     updateRemoveButtons();
     scheduleDraftSave();
 
-    const fallback = lineItems()[0];
-    if (fallback) {
-      setActiveLine(fallback);
+    const topLine = getTopLine();
+    if (topLine) {
+      setActiveLine(topLine);
     }
   });
 
@@ -765,14 +788,9 @@
   if (initialDraft) {
     restoreDraft();
   } else {
-    const firstLine = lineItems()[0];
-    if (firstLine) {
-      setActiveLine(firstLine);
-    }
-
-    const firstHeader = headerFields()[0];
-    if (firstHeader) {
-      focusField(firstHeader);
+    const workingLine = ensureTopWorkingLine();
+    if (workingLine) {
+      focusField(document.getElementById("nomor_faktur"));
     }
   }
 })();
