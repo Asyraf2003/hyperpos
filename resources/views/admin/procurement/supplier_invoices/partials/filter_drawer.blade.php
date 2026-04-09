@@ -9,6 +9,27 @@
 
         <form id="procurement-filter-form">
             <div class="form-group mb-4">
+                <label class="form-label" for="filter-nama-pt">Nama PT</label>
+                <input
+                    type="text"
+                    id="filter-nama-pt"
+                    name="nama_pt"
+                    class="form-control"
+                    placeholder="Cari nama PT"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label" for="filter-payment-status">Status Tagihan</label>
+                <select id="filter-payment-status" name="payment_status" class="form-select">
+                    <option value="all">Semua</option>
+                    <option value="outstanding">Masih Punya Tagihan</option>
+                    <option value="paid">Sudah Lunas</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-4">
                 <label class="form-label" for="shipment-date-range">Rentang Tanggal Kirim</label>
                 <input
                     type="text"

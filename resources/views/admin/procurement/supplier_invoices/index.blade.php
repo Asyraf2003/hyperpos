@@ -20,7 +20,7 @@
                                 type="text"
                                 id="procurement-search-input"
                                 class="form-control"
-                                placeholder="Cari nomor nota atau nama PT"
+                                placeholder="Cari nomor faktur atau nama PT"
                                 autocomplete="off"
                             >
                         </form>
@@ -39,7 +39,7 @@
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
-                                <th>Nota</th>
+                                <th>Nomor Faktur</th>
                                 <th>
                                     <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="nama_pt_pengirim">
                                         Nama PT
@@ -167,7 +167,7 @@
 
                         <div class="alert alert-light-secondary border mt-3 mb-0">
                             <small class="text-muted d-block">
-                                Edit nota supplier belum ditampilkan dari index karena route dan policy edit belum dikunci final.
+                                Edit nota supplier belum ditampilkan dari index karena route dan use case edit pre-effect belum dikunci implementasinya.
                             </small>
                         </div>
                     </div>

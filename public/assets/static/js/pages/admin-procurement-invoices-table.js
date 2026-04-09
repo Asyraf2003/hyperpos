@@ -4,6 +4,8 @@
 
   const defaults = {
     q: "",
+    nama_pt: "",
+    payment_status: "all",
     page: 1,
     sort_by: "shipment_date",
     sort_dir: "desc",
@@ -22,6 +24,7 @@
     "total_received_qty"
   ]);
   const allowedSortDir = new Set(["asc", "desc"]);
+  const allowedPaymentStatus = new Set(["all", "outstanding", "paid"]);
 
   const $ = (id) => document.getElementById(id);
   const body = $("procurement-invoice-table-body");
@@ -83,13 +86,21 @@
     `;
   };
 
+  const invoiceCellHtml = (row) => {
+    const nomorFaktur = trimValue(row.nomor_faktur);
+    return `<div class="fw-semibold">${esc(nomorFaktur || "-")}</div>`;
+  };
+
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
     const sortBy = trimValue(p.get("sort_by"));
     const sortDir = trimValue(p.get("sort_dir"));
+    const paymentStatus = trimValue(p.get("payment_status"));
 
     return {
       q: trimValue(p.get("q")),
+      nama_pt: trimValue(p.get("nama_pt")),
+      payment_status: allowedPaymentStatus.has(paymentStatus) ? paymentStatus : defaults.payment_status,
       page: intOrDefault(p.get("page"), 1),
       sort_by: allowedSortBy.has(sortBy) ? sortBy : defaults.sort_by,
       sort_dir: allowedSortDir.has(sortDir) ? sortDir : defaults.sort_dir,
@@ -103,6 +114,14 @@
   const syncInputsFromState = () => {
     if (searchInput) {
       searchInput.value = s.q;
+    }
+
+    if (filterForm?.elements["nama_pt"]) {
+      filterForm.elements["nama_pt"].value = s.nama_pt;
+    }
+
+    if (filterForm?.elements["payment_status"]) {
+      filterForm.elements["payment_status"].value = s.payment_status;
     }
 
     if (filterForm?.elements["shipment_date_from"]) {
@@ -121,10 +140,11 @@
       page: String(s.page),
       per_page: "10",
       sort_by: s.sort_by,
-      sort_dir: s.sort_dir
+      sort_dir: s.sort_dir,
+      payment_status: s.payment_status
     };
 
-    ["q", "shipment_date_from", "shipment_date_to"].forEach((k) => {
+    ["q", "nama_pt", "shipment_date_from", "shipment_date_to"].forEach((k) => {
       if (s[k]) obj[k] = s[k];
     });
 
@@ -167,13 +187,14 @@
     const supplierName = trimValue(row.supplier_nama_pt_pengirim_current)
       || trimValue(row.supplier_nama_pt_pengirim_snapshot)
       || "-";
+    const nomorFaktur = trimValue(row.nomor_faktur) || "-";
 
-    actionModalSubtitle.textContent = `${row.supplier_invoice_id} • ${supplierName}`;
+    actionModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
     actionDetailLink.href = detailUrl(row.supplier_invoice_id);
 
     if (row.can_record_payment) {
       actionPaymentLink.href = paymentSectionUrl(row.supplier_invoice_id);
-      actionPaymentTitle.textContent = "Catat Pembayaran";
+      actionPaymentTitle.textContent = "Bayar";
       actionPaymentDescription.textContent = "Buka bagian pembayaran pada detail nota.";
     } else {
       actionPaymentLink.href = detailUrl(row.supplier_invoice_id);
@@ -187,11 +208,11 @@
       actionProofDescription.textContent = "Bukti bayar baru bisa diunggah setelah ada pembayaran.";
     } else if (row.has_uploaded_proof) {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Lihat Bukti Pembayaran";
+      actionProofTitle.textContent = "Lihat Bukti Bayar";
       actionProofDescription.textContent = "Buka riwayat bukti pembayaran pada detail nota.";
     } else {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Unggah Bukti Pembayaran";
+      actionProofTitle.textContent = "Unggah Bukti Bayar";
       actionProofDescription.textContent = "Buka bagian unggah bukti pada detail nota.";
     }
   };
@@ -199,7 +220,7 @@
   const rowHtml = (row, index, meta) => `
     <tr>
       <td>${(meta.page - 1) * meta.per_page + index + 1}</td>
-      <td>${esc(row.supplier_invoice_id)}</td>
+      <td>${invoiceCellHtml(row)}</td>
       <td>${supplierCellHtml(row)}</td>
       <td>${esc(row.shipment_date)}</td>
       <td>${esc(row.due_date)}</td>
@@ -344,6 +365,10 @@
     e.preventDefault();
 
     const f = new FormData(filterForm);
+    const paymentStatus = trimValue(f.get("payment_status"));
+
+    s.nama_pt = trimValue(f.get("nama_pt"));
+    s.payment_status = allowedPaymentStatus.has(paymentStatus) ? paymentStatus : "all";
     s.shipment_date_from = trimValue(f.get("shipment_date_from"));
     s.shipment_date_to = trimValue(f.get("shipment_date_to"));
     s.page = 1;
@@ -353,6 +378,8 @@
   });
 
   resetFilter?.addEventListener("click", () => {
+    s.nama_pt = "";
+    s.payment_status = "all";
     s.shipment_date_from = "";
     s.shipment_date_to = "";
     s.page = 1;
