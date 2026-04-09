@@ -558,6 +558,7 @@
     const hiddenInput = item.querySelector("[data-product-id]");
     const resultsBox = item.querySelector("[data-product-results]");
     const qtyInput = item.querySelector("[data-qty-input]");
+    const createProductLink = item.querySelector("a[href*='/admin/products/create']");
 
     if (!searchInput || !hiddenInput || !resultsBox) return;
 
@@ -566,6 +567,14 @@
     let activeChoiceIndex = -1;
 
     const choiceButtons = () => Array.from(resultsBox.querySelectorAll("[data-product-choice]"));
+    const createProductButton = () => resultsBox.querySelector("[data-create-product-action]");
+
+    const openCreateProduct = () => {
+      const href = createProductLink?.getAttribute("href");
+      if (!href) return;
+
+      window.location.assign(href);
+    };
 
     const syncActiveChoice = () => {
       choiceButtons().forEach((button, index) => {
@@ -589,9 +598,20 @@
 
     const renderResults = (rows) => {
       if (!rows.length) {
-        resultsBox.innerHTML = '<div class="list-group-item text-muted">Produk tidak ditemukan.</div>';
+        const createHref = createProductLink?.getAttribute("href");
+
+        resultsBox.innerHTML = createHref
+          ? '<button type="button" class="list-group-item list-group-item-action" data-create-product-action><div class="fw-semibold">Produk tidak ditemukan</div><small class="text-muted">Tekan Enter untuk buat product baru.</small></button>'
+          : '<div class="list-group-item text-muted">Produk tidak ditemukan.</div>';
+
         resultsBox.classList.remove("d-none");
         activeChoiceIndex = -1;
+
+        const button = createProductButton();
+        if (button) {
+          button.addEventListener("click", openCreateProduct);
+        }
+
         return;
       }
 
@@ -684,6 +704,7 @@
       }
 
       const buttons = choiceButtons();
+      const createButton = createProductButton();
 
       if (event.key === "ArrowDown" && buttons.length) {
         event.preventDefault();
@@ -712,6 +733,11 @@
 
       if (buttons.length && activeChoiceIndex >= 0 && buttons[activeChoiceIndex]) {
         buttons[activeChoiceIndex].click();
+        return;
+      }
+
+      if (createButton instanceof HTMLElement) {
+        createButton.click();
         return;
       }
 
