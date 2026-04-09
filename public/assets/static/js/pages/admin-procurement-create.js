@@ -136,24 +136,20 @@
 
   const isLineCompletelyEmpty = (item) => {
     const hiddenProductId = item.querySelector("[data-product-id]");
-    const productSearch = item.querySelector("[data-product-search]");
     const qtyInput = item.querySelector("[data-qty-input]");
     const moneyRaw = item.querySelector("[data-money-raw]");
     const moneyDisplay = item.querySelector("[data-money-display]");
 
     const productId = String(hiddenProductId?.value ?? "").trim();
-    const productText = String(productSearch?.value ?? "").trim();
     const qty = String(qtyInput?.value ?? "").replace(/\D+/g, "");
     const totalRaw = String(moneyRaw?.value ?? "").trim();
     const totalDisplay = String(moneyDisplay?.value ?? "").trim();
 
-    return (
-      productId === "" &&
-      productText === "" &&
-      (qty === "" || qty === "1") &&
-      totalRaw === "" &&
-      totalDisplay === ""
-    );
+    const hasSelectedProduct = productId !== "";
+    const hasMeaningfulQty = qty !== "" && qty !== "1";
+    const hasMeaningfulTotal = totalRaw !== "" || totalDisplay !== "";
+
+    return !hasSelectedProduct && !hasMeaningfulQty && !hasMeaningfulTotal;
   };
 
   const pruneEmptyLinesBeforeSubmit = () => {
