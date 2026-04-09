@@ -13,6 +13,7 @@ final class CreateSupplierInvoicePostValidator
     {
         $this->validateTanggalTerima($request, $validator);
         $this->validateDuplicateLineNo($request, $validator);
+        $this->validateLineTotalDivisibleByQty($request, $validator);
     }
 
     private function validateTanggalTerima(FormRequest $request, Validator $validator): void
@@ -64,6 +65,36 @@ final class CreateSupplierInvoicePostValidator
             }
 
             $seen[$normalized] = true;
+        }
+    }
+
+    private function validateLineTotalDivisibleByQty(FormRequest $request, Validator $validator): void
+    {
+        $lines = $request->input('lines');
+
+        if (! is_array($lines)) {
+            return;
+        }
+
+        foreach ($lines as $index => $line) {
+            if (! is_array($line)) {
+                continue;
+            }
+
+            $qty = isset($line['qty_pcs']) ? (int) $line['qty_pcs'] : 0;
+            $lineTotal = isset($line['line_total_rupiah']) ? (int) $line['line_total_rupiah'] : 0;
+            $lineNo = isset($line['line_no']) ? (int) $line['line_no'] : ((int) $index + 1);
+
+            if ($qty < 1 || $lineTotal < 1) {
+                continue;
+            }
+
+            if ($lineTotal % $qty !== 0) {
+                $validator->errors()->add(
+                    'lines.' . $index . '.line_total_rupiah',
+                    'Baris ' . $lineNo . ': total rincian harus habis dibagi qty.'
+                );
+            }
         }
     }
 }
