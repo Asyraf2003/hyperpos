@@ -50,26 +50,38 @@ trait SeedsMinimalProcurementFixture
         );
     }
 
+
     private function seedMinimalSupplierInvoice(
         string $id,
         string $supplierId,
         string $tanggalPengiriman,
         string $jatuhTempo,
         int $grandTotalRupiah,
-        string $supplierNamaPtPengirimSnapshot = 'PT Sumber Makmur'
+        ?string $supplierNamaPtPengirimSnapshot = 'PT Sumber Makmur',
+        ?string $nomorFaktur = null
     ): void {
+        $resolvedNomorFaktur = $nomorFaktur ?? ('INV-' . strtoupper($id));
+
         DB::table('supplier_invoices')->updateOrInsert(
             ['id' => $id],
             [
                 'supplier_id' => $supplierId,
                 'supplier_nama_pt_pengirim_snapshot' => $supplierNamaPtPengirimSnapshot,
+                'nomor_faktur' => $resolvedNomorFaktur,
+                'nomor_faktur_normalized' => mb_strtolower(trim($resolvedNomorFaktur), 'UTF-8'),
+                'document_kind' => 'invoice',
+                'lifecycle_status' => 'active',
+                'origin_supplier_invoice_id' => null,
+                'superseded_by_supplier_invoice_id' => null,
                 'tanggal_pengiriman' => $tanggalPengiriman,
                 'jatuh_tempo' => $jatuhTempo,
                 'grand_total_rupiah' => $grandTotalRupiah,
+                'voided_at' => null,
+                'void_reason' => null,
+                'last_revision_no' => 0,
             ]
         );
     }
-
 
     private function seedMinimalSupplierInvoiceLine(
         string $id,

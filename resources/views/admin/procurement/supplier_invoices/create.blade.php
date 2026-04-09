@@ -6,235 +6,55 @@
 
 @section('content')
     <section class="section">
-        <form action="{{ route('admin.procurement.supplier-invoices.store') }}" method="post" novalidate>
+        <form
+            action="{{ route('admin.procurement.supplier-invoices.store') }}"
+            method="post"
+            novalidate
+            id="procurement-create-form"
+            data-procurement-create-form="1"
+        >
             @csrf
 
-            <div class="row">
-                <div class="col-12 col-xl-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center gap-2">
-                                <div>
-                                    <h4 class="card-title mb-1">Rincian Nota</h4>
-                                    <p class="mb-0 text-muted">
-                                        Cari produk dengan mengetik nama, merek, ukuran, atau kode.
-                                    </p>
-                                </div>
-
-                                <button type="button" id="add-procurement-line" class="btn btn-primary">
-                                    Tambah Rincian
-                                </button>
-                            </div>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                        <div>
+                            <h4 class="card-title mb-1">Informasi Nota</h4>
+                            <p class="mb-0 text-muted">
+                                Isi identitas nota dulu, lalu lanjut isi rincian barang seperti nota pengadaan.
+                            </p>
                         </div>
 
-                        <div class="card-body">
-                            @error('supplier_invoice')
-                                <div class="alert alert-danger">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                        <div class="d-flex flex-wrap gap-2">
+                            <a
+                                href="{{ route('admin.products.create') }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="btn btn-light-primary"
+                            >
+                                Buat Product
+                            </a>
 
-                            <div id="procurement-line-items" data-next-index="{{ count($lineItemsView) }}">
-                                @foreach ($lineItemsView as $lineView)
-                                    <div class="border rounded p-3 mb-3" data-line-item>
-                                        <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-                                            <div>
-                                                <h6 class="mb-0">Rincian <span data-line-label>{{ $lineView['line_no'] }}</span></h6>
-                                                <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
-                                            </div>
-
-                                            <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
-                                                Hapus
-                                            </button>
-                                        </div>
-
-                                        <input
-                                            type="hidden"
-                                            name="lines[{{ $lineView['index'] }}][line_no]"
-                                            value="{{ $lineView['line_no'] }}"
-                                            data-line-no
-                                        >
-
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="form-group mb-3 position-relative">
-                                                    <label class="form-label">Produk</label>
-
-                                                    <input
-                                                        type="hidden"
-                                                        name="lines[{{ $lineView['index'] }}][product_id]"
-                                                        value="{{ $lineView['selected_product_id'] }}"
-                                                        data-product-id
-                                                    >
-
-                                                    <input
-                                                        type="text"
-                                                        value="{{ $lineView['selected_label'] }}"
-                                                        class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
-                                                        placeholder="Ketik minimal 2 huruf untuk mencari produk"
-                                                        autocomplete="off"
-                                                        data-product-search
-                                                    >
-
-                                                    <div
-                                                        class="list-group position-absolute w-100 shadow-sm d-none"
-                                                        style="z-index: 20;"
-                                                        data-product-results
-                                                    ></div>
-
-                                                    @error('lines.' . $lineView['index'] . '.product_id')
-                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <div class="col-12 col-lg-4">
-                                                <div class="form-group mb-3">
-                                                    <label class="form-label">Jumlah (Pcs)</label>
-                                                    <input
-                                                        type="text"
-                                                        inputmode="numeric"
-                                                        name="lines[{{ $lineView['index'] }}][qty_pcs]"
-                                                        value="{{ $lineView['qty_pcs'] }}"
-                                                        class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
-                                                        placeholder="Contoh: 2"
-                                                        data-qty-input
-                                                        required
-                                                    >
-                                                    @error('lines.' . $lineView['index'] . '.qty_pcs')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <div class="col-12 col-lg-8">
-                                                <div class="form-group mb-3">
-                                                    <label class="form-label">Total Rincian (Rupiah)</label>
-
-                                                    <input
-                                                        type="hidden"
-                                                        name="lines[{{ $lineView['index'] }}][line_total_rupiah]"
-                                                        value="{{ $lineView['line_total_raw'] }}"
-                                                        data-money-raw
-                                                    >
-
-                                                    <input
-                                                        type="text"
-                                                        inputmode="numeric"
-                                                        value="{{ $lineView['line_total_display'] }}"
-                                                        class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
-                                                        placeholder="Contoh: 150.000"
-                                                        data-money-display
-                                                        required
-                                                    >
-
-                                                    @error('lines.' . $lineView['index'] . '.line_total_rupiah')
-                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <template id="procurement-line-template">
-                                <div class="border rounded p-3 mb-3" data-line-item>
-                                    <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
-                                        <div>
-                                            <h6 class="mb-0">Rincian <span data-line-label>__LINE_NO__</span></h6>
-                                            <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
-                                        </div>
-
-                                        <button type="button" class="btn btn-sm btn-light-danger" data-remove-line>
-                                            Hapus
-                                        </button>
-                                    </div>
-
-                                    <input
-                                        type="hidden"
-                                        name="lines[__INDEX__][line_no]"
-                                        value="__LINE_NO__"
-                                        data-line-no
-                                    >
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="form-group mb-3 position-relative">
-                                                <label class="form-label">Produk</label>
-
-                                                <input type="hidden" name="lines[__INDEX__][product_id]" value="" data-product-id>
-
-                                                <input
-                                                    type="text"
-                                                    class="form-control"
-                                                    placeholder="Ketik minimal 2 huruf untuk mencari produk"
-                                                    autocomplete="off"
-                                                    data-product-search
-                                                >
-
-                                                <div
-                                                    class="list-group position-absolute w-100 shadow-sm d-none"
-                                                    style="z-index: 20;"
-                                                    data-product-results
-                                                ></div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-lg-4">
-                                            <div class="form-group mb-3">
-                                                <label class="form-label">Jumlah (Pcs)</label>
-                                                <input
-                                                    type="text"
-                                                    inputmode="numeric"
-                                                    name="lines[__INDEX__][qty_pcs]"
-                                                    value="1"
-                                                    class="form-control"
-                                                    placeholder="Contoh: 2"
-                                                    data-qty-input
-                                                    required
-                                                >
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-lg-8">
-                                            <div class="form-group mb-3">
-                                                <label class="form-label">Total Rincian (Rupiah)</label>
-
-                                                <input
-                                                    type="hidden"
-                                                    name="lines[__INDEX__][line_total_rupiah]"
-                                                    value=""
-                                                    data-money-raw
-                                                >
-
-                                                <input
-                                                    type="text"
-                                                    inputmode="numeric"
-                                                    value=""
-                                                    class="form-control"
-                                                    placeholder="Contoh: 150.000"
-                                                    data-money-display
-                                                    required
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
+                            <a
+                                href="{{ route('admin.procurement.supplier-invoices.index') }}"
+                                class="btn btn-light-secondary"
+                            >
+                                Kembali ke Daftar
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-12 col-xl-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-1">Informasi Nota</h4>
-                            <p class="mb-0 text-muted">Informasi pemasok dan tanggal transaksi.</p>
+                <div class="card-body">
+                    @error('supplier_invoice')
+                        <div class="alert alert-danger">
+                            {{ $message }}
                         </div>
+                    @enderror
 
-                        <div class="card-body">
-                            <div class="form-group mb-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-xl-3">
+                            <div class="form-group">
                                 <label for="nomor_faktur" class="form-label">Nomor Faktur</label>
                                 <input
                                     type="text"
@@ -243,14 +63,17 @@
                                     value="{{ old('nomor_faktur') }}"
                                     class="form-control @error('nomor_faktur') is-invalid @enderror"
                                     placeholder="Contoh: INV-SUP-2026-0001"
+                                    data-procurement-header-field
                                     required
                                 >
                                 @error('nomor_faktur')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="form-group mb-4">
+                        <div class="col-12 col-xl-3">
+                            <div class="form-group">
                                 <label for="nama_pt_pengirim" class="form-label">Nama PT Pengirim</label>
                                 <input
                                     type="text"
@@ -259,14 +82,17 @@
                                     value="{{ old('nama_pt_pengirim') }}"
                                     class="form-control @error('nama_pt_pengirim') is-invalid @enderror"
                                     placeholder="Contoh: PT Federal Abadi"
+                                    data-procurement-header-field
                                     required
                                 >
                                 @error('nama_pt_pengirim')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="form-group mb-4">
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <div class="form-group">
                                 <label for="tanggal_pengiriman" class="form-label">Tanggal Pengiriman</label>
                                 <input
                                     type="date"
@@ -275,14 +101,17 @@
                                     name="tanggal_pengiriman"
                                     value="{{ old('tanggal_pengiriman', now()->format('Y-m-d')) }}"
                                     class="form-control @error('tanggal_pengiriman') is-invalid @enderror"
+                                    data-procurement-header-field
                                     required
                                 >
                                 @error('tanggal_pengiriman')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="form-group mb-4">
+                        <div class="col-12 col-md-6 col-xl-2">
+                            <div class="form-group">
                                 <label for="tanggal_terima" class="form-label">Tanggal Diterima</label>
                                 <input
                                     type="date"
@@ -291,65 +120,374 @@
                                     name="tanggal_terima"
                                     value="{{ old('tanggal_terima', now()->format('Y-m-d')) }}"
                                     class="form-control @error('tanggal_terima') is-invalid @enderror"
+                                    data-procurement-header-field
                                 >
-                                <small class="text-muted">
-                                    Dipakai saat penerimaan otomatis aktif. Jika kosong, sistem akan memakai tanggal pengiriman.
-                                </small>
                                 @error('tanggal_terima')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
 
-                            <div class="form-group mb-4">
+                        <div class="col-12 col-xl-2">
+                            <div class="form-group">
                                 <label class="form-label d-block">Mode Penerimaan</label>
 
-                                <div class="border rounded p-3 mb-2">
-                                    <div class="form-check">
+                                <div class="d-flex flex-column gap-2">
+                                    <label class="border rounded px-3 py-2 d-flex align-items-start gap-2">
                                         <input
-                                            class="form-check-input"
+                                            class="form-check-input mt-1"
                                             type="radio"
                                             name="auto_receive"
                                             id="auto_receive_yes"
                                             value="1"
                                             {{ old('auto_receive', '1') === '1' ? 'checked' : '' }}
                                         >
-                                        <label class="form-check-label" for="auto_receive_yes">
-                                            Terima barang otomatis
-                                        </label>
-                                    </div>
-                                    <small class="text-muted d-block mt-1">
-                                        Nota langsung masuk ke alur penerimaan barang setelah dibuat.
-                                    </small>
-                                </div>
+                                        <span>
+                                            <span class="d-block fw-semibold">Terima otomatis</span>
+                                            <small class="text-muted">Langsung lanjut ke penerimaan barang.</small>
+                                        </span>
+                                    </label>
 
-                                <div class="border rounded p-3">
-                                    <div class="form-check">
+                                    <label class="border rounded px-3 py-2 d-flex align-items-start gap-2">
                                         <input
-                                            class="form-check-input"
+                                            class="form-check-input mt-1"
                                             type="radio"
                                             name="auto_receive"
                                             id="auto_receive_no"
                                             value="0"
                                             {{ old('auto_receive') === '0' ? 'checked' : '' }}
                                         >
-                                        <label class="form-check-label" for="auto_receive_no">
-                                            Simpan nota saja
-                                        </label>
-                                    </div>
-                                    <small class="text-muted d-block mt-1">
-                                        Nota disimpan tanpa proses penerimaan barang otomatis.
-                                    </small>
+                                        <span>
+                                            <span class="d-block fw-semibold">Simpan nota saja</span>
+                                            <small class="text-muted">Tanpa penerimaan otomatis.</small>
+                                        </span>
+                                    </label>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="d-flex justify-content-start gap-2">
-                                <button type="submit" class="btn btn-primary">
-                                    Simpan Nota Pemasok
-                                </button>
-                                <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="btn btn-light-secondary">
-                                    Batal
-                                </a>
+                    <div class="mt-3 pt-3 border-top">
+                        <small class="text-muted d-block">
+                            Arah kerja UI ini akan dibuat keyboard-first seperti product.
+                            Untuk sekarang kita rapikan dulu bentuk notanya, lalu engine Enter dan pembersihan baris kosong menyusul di step berikutnya.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
+                        <div>
+                            <h4 class="card-title mb-1">Rincian Nota</h4>
+                            <p class="mb-0 text-muted">
+                                Cari product berdasarkan nama, merek, ukuran, atau kode. Jika product belum ada, buka form product lewat tombol di atas.
+                            </p>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" id="add-procurement-line" class="btn btn-primary">
+                                Tambah Rincian
+                            </button>
+
+                            <button type="submit" class="btn btn-success">
+                                Simpan Nota Pemasok
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
+                        style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px; gap: 16px;">
+                        <div>Baris</div>
+                        <div>Product</div>
+                        <div>Qty (Pcs)</div>
+                        <div>Total Rincian</div>
+                        <div class="text-center">Aksi</div>
+                    </div>
+
+                    <div id="procurement-line-items" data-next-index="{{ count($lineItemsView) }}" class="d-flex flex-column gap-3">
+                        @foreach ($lineItemsView as $lineView)
+                            <div class="border rounded p-3" data-line-item>
+                                <input
+                                    type="hidden"
+                                    name="lines[{{ $lineView['index'] }}][line_no]"
+                                    value="{{ $lineView['line_no'] }}"
+                                    data-line-no
+                                >
+
+                                <div
+                                    class="d-grid gap-3 align-items-start"
+                                    style="grid-template-columns: 1fr;"
+                                >
+                                    <div
+                                        class="d-grid gap-3 align-items-start"
+                                        style="grid-template-columns: 1fr;"
+                                    >
+                                        <div
+                                            class="d-grid gap-3 align-items-start"
+                                            style="grid-template-columns: 1fr;"
+                                            data-line-grid-mobile
+                                        >
+                                            <div
+                                                class="d-grid gap-3 align-items-start"
+                                                style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                                class="d-none d-xl-grid"
+                                            >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="d-grid gap-3 align-items-start"
+                                    style="grid-template-columns: 1fr;"
+                                >
+                                    <div class="d-xl-none border-bottom pb-2 mb-3">
+                                        <div class="fw-semibold">Rincian <span data-line-label>{{ $lineView['line_no'] }}</span></div>
+                                        <small class="text-muted">Isi product, jumlah, dan total rincian.</small>
+                                    </div>
+
+                                    <div
+                                        class="d-grid gap-3 align-items-start"
+                                        style="grid-template-columns: 1fr;"
+                                    >
+                                        <div
+                                            class="d-grid gap-3 align-items-start"
+                                            style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                            class="d-none d-xl-grid"
+                                        >
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-column d-xl-grid gap-3 align-items-start"
+                                        style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;">
+                                        <div class="w-100">
+                                            <label class="form-label d-xl-none">Baris</label>
+                                            <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
+                                                <span data-line-label>{{ $lineView['line_no'] }}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-100 position-relative">
+                                            <label class="form-label d-xl-none">Product</label>
+
+                                            <input
+                                                type="hidden"
+                                                name="lines[{{ $lineView['index'] }}][product_id]"
+                                                value="{{ $lineView['selected_product_id'] }}"
+                                                data-product-id
+                                            >
+
+                                            <input
+                                                type="text"
+                                                value="{{ $lineView['selected_label'] }}"
+                                                class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
+                                                placeholder="Ketik minimal 2 huruf untuk mencari produk"
+                                                autocomplete="off"
+                                                data-product-search
+                                            >
+
+                                            <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                                                <small class="text-muted">Belum ada produk yang cocok?</small>
+                                                <a
+                                                    href="{{ route('admin.products.create') }}"
+                                                    target="_blank"
+                                                    rel="noopener"
+                                                    class="btn btn-sm btn-light-primary"
+                                                >
+                                                    Buat Product
+                                                </a>
+                                            </div>
+
+                                            <div
+                                                class="list-group position-absolute w-100 shadow-sm d-none mt-1"
+                                                style="z-index: 20;"
+                                                data-product-results
+                                            ></div>
+
+                                            @error('lines.' . $lineView['index'] . '.product_id')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="w-100">
+                                            <label class="form-label d-xl-none">Jumlah (Pcs)</label>
+                                            <input
+                                                type="text"
+                                                inputmode="numeric"
+                                                name="lines[{{ $lineView['index'] }}][qty_pcs]"
+                                                value="{{ $lineView['qty_pcs'] }}"
+                                                class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
+                                                placeholder="Contoh: 2"
+                                                data-qty-input
+                                                required
+                                            >
+                                            @error('lines.' . $lineView['index'] . '.qty_pcs')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="w-100">
+                                            <label class="form-label d-xl-none">Total Rincian (Rupiah)</label>
+
+                                            <input
+                                                type="hidden"
+                                                name="lines[{{ $lineView['index'] }}][line_total_rupiah]"
+                                                value="{{ $lineView['line_total_raw'] }}"
+                                                data-money-raw
+                                            >
+
+                                            <input
+                                                type="text"
+                                                inputmode="numeric"
+                                                value="{{ $lineView['line_total_display'] }}"
+                                                class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
+                                                placeholder="Contoh: 150.000"
+                                                data-money-display
+                                                required
+                                            >
+
+                                            @error('lines.' . $lineView['index'] . '.line_total_rupiah')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="w-100">
+                                            <label class="form-label d-xl-none">Aksi</label>
+                                            <button
+                                                type="button"
+                                                class="btn btn-light-danger w-100"
+                                                data-remove-line
+                                            >
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        @endforeach
+                    </div>
+
+                    <template id="procurement-line-template">
+                        <div class="border rounded p-3" data-line-item>
+                            <input
+                                type="hidden"
+                                name="lines[__INDEX__][line_no]"
+                                value="__LINE_NO__"
+                                data-line-no
+                            >
+
+                            <div class="d-flex flex-column d-xl-grid gap-3 align-items-start"
+                                style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;">
+                                <div class="w-100">
+                                    <label class="form-label d-xl-none">Baris</label>
+                                    <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
+                                        <span data-line-label>__LINE_NO__</span>
+                                    </div>
+                                </div>
+
+                                <div class="w-100 position-relative">
+                                    <label class="form-label d-xl-none">Product</label>
+
+                                    <input
+                                        type="hidden"
+                                        name="lines[__INDEX__][product_id]"
+                                        value=""
+                                        data-product-id
+                                    >
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        placeholder="Ketik minimal 2 huruf untuk mencari produk"
+                                        autocomplete="off"
+                                        data-product-search
+                                    >
+
+                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                                        <small class="text-muted">Belum ada produk yang cocok?</small>
+                                        <a
+                                            href="{{ route('admin.products.create') }}"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="btn btn-sm btn-light-primary"
+                                        >
+                                            Buat Product
+                                        </a>
+                                    </div>
+
+                                    <div
+                                        class="list-group position-absolute w-100 shadow-sm d-none mt-1"
+                                        style="z-index: 20;"
+                                        data-product-results
+                                    ></div>
+                                </div>
+
+                                <div class="w-100">
+                                    <label class="form-label d-xl-none">Jumlah (Pcs)</label>
+                                    <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        name="lines[__INDEX__][qty_pcs]"
+                                        value="1"
+                                        class="form-control"
+                                        placeholder="Contoh: 2"
+                                        data-qty-input
+                                        required
+                                    >
+                                </div>
+
+                                <div class="w-100">
+                                    <label class="form-label d-xl-none">Total Rincian (Rupiah)</label>
+
+                                    <input
+                                        type="hidden"
+                                        name="lines[__INDEX__][line_total_rupiah]"
+                                        value=""
+                                        data-money-raw
+                                    >
+
+                                    <input
+                                        type="text"
+                                        inputmode="numeric"
+                                        value=""
+                                        class="form-control"
+                                        placeholder="Contoh: 150.000"
+                                        data-money-display
+                                        required
+                                    >
+                                </div>
+
+                                <div class="w-100">
+                                    <label class="form-label d-xl-none">Aksi</label>
+                                    <button
+                                        type="button"
+                                        class="btn btn-light-danger w-100"
+                                        data-remove-line
+                                    >
+                                        Hapus
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <small class="text-muted">
+                            Baris kosong penuh belum dihapus otomatis pada step ini. Pembersihan baris kosong dan flow Enter akan kita kunci di step JS berikutnya.
+                        </small>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" id="add-procurement-line-footer" class="btn btn-light-primary d-none">
+                                Tambah Rincian
+                            </button>
+
+                            <button type="submit" class="btn btn-success">
+                                Simpan Nota Pemasok
+                            </button>
                         </div>
                     </div>
                 </div>
