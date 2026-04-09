@@ -33,7 +33,12 @@ final class CreateSupplierInvoicePageController extends Controller
         $oldLines = old('lines');
 
         if (! is_array($oldLines) || $oldLines === []) {
-            $oldLines = [['product_id' => '', 'qty_pcs' => '1', 'line_total_rupiah' => '']];
+            $oldLines = [[
+                'line_no' => '1',
+                'product_id' => '',
+                'qty_pcs' => '1',
+                'line_total_rupiah' => '',
+            ]];
         }
 
         $lineItems = [];
@@ -45,9 +50,11 @@ final class CreateSupplierInvoicePageController extends Controller
 
             $selectedProductId = (string) ($line['product_id'] ?? '');
             $lineTotalRaw = isset($line['line_total_rupiah']) ? (string) $line['line_total_rupiah'] : '';
+            $lineNo = isset($line['line_no']) ? (string) $line['line_no'] : (string) ((int) $index + 1);
 
             $lineItems[] = [
                 'index' => (int) $index,
+                'line_no' => $lineNo,
                 'selected_product_id' => $selectedProductId,
                 'selected_label' => $selectedProductId !== ''
                     ? ($productLabelsById[$selectedProductId] ?? '')

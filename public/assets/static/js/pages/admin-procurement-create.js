@@ -22,6 +22,23 @@
     "'": "&#39;"
   }[m]));
 
+  const syncLineNumbers = () => {
+    const items = container.querySelectorAll("[data-line-item]");
+
+    items.forEach((item, index) => {
+      const lineNo = String(index + 1);
+      const lineNoInput = item.querySelector("[data-line-no]");
+      const lineLabel = item.querySelector("[data-line-label]");
+
+      if (lineNoInput) {
+        lineNoInput.value = lineNo;
+      }
+
+      if (lineLabel) {
+        lineLabel.textContent = lineNo;
+      }
+    });
+  };
 
   const updateRemoveButtons = () => {
     const items = container.querySelectorAll("[data-line-item]");
@@ -165,7 +182,11 @@
   };
 
   addButton.addEventListener("click", () => {
-    const html = template.innerHTML.replaceAll("__INDEX__", String(nextIndex));
+    const lineNo = String(container.querySelectorAll("[data-line-item]").length + 1);
+    const html = template.innerHTML
+      .replaceAll("__INDEX__", String(nextIndex))
+      .replaceAll("__LINE_NO__", lineNo);
+
     container.insertAdjacentHTML("beforeend", html);
     nextIndex += 1;
 
@@ -175,6 +196,7 @@
       initLineItem(lastItem);
     }
 
+    syncLineNumbers();
     updateRemoveButtons();
   });
 
@@ -189,6 +211,7 @@
     if (items.length <= 1) return;
 
     item.remove();
+    syncLineNumbers();
     updateRemoveButtons();
   });
 
@@ -203,6 +226,7 @@
   });
 
   container.querySelectorAll("[data-line-item]").forEach(initLineItem);
+  syncLineNumbers();
   updateRemoveButtons();
   updateTanggalTerimaState();
 })();

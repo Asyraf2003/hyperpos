@@ -39,7 +39,7 @@
                                     <div class="border rounded p-3 mb-3" data-line-item>
                                         <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                             <div>
-                                                <h6 class="mb-0">Rincian {{ $loop->iteration }}</h6>
+                                                <h6 class="mb-0">Rincian <span data-line-label>{{ $lineView['line_no'] }}</span></h6>
                                                 <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
                                             </div>
 
@@ -47,6 +47,13 @@
                                                 Hapus
                                             </button>
                                         </div>
+
+                                        <input
+                                            type="hidden"
+                                            name="lines[{{ $lineView['index'] }}][line_no]"
+                                            value="{{ $lineView['line_no'] }}"
+                                            data-line-no
+                                        >
 
                                         <div class="row">
                                             <div class="col-12">
@@ -135,7 +142,7 @@
                                 <div class="border rounded p-3 mb-3" data-line-item>
                                     <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
                                         <div>
-                                            <h6 class="mb-0">Rincian Baru</h6>
+                                            <h6 class="mb-0">Rincian <span data-line-label>__LINE_NO__</span></h6>
                                             <small class="text-muted">Isi produk, kuantitas, dan total nilai rincian.</small>
                                         </div>
 
@@ -143,6 +150,13 @@
                                             Hapus
                                         </button>
                                     </div>
+
+                                    <input
+                                        type="hidden"
+                                        name="lines[__INDEX__][line_no]"
+                                        value="__LINE_NO__"
+                                        data-line-no
+                                    >
 
                                     <div class="row">
                                         <div class="col-12">
