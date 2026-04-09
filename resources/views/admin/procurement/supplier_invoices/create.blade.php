@@ -27,7 +27,7 @@
 
                         <div class="d-flex flex-wrap gap-2">
                             <a
-                                href="{{ route('admin.products.create') }}"
+                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
                                 target="_blank"
                                 rel="noopener"
                                 class="btn btn-light-primary"
@@ -182,7 +182,7 @@
                         <div>
                             <h4 class="card-title mb-1">Rincian Nota</h4>
                             <p class="mb-0 text-muted">
-                                Cari product berdasarkan nama, merek, ukuran, atau kode. Jika product belum ada, buka form product lewat tombol di atas.
+                                Cari produk berdasarkan nama, merek, ukuran, atau kode. Jika produk belum ada, buka form product lewat tombol di atas.
                             </p>
                         </div>
 
@@ -202,7 +202,7 @@
                     <div class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
                         style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px; gap: 16px;">
                         <div>Baris</div>
-                        <div>Product</div>
+                        <div>Produk</div>
                         <div>Qty (Pcs)</div>
                         <div>Total Rincian</div>
                         <div class="text-center">Aksi</div>
@@ -218,153 +218,108 @@
                                     data-line-no
                                 >
 
-                                <div
-                                    class="d-grid gap-3 align-items-start"
-                                    style="grid-template-columns: 1fr;"
-                                >
-                                    <div
-                                        class="d-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 1fr;"
-                                    >
-                                        <div
-                                            class="d-grid gap-3 align-items-start"
-                                            style="grid-template-columns: 1fr;"
-                                            data-line-grid-mobile
+                                <div class="d-flex flex-column d-xl-grid gap-3 align-items-start"
+                                    style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;">
+                                    <div class="w-100">
+                                        <label class="form-label d-xl-none">Baris</label>
+                                        <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
+                                            <span data-line-label>{{ $lineView['line_no'] }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-100 position-relative">
+                                        <label class="form-label d-xl-none">Produk</label>
+
+                                        <input
+                                            type="hidden"
+                                            name="lines[{{ $lineView['index'] }}][product_id]"
+                                            value="{{ $lineView['selected_product_id'] }}"
+                                            data-product-id
                                         >
-                                            <div
-                                                class="d-grid gap-3 align-items-start"
-                                                style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
-                                                class="d-none d-xl-grid"
-                                            >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div
-                                    class="d-grid gap-3 align-items-start"
-                                    style="grid-template-columns: 1fr;"
-                                >
-                                    <div class="d-xl-none border-bottom pb-2 mb-3">
-                                        <div class="fw-semibold">Rincian <span data-line-label>{{ $lineView['line_no'] }}</span></div>
-                                        <small class="text-muted">Isi product, jumlah, dan total rincian.</small>
-                                    </div>
-
-                                    <div
-                                        class="d-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 1fr;"
-                                    >
-                                        <div
-                                            class="d-grid gap-3 align-items-start"
-                                            style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
-                                            class="d-none d-xl-grid"
+                                        <input
+                                            type="text"
+                                            value="{{ $lineView['selected_label'] }}"
+                                            class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
+                                            placeholder="Ketik minimal 2 huruf untuk mencari produk"
+                                            autocomplete="off"
+                                            data-product-search
                                         >
+
+                                        <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
+                                            <small class="text-muted">Belum ada produk yang cocok?</small>
+                                            <a
+                                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="btn btn-sm btn-light-primary"
+                                            >
+                                                Buat Product
+                                            </a>
                                         </div>
+
+                                        <div
+                                            class="list-group position-absolute w-100 shadow-sm d-none mt-1"
+                                            style="z-index: 20;"
+                                            data-product-results
+                                        ></div>
+
+                                        @error('lines.' . $lineView['index'] . '.product_id')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
                                     </div>
 
-                                    <div class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;">
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Baris</label>
-                                            <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
-                                                <span data-line-label>{{ $lineView['line_no'] }}</span>
-                                            </div>
-                                        </div>
+                                    <div class="w-100">
+                                        <label class="form-label d-xl-none">Jumlah (Pcs)</label>
+                                        <input
+                                            type="text"
+                                            inputmode="numeric"
+                                            name="lines[{{ $lineView['index'] }}][qty_pcs]"
+                                            value="{{ $lineView['qty_pcs'] }}"
+                                            class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
+                                            placeholder="Contoh: 2"
+                                            data-qty-input
+                                            required
+                                        >
+                                        @error('lines.' . $lineView['index'] . '.qty_pcs')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                                        <div class="w-100 position-relative">
-                                            <label class="form-label d-xl-none">Product</label>
+                                    <div class="w-100">
+                                        <label class="form-label d-xl-none">Total Rincian (Rupiah)</label>
 
-                                            <input
-                                                type="hidden"
-                                                name="lines[{{ $lineView['index'] }}][product_id]"
-                                                value="{{ $lineView['selected_product_id'] }}"
-                                                data-product-id
-                                            >
+                                        <input
+                                            type="hidden"
+                                            name="lines[{{ $lineView['index'] }}][line_total_rupiah]"
+                                            value="{{ $lineView['line_total_raw'] }}"
+                                            data-money-raw
+                                        >
 
-                                            <input
-                                                type="text"
-                                                value="{{ $lineView['selected_label'] }}"
-                                                class="form-control @error('lines.' . $lineView['index'] . '.product_id') is-invalid @enderror"
-                                                placeholder="Ketik minimal 2 huruf untuk mencari produk"
-                                                autocomplete="off"
-                                                data-product-search
-                                            >
+                                        <input
+                                            type="text"
+                                            inputmode="numeric"
+                                            value="{{ $lineView['line_total_display'] }}"
+                                            class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
+                                            placeholder="Contoh: 150.000"
+                                            data-money-display
+                                            required
+                                        >
 
-                                            <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                                <small class="text-muted">Belum ada produk yang cocok?</small>
-                                                <a
-                                                    href="{{ route('admin.products.create') }}"
-                                                    target="_blank"
-                                                    rel="noopener"
-                                                    class="btn btn-sm btn-light-primary"
-                                                >
-                                                    Buat Product
-                                                </a>
-                                            </div>
+                                        @error('lines.' . $lineView['index'] . '.line_total_rupiah')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
 
-                                            <div
-                                                class="list-group position-absolute w-100 shadow-sm d-none mt-1"
-                                                style="z-index: 20;"
-                                                data-product-results
-                                            ></div>
-
-                                            @error('lines.' . $lineView['index'] . '.product_id')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Jumlah (Pcs)</label>
-                                            <input
-                                                type="text"
-                                                inputmode="numeric"
-                                                name="lines[{{ $lineView['index'] }}][qty_pcs]"
-                                                value="{{ $lineView['qty_pcs'] }}"
-                                                class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
-                                                placeholder="Contoh: 2"
-                                                data-qty-input
-                                                required
-                                            >
-                                            @error('lines.' . $lineView['index'] . '.qty_pcs')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Total Rincian (Rupiah)</label>
-
-                                            <input
-                                                type="hidden"
-                                                name="lines[{{ $lineView['index'] }}][line_total_rupiah]"
-                                                value="{{ $lineView['line_total_raw'] }}"
-                                                data-money-raw
-                                            >
-
-                                            <input
-                                                type="text"
-                                                inputmode="numeric"
-                                                value="{{ $lineView['line_total_display'] }}"
-                                                class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
-                                                placeholder="Contoh: 150.000"
-                                                data-money-display
-                                                required
-                                            >
-
-                                            @error('lines.' . $lineView['index'] . '.line_total_rupiah')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Aksi</label>
-                                            <button
-                                                type="button"
-                                                class="btn btn-light-danger w-100"
-                                                data-remove-line
-                                            >
-                                                Hapus
-                                            </button>
-                                        </div>
+                                    <div class="w-100">
+                                        <label class="form-label d-xl-none">Aksi</label>
+                                        <button
+                                            type="button"
+                                            class="btn btn-light-danger w-100"
+                                            data-remove-line
+                                        >
+                                            Hapus
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -390,7 +345,7 @@
                                 </div>
 
                                 <div class="w-100 position-relative">
-                                    <label class="form-label d-xl-none">Product</label>
+                                    <label class="form-label d-xl-none">Produk</label>
 
                                     <input
                                         type="hidden"
@@ -410,7 +365,7 @@
                                     <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
                                         <small class="text-muted">Belum ada produk yang cocok?</small>
                                         <a
-                                            href="{{ route('admin.products.create') }}"
+                                            href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
                                             target="_blank"
                                             rel="noopener"
                                             class="btn btn-sm btn-light-primary"

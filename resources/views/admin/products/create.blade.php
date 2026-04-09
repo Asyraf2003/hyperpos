@@ -20,8 +20,29 @@
                     </div>
 
                     <div class="card-body">
+                        @if (! empty($returnTo))
+                            <div class="alert alert-light-primary border">
+                                <div class="fw-semibold mb-1">Mode kembali ke nota aktif</div>
+                                <small class="text-muted d-block">
+                                    Setelah product berhasil dibuat, Anda akan diarahkan kembali ke halaman nota supplier agar bisa lanjut mencatat.
+                                </small>
+                            </div>
+                        @endif
+
                         <form action="{{ route('admin.products.store') }}" method="post" id="product-master-form" data-product-master-form="1">
                             @csrf
+
+                            <input
+                                type="hidden"
+                                name="return_to"
+                                value="{{ old('return_to', $returnTo) }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="return_label"
+                                value="{{ old('return_label', $returnLabel ?? 'Kembali') }}"
+                            >
 
                             <div class="row">
                                 <div class="col-12">
@@ -138,10 +159,18 @@
 
                             <div class="d-flex justify-content-start gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    Simpan Product</button>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
-                                    Batal
-                                </a>
+                                    Simpan Product
+                                </button>
+
+                                @if (! empty($returnTo))
+                                    <a href="{{ $returnTo }}" class="btn btn-light-primary">
+                                        {{ $returnLabel ?? 'Kembali' }}
+                                    </a>
+                                @else
+                                    <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
+                                        Batal
+                                    </a>
+                                @endif
                             </div>
                         </form>
                     </div>

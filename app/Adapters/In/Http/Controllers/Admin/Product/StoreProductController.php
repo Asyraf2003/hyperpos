@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Product;
 
-use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Adapters\In\Http\Requests\ProductCatalog\CreateProductRequest;
+use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Application\ProductCatalog\UseCases\CreateProductHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -45,8 +45,39 @@ final class StoreProductController extends Controller
                 ->withInput();
         }
 
+        $returnTo = $this->resolveReturnTo($request->input('return_to'));
+        $successMessage = $result->message() ?? 'Product master berhasil dibuat.';
+
+        if ($returnTo !== null) {
+            return redirect()
+                ->to($returnTo)
+                ->with('success', $successMessage . ' Silakan lanjutkan nota Anda.');
+        }
+
         return redirect()
             ->route('admin.products.index')
-            ->with('success', $result->message() ?? 'Product master berhasil dibuat.');
+            ->with('success', $successMessage);
+    }
+
+    private function resolveReturnTo(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $allowedAbsolute = route('admin.procurement.supplier-invoices.create');
+        $allowedRelative = route('admin.procurement.supplier-invoices.create', [], false);
+
+        if (str_starts_with($trimmed, $allowedAbsolute) || str_starts_with($trimmed, $allowedRelative)) {
+            return $trimmed;
+        }
+
+        return null;
     }
 }
