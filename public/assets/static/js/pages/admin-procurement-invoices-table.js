@@ -40,19 +40,32 @@
   const actionModalElement = $("procurement-action-modal");
   const actionModalSubtitle = $("procurement-action-modal-subtitle");
   const actionDetailLink = $("procurement-action-detail-link");
-  const actionPaymentLink = $("procurement-action-payment-link");
+  const actionPaymentButton = $("procurement-action-payment-link");
   const actionPaymentTitle = $("procurement-action-payment-title");
   const actionPaymentDescription = $("procurement-action-payment-description");
   const actionProofLink = $("procurement-action-proof-link");
   const actionProofTitle = $("procurement-action-proof-title");
   const actionProofDescription = $("procurement-action-proof-description");
 
+  const paymentModalElement = $("procurement-payment-modal");
+  const paymentModalSubtitle = $("procurement-payment-modal-subtitle");
+  const paymentForm = $("procurement-payment-form");
+  const paymentInvoiceIdInput = $("procurement-payment-invoice-id");
+  const paymentDateInput = $("procurement-payment-date");
+  const paymentAmountRaw = $("procurement-payment-amount");
+  const paymentAmountDisplay = $("procurement-payment-amount-display");
+
   const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
     ? new window.bootstrap.Modal(actionModalElement)
     : null;
 
+  const paymentModal = paymentModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(paymentModalElement)
+    : null;
+
   let searchDebounceTimer = null;
   let requestCounter = 0;
+  let pendingPaymentAction = null;
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
     "&": "&amp;",
@@ -65,6 +78,7 @@
   const trimValue = (v) => String(v ?? "").trim();
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const paymentStoreUrl = (id) => c.paymentStoreBaseUrl.replace("__ID__", encodeURIComponent(id));
   const paymentSectionUrl = (id) => `${detailUrl(id)}#payment-form-section`;
   const proofSectionUrl = (id) => `${detailUrl(id)}#payment-proof-section`;
 
@@ -72,6 +86,8 @@
     const n = Number.parseInt(String(v ?? ""), 10);
     return Number.isNaN(n) || n < 1 ? fallback : n;
   };
+
+  const todayYmd = () => new Date().toISOString().slice(0, 10);
 
   const supplierCellHtml = (row) => {
     const currentName = trimValue(row.supplier_nama_pt_pengirim_current);
@@ -170,11 +186,49 @@
     if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
+  const openPaymentModal = (row, preserveOldInput = false) => {
+    if (!paymentForm || !paymentModal) {
+      window.location.assign(paymentSectionUrl(row.supplier_invoice_id));
+      return;
+    }
+
+    const supplierName = trimValue(row.supplier_nama_pt_pengirim_current)
+      || trimValue(row.supplier_nama_pt_pengirim_snapshot)
+      || "-";
+    const nomorFaktur = trimValue(row.nomor_faktur) || "-";
+
+    paymentForm.action = paymentStoreUrl(row.supplier_invoice_id);
+
+    if (paymentInvoiceIdInput) {
+      paymentInvoiceIdInput.value = row.supplier_invoice_id;
+    }
+
+    if (paymentModalSubtitle) {
+      paymentModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
+    }
+
+    if (!preserveOldInput) {
+      if (paymentDateInput) {
+        paymentDateInput.value = c.oldPaymentInvoiceId ? (c.oldPaymentDate || todayYmd()) : todayYmd();
+      }
+
+      if (paymentAmountRaw) {
+        paymentAmountRaw.value = String(row.outstanding_rupiah || "");
+      }
+
+      if (paymentAmountDisplay) {
+        paymentAmountDisplay.value = String(Number(row.outstanding_rupiah || 0).toLocaleString("id-ID"));
+      }
+    }
+
+    paymentModal.show();
+  };
+
   const configureActionModal = (row) => {
     if (
       !actionModalSubtitle ||
       !actionDetailLink ||
-      !actionPaymentLink ||
+      !actionPaymentButton ||
       !actionPaymentTitle ||
       !actionPaymentDescription ||
       !actionProofLink ||
@@ -193,11 +247,11 @@
     actionDetailLink.href = detailUrl(row.supplier_invoice_id);
 
     if (row.can_record_payment) {
-      actionPaymentLink.href = paymentSectionUrl(row.supplier_invoice_id);
+      pendingPaymentAction = { mode: "modal", row };
       actionPaymentTitle.textContent = "Bayar";
-      actionPaymentDescription.textContent = "Buka bagian pembayaran pada detail nota.";
+      actionPaymentDescription.textContent = "Buka form pembayaran langsung dari daftar nota.";
     } else {
-      actionPaymentLink.href = detailUrl(row.supplier_invoice_id);
+      pendingPaymentAction = { mode: "detail", row };
       actionPaymentTitle.textContent = "Lihat Pembayaran";
       actionPaymentDescription.textContent = "Nota ini sudah lunas. Buka detail untuk melihat riwayat pembayaran.";
     }
@@ -315,11 +369,31 @@
     renderSortIndicators();
     syncInputsFromState();
     updateUrl(replaceUrl);
+
+    if (c.oldPaymentInvoiceId) {
+      const failedRow = (json.data.rows || []).find((row) => row.supplier_invoice_id === c.oldPaymentInvoiceId);
+      if (failedRow) {
+        openPaymentModal(failedRow, true);
+        c.oldPaymentInvoiceId = "";
+      }
+    }
   };
 
   $("open-procurement-filter")?.addEventListener("click", () => drawOpen(true));
   $("close-procurement-filter")?.addEventListener("click", () => drawOpen(false));
   backdrop?.addEventListener("click", () => drawOpen(false));
+
+  actionPaymentButton?.addEventListener("click", () => {
+    if (!pendingPaymentAction) return;
+
+    if (pendingPaymentAction.mode === "detail") {
+      window.location.assign(paymentSectionUrl(pendingPaymentAction.row.supplier_invoice_id));
+      return;
+    }
+
+    actionModal?.hide();
+    openPaymentModal(pendingPaymentAction.row);
+  });
 
   searchForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -445,6 +519,10 @@
     Object.assign(s, stateFromUrl());
     load(true);
   });
+
+  if (window.AdminMoneyInput) {
+    window.AdminMoneyInput.bindMoneyPair(paymentAmountDisplay, paymentAmountRaw);
+  }
 
   syncInputsFromState();
   renderSortIndicators();

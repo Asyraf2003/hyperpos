@@ -6,6 +6,22 @@
 
 @section('content')
     <section class="section">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @error('supplier_payment')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
+
+        @if ($errors->has('payment_date') || $errors->has('amount'))
+            <div class="alert alert-danger">
+                Pembayaran supplier gagal dicatat. Periksa tanggal pembayaran dan nominal.
+            </div>
+        @endif
+
         <div class="card">
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
@@ -139,16 +155,16 @@
                             </div>
 
                             <div class="col-12 col-md-4">
-                                <a
-                                    href="#"
+                                <button
+                                    type="button"
                                     id="procurement-action-payment-link"
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
-                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Catat Pembayaran</div>
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
                                     <div class="small opacity-75" id="procurement-action-payment-description">
-                                        Buka bagian pembayaran pada detail nota.
+                                        Buka form pembayaran nota.
                                     </div>
-                                </a>
+                                </button>
                             </div>
 
                             <div class="col-12 col-md-4">
@@ -157,7 +173,7 @@
                                     id="procurement-action-proof-link"
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
-                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Unggah Bukti Pembayaran</div>
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Unggah Bukti Bayar</div>
                                     <div class="small opacity-75" id="procurement-action-proof-description">
                                         Buka bagian bukti pembayaran pada detail nota.
                                     </div>
@@ -174,14 +190,97 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="procurement-payment-modal"
+            tabindex="-1"
+            aria-labelledby="procurement-payment-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="procurement-payment-modal-title">Bayar Nota Supplier</h3>
+                            <p class="mb-0 text-muted fs-6" id="procurement-payment-modal-subtitle">
+                                Catat pembayaran langsung dari daftar nota.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <form method="post" id="procurement-payment-form">
+                            @csrf
+
+                            <input type="hidden" name="payment_invoice_id" id="procurement-payment-invoice-id" value="{{ old('payment_invoice_id') }}">
+
+                            <div class="form-group mb-4">
+                                <label for="procurement-payment-date" class="form-label">Tanggal Pembayaran</label>
+                                <input
+                                    type="date"
+                                    data-ui-date="single"
+                                    id="procurement-payment-date"
+                                    name="payment_date"
+                                    value="{{ old('payment_date', now()->format('Y-m-d')) }}"
+                                    class="form-control @error('payment_date') is-invalid @enderror"
+                                    required
+                                >
+                                @error('payment_date')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4" data-money-input-group>
+                                <label for="procurement-payment-amount-display" class="form-label">Nominal Pembayaran</label>
+
+                                <input
+                                    type="hidden"
+                                    id="procurement-payment-amount"
+                                    name="amount"
+                                    value="{{ old('amount') }}"
+                                    data-money-raw
+                                >
+
+                                <input
+                                    type="text"
+                                    id="procurement-payment-amount-display"
+                                    value="{{ old('amount') }}"
+                                    class="form-control @error('amount') is-invalid @enderror"
+                                    placeholder="Contoh: 150.000"
+                                    inputmode="numeric"
+                                    data-money-display
+                                    required
+                                >
+
+                                @error('amount')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan Pembayaran</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.procurementInvoiceTableConfig = {
             endpoint: @json(route('admin.procurement.supplier-invoices.table')),
-            detailBaseUrl: @json(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => '__ID__']))
+            detailBaseUrl: @json(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => '__ID__'])),
+            paymentStoreBaseUrl: @json(route('admin.procurement.supplier-invoices.payments.store', ['supplierInvoiceId' => '__ID__'])),
+            oldPaymentInvoiceId: @json(old('payment_invoice_id')),
+            oldPaymentDate: @json(old('payment_date', now()->format('Y-m-d'))),
+            oldPaymentAmount: @json(old('amount'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-invoices-table.js') }}"></script>
