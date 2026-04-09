@@ -6,22 +6,6 @@
 
 @section('content')
     <section class="section">
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @error('supplier_payment')
-            <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-
-        @if ($errors->has('payment_date') || $errors->has('amount'))
-            <div class="alert alert-danger">
-                Pembayaran supplier gagal dicatat. Periksa tanggal pembayaran dan nominal.
-            </div>
-        @endif
-
         <div class="card">
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">

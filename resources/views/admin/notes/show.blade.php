@@ -62,24 +62,6 @@
                     <div class="card-body">
                         <div class="fw-bold mb-1">Status Operasional</div>
 
-                        @if (session('success'))
-                            <div class="alert alert-success py-2 px-3 mt-3 mb-3">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-
-                        @if ($errors->has('reopen'))
-                            <div class="alert alert-danger py-2 px-3 mt-3 mb-3">
-                                {{ $errors->first('reopen') }}
-                            </div>
-                        @endif
-
-                        @if ($errors->has('reason'))
-                            <div class="alert alert-danger py-2 px-3 mt-3 mb-3">
-                                {{ $errors->first('reason') }}
-                            </div>
-                        @endif
-
                         @if ($note['is_closed'])
                             <div class="text-muted small mb-3">
                                 Nota ini sedang ditutup. Admin wajib memberi alasan sebelum membuka ulang note.
