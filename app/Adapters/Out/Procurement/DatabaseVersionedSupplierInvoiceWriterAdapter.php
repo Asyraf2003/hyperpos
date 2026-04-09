@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Procurement;
 
+use App\Adapters\Out\Procurement\Concerns\LoadsCurrentSupplierInvoiceWriteSnapshot;
 use App\Adapters\Out\Procurement\Concerns\PersistsVersionedSupplierInvoiceWrites;
 use App\Adapters\Out\Procurement\Concerns\RecordsSupplierInvoiceHistory;
 use App\Adapters\Out\Procurement\Concerns\SupplierInvoiceWritePayloads;
@@ -16,6 +17,7 @@ use App\Ports\Out\UuidPort;
 
 final class DatabaseVersionedSupplierInvoiceWriterAdapter implements SupplierInvoiceWriterPort, SupplierInvoiceLifecyclePort
 {
+    use LoadsCurrentSupplierInvoiceWriteSnapshot;
     use PersistsVersionedSupplierInvoiceWrites;
     use RecordsSupplierInvoiceHistory;
     use SupplierInvoiceWritePayloads;
@@ -30,5 +32,10 @@ final class DatabaseVersionedSupplierInvoiceWriterAdapter implements SupplierInv
     public function create(SupplierInvoice $supplierInvoice): void
     {
         $this->persistCreatedInvoice($supplierInvoice);
+    }
+
+    public function update(SupplierInvoice $supplierInvoice): void
+    {
+        $this->persistUpdatedInvoice($supplierInvoice);
     }
 }
