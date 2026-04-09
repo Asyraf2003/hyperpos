@@ -160,7 +160,13 @@
     const items = lineItems();
     const removable = items.filter((item) => isLineCompletelyEmpty(item));
 
-    removable.forEach((item) => item.remove());
+    removable.forEach((item) => {
+      item.querySelectorAll("[name]").forEach((field) => {
+        field.disabled = true;
+      });
+
+      item.remove();
+    });
 
     syncLineNumbers();
     updateRemoveButtons();
