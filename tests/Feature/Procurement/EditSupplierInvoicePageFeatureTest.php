@@ -59,7 +59,8 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSee('Edit Nota Supplier');
         $response->assertSee('INV-SUP-001');
         $response->assertSee('PT Sumber Makmur');
-        $response->assertSee('Jumlah Line');
+        $response->assertSee('Rincian Nota');
+        $response->assertSee('Simpan Perubahan Nota');
     }
 
     public function test_admin_is_redirected_to_detail_when_supplier_invoice_is_locked_for_edit(): void
