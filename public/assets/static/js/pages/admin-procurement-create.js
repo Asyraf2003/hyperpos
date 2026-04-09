@@ -311,29 +311,7 @@
     focusField(getLineFields(nextItem).product);
   };
 
-  const createDraftPanel = () => {
-    const panel = document.createElement("div");
-    panel.className = "alert alert-light-secondary border d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4";
-    panel.setAttribute("data-draft-panel", "1");
-    panel.innerHTML = `
-      <div>
-        <div class="fw-semibold mb-1">Draft Lokal</div>
-        <small class="text-muted d-block" data-draft-status>Belum ada draft lokal tersimpan.</small>
-      </div>
-      <div class="d-flex flex-wrap gap-2">
-        <button type="button" class="btn btn-sm btn-light-primary" data-draft-restore disabled>Pulihkan Draft</button>
-        <button type="button" class="btn btn-sm btn-light-danger" data-draft-clear disabled>Hapus Draft</button>
-      </div>
-    `;
-
-    form.prepend(panel);
-    return panel;
-  };
-
-  const draftPanel = createDraftPanel();
-  const draftStatus = draftPanel.querySelector("[data-draft-status]");
-  const draftRestoreButton = draftPanel.querySelector("[data-draft-restore]");
-  const draftClearButton = draftPanel.querySelector("[data-draft-clear]");
+  const draftStatus = null;
 
   const readDraft = () => {
     try {
@@ -356,60 +334,16 @@
     }
   };
 
-  const clearDraft = (message = "Draft lokal dihapus.") => {
+  const clearDraft = () => {
     try {
       window.localStorage.removeItem(DRAFT_KEY);
     } catch (_error) {
       // ignore localStorage failures
     }
-
-    if (draftStatus) {
-      draftStatus.textContent = message;
-    }
-
-    if (draftRestoreButton) {
-      draftRestoreButton.disabled = true;
-    }
-
-    if (draftClearButton) {
-      draftClearButton.disabled = true;
-    }
   };
 
-  const updateDraftPanelState = (message = null) => {
-    const draft = readDraft();
-
-    if (!draft) {
-      if (draftStatus) {
-        draftStatus.textContent = message || "Belum ada draft lokal tersimpan.";
-      }
-
-      if (draftRestoreButton) {
-        draftRestoreButton.disabled = true;
-      }
-
-      if (draftClearButton) {
-        draftClearButton.disabled = true;
-      }
-
-      return;
-    }
-
-    const timestamp = draft.saved_at
-      ? new Date(draft.saved_at).toLocaleString("id-ID")
-      : "waktu tidak diketahui";
-
-    if (draftStatus) {
-      draftStatus.textContent = message || `Draft lokal tersimpan. Simpan terakhir: ${timestamp}.`;
-    }
-
-    if (draftRestoreButton) {
-      draftRestoreButton.disabled = false;
-    }
-
-    if (draftClearButton) {
-      draftClearButton.disabled = false;
-    }
+  const updateDraftPanelState = () => {
+    // draft dipulihkan otomatis tanpa panel aksi
   };
 
   const collectDraftPayload = () => {
@@ -448,12 +382,8 @@
       return;
     }
 
-    const written = writeDraft(payload);
-    updateDraftPanelState(
-      written
-        ? null
-        : "Draft tidak bisa disimpan ke browser ini."
-    );
+    writeDraft(payload);
+    updateDraftPanelState();
   };
 
   const scheduleDraftSave = () => {
@@ -505,17 +435,10 @@
       setActiveLine(firstLine);
     }
 
-    updateDraftPanelState("Draft lokal berhasil dipulihkan.");
+    updateDraftPanelState();
     focusField(document.getElementById("nomor_faktur"));
   };
 
-  draftRestoreButton?.addEventListener("click", () => {
-    restoreDraft();
-  });
-
-  draftClearButton?.addEventListener("click", () => {
-    clearDraft("Draft lokal dihapus.");
-  });
 
   const attachSharedShortcuts = (field, item, fieldName) => {
     if (!field) return;
@@ -838,13 +761,18 @@
   updateTanggalTerimaState();
   updateDraftPanelState();
 
-  const firstLine = lineItems()[0];
-  if (firstLine) {
-    setActiveLine(firstLine);
-  }
+  const initialDraft = readDraft();
+  if (initialDraft) {
+    restoreDraft();
+  } else {
+    const firstLine = lineItems()[0];
+    if (firstLine) {
+      setActiveLine(firstLine);
+    }
 
-  const firstHeader = headerFields()[0];
-  if (firstHeader) {
-    focusField(firstHeader);
+    const firstHeader = headerFields()[0];
+    if (firstHeader) {
+      focusField(firstHeader);
+    }
   }
 })();

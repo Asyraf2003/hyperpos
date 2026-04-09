@@ -35,6 +35,15 @@
                                 Buat Product
                             </a>
 
+                            <button
+                                type="button"
+                                class="btn btn-light-danger"
+                                id="procurement-start-new"
+                                onclick="window.localStorage.removeItem('admin.procurement.create-supplier-invoice.draft.v1'); window.location.reload();"
+                            >
+                                Mulai Baru
+                            </button>
+
                             <a
                                 href="{{ route('admin.procurement.supplier-invoices.index') }}"
                                 class="btn btn-light-secondary"
