@@ -43,7 +43,7 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
             ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.index'));
-        $response->assertSessionHas('error', 'Invoice supplier tidak ditemukan.');
+        $response->assertSessionHas('error', 'Nota supplier tidak ditemukan.');
     }
 
     public function test_admin_can_access_edit_supplier_invoice_page_when_invoice_is_still_editable(): void
@@ -71,8 +71,6 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
             'supplier_invoice_id' => 'invoice-1',
             'paid_at' => '2026-03-16',
             'amount_rupiah' => 5000,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         $response = $this->actingAs($this->user('admin'))

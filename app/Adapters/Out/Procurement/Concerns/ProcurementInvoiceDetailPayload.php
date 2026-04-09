@@ -44,6 +44,9 @@ trait ProcurementInvoiceDetailPayload
         return [
             'summary' => [
                 'supplier_invoice_id' => (string) $summary->supplier_invoice_id,
+                'nomor_faktur' => $summary->nomor_faktur !== null
+                    ? (string) $summary->nomor_faktur
+                    : '',
                 'supplier_id' => (string) $summary->supplier_id,
                 'supplier_nama_pt_pengirim_current' => $summary->supplier_nama_pt_pengirim_current !== null
                     ? (string) $summary->supplier_nama_pt_pengirim_current
