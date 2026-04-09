@@ -71,6 +71,8 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
             'supplier_invoice_id' => 'invoice-1',
             'paid_at' => '2026-03-16',
             'amount_rupiah' => 5000,
+            'proof_status' => 'pending',
+            'proof_storage_path' => null,
         ]);
 
         $response = $this->actingAs($this->user('admin'))

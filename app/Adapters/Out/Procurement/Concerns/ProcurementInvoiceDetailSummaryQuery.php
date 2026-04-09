@@ -39,6 +39,7 @@ trait ProcurementInvoiceDetailSummaryQuery
             ->where('supplier_invoices.id', $supplierInvoiceId)
             ->first([
                 'supplier_invoices.id as supplier_invoice_id',
+                'supplier_invoices.nomor_faktur',
                 'supplier_invoices.supplier_id',
                 'suppliers.nama_pt_pengirim as supplier_nama_pt_pengirim_current',
                 'supplier_invoices.supplier_nama_pt_pengirim_snapshot as supplier_nama_pt_pengirim_snapshot',
