@@ -213,6 +213,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         ]);
     }
 
+
     private function seedSupplierInvoiceLine(
         string $id,
         string $supplierInvoiceId,
@@ -223,11 +224,18 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         ?string $productKodeBarangSnapshot = 'KB-001',
         string $productNamaBarangSnapshot = 'Ban Luar',
         string $productMerekSnapshot = 'Federal',
-        ?int $productUkuranSnapshot = 90
+        ?int $productUkuranSnapshot = 90,
+        ?int $lineNo = null
     ): void {
+        $resolvedLineNo = $lineNo
+            ?? ((int) (DB::table('supplier_invoice_lines')
+                ->where('supplier_invoice_id', $supplierInvoiceId)
+                ->max('line_no') ?? 0) + 1);
+
         DB::table('supplier_invoice_lines')->insert([
             'id' => $id,
             'supplier_invoice_id' => $supplierInvoiceId,
+            'line_no' => $resolvedLineNo,
             'product_id' => $productId,
             'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
             'product_nama_barang_snapshot' => $productNamaBarangSnapshot,

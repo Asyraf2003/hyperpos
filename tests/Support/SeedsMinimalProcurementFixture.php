@@ -70,6 +70,7 @@ trait SeedsMinimalProcurementFixture
         );
     }
 
+
     private function seedMinimalSupplierInvoiceLine(
         string $id,
         string $supplierInvoiceId,
@@ -80,12 +81,25 @@ trait SeedsMinimalProcurementFixture
         ?string $productKodeBarangSnapshot = 'KB-001',
         string $productNamaBarangSnapshot = 'Ban Luar',
         string $productMerekSnapshot = 'Federal',
-        ?int $productUkuranSnapshot = 100
+        ?int $productUkuranSnapshot = 100,
+        ?int $lineNo = null
     ): void {
+        $existingLineNo = DB::table('supplier_invoice_lines')
+            ->where('id', $id)
+            ->value('line_no');
+
+        $resolvedLineNo = $lineNo
+            ?? ($existingLineNo !== null
+                ? (int) $existingLineNo
+                : ((int) (DB::table('supplier_invoice_lines')
+                    ->where('supplier_invoice_id', $supplierInvoiceId)
+                    ->max('line_no') ?? 0) + 1));
+
         DB::table('supplier_invoice_lines')->updateOrInsert(
             ['id' => $id],
             [
                 'supplier_invoice_id' => $supplierInvoiceId,
+                'line_no' => $resolvedLineNo,
                 'product_id' => $productId,
                 'product_kode_barang_snapshot' => $productKodeBarangSnapshot,
                 'product_nama_barang_snapshot' => $productNamaBarangSnapshot,

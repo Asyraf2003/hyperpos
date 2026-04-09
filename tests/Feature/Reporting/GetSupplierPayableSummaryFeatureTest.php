@@ -131,17 +131,25 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         ]);
     }
 
+
     private function seedSupplierInvoiceLine(
         string $id,
         string $supplierInvoiceId,
         string $productId,
         int $qtyPcs,
         int $lineTotalRupiah,
-        int $unitCostRupiah
+        int $unitCostRupiah,
+        ?int $lineNo = null
     ): void {
+        $resolvedLineNo = $lineNo
+            ?? ((int) (DB::table('supplier_invoice_lines')
+                ->where('supplier_invoice_id', $supplierInvoiceId)
+                ->max('line_no') ?? 0) + 1);
+
         DB::table('supplier_invoice_lines')->insert([
             'id' => $id,
             'supplier_invoice_id' => $supplierInvoiceId,
+            'line_no' => $resolvedLineNo,
             'product_id' => $productId,
             'product_kode_barang_snapshot' => (string) DB::table('products')->where('id', $productId)->value('kode_barang'),
             'product_nama_barang_snapshot' => (string) DB::table('products')->where('id', $productId)->value('nama_barang'),
