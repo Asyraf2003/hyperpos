@@ -180,15 +180,18 @@
                             </div>
 
                             <div class="col-12 col-md-6 col-xl-3">
-                                <button
-                                    type="button"
+                                <a
+                                    href="#"
                                     id="procurement-action-edit-link"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4 h-100"
-                                    disabled
+                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4 h-100 disabled"
+                                    aria-disabled="true"
+                                    tabindex="-1"
                                 >
-                                    <div class="fw-bold fs-5 mb-1">Edit Nota</div>
-                                    <div class="small opacity-75">Tersedia setelah route dan use case edit pre-effect dikunci.</div>
-                                </button>
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-edit-title">Edit Nota</div>
+                                    <div class="small opacity-75" id="procurement-action-edit-description">
+                                        Tersedia hanya untuk nota pre-effect yang belum punya receipt atau payment.
+                                    </div>
+                                </a>
                             </div>
                         </div>
 

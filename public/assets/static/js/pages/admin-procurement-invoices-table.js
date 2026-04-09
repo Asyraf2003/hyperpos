@@ -51,6 +51,9 @@
   const actionProofLink = $("procurement-action-proof-link");
   const actionProofTitle = $("procurement-action-proof-title");
   const actionProofDescription = $("procurement-action-proof-description");
+  const actionEditLink = $("procurement-action-edit-link");
+  const actionEditTitle = $("procurement-action-edit-title");
+  const actionEditDescription = $("procurement-action-edit-description");
 
   const setLinkDisabledState = (node, disabled) => {
     if (!node) return;
@@ -103,6 +106,7 @@
   const trimValue = (v) => String(v ?? "").trim();
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const editUrl = (id) => `${detailUrl(id)}/edit`;
   const paymentStoreUrl = (id) => c.paymentStoreBaseUrl.replace("__ID__", encodeURIComponent(id));
   const paymentSectionUrl = (id) => `${detailUrl(id)}#payment-form-section`;
   const proofSectionUrl = (id) => `${detailUrl(id)}#payment-proof-section`;
@@ -318,7 +322,10 @@
       !actionPaymentDescription ||
       !actionProofLink ||
       !actionProofTitle ||
-      !actionProofDescription
+      !actionProofDescription ||
+      !actionEditLink ||
+      !actionEditTitle ||
+      !actionEditDescription
     ) {
       return;
     }
@@ -356,6 +363,20 @@
       actionProofTitle.textContent = "Unggah Bukti Bayar";
       actionProofDescription.textContent = "Buka bagian unggah bukti pembayaran.";
       setLinkDisabledState(actionProofLink, false);
+    }
+
+    const isEditable = Number(row.payment_count || 0) < 1 && Number(row.receipt_count || 0) < 1;
+
+    if (isEditable) {
+      actionEditLink.href = editUrl(row.supplier_invoice_id);
+      actionEditTitle.textContent = "Edit Nota";
+      actionEditDescription.textContent = "Ubah header, qty, dan total rincian untuk nota pre-effect.";
+      setLinkDisabledState(actionEditLink, false);
+    } else {
+      actionEditLink.href = "#";
+      actionEditTitle.textContent = "Edit Nota";
+      actionEditDescription.textContent = "Tidak tersedia setelah ada receipt atau payment.";
+      setLinkDisabledState(actionEditLink, true);
     }
   };
 
@@ -474,6 +495,12 @@
 
   actionProofLink?.addEventListener("click", (event) => {
     if (actionProofLink.getAttribute("aria-disabled") === "true") {
+      event.preventDefault();
+    }
+  });
+
+  actionEditLink?.addEventListener("click", (event) => {
+    if (actionEditLink.getAttribute("aria-disabled") === "true") {
       event.preventDefault();
     }
   });
