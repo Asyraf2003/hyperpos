@@ -30,6 +30,9 @@
   const body = $("procurement-invoice-table-body");
   const pager = $("procurement-invoice-table-pagination");
   const summary = $("procurement-invoice-table-summary");
+  const activeFilters = $("procurement-active-filters");
+  const activeFilterChips = $("procurement-active-filter-chips");
+  const resetAllFilters = $("procurement-reset-all-filters");
   const searchForm = $("procurement-search-form");
   const searchInput = $("procurement-search-input");
   const filterForm = $("procurement-filter-form");
@@ -126,6 +129,53 @@
   const invoiceCellHtml = (row) => {
     const nomorFaktur = trimValue(row.nomor_faktur);
     return `<div class="fw-semibold">${esc(nomorFaktur || "-")}</div>`;
+  };
+
+  const activeFilterEntries = () => {
+    const entries = [];
+
+    if (trimValue(s.q) !== "") {
+      entries.push({ label: "Keyword", value: s.q });
+    }
+
+    if (trimValue(s.nama_pt) !== "") {
+      entries.push({ label: "Nama PT", value: s.nama_pt });
+    }
+
+    if (s.payment_status === "outstanding") {
+      entries.push({ label: "Status", value: "Masih Punya Tagihan" });
+    }
+
+    if (s.payment_status === "paid") {
+      entries.push({ label: "Status", value: "Sudah Lunas" });
+    }
+
+    if (trimValue(s.shipment_date_from) !== "" || trimValue(s.shipment_date_to) !== "") {
+      const from = trimValue(s.shipment_date_from) || "...";
+      const to = trimValue(s.shipment_date_to) || "...";
+      entries.push({ label: "Tanggal Kirim", value: `${from} s.d. ${to}` });
+    }
+
+    return entries;
+  };
+
+  const renderActiveFilters = () => {
+    if (!activeFilters || !activeFilterChips) return;
+
+    const entries = activeFilterEntries();
+
+    if (!entries.length) {
+      activeFilters.classList.add("d-none");
+      activeFilterChips.innerHTML = "";
+      return;
+    }
+
+    activeFilters.classList.remove("d-none");
+    activeFilterChips.innerHTML = entries.map((entry) => `
+      <span class="badge bg-light-primary text-primary border px-3 py-2">
+        ${esc(entry.label)}: ${esc(entry.value)}
+      </span>
+    `).join("");
   };
 
   const stateFromUrl = () => {
@@ -396,6 +446,7 @@
     renderPager(json.data.meta || {});
     renderSortIndicators();
     syncInputsFromState();
+    renderActiveFilters();
     updateUrl(replaceUrl);
 
     if (c.oldPaymentInvoiceId) {
@@ -496,6 +547,17 @@
     load();
   });
 
+  resetAllFilters?.addEventListener("click", () => {
+    s.q = "";
+    s.nama_pt = "";
+    s.payment_status = "all";
+    s.shipment_date_from = "";
+    s.shipment_date_to = "";
+    s.page = 1;
+    syncInputsFromState();
+    load();
+  });
+
   document.querySelector("#procurement-invoice-table thead")?.addEventListener("click", (e) => {
     const button = e.target.closest("[data-sort-by]");
     if (!button) return;
@@ -560,5 +622,6 @@
 
   syncInputsFromState();
   renderSortIndicators();
+  renderActiveFilters();
   load(true);
 })();

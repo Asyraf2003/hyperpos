@@ -117,6 +117,20 @@
                     <small id="procurement-invoice-table-summary" class="text-muted">Total: -</small>
                     <div id="procurement-invoice-table-pagination"></div>
                 </div>
+
+                <div id="procurement-active-filters" class="d-none mt-3 pt-3 border-top">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                        <div class="d-flex flex-wrap gap-2" id="procurement-active-filter-chips"></div>
+
+                        <button
+                            type="button"
+                            id="procurement-reset-all-filters"
+                            class="btn btn-light-secondary btn-sm"
+                        >
+                            Reset Semua Filter
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
