@@ -23,6 +23,16 @@ trait ProcurementInvoiceTableFilters
             });
         }
 
+        if ($filters->nomorFaktur() !== null) {
+            $nomorFaktur = $filters->nomorFaktur();
+
+            $query->where(function (Builder $builder) use ($nomorFaktur): void {
+                $builder
+                    ->where('supplier_invoices.nomor_faktur', 'like', '%' . $nomorFaktur . '%')
+                    ->orWhere('supplier_invoices.nomor_faktur_normalized', 'like', '%' . mb_strtolower($nomorFaktur, 'UTF-8') . '%');
+            });
+        }
+
         if ($filters->namaPt() !== null) {
             $namaPt = $filters->namaPt();
 

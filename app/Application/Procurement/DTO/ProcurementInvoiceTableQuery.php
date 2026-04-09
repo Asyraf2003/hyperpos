@@ -8,6 +8,7 @@ final class ProcurementInvoiceTableQuery
 {
     public function __construct(
         private readonly ?string $q,
+        private readonly ?string $nomorFaktur,
         private readonly ?string $namaPt,
         private readonly string $paymentStatus,
         private readonly int $page,
@@ -26,6 +27,7 @@ final class ProcurementInvoiceTableQuery
     {
         return new self(
             self::nullableString($data['q'] ?? null),
+            self::nullableString($data['nomor_faktur'] ?? null),
             self::nullableString($data['nama_pt'] ?? null),
             isset($data['payment_status']) ? (string) $data['payment_status'] : 'all',
             isset($data['page']) ? (int) $data['page'] : 1,
@@ -40,6 +42,11 @@ final class ProcurementInvoiceTableQuery
     public function q(): ?string
     {
         return $this->q;
+    }
+
+    public function nomorFaktur(): ?string
+    {
+        return $this->nomorFaktur;
     }
 
     public function namaPt(): ?string

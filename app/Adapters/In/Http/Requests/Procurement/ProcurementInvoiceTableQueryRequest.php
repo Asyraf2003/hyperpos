@@ -18,6 +18,7 @@ final class ProcurementInvoiceTableQueryRequest extends FormRequest
     {
         $this->merge([
             'q' => $this->trimOrNull('q'),
+            'nomor_faktur' => $this->trimOrNull('nomor_faktur'),
             'nama_pt' => $this->trimOrNull('nama_pt'),
             'payment_status' => $this->trimOrNull('payment_status'),
             'sort_by' => $this->trimOrNull('sort_by'),
@@ -34,6 +35,7 @@ final class ProcurementInvoiceTableQueryRequest extends FormRequest
     {
         return [
             'q' => ['nullable', 'string'],
+            'nomor_faktur' => ['nullable', 'string'],
             'nama_pt' => ['nullable', 'string'],
             'payment_status' => ['nullable', 'in:outstanding,paid,all'],
             'page' => ['nullable', 'integer', 'min:1'],

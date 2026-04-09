@@ -9,6 +9,18 @@
 
         <form id="procurement-filter-form">
             <div class="form-group mb-4">
+                <label class="form-label" for="filter-nomor-faktur">No Faktur</label>
+                <input
+                    type="text"
+                    id="filter-nomor-faktur"
+                    name="nomor_faktur"
+                    class="form-control"
+                    placeholder="Cari nomor faktur"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="form-group mb-4">
                 <label class="form-label" for="filter-nama-pt">Nama PT</label>
                 <input
                     type="text"
