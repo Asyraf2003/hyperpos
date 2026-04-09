@@ -20,7 +20,13 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
                 'id',
                 'supplier_id',
                 'supplier_nama_pt_pengirim_snapshot',
+                'nomor_faktur',
+                'document_kind',
+                'lifecycle_status',
+                'origin_supplier_invoice_id',
+                'superseded_by_supplier_invoice_id',
                 'tanggal_pengiriman',
+                'jatuh_tempo',
             ])
             ->where('id', $supplierInvoiceId)
             ->first();
@@ -32,7 +38,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
         $lineRows = DB::table('supplier_invoice_lines')
             ->select([
                 'id',
-                'supplier_invoice_id',
+                'line_no',
                 'product_id',
                 'product_kode_barang_snapshot',
                 'product_nama_barang_snapshot',
@@ -42,6 +48,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
                 'line_total_rupiah',
             ])
             ->where('supplier_invoice_id', (string) $invoiceRow->id)
+            ->orderBy('line_no')
             ->get();
 
         $lines = [];
@@ -49,6 +56,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
         foreach ($lineRows as $row) {
             $lines[] = SupplierInvoiceLine::rehydrate(
                 (string) $row->id,
+                (int) $row->line_no,
                 (string) $row->product_id,
                 $row->product_kode_barang_snapshot !== null ? (string) $row->product_kode_barang_snapshot : null,
                 (string) $row->product_nama_barang_snapshot,
@@ -62,8 +70,14 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
         return SupplierInvoice::rehydrate(
             (string) $invoiceRow->id,
             (string) $invoiceRow->supplier_id,
-            (string) $invoiceRow->supplier_nama_pt_pengirim_snapshot,
+            (string) ($invoiceRow->supplier_nama_pt_pengirim_snapshot ?? ''),
+            (string) ($invoiceRow->nomor_faktur ?? ''),
+            (string) ($invoiceRow->document_kind ?? 'invoice'),
+            (string) ($invoiceRow->lifecycle_status ?? 'active'),
+            $invoiceRow->origin_supplier_invoice_id !== null ? (string) $invoiceRow->origin_supplier_invoice_id : null,
+            $invoiceRow->superseded_by_supplier_invoice_id !== null ? (string) $invoiceRow->superseded_by_supplier_invoice_id : null,
             new DateTimeImmutable((string) $invoiceRow->tanggal_pengiriman),
+            new DateTimeImmutable((string) $invoiceRow->jatuh_tempo),
             $lines,
         );
     }

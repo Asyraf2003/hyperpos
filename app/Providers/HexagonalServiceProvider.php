@@ -149,6 +149,7 @@ use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
 use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 use App\Ports\Out\Payment\RefundComponentAllocationWriterPort;
+use App\Ports\Out\Procurement\SupplierInvoiceLifecyclePort;
 use App\Ports\Out\Procurement\SupplierInvoiceLineReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
