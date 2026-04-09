@@ -9,8 +9,11 @@
 
   if (!config || !form || !container || !addButton || !template) return;
 
+  const DRAFT_KEY = "admin.procurement.create-supplier-invoice.draft.v1";
+
   let nextIndex = Number.parseInt(container.dataset.nextIndex || "0", 10);
   let activeLineItem = null;
+  let saveTimer = null;
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
@@ -80,7 +83,6 @@
     items.forEach((item) => {
       const button = item.querySelector("[data-remove-line]");
       if (!button) return;
-
       button.disabled = items.length === 1;
     });
   };
@@ -123,6 +125,15 @@
     qtyInput.addEventListener("blur", syncQty);
   };
 
+  const formatMoneyDisplay = (rawValue, displayValue = "") => {
+    const raw = String(rawValue ?? "").trim();
+    if (raw !== "" && /^\d+$/.test(raw)) {
+      return Number.parseInt(raw, 10).toLocaleString("id-ID");
+    }
+
+    return String(displayValue ?? "");
+  };
+
   const isLineCompletelyEmpty = (item) => {
     const hiddenProductId = item.querySelector("[data-product-id]");
     const productSearch = item.querySelector("[data-product-search]");
@@ -160,7 +171,43 @@
       .replaceAll("__INDEX__", String(index))
       .replaceAll("__LINE_NO__", String(lineNo));
 
-  const appendLine = () => {
+  const populateLineItem = (item, line) => {
+    const lineNoInput = item.querySelector("[data-line-no]");
+    const productIdInput = item.querySelector("[data-product-id]");
+    const productSearchInput = item.querySelector("[data-product-search]");
+    const qtyInput = item.querySelector("[data-qty-input]");
+    const moneyRawInput = item.querySelector("[data-money-raw]");
+    const moneyDisplayInput = item.querySelector("[data-money-display]");
+
+    if (lineNoInput) {
+      lineNoInput.value = String(line.line_no ?? "");
+    }
+
+    if (productIdInput) {
+      productIdInput.value = String(line.product_id ?? "");
+    }
+
+    if (productSearchInput) {
+      productSearchInput.value = String(line.product_label ?? "");
+    }
+
+    if (qtyInput) {
+      qtyInput.value = String(line.qty_pcs ?? "1");
+    }
+
+    if (moneyRawInput) {
+      moneyRawInput.value = String(line.line_total_rupiah ?? "");
+    }
+
+    if (moneyDisplayInput) {
+      moneyDisplayInput.value = formatMoneyDisplay(
+        line.line_total_rupiah ?? "",
+        line.line_total_display ?? ""
+      );
+    }
+  };
+
+  const appendLine = (lineData = null) => {
     const html = buildLineHtml(nextIndex, lineItems().length + 1);
     container.insertAdjacentHTML("beforeend", html);
     nextIndex += 1;
@@ -170,6 +217,11 @@
 
     if (lastItem) {
       initLineItem(lastItem);
+
+      if (lineData) {
+        populateLineItem(lastItem, lineData);
+      }
+
       syncLineNumbers();
       updateRemoveButtons();
       setActiveLine(lastItem);
@@ -178,9 +230,33 @@
     return lastItem;
   };
 
+  const removeCurrentLineIfEmpty = (item) => {
+    const items = lineItems();
+
+    if (items.length <= 1 || !isLineCompletelyEmpty(item)) {
+      return;
+    }
+
+    const itemIndex = items.indexOf(item);
+    item.remove();
+
+    syncLineNumbers();
+    updateRemoveButtons();
+    scheduleDraftSave();
+
+    const remaining = lineItems();
+    const fallback = remaining[itemIndex] || remaining[itemIndex - 1] || remaining[0];
+
+    if (fallback) {
+      setActiveLine(fallback);
+      focusField(getLineFields(fallback).product);
+    }
+  };
+
   const moveHeaderFocus = (currentField, direction) => {
     const fields = headerFields();
     const index = fields.indexOf(currentField);
+
     if (index === -1) return;
 
     const target = fields[index + direction];
@@ -201,11 +277,13 @@
   const moveLineFocus = (item, fieldName, direction) => {
     const items = lineItems();
     const itemIndex = items.indexOf(item);
+
     if (itemIndex === -1) return;
 
     const fields = getLineFields(item);
     const order = ["product", "qty", "total"];
     const currentIndex = order.indexOf(fieldName);
+
     if (currentIndex === -1) return;
 
     const nextFieldName = order[currentIndex + direction];
@@ -233,26 +311,211 @@
     focusField(getLineFields(nextItem).product);
   };
 
-  const removeCurrentLineIfEmpty = (item) => {
-    const items = lineItems();
-    if (items.length <= 1 || !isLineCompletelyEmpty(item)) {
+  const createDraftPanel = () => {
+    const panel = document.createElement("div");
+    panel.className = "alert alert-light-secondary border d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4";
+    panel.setAttribute("data-draft-panel", "1");
+    panel.innerHTML = `
+      <div>
+        <div class="fw-semibold mb-1">Draft Lokal</div>
+        <small class="text-muted d-block" data-draft-status>Belum ada draft lokal tersimpan.</small>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-sm btn-light-primary" data-draft-restore disabled>Pulihkan Draft</button>
+        <button type="button" class="btn btn-sm btn-light-danger" data-draft-clear disabled>Hapus Draft</button>
+      </div>
+    `;
+
+    form.prepend(panel);
+    return panel;
+  };
+
+  const draftPanel = createDraftPanel();
+  const draftStatus = draftPanel.querySelector("[data-draft-status]");
+  const draftRestoreButton = draftPanel.querySelector("[data-draft-restore]");
+  const draftClearButton = draftPanel.querySelector("[data-draft-clear]");
+
+  const readDraft = () => {
+    try {
+      const raw = window.localStorage.getItem(DRAFT_KEY);
+      if (!raw) return null;
+
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (_error) {
+      return null;
+    }
+  };
+
+  const writeDraft = (payload) => {
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+      return true;
+    } catch (_error) {
+      return false;
+    }
+  };
+
+  const clearDraft = (message = "Draft lokal dihapus.") => {
+    try {
+      window.localStorage.removeItem(DRAFT_KEY);
+    } catch (_error) {
+      // ignore localStorage failures
+    }
+
+    if (draftStatus) {
+      draftStatus.textContent = message;
+    }
+
+    if (draftRestoreButton) {
+      draftRestoreButton.disabled = true;
+    }
+
+    if (draftClearButton) {
+      draftClearButton.disabled = true;
+    }
+  };
+
+  const updateDraftPanelState = (message = null) => {
+    const draft = readDraft();
+
+    if (!draft) {
+      if (draftStatus) {
+        draftStatus.textContent = message || "Belum ada draft lokal tersimpan.";
+      }
+
+      if (draftRestoreButton) {
+        draftRestoreButton.disabled = true;
+      }
+
+      if (draftClearButton) {
+        draftClearButton.disabled = true;
+      }
+
       return;
     }
 
-    const itemIndex = items.indexOf(item);
-    item.remove();
+    const timestamp = draft.saved_at
+      ? new Date(draft.saved_at).toLocaleString("id-ID")
+      : "waktu tidak diketahui";
+
+    if (draftStatus) {
+      draftStatus.textContent = message || `Draft lokal tersimpan. Simpan terakhir: ${timestamp}.`;
+    }
+
+    if (draftRestoreButton) {
+      draftRestoreButton.disabled = false;
+    }
+
+    if (draftClearButton) {
+      draftClearButton.disabled = false;
+    }
+  };
+
+  const collectDraftPayload = () => {
+    const selectedAutoReceive = document.querySelector('input[name="auto_receive"]:checked');
+
+    return {
+      saved_at: new Date().toISOString(),
+      header: {
+        nomor_faktur: String(document.getElementById("nomor_faktur")?.value ?? ""),
+        nama_pt_pengirim: String(document.getElementById("nama_pt_pengirim")?.value ?? ""),
+        tanggal_pengiriman: String(document.getElementById("tanggal_pengiriman")?.value ?? ""),
+        tanggal_terima: String(document.getElementById("tanggal_terima")?.value ?? ""),
+        auto_receive: selectedAutoReceive ? String(selectedAutoReceive.value) : "1"
+      },
+      lines: lineItems()
+        .filter((item) => !isLineCompletelyEmpty(item))
+        .map((item) => ({
+          line_no: String(item.querySelector("[data-line-no]")?.value ?? ""),
+          product_id: String(item.querySelector("[data-product-id]")?.value ?? ""),
+          product_label: String(item.querySelector("[data-product-search]")?.value ?? ""),
+          qty_pcs: String(item.querySelector("[data-qty-input]")?.value ?? ""),
+          line_total_rupiah: String(item.querySelector("[data-money-raw]")?.value ?? ""),
+          line_total_display: String(item.querySelector("[data-money-display]")?.value ?? "")
+        }))
+    };
+  };
+
+  const persistDraftNow = () => {
+    const payload = collectDraftPayload();
+    const hasMeaningfulHeader =
+      payload.header.nomor_faktur.trim() !== "" ||
+      payload.header.nama_pt_pengirim.trim() !== "";
+
+    if (!hasMeaningfulHeader && payload.lines.length === 0) {
+      clearDraft("Belum ada draft lokal tersimpan.");
+      return;
+    }
+
+    const written = writeDraft(payload);
+    updateDraftPanelState(
+      written
+        ? null
+        : "Draft tidak bisa disimpan ke browser ini."
+    );
+  };
+
+  const scheduleDraftSave = () => {
+    window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(persistDraftNow, 300);
+  };
+
+  const restoreDraft = () => {
+    const draft = readDraft();
+    if (!draft) {
+      updateDraftPanelState("Draft lokal tidak ditemukan.");
+      return;
+    }
+
+    const header = draft.header || {};
+    const lines = Array.isArray(draft.lines) ? draft.lines : [];
+
+    const nomorFakturInput = document.getElementById("nomor_faktur");
+    const namaPtInput = document.getElementById("nama_pt_pengirim");
+    const tanggalPengirimanInput = document.getElementById("tanggal_pengiriman");
+    const tanggalTerimaInputLocal = document.getElementById("tanggal_terima");
+    const autoReceiveValue = String(header.auto_receive ?? "1");
+
+    if (nomorFakturInput) nomorFakturInput.value = String(header.nomor_faktur ?? "");
+    if (namaPtInput) namaPtInput.value = String(header.nama_pt_pengirim ?? "");
+    if (tanggalPengirimanInput) tanggalPengirimanInput.value = String(header.tanggal_pengiriman ?? "");
+    if (tanggalTerimaInputLocal) tanggalTerimaInputLocal.value = String(header.tanggal_terima ?? "");
+
+    const autoReceiveTarget = document.querySelector(`input[name="auto_receive"][value="${autoReceiveValue}"]`);
+    if (autoReceiveTarget instanceof HTMLInputElement) {
+      autoReceiveTarget.checked = true;
+    }
+
+    container.innerHTML = "";
+    nextIndex = 0;
+
+    if (lines.length === 0) {
+      appendLine();
+    } else {
+      lines.forEach((line) => appendLine(line));
+    }
 
     syncLineNumbers();
     updateRemoveButtons();
+    updateTanggalTerimaState();
 
-    const remaining = lineItems();
-    const fallback = remaining[itemIndex] || remaining[itemIndex - 1] || remaining[0];
-
-    if (fallback) {
-      setActiveLine(fallback);
-      focusField(getLineFields(fallback).product);
+    const firstLine = lineItems()[0];
+    if (firstLine) {
+      setActiveLine(firstLine);
     }
+
+    updateDraftPanelState("Draft lokal berhasil dipulihkan.");
+    focusField(document.getElementById("nomor_faktur"));
   };
+
+  draftRestoreButton?.addEventListener("click", () => {
+    restoreDraft();
+  });
+
+  draftClearButton?.addEventListener("click", () => {
+    clearDraft("Draft lokal dihapus.");
+  });
 
   const attachSharedShortcuts = (field, item, fieldName) => {
     if (!field) return;
@@ -272,6 +535,7 @@
         if (newItem) {
           focusField(getLineFields(newItem).product);
         }
+        scheduleDraftSave();
         return;
       }
 
@@ -319,6 +583,7 @@
       hiddenInput.value = row.id || "";
       searchInput.value = row.label || "";
       hideResults();
+      scheduleDraftSave();
       focusField(qtyInput);
     };
 
@@ -357,6 +622,7 @@
 
       if (query.length < 2) {
         hideResults();
+        scheduleDraftSave();
         return;
       }
 
@@ -407,6 +673,7 @@
         if (newItem) {
           focusField(getLineFields(newItem).product);
         }
+        scheduleDraftSave();
         return;
       }
 
@@ -495,6 +762,7 @@
     if (newItem) {
       focusField(getLineFields(newItem).product);
     }
+    scheduleDraftSave();
   });
 
   container.addEventListener("click", (event) => {
@@ -509,6 +777,7 @@
     item.remove();
     syncLineNumbers();
     updateRemoveButtons();
+    scheduleDraftSave();
 
     const fallback = lineItems()[0];
     if (fallback) {
@@ -523,17 +792,25 @@
   });
 
   autoReceiveInputs.forEach((input) => {
-    input.addEventListener("change", updateTanggalTerimaState);
+    input.addEventListener("change", () => {
+      updateTanggalTerimaState();
+      scheduleDraftSave();
+    });
   });
+
+  form.addEventListener("input", scheduleDraftSave);
+  form.addEventListener("change", scheduleDraftSave);
 
   form.addEventListener("submit", () => {
     pruneEmptyLinesBeforeSubmit();
+    persistDraftNow();
   });
 
   lineItems().forEach(initLineItem);
   syncLineNumbers();
   updateRemoveButtons();
   updateTanggalTerimaState();
+  updateDraftPanelState();
 
   const firstLine = lineItems()[0];
   if (firstLine) {
