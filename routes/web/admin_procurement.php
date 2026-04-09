@@ -12,6 +12,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDa
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProofAttachmentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\UpdateSupplierInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
@@ -43,6 +44,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}/edit', EditSupplierInvoicePageController::class)
         ->name('admin.procurement.supplier-invoices.edit');
+
+    Route::put('/admin/procurement/supplier-invoices/{supplierInvoiceId}', UpdateSupplierInvoiceController::class)
+        ->name('admin.procurement.supplier-invoices.update');
 
     Route::post('/admin/procurement/supplier-invoices', StoreSupplierInvoiceController::class)
         ->name('admin.procurement.supplier-invoices.store');
