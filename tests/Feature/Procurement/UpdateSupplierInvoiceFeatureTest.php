@@ -70,6 +70,124 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         ]);
     }
 
+
+    public function test_admin_can_add_new_line_when_updating_editable_supplier_invoice(): void
+    {
+        $this->seedEditableInvoice();
+        $this->seedSecondProduct();
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-1',
+            ]), [
+                'nomor_faktur' => 'INV-SUP-001-REV',
+                'nama_pt_pengirim' => 'PT Sumber Makmur',
+                'tanggal_pengiriman' => '2026-03-20',
+                'lines' => [
+                    [
+                        'line_no' => 1,
+                        'product_id' => 'product-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                    [
+                        'line_no' => 2,
+                        'product_id' => 'product-2',
+                        'qty_pcs' => 1,
+                        'line_total_rupiah' => 15000,
+                    ],
+                ],
+            ]);
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-1',
+        ]));
+        $response->assertSessionHas('success', 'Nota supplier berhasil diperbarui.');
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-1',
+            'grand_total_rupiah' => 35000,
+            'last_revision_no' => 2,
+        ]);
+
+        $this->assertDatabaseHas('supplier_invoice_lines', [
+            'supplier_invoice_id' => 'invoice-1',
+            'line_no' => 1,
+            'product_id' => 'product-1',
+            'qty_pcs' => 2,
+            'line_total_rupiah' => 20000,
+            'unit_cost_rupiah' => 10000,
+        ]);
+
+        $this->assertDatabaseHas('supplier_invoice_lines', [
+            'supplier_invoice_id' => 'invoice-1',
+            'line_no' => 2,
+            'product_id' => 'product-2',
+            'qty_pcs' => 1,
+            'line_total_rupiah' => 15000,
+            'unit_cost_rupiah' => 15000,
+        ]);
+    }
+
+    public function test_admin_can_remove_existing_line_when_updating_editable_supplier_invoice(): void
+    {
+        $this->seedEditableInvoice();
+        $this->seedSecondProduct();
+
+        DB::table('supplier_invoice_lines')->insert([
+            'id' => 'invoice-line-2',
+            'supplier_invoice_id' => 'invoice-1',
+            'line_no' => 2,
+            'product_id' => 'product-2',
+            'product_kode_barang_snapshot' => 'KB-002',
+            'product_nama_barang_snapshot' => 'Oli Mesin',
+            'product_merek_snapshot' => 'Federal Oil',
+            'product_ukuran_snapshot' => 1,
+            'qty_pcs' => 1,
+            'line_total_rupiah' => 15000,
+            'unit_cost_rupiah' => 15000,
+        ]);
+
+        DB::table('supplier_invoices')
+            ->where('id', 'invoice-1')
+            ->update([
+                'grand_total_rupiah' => 35000,
+            ]);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-1',
+            ]), [
+                'nomor_faktur' => 'INV-SUP-001',
+                'nama_pt_pengirim' => 'PT Sumber Makmur',
+                'tanggal_pengiriman' => '2026-03-15',
+                'lines' => [
+                    [
+                        'line_no' => 1,
+                        'product_id' => 'product-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]);
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-1',
+        ]));
+        $response->assertSessionHas('success', 'Nota supplier berhasil diperbarui.');
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-1',
+            'grand_total_rupiah' => 20000,
+            'last_revision_no' => 2,
+        ]);
+
+        $this->assertDatabaseMissing('supplier_invoice_lines', [
+            'id' => 'invoice-line-2',
+            'supplier_invoice_id' => 'invoice-1',
+        ]);
+    }
+
     public function test_admin_update_supplier_invoice_redirects_to_index_when_invoice_is_missing(): void
     {
         $response = $this->actingAs($this->user('admin'))
@@ -185,6 +303,19 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'qty_pcs' => 2,
             'line_total_rupiah' => 20000,
             'unit_cost_rupiah' => 10000,
+        ]);
+    }
+
+
+    private function seedSecondProduct(): void
+    {
+        DB::table('products')->insert([
+            'id' => 'product-2',
+            'kode_barang' => 'KB-002',
+            'nama_barang' => 'Oli Mesin',
+            'merek' => 'Federal Oil',
+            'ukuran' => 1,
+            'harga_jual' => 15000,
         ]);
     }
 
