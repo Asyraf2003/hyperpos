@@ -6,6 +6,18 @@ namespace Tests\Feature\Procurement;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support persis, lalu jalankan test lagi:
+
+```bash
+cat > tests/Feature/Procurement/CreateSupplierInvoicePageFeatureTest.php <<'PHP'
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Procurement;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -28,7 +40,37 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_create_supplier_invoice_page_v2_shell(): void
+    public function test_admin_can_access_create_supplier_invoice_page_with_nomor_faktur_and_line_no_contract(): void\Facades\DB;
+use Tests\TestCase;
+
+final class CreateSupplierInvoicePageFeatureTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_guest_is_redirected_to_login_when_accessing_create_supplier_invoice_page(): void
+    {
+        $this->get(route('admin.procurement.supplier-invoices.create'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_create_supplier_invoice_page(): void
+    {
+        $response = $this->actingAs($this->user('kasir'))
+            ->get(route('admin.procurement.supplier-invoices.create'));
+
+        $response->assertRedirect(route('cashier.dashboard'));
+        $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
+    }
+
+    public function test_admin_can_access_create_supplier_invoice_page_with_nomor_faktur_and_line_no_contract(): void
+    {
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->get(route('admin.procurement.supplier-invoices.create'));
+
+        $response->assertOk();
+        $response->assertSee('R
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
 
@@ -38,10 +80,31 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Rincian Nota');
         $response->assertSee('Informasi Nota');
-        $response->assertSee('Cari produk dengan mengetik nama, merek, ukuran, atau kode.');
+        $response->assertSee('Nomor Faktur');
+        $response->assertSee('name="nomor_faktur"', false);
+        $response->assertincian Nota');
+        $response->assertSee('Informasi Nota');
+        $response->assertSee('Nomor Faktur');
+        $response->assertSee('name="nomor_faktur"', false);
+        $response->assertSee('name="lines[0][line_no]"', false);
+        $response->assertSee('data-line-no', false);
+        $response->assertSee('data-line-label', false);
+        $response->assertSee('Ketik minimal 2 huruf untuk mencari produk');
+        $response->assertSee('add-procurement-line', false);
+        $response->assertSee('data-product-search', false);
+        $response->assertSee('admin-procSee('name="lines[0][line_no]"', false);
+        $response->assertSee('data-line-no', false);
+        $response->assertSee('data-line-label', false);
+        $response->assertSee('Ketik minimal 2 huruf untuk mencari produk');
         $response->assertSee('add-procurement-line', false);
         $response->assertSee('data-product-search', false);
         $response->assertSee('admin-procurement-create.js');
+        $response->assertSee(json_encode(route('admin.procurement.products.lookup')), false);
+    }
+
+    private function user(string $role): User
+    {
+        $user =urement-create.js');
         $response->assertSee(json_encode(route('admin.procurement.products.lookup')), false);
     }
 
@@ -53,7 +116,23 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
             'password' => 'password123',
         ]);
 
+        DB::table User::query()->create([
+            'name' => 'Test',
+            'email' => $role . '@example.test',
+            'password' => 'password123',
+        ]);
+
         DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => $role,
+        ]);
+
+        return $user;
+    }
+
+    private function seedProduct(
+        string $id,
+        ?string $kodeBarang('actor_accesses')->insert([
             'actor_id' => (string) $user->getAuthIdentifier(),
             'role' => $role,
         ]);
@@ -70,12 +149,28 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         int $hargaJual
     ): void {
         DB::table('products')->insert([
+            'id' =>,
+        string $namaBarang,
+        string $merek,
+        ?int $ukuran,
+        int $hargaJual
+    ): void {
+        DB::table('products')->insert([
             'id' => $id,
+            'kode_barang' => $kodeBarang,
+            'nama_barang $id,
             'kode_barang' => $kodeBarang,
             'nama_barang' => $namaBarang,
             'merek' => $merek,
+           ' => $namaBarang,
+            'merek' => $merek,
             'ukuran' => $ukuran,
+            'harga_jual' => 'ukuran' => $ukuran,
             'harga_jual' => $hargaJual,
+        ]);
+    }
+}
+PHP $hargaJual,
         ]);
     }
 }
