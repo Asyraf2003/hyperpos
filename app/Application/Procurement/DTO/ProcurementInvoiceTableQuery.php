@@ -8,6 +8,8 @@ final class ProcurementInvoiceTableQuery
 {
     public function __construct(
         private readonly ?string $q,
+        private readonly ?string $namaPt,
+        private readonly string $paymentStatus,
         private readonly int $page,
         private readonly int $perPage,
         private readonly string $sortBy,
@@ -24,6 +26,8 @@ final class ProcurementInvoiceTableQuery
     {
         return new self(
             self::nullableString($data['q'] ?? null),
+            self::nullableString($data['nama_pt'] ?? null),
+            isset($data['payment_status']) ? (string) $data['payment_status'] : 'all',
             isset($data['page']) ? (int) $data['page'] : 1,
             isset($data['per_page']) ? (int) $data['per_page'] : 10,
             isset($data['sort_by']) ? (string) $data['sort_by'] : 'shipment_date',
@@ -36,6 +40,16 @@ final class ProcurementInvoiceTableQuery
     public function q(): ?string
     {
         return $this->q;
+    }
+
+    public function namaPt(): ?string
+    {
+        return $this->namaPt;
+    }
+
+    public function paymentStatus(): string
+    {
+        return $this->paymentStatus;
     }
 
     public function page(): int

@@ -61,6 +61,7 @@ trait ProcurementInvoiceTableBaseQuery
             })
             ->select([
                 'supplier_invoices.id as supplier_invoice_id',
+                'supplier_invoices.nomor_faktur',
                 'suppliers.nama_pt_pengirim as supplier_nama_pt_pengirim_current',
                 'supplier_invoices.supplier_nama_pt_pengirim_snapshot as supplier_nama_pt_pengirim_snapshot',
                 'supplier_invoices.tanggal_pengiriman as shipment_date',

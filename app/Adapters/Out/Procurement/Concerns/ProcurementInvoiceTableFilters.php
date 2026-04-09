@@ -16,10 +16,33 @@ trait ProcurementInvoiceTableFilters
 
             $query->where(function (Builder $builder) use ($keyword): void {
                 $builder
-                    ->where('supplier_invoices.id', 'like', '%' . $keyword . '%')
+                    ->where('supplier_invoices.nomor_faktur', 'like', '%' . $keyword . '%')
+                    ->orWhere('supplier_invoices.nomor_faktur_normalized', 'like', '%' . mb_strtolower($keyword, 'UTF-8') . '%')
                     ->orWhere('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%')
                     ->orWhere('supplier_invoices.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%');
             });
+        }
+
+        if ($filters->namaPt() !== null) {
+            $namaPt = $filters->namaPt();
+
+            $query->where(function (Builder $builder) use ($namaPt): void {
+                $builder
+                    ->where('suppliers.nama_pt_pengirim', 'like', '%' . $namaPt . '%')
+                    ->orWhere('supplier_invoices.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $namaPt . '%');
+            });
+        }
+
+        if ($filters->paymentStatus() === 'outstanding') {
+            $query->whereRaw(
+                'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) > 0'
+            );
+        }
+
+        if ($filters->paymentStatus() === 'paid') {
+            $query->whereRaw(
+                'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) <= 0'
+            );
         }
 
         if ($filters->shipmentDateFrom() !== null) {

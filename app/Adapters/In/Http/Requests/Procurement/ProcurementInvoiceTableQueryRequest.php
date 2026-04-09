@@ -18,6 +18,8 @@ final class ProcurementInvoiceTableQueryRequest extends FormRequest
     {
         $this->merge([
             'q' => $this->trimOrNull('q'),
+            'nama_pt' => $this->trimOrNull('nama_pt'),
+            'payment_status' => $this->trimOrNull('payment_status'),
             'sort_by' => $this->trimOrNull('sort_by'),
             'sort_dir' => $this->trimOrNull('sort_dir'),
             'shipment_date_from' => $this->trimOrNull('shipment_date_from'),
@@ -32,6 +34,8 @@ final class ProcurementInvoiceTableQueryRequest extends FormRequest
     {
         return [
             'q' => ['nullable', 'string'],
+            'nama_pt' => ['nullable', 'string'],
+            'payment_status' => ['nullable', 'in:outstanding,paid,all'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
             'sort_by' => ['nullable', 'in:shipment_date,due_date,nama_pt_pengirim,grand_total_rupiah,total_paid_rupiah,outstanding_rupiah,receipt_count,total_received_qty'],

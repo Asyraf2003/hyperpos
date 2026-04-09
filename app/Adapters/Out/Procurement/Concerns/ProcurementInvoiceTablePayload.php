@@ -24,6 +24,7 @@ trait ProcurementInvoiceTablePayload
 
             return [
                 'supplier_invoice_id' => (string) $row->supplier_invoice_id,
+                'nomor_faktur' => $row->nomor_faktur !== null ? (string) $row->nomor_faktur : '',
                 'supplier_nama_pt_pengirim_current' => $row->supplier_nama_pt_pengirim_current !== null
                     ? (string) $row->supplier_nama_pt_pengirim_current
                     : '',
@@ -53,6 +54,8 @@ trait ProcurementInvoiceTablePayload
                 'sort_dir' => $query->sortDir(),
                 'filters' => [
                     'q' => $query->q(),
+                    'nama_pt' => $query->namaPt(),
+                    'payment_status' => $query->paymentStatus(),
                     'shipment_date_from' => $query->shipmentDateFrom(),
                     'shipment_date_to' => $query->shipmentDateTo(),
                 ],
