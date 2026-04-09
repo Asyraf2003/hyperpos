@@ -43,6 +43,7 @@
   const actionPaymentButton = $("procurement-action-payment-link");
   const actionPaymentTitle = $("procurement-action-payment-title");
   const actionPaymentDescription = $("procurement-action-payment-description");
+  const actionProofCol = $("procurement-action-proof-col");
   const actionProofLink = $("procurement-action-proof-link");
   const actionProofTitle = $("procurement-action-proof-title");
   const actionProofDescription = $("procurement-action-proof-description");
@@ -54,6 +55,7 @@
   const paymentDateInput = $("procurement-payment-date");
   const paymentAmountRaw = $("procurement-payment-amount");
   const paymentAmountDisplay = $("procurement-payment-amount-display");
+  const paymentAmountHelp = $("procurement-payment-amount-help");
 
   const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
     ? new window.bootstrap.Modal(actionModalElement)
@@ -207,6 +209,10 @@
       paymentModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
     }
 
+    if (paymentAmountHelp) {
+      paymentAmountHelp.textContent = `Maksimal sebesar sisa tagihan ${rupiah(row.outstanding_rupiah || 0)}.`;
+    }
+
     if (!preserveOldInput) {
       if (paymentDateInput) {
         paymentDateInput.value = c.oldPaymentInvoiceId ? (c.oldPaymentDate || todayYmd()) : todayYmd();
@@ -249,25 +255,29 @@
     if (row.can_record_payment) {
       pendingPaymentAction = { mode: "modal", row };
       actionPaymentTitle.textContent = "Bayar";
-      actionPaymentDescription.textContent = "Buka form pembayaran langsung dari daftar nota.";
+      actionPaymentDescription.textContent = "Catat pembayaran langsung dari daftar nota.";
     } else {
       pendingPaymentAction = { mode: "detail", row };
-      actionPaymentTitle.textContent = "Lihat Pembayaran";
+      actionPaymentTitle.textContent = "Riwayat Pembayaran";
       actionPaymentDescription.textContent = "Nota ini sudah lunas. Buka detail untuk melihat riwayat pembayaran.";
     }
 
-    if (row.payment_count < 1) {
-      actionProofLink.href = paymentSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Catat Pembayaran Dulu";
-      actionProofDescription.textContent = "Bukti bayar baru bisa diunggah setelah ada pembayaran.";
+    if (actionProofCol) {
+      actionProofCol.classList.toggle("d-none", Number(row.payment_count || 0) < 1);
+    }
+
+    if (Number(row.payment_count || 0) < 1) {
+      actionProofLink.href = "#";
+      actionProofTitle.textContent = "Bukti Bayar";
+      actionProofDescription.textContent = "Belum ada pembayaran untuk nota ini.";
     } else if (row.has_uploaded_proof) {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Lihat Bukti Bayar";
-      actionProofDescription.textContent = "Buka riwayat bukti pembayaran pada detail nota.";
+      actionProofTitle.textContent = "Bukti Bayar";
+      actionProofDescription.textContent = "Lihat atau unduh lampiran bukti pembayaran.";
     } else {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
       actionProofTitle.textContent = "Unggah Bukti Bayar";
-      actionProofDescription.textContent = "Buka bagian unggah bukti pada detail nota.";
+      actionProofDescription.textContent = "Buka bagian unggah bukti pembayaran.";
     }
   };
 

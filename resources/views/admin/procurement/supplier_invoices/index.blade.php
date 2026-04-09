@@ -167,13 +167,13 @@
                                 </button>
                             </div>
 
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-4" id="procurement-action-proof-col">
                                 <a
                                     href="#"
                                     id="procurement-action-proof-link"
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
-                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Unggah Bukti Bayar</div>
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Bukti Bayar</div>
                                     <div class="small opacity-75" id="procurement-action-proof-description">
                                         Buka bagian bukti pembayaran pada detail nota.
                                     </div>
@@ -257,6 +257,10 @@
                                 @error('amount')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
+
+                                <small class="text-muted d-block mt-2" id="procurement-payment-amount-help">
+                                    Maksimal sebesar sisa tagihan nota.
+                                </small>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
