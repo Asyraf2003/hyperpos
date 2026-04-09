@@ -48,6 +48,25 @@
   const actionProofTitle = $("procurement-action-proof-title");
   const actionProofDescription = $("procurement-action-proof-description");
 
+  const setLinkDisabledState = (node, disabled) => {
+    if (!node) return;
+
+    node.classList.toggle("disabled", disabled);
+    node.classList.toggle("btn-outline-secondary", disabled);
+    node.classList.toggle("text-muted", disabled);
+    node.classList.toggle("border-secondary", disabled);
+
+    if (!disabled) {
+      node.classList.remove("btn-outline-secondary", "text-muted", "border-secondary");
+      if (!node.classList.contains("btn-outline-primary")) {
+        node.classList.add("btn-outline-primary");
+      }
+    }
+
+    node.setAttribute("aria-disabled", disabled ? "true" : "false");
+    node.tabIndex = disabled ? -1 : 0;
+  };
+
   const paymentModalElement = $("procurement-payment-modal");
   const paymentModalSubtitle = $("procurement-payment-modal-subtitle");
   const paymentForm = $("procurement-payment-form");
@@ -262,22 +281,21 @@
       actionPaymentDescription.textContent = "Nota ini sudah lunas. Buka detail untuk melihat riwayat pembayaran.";
     }
 
-    if (actionProofCol) {
-      actionProofCol.classList.toggle("d-none", Number(row.payment_count || 0) < 1);
-    }
-
     if (Number(row.payment_count || 0) < 1) {
       actionProofLink.href = "#";
       actionProofTitle.textContent = "Bukti Bayar";
-      actionProofDescription.textContent = "Belum ada pembayaran untuk nota ini.";
+      actionProofDescription.textContent = "Tersedia setelah ada pembayaran pertama.";
+      setLinkDisabledState(actionProofLink, true);
     } else if (row.has_uploaded_proof) {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
       actionProofTitle.textContent = "Bukti Bayar";
       actionProofDescription.textContent = "Lihat atau unduh lampiran bukti pembayaran.";
+      setLinkDisabledState(actionProofLink, false);
     } else {
       actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
       actionProofTitle.textContent = "Unggah Bukti Bayar";
       actionProofDescription.textContent = "Buka bagian unggah bukti pembayaran.";
+      setLinkDisabledState(actionProofLink, false);
     }
   };
 
@@ -392,6 +410,12 @@
   $("open-procurement-filter")?.addEventListener("click", () => drawOpen(true));
   $("close-procurement-filter")?.addEventListener("click", () => drawOpen(false));
   backdrop?.addEventListener("click", () => drawOpen(false));
+
+  actionProofLink?.addEventListener("click", (event) => {
+    if (actionProofLink.getAttribute("aria-disabled") === "true") {
+      event.preventDefault();
+    }
+  });
 
   actionPaymentButton?.addEventListener("click", () => {
     if (!pendingPaymentAction) return;
