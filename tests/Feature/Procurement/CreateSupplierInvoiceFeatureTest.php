@@ -22,10 +22,12 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->seedMinimalProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000);
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => ' INV-SUP-2026-0001 ',
             'nama_pt_pengirim' => '  PT Sumber Makmur  ',
             'tanggal_pengiriman' => '2026-03-12',
             'lines' => [
                 [
+                    'line_no' => 1,
                     'product_id' => 'product-1',
                     'product_kode_barang_snapshot' => 'KB-001',
                     'product_nama_barang_snapshot' => 'Ban Luar',
@@ -35,6 +37,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
                     'line_total_rupiah' => 20000,
                 ],
                 [
+                    'line_no' => 2,
                     'product_id' => 'product-2',
                     'qty_pcs' => 3,
                     'line_total_rupiah' => 30000,
@@ -57,9 +60,14 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('supplier_invoices', [
             'supplier_id' => (string) $supplier->id,
+            'nomor_faktur' => 'INV-SUP-2026-0001',
+            'nomor_faktur_normalized' => 'inv-sup-2026-0001',
+            'document_kind' => 'invoice',
+            'lifecycle_status' => 'active',
             'tanggal_pengiriman' => '2026-03-12',
             'jatuh_tempo' => '2026-04-12',
             'grand_total_rupiah' => 50000,
+            'last_revision_no' => 1,
         ]);
 
         $invoice = DB::table('supplier_invoices')
@@ -73,15 +81,36 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $invoiceLine1 = DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_id', (string) $invoice->id)
             ->where('product_id', 'product-1')
+            ->where('line_no', 1)
             ->first();
 
         $invoiceLine2 = DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_id', (string) $invoice->id)
             ->where('product_id', 'product-2')
+            ->where('line_no', 2)
             ->first();
 
         $this->assertNotNull($invoiceLine1);
         $this->assertNotNull($invoiceLine2);
+
+        $this->assertDatabaseHas('supplier_invoice_versions', [
+            'supplier_invoice_id' => (string) $invoice->id,
+            'revision_no' => 1,
+            'event_name' => 'supplier_invoice_created',
+        ]);
+
+        $auditEvent = DB::table('audit_events')
+            ->where('aggregate_type', 'supplier_invoice')
+            ->where('aggregate_id', (string) $invoice->id)
+            ->where('event_name', 'supplier_invoice_created')
+            ->first();
+
+        $this->assertNotNull($auditEvent);
+
+        $this->assertDatabaseHas('audit_event_snapshots', [
+            'audit_event_id' => (string) $auditEvent->id,
+            'snapshot_kind' => 'after',
+        ]);
 
         $this->assertDatabaseHas('supplier_receipts', [
             'supplier_invoice_id' => (string) $invoice->id,
@@ -169,10 +198,12 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->loginAsKasir();
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-2026-0002',
             'nama_pt_pengirim' => 'PT Sumber Makmur',
             'tanggal_pengiriman' => '2026-03-12',
             'lines' => [
                 [
+                    'line_no' => 1,
                     'product_id' => 'unknown-product',
                     'qty_pcs' => 2,
                     'line_total_rupiah' => 20000,
@@ -185,6 +216,9 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('suppliers', 0);
         $this->assertDatabaseCount('supplier_invoices', 0);
         $this->assertDatabaseCount('supplier_invoice_lines', 0);
+        $this->assertDatabaseCount('supplier_invoice_versions', 0);
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_event_snapshots', 0);
         $this->assertDatabaseCount('supplier_payments', 0);
         $this->assertDatabaseCount('supplier_receipts', 0);
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
@@ -199,10 +233,12 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-2026-0003',
             'nama_pt_pengirim' => 'PT Sumber Makmur',
             'tanggal_pengiriman' => '2026-03-12',
             'lines' => [
                 [
+                    'line_no' => 1,
                     'product_id' => 'product-1',
                     'product_kode_barang_snapshot' => 'KB-001',
                     'product_nama_barang_snapshot' => 'Ban Luar',
@@ -219,12 +255,52 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('suppliers', 0);
         $this->assertDatabaseCount('supplier_invoices', 0);
         $this->assertDatabaseCount('supplier_invoice_lines', 0);
+        $this->assertDatabaseCount('supplier_invoice_versions', 0);
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_event_snapshots', 0);
         $this->assertDatabaseCount('supplier_payments', 0);
         $this->assertDatabaseCount('supplier_receipts', 0);
         $this->assertDatabaseCount('supplier_receipt_lines', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
         $this->assertDatabaseCount('product_inventory', 0);
         $this->assertDatabaseCount('product_inventory_costing', 0);
+    }
+
+    public function test_create_supplier_invoice_endpoint_rejects_duplicate_line_no(): void
+    {
+        $this->loginAsKasir();
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedMinimalProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000);
+
+        $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-2026-0004',
+            'nama_pt_pengirim' => 'PT Sumber Makmur',
+            'tanggal_pengiriman' => '2026-03-12',
+            'lines' => [
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-1',
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 20000,
+                ],
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-2',
+                    'qty_pcs' => 3,
+                    'line_total_rupiah' => 30000,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['lines.1.line_no']);
+
+        $this->assertDatabaseCount('suppliers', 0);
+        $this->assertDatabaseCount('supplier_invoices', 0);
+        $this->assertDatabaseCount('supplier_invoice_lines', 0);
+        $this->assertDatabaseCount('supplier_invoice_versions', 0);
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_event_snapshots', 0);
     }
 
     public function test_create_supplier_invoice_endpoint_can_disable_auto_receive_and_reuse_existing_supplier_without_auto_recording_payment(): void
@@ -234,11 +310,13 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->seedMinimalSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
 
         $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-2026-0005',
             'nama_pt_pengirim' => '  pt   sumber    makmur ',
             'tanggal_pengiriman' => '2026-01-30',
             'auto_receive' => false,
             'lines' => [
                 [
+                    'line_no' => 1,
                     'product_id' => 'product-1',
                     'product_kode_barang_snapshot' => 'KB-001',
                     'product_nama_barang_snapshot' => 'Ban Luar',
@@ -263,9 +341,14 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseHas('supplier_invoices', [
             'supplier_id' => 'supplier-1',
             'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
+            'nomor_faktur' => 'INV-SUP-2026-0005',
+            'nomor_faktur_normalized' => 'inv-sup-2026-0005',
+            'document_kind' => 'invoice',
+            'lifecycle_status' => 'active',
             'tanggal_pengiriman' => '2026-01-30',
             'jatuh_tempo' => '2026-02-28',
             'grand_total_rupiah' => 20000,
+            'last_revision_no' => 1,
         ]);
 
         $invoice = DB::table('supplier_invoices')
@@ -273,6 +356,18 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             ->first();
 
         $this->assertNotNull($invoice);
+
+        $this->assertDatabaseHas('supplier_invoice_lines', [
+            'supplier_invoice_id' => (string) $invoice->id,
+            'line_no' => 1,
+            'product_id' => 'product-1',
+        ]);
+
+        $this->assertDatabaseHas('supplier_invoice_versions', [
+            'supplier_invoice_id' => (string) $invoice->id,
+            'revision_no' => 1,
+            'event_name' => 'supplier_invoice_created',
+        ]);
 
         $this->assertDatabaseCount('supplier_payments', 0);
         $this->assertDatabaseCount('supplier_receipts', 0);
