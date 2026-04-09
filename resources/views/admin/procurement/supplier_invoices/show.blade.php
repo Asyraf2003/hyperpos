@@ -156,7 +156,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="payment-form-section">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Catat Pembayaran</h4>
                         <p class="mb-0 text-muted">Pembayaran pemasok dicatat secara eksplisit per nota.</p>
@@ -224,7 +224,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="payment-proof-section">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Bukti Pembayaran</h4>
                         <p class="mb-0 text-muted">Unggah bukti ke baris pembayaran yang sudah tercatat. Maksimal 3 file per unggahan dan bisa unggah lagi untuk pembayaran yang sama.</p>

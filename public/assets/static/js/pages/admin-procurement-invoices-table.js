@@ -31,10 +31,22 @@
   const searchInput = $("procurement-search-input");
   const filterForm = $("procurement-filter-form");
   const resetFilter = $("reset-procurement-filter");
-  
-  // PENAMBAHAN: Variabel untuk drawer
   const drawer = $("procurement-filter-drawer");
   const backdrop = $("procurement-filter-backdrop");
+
+  const actionModalElement = $("procurement-action-modal");
+  const actionModalSubtitle = $("procurement-action-modal-subtitle");
+  const actionDetailLink = $("procurement-action-detail-link");
+  const actionPaymentLink = $("procurement-action-payment-link");
+  const actionPaymentTitle = $("procurement-action-payment-title");
+  const actionPaymentDescription = $("procurement-action-payment-description");
+  const actionProofLink = $("procurement-action-proof-link");
+  const actionProofTitle = $("procurement-action-proof-title");
+  const actionProofDescription = $("procurement-action-proof-description");
+
+  const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(actionModalElement)
+    : null;
 
   let searchDebounceTimer = null;
   let requestCounter = 0;
@@ -47,8 +59,16 @@
     "'": "&#39;"
   }[m]));
 
+  const trimValue = (v) => String(v ?? "").trim();
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
+  const paymentSectionUrl = (id) => `${detailUrl(id)}#payment-form-section`;
+  const proofSectionUrl = (id) => `${detailUrl(id)}#payment-proof-section`;
+
+  const intOrDefault = (v, fallback) => {
+    const n = Number.parseInt(String(v ?? ""), 10);
+    return Number.isNaN(n) || n < 1 ? fallback : n;
+  };
 
   const supplierCellHtml = (row) => {
     const currentName = trimValue(row.supplier_nama_pt_pengirim_current);
@@ -61,13 +81,6 @@
       <div class="fw-semibold">${esc(primary)}</div>
       ${showSnapshot ? `<div class="small text-muted">saat nota dibuat: ${esc(snapshotName)}</div>` : ""}
     `;
-  };
-
-  const trimValue = (v) => String(v ?? "").trim();
-
-  const intOrDefault = (v, fallback) => {
-    const n = Number.parseInt(String(v ?? ""), 10);
-    return Number.isNaN(n) || n < 1 ? fallback : n;
   };
 
   const stateFromUrl = () => {
@@ -88,9 +101,18 @@
   const s = stateFromUrl();
 
   const syncInputsFromState = () => {
-    searchInput.value = s.q;
-    filterForm.elements["shipment_date_from"].value = s.shipment_date_from;
-    filterForm.elements["shipment_date_to"].value = s.shipment_date_to;
+    if (searchInput) {
+      searchInput.value = s.q;
+    }
+
+    if (filterForm?.elements["shipment_date_from"]) {
+      filterForm.elements["shipment_date_from"].value = s.shipment_date_from;
+    }
+
+    if (filterForm?.elements["shipment_date_to"]) {
+      filterForm.elements["shipment_date_to"].value = s.shipment_date_to;
+    }
+
     window.AdminDateInput?.refreshWithin(filterForm);
   };
 
@@ -123,26 +145,78 @@
     window.history.pushState(null, "", url);
   };
 
-  // PENAMBAHAN: Fungsi untuk toggle drawer
   const drawOpen = (open) => {
-    drawer.classList.toggle("d-none", !open);
-    backdrop.classList.toggle("d-none", !open);
+    if (drawer) drawer.classList.toggle("d-none", !open);
+    if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
-  const rowHtml = (r, i, meta) => `
+  const configureActionModal = (row) => {
+    if (
+      !actionModalSubtitle ||
+      !actionDetailLink ||
+      !actionPaymentLink ||
+      !actionPaymentTitle ||
+      !actionPaymentDescription ||
+      !actionProofLink ||
+      !actionProofTitle ||
+      !actionProofDescription
+    ) {
+      return;
+    }
+
+    const supplierName = trimValue(row.supplier_nama_pt_pengirim_current)
+      || trimValue(row.supplier_nama_pt_pengirim_snapshot)
+      || "-";
+
+    actionModalSubtitle.textContent = `${row.supplier_invoice_id} • ${supplierName}`;
+    actionDetailLink.href = detailUrl(row.supplier_invoice_id);
+
+    if (row.can_record_payment) {
+      actionPaymentLink.href = paymentSectionUrl(row.supplier_invoice_id);
+      actionPaymentTitle.textContent = "Catat Pembayaran";
+      actionPaymentDescription.textContent = "Buka bagian pembayaran pada detail nota.";
+    } else {
+      actionPaymentLink.href = detailUrl(row.supplier_invoice_id);
+      actionPaymentTitle.textContent = "Lihat Pembayaran";
+      actionPaymentDescription.textContent = "Nota ini sudah lunas. Buka detail untuk melihat riwayat pembayaran.";
+    }
+
+    if (row.payment_count < 1) {
+      actionProofLink.href = paymentSectionUrl(row.supplier_invoice_id);
+      actionProofTitle.textContent = "Catat Pembayaran Dulu";
+      actionProofDescription.textContent = "Bukti bayar baru bisa diunggah setelah ada pembayaran.";
+    } else if (row.has_uploaded_proof) {
+      actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
+      actionProofTitle.textContent = "Lihat Bukti Pembayaran";
+      actionProofDescription.textContent = "Buka riwayat bukti pembayaran pada detail nota.";
+    } else {
+      actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
+      actionProofTitle.textContent = "Unggah Bukti Pembayaran";
+      actionProofDescription.textContent = "Buka bagian unggah bukti pada detail nota.";
+    }
+  };
+
+  const rowHtml = (row, index, meta) => `
     <tr>
-      <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
-      <td>${esc(r.supplier_invoice_id)}</td>
-      <td>${supplierCellHtml(r)}</td>
-      <td>${esc(r.shipment_date)}</td>
-      <td>${esc(r.due_date)}</td>
-      <td>${rupiah(r.grand_total_rupiah)}</td>
-      <td>${rupiah(r.total_paid_rupiah)}</td>
-      <td>${rupiah(r.outstanding_rupiah)}</td>
-      <td>${esc(r.receipt_count)}</td>
-      <td>${esc(r.total_received_qty)}</td>
+      <td>${(meta.page - 1) * meta.per_page + index + 1}</td>
+      <td>${esc(row.supplier_invoice_id)}</td>
+      <td>${supplierCellHtml(row)}</td>
+      <td>${esc(row.shipment_date)}</td>
+      <td>${esc(row.due_date)}</td>
+      <td>${rupiah(row.grand_total_rupiah)}</td>
+      <td>${rupiah(row.total_paid_rupiah)}</td>
+      <td>${rupiah(row.outstanding_rupiah)}</td>
+      <td>${esc(row.receipt_count)}</td>
+      <td>${esc(row.total_received_qty)}</td>
       <td class="text-center">
-        <a href="${detailUrl(r.supplier_invoice_id)}" class="btn btn-sm btn-outline-secondary">Detail</a>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          data-procurement-action="open"
+          data-row='${JSON.stringify(row).replace(/'/g, "&apos;")}'
+        >
+          Aksi
+        </button>
       </td>
     </tr>
   `;
@@ -153,7 +227,7 @@
       return;
     }
 
-    body.innerHTML = rows.map((r, i) => rowHtml(r, i, meta)).join("");
+    body.innerHTML = rows.map((row, index) => rowHtml(row, index, meta)).join("");
   };
 
   const renderPager = (meta) => {
@@ -222,14 +296,13 @@
     updateUrl(replaceUrl);
   };
 
-  // PENAMBAHAN: Event listener untuk tombol filter (Buka/Tutup/Backdrop)
-  $("open-procurement-filter").addEventListener("click", () => drawOpen(true));
-  $("close-procurement-filter").addEventListener("click", () => drawOpen(false));
-  backdrop.addEventListener("click", () => drawOpen(false));
+  $("open-procurement-filter")?.addEventListener("click", () => drawOpen(true));
+  $("close-procurement-filter")?.addEventListener("click", () => drawOpen(false));
+  backdrop?.addEventListener("click", () => drawOpen(false));
 
-  searchForm.addEventListener("submit", (e) => {
+  searchForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    const value = trimValue(searchInput.value);
+    const value = trimValue(searchInput?.value);
 
     if (value.length === 0) {
       s.q = "";
@@ -245,7 +318,7 @@
     }
   });
 
-  searchInput.addEventListener("input", () => {
+  searchInput?.addEventListener("input", () => {
     const value = trimValue(searchInput.value);
     clearTimeout(searchDebounceTimer);
 
@@ -267,74 +340,86 @@
     }, 300);
   });
 
-  filterForm.addEventListener("submit", (e) => {
+  filterForm?.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const f = new FormData(filterForm);
     s.shipment_date_from = trimValue(f.get("shipment_date_from"));
     s.shipment_date_to = trimValue(f.get("shipment_date_to"));
     s.page = 1;
-    
-    // PENAMBAHAN: Tutup drawer setelah submit
+
     drawOpen(false);
     load();
   });
 
-  resetFilter.addEventListener("click", () => {
+  resetFilter?.addEventListener("click", () => {
     s.shipment_date_from = "";
     s.shipment_date_to = "";
     s.page = 1;
     syncInputsFromState();
-    
-    // PENAMBAHAN: Tutup drawer setelah di-reset
     drawOpen(false);
     load();
   });
 
-  document.querySelectorAll("[data-sort-by]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const key = button.dataset.sortBy;
+  document.querySelector("#procurement-invoice-table thead")?.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-sort-by]");
+    if (!button) return;
 
-      if (!allowedSortBy.has(key)) {
-        return;
-      }
+    const key = button.dataset.sortBy;
+    if (!allowedSortBy.has(key)) {
+      return;
+    }
 
-      if (s.sort_by === key) {
-        s.sort_dir = s.sort_dir === "asc" ? "desc" : "asc";
-      } else {
-        s.sort_by = key;
-        s.sort_dir = key === "shipment_date" ? "desc" : "asc";
-      }
+    if (s.sort_by === key) {
+      s.sort_dir = s.sort_dir === "asc" ? "desc" : "asc";
+    } else {
+      s.sort_by = key;
+      s.sort_dir = key === "shipment_date" ? "desc" : "asc";
+    }
 
-      s.page = 1;
-      load();
-    });
+    s.page = 1;
+    load();
   });
 
-  pager.addEventListener("click", (e) => {
+  pager?.addEventListener("click", (e) => {
     const link = e.target.closest("[data-page]");
     if (!link) return;
 
     e.preventDefault();
 
     const nextPage = intOrDefault(link.dataset.page, s.page);
-    if (nextPage === s.page) return;
+    if (nextPage === s.page) {
+      return;
+    }
 
     s.page = nextPage;
     load();
   });
 
+  body?.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-procurement-action='open']");
+    if (!button) return;
+
+    const raw = button.getAttribute("data-row");
+    if (!raw) return;
+
+    const row = JSON.parse(raw.replace(/&apos;/g, "'"));
+    configureActionModal(row);
+
+    if (actionModal) {
+      actionModal.show();
+      return;
+    }
+
+    window.location.assign(detailUrl(row.supplier_invoice_id));
+  });
+
   window.addEventListener("popstate", () => {
-    const nextState = stateFromUrl();
-    s.q = nextState.q;
-    s.page = nextState.page;
-    s.sort_by = nextState.sort_by;
-    s.sort_dir = nextState.sort_dir;
-    s.shipment_date_from = nextState.shipment_date_from;
-    s.shipment_date_to = nextState.shipment_date_to;
+    Object.assign(s, stateFromUrl());
     load(true);
   });
 
   syncInputsFromState();
+  renderSortIndicators();
   load(true);
 })();

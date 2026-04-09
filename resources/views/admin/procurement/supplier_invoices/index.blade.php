@@ -90,7 +90,7 @@
                                 </th>
                                 <th class="text-center">Aksi</th>
                             </tr>
-                        </thead>                        
+                        </thead>
                         <tbody id="procurement-invoice-table-body">
                             <tr><td colspan="11" class="text-center text-muted py-4">Memuat data...</td></tr>
                         </tbody>
@@ -104,8 +104,76 @@
             </div>
         </div>
 
-        {{-- Asumsi path penempatan file partial Anda, silakan sesuaikan jika letak foldernya berbeda --}}
         @include('admin.procurement.supplier_invoices.partials.filter_drawer')
+
+        <div
+            class="modal fade"
+            id="procurement-action-modal"
+            tabindex="-1"
+            aria-labelledby="procurement-action-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="procurement-action-modal-title">Aksi Nota Supplier</h3>
+                            <p class="mb-0 text-muted fs-6" id="procurement-action-modal-subtitle">
+                                Pilih tindakan untuk nota supplier.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <a
+                                    href="#"
+                                    id="procurement-action-detail-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Detail Nota</div>
+                                    <div class="small opacity-75">Lihat ringkasan nota, pembayaran, dan bukti bayar.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <a
+                                    href="#"
+                                    id="procurement-action-payment-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Catat Pembayaran</div>
+                                    <div class="small opacity-75" id="procurement-action-payment-description">
+                                        Buka bagian pembayaran pada detail nota.
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <a
+                                    href="#"
+                                    id="procurement-action-proof-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Unggah Bukti Pembayaran</div>
+                                    <div class="small opacity-75" id="procurement-action-proof-description">
+                                        Buka bagian bukti pembayaran pada detail nota.
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light-secondary border mt-3 mb-0">
+                            <small class="text-muted d-block">
+                                Edit nota supplier belum ditampilkan dari index karena route dan policy edit belum dikunci final.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
