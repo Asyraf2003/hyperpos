@@ -6,15 +6,12 @@ namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
-use App\Application\Procurement\Services\SupplierInvoiceFactory;
-use App\Application\Procurement\Services\SupplierService;
+use App\Application\Procurement\Services\UpdatedSupplierInvoiceBuilder;
 use App\Application\Shared\DTO\Result;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
-use DateTimeImmutable;
 use Throwable;
 
 final class UpdateSupplierInvoiceHandler
@@ -22,8 +19,7 @@ final class UpdateSupplierInvoiceHandler
     public function __construct(
         private readonly SupplierInvoiceReaderPort $reader,
         private readonly SupplierInvoiceWriterPort $writer,
-        private readonly SupplierService $supplierService,
-        private readonly SupplierInvoiceFactory $invoiceFactory,
+        private readonly UpdatedSupplierInvoiceBuilder $builder,
         private readonly SupplierInvoiceEditabilityGuard $guard,
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierInvoiceChangeContext $changeContext,
@@ -57,15 +53,8 @@ final class UpdateSupplierInvoiceHandler
         $started = false;
 
         try {
-            $shipmentDate = DateTimeImmutable::createFromFormat('!Y-m-d', trim($tanggalPengiriman))
-                ?: throw new DomainException('Format tanggal pengiriman salah.');
-
-            $invoiceLines = $this->invoiceFactory->makeLines($lines);
-
             $this->transactions->begin();
             $started = true;
-
-            $supplier = $this->supplierService->resolve($namaPtPengirim);
 
             $this->changeContext->set(
                 $performedByActorId,
@@ -74,13 +63,12 @@ final class UpdateSupplierInvoiceHandler
                 'supplier_invoice_updated',
             );
 
-            $updated = SupplierInvoice::create(
-                $current->id(),
-                $supplier->id(),
-                $supplier->namaPtPengirim(),
-                trim($nomorFaktur),
-                $shipmentDate,
-                $invoiceLines,
+            $updated = $this->builder->build(
+                $current,
+                $nomorFaktur,
+                $namaPtPengirim,
+                $tanggalPengiriman,
+                $lines,
             );
 
             $this->writer->update($updated);
