@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\EmployeeFinance\UseCases;
 
 use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
-use App\Core\EmployeeFinance\Employee\Employee;
+use App\Application\EmployeeFinance\Support\EmployeeProfileAuditSnapshotBuilder;
 use App\Core\EmployeeFinance\Employee\EmployeeStatus;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
 use App\Core\Shared\Exceptions\DomainException;
@@ -26,6 +26,7 @@ final class UpdateEmployeeProfileHandler
         private AuditLogPort $auditLog,
         private TransactionManagerPort $transactionManager,
         private EmployeeChangeContext $changeContext,
+        private EmployeeProfileAuditSnapshotBuilder $snapshotBuilder,
     ) {
     }
 
@@ -54,14 +55,9 @@ final class UpdateEmployeeProfileHandler
                 throw new InvalidArgumentException('Karyawan tidak ditemukan.');
             }
 
-            $before = $this->snapshot($employee);
+            $before = $this->snapshotBuilder->build($employee);
 
-            $this->changeContext->set(
-                $performedByActorId,
-                'admin',
-                'admin_web',
-                $changeReason,
-            );
+            $this->changeContext->set($performedByActorId, 'admin', 'admin_web', $changeReason);
 
             $employee->updateProfile(
                 $employeeName,
@@ -71,10 +67,7 @@ final class UpdateEmployeeProfileHandler
                 $this->parseOptionalDate($endedAt),
             );
 
-            $employee->updateDefaultSalaryAmount(
-                $this->toNullableMoney($defaultSalaryAmount),
-                $changeReason,
-            );
+            $employee->updateDefaultSalaryAmount($this->toNullableMoney($defaultSalaryAmount), $changeReason);
 
             if ($employmentStatus === EmployeeStatus::INACTIVE->value) {
                 $employee->deactivate();
@@ -89,7 +82,7 @@ final class UpdateEmployeeProfileHandler
                 'performed_by_actor_id' => $performedByActorId,
                 'reason' => $changeReason,
                 'before' => $before,
-                'after' => $this->snapshot($employee),
+                'after' => $this->snapshotBuilder->build($employee),
             ]);
 
             $this->transactionManager->commit();
@@ -116,31 +109,5 @@ final class UpdateEmployeeProfileHandler
         }
 
         return new DateTimeImmutable($value);
-    }
-
-    private function snapshot(Employee $employee): array
-    {
-        $defaultSalaryAmount = $employee->getDefaultSalaryAmount()?->amount();
-        $salaryBasisType = $employee->getSalaryBasisType()->value;
-        $employmentStatus = $employee->getEmploymentStatus()->value;
-
-        return [
-            'employee_name' => $employee->getEmployeeName(),
-            'name' => $employee->getName(),
-            'phone' => $employee->getPhone(),
-            'default_salary_amount' => $defaultSalaryAmount,
-            'base_salary_amount' => $defaultSalaryAmount,
-            'salary_basis_type' => $salaryBasisType,
-            'pay_period_value' => $salaryBasisType,
-            'employment_status' => $employmentStatus,
-            'status_value' => $employmentStatus,
-            'started_at' => $this->formatDate($employee->getStartedAt()),
-            'ended_at' => $this->formatDate($employee->getEndedAt()),
-        ];
-    }
-
-    private function formatDate(?DateTimeImmutable $value): ?string
-    {
-        return $value?->format('Y-m-d');
     }
 }
