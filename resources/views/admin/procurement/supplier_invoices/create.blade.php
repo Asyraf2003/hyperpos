@@ -17,7 +17,7 @@
 
             <div class="row g-4">
                 <div class="col-12 col-xl-8 order-2 order-xl-1">
-                    <div class="card">
+                    <div class="card h-100">
                         <div class="card-header">
                             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                                 <div>
@@ -288,7 +288,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group position-relative">
                                     <label for="nama_pt_pengirim" class="form-label">Nama PT Pengirim</label>
                                     <input
                                         type="text"
@@ -297,9 +297,16 @@
                                         value="{{ old('nama_pt_pengirim') }}"
                                         class="form-control @error('nama_pt_pengirim') is-invalid @enderror"
                                         placeholder="Contoh: PT Federal Abadi"
+                                        autocomplete="off"
                                         data-procurement-header-field
+                                        data-supplier-search
                                         required
                                     >
+                                    <div
+                                        class="list-group position-absolute w-100 shadow-sm d-none mt-1"
+                                        style="z-index: 20;"
+                                        data-supplier-results
+                                    ></div>
                                     @error('nama_pt_pengirim')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -402,6 +409,7 @@
     <script>
         window.procurementCreateConfig = {
             lookupEndpoint: @json(route('admin.procurement.products.lookup')),
+            supplierLookupEndpoint: @json(route('admin.procurement.suppliers.lookup')),
             clearDraftOnLoad: @json((bool) session('clear_procurement_create_draft'))
         };
     </script>

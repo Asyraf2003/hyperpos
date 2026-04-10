@@ -43,4 +43,41 @@ final class DatabaseSupplierReaderAdapter implements SupplierReaderPort
             (string) $row->nama_pt_pengirim,
         );
     }
+
+    public function search(string $query, int $limit = 10): array
+    {
+        $normalizedQuery = $this->normalizeNamaPtPengirim($query);
+
+        if ($normalizedQuery === '') {
+            return [];
+        }
+
+        $rows = DB::table('suppliers')
+            ->select(['id', 'nama_pt_pengirim', 'nama_pt_pengirim_normalized'])
+            ->where(function ($builder) use ($query, $normalizedQuery): void {
+                $builder
+                    ->where('nama_pt_pengirim', 'like', '%' . trim($query) . '%')
+                    ->orWhere('nama_pt_pengirim_normalized', 'like', '%' . $normalizedQuery . '%');
+            })
+            ->orderBy('nama_pt_pengirim')
+            ->limit($limit)
+            ->get();
+
+        return $rows
+            ->map(
+                static fn (object $row): Supplier => Supplier::rehydrate(
+                    (string) $row->id,
+                    (string) $row->nama_pt_pengirim,
+                )
+            )
+            ->all();
+    }
+
+    private function normalizeNamaPtPengirim(string $namaPtPengirim): string
+    {
+        $normalized = trim($namaPtPengirim);
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? $normalized;
+
+        return mb_strtolower($normalized);
+    }
 }

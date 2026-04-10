@@ -6,6 +6,8 @@
   const template = document.getElementById("procurement-line-template");
   const tanggalTerimaInput = document.getElementById("tanggal_terima");
   const autoReceiveInputs = document.querySelectorAll('input[name="auto_receive"]');
+  const supplierSearchInput = document.querySelector("[data-supplier-search]");
+  const supplierResultsBox = document.querySelector("[data-supplier-results]");
 
   if (!config || !form || !container || !addButton || !template) return;
 
@@ -93,6 +95,11 @@
       box.classList.add("d-none");
       box.innerHTML = "";
     });
+
+    if (supplierResultsBox) {
+      supplierResultsBox.classList.add("d-none");
+      supplierResultsBox.innerHTML = "";
+    }
   };
 
   const updateTanggalTerimaState = () => {
@@ -502,6 +509,152 @@
     });
   };
 
+  const initSupplierLookup = () => {
+    if (!supplierSearchInput || !supplierResultsBox || !config.supplierLookupEndpoint) {
+      return;
+    }
+
+    let debounceTimer = null;
+    let requestCounter = 0;
+    let activeChoiceIndex = -1;
+
+    const resultButtons = () => Array.from(supplierResultsBox.querySelectorAll("[data-supplier-choice]"));
+
+    const syncActiveChoice = () => {
+      resultButtons().forEach((button, index) => {
+        button.classList.toggle("active", index === activeChoiceIndex);
+      });
+    };
+
+    const hideResults = () => {
+      supplierResultsBox.innerHTML = "";
+      supplierResultsBox.classList.add("d-none");
+      activeChoiceIndex = -1;
+    };
+
+    const selectSupplier = (row) => {
+      supplierSearchInput.value = row.nama_pt_pengirim || row.label || "";
+      hideResults();
+      scheduleDraftSave();
+    };
+
+    const renderResults = (rows) => {
+      if (!rows.length) {
+        supplierResultsBox.innerHTML = '<div class="list-group-item text-muted">Belum ada riwayat supplier yang cocok. Lanjutkan untuk membuat data baru.</div>';
+        supplierResultsBox.classList.remove("d-none");
+        activeChoiceIndex = -1;
+        return;
+      }
+
+      supplierResultsBox.innerHTML = rows.map((row) => `
+        <button
+          type="button"
+          class="list-group-item list-group-item-action"
+          data-supplier-choice='${JSON.stringify(row).replace(/'/g, "&apos;")}'
+        >
+          <div class="fw-semibold">${esc(row.nama_pt_pengirim || row.label)}</div>
+          <small class="text-muted">Pilih supplier existing</small>
+        </button>
+      `).join("");
+
+      supplierResultsBox.classList.remove("d-none");
+      activeChoiceIndex = 0;
+      syncActiveChoice();
+
+      resultButtons().forEach((button) => {
+        button.addEventListener("click", () => {
+          const raw = button.getAttribute("data-supplier-choice");
+          if (!raw) return;
+
+          selectSupplier(JSON.parse(raw.replace(/&apos;/g, "'")));
+        });
+      });
+    };
+
+    const fetchResults = async () => {
+      const query = supplierSearchInput.value.trim();
+
+      if (query.length < 2) {
+        hideResults();
+        scheduleDraftSave();
+        return;
+      }
+
+      const currentRequest = ++requestCounter;
+      const response = await fetch(`${config.supplierLookupEndpoint}?q=${encodeURIComponent(query)}`, {
+        headers: { Accept: "application/json" }
+      });
+
+      const json = await response.json();
+
+      if (currentRequest !== requestCounter) {
+        return;
+      }
+
+      if (!response.ok || !json.success) {
+        supplierResultsBox.innerHTML = '<div class="list-group-item text-danger">Gagal memuat supplier.</div>';
+        supplierResultsBox.classList.remove("d-none");
+        activeChoiceIndex = -1;
+        return;
+      }
+
+      renderResults(json.data?.rows || []);
+    };
+
+    supplierSearchInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(fetchResults, 250);
+    });
+
+    supplierSearchInput.addEventListener("focus", () => {
+      if (supplierSearchInput.value.trim().length >= 2) {
+        fetchResults();
+      }
+    });
+
+    supplierSearchInput.addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        form.requestSubmit();
+        return;
+      }
+
+      const buttons = resultButtons();
+
+      if (event.key === "ArrowDown" && buttons.length) {
+        event.preventDefault();
+        activeChoiceIndex = Math.min(activeChoiceIndex + 1, buttons.length - 1);
+        syncActiveChoice();
+        return;
+      }
+
+      if (event.key === "ArrowUp" && buttons.length) {
+        event.preventDefault();
+        activeChoiceIndex = Math.max(activeChoiceIndex - 1, 0);
+        syncActiveChoice();
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        hideResults();
+        return;
+      }
+
+      if (event.key !== "Enter") return;
+      if (event.ctrlKey || event.altKey || event.metaKey) return;
+
+      event.preventDefault();
+
+      if (buttons.length && activeChoiceIndex >= 0 && buttons[activeChoiceIndex]) {
+        buttons[activeChoiceIndex].click();
+        return;
+      }
+
+      moveHeaderFocus(supplierSearchInput, event.shiftKey ? -1 : 1);
+    });
+  };
+
   const initProductLookup = (item) => {
     const searchInput = item.querySelector("[data-product-search]");
     const hiddenInput = item.querySelector("[data-product-id]");
@@ -761,7 +914,7 @@
   });
 
   document.addEventListener("click", (event) => {
-    if (!event.target.closest("[data-line-item]")) {
+    if (!event.target.closest("[data-line-item]") && !event.target.closest("[data-supplier-search]")) {
       closeAllResults();
     }
   });
@@ -782,6 +935,7 @@
   });
 
   lineItems().forEach(initLineItem);
+  initSupplierLookup();
   syncLineNumbers();
   updateRemoveButtons();
   updateTanggalTerimaState();

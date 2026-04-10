@@ -28,7 +28,7 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_create_supplier_invoice_page_with_nomor_faktur_and_line_no_contract(): void
+    public function test_admin_can_access_create_supplier_invoice_page_with_supplier_lookup_contract(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
 
@@ -46,8 +46,11 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSee('Ketik minimal 2 huruf untuk mencari produk');
         $response->assertSee('add-procurement-line', false);
         $response->assertSee('data-product-search', false);
+        $response->assertSee('data-supplier-search', false);
+        $response->assertSee('data-supplier-results', false);
         $response->assertSee('admin-procurement-create.js');
         $response->assertSee(json_encode(route('admin.procurement.products.lookup')), false);
+        $response->assertSee(json_encode(route('admin.procurement.suppliers.lookup')), false);
     }
 
     private function user(string $role): User
