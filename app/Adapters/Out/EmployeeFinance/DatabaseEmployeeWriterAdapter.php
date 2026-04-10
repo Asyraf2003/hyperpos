@@ -6,8 +6,8 @@ namespace App\Adapters\Out\EmployeeFinance;
 
 use App\Core\EmployeeFinance\Employee\Employee;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeWriterAdapter implements EmployeeWriterPort
 {
@@ -23,7 +23,6 @@ final class DatabaseEmployeeWriterAdapter implements EmployeeWriterPort
             ])
         );
 
-        // Pastikan created_at terisi jika ini data baru (updateOrInsert tidak otomatis mengisi created_at)
         DB::table('employees')
             ->where('id', $employee->getId())
             ->whereNull('created_at')
@@ -37,11 +36,13 @@ final class DatabaseEmployeeWriterAdapter implements EmployeeWriterPort
     {
         return [
             'id' => $employee->getId(),
-            'name' => $employee->getName(),
+            'employee_name' => $employee->getEmployeeName(),
             'phone' => $employee->getPhone(),
-            'base_salary' => $employee->getBaseSalary()->amount(),
-            'pay_period' => $employee->getPayPeriod()->value,
-            'status' => $employee->getStatus()->value,
+            'salary_basis_type' => $employee->getSalaryBasisType()->value,
+            'default_salary_amount' => $employee->getDefaultSalaryAmount()?->amount(),
+            'employment_status' => $employee->getEmploymentStatus()->value,
+            'started_at' => $employee->getStartedAt()?->format('Y-m-d'),
+            'ended_at' => $employee->getEndedAt()?->format('Y-m-d'),
         ];
     }
 }

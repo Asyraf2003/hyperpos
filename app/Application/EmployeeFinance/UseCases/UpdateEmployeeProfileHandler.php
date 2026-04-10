@@ -13,6 +13,7 @@ use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
 use App\Ports\Out\TransactionManagerPort;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Throwable;
 
@@ -28,13 +29,15 @@ final class UpdateEmployeeProfileHandler
 
     public function handle(
         string $employeeId,
-        string $name,
+        string $employeeName,
         ?string $phone,
-        int $baseSalaryAmount,
-        string $payPeriodValue,
-        string $statusValue,
+        ?int $defaultSalaryAmount,
+        string $salaryBasisType,
+        string $employmentStatus,
         string $changeReason,
         string $performedByActorId,
+        ?string $startedAt = null,
+        ?string $endedAt = null,
     ): void {
         if (trim($changeReason) === '') {
             throw new DomainException('Catatan perubahan wajib diisi.');
@@ -51,10 +54,20 @@ final class UpdateEmployeeProfileHandler
 
             $before = $this->snapshot($employee);
 
-            $employee->updateProfile($name, $phone, PayPeriod::from($payPeriodValue));
-            $employee->updateBaseSalary(Money::fromInt($baseSalaryAmount), $changeReason);
+            $employee->updateProfile(
+                $employeeName,
+                $phone,
+                PayPeriod::from($salaryBasisType),
+                $this->parseOptionalDate($startedAt),
+                $this->parseOptionalDate($endedAt),
+            );
 
-            if ($statusValue === EmployeeStatus::INACTIVE->value) {
+            $employee->updateDefaultSalaryAmount(
+                $this->toNullableMoney($defaultSalaryAmount),
+                $changeReason,
+            );
+
+            if ($employmentStatus === EmployeeStatus::INACTIVE->value) {
                 $employee->deactivate();
             } else {
                 $employee->activate();
@@ -77,14 +90,47 @@ final class UpdateEmployeeProfileHandler
         }
     }
 
+    private function toNullableMoney(?int $amount): ?Money
+    {
+        if ($amount === null || $amount <= 0) {
+            return null;
+        }
+
+        return Money::fromInt($amount);
+    }
+
+    private function parseOptionalDate(?string $value): ?DateTimeImmutable
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        return new DateTimeImmutable($value);
+    }
+
     private function snapshot(Employee $employee): array
     {
+        $defaultSalaryAmount = $employee->getDefaultSalaryAmount()?->amount();
+        $salaryBasisType = $employee->getSalaryBasisType()->value;
+        $employmentStatus = $employee->getEmploymentStatus()->value;
+
         return [
+            'employee_name' => $employee->getEmployeeName(),
             'name' => $employee->getName(),
             'phone' => $employee->getPhone(),
-            'base_salary_amount' => $employee->getBaseSalary()->amount(),
-            'pay_period_value' => $employee->getPayPeriod()->value,
-            'status_value' => $employee->getStatus()->value,
+            'default_salary_amount' => $defaultSalaryAmount,
+            'base_salary_amount' => $defaultSalaryAmount,
+            'salary_basis_type' => $salaryBasisType,
+            'pay_period_value' => $salaryBasisType,
+            'employment_status' => $employmentStatus,
+            'status_value' => $employmentStatus,
+            'started_at' => $this->formatDate($employee->getStartedAt()),
+            'ended_at' => $this->formatDate($employee->getEndedAt()),
         ];
+    }
+
+    private function formatDate(?DateTimeImmutable $value): ?string
+    {
+        return $value?->format('Y-m-d');
     }
 }
