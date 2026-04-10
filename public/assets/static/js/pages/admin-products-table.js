@@ -165,7 +165,7 @@
       return "";
     }
 
-    return `<div class="mt-1"><span class="badge bg-light-danger text-danger">Soft Deleted</span></div>`;
+    return `<div class="mt-1"><span class="badge bg-light-danger text-danger">Hapus Produk</span></div>`;
   };
 
   const rowHtml = (r, i, meta) => `

@@ -28,15 +28,6 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <a
-                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Edit Nota Supplier']) }}"
-                                target="_blank"
-                                rel="noopener"
-                                class="btn btn-light-primary"
-                            >
-                                Buat Product
-                            </a>
-
                             <button
                                 type="button"
                                 class="btn btn-light-danger"
@@ -45,20 +36,6 @@
                             >
                                 Muat Ulang Draft
                             </button>
-
-                            <a
-                                href="{{ route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $summary['supplier_invoice_id']]) }}"
-                                class="btn btn-light-secondary"
-                            >
-                                Kembali ke Detail
-                            </a>
-
-                            <a
-                                href="{{ route('admin.procurement.supplier-invoices.index') }}"
-                                class="btn btn-light-secondary"
-                            >
-                                Kembali ke Daftar
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -128,13 +105,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="mt-3 pt-3 border-top">
-                        <small class="text-muted d-block">
-                            Edit sekarang memakai engine interaktif yang sama dengan create:
-                            tambah baris, hapus baris, dan pilih product via lookup.
-                        </small>
-                    </div>
                 </div>
             </div>
 
@@ -153,9 +123,16 @@
                                 Tambah Rincian
                             </button>
 
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 Simpan Perubahan Nota
                             </button>
+
+                            <a
+                                href="{{ route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $summary['supplier_invoice_id']]) }}"
+                                class="btn btn-light-secondary"
+                            >
+                                Batal
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -207,18 +184,6 @@
                                             autocomplete="off"
                                             data-product-search
                                         >
-
-                                        <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                            <small class="text-muted">Belum ada produk yang cocok?</small>
-                                            <a
-                                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Edit Nota Supplier']) }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                class="btn btn-sm btn-light-primary"
-                                            >
-                                                Buat Product
-                                            </a>
-                                        </div>
 
                                         <div
                                             class="list-group position-absolute w-100 shadow-sm d-none mt-1"
@@ -325,18 +290,6 @@
                                         data-product-search
                                     >
 
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small class="text-muted">Belum ada produk yang cocok?</small>
-                                        <a
-                                            href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Edit Nota Supplier']) }}"
-                                            target="_blank"
-                                            rel="noopener"
-                                            class="btn btn-sm btn-light-primary"
-                                        >
-                                            Buat Product
-                                        </a>
-                                    </div>
-
                                     <div
                                         class="list-group position-absolute w-100 shadow-sm d-none mt-1"
                                         style="z-index: 20;"
@@ -392,19 +345,6 @@
                             </div>
                         </div>
                     </template>
-
-                    <div class="d-flex justify-content-start gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">
-                            Simpan Perubahan Nota
-                        </button>
-
-                        <a
-                            href="{{ route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $summary['supplier_invoice_id']]) }}"
-                            class="btn btn-light-secondary"
-                        >
-                            Batal
-                        </a>
-                    </div>
                 </div>
             </div>
         </form>

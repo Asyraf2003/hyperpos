@@ -26,15 +26,6 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <a
-                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
-                                target="_blank"
-                                rel="noopener"
-                                class="btn btn-light-primary"
-                            >
-                                Buat Product
-                            </a>
-
                             <button
                                 type="button"
                                 class="btn btn-light-danger"
@@ -43,13 +34,6 @@
                             >
                                 Mulai Baru
                             </button>
-
-                            <a
-                                href="{{ route('admin.procurement.supplier-invoices.index') }}"
-                                class="btn btn-light-secondary"
-                            >
-                                Kembali ke Daftar
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -175,13 +159,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="mt-3 pt-3 border-top">
-                        <small class="text-muted d-block">
-                            Arah kerja UI ini akan dibuat keyboard-first seperti product.
-                            Untuk sekarang kita rapikan dulu bentuk notanya, lalu engine Enter dan pembersihan baris kosong menyusul di step berikutnya.
-                        </small>
-                    </div>
                 </div>
             </div>
 
@@ -254,18 +231,6 @@
                                             autocomplete="off"
                                             data-product-search
                                         >
-
-                                        <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                            <small class="text-muted">Belum ada produk yang cocok?</small>
-                                            <a
-                                                href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
-                                                target="_blank"
-                                                rel="noopener"
-                                                class="btn btn-sm btn-light-primary"
-                                            >
-                                                Buat Product
-                                            </a>
-                                        </div>
 
                                         <div
                                             class="list-group position-absolute w-100 shadow-sm d-none mt-1"
@@ -371,18 +336,6 @@
                                         data-product-search
                                     >
 
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small class="text-muted">Belum ada produk yang cocok?</small>
-                                        <a
-                                            href="{{ route('admin.products.create', ['return_to' => url()->full(), 'return_label' => 'Kembali ke Nota Pemasok']) }}"
-                                            target="_blank"
-                                            rel="noopener"
-                                            class="btn btn-sm btn-light-primary"
-                                        >
-                                            Buat Product
-                                        </a>
-                                    </div>
-
                                     <div
                                         class="list-group position-absolute w-100 shadow-sm d-none mt-1"
                                         style="z-index: 20;"
@@ -438,22 +391,6 @@
                             </div>
                         </div>
                     </template>
-
-                    <div class="mt-4 pt-3 border-top d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                        <small class="text-muted">
-                            Baris kosong penuh belum dihapus otomatis pada step ini. Pembersihan baris kosong dan flow Enter akan kita kunci di step JS berikutnya.
-                        </small>
-
-                        <div class="d-flex gap-2">
-                            <button type="button" id="add-procurement-line-footer" class="btn btn-light-primary d-none">
-                                Tambah Rincian
-                            </button>
-
-                            <button type="submit" class="btn btn-success">
-                                Simpan Nota Pemasok
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </form>

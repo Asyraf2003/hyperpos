@@ -12,7 +12,7 @@
                 <label class="form-label" for="filter-status">Status Produk</label>
                 <select id="filter-status" name="status" class="form-select">
                     <option value="active">Aktif</option>
-                    <option value="deleted">Soft Deleted</option>
+                    <option value="deleted">Produk Terhapus</option>
                     <option value="all">Semua</option>
                 </select>
             </div>

@@ -149,7 +149,7 @@
                                         id="product-action-delete-button"
                                         class="btn btn-outline-danger w-100 text-start py-3 px-4 h-100"
                                     >
-                                        <div class="fw-bold fs-5 mb-1">Soft delete</div>
+                                        <div class="fw-bold fs-5 mb-1">Hapus Produk</div>
                                         <div class="small opacity-75">Sembunyikan dari daftar tanpa menghapus histori.</div>
                                     </button>
                                 </form>
