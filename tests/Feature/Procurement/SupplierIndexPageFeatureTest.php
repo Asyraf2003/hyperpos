@@ -34,8 +34,10 @@ final class SupplierIndexPageFeatureTest extends TestCase
         $response->assertSee('List data pemasok untuk admin.');
         $response->assertSee('supplier-search-form', false);
         $response->assertSee('supplier-table-body', false);
+        $response->assertSee('supplier-edit-modal', false);
         $response->assertSee('admin-suppliers-table.js');
         $response->assertSee('editBaseUrl', false);
+        $response->assertSee('updateUrlTemplate', false);
         $response->assertSee('/admin/suppliers', false);
     }
 

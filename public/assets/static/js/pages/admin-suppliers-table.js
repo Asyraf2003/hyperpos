@@ -25,8 +25,21 @@
   const searchForm = $("supplier-search-form");
   const searchInput = $("supplier-search-input");
 
+  const editModalElement = $("supplier-edit-modal");
+  const editModalSubtitle = $("supplier-edit-modal-subtitle");
+  const editForm = $("supplier-edit-form");
+  const editSupplierIdInput = $("supplier-edit-supplier-id");
+  const editNamaPtInput = $("supplier-edit-nama-pt-pengirim");
+  const editFormAlert = $("supplier-edit-form-alert");
+  const editNamaPtError = $("supplier-edit-nama-pt-error");
+
+  const editModal = editModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(editModalElement)
+    : null;
+
   let searchDebounceTimer = null;
   let requestCounter = 0;
+  let lastLoadedRows = [];
 
   const esc = (v) => String(v ?? "").replace(/[&<>\"']/g, (m) => ({
     "&": "&amp;",
@@ -38,6 +51,7 @@
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const angka = (v) => Number(v || 0).toLocaleString("id-ID");
+  const trimValue = (v) => String(v ?? "").trim();
 
   const tanggalId = (v) => {
     if (!v) {
@@ -57,14 +71,74 @@
     }).format(date);
   };
 
-  const trimValue = (v) => String(v ?? "").trim();
-
   const intOrDefault = (v, fallback) => {
     const n = Number.parseInt(String(v ?? ""), 10);
     return Number.isNaN(n) || n < 1 ? fallback : n;
   };
 
-  const editUrl = (supplierId) => `${String(c.editBaseUrl || "").replace(/\/$/, "")}/${encodeURIComponent(supplierId)}/edit`;
+  const editPageUrl = (supplierId) =>
+    `${String(c.editBaseUrl || "").replace(/\/$/, "")}/${encodeURIComponent(supplierId)}/edit`;
+
+  const updateUrl = (supplierId) =>
+    String(c.updateUrlTemplate || "").replace("__ID__", encodeURIComponent(supplierId));
+
+  const setFormError = (message) => {
+    if (!editFormAlert || !editNamaPtInput || !editNamaPtError) {
+      return;
+    }
+
+    const normalized = trimValue(message);
+
+    if (normalized === "") {
+      editFormAlert.textContent = "";
+      editFormAlert.classList.add("d-none");
+      editNamaPtInput.classList.remove("is-invalid");
+      editNamaPtError.textContent = "";
+      editNamaPtError.classList.add("d-none");
+      return;
+    }
+
+    editFormAlert.textContent = normalized;
+    editFormAlert.classList.remove("d-none");
+    editNamaPtInput.classList.add("is-invalid");
+    editNamaPtError.textContent = normalized;
+    editNamaPtError.classList.remove("d-none");
+  };
+
+  const focusEditInput = () => {
+    if (!editNamaPtInput) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      editNamaPtInput.focus();
+      editNamaPtInput.select();
+    });
+  };
+
+  const openEditModal = (supplierId, supplierName, preserveOldInput = false) => {
+    if (!editModal || !editForm || !editSupplierIdInput || !editNamaPtInput) {
+      window.location.assign(editPageUrl(supplierId));
+      return;
+    }
+
+    editForm.action = updateUrl(supplierId);
+    editSupplierIdInput.value = supplierId;
+
+    if (editModalSubtitle) {
+      editModalSubtitle.textContent = trimValue(supplierName) === ""
+        ? "Ubah nama PT pemasok langsung dari daftar."
+        : `Ubah nama PT untuk ${supplierName}.`;
+    }
+
+    if (!preserveOldInput) {
+      editNamaPtInput.value = supplierName;
+      setFormError("");
+    }
+
+    editModal.show();
+    focusEditInput();
+  };
 
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
@@ -101,7 +175,7 @@
 
   const paramsString = () => new URLSearchParams(paramsObject()).toString();
 
-  const updateUrl = (replace = false) => {
+  const updateUrlState = (replace = false) => {
     const url = new URL(window.location.href);
     url.search = paramsString();
 
@@ -122,9 +196,15 @@
       <td class="text-end">${angka(r.invoice_unpaid_count)}</td>
       <td>${tanggalId(r.last_shipment_date)}</td>
       <td>
-        <a href="${editUrl(r.id)}" class="btn btn-sm btn-outline-primary">
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          data-supplier-action="edit"
+          data-supplier-id="${esc(r.id)}"
+          data-supplier-name="${esc(r.nama_pt_pengirim)}"
+        >
           Edit
-        </a>
+        </button>
       </td>
     </tr>
   `;
@@ -176,6 +256,27 @@
     });
   };
 
+  const maybeRestoreFailedEditModal = () => {
+    if (!c.hasUpdateErrors || !c.oldSupplierId) {
+      return;
+    }
+
+    const failedId = String(c.oldSupplierId);
+    const failedRow = lastLoadedRows.find((row) => String(row.id) === failedId);
+    const supplierName = failedRow
+      ? trimValue(failedRow.nama_pt_pengirim)
+      : trimValue(c.oldNamaPtPengirim);
+
+    openEditModal(failedId, supplierName, true);
+
+    if (editNamaPtInput && trimValue(c.oldNamaPtPengirim) !== "") {
+      editNamaPtInput.value = c.oldNamaPtPengirim;
+    }
+
+    setFormError(c.updateErrorMessage);
+    c.hasUpdateErrors = false;
+  };
+
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
 
@@ -196,12 +297,15 @@
       return;
     }
 
-    renderRows(json.data.rows || [], json.data.meta || {});
+    lastLoadedRows = json.data.rows || [];
+
+    renderRows(lastLoadedRows, json.data.meta || {});
     renderSummary(json.data.meta || {});
     renderPager(json.data.meta || {});
     renderSortIndicators();
     syncInputsFromState();
-    updateUrl(replaceUrl);
+    updateUrlState(replaceUrl);
+    maybeRestoreFailedEditModal();
   };
 
   searchForm.addEventListener("submit", (e) => {
@@ -279,6 +383,20 @@
     load();
   });
 
+  body.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-supplier-action='edit']");
+    if (!button) return;
+
+    const supplierId = trimValue(button.dataset.supplierId);
+    const supplierName = trimValue(button.dataset.supplierName);
+
+    if (supplierId === "") {
+      return;
+    }
+
+    openEditModal(supplierId, supplierName);
+  });
+
   window.addEventListener("popstate", () => {
     const nextState = stateFromUrl();
     s.q = nextState.q;
@@ -286,6 +404,12 @@
     s.sort_by = nextState.sort_by;
     s.sort_dir = nextState.sort_dir;
     load(true);
+  });
+
+  editModalElement?.addEventListener("hidden.bs.modal", () => {
+    if (!c.hasUpdateErrors) {
+      setFormError("");
+    }
   });
 
   syncInputsFromState();

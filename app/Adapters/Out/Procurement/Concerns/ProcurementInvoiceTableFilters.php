@@ -23,26 +23,6 @@ trait ProcurementInvoiceTableFilters
             });
         }
 
-        if ($filters->nomorFaktur() !== null) {
-            $nomorFaktur = $filters->nomorFaktur();
-
-            $query->where(function (Builder $builder) use ($nomorFaktur): void {
-                $builder
-                    ->where('supplier_invoices.nomor_faktur', 'like', '%' . $nomorFaktur . '%')
-                    ->orWhere('supplier_invoices.nomor_faktur_normalized', 'like', '%' . mb_strtolower($nomorFaktur, 'UTF-8') . '%');
-            });
-        }
-
-        if ($filters->namaPt() !== null) {
-            $namaPt = $filters->namaPt();
-
-            $query->where(function (Builder $builder) use ($namaPt): void {
-                $builder
-                    ->where('suppliers.nama_pt_pengirim', 'like', '%' . $namaPt . '%')
-                    ->orWhere('supplier_invoices.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $namaPt . '%');
-            });
-        }
-
         if ($filters->paymentStatus() === 'outstanding') {
             $query->whereRaw(
                 'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) > 0'

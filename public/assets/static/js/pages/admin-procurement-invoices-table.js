@@ -4,8 +4,6 @@
 
   const defaults = {
     q: "",
-    nomor_faktur: "",
-    nama_pt: "",
     payment_status: "all",
     page: 1,
     sort_by: "shipment_date",
@@ -143,14 +141,6 @@
       entries.push({ label: "Keyword", value: s.q });
     }
 
-    if (trimValue(s.nomor_faktur) !== "") {
-      entries.push({ label: "No Faktur", value: s.nomor_faktur });
-    }
-
-    if (trimValue(s.nama_pt) !== "") {
-      entries.push({ label: "Nama PT", value: s.nama_pt });
-    }
-
     if (s.payment_status === "outstanding") {
       entries.push({ label: "Status", value: "Masih Punya Tagihan" });
     }
@@ -195,8 +185,6 @@
 
     return {
       q: trimValue(p.get("q")),
-      nomor_faktur: trimValue(p.get("nomor_faktur")),
-      nama_pt: trimValue(p.get("nama_pt")),
       payment_status: allowedPaymentStatus.has(paymentStatus) ? paymentStatus : defaults.payment_status,
       page: intOrDefault(p.get("page"), 1),
       sort_by: allowedSortBy.has(sortBy) ? sortBy : defaults.sort_by,
@@ -211,14 +199,6 @@
   const syncInputsFromState = () => {
     if (searchInput) {
       searchInput.value = s.q;
-    }
-
-    if (filterForm?.elements["nomor_faktur"]) {
-      filterForm.elements["nomor_faktur"].value = s.nomor_faktur;
-    }
-
-    if (filterForm?.elements["nama_pt"]) {
-      filterForm.elements["nama_pt"].value = s.nama_pt;
     }
 
     if (filterForm?.elements["payment_status"]) {
@@ -245,7 +225,7 @@
       payment_status: s.payment_status
     };
 
-    ["q", "nomor_faktur", "nama_pt", "shipment_date_from", "shipment_date_to"].forEach((k) => {
+    ["q", "shipment_date_from", "shipment_date_to"].forEach((k) => {
       if (s[k]) obj[k] = s[k];
     });
 
@@ -563,8 +543,6 @@
     const f = new FormData(filterForm);
     const paymentStatus = trimValue(f.get("payment_status"));
 
-    s.nomor_faktur = trimValue(f.get("nomor_faktur"));
-    s.nama_pt = trimValue(f.get("nama_pt"));
     s.payment_status = allowedPaymentStatus.has(paymentStatus) ? paymentStatus : "all";
     s.shipment_date_from = trimValue(f.get("shipment_date_from"));
     s.shipment_date_to = trimValue(f.get("shipment_date_to"));
@@ -575,8 +553,6 @@
   });
 
   resetFilter?.addEventListener("click", () => {
-    s.nomor_faktur = "";
-    s.nama_pt = "";
     s.payment_status = "all";
     s.shipment_date_from = "";
     s.shipment_date_to = "";
@@ -588,8 +564,6 @@
 
   resetAllFilters?.addEventListener("click", () => {
     s.q = "";
-    s.nomor_faktur = "";
-    s.nama_pt = "";
     s.payment_status = "all";
     s.shipment_date_from = "";
     s.shipment_date_to = "";

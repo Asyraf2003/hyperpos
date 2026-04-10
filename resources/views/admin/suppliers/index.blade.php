@@ -78,6 +78,72 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="supplier-edit-modal"
+            tabindex="-1"
+            aria-labelledby="supplier-edit-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <form
+                        id="supplier-edit-form"
+                        method="POST"
+                        action="{{ url('/admin/suppliers/__ID__') }}"
+                    >
+                        @csrf
+                        @method('PUT')
+
+                        <input
+                            type="hidden"
+                            name="supplier_id"
+                            id="supplier-edit-supplier-id"
+                            value="{{ old('supplier_id') }}"
+                        >
+
+                        <div class="modal-header border-0 pb-0 px-4 pt-4">
+                            <div class="w-100">
+                                <h3 class="modal-title fw-bold mb-1" id="supplier-edit-modal-title">Edit Pemasok</h3>
+                                <p class="mb-0 text-muted fs-6" id="supplier-edit-modal-subtitle">
+                                    Ubah nama PT pemasok langsung dari daftar.
+                                </p>
+                            </div>
+
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+
+                        <div class="modal-body px-4 pb-3 pt-3">
+                            <div
+                                id="supplier-edit-form-alert"
+                                class="alert alert-danger d-none"
+                                role="alert"
+                            ></div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="supplier-edit-nama-pt-pengirim">Nama PT Pengirim</label>
+                                <input
+                                    type="text"
+                                    id="supplier-edit-nama-pt-pengirim"
+                                    name="nama_pt_pengirim"
+                                    class="form-control"
+                                    value="{{ old('nama_pt_pengirim') }}"
+                                    placeholder="Masukkan nama PT pengirim"
+                                    autocomplete="off"
+                                >
+                                <div id="supplier-edit-nama-pt-error" class="invalid-feedback d-none"></div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
@@ -85,7 +151,12 @@
     <script>
         window.supplierTableConfig = {
             endpoint: @json(route('admin.suppliers.table')),
-            editBaseUrl: @json(url('/admin/suppliers'))
+            editBaseUrl: @json(url('/admin/suppliers')),
+            updateUrlTemplate: @json(url('/admin/suppliers/__ID__')),
+            oldSupplierId: @json(old('supplier_id')),
+            oldNamaPtPengirim: @json(old('nama_pt_pengirim')),
+            hasUpdateErrors: @json($errors->has('nama_pt_pengirim') || $errors->has('supplier')),
+            updateErrorMessage: @json($errors->first('nama_pt_pengirim') ?: $errors->first('supplier'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-suppliers-table.js') }}"></script>

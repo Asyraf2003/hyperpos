@@ -54,8 +54,6 @@ trait ProcurementInvoiceTablePayload
                 'sort_dir' => $query->sortDir(),
                 'filters' => [
                     'q' => $query->q(),
-                    'nomor_faktur' => $query->nomorFaktur(),
-                    'nama_pt' => $query->namaPt(),
                     'payment_status' => $query->paymentStatus(),
                     'shipment_date_from' => $query->shipmentDateFrom(),
                     'shipment_date_to' => $query->shipmentDateTo(),
