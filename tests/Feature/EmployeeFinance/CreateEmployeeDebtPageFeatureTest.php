@@ -32,11 +32,11 @@ final class CreateEmployeeDebtPageFeatureTest extends TestCase
     {
         DB::table('employees')->insert([
             'id' => (string) Str::uuid(),
-            'name' => 'Budi Hutang',
+            'employee_name' => 'Budi Hutang',
             'phone' => '081222222222',
-            'base_salary' => 4500000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 4500000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -56,11 +56,11 @@ final class CreateEmployeeDebtPageFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Asyraf Mubarak',
+            'employee_name' => 'Asyraf Mubarak',
             'phone' => '08111222333',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

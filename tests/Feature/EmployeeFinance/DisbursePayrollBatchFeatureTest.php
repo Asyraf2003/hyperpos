@@ -122,11 +122,11 @@ final class DisbursePayrollBatchFeatureTest extends TestCase
     {
         DB::table('employees')->insert([
             'id' => $id,
-            'name' => $name,
+            'employee_name' => $name,
             'phone' => '0812',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => $status,
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

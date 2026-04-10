@@ -19,10 +19,10 @@ final class RecordEmployeeDebtFeatureTest extends TestCase
         // Setup data persis seperti gaya Anda
         DB::table('employees')->insert([
             'id' => 'emp-1',
-            'name' => 'Montir A',
-            'base_salary' => 2000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'employee_name' => 'Montir A',
+            'default_salary_amount' => 2000000,
+            'salary_basis_type' => 'weekly',
+            'employment_status' => 'active',
         ]);
 
         $handler = app(RecordEmployeeDebtHandler::class);

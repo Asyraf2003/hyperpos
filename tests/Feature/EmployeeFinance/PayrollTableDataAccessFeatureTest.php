@@ -29,11 +29,11 @@ final class PayrollTableDataAccessFeatureTest extends TestCase
     {
         DB::table('employees')->insert([
             'id' => '11111111-1111-1111-1111-111111111111',
-            'name' => 'Budi',
+            'employee_name' => 'Budi',
             'phone' => '0812',
-            'base_salary' => 5000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'weekly',
+            'employment_status' => 'active',
         ]);
 
         DB::table('payroll_disbursements')->insert([

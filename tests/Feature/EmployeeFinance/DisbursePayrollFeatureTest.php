@@ -21,11 +21,11 @@ final class DisbursePayrollFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Asyraf Payroll',
+            'employee_name' => 'Asyraf Payroll',
             'phone' => '081111111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

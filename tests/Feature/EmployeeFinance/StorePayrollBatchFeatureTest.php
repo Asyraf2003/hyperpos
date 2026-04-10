@@ -56,8 +56,8 @@ final class StorePayrollBatchFeatureTest extends TestCase
     private function seedEmployee(string $id): void
     {
         DB::table('employees')->insert([
-            'id' => $id, 'name' => 'Employee '.$id[0], 'phone' => '0812', 'base_salary' => 5000000,
-            'pay_period' => 'monthly', 'status' => 'active', 'created_at' => now(), 'updated_at' => now(),
+            'id' => $id, 'employee_name' => 'Employee '.$id[0], 'phone' => '0812', 'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly', 'employment_status' => 'active', 'created_at' => now(), 'updated_at' => now(),
         ]);
     }
 }

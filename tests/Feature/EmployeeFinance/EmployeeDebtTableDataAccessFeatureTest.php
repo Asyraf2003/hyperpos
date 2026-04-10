@@ -27,7 +27,7 @@ final class EmployeeDebtTableDataAccessFeatureTest extends TestCase
 
     public function test_admin_can_get_employee_debt_table_json(): void
     {
-        DB::table('employees')->insert(['id' => 'emp-1', 'name' => 'Budi', 'phone' => '0812', 'base_salary' => 5000000, 'pay_period' => 'weekly', 'status' => 'active']);
+        DB::table('employees')->insert(['id' => 'emp-1', 'employee_name' => 'Budi', 'phone' => '0812', 'default_salary_amount' => 5000000, 'salary_basis_type' => 'weekly', 'employment_status' => 'active']);
         DB::table('employee_debts')->insert(['id' => 'debt-1', 'employee_id' => 'emp-1', 'total_debt' => 1000000, 'remaining_balance' => 750000, 'status' => 'unpaid', 'created_at' => '2026-03-25 00:00:00']);
 
         $response = $this->actingAs($this->user('admin'))->get(route('admin.employee-debts.table'));

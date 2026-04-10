@@ -21,11 +21,11 @@ final class EmployeeDebtDetailPageFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Asyraf Detail Hutang',
+            'employee_name' => 'Asyraf Detail Hutang',
             'phone' => '081111111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -70,11 +70,11 @@ final class EmployeeDebtDetailPageFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Asyraf Bayar Hutang',
+            'employee_name' => 'Asyraf Bayar Hutang',
             'phone' => '081111111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

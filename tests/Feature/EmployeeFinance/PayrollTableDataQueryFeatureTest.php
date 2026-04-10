@@ -67,11 +67,11 @@ final class PayrollTableDataQueryFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => $name,
+            'employee_name' => $name,
             'phone' => '0812',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
         ]);
 
         DB::table('payroll_disbursements')->insert([

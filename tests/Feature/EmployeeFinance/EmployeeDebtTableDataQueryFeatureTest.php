@@ -57,7 +57,7 @@ final class EmployeeDebtTableDataQueryFeatureTest extends TestCase
     private function seedDebt(string $name, int $total, int $remaining, string $status, string $createdAt): void
     {
         $employeeId = (string) Str::uuid();
-        DB::table('employees')->insert(['id' => $employeeId, 'name' => $name, 'phone' => '0812', 'base_salary' => 5000000, 'pay_period' => 'monthly', 'status' => 'active']);
+        DB::table('employees')->insert(['id' => $employeeId, 'employee_name' => $name, 'phone' => '0812', 'default_salary_amount' => 5000000, 'salary_basis_type' => 'monthly', 'employment_status' => 'active']);
         DB::table('employee_debts')->insert(['id' => (string) Str::uuid(), 'employee_id' => $employeeId, 'total_debt' => $total, 'remaining_balance' => $remaining, 'status' => $status, 'created_at' => $createdAt]);
     }
 }
