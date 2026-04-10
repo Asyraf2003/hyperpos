@@ -34,6 +34,11 @@ final class SupplierSeeder extends Seeder
             ['nama' => 'PT. Keihin Indonesia', 'kontak' => '081288779900'],
             ['nama' => 'PT. Denso Indonesia', 'kontak' => '081166554422'],
             ['nama' => 'PT. Yamaha Indonesia Motor Mfg (Parts)', 'kontak' => '081922334455'],
+            ['nama' => 'PT. Nusantara Motor Parts Sejahtera', 'kontak' => '081700111222'],
+            ['nama' => 'PT. Sinar Teknik Otomotif Abadi', 'kontak' => '081700111333'],
+            ['nama' => 'PT. Prima Sparepart Niaga', 'kontak' => '081700111444'],
+            ['nama' => 'PT. Cipta Komponen Kendara', 'kontak' => '081700111555'],
+            ['nama' => 'PT. Sentra Distribusi Partindo', 'kontak' => '081700111666'],
         ];
 
         foreach ($suppliers as $s) {
