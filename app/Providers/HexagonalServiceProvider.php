@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Application\ProductCatalog\Context\ProductChangeContext;
+use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
 use App\Adapters\Out\Audit\DatabaseAuditLogAdapter;
 use App\Adapters\Out\Audit\DatabaseAuditLogReaderAdapter;
 use App\Adapters\Out\Auth\LaravelUuidAdapter;
@@ -185,6 +186,7 @@ class HexagonalServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(ProductChangeContext::class, fn (): ProductChangeContext => new ProductChangeContext());
+        $this->app->scoped(EmployeeChangeContext::class, fn (): EmployeeChangeContext => new EmployeeChangeContext());
         $this->app->bind(HealthCheckUseCase::class, HealthCheckHandler::class);
 
         $this->app->singleton(ClockPort::class, SystemClockAdapter::class);
@@ -285,7 +287,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(OperationalProfitReportingSourceReaderPort::class, DatabaseOperationalProfitReportingSourceReaderAdapter::class);
 
         $this->app->singleton(EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
-        $this->app->singleton(EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeWriterAdapter::class);
+        $this->app->scoped(EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseVersionedEmployeeWriterAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeTableReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeTableReaderAdapter::class);
         $this->app->singleton(EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
         $this->app->singleton(EmployeeDebtAdjustmentWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentWriterAdapter::class);
