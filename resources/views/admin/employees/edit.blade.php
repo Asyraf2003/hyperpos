@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data Karyawan')
-@section('heading', 'Edit Data Karyawan')
+@section('title', 'Edit Karyawan')
+@section('heading', 'Edit Karyawan')
 
 @section('content')
     <section class="section">
@@ -11,9 +11,9 @@
                     <div class="card-header">
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Edit Data Karyawan</h4>
+                                <h4 class="card-title mb-1">Edit Karyawan</h4>
                                 <p class="mb-0 text-muted">
-                                    Perubahan master karyawan wajib menyertakan catatan koreksi.
+                                    Perubahan master karyawan wajib menyertakan catatan perubahan.
                                 </p>
                             </div>
                         </div>
@@ -26,23 +26,23 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.employees.update', ['employeeId' => $employee->getId()]) }}" method="post">
+                        <form action="{{ route('admin.employees.update', ['employeeId' => $employee->getId()]) }}" method="post" id="employee-master-form" data-employee-master-form="1">
                             @csrf
                             @method('put')
 
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group mb-4">
-                                        <label for="name" class="form-label">Nama Karyawan</label>
+                                        <label for="employee_name" class="form-label">Nama Karyawan</label>
                                         <input
                                             type="text"
-                                            id="name"
-                                            name="name"
-                                            value="{{ old('name', $employee->getName()) }}"
-                                            class="form-control @error('name') is-invalid @enderror"
+                                            id="employee_name"
+                                            name="employee_name"
+                                            value="{{ old('employee_name', old('name', $employee->getEmployeeName())) }}"
+                                            class="form-control @error('employee_name') is-invalid @enderror"
                                             required
                                         >
-                                        @error('name')
+                                        @error('employee_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -65,48 +65,21 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12">
-                                    <div class="form-group mb-4" data-money-input-group>
-                                        <label for="base_salary_amount_display" class="form-label">Gaji Pokok</label>
-
-                                        <input
-                                            type="hidden"
-                                            id="base_salary_amount"
-                                            name="base_salary_amount"
-                                            value="{{ old('base_salary_amount', $employee->getBaseSalary()->amount()) }}"
-                                            data-money-raw
-                                        >
-
-                                        <input
-                                            type="text"
-                                            id="base_salary_amount_display"
-                                            value="{{ old('base_salary_amount', $employee->getBaseSalary()->amount()) }}"
-                                            class="form-control @error('base_salary_amount') is-invalid @enderror"
-                                            inputmode="numeric"
-                                            data-money-display
-                                            required
-                                        >
-
-                                        @error('base_salary_amount')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
                                 <div class="col-12 col-md-6">
                                     <div class="form-group mb-4">
-                                        <label for="pay_period_value" class="form-label">Periode Gaji</label>
+                                        <label for="salary_basis_type" class="form-label">Basis Gaji</label>
                                         <select
-                                            id="pay_period_value"
-                                            name="pay_period_value"
-                                            class="form-select @error('pay_period_value') is-invalid @enderror"
+                                            id="salary_basis_type"
+                                            name="salary_basis_type"
+                                            class="form-select @error('salary_basis_type') is-invalid @enderror"
                                             required
                                         >
-                                            <option value="monthly" @selected(old('pay_period_value', $employee->getPayPeriod()->value) === 'monthly')>Bulanan</option>
-                                            <option value="weekly" @selected(old('pay_period_value', $employee->getPayPeriod()->value) === 'weekly')>Mingguan</option>
-                                            <option value="daily" @selected(old('pay_period_value', $employee->getPayPeriod()->value) === 'daily')>Harian</option>
+                                            <option value="monthly" @selected(old('salary_basis_type', old('pay_period_value', $employee->getSalaryBasisType()->value)) === 'monthly')>Bulanan</option>
+                                            <option value="weekly" @selected(old('salary_basis_type', old('pay_period_value', $employee->getSalaryBasisType()->value)) === 'weekly')>Mingguan</option>
+                                            <option value="daily" @selected(old('salary_basis_type', old('pay_period_value', $employee->getSalaryBasisType()->value)) === 'daily')>Harian</option>
+                                            <option value="manual" @selected(old('salary_basis_type', old('pay_period_value', $employee->getSalaryBasisType()->value)) === 'manual')>Manual</option>
                                         </select>
-                                        @error('pay_period_value')
+                                        @error('salary_basis_type')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -114,17 +87,77 @@
 
                                 <div class="col-12 col-md-6">
                                     <div class="form-group mb-4">
-                                        <label for="status_value" class="form-label">Status</label>
+                                        <label for="employment_status" class="form-label">Status</label>
                                         <select
-                                            id="status_value"
-                                            name="status_value"
-                                            class="form-select @error('status_value') is-invalid @enderror"
+                                            id="employment_status"
+                                            name="employment_status"
+                                            class="form-select @error('employment_status') is-invalid @enderror"
                                             required
                                         >
-                                            <option value="active" @selected(old('status_value', $employee->getStatus()->value) === 'active')>Aktif</option>
-                                            <option value="inactive" @selected(old('status_value', $employee->getStatus()->value) === 'inactive')>Nonaktif</option>
+                                            <option value="active" @selected(old('employment_status', old('status_value', $employee->getEmploymentStatus()->value)) === 'active')>Aktif</option>
+                                            <option value="inactive" @selected(old('employment_status', old('status_value', $employee->getEmploymentStatus()->value)) === 'inactive')>Nonaktif</option>
                                         </select>
-                                        @error('status_value')
+                                        @error('employment_status')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group mb-4" data-money-input-group>
+                                        <label for="default_salary_amount_display" class="form-label">Default Gaji</label>
+
+                                        <input
+                                            type="hidden"
+                                            id="default_salary_amount"
+                                            name="default_salary_amount"
+                                            value="{{ old('default_salary_amount', old('base_salary_amount', $employee->getDefaultSalaryAmount()?->amount())) }}"
+                                            data-money-raw
+                                        >
+
+                                        <input
+                                            type="text"
+                                            id="default_salary_amount_display"
+                                            value="{{ old('default_salary_amount', old('base_salary_amount', $employee->getDefaultSalaryAmount()?->amount())) }}"
+                                            class="form-control @error('default_salary_amount') is-invalid @enderror"
+                                            placeholder="Opsional. Contoh: 5.000.000"
+                                            inputmode="numeric"
+                                            data-money-display
+                                        >
+
+                                        @error('default_salary_amount')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label for="started_at" class="form-label">Mulai Kerja</label>
+                                        <input
+                                            type="date"
+                                            id="started_at"
+                                            name="started_at"
+                                            value="{{ old('started_at', $employee->getStartedAt()?->format('Y-m-d')) }}"
+                                            class="form-control @error('started_at') is-invalid @enderror"
+                                        >
+                                        @error('started_at')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group mb-4">
+                                        <label for="ended_at" class="form-label">Berakhir</label>
+                                        <input
+                                            type="date"
+                                            id="ended_at"
+                                            name="ended_at"
+                                            value="{{ old('ended_at', $employee->getEndedAt()?->format('Y-m-d')) }}"
+                                            class="form-control @error('ended_at') is-invalid @enderror"
+                                        >
+                                        @error('ended_at')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -138,7 +171,7 @@
                                             name="change_reason"
                                             rows="3"
                                             class="form-control @error('change_reason') is-invalid @enderror"
-                                            placeholder="Wajib diisi. Contoh: cuti 2 minggu, koreksi nomor telepon, penyesuaian data."
+                                            placeholder="Wajib diisi"
                                             required
                                         >{{ old('change_reason') }}</textarea>
                                         @error('change_reason')
