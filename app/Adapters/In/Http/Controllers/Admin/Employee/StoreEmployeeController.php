@@ -20,10 +20,12 @@ final class StoreEmployeeController extends Controller
 
         try {
             $useCase->handle(
-                (string) $data['name'],
+                (string) $data['employee_name'],
                 isset($data['phone']) && $data['phone'] !== '' ? (string) $data['phone'] : null,
-                (int) $data['base_salary_amount'],
-                (string) $data['pay_period_value'],
+                isset($data['default_salary_amount']) ? (int) $data['default_salary_amount'] : null,
+                (string) $data['salary_basis_type'],
+                isset($data['started_at']) && $data['started_at'] !== '' ? (string) $data['started_at'] : null,
+                isset($data['ended_at']) && $data['ended_at'] !== '' ? (string) $data['ended_at'] : null,
             );
         } catch (Throwable $e) {
             $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Data karyawan gagal dibuat.';
