@@ -19,7 +19,7 @@
 
             <div class="row g-4">
                 <div class="col-12 col-xl-8 order-2 order-xl-1">
-                    <div class="card h-100">
+                    <div class="card">
                         <div class="card-header">
                             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                                 <div>
