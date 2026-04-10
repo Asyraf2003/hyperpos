@@ -60,6 +60,10 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSee('INV-SUP-001');
         $response->assertSee('PT Sumber Makmur');
         $response->assertSee('Rincian Nota');
+        $response->assertSee('Tambah Rincian');
+        $response->assertSee('add-procurement-line', false);
+        $response->assertSee('data-product-search', false);
+        $response->assertSee('admin-procurement-edit.js');
         $response->assertSee('Simpan Perubahan Nota');
     }
 
