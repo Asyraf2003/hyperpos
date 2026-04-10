@@ -22,12 +22,21 @@ final class ProductVolumeSeeder extends Seeder
     private function seedActiveClean(CreateProductHandler $handler, int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
-            $created = $handler->handle(...$this->buildCleanPayload($i));
+            $payload = $this->buildCleanPayload($i);
+
+            $created = $handler->handle(
+                kodeBarang: $payload['kodeBarang'],
+                namaBarang: $payload['namaBarang'],
+                merek: $payload['merek'],
+                ukuran: $payload['ukuran'],
+                hargaJual: $payload['hargaJual'],
+            );
 
             if ($created->isFailure()) {
                 Log::warning('ProductVolumeSeeder active clean gagal.', [
                     'message' => $created->message(),
                     'index' => $i,
+                    'kode_barang' => $payload['kodeBarang'],
                 ]);
             }
         }
@@ -39,12 +48,21 @@ final class ProductVolumeSeeder extends Seeder
         int $count,
     ): void {
         for ($i = 1; $i <= $count; $i++) {
-            $created = $createHandler->handle(...$this->buildEditedCreatePayload($i));
+            $createPayload = $this->buildEditedCreatePayload($i);
+
+            $created = $createHandler->handle(
+                kodeBarang: $createPayload['kodeBarang'],
+                namaBarang: $createPayload['namaBarang'],
+                merek: $createPayload['merek'],
+                ukuran: $createPayload['ukuran'],
+                hargaJual: $createPayload['hargaJual'],
+            );
 
             if ($created->isFailure()) {
                 Log::warning('ProductVolumeSeeder active edited create gagal.', [
                     'message' => $created->message(),
                     'index' => $i,
+                    'kode_barang' => $createPayload['kodeBarang'],
                 ]);
                 continue;
             }
@@ -59,9 +77,15 @@ final class ProductVolumeSeeder extends Seeder
                 continue;
             }
 
+            $updatePayload = $this->buildEditedUpdatePayload($i);
+
             $updated = $updateHandler->handle(
                 productId: $productId,
-                ...$this->buildEditedUpdatePayload($i),
+                kodeBarang: $updatePayload['kodeBarang'],
+                namaBarang: $updatePayload['namaBarang'],
+                merek: $updatePayload['merek'],
+                ukuran: $updatePayload['ukuran'],
+                hargaJual: $updatePayload['hargaJual'],
             );
 
             if ($updated->isFailure()) {
@@ -69,6 +93,7 @@ final class ProductVolumeSeeder extends Seeder
                     'message' => $updated->message(),
                     'product_id' => $productId,
                     'index' => $i,
+                    'kode_barang' => $updatePayload['kodeBarang'],
                 ]);
             }
         }
@@ -79,7 +104,7 @@ final class ProductVolumeSeeder extends Seeder
         return [
             'kodeBarang' => sprintf('PRD-V2-ACT-%03d', $index),
             'namaBarang' => $this->buildName($index, false),
-            'merek' => $this->brands()[$index % count($this->brands())],
+            'merek' => $this->brandAt($index),
             'ukuran' => $this->buildSize($index),
             'hargaJual' => 28000 + (($index * 13750) % 420000),
         ];
@@ -90,7 +115,7 @@ final class ProductVolumeSeeder extends Seeder
         return [
             'kodeBarang' => sprintf('PRD-V2-EDT-%03d', $index),
             'namaBarang' => $this->buildName($index + 270, true) . ' Draft',
-            'merek' => $this->brands()[($index + 2) % count($this->brands())],
+            'merek' => $this->brandAt($index + 2),
             'ukuran' => $this->buildSize($index + 270),
             'hargaJual' => 35000 + (($index * 11000) % 360000),
         ];
@@ -101,7 +126,7 @@ final class ProductVolumeSeeder extends Seeder
         return [
             'kodeBarang' => sprintf('PRD-V2-EDT-%03d', $index),
             'namaBarang' => $this->buildName($index + 270, true),
-            'merek' => $this->brands()[($index + 5) % count($this->brands())],
+            'merek' => $this->brandAt($index + 5),
             'ukuran' => $this->buildSize($index + 271),
             'hargaJual' => 42000 + (($index * 12500) % 390000),
         ];
@@ -129,8 +154,10 @@ final class ProductVolumeSeeder extends Seeder
         return $sizes[$index % count($sizes)];
     }
 
-    private function brands(): array
+    private function brandAt(int $index): string
     {
-        return ['Federal', 'Astra', 'Nissin', 'NGK', 'Stanley', 'Bando', 'Yamaha', 'YGP', 'DID', 'Mikuni', 'FIM', 'KYB', 'FDR', 'Showa', 'BRT', 'FCC'];
+        $brands = ['Federal', 'Astra', 'Nissin', 'NGK', 'Stanley', 'Bando', 'Yamaha', 'YGP', 'DID', 'Mikuni', 'FIM', 'KYB', 'FDR', 'Showa', 'BRT', 'FCC'];
+
+        return $brands[$index % count($brands)];
     }
 }
