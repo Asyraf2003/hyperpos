@@ -8,7 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 final class EmployeeTableQueryRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     protected function prepareForValidation(): void
     {
@@ -25,7 +28,7 @@ final class EmployeeTableQueryRequest extends FormRequest
             'q' => ['nullable', 'string'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
-            'sort_by' => ['nullable', 'in:name,base_salary,pay_period,status'],
+            'sort_by' => ['nullable', 'in:employee_name,default_salary_amount,salary_basis_type,employment_status'],
             'sort_dir' => ['nullable', 'in:asc,desc'],
         ];
     }
@@ -33,8 +36,13 @@ final class EmployeeTableQueryRequest extends FormRequest
     private function trimOrNull(string $key): ?string
     {
         $value = $this->input($key);
-        if (! is_string($value)) return null;
+
+        if (! is_string($value)) {
+            return null;
+        }
+
         $trimmed = trim($value);
+
         return $trimmed === '' ? null : $trimmed;
     }
 }

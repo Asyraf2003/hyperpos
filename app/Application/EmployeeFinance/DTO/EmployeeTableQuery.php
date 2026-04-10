@@ -21,21 +21,44 @@ final class EmployeeTableQuery
             self::nullableString($data['q'] ?? null),
             isset($data['page']) ? (int) $data['page'] : 1,
             isset($data['per_page']) ? (int) $data['per_page'] : 10,
-            isset($data['sort_by']) ? (string) $data['sort_by'] : 'name',
+            isset($data['sort_by']) ? (string) $data['sort_by'] : 'employee_name',
             isset($data['sort_dir']) ? (string) $data['sort_dir'] : 'asc',
         );
     }
 
-    public function q(): ?string { return $this->q; }
-    public function page(): int { return $this->page; }
-    public function perPage(): int { return $this->perPage; }
-    public function sortBy(): string { return $this->sortBy; }
-    public function sortDir(): string { return $this->sortDir; }
+    public function q(): ?string
+    {
+        return $this->q;
+    }
+
+    public function page(): int
+    {
+        return $this->page;
+    }
+
+    public function perPage(): int
+    {
+        return $this->perPage;
+    }
+
+    public function sortBy(): string
+    {
+        return $this->sortBy;
+    }
+
+    public function sortDir(): string
+    {
+        return $this->sortDir;
+    }
 
     private static function nullableString(mixed $value): ?string
     {
-        if (! is_string($value)) return null;
+        if (! is_string($value)) {
+            return null;
+        }
+
         $normalized = trim($value);
+
         return $normalized === '' ? null : $normalized;
     }
 }
