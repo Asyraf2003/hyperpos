@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\EmployeeFinance\UseCases;
 
+use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
 use App\Core\EmployeeFinance\Employee\Employee;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
 use App\Core\Shared\ValueObjects\Money;
@@ -19,6 +20,7 @@ final class RegisterEmployeeHandler
         private EmployeeWriterPort $employeeWriter,
         private UuidPort $uuidPort,
         private TransactionManagerPort $transactionManager,
+        private EmployeeChangeContext $changeContext,
     ) {
     }
 
@@ -34,6 +36,13 @@ final class RegisterEmployeeHandler
 
         try {
             $id = $this->uuidPort->generate();
+
+            $this->changeContext->set(
+                null,
+                null,
+                'admin_web',
+                null,
+            );
 
             $employee = Employee::register(
                 $id,
@@ -51,6 +60,7 @@ final class RegisterEmployeeHandler
 
             return $id;
         } catch (Throwable $e) {
+            $this->changeContext->clear();
             $this->transactionManager->rollBack();
             throw $e;
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\EmployeeFinance\UseCases;
 
+use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
 use App\Core\EmployeeFinance\Employee\Employee;
 use App\Core\EmployeeFinance\Employee\EmployeeStatus;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
@@ -24,6 +25,7 @@ final class UpdateEmployeeProfileHandler
         private EmployeeWriterPort $employeeWriter,
         private AuditLogPort $auditLog,
         private TransactionManagerPort $transactionManager,
+        private EmployeeChangeContext $changeContext,
     ) {
     }
 
@@ -53,6 +55,13 @@ final class UpdateEmployeeProfileHandler
             }
 
             $before = $this->snapshot($employee);
+
+            $this->changeContext->set(
+                $performedByActorId,
+                'admin',
+                'admin_web',
+                $changeReason,
+            );
 
             $employee->updateProfile(
                 $employeeName,
@@ -85,6 +94,7 @@ final class UpdateEmployeeProfileHandler
 
             $this->transactionManager->commit();
         } catch (Throwable $e) {
+            $this->changeContext->clear();
             $this->transactionManager->rollBack();
             throw $e;
         }
