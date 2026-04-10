@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
+use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
 use App\Application\Procurement\Services\SupplierInvoiceFactory;
 use App\Application\Procurement\Services\SupplierService;
 use App\Application\Shared\DTO\Result;
@@ -23,7 +24,7 @@ final class UpdateSupplierInvoiceHandler
         private readonly SupplierInvoiceWriterPort $writer,
         private readonly SupplierService $supplierService,
         private readonly SupplierInvoiceFactory $invoiceFactory,
-        private readonly GetProcurementInvoiceDetailHandler $details,
+        private readonly SupplierInvoiceEditabilityGuard $guard,
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierInvoiceChangeContext $changeContext,
     ) {
@@ -48,17 +49,9 @@ final class UpdateSupplierInvoiceHandler
             );
         }
 
-        $detail = $this->details->handle($supplierInvoiceId);
-        $payload = $detail->data();
-        $summary = is_array($payload) && is_array($payload['summary'] ?? null)
-            ? $payload['summary']
-            : [];
-
-        if ((string) ($summary['policy_state'] ?? 'locked') !== 'editable') {
-            return Result::failure(
-                'Nota supplier ini sudah terkunci. Gunakan correction / reversal.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_LOCKED']]
-            );
+        $guard = $this->guard->ensureEditable($supplierInvoiceId);
+        if ($guard->isFailure()) {
+            return $guard;
         }
 
         $started = false;
@@ -91,7 +84,6 @@ final class UpdateSupplierInvoiceHandler
             );
 
             $this->writer->update($updated);
-
             $this->transactions->commit();
 
             return Result::success(
