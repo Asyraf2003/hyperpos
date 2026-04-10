@@ -194,12 +194,6 @@
                                 </a>
                             </div>
                         </div>
-
-                        <div class="alert alert-light-secondary border mt-3 mb-0">
-                            <small class="text-muted d-block">
-                                Edit nota supplier belum ditampilkan dari index karena route dan use case edit pre-effect belum dikunci implementasinya.
-                            </small>
-                        </div>
                     </div>
                 </div>
             </div>
