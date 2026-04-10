@@ -39,55 +39,16 @@ final class ProcurementInvoiceTableQuery
         );
     }
 
-    public function q(): ?string
-    {
-        return $this->q;
-    }
-
-    public function nomorFaktur(): ?string
-    {
-        return $this->nomorFaktur;
-    }
-
-    public function namaPt(): ?string
-    {
-        return $this->namaPt;
-    }
-
-    public function paymentStatus(): string
-    {
-        return $this->paymentStatus;
-    }
-
-    public function page(): int
-    {
-        return $this->page;
-    }
-
-    public function perPage(): int
-    {
-        return $this->perPage;
-    }
-
-    public function sortBy(): string
-    {
-        return $this->sortBy;
-    }
-
-    public function sortDir(): string
-    {
-        return $this->sortDir;
-    }
-
-    public function shipmentDateFrom(): ?string
-    {
-        return $this->shipmentDateFrom;
-    }
-
-    public function shipmentDateTo(): ?string
-    {
-        return $this->shipmentDateTo;
-    }
+    public function q(): ?string { return $this->q; }
+    public function nomorFaktur(): ?string { return $this->nomorFaktur; }
+    public function namaPt(): ?string { return $this->namaPt; }
+    public function paymentStatus(): string { return $this->paymentStatus; }
+    public function page(): int { return $this->page; }
+    public function perPage(): int { return $this->perPage; }
+    public function sortBy(): string { return $this->sortBy; }
+    public function sortDir(): string { return $this->sortDir; }
+    public function shipmentDateFrom(): ?string { return $this->shipmentDateFrom; }
+    public function shipmentDateTo(): ?string { return $this->shipmentDateTo; }
 
     private static function nullableString(mixed $value): ?string
     {
