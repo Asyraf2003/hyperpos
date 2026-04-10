@@ -1,5 +1,3 @@
-tt37rt762gr67324rtgf4g74gyf/PATH: /mnt/data/handoff_employee_salary_debt_v1.md
-
 # Handoff V1 - Employee, Salary, Debt
 
 ## Status
