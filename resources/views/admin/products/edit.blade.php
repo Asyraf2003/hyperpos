@@ -18,7 +18,7 @@
                             </div>
 
                             <div class="d-flex flex-column flex-sm-row gap-2">
-                                <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-warning">
+                                <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-primary">
                                     Ubah Stok
                                 </a>
                             </div>

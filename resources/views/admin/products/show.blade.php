@@ -15,7 +15,7 @@
                 <a href="{{ $page['actions']['edit_identity_url'] }}" class="btn btn-primary">
                     Edit Identitas
                 </a>
-                <a href="{{ $page['actions']['stock_adjustment_url'] }}" class="btn btn-warning">
+                <a href="{{ $page['actions']['stock_adjustment_url'] }}" class="btn btn-primary">
                     Ubah Stok
                 </a>
             </div>

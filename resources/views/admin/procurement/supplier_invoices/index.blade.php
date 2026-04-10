@@ -266,9 +266,9 @@
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
 
-                                <small class="text-muted d-block mt-2" id="procurement-payment-amount-help">
+                                <p class="fs-5 text-muted d-block mt-2" id="procurement-payment-amount-help">
                                     Maksimal sebesar sisa tagihan nota.
-                                </small>
+                                </p>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">

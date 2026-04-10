@@ -120,7 +120,7 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-danger">
+                            <button type="submit" class="btn btn-primary">
                                 Catat Stok Penyesuaian
                             </button>
                         </form>
