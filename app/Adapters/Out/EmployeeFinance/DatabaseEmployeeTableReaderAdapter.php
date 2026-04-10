@@ -12,14 +12,24 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
 {
     public function search(EmployeeTableQuery $query): array
     {
-        $builder = DB::table('employees')->select(['id', 'name', 'phone', 'base_salary', 'pay_period', 'status']);
+        $builder = DB::table('employees')->select([
+            'id',
+            'employee_name',
+            'phone',
+            'salary_basis_type',
+            'default_salary_amount',
+            'employment_status',
+        ]);
 
         if ($query->q() !== null) {
             foreach (preg_split('/\s+/', $query->q()) ?: [] as $term) {
                 $builder->where(function ($where) use ($term): void {
                     $like = '%' . $term . '%';
-                    $where->where('name', 'like', $like)->orWhere('phone', 'like', $like)
-                        ->orWhere('pay_period', 'like', $like)->orWhere('status', 'like', $like);
+
+                    $where->where('employee_name', 'like', $like)
+                        ->orWhere('phone', 'like', $like)
+                        ->orWhere('salary_basis_type', 'like', $like)
+                        ->orWhere('employment_status', 'like', $like);
                 });
             }
         }
@@ -30,14 +40,16 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
         return [
             'rows' => collect($paginator->items())->map(fn (object $row): array => [
                 'id' => (string) $row->id,
-                'name' => (string) $row->name,
+                'employee_name' => (string) $row->employee_name,
                 'phone' => $row->phone !== null ? (string) $row->phone : null,
-                'base_salary_amount' => (int) $row->base_salary,
-                'base_salary_formatted' => number_format((int) $row->base_salary, 0, ',', '.'),
-                'pay_period_value' => (string) $row->pay_period,
-                'pay_period_label' => $this->payPeriodLabel((string) $row->pay_period),
-                'status_value' => (string) $row->status,
-                'status_label' => $this->statusLabel((string) $row->status),
+                'salary_basis_type' => (string) $row->salary_basis_type,
+                'salary_basis_label' => $this->salaryBasisLabel((string) $row->salary_basis_type),
+                'default_salary_amount' => $row->default_salary_amount !== null ? (int) $row->default_salary_amount : null,
+                'default_salary_amount_formatted' => $row->default_salary_amount !== null
+                    ? number_format((int) $row->default_salary_amount, 0, ',', '.')
+                    : null,
+                'employment_status' => (string) $row->employment_status,
+                'employment_status_label' => $this->employmentStatusLabel((string) $row->employment_status),
             ])->values()->all(),
             'meta' => [
                 'page' => $paginator->currentPage(),
@@ -51,13 +63,23 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
         ];
     }
 
-    private function payPeriodLabel(string $value): string
+    private function salaryBasisLabel(string $value): string
     {
-        return match ($value) { 'daily' => 'Harian', 'weekly' => 'Mingguan', 'monthly' => 'Bulanan', default => ucfirst($value) };
+        return match ($value) {
+            'daily' => 'Harian',
+            'weekly' => 'Mingguan',
+            'monthly' => 'Bulanan',
+            'manual' => 'Manual',
+            default => ucfirst($value),
+        };
     }
 
-    private function statusLabel(string $value): string
+    private function employmentStatusLabel(string $value): string
     {
-        return match ($value) { 'active' => 'Aktif', 'inactive' => 'Nonaktif', default => ucfirst($value) };
+        return match ($value) {
+            'active' => 'Aktif',
+            'inactive' => 'Nonaktif',
+            default => ucfirst($value),
+        };
     }
 }

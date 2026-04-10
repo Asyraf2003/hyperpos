@@ -8,19 +8,19 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeDetailPageQuery
 {
-    public function __construct(
-        private DatabaseEmployeeDebtSummaryByEmployeeQuery $debtSummaryQuery,
-        private DatabaseEmployeeDebtRecordListByEmployeeQuery $debtRecordListQuery,
-        private DatabaseEmployeeDebtPaymentListByEmployeeQuery $debtPaymentListQuery,
-        private DatabaseEmployeePayrollSummaryByEmployeeQuery $payrollSummaryQuery,
-        private DatabaseEmployeePayrollHistoryByEmployeeQuery $payrollHistoryQuery,
-    ) {
-    }
-
     public function findById(string $employeeId): ?array
     {
         $row = DB::table('employees')
-            ->select(['id', 'name', 'phone', 'base_salary', 'pay_period', 'status'])
+            ->select([
+                'id',
+                'employee_name',
+                'phone',
+                'salary_basis_type',
+                'default_salary_amount',
+                'employment_status',
+                'started_at',
+                'ended_at',
+            ])
             ->where('id', $employeeId)
             ->first();
 
@@ -28,45 +28,41 @@ final class DatabaseEmployeeDetailPageQuery
             return null;
         }
 
-        $baseSalary = (int) $row->base_salary;
-        $payPeriodValue = (string) $row->pay_period;
-        $statusValue = (string) $row->status;
+        $defaultSalaryAmount = $row->default_salary_amount !== null ? (int) $row->default_salary_amount : null;
+        $salaryBasisType = (string) $row->salary_basis_type;
+        $employmentStatus = (string) $row->employment_status;
 
         return [
             'summary' => [
                 'id' => (string) $row->id,
-                'name' => (string) $row->name,
+                'employee_name' => (string) $row->employee_name,
                 'phone' => $row->phone !== null ? (string) $row->phone : null,
-                'base_salary_amount' => $baseSalary,
-                'base_salary_formatted' => number_format($baseSalary, 0, ',', '.'),
-                'pay_period_value' => $payPeriodValue,
-                'pay_period_label' => $this->payPeriodLabel($payPeriodValue),
-                'status_value' => $statusValue,
-                'status_label' => $this->statusLabel($statusValue),
-            ],
-            'debt' => [
-                'summary' => $this->debtSummaryQuery->findByEmployeeId($employeeId),
-                'records' => $this->debtRecordListQuery->findByEmployeeId($employeeId),
-                'payments' => $this->debtPaymentListQuery->findByEmployeeId($employeeId),
-            ],
-            'payroll' => [
-                'summary' => $this->payrollSummaryQuery->findByEmployeeId($employeeId),
-                'records' => $this->payrollHistoryQuery->findByEmployeeId($employeeId),
+                'salary_basis_type' => $salaryBasisType,
+                'salary_basis_label' => $this->salaryBasisLabel($salaryBasisType),
+                'default_salary_amount' => $defaultSalaryAmount,
+                'default_salary_amount_formatted' => $defaultSalaryAmount !== null
+                    ? number_format($defaultSalaryAmount, 0, ',', '.')
+                    : null,
+                'employment_status' => $employmentStatus,
+                'employment_status_label' => $this->employmentStatusLabel($employmentStatus),
+                'started_at' => $row->started_at !== null ? (string) $row->started_at : null,
+                'ended_at' => $row->ended_at !== null ? (string) $row->ended_at : null,
             ],
         ];
     }
 
-    private function payPeriodLabel(string $value): string
+    private function salaryBasisLabel(string $value): string
     {
         return match ($value) {
             'daily' => 'Harian',
             'weekly' => 'Mingguan',
             'monthly' => 'Bulanan',
+            'manual' => 'Manual',
             default => ucfirst($value),
         };
     }
 
-    private function statusLabel(string $value): string
+    private function employmentStatusLabel(string $value): string
     {
         return match ($value) {
             'active' => 'Aktif',
