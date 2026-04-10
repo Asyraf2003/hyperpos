@@ -42,7 +42,11 @@
                                             <option value="">Pilih karyawan</option>
                                             @foreach ($employees as $employee)
                                                 <option value="{{ $employee['id'] }}" @selected(old('employee_id') === $employee['id'])>
-                                                    {{ $employee['name'] }} - {{ $employee['pay_period_label'] }} - Rp{{ $employee['base_salary_formatted'] }}
+                                                    {{ $employee['employee_name'] }}
+                                                    - {{ $employee['salary_basis_label'] }}
+                                                    @if ($employee['default_salary_amount_formatted'] !== null)
+                                                        - Rp{{ $employee['default_salary_amount_formatted'] }}
+                                                    @endif
                                                 </option>
                                             @endforeach
                                         </select>
