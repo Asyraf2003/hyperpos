@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Core\EmployeeFinance\Employee;
 
-use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use DateTimeImmutable;
-use InvalidArgumentException;
 
 class Employee
 {
+    use EmployeeValidation;
+    use EmployeeAccessors;
+
     public function __construct(
         private string $id,
         private string $employeeName,
@@ -54,7 +55,6 @@ class Employee
         ?DateTimeImmutable $endedAt = null,
     ): void {
         $this->validateEmployeeName($employeeName);
-
         $this->employeeName = $employeeName;
         $this->phone = self::normalizePhone($phone);
         $this->salaryBasisType = $salaryBasisType;
@@ -65,16 +65,7 @@ class Employee
     public function updateDefaultSalaryAmount(?Money $newAmount, ?string $reason = null): void
     {
         $this->validateDefaultSalaryAmount($newAmount);
-
-        if (
-            $this->defaultSalaryAmount !== null &&
-            $newAmount !== null &&
-            $this->defaultSalaryAmount->greaterThan($newAmount) &&
-            empty(trim((string) $reason))
-        ) {
-            throw new DomainException('Penurunan nominal default gaji wajib menyertakan alasan.');
-        }
-
+        $this->assertSalaryReductionHasReason($newAmount, $reason);
         $this->defaultSalaryAmount = $newAmount;
     }
 
@@ -91,94 +82,5 @@ class Employee
     public function deactivate(): void
     {
         $this->employmentStatus = EmployeeStatus::INACTIVE;
-    }
-
-    private function validateEmployeeName(string $employeeName): void
-    {
-        if (trim($employeeName) === '') {
-            throw new InvalidArgumentException('Nama karyawan tidak boleh kosong.');
-        }
-    }
-
-    private function validateDefaultSalaryAmount(?Money $defaultSalaryAmount): void
-    {
-        if ($defaultSalaryAmount === null) {
-            return;
-        }
-
-        if ($defaultSalaryAmount->isZero() || $defaultSalaryAmount->isNegative()) {
-            throw new InvalidArgumentException('Nominal default gaji harus lebih dari nol.');
-        }
-    }
-
-    private static function normalizePhone(?string $phone): ?string
-    {
-        if ($phone === null) {
-            return null;
-        }
-
-        $normalized = trim($phone);
-
-        return $normalized === '' ? null : $normalized;
-    }
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function getEmployeeName(): string
-    {
-        return $this->employeeName;
-    }
-
-    public function getName(): string
-    {
-        return $this->employeeName;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function getDefaultSalaryAmount(): ?Money
-    {
-        return $this->defaultSalaryAmount;
-    }
-
-    public function getBaseSalary(): Money
-    {
-        return $this->defaultSalaryAmount ?? Money::fromInt(0);
-    }
-
-    public function getSalaryBasisType(): PayPeriod
-    {
-        return $this->salaryBasisType;
-    }
-
-    public function getPayPeriod(): PayPeriod
-    {
-        return $this->salaryBasisType;
-    }
-
-    public function getEmploymentStatus(): EmployeeStatus
-    {
-        return $this->employmentStatus;
-    }
-
-    public function getStatus(): EmployeeStatus
-    {
-        return $this->employmentStatus;
-    }
-
-    public function getStartedAt(): ?DateTimeImmutable
-    {
-        return $this->startedAt;
-    }
-
-    public function getEndedAt(): ?DateTimeImmutable
-    {
-        return $this->endedAt;
     }
 }

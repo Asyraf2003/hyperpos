@@ -100,11 +100,13 @@ final class GetEmployeeDebtSummaryFeatureTest extends TestCase
     ): void {
         DB::table('employees')->insert([
             'id' => $id,
-            'name' => $name,
+            'employee_name' => $name,
             'phone' => $phone,
-            'base_salary' => $baseSalary,
-            'pay_period' => $payPeriod,
-            'status' => $status,
+            'salary_basis_type' => $payPeriod,
+            'default_salary_amount' => $baseSalary,
+            'employment_status' => $status,
+            'started_at' => null,
+            'ended_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

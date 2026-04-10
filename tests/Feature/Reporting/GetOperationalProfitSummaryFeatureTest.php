@@ -98,11 +98,13 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
     {
         DB::table('employees')->insert([
             'id' => $id,
-            'name' => $name,
+            'employee_name' => $name,
             'phone' => null,
-            'base_salary' => 3000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'salary_basis_type' => 'weekly',
+            'default_salary_amount' => 3000000,
+            'employment_status' => 'active',
+            'started_at' => null,
+            'ended_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

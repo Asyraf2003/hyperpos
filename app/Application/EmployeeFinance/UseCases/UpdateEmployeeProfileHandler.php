@@ -6,15 +6,14 @@ namespace App\Application\EmployeeFinance\UseCases;
 
 use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
 use App\Application\EmployeeFinance\Support\EmployeeProfileAuditSnapshotBuilder;
+use App\Application\EmployeeFinance\Support\EmployeeProfileValueCaster;
 use App\Core\EmployeeFinance\Employee\EmployeeStatus;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
 use App\Ports\Out\TransactionManagerPort;
-use DateTimeImmutable;
 use InvalidArgumentException;
 use Throwable;
 
@@ -27,6 +26,7 @@ final class UpdateEmployeeProfileHandler
         private TransactionManagerPort $transactionManager,
         private EmployeeChangeContext $changeContext,
         private EmployeeProfileAuditSnapshotBuilder $snapshotBuilder,
+        private EmployeeProfileValueCaster $valueCaster,
     ) {
     }
 
@@ -56,18 +56,20 @@ final class UpdateEmployeeProfileHandler
             }
 
             $before = $this->snapshotBuilder->build($employee);
-
             $this->changeContext->set($performedByActorId, 'admin', 'admin_web', $changeReason);
 
             $employee->updateProfile(
                 $employeeName,
                 $phone,
                 PayPeriod::from($salaryBasisType),
-                $this->parseOptionalDate($startedAt),
-                $this->parseOptionalDate($endedAt),
+                $this->valueCaster->parseOptionalDate($startedAt),
+                $this->valueCaster->parseOptionalDate($endedAt),
             );
 
-            $employee->updateDefaultSalaryAmount($this->toNullableMoney($defaultSalaryAmount), $changeReason);
+            $employee->updateDefaultSalaryAmount(
+                $this->valueCaster->toNullableMoney($defaultSalaryAmount),
+                $changeReason,
+            );
 
             if ($employmentStatus === EmployeeStatus::INACTIVE->value) {
                 $employee->deactivate();
@@ -91,23 +93,5 @@ final class UpdateEmployeeProfileHandler
             $this->transactionManager->rollBack();
             throw $e;
         }
-    }
-
-    private function toNullableMoney(?int $amount): ?Money
-    {
-        if ($amount === null || $amount <= 0) {
-            return null;
-        }
-
-        return Money::fromInt($amount);
-    }
-
-    private function parseOptionalDate(?string $value): ?DateTimeImmutable
-    {
-        if ($value === null || trim($value) === '') {
-            return null;
-        }
-
-        return new DateTimeImmutable($value);
     }
 }
