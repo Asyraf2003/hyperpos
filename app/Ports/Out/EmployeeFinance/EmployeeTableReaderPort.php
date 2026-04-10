@@ -11,12 +11,23 @@ interface EmployeeTableReaderPort
     /**
      * @return array{
      *   rows:list<array{
-     *     id:string,name:string,phone:?string,base_salary_amount:int,
-     *     base_salary_formatted:string,pay_period_value:string,pay_period_label:string,
-     *     status_value:string,status_label:string
+     *     id:string,
+     *     employee_name:string,
+     *     phone:?string,
+     *     salary_basis_type:string,
+     *     salary_basis_label:string,
+     *     default_salary_amount:?int,
+     *     default_salary_amount_formatted:?string,
+     *     employment_status:string,
+     *     employment_status_label:string
      *   }>,
      *   meta:array{
-     *     page:int,per_page:int,total:int,last_page:int,sort_by:string,sort_dir:string,
+     *     page:int,
+     *     per_page:int,
+     *     total:int,
+     *     last_page:int,
+     *     sort_by:string,
+     *     sort_dir:string,
      *     filters:array{q:?string}
      *   }
      * }
