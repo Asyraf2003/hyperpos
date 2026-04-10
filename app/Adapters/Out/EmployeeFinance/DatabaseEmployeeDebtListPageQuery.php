@@ -14,7 +14,10 @@ final class DatabaseEmployeeDebtListPageQuery
     {
         $builder = DB::table('employee_debts')
             ->join('employees', 'employees.id', '=', 'employee_debts.employee_id')
-            ->select(['employee_debts.employee_id', 'employees.name as employee_name'])
+            ->select([
+                'employee_debts.employee_id',
+                'employees.employee_name as employee_name',
+            ])
             ->selectRaw('COUNT(*) as total_debt_records')
             ->selectRaw('SUM(employee_debts.total_debt) as total_debt_amount')
             ->selectRaw('SUM(employee_debts.remaining_balance) as total_remaining_balance')
@@ -24,7 +27,7 @@ final class DatabaseEmployeeDebtListPageQuery
 
         if ($query->q() !== null) {
             foreach (preg_split('/\s+/', $query->q()) ?: [] as $term) {
-                $builder->where('employees.name', 'like', '%'.$term.'%');
+                $builder->where('employees.employee_name', 'like', '%'.$term.'%');
             }
         }
 
@@ -36,7 +39,7 @@ final class DatabaseEmployeeDebtListPageQuery
             default => 'latest_recorded_at',
         };
 
-        $paginator = $builder->groupBy('employee_debts.employee_id', 'employees.name')
+        $paginator = $builder->groupBy('employee_debts.employee_id', 'employees.employee_name')
             ->orderBy($column, $query->sortDir())
             ->orderBy('employee_name')
             ->paginate($query->perPage(), ['*'], 'page', $query->page());

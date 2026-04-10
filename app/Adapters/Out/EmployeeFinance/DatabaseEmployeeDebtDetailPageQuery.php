@@ -16,7 +16,7 @@ final class DatabaseEmployeeDebtDetailPageQuery
             ->select([
                 'employee_debts.id',
                 'employee_debts.employee_id',
-                'employees.name as employee_name',
+                'employees.employee_name as employee_name',
                 'employee_debts.total_debt',
                 'employee_debts.remaining_balance',
                 'employee_debts.status',
