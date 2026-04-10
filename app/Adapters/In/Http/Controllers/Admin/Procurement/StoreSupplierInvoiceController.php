@@ -36,7 +36,8 @@ final class StoreSupplierInvoiceController extends Controller
 
         return redirect()
             ->route('admin.procurement.supplier-invoices.index')
-            ->with('success', $result->message() ?? 'Nota supplier berhasil dibuat.');
+            ->with('success', $result->message() ?? 'Nota supplier berhasil dibuat.')
+            ->with('clear_procurement_create_draft', true);
     }
 
     /**

@@ -10,6 +10,7 @@
   if (!config || !form || !container || !addButton || !template) return;
 
   const DRAFT_KEY = "admin.procurement.create-supplier-invoice.draft.v1";
+  const clearDraftOnLoad = Boolean(config.clearDraftOnLoad);
 
   let nextIndex = Number.parseInt(container.dataset.nextIndex || "0", 10);
   let activeLineItem = null;
@@ -786,13 +787,21 @@
   updateTanggalTerimaState();
   updateDraftPanelState();
 
-  const initialDraft = readDraft();
-  if (initialDraft) {
-    restoreDraft();
-  } else {
+  if (clearDraftOnLoad) {
+    clearDraft();
     const workingLine = ensureTopWorkingLine();
     if (workingLine) {
       focusField(document.getElementById("nomor_faktur"));
+    }
+  } else {
+    const initialDraft = readDraft();
+    if (initialDraft) {
+      restoreDraft();
+    } else {
+      const workingLine = ensureTopWorkingLine();
+      if (workingLine) {
+        focusField(document.getElementById("nomor_faktur"));
+      }
     }
   }
 })();

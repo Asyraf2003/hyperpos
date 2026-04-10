@@ -464,7 +464,8 @@
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.procurementCreateConfig = {
-            lookupEndpoint: @json(route('admin.procurement.products.lookup'))
+            lookupEndpoint: @json(route('admin.procurement.products.lookup')),
+            clearDraftOnLoad: @json((bool) session('clear_procurement_create_draft'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-create.js') }}"></script>

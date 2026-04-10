@@ -284,6 +284,16 @@
 @endsection
 
 @push('scripts')
+    @if (session('clear_procurement_create_draft'))
+        <script>
+            try {
+                window.localStorage.removeItem('admin.procurement.create-supplier-invoice.draft.v1');
+            } catch (_error) {
+                // ignore localStorage failures
+            }
+        </script>
+    @endif
+
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.procurementInvoiceTableConfig = {
