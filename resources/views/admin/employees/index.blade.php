@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Data Karyawan')
-@section('heading', 'Data Karyawan')
+@section('title', 'Karyawan')
+@section('heading', 'Karyawan')
 
 @section('content')
     <section class="section">
@@ -9,20 +9,21 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Data Karyawan</h4>
-                        <p class="mb-0 text-muted">Tabel data karyawan interaktif untuk admin.</p>
+                        <h4 class="card-title mb-1">Master Karyawan</h4>
+                        <p class="mb-0 text-muted">Tabel karyawan interaktif untuk admin.</p>
                     </div>
+
                     <div class="d-flex flex-column flex-md-row gap-2">
                         <form id="employee-search-form" class="d-flex flex-column gap-1">
                             <input
                                 type="text"
                                 id="employee-search-input"
                                 class="form-control"
-                                placeholder="Cari nama, telepon, periode, atau status"
+                                placeholder="Cari nama, telepon, basis gaji, atau status"
                                 autocomplete="off"
                             >
                         </form>
-                        <a href="{{ route('admin.employees.create') }}" class="btn btn-primary">Tambah Data Karyawan</a>
+                        <a href="{{ route('admin.employees.create') }}" class="btn btn-primary">Tambah Karyawan</a>
                     </div>
                 </div>
             </div>
@@ -34,28 +35,28 @@
                             <tr class="text-nowrap">
                                 <th style="width: 64px;">No</th>
                                 <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="name">
-                                        Nama
-                                        <span class="ms-1 text-muted" data-sort-indicator="name">↕</span>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="employee_name">
+                                        Nama Karyawan
+                                        <span class="ms-1 text-muted" data-sort-indicator="employee_name">↕</span>
                                     </button>
                                 </th>
                                 <th>Telepon</th>
                                 <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="base_salary">
-                                        Gaji Pokok
-                                        <span class="ms-1 text-muted" data-sort-indicator="base_salary">↕</span>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="default_salary_amount">
+                                        Default Gaji
+                                        <span class="ms-1 text-muted" data-sort-indicator="default_salary_amount">↕</span>
                                     </button>
                                 </th>
                                 <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="pay_period">
-                                        Periode Gaji
-                                        <span class="ms-1 text-muted" data-sort-indicator="pay_period">↕</span>
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="salary_basis_type">
+                                        Basis Gaji
+                                        <span class="ms-1 text-muted" data-sort-indicator="salary_basis_type">↕</span>
                                     </button>
                                 </th>
                                 <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="status">
+                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="employment_status">
                                         Status
-                                        <span class="ms-1 text-muted" data-sort-indicator="status">↕</span>
+                                        <span class="ms-1 text-muted" data-sort-indicator="employment_status">↕</span>
                                     </button>
                                 </th>
                                 <th class="text-center">Aksi</th>
