@@ -43,7 +43,7 @@ final class DatabaseVersionedEmployeeWriterAdapter implements EmployeeWriterPort
         $eventName = 'employee_created';
         $auditEventId = $this->uuid->generate();
 
-        DB::table('employees')->insert($this->toEmployeeRecord($employee));
+        DB::table('employees')->insert($this->toCreateEmployeeRecord($employee, $occurredAt));
         DB::table('employee_versions')->insert(
             $this->toVersionRecord($employee->getId(), $revisionNo, $eventName, $occurredAt, $context, $snapshot)
         );
@@ -69,7 +69,7 @@ final class DatabaseVersionedEmployeeWriterAdapter implements EmployeeWriterPort
 
         DB::table('employees')
             ->where('id', $employee->getId())
-            ->update($this->toEmployeeRecord($employee));
+            ->update($this->toUpdateEmployeeRecord($employee, $occurredAt));
 
         DB::table('employee_versions')->insert(
             $this->toVersionRecord($employee->getId(), $revisionNo, $eventName, $occurredAt, $context, $afterSnapshot)
@@ -95,9 +95,9 @@ final class DatabaseVersionedEmployeeWriterAdapter implements EmployeeWriterPort
     }
 
     /**
-     * @return array<string, string|int|null>
+     * @return array<string, string|int|null|\DateTimeImmutable>
      */
-    private function toEmployeeRecord(Employee $employee): array
+    private function toCreateEmployeeRecord(Employee $employee, \DateTimeImmutable $occurredAt): array
     {
         return [
             'id' => $employee->getId(),
@@ -108,8 +108,25 @@ final class DatabaseVersionedEmployeeWriterAdapter implements EmployeeWriterPort
             'employment_status' => $employee->getEmploymentStatus()->value,
             'started_at' => $employee->getStartedAt()?->format('Y-m-d'),
             'ended_at' => $employee->getEndedAt()?->format('Y-m-d'),
-            'updated_at' => $occurredAt = $this->clock->now(),
             'created_at' => $occurredAt,
+            'updated_at' => $occurredAt,
+        ];
+    }
+
+    /**
+     * @return array<string, string|int|null|\DateTimeImmutable>
+     */
+    private function toUpdateEmployeeRecord(Employee $employee, \DateTimeImmutable $occurredAt): array
+    {
+        return [
+            'employee_name' => $employee->getEmployeeName(),
+            'phone' => $employee->getPhone(),
+            'salary_basis_type' => $employee->getSalaryBasisType()->value,
+            'default_salary_amount' => $employee->getDefaultSalaryAmount()?->amount(),
+            'employment_status' => $employee->getEmploymentStatus()->value,
+            'started_at' => $employee->getStartedAt()?->format('Y-m-d'),
+            'ended_at' => $employee->getEndedAt()?->format('Y-m-d'),
+            'updated_at' => $occurredAt,
         ];
     }
 
