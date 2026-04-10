@@ -176,6 +176,7 @@
 
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-master-form.js') }}"></script>
     <script>
         window.AdminMoneyInput?.bindBySelector(document);
     </script>
