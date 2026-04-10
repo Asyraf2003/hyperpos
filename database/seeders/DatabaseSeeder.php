@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SupplierSeeder::class,
             EmployeeFinanceSeeder::class,
             SupplierInvoiceScenarioSeeder::class,
+            SupplierInvoiceBaselineSeeder::class,
             ExpenseSeeder::class,
             FinancialCorrectionSeeder::class,
         ]);
