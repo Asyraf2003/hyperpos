@@ -6,80 +6,179 @@ namespace App\Core\EmployeeFinance\Employee;
 
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
+use DateTimeImmutable;
 use InvalidArgumentException;
 
 class Employee
 {
     public function __construct(
         private string $id,
-        private string $name,
+        private string $employeeName,
         private ?string $phone,
-        private Money $baseSalary,
-        private PayPeriod $payPeriod,
-        private EmployeeStatus $status
+        private ?Money $defaultSalaryAmount,
+        private PayPeriod $salaryBasisType,
+        private EmployeeStatus $employmentStatus,
+        private ?DateTimeImmutable $startedAt = null,
+        private ?DateTimeImmutable $endedAt = null,
     ) {
-        $this->validateName($name);
-        $this->validateBaseSalary($baseSalary);
+        $this->validateEmployeeName($employeeName);
+        $this->validateDefaultSalaryAmount($defaultSalaryAmount);
     }
 
     public static function register(
         string $id,
-        string $name,
+        string $employeeName,
         ?string $phone,
-        Money $baseSalary,
-        PayPeriod $payPeriod
+        ?Money $defaultSalaryAmount,
+        PayPeriod $salaryBasisType,
+        ?DateTimeImmutable $startedAt = null,
+        ?DateTimeImmutable $endedAt = null,
     ): self {
-        return new self($id, $name, $phone, $baseSalary, $payPeriod, EmployeeStatus::ACTIVE);
+        return new self(
+            $id,
+            $employeeName,
+            self::normalizePhone($phone),
+            $defaultSalaryAmount,
+            $salaryBasisType,
+            EmployeeStatus::ACTIVE,
+            $startedAt,
+            $endedAt,
+        );
     }
 
-    public function updateProfile(string $name, ?string $phone, PayPeriod $payPeriod): void
-    {
-        $this->validateName($name);
+    public function updateProfile(
+        string $employeeName,
+        ?string $phone,
+        PayPeriod $salaryBasisType,
+        ?DateTimeImmutable $startedAt = null,
+        ?DateTimeImmutable $endedAt = null,
+    ): void {
+        $this->validateEmployeeName($employeeName);
 
-        $this->name = $name;
-        $this->phone = $phone !== null && trim($phone) === '' ? null : $phone;
-        $this->payPeriod = $payPeriod;
+        $this->employeeName = $employeeName;
+        $this->phone = self::normalizePhone($phone);
+        $this->salaryBasisType = $salaryBasisType;
+        $this->startedAt = $startedAt;
+        $this->endedAt = $endedAt;
+    }
+
+    public function updateDefaultSalaryAmount(?Money $newAmount, ?string $reason = null): void
+    {
+        $this->validateDefaultSalaryAmount($newAmount);
+
+        if (
+            $this->defaultSalaryAmount !== null &&
+            $newAmount !== null &&
+            $this->defaultSalaryAmount->greaterThan($newAmount) &&
+            empty(trim((string) $reason))
+        ) {
+            throw new DomainException('Penurunan nominal default gaji wajib menyertakan alasan.');
+        }
+
+        $this->defaultSalaryAmount = $newAmount;
     }
 
     public function updateBaseSalary(Money $newSalary, ?string $reason = null): void
     {
-        $this->validateBaseSalary($newSalary);
-
-        if ($this->baseSalary->greaterThan($newSalary) && empty(trim((string) $reason))) {
-            throw new DomainException('Penurunan gaji pokok wajib menyertakan alasan.');
-        }
-
-        $this->baseSalary = $newSalary;
+        $this->updateDefaultSalaryAmount($newSalary, $reason);
     }
 
     public function activate(): void
     {
-        $this->status = EmployeeStatus::ACTIVE;
+        $this->employmentStatus = EmployeeStatus::ACTIVE;
     }
 
     public function deactivate(): void
     {
-        $this->status = EmployeeStatus::INACTIVE;
+        $this->employmentStatus = EmployeeStatus::INACTIVE;
     }
 
-    private function validateName(string $name): void
+    private function validateEmployeeName(string $employeeName): void
     {
-        if (empty(trim($name))) {
+        if (trim($employeeName) === '') {
             throw new InvalidArgumentException('Nama karyawan tidak boleh kosong.');
         }
     }
 
-    private function validateBaseSalary(Money $baseSalary): void
+    private function validateDefaultSalaryAmount(?Money $defaultSalaryAmount): void
     {
-        if ($baseSalary->isZero() || $baseSalary->isNegative()) {
-            throw new InvalidArgumentException('Gaji pokok harus lebih dari nol.');
+        if ($defaultSalaryAmount === null) {
+            return;
+        }
+
+        if ($defaultSalaryAmount->isZero() || $defaultSalaryAmount->isNegative()) {
+            throw new InvalidArgumentException('Nominal default gaji harus lebih dari nol.');
         }
     }
 
-    public function getId(): string { return $this->id; }
-    public function getName(): string { return $this->name; }
-    public function getPhone(): ?string { return $this->phone; }
-    public function getBaseSalary(): Money { return $this->baseSalary; }
-    public function getPayPeriod(): PayPeriod { return $this->payPeriod; }
-    public function getStatus(): EmployeeStatus { return $this->status; }
+    private static function normalizePhone(?string $phone): ?string
+    {
+        if ($phone === null) {
+            return null;
+        }
+
+        $normalized = trim($phone);
+
+        return $normalized === '' ? null : $normalized;
+    }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function getEmployeeName(): string
+    {
+        return $this->employeeName;
+    }
+
+    public function getName(): string
+    {
+        return $this->employeeName;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function getDefaultSalaryAmount(): ?Money
+    {
+        return $this->defaultSalaryAmount;
+    }
+
+    public function getBaseSalary(): Money
+    {
+        return $this->defaultSalaryAmount ?? Money::fromInt(0);
+    }
+
+    public function getSalaryBasisType(): PayPeriod
+    {
+        return $this->salaryBasisType;
+    }
+
+    public function getPayPeriod(): PayPeriod
+    {
+        return $this->salaryBasisType;
+    }
+
+    public function getEmploymentStatus(): EmployeeStatus
+    {
+        return $this->employmentStatus;
+    }
+
+    public function getStatus(): EmployeeStatus
+    {
+        return $this->employmentStatus;
+    }
+
+    public function getStartedAt(): ?DateTimeImmutable
+    {
+        return $this->startedAt;
+    }
+
+    public function getEndedAt(): ?DateTimeImmutable
+    {
+        return $this->endedAt;
+    }
 }
