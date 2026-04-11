@@ -79,24 +79,12 @@
             </div>
         </div>
 
-        @if ($errors->has('payroll_reversal'))
-            <div class="alert alert-danger">
-                {{ $errors->first('payroll_reversal') }}
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="card mb-4">
             <div class="card-body">
                 <div class="alert alert-light-warning mb-0">
                     <div class="fw-semibold mb-1">Kebijakan Koreksi Payroll</div>
                     <div class="small">
-                        Edit langsung payroll tidak tersedia. Koreksi dilakukan dengan reversal lalu catat ulang payroll yang benar.
+                        Edit langsung payroll tidak tersedia. Koreksi akan dipusatkan di halaman detail gaji karyawan ini.
                     </div>
                 </div>
             </div>
@@ -124,12 +112,11 @@
                                 <th>Mode Pencairan</th>
                                 <th>Catatan</th>
                                 <th>Status</th>
-                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="employee-payroll-history-body">
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
+                                <td colspan="6" class="text-center text-muted py-4">Sedang memuat data...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -141,52 +128,6 @@
                 </div>
             </div>
         </div>
-
-        <div
-            class="modal fade"
-            id="employee-payroll-reversal-modal"
-            tabindex="-1"
-            aria-labelledby="employee-payroll-reversal-modal-title"
-            aria-hidden="true"
-        >
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                    <form id="employee-payroll-reversal-form" method="POST" action="#">
-                        @csrf
-
-                        <div class="modal-header border-0 pb-0 px-4 pt-4">
-                            <div class="w-100">
-                                <h3 class="modal-title fw-bold mb-1" id="employee-payroll-reversal-modal-title">Reversal Gaji</h3>
-                                <p class="mb-0 text-muted fs-6" id="employee-payroll-reversal-modal-subtitle">
-                                    Isi alasan pembatalan pencairan gaji.
-                                </p>
-                            </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-                        </div>
-
-                        <div class="modal-body px-4 pb-3 pt-3">
-                            <div class="mb-3">
-                                <label for="employee-payroll-reversal-reason" class="form-label">Alasan</label>
-                                <textarea
-                                    name="reason"
-                                    id="employee-payroll-reversal-reason"
-                                    class="form-control"
-                                    rows="4"
-                                    required
-                                    placeholder="Tulis alasan pembatalan pencairan gaji"
-                                >{{ old('reason') }}</textarea>
-                                <div class="form-text">Alasan wajib diisi untuk kebutuhan audit koreksi payroll.</div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-danger">Simpan Reversal</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </section>
 @endsection
 
@@ -194,7 +135,6 @@
     <script>
         window.employeePayrollHistoryConfig = {
             endpoint: @json(route('admin.employees.payroll-table', ['employeeId' => $detail['summary']['id']])),
-            reverseStoreBaseUrl: @json(route('admin.payrolls.reverse.store', ['payrollId' => '__ID__'])),
             employeeDetailUrl: @json(route('admin.employees.show', ['employeeId' => $detail['summary']['id']]))
         };
     </script>
