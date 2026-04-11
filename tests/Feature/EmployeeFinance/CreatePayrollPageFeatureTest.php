@@ -46,11 +46,15 @@ final class CreatePayrollPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Form Pencairan Gaji');
-        $response->assertSee('Pilih Karyawan');
+        $response->assertSee('Cari Karyawan');
+        $response->assertSee('Ketik minimal 2 huruf');
+        $response->assertSee('Karyawan Terpilih');
         $response->assertSee('Nominal Pencairan');
         $response->assertSee('Tanggal Pencairan');
         $response->assertSee('Mode Pencairan');
         $response->assertSee('Simpan Pencairan Gaji');
+        $response->assertSee('admin-payroll-create.js');
+        $response->assertSee('autofocus', false);
     }
 
     public function test_admin_can_store_single_payroll_from_create_page(): void

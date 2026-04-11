@@ -12,7 +12,10 @@
                     <div class="card-header">
                         <div>
                             <h4 class="card-title mb-1">Form Pencairan Gaji</h4>
-                            <p class="mb-0 text-muted">Pencairan gaji manual dicatat satu per satu. Koreksi dilakukan lewat reversal lalu catat ulang.</p>
+                            <p class="mb-0 text-muted">
+                                Pencairan gaji manual dicatat satu per satu. Ketik minimal 2 huruf untuk mencari karyawan.
+                                Koreksi dilakukan lewat reversal lalu catat ulang.
+                            </p>
                         </div>
                     </div>
 
@@ -23,27 +26,47 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.payrolls.store') }}" method="post">
+                        <form id="payroll-create-form" action="{{ route('admin.payrolls.store') }}" method="post">
                             @csrf
 
+                            <input
+                                type="hidden"
+                                id="employee_id"
+                                name="employee_id"
+                                value="{{ old('employee_id') }}"
+                            >
+
                             <div class="form-group mb-4">
-                                <label for="employee_id" class="form-label">Pilih Karyawan</label>
-                                <select
-                                    id="employee_id"
-                                    name="employee_id"
-                                    class="form-select @error('employee_id') is-invalid @enderror"
-                                    required
+                                <label for="employee_search" class="form-label">Cari Karyawan</label>
+                                <input
+                                    type="text"
+                                    id="employee_search"
+                                    class="form-control @error('employee_id') is-invalid @enderror"
+                                    placeholder="Ketik minimal 2 huruf nama atau telepon"
+                                    autocomplete="off"
+                                    autofocus
                                 >
-                                    <option value="">-- Pilih karyawan --</option>
-                                    @foreach ($employees as $employee)
-                                        <option value="{{ $employee['id'] }}" @selected(old('employee_id') === $employee['id'])>
-                                            {{ $employee['employee_name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <small class="text-muted">
+                                    Tekan Enter untuk memilih hasil aktif lalu lanjut otomatis ke nominal.
+                                </small>
                                 @error('employee_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
+                            </div>
+
+                            <div
+                                id="payroll-employee-search-results"
+                                class="list-group mb-4 d-none"
+                                aria-live="polite"
+                            ></div>
+
+                            <div class="card bg-light-subtle border mb-4">
+                                <div class="card-body">
+                                    <h6 class="mb-2">Karyawan Terpilih</h6>
+                                    <div id="payroll-selected-employee" class="text-muted">
+                                        Belum ada karyawan dipilih.
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">
@@ -111,15 +134,19 @@
 
                             <div class="form-group mb-4">
                                 <label for="notes" class="form-label">Catatan</label>
-                                <textarea
+                                <input
+                                    type="text"
                                     id="notes"
                                     name="notes"
-                                    rows="3"
+                                    value="{{ old('notes') }}"
                                     class="form-control @error('notes') is-invalid @enderror"
                                     placeholder="Opsional"
-                                >{{ old('notes') }}</textarea>
+                                >
+                                <small class="text-muted">
+                                    Tekan Enter di field ini untuk langsung menyimpan pencairan.
+                                </small>
                                 @error('notes')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -142,6 +169,10 @@
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
+        window.payrollCreateConfig = {
+            employees: @json($employees),
+        };
         window.AdminMoneyInput?.bindBySelector(document);
     </script>
+    <script src="{{ asset('assets/static/js/pages/admin-payroll-create.js') }}"></script>
 @endpush
