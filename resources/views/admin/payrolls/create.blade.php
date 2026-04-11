@@ -20,11 +20,6 @@
                     </div>
 
                     <div class="card-body">
-                        @if ($errors->has('payroll'))
-                            <div class="alert alert-danger">
-                                {{ $errors->first('payroll') }}
-                            </div>
-                        @endif
 
                         <form id="payroll-create-form" action="{{ route('admin.payrolls.store') }}" method="post">
                             @csrf

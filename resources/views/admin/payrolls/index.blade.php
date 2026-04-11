@@ -22,18 +22,6 @@
             </div>
 
             <div class="card-body">
-                @if ($errors->has('payroll_reversal'))
-                    <div class="alert alert-danger">
-                        {{ $errors->first('payroll_reversal') }}
-                    </div>
-                @endif
-
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
                 <div class="table-responsive">
                     <table class="table table-lg" id="payroll-table">
                         <thead>

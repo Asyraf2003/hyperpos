@@ -21,11 +21,6 @@
                     </div>
 
                     <div class="card-body">
-                        @if ($errors->has('employee'))
-                            <div class="alert alert-danger">
-                                {{ $errors->first('employee') }}
-                            </div>
-                        @endif
 
                         <form action="{{ route('admin.employees.store') }}" method="post" id="employee-master-form" data-employee-master-form="1">
                             @csrf
