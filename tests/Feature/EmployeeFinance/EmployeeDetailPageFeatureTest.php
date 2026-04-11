@@ -39,18 +39,22 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Detail Karyawan');
         $response->assertSee('Ringkasan Karyawan');
+        $response->assertSee('Nama Karyawan');
+        $response->assertSee('Telepon');
+        $response->assertSee('Basis Gaji');
+        $response->assertSee('Default Gaji');
+        $response->assertSee('Status');
+        $response->assertSee('Mulai Kerja');
+        $response->assertSee('Berakhir');
         $response->assertSee('Budi Santoso');
         $response->assertSee('Mingguan');
         $response->assertSee('Aktif');
-        $response->assertSee('Ringkasan Hutang Karyawan');
-        $response->assertSee('Riwayat Hutang');
-        $response->assertSee('Riwayat Pembayaran Hutang');
-        $response->assertSee('Ringkasan Riwayat Gaji');
-        $response->assertSee('Riwayat Gaji');
+        $response->assertSee('Rp5.000.000');
         $response->assertSee('Edit Karyawan');
+        $response->assertSee('Lihat Hutang Karyawan');
     }
 
-    public function test_admin_can_see_employee_debt_summary_and_histories_on_detail_page(): void
+    public function test_admin_can_access_employee_detail_page_when_employee_has_debt_records(): void
     {
         $employeeId = $this->seedEmployee();
         $debtId = (string) Str::uuid();
@@ -80,18 +84,12 @@ final class EmployeeDetailPageFeatureTest extends TestCase
             ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
 
         $response->assertOk();
-        $response->assertSee('Total Record Hutang');
-        $response->assertSee('Rp1.000.000');
-        $response->assertSee('Rp250.000');
-        $response->assertSee('1 aktif');
-        $response->assertSee('0 lunas');
-        $response->assertSee('Pinjaman kebutuhan keluarga');
-        $response->assertSee('Belum Lunas');
-        $response->assertSee('Potong gaji minggu ini');
-        $response->assertSee('Buka Hutang');
+        $response->assertSee('Budi Santoso');
+        $response->assertSee('Lihat Hutang Karyawan');
+        $response->assertSee('Edit Karyawan');
     }
 
-    public function test_admin_can_see_employee_payroll_summary_on_detail_page_and_payroll_rows_from_json_table_endpoint(): void
+    public function test_admin_can_access_employee_detail_page_and_employee_payroll_table_endpoint(): void
     {
         $employeeId = $this->seedEmployee();
 
@@ -124,16 +122,9 @@ final class EmployeeDetailPageFeatureTest extends TestCase
             ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
 
         $response->assertOk();
-        $response->assertSee('Total Record Payroll');
-        $response->assertSee('2');
-        $response->assertSee('Rp3.000.000');
-        $response->assertSee('2026-03-27');
-        $response->assertSee('Riwayat Gaji');
-        $response->assertSee('employee-payroll-table-body', false);
-        $response->assertSee('employee-payroll-table-summary', false);
-        $response->assertSee('employee-payroll-table-pagination', false);
-        $response->assertSee('admin-employee-payroll-table.js');
-        $response->assertSee(json_encode(route('admin.employees.payroll-table', ['employeeId' => $employeeId])), false);
+        $response->assertSee('Budi Santoso');
+        $response->assertSee('Edit Karyawan');
+        $response->assertSee('Lihat Hutang Karyawan');
 
         $tableResponse = $this->actingAs($admin)->getJson(route('admin.employees.payroll-table', [
             'employeeId' => $employeeId,
@@ -167,11 +158,13 @@ final class EmployeeDetailPageFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Budi Santoso',
+            'employee_name' => 'Budi Santoso',
             'phone' => '081211111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'weekly',
+            'employment_status' => 'active',
+            'started_at' => null,
+            'ended_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

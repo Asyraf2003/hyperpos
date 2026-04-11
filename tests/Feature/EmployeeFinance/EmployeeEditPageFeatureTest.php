@@ -37,9 +37,14 @@ final class EmployeeEditPageFeatureTest extends TestCase
             ->get(route('admin.employees.edit', ['employeeId' => $employeeId]));
 
         $response->assertOk();
-        $response->assertSee('Edit Data Karyawan');
+        $response->assertSee('Edit Karyawan');
         $response->assertSee('Catatan Perubahan');
+        $response->assertSee('Nama Karyawan');
+        $response->assertSee('Basis Gaji');
+        $response->assertSee('Default Gaji');
+        $response->assertSee('Status');
         $response->assertSee('Nonaktif');
+        $response->assertSee('Simpan Perubahan');
     }
 
     public function test_admin_is_redirected_to_index_when_employee_is_missing(): void
@@ -54,16 +59,17 @@ final class EmployeeEditPageFeatureTest extends TestCase
     public function test_admin_can_update_employee_and_write_audit_log(): void
     {
         $employeeId = $this->seedEmployee();
-
         $admin = $this->createUserWithRole('admin-employee-update@example.test', 'admin');
 
         $response = $this->actingAs($admin)
             ->put(route('admin.employees.update', ['employeeId' => $employeeId]), [
-                'name' => 'Budi Santoso Update',
+                'employee_name' => 'Budi Santoso Update',
                 'phone' => '081299999999',
-                'base_salary_amount' => 5500000,
-                'pay_period_value' => 'monthly',
-                'status_value' => 'inactive',
+                'default_salary_amount' => 5500000,
+                'salary_basis_type' => 'monthly',
+                'employment_status' => 'inactive',
+                'started_at' => null,
+                'ended_at' => null,
                 'change_reason' => 'Cuti panjang sementara.',
             ]);
 
@@ -72,11 +78,11 @@ final class EmployeeEditPageFeatureTest extends TestCase
 
         $this->assertDatabaseHas('employees', [
             'id' => $employeeId,
-            'name' => 'Budi Santoso Update',
+            'employee_name' => 'Budi Santoso Update',
             'phone' => '081299999999',
-            'base_salary' => 5500000,
-            'pay_period' => 'monthly',
-            'status' => 'inactive',
+            'default_salary_amount' => 5500000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'inactive',
         ]);
 
         $this->assertDatabaseHas('audit_logs', [
@@ -110,11 +116,13 @@ final class EmployeeEditPageFeatureTest extends TestCase
         $response = $this->from(route('admin.employees.edit', ['employeeId' => $employeeId]))
             ->actingAs($this->createUserWithRole('admin-employee-update-blank@example.test', 'admin'))
             ->put(route('admin.employees.update', ['employeeId' => $employeeId]), [
-                'name' => 'Budi Santoso Update',
+                'employee_name' => 'Budi Santoso Update',
                 'phone' => '081299999999',
-                'base_salary_amount' => 5500000,
-                'pay_period_value' => 'monthly',
-                'status_value' => 'inactive',
+                'default_salary_amount' => 5500000,
+                'salary_basis_type' => 'monthly',
+                'employment_status' => 'inactive',
+                'started_at' => null,
+                'ended_at' => null,
                 'change_reason' => '   ',
             ]);
 
@@ -125,11 +133,11 @@ final class EmployeeEditPageFeatureTest extends TestCase
 
         $this->assertDatabaseHas('employees', [
             'id' => $employeeId,
-            'name' => 'Budi Santoso',
+            'employee_name' => 'Budi Santoso',
             'phone' => '081211111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'weekly',
+            'employment_status' => 'active',
         ]);
 
         $this->assertDatabaseMissing('audit_logs', [
@@ -143,11 +151,13 @@ final class EmployeeEditPageFeatureTest extends TestCase
 
         DB::table('employees')->insert([
             'id' => $employeeId,
-            'name' => 'Budi Santoso',
+            'employee_name' => 'Budi Santoso',
             'phone' => '081211111111',
-            'base_salary' => 5000000,
-            'pay_period' => 'weekly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'weekly',
+            'employment_status' => 'active',
+            'started_at' => null,
+            'ended_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
