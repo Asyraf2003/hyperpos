@@ -43,9 +43,13 @@ final class DatabaseEmployeeDetailPageQuery
             ->orderByDesc('revision_no')
             ->get();
 
+        $createdVersion = $this->createdVersion($employeeId);
+        $firstRecordedVersion = $this->firstRecordedVersion($employeeId);
+
         $currentIdentity = $this->identityFromCurrentRow($row);
-        $initialVersion = $versionRows->last();
-        $initialIdentity = $initialVersion !== null ? $this->identityFromVersionRow($initialVersion) : null;
+        $initialSource = $createdVersion ?? $firstRecordedVersion;
+        $initialIdentity = $initialSource !== null ? $this->identityFromVersionRow($initialSource) : null;
+        $initialIdentitySource = $this->initialIdentitySourceLabel($createdVersion, $firstRecordedVersion);
 
         return [
             'summary' => $currentIdentity,
@@ -54,13 +58,45 @@ final class DatabaseEmployeeDetailPageQuery
                 'subtitle' => 'Profil saat ini dan riwayat versi karyawan.',
                 'current_identity' => $currentIdentity,
                 'initial_identity' => $initialIdentity,
-                'initial_identity_meta' => $this->initialIdentityMeta($initialIdentity),
+                'initial_identity_source' => $initialIdentitySource,
+                'initial_identity_meta' => $this->initialIdentityMeta($initialIdentitySource),
                 'timeline' => $versionRows
                     ->map(fn (object $version): array => $this->timelineEntry($version))
                     ->values()
                     ->all(),
             ],
         ];
+    }
+
+    private function createdVersion(string $employeeId): ?object
+    {
+        return DB::table('employee_versions')
+            ->where('employee_id', $employeeId)
+            ->where('event_name', 'employee_created')
+            ->orderBy('revision_no')
+            ->first([
+                'revision_no',
+                'event_name',
+                'changed_by_actor_id',
+                'change_reason',
+                'changed_at',
+                'snapshot_json',
+            ]);
+    }
+
+    private function firstRecordedVersion(string $employeeId): ?object
+    {
+        return DB::table('employee_versions')
+            ->where('employee_id', $employeeId)
+            ->orderBy('revision_no')
+            ->first([
+                'revision_no',
+                'event_name',
+                'changed_by_actor_id',
+                'change_reason',
+                'changed_at',
+                'snapshot_json',
+            ]);
     }
 
     private function identityFromCurrentRow(object $row): array
@@ -118,25 +154,44 @@ final class DatabaseEmployeeDetailPageQuery
         ];
     }
 
-    private function initialIdentityMeta(?array $initialIdentity): array
+    private function initialIdentitySourceLabel(?object $createdVersion, ?object $firstRecordedVersion): string
     {
-        if ($initialIdentity === null) {
-            return [
+        if ($createdVersion !== null) {
+            return 'created_version';
+        }
+
+        if ($firstRecordedVersion !== null) {
+            return 'first_recorded_version';
+        }
+
+        return 'unavailable';
+    }
+
+    private function initialIdentityMeta(string $source): array
+    {
+        return match ($source) {
+            'created_version' => [
+                'title' => 'Identitas Awal',
+                'badge_tone' => 'info',
+                'badge_label' => 'Versi Awal',
+                'note' => null,
+                'show_values' => true,
+            ],
+            'first_recorded_version' => [
+                'title' => 'Identitas Awal',
+                'badge_tone' => 'warning',
+                'badge_label' => 'Versi Tercatat Pertama',
+                'note' => 'Data awal resmi tidak tersedia. Yang ditampilkan adalah versi pertama yang berhasil terekam di histori.',
+                'show_values' => true,
+            ],
+            default => [
                 'title' => 'Identitas Awal',
                 'badge_tone' => 'secondary',
                 'badge_label' => 'Tidak Tersedia',
                 'note' => 'Riwayat awal karyawan belum tersedia.',
                 'show_values' => false,
-            ];
-        }
-
-        return [
-            'title' => 'Identitas Awal',
-            'badge_tone' => 'info',
-            'badge_label' => 'Versi Awal',
-            'note' => null,
-            'show_values' => true,
-        ];
+            ],
+        };
     }
 
     private function timelineEntry(object $row): array
@@ -149,7 +204,7 @@ final class DatabaseEmployeeDetailPageQuery
         $employmentStatus = (string) ($snapshot['employment_status'] ?? 'active');
 
         return [
-            'revision_label' => 'Revisi '.$row->revision_no,
+            'revision_label' => 'Revisi '.(int) $row->revision_no,
             'event_name' => $this->eventLabel((string) $row->event_name),
             'changed_at' => Carbon::parse((string) $row->changed_at)->format('Y-m-d H:i'),
             'actor_label' => $row->changed_by_actor_id !== null ? 'Actor '.$row->changed_by_actor_id : null,
@@ -170,7 +225,7 @@ final class DatabaseEmployeeDetailPageQuery
 
     private function decodeSnapshot(string $json): array
     {
-        $decoded = json_decode($json, true);
+        $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         return is_array($decoded) ? $decoded : [];
     }

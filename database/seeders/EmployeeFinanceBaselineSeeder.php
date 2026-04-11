@@ -13,6 +13,8 @@ final class EmployeeFinanceBaselineSeeder extends Seeder
     public function run(): void
     {
         $anchor = CarbonImmutable::create(2026, 4, 12, 12, 0, 0, 'Asia/Jakarta');
+        $employeeCreatedAt = $anchor->subDays(30);
+        $employeeUpdatedAt = $anchor->subDays(1);
 
         $employees = [
             [
@@ -141,10 +143,12 @@ final class EmployeeFinanceBaselineSeeder extends Seeder
             DB::table('employees')->updateOrInsert(
                 ['id' => $employee['id']],
                 array_merge($employee, [
-                    'created_at' => $anchor->subDays(30),
-                    'updated_at' => $anchor->subDays(1),
+                    'created_at' => $employeeCreatedAt,
+                    'updated_at' => $employeeUpdatedAt,
                 ])
             );
+
+            $this->seedEmployeeCreatedVersion($employee, $employeeCreatedAt);
         }
 
         $payrolls = [
@@ -211,5 +215,77 @@ final class EmployeeFinanceBaselineSeeder extends Seeder
         }
 
         $this->command?->info('EmployeeFinanceBaselineSeeder selesai: 12 employee, 12 payroll, 6 debt, 7 payment.');
+    }
+
+    private function seedEmployeeCreatedVersion(array $employee, CarbonImmutable $occurredAt): void
+    {
+        $versionId = 'seed-employee-version-'.$employee['id'];
+        $auditEventId = 'seed-audit-event-'.$employee['id'];
+        $snapshotId = 'seed-audit-snapshot-after-'.$employee['id'];
+        $snapshot = $this->employeeSnapshot($employee);
+        $metadata = [
+            'seed_source' => self::class,
+            'seed_kind' => 'baseline_employee_created',
+        ];
+
+        DB::table('employee_versions')->updateOrInsert(
+            [
+                'employee_id' => $employee['id'],
+                'revision_no' => 1,
+            ],
+            [
+                'id' => $versionId,
+                'event_name' => 'employee_created',
+                'changed_by_actor_id' => null,
+                'change_reason' => 'Seed baseline employee finance.',
+                'changed_at' => $occurredAt,
+                'snapshot_json' => json_encode($snapshot, JSON_THROW_ON_ERROR),
+            ]
+        );
+
+        DB::table('audit_events')->updateOrInsert(
+            [
+                'id' => $auditEventId,
+            ],
+            [
+                'bounded_context' => 'employee_finance',
+                'aggregate_type' => 'employee',
+                'aggregate_id' => $employee['id'],
+                'event_name' => 'employee_created',
+                'actor_id' => null,
+                'actor_role' => null,
+                'reason' => 'Seed baseline employee finance.',
+                'source_channel' => 'seeder',
+                'request_id' => null,
+                'correlation_id' => 'employee-finance-baseline-seeder',
+                'occurred_at' => $occurredAt,
+                'metadata_json' => json_encode($metadata, JSON_THROW_ON_ERROR),
+            ]
+        );
+
+        DB::table('audit_event_snapshots')->updateOrInsert(
+            [
+                'audit_event_id' => $auditEventId,
+                'snapshot_kind' => 'after',
+            ],
+            [
+                'id' => $snapshotId,
+                'payload_json' => json_encode($snapshot, JSON_THROW_ON_ERROR),
+                'created_at' => $occurredAt,
+            ]
+        );
+    }
+
+    private function employeeSnapshot(array $employee): array
+    {
+        return [
+            'employee_name' => $employee['employee_name'],
+            'phone' => $employee['phone'],
+            'salary_basis_type' => $employee['salary_basis_type'],
+            'default_salary_amount' => $employee['default_salary_amount'],
+            'employment_status' => $employee['employment_status'],
+            'started_at' => $employee['started_at'],
+            'ended_at' => $employee['ended_at'],
+        ];
     }
 }

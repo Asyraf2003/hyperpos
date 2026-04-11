@@ -78,6 +78,7 @@ final class EmployeeDetailVersionTimelineFeatureTest extends TestCase
         $response->assertSee('Identitas Saat Ini');
         $response->assertSee('Identitas Awal');
         $response->assertSee('Riwayat Versi Karyawan');
+        $response->assertSee('Versi Awal');
         $response->assertSee('Asyraf Timeline Update');
         $response->assertSee('Asyraf Timeline');
         $response->assertSee('Revisi 2');
@@ -90,6 +91,52 @@ final class EmployeeDetailVersionTimelineFeatureTest extends TestCase
         $response->assertSee('Rp5.000.000');
         $response->assertSee('Nonaktif');
         $response->assertSee('Aktif');
+    }
+
+    public function test_employee_detail_marks_first_recorded_version_when_created_version_is_missing(): void
+    {
+        $employeeId = (string) Str::uuid();
+
+        DB::table('employees')->insert([
+            'id' => $employeeId,
+            'employee_name' => 'Seed Lama Update',
+            'phone' => '081288888888',
+            'default_salary_amount' => 4500000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
+            'started_at' => '2026-03-01',
+            'ended_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('employee_versions')->insert([
+            'id' => (string) Str::uuid(),
+            'employee_id' => $employeeId,
+            'revision_no' => 3,
+            'event_name' => 'employee_updated',
+            'changed_by_actor_id' => 'admin-seed',
+            'change_reason' => 'Sinkronisasi awal histori.',
+            'changed_at' => '2026-04-05 11:00:00',
+            'snapshot_json' => json_encode([
+                'employee_name' => 'Seed Lama Update',
+                'phone' => '081288888888',
+                'salary_basis_type' => 'monthly',
+                'default_salary_amount' => 4500000,
+                'employment_status' => 'active',
+                'started_at' => '2026-03-01',
+                'ended_at' => null,
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $response = $this->actingAs($this->createUserWithRole('admin-employee-seed@example.test', 'admin'))
+            ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
+
+        $response->assertOk();
+        $response->assertSee('Versi Tercatat Pertama');
+        $response->assertSee('Data awal resmi tidak tersedia. Yang ditampilkan adalah versi pertama yang berhasil terekam di histori.');
+        $response->assertSee('Seed Lama Update');
+        $response->assertSee('Sinkronisasi awal histori.');
     }
 
     private function createUserWithRole(string $email, string $role): User
