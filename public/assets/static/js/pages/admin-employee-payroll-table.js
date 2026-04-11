@@ -107,7 +107,7 @@
     body.innerHTML = rows.map((row, i) => {
       const number = ((page - 1) * perPage) + i + 1;
       const statusHtml = row.is_reversed
-        ? '<span class="text-danger">Direversal</span>'
+        ? `<span class="text-danger">Direversal${row.reversal_created_at ? ` · ${esc(row.reversal_created_at)}` : ''}</span>`
         : '<span class="text-success">Aktif</span>';
 
       const notesHtml = row.is_reversed && row.reversal_reason
@@ -117,9 +117,15 @@
       const actionHtml = row.is_reversed
         ? '<span class="text-muted">-</span>'
         : `
-          <form action="${reverseUrl(row.id)}" method="post" class="d-inline">
+          <form action="${reverseUrl(row.id)}" method="post" class="d-grid gap-2">
             <input type="hidden" name="_token" value="${esc(c.csrfToken)}">
-            <input type="hidden" name="reason" value="Koreksi payout payroll">
+            <textarea
+              name="reason"
+              rows="2"
+              class="form-control form-control-sm"
+              placeholder="Alasan reversal payroll"
+              required
+            ></textarea>
             <button type="submit" class="btn btn-sm btn-light-danger">Reverse</button>
           </form>
         `;

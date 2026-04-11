@@ -19,6 +19,12 @@
                     Edit Karyawan
                 </a>
                 <a
+                    href="{{ route('admin.payrolls.create') }}"
+                    class="btn btn-light-primary"
+                >
+                    Catat Gaji
+                </a>
+                <a
                     href="{{ route('admin.employee-debts.index') }}"
                     class="btn btn-light-secondary"
                 >
@@ -27,9 +33,9 @@
             </div>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4 mb-4">
             <div class="col-12 col-xl-5">
-                <div class="card">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Identitas Saat Ini</h5>
                     </div>
@@ -70,83 +76,94 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card mt-4">
+            <div class="col-12 col-xl-3">
+                <div class="card h-100">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <h5 class="card-title mb-0">Ringkasan Hutang Karyawan</h5>
+                            <h5 class="card-title mb-0">Ringkasan Hutang</h5>
                             <a
                                 href="{{ route('admin.employee-debts.index') }}"
                                 class="btn btn-sm btn-light-secondary"
                             >
-                                Buka Halaman Hutang
+                                Buka
                             </a>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Total Record Hutang</small>
-                                <div class="fw-semibold">{{ $debtSummary['total_debt_records'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Record</small>
+                            <div class="fw-semibold">{{ $debtSummary['total_debt_records'] }}</div>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Hutang Aktif</small>
-                                <div class="fw-semibold">{{ $debtSummary['active_debt_count'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Hutang Aktif</small>
+                            <div class="fw-semibold">{{ $debtSummary['active_debt_count'] }}</div>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Hutang Lunas</small>
-                                <div class="fw-semibold">{{ $debtSummary['paid_debt_count'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Hutang Lunas</small>
+                            <div class="fw-semibold">{{ $debtSummary['paid_debt_count'] }}</div>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Total Nominal Hutang</small>
-                                <div class="fw-semibold">Rp{{ $debtSummary['total_debt_amount_formatted'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Nominal</small>
+                            <div class="fw-semibold">Rp{{ $debtSummary['total_debt_amount_formatted'] }}</div>
+                        </div>
 
-                            <div class="col-12">
-                                <small class="text-muted d-block">Total Sisa Hutang</small>
-                                <div class="fw-semibold">Rp{{ $debtSummary['total_remaining_balance_formatted'] }}</div>
-                            </div>
+                        <div>
+                            <small class="text-muted d-block">Sisa Hutang</small>
+                            <div class="fw-semibold">Rp{{ $debtSummary['total_remaining_balance_formatted'] }}</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="card mt-4">
+            <div class="col-12 col-xl-4">
+                <div class="card h-100">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center gap-2">
-                            <h5 class="card-title mb-0">Ringkasan Gaji Karyawan</h5>
+                            <h5 class="card-title mb-0">Ringkasan Gaji</h5>
                             <a
-                                href="{{ route('admin.employees.show', ['employeeId' => $detail['summary']['id']]) }}"
-                                class="btn btn-sm btn-light-secondary"
+                                href="{{ route('admin.payrolls.create') }}"
+                                class="btn btn-sm btn-light-primary"
                             >
-                                Lihat Tabel Gaji
+                                Catat
                             </a>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Total Payroll Aktif</small>
-                                <div class="fw-semibold">{{ $payrollSummary['total_payroll_records'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Payroll Aktif</small>
+                            <div class="fw-semibold">{{ $payrollSummary['total_payroll_records'] }}</div>
+                        </div>
 
-                            <div class="col-12 col-md-6">
-                                <small class="text-muted d-block">Total Nominal Cair</small>
-                                <div class="fw-semibold">Rp{{ $payrollSummary['total_disbursed_amount_formatted'] }}</div>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Nominal Cair</small>
+                            <div class="fw-semibold">Rp{{ $payrollSummary['total_disbursed_amount_formatted'] }}</div>
+                        </div>
 
-                            <div class="col-12">
-                                <small class="text-muted d-block">Pencairan Terakhir</small>
-                                <div class="fw-semibold">{{ $payrollSummary['latest_disbursement_date'] ?? '-' }}</div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Pencairan Terakhir</small>
+                            <div class="fw-semibold">{{ $payrollSummary['latest_disbursement_date'] ?? '-' }}</div>
+                        </div>
+
+                        <div class="alert alert-light-warning mb-0">
+                            <div class="fw-semibold mb-1">Koreksi Payroll</div>
+                            <div class="small">
+                                Edit langsung tidak tersedia. Koreksi payroll dilakukan lewat reversal lalu catat ulang payroll yang benar.
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
-                    <div class="card mt-4">
+        <div class="row g-4 mb-4">
+            @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
+                <div class="col-12 col-xl-5">
+                    <div class="card h-100">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center gap-2">
                                 <h5 class="card-title mb-0">{{ $page['initial_identity_meta']['title'] }}</h5>
@@ -205,10 +222,77 @@
                             @endif
                         </div>
                     </div>
-                @endif
-            </div>
+                </div>
+            @endif
 
-            <div class="col-12 col-xl-7">
+            <div class="col-12 {{ ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null) ? 'col-xl-7' : 'col-xl-12' }}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                            <div>
+                                <h5 class="card-title mb-0">Riwayat Gaji Karyawan</h5>
+                                <p class="mb-0 text-muted small">Riwayat pencairan aktif dan reversal payroll karyawan.</p>
+                            </div>
+                            <a
+                                href="{{ route('admin.payrolls.create') }}"
+                                class="btn btn-sm btn-primary"
+                            >
+                                Catat Ulang Payroll
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if ($errors->has('payroll_reversal'))
+                            <div class="alert alert-danger">
+                                {{ $errors->first('payroll_reversal') }}
+                            </div>
+                        @endif
+
+                        @if (session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <div class="alert alert-light-warning">
+                            <div class="fw-semibold mb-1">Kebijakan Koreksi Payroll</div>
+                            <div class="small">
+                                Edit langsung payroll tidak tersedia. Bila salah input, lakukan reversal dengan alasan yang jelas lalu catat ulang payroll yang benar.
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr class="text-nowrap">
+                                        <th style="width: 64px;">No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nominal</th>
+                                        <th>Mode</th>
+                                        <th>Status</th>
+                                        <th>Catatan</th>
+                                        <th style="width: 240px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employee-payroll-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Sedang memuat riwayat gaji...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                            <small id="employee-payroll-table-summary" class="text-muted">Total: -</small>
+                            <div id="employee-payroll-table-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Riwayat Versi Karyawan</h5>
@@ -288,3 +372,14 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.employeePayrollTableConfig = {
+            endpoint: @json(route('admin.employees.payroll-table', ['employeeId' => $detail['summary']['id']])),
+            reverseBaseUrl: @json(route('admin.payrolls.reverse.store', ['payrollId' => '__ID__'])),
+            csrfToken: @json(csrf_token()),
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-payroll-table.js') }}"></script>
+@endpush
