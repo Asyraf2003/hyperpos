@@ -23,6 +23,7 @@ final class EmployeeDetailPageController extends Controller
 
         return view('admin.employees.show', [
             'detail' => $detail,
+            'page' => $detail['page'],
         ]);
     }
 }
