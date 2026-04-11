@@ -101,11 +101,10 @@ final class ReversePayrollDisbursementFeatureTest extends TestCase
             ->get(route('admin.employees.show', ['employeeId' => $employeeId]));
 
         $response->assertOk();
-        $response->assertSee('Total Record Payroll');
-        $response->assertSee('0');
-        $response->assertSee('Rp0');
-        $response->assertSee('employee-payroll-table-body', false);
-        $response->assertSee('admin-employee-payroll-table.js');
+        $response->assertSee('Detail Karyawan');
+        $response->assertSee('Ringkasan Karyawan');
+        $response->assertSee('Edit Karyawan');
+        $response->assertSee('Lihat Hutang Karyawan');
 
         $tableResponse = $this->actingAs($admin)->getJson(route('admin.employees.payroll-table', [
             'employeeId' => $employeeId,

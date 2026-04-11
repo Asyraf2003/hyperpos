@@ -35,7 +35,7 @@ final class UpdateEmployeeBaseSalaryFeatureTest extends TestCase
 
         $this->assertDatabaseHas('employees', [
             'id' => $employeeId,
-            'base_salary' => 5500000,
+            'default_salary_amount' => 5500000,
         ]);
     }
 
