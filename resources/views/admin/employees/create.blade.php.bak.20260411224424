@@ -21,6 +21,7 @@
                     </div>
 
                     <div class="card-body">
+
                         <form action="{{ route('admin.employees.store') }}" method="post" id="employee-master-form" data-employee-master-form="1">
                             @csrf
 

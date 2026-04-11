@@ -20,6 +20,7 @@
                     </div>
 
                     <div class="card-body">
+
                         <form id="payroll-create-form" action="{{ route('admin.payrolls.store') }}" method="post">
                             @csrf
 
