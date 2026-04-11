@@ -46,12 +46,20 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Status');
         $response->assertSee('Mulai Kerja');
         $response->assertSee('Berakhir');
+        $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('Total Record Hutang');
+        $response->assertSee('Hutang Aktif');
+        $response->assertSee('Hutang Lunas');
+        $response->assertSee('Total Nominal Hutang');
+        $response->assertSee('Total Sisa Hutang');
         $response->assertSee('Budi Santoso');
         $response->assertSee('Mingguan');
         $response->assertSee('Aktif');
         $response->assertSee('Rp5.000.000');
+        $response->assertSee('Rp0');
         $response->assertSee('Edit Karyawan');
         $response->assertSee('Lihat Hutang Karyawan');
+        $response->assertSee('Buka Halaman Hutang');
     }
 
     public function test_admin_can_access_employee_detail_page_when_employee_has_debt_records(): void
@@ -85,7 +93,12 @@ final class EmployeeDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Budi Santoso');
+        $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('1');
+        $response->assertSee('Rp1.000.000');
+        $response->assertSee('Rp250.000');
         $response->assertSee('Lihat Hutang Karyawan');
+        $response->assertSee('Buka Halaman Hutang');
         $response->assertSee('Edit Karyawan');
     }
 
@@ -123,6 +136,7 @@ final class EmployeeDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Budi Santoso');
+        $response->assertSee('Ringkasan Hutang Karyawan');
         $response->assertSee('Edit Karyawan');
         $response->assertSee('Lihat Hutang Karyawan');
 

@@ -71,6 +71,48 @@
                     </div>
                 </div>
 
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <h5 class="card-title mb-0">Ringkasan Hutang Karyawan</h5>
+                            <a
+                                href="{{ route('admin.employee-debts.index') }}"
+                                class="btn btn-sm btn-light-secondary"
+                            >
+                                Buka Halaman Hutang
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Total Record Hutang</small>
+                                <div class="fw-semibold">{{ $debtSummary['total_debt_records'] }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Hutang Aktif</small>
+                                <div class="fw-semibold">{{ $debtSummary['active_debt_count'] }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Hutang Lunas</small>
+                                <div class="fw-semibold">{{ $debtSummary['paid_debt_count'] }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Total Nominal Hutang</small>
+                                <div class="fw-semibold">Rp{{ $debtSummary['total_debt_amount_formatted'] }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                <small class="text-muted d-block">Total Sisa Hutang</small>
+                                <div class="fw-semibold">Rp{{ $debtSummary['total_remaining_balance_formatted'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
                     <div class="card mt-4">
                         <div class="card-header">
