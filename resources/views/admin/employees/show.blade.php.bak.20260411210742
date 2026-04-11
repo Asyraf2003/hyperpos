@@ -19,10 +19,10 @@
                     Edit Karyawan
                 </a>
                 <a
-                    href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
+                    href="{{ route('admin.payrolls.create') }}"
                     class="btn btn-light-primary"
                 >
-                    Detail Gaji
+                    Catat Gaji
                 </a>
                 <a
                     href="{{ route('admin.employee-debts.index') }}"
@@ -126,10 +126,10 @@
                         <div class="d-flex justify-content-between align-items-center gap-2">
                             <h5 class="card-title mb-0">Ringkasan Gaji</h5>
                             <a
-                                href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
+                                href="{{ route('admin.payrolls.create') }}"
                                 class="btn btn-sm btn-light-primary"
                             >
-                                Buka
+                                Catat
                             </a>
                         </div>
                     </div>
@@ -150,9 +150,9 @@
                         </div>
 
                         <div class="alert alert-light-warning mb-0">
-                            <div class="fw-semibold mb-1">Modul Gaji Dipisah</div>
+                            <div class="fw-semibold mb-1">Koreksi Payroll</div>
                             <div class="small">
-                                Riwayat gaji karyawan dibuka dari halaman detail gaji agar detail karyawan tetap fokus pada identitas dan ringkasan umum.
+                                Edit langsung tidak tersedia. Koreksi payroll dilakukan lewat reversal lalu catat ulang payroll yang benar.
                             </div>
                         </div>
                     </div>
@@ -228,36 +228,63 @@
             <div class="col-12 {{ ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null) ? 'col-xl-7' : 'col-xl-12' }}">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Navigasi Modul Karyawan</h5>
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                            <div>
+                                <h5 class="card-title mb-0">Riwayat Gaji Karyawan</h5>
+                                <p class="mb-0 text-muted small">Riwayat pencairan aktif dan reversal payroll karyawan.</p>
+                            </div>
+                            <a
+                                href="{{ route('admin.payrolls.create') }}"
+                                class="btn btn-sm btn-primary"
+                            >
+                                Catat Ulang Payroll
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6">
-                                <a
-                                    href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
-                                >
-                                    <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
-                                    <div class="small opacity-75">Buka riwayat gaji, status pencairan, dan koreksi payroll khusus karyawan ini.</div>
-                                </a>
+                        @if ($errors->has('payroll_reversal'))
+                            <div class="alert alert-danger">
+                                {{ $errors->first('payroll_reversal') }}
                             </div>
+                        @endif
 
-                            <div class="col-12 col-md-6">
-                                <a
-                                    href="{{ route('admin.employee-debts.index') }}"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
-                                >
-                                    <div class="fw-bold fs-5 mb-1">Hutang Karyawan</div>
-                                    <div class="small opacity-75">Buka modul hutang untuk melihat riwayat dan tindak lanjut hutang karyawan.</div>
-                                </a>
+                        @if (session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <div class="alert alert-light-warning">
+                            <div class="fw-semibold mb-1">Kebijakan Koreksi Payroll</div>
+                            <div class="small">
+                                Edit langsung payroll tidak tersedia. Bila salah input, lakukan reversal dengan alasan yang jelas lalu catat ulang payroll yang benar.
                             </div>
                         </div>
 
-                        <div class="alert alert-light-info mt-4 mb-0">
-                            <div class="fw-semibold mb-1">Halaman Detail Karyawan</div>
-                            <div class="small">
-                                Halaman ini difokuskan untuk identitas, ringkasan umum, dan riwayat versi karyawan. Riwayat gaji dipisah ke halaman detail gaji.
-                            </div>
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr class="text-nowrap">
+                                        <th style="width: 64px;">No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nominal</th>
+                                        <th>Mode</th>
+                                        <th>Status</th>
+                                        <th>Catatan</th>
+                                        <th style="width: 240px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employee-payroll-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Sedang memuat riwayat gaji...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
+                            <small id="employee-payroll-table-summary" class="text-muted">Total: -</small>
+                            <div id="employee-payroll-table-pagination"></div>
                         </div>
                     </div>
                 </div>
@@ -345,3 +372,14 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        window.employeePayrollTableConfig = {
+            endpoint: @json(route('admin.employees.payroll-table', ['employeeId' => $detail['summary']['id']])),
+            reverseBaseUrl: @json(route('admin.payrolls.reverse.store', ['payrollId' => '__ID__'])),
+            csrfToken: @json(csrf_token()),
+        };
+    </script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-payroll-table.js') }}"></script>
+@endpush
