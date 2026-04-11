@@ -57,7 +57,7 @@ final class UpdateEmployeeBaseSalaryFeatureTest extends TestCase
         $handler = app(UpdateEmployeeBaseSalaryHandler::class);
 
         $this->expectException(\App\Core\Shared\Exceptions\DomainException::class);
-        $this->expectExceptionMessage('Penurunan gaji pokok wajib menyertakan alasan.');
+        $this->expectExceptionMessage('Penurunan nominal default gaji wajib menyertakan alasan.');
 
         $handler->handle($employeeId, 4500000);
     }

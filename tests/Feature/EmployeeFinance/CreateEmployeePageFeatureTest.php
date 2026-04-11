@@ -33,32 +33,37 @@ final class CreateEmployeePageFeatureTest extends TestCase
             ->get(route('admin.employees.create'));
 
         $response->assertOk();
-        $response->assertSee('Tambah Data Karyawan');
-        $response->assertSee('Nama Karyawan');
-        $response->assertSee('Gaji Pokok');
-        $response->assertSee('Periode Gaji');
-        $response->assertSee('Simpan Data Karyawan');
+        $response->assertSee('name="employee_name"', false);
+        $response->assertSee('name="phone"', false);
+        $response->assertSee('name="default_salary_amount"', false);
+        $response->assertSee('name="salary_basis_type"', false);
+        $response->assertSee('name="started_at"', false);
+        $response->assertSee('name="ended_at"', false);
     }
 
     public function test_admin_can_store_employee_from_create_page(): void
     {
         $response = $this->actingAs($this->createUserWithRole('admin-employee-store@example.test', 'admin'))
             ->post(route('admin.employees.store'), [
-                'name' => 'Asyraf Mubarak',
+                'employee_name' => 'Asyraf Mubarak',
                 'phone' => '08111222333',
-                'base_salary_amount' => 5000000,
-                'pay_period_value' => 'monthly',
+                'default_salary_amount' => 5000000,
+                'salary_basis_type' => 'monthly',
+                'started_at' => '2026-04-01',
+                'ended_at' => null,
             ]);
 
         $response->assertRedirect(route('admin.employees.index'));
         $response->assertSessionHas('success', 'Data karyawan berhasil dibuat.');
 
         $this->assertDatabaseHas('employees', [
-            'name' => 'Asyraf Mubarak',
+            'employee_name' => 'Asyraf Mubarak',
             'phone' => '08111222333',
-            'base_salary' => 5000000,
-            'pay_period' => 'monthly',
-            'status' => 'active',
+            'default_salary_amount' => 5000000,
+            'salary_basis_type' => 'monthly',
+            'employment_status' => 'active',
+            'started_at' => '2026-04-01',
+            'ended_at' => null,
         ]);
     }
 

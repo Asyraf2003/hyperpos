@@ -18,7 +18,7 @@ final class DatabasePayrollTableReaderAdapter implements PayrollTableReaderPort
             ->select([
                 'payroll_disbursements.id',
                 'payroll_disbursements.employee_id',
-                'employees.name as employee_name',
+                'employees.employee_name as employee_name',
                 'payroll_disbursements.amount',
                 'payroll_disbursements.disbursement_date',
                 'payroll_disbursements.mode',
@@ -28,8 +28,8 @@ final class DatabasePayrollTableReaderAdapter implements PayrollTableReaderPort
         if ($query->q() !== null) {
             foreach (preg_split('/\s+/', $query->q()) ?: [] as $term) {
                 $builder->where(function ($where) use ($term): void {
-                    $like = '%' . $term . '%';
-                    $where->where('employees.name', 'like', $like)
+                    $like = '%'.$term.'%';
+                    $where->where('employees.employee_name', 'like', $like)
                         ->orWhere('payroll_disbursements.notes', 'like', $like)
                         ->orWhere('payroll_disbursements.mode', 'like', $like)
                         ->orWhere(DB::raw('DATE(payroll_disbursements.disbursement_date)'), 'like', $like);
@@ -38,7 +38,7 @@ final class DatabasePayrollTableReaderAdapter implements PayrollTableReaderPort
         }
 
         $column = match ($query->sortBy()) {
-            'employee_name' => 'employees.name',
+            'employee_name' => 'employees.employee_name',
             'amount' => 'payroll_disbursements.amount',
             'mode' => 'payroll_disbursements.mode',
             default => 'payroll_disbursements.disbursement_date',
