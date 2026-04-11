@@ -26,32 +26,41 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.employee-debts.store') }}" method="post">
+                        <form action="{{ route('admin.employee-debts.store') }}" method="post" id="employee-debt-create-form">
                             @csrf
 
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="form-group mb-4">
-                                        <label for="employee_id" class="form-label">Karyawan</label>
-                                        <select
+                                    <div class="form-group mb-4 position-relative">
+                                        <label for="employee_picker_query" class="form-label">Karyawan</label>
+
+                                        <input
+                                            type="hidden"
                                             id="employee_id"
                                             name="employee_id"
-                                            class="form-select @error('employee_id') is-invalid @enderror"
+                                            value="{{ old('employee_id') }}"
+                                        >
+
+                                        <input
+                                            type="text"
+                                            id="employee_picker_query"
+                                            name="employee_lookup"
+                                            value="{{ old('employee_lookup') }}"
+                                            class="form-control @error('employee_id') is-invalid @enderror"
+                                            placeholder="Ketik minimal 2 huruf nama karyawan"
+                                            autocomplete="off"
+                                            spellcheck="false"
                                             required
                                         >
-                                            <option value="">Pilih karyawan</option>
-                                            @foreach ($employees as $employee)
-                                                <option value="{{ $employee['id'] }}" @selected(old('employee_id') === $employee['id'])>
-                                                    {{ $employee['employee_name'] }}
-                                                    - {{ $employee['salary_basis_label'] }}
-                                                    @if ($employee['default_salary_amount_formatted'] !== null)
-                                                        - Rp{{ $employee['default_salary_amount_formatted'] }}
-                                                    @endif
-                                                </option>
-                                            @endforeach
-                                        </select>
+
+                                        <div id="employee-picker-results" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 1050;"></div>
+
+                                        <small id="employee-picker-summary" class="text-muted d-block mt-2">
+                                            Pilih karyawan dari hasil pencarian. Data yang dikirim tetap employee_id berbentuk UUID.
+                                        </small>
+
                                         @error('employee_id')
-                                            <div class="invalid-feedback">
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
@@ -125,7 +134,13 @@
 @endsection
 
 @push('scripts')
+    <script>
+        window.employeeDebtCreateConfig = {
+            employees: @json($employees),
+        };
+    </script>
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-debt-create.js') }}"></script>
     <script>
         window.AdminMoneyInput?.bindBySelector(document);
     </script>
