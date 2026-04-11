@@ -66,7 +66,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-md-6">
+                                <div class="col-12">
                                     <div class="form-group mb-4">
                                         <label for="salary_basis_type" class="form-label">Basis Gaji</label>
                                         <select
@@ -81,24 +81,6 @@
                                             <option value="manual" @selected(old('salary_basis_type', old('pay_period_value', $employee->getSalaryBasisType()->value)) === 'manual')>Manual</option>
                                         </select>
                                         @error('salary_basis_type')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-12 col-md-6">
-                                    <div class="form-group mb-4">
-                                        <label for="employment_status" class="form-label">Status</label>
-                                        <select
-                                            id="employment_status"
-                                            name="employment_status"
-                                            class="form-select @error('employment_status') is-invalid @enderror"
-                                            required
-                                        >
-                                            <option value="active" @selected(old('employment_status', old('status_value', $employee->getEmploymentStatus()->value)) === 'active')>Aktif</option>
-                                            <option value="inactive" @selected(old('employment_status', old('status_value', $employee->getEmploymentStatus()->value)) === 'inactive')>Nonaktif</option>
-                                        </select>
-                                        @error('employment_status')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -161,8 +143,11 @@
                                             class="form-control @error('ended_at') is-invalid @enderror"
                                         >
                                         @error('ended_at')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
+                                        <div class="form-text">
+                                            Jika tanggal akhir kerja diisi, status karyawan otomatis menjadi Nonaktif.
+                                        </div>
                                     </div>
                                 </div>
 

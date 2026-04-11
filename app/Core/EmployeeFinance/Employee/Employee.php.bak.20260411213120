@@ -41,7 +41,7 @@ class Employee
             self::normalizePhone($phone),
             $defaultSalaryAmount,
             $salaryBasisType,
-            self::resolveEmploymentStatus($endedAt),
+            EmployeeStatus::ACTIVE,
             $startedAt,
             $endedAt,
         );
@@ -60,7 +60,6 @@ class Employee
         $this->salaryBasisType = $salaryBasisType;
         $this->startedAt = $startedAt;
         $this->endedAt = $endedAt;
-        $this->employmentStatus = self::resolveEmploymentStatus($endedAt);
     }
 
     public function updateDefaultSalaryAmount(?Money $newAmount, ?string $reason = null): void
@@ -83,12 +82,5 @@ class Employee
     public function deactivate(): void
     {
         $this->employmentStatus = EmployeeStatus::INACTIVE;
-    }
-
-    private static function resolveEmploymentStatus(?DateTimeImmutable $endedAt): EmployeeStatus
-    {
-        return $endedAt === null
-            ? EmployeeStatus::ACTIVE
-            : EmployeeStatus::INACTIVE;
     }
 }

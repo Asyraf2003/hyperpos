@@ -43,7 +43,7 @@ final class RegisterEmployeeRequest extends FormRequest
             'default_salary_amount' => ['present', 'nullable', 'integer', 'min:1'],
             'base_salary_amount' => ['present', 'nullable', 'integer', 'min:1'],
             'started_at' => ['nullable', 'date'],
-            'ended_at' => ['nullable', 'date', 'after_or_equal:started_at'],
+            'ended_at' => ['nullable', 'date'],
         ];
     }
 

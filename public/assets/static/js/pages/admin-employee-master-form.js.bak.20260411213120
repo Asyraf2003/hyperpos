@@ -6,6 +6,7 @@
     "employee_name",
     "phone",
     "salary_basis_type",
+    "employment_status",
     "default_salary_amount_display",
     "started_at",
     "ended_at",

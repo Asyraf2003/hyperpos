@@ -153,13 +153,10 @@
                                             class="form-control @error('ended_at') is-invalid @enderror"
                                         >
                                         @error('ended_at')
-                                            <div class="invalid-feedback d-block">
+                                            <div class="invalid-feedback">
                                                 {{ $message }}
                                             </div>
                                         @enderror
-                                        <div class="form-text">
-                                            Jika tanggal akhir kerja diisi, status karyawan otomatis menjadi Nonaktif.
-                                        </div>
                                     </div>
                                 </div>
                             </div>

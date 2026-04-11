@@ -6,6 +6,7 @@ namespace App\Application\EmployeeFinance\UseCases;
 
 use App\Application\EmployeeFinance\Context\EmployeeChangeContext;
 use App\Application\EmployeeFinance\Support\EmployeeProfileValueCaster;
+use App\Core\EmployeeFinance\Employee\EmployeeStatus;
 use App\Core\EmployeeFinance\Employee\PayPeriod;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
@@ -31,6 +32,7 @@ final class UpdateEmployeeProfileHandler
         ?string $phone,
         ?int $defaultSalaryAmount,
         string $salaryBasisType,
+        string $employmentStatus,
         string $changeReason,
         string $performedByActorId,
         ?string $startedAt = null,
@@ -63,6 +65,12 @@ final class UpdateEmployeeProfileHandler
                 $this->valueCaster->toNullableMoney($defaultSalaryAmount),
                 $changeReason,
             );
+
+            if ($employmentStatus === EmployeeStatus::INACTIVE->value) {
+                $employee->deactivate();
+            } else {
+                $employee->activate();
+            }
 
             $this->employeeWriter->save($employee);
 
