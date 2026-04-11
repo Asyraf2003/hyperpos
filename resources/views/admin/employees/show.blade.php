@@ -113,6 +113,38 @@
                     </div>
                 </div>
 
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <h5 class="card-title mb-0">Ringkasan Gaji Karyawan</h5>
+                            <a
+                                href="{{ route('admin.employees.show', ['employeeId' => $detail['summary']['id']]) }}"
+                                class="btn btn-sm btn-light-secondary"
+                            >
+                                Lihat Tabel Gaji
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Total Payroll Aktif</small>
+                                <div class="fw-semibold">{{ $payrollSummary['total_payroll_records'] }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <small class="text-muted d-block">Total Nominal Cair</small>
+                                <div class="fw-semibold">Rp{{ $payrollSummary['total_disbursed_amount_formatted'] }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                <small class="text-muted d-block">Pencairan Terakhir</small>
+                                <div class="fw-semibold">{{ $payrollSummary['latest_disbursement_date'] ?? '-' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
                     <div class="card mt-4">
                         <div class="card-header">

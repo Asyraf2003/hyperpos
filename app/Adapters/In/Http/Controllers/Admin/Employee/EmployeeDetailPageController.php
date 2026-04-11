@@ -6,6 +6,7 @@ namespace App\Adapters\In\Http\Controllers\Admin\Employee;
 
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtSummaryByEmployeeQuery;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDetailPageQuery;
+use App\Adapters\Out\EmployeeFinance\DatabaseEmployeePayrollSummaryByEmployeeQuery;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -16,6 +17,7 @@ final class EmployeeDetailPageController extends Controller
         string $employeeId,
         DatabaseEmployeeDetailPageQuery $query,
         DatabaseEmployeeDebtSummaryByEmployeeQuery $debtSummaryQuery,
+        DatabaseEmployeePayrollSummaryByEmployeeQuery $payrollSummaryQuery,
     ): View|RedirectResponse {
         $detail = $query->findById($employeeId);
 
@@ -29,6 +31,7 @@ final class EmployeeDetailPageController extends Controller
             'detail' => $detail,
             'page' => $detail['page'],
             'debtSummary' => $debtSummaryQuery->findByEmployeeId($employeeId),
+            'payrollSummary' => $payrollSummaryQuery->findByEmployeeId($employeeId),
         ]);
     }
 }

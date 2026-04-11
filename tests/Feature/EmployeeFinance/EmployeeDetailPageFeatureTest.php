@@ -47,11 +47,15 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Mulai Kerja');
         $response->assertSee('Berakhir');
         $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('Ringkasan Gaji Karyawan');
         $response->assertSee('Total Record Hutang');
         $response->assertSee('Hutang Aktif');
         $response->assertSee('Hutang Lunas');
         $response->assertSee('Total Nominal Hutang');
         $response->assertSee('Total Sisa Hutang');
+        $response->assertSee('Total Payroll Aktif');
+        $response->assertSee('Total Nominal Cair');
+        $response->assertSee('Pencairan Terakhir');
         $response->assertSee('Budi Santoso');
         $response->assertSee('Mingguan');
         $response->assertSee('Aktif');
@@ -60,6 +64,7 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertSee('Edit Karyawan');
         $response->assertSee('Lihat Hutang Karyawan');
         $response->assertSee('Buka Halaman Hutang');
+        $response->assertSee('Lihat Tabel Gaji');
     }
 
     public function test_admin_can_access_employee_detail_page_when_employee_has_debt_records(): void
@@ -137,8 +142,13 @@ final class EmployeeDetailPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Budi Santoso');
         $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('Ringkasan Gaji Karyawan');
+        $response->assertSee('2');
+        $response->assertSee('Rp3.000.000');
+        $response->assertSee('2026-03-27');
         $response->assertSee('Edit Karyawan');
         $response->assertSee('Lihat Hutang Karyawan');
+        $response->assertSee('Lihat Tabel Gaji');
 
         $tableResponse = $this->actingAs($admin)->getJson(route('admin.employees.payroll-table', [
             'employeeId' => $employeeId,
