@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProductSeeder::class,
             SupplierSeeder::class,
-            EmployeeFinanceSeeder::class,
+            EmployeeFinanceBaselineSeeder::class,
             SupplierInvoiceScenarioSeeder::class,
             SupplierInvoiceBaselineSeeder::class,
             ExpenseSeeder::class,

@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@include('layouts.partials.date-picker-assets')
 
 @section('title', 'Edit Karyawan')
 @section('heading', 'Edit Karyawan')
@@ -136,6 +137,7 @@
                                         <label for="started_at" class="form-label">Mulai Kerja</label>
                                         <input
                                             type="date"
+                                            data-ui-date="single"
                                             id="started_at"
                                             name="started_at"
                                             value="{{ old('started_at', $employee->getStartedAt()?->format('Y-m-d')) }}"
@@ -152,6 +154,7 @@
                                         <label for="ended_at" class="form-label">Berakhir</label>
                                         <input
                                             type="date"
+                                            data-ui-date="single"
                                             id="ended_at"
                                             name="ended_at"
                                             value="{{ old('ended_at', $employee->getEndedAt()?->format('Y-m-d')) }}"
