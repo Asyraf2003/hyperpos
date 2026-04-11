@@ -53,6 +53,26 @@ final class PayrollTableDataQueryFeatureTest extends TestCase
         $r->assertJsonPath('data.rows.0.employee_name', 'Employee 11');
     }
 
+    public function test_reversed_payroll_is_still_visible_in_global_payroll_table_with_reversal_flags(): void
+    {
+        $payrollId = $this->seedPayrollRow('Budi Reversal', '2026-03-25 00:00:00', 5000000, 'monthly', 'Gaji dibatalkan');
+
+        DB::table('payroll_disbursement_reversals')->insert([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'payroll_disbursement_id' => $payrollId,
+            'reason' => 'Koreksi payout payroll',
+            'performed_by_actor_id' => '1',
+            'created_at' => '2026-03-25 12:00:00',
+            'updated_at' => '2026-03-25 12:00:00',
+        ]);
+
+        $r = $this->actingAs($this->admin())->get(route('admin.payrolls.table'));
+        $r->assertOk();
+        $r->assertJsonPath('data.rows.0.employee_name', 'Budi Reversal');
+        $r->assertJsonPath('data.rows.0.is_reversed', true);
+        $r->assertJsonPath('data.rows.0.reversal_reason', 'Koreksi payout payroll');
+    }
+
     private function admin(): User
     {
         $user = User::query()->create(['name' => 'Admin', 'email' => 'admin@example.test', 'password' => 'password123']);
@@ -60,7 +80,7 @@ final class PayrollTableDataQueryFeatureTest extends TestCase
         return $user;
     }
 
-    private function seedPayrollRow(string $name, string $date, int $amount, string $mode, string $notes): void
+    private function seedPayrollRow(string $name, string $date, int $amount, string $mode, string $notes): string
     {
         $employeeId = (string) \Illuminate\Support\Str::uuid();
         $payrollId = (string) \Illuminate\Support\Str::uuid();
@@ -82,5 +102,7 @@ final class PayrollTableDataQueryFeatureTest extends TestCase
             'mode' => $mode,
             'notes' => $notes,
         ]);
+
+        return $payrollId;
     }
 }

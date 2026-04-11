@@ -94,6 +94,66 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         ], $data['row']);
     }
 
+    public function test_get_operational_profit_summary_handler_excludes_reversed_payroll_from_profit_metrics(): void
+    {
+        $this->seedEmployee('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Montir Reversal');
+
+        DB::table('payroll_disbursements')->insert([
+            [
+                'id' => 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+                'employee_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                'amount' => 40000,
+                'disbursement_date' => '2026-03-16 12:00:00',
+                'mode' => 'weekly',
+                'notes' => 'Payroll direversal',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+                'employee_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                'amount' => 10000,
+                'disbursement_date' => '2026-03-16 13:00:00',
+                'mode' => 'weekly',
+                'notes' => 'Payroll aktif',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        DB::table('payroll_disbursement_reversals')->insert([
+            'id' => 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+            'payroll_disbursement_id' => 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            'reason' => 'Koreksi payout payroll',
+            'performed_by_actor_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $result = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-03-15', '2026-03-16');
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertTrue($result->isSuccess());
+
+        $data = $result->data();
+
+        $this->assertSame([
+            'from_date' => '2026-03-15',
+            'to_date' => '2026-03-16',
+            'gross_revenue_rupiah' => 0,
+            'refunded_rupiah' => 0,
+            'net_revenue_rupiah' => 0,
+            'external_purchase_cost_rupiah' => 0,
+            'store_stock_cogs_rupiah' => 0,
+            'direct_cost_rupiah' => 0,
+            'gross_profit_rupiah' => 0,
+            'operational_expense_rupiah' => 0,
+            'payroll_disbursement_rupiah' => 10000,
+            'net_operational_profit_rupiah' => -10000,
+        ], $data['row']);
+    }
+
     private function seedEmployee(string $id, string $name): void
     {
         DB::table('employees')->insert([

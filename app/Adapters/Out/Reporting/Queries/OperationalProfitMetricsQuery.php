@@ -57,16 +57,32 @@ final class OperationalProfitMetricsQuery
 
     private function storeStockCogs(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('inventory_movements')->where('movement_type', 'stock_out')->where('source_type', 'work_item_store_stock_line')->whereBetween('tanggal_mutasi', [$fromDate, $toDate])->sum(DB::raw('ABS(total_cost_rupiah)')) ?? 0);
+        return (int) (DB::table('inventory_movements')
+            ->where('movement_type', 'stock_out')
+            ->where('source_type', 'work_item_store_stock_line')
+            ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
+            ->sum(DB::raw('ABS(total_cost_rupiah)')) ?? 0);
     }
 
     private function operationalExpense(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('operational_expenses')->where('status', 'posted')->whereBetween('expense_date', [$fromDate, $toDate])->sum('amount_rupiah') ?? 0);
+        return (int) (DB::table('operational_expenses')
+            ->where('status', 'posted')
+            ->whereBetween('expense_date', [$fromDate, $toDate])
+            ->sum('amount_rupiah') ?? 0);
     }
 
     private function payrollDisbursement(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('payroll_disbursements')->whereBetween(DB::raw('DATE(disbursement_date)'), [$fromDate, $toDate])->sum('amount') ?? 0);
+        return (int) (DB::table('payroll_disbursements')
+            ->leftJoin(
+                'payroll_disbursement_reversals',
+                'payroll_disbursements.id',
+                '=',
+                'payroll_disbursement_reversals.payroll_disbursement_id'
+            )
+            ->whereNull('payroll_disbursement_reversals.id')
+            ->whereBetween(DB::raw('DATE(payroll_disbursements.disbursement_date)'), [$fromDate, $toDate])
+            ->sum('payroll_disbursements.amount') ?? 0);
     }
 }
