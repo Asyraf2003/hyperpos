@@ -28,8 +28,7 @@
     return Number.isNaN(n) || n < 1 ? f : n;
   };
 
-  const employeeDetailUrl = (id) => c.employeeDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
-  const employeePayrollDetailUrl = (id) => c.employeePayrollDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
+  const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
 
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
@@ -113,20 +112,19 @@
 
     body.innerHTML = rows.map((r, i) => {
       const notesHtml = r.is_reversed && r.reversal_reason
-        ? `${esc(r.notes ?? '-')}<div class="small text-danger mt-1">Dibatalkan: ${esc(r.reversal_reason)}</div>`
+        ? `${esc(r.notes ?? '-')}<div class="small text-danger mt-1">Reversal: ${esc(r.reversal_reason)}</div>`
         : esc(r.notes ?? '-');
 
       const statusHtml = r.is_reversed
-        ? `<div class="small text-danger mt-1">Dibatalkan${r.reversal_created_at ? ` • ${esc(r.reversal_created_at)}` : ''}</div>`
+        ? `<div class="small text-danger mt-1">Direversal${r.reversal_created_at ? ` • ${esc(r.reversal_created_at)}` : ''}</div>`
         : '<div class="small text-success mt-1">Aktif</div>';
 
       const actionHtml = r.employee_id
         ? `
           <div class="d-flex flex-column align-items-center gap-1">
-            <a href="${employeeDetailUrl(r.employee_id)}" class="btn btn-sm btn-light-primary">Detail Karyawan</a>
-            <a href="${employeePayrollDetailUrl(r.employee_id)}" class="btn btn-sm btn-light-secondary">Detail Gaji</a>
+            <a href="${detailUrl(r.employee_id)}" class="btn btn-sm btn-light-primary">Detail Karyawan</a>
             <span class="badge ${r.is_reversed ? 'bg-light-danger text-danger' : 'bg-light-success text-success'}">
-              ${r.is_reversed ? 'Dibatalkan' : 'Aktif'}
+              ${r.is_reversed ? 'Direversal' : 'Aktif'}
             </span>
           </div>
         `

@@ -105,7 +105,7 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Karyawan</div>
-                                    <div class="small opacity-75">Lihat identitas dan ringkasan umum karyawan.</div>
+                                    <div class="small opacity-75">Lihat ringkasan profil, status, dan histori terkait.</div>
                                 </a>
                             </div>
 
@@ -126,8 +126,8 @@
                                     id="employee-action-payroll-link"
                                     class="btn btn-outline-secondary w-100 text-start py-3 px-4"
                                 >
-                                    <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
-                                    <div class="small opacity-75">Buka riwayat gaji khusus karyawan ini.</div>
+                                    <div class="fw-bold fs-5 mb-1">Buka Modul Gaji</div>
+                                    <div class="small opacity-75">Masuk ke daftar gaji admin untuk tindak lanjut pencairan.</div>
                                 </a>
                             </div>
 
@@ -155,7 +155,7 @@
             endpoint: @json(route('admin.employees.table')),
             detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__'])),
             editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__'])),
-            payrollDetailBaseUrl: @json(route('admin.employees.payrolls.show', ['employeeId' => '__ID__'])),
+            payrollIndexUrl: @json(route('admin.payrolls.index')),
             employeeDebtCreateUrl: @json(route('admin.employee-debts.create'))
         };
     </script>

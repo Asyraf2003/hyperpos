@@ -14,7 +14,6 @@
 
   const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const editUrl = (id) => c.editBaseUrl.replace('__ID__', encodeURIComponent(id));
-  const payrollDetailUrl = (id) => c.payrollDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const debtCreateUrl = (id) => `${c.employeeDebtCreateUrl}?employee_id=${encodeURIComponent(id)}`;
 
   document.addEventListener('click', (event) => {
@@ -33,7 +32,7 @@
 
     detailLink.href = detailUrl(employeeId);
     editLink.href = editUrl(employeeId);
-    payrollLink.href = payrollDetailUrl(employeeId);
+    payrollLink.href = c.payrollIndexUrl;
     debtLink.href = debtCreateUrl(employeeId);
 
     modal.show();
