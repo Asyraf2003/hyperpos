@@ -6,6 +6,7 @@ namespace App\Adapters\In\Http\Controllers\Admin\EmployeeDebt;
 
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentListQuery;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtDetailPageQuery;
+use App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtPaymentReversalListQuery;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -16,6 +17,7 @@ final class EmployeeDebtDetailPageController extends Controller
         string $debtId,
         DatabaseEmployeeDebtDetailPageQuery $query,
         DatabaseEmployeeDebtAdjustmentListQuery $adjustmentQuery,
+        DatabaseEmployeeDebtPaymentReversalListQuery $paymentReversalQuery,
     ): View|RedirectResponse {
         $detail = $query->findById($debtId);
 
@@ -28,6 +30,7 @@ final class EmployeeDebtDetailPageController extends Controller
         return view('admin.employee_debts.show', [
             'detail' => $detail,
             'adjustments' => $adjustmentQuery->findByDebtId($debtId),
+            'paymentReversals' => $paymentReversalQuery->findByDebtId($debtId),
         ]);
     }
 }

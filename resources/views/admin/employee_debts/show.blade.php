@@ -141,10 +141,16 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Riwayat Pembayaran</h4>
-                        <p class="mb-0 text-muted">Riwayat cicilan/pelunasan hutang karyawan.</p>
+                        <p class="mb-0 text-muted">Riwayat cicilan/pelunasan hutang karyawan yang masih aktif.</p>
                     </div>
 
                     <div class="card-body">
+                        @if ($errors->has('debt_payment_reversal'))
+                            <div class="alert alert-danger">
+                                {{ $errors->first('debt_payment_reversal') }}
+                            </div>
+                        @endif
+
                         <div class="table-responsive">
                             <table class="table table-lg">
                                 <thead>
@@ -153,6 +159,7 @@
                                         <th>Tanggal Bayar</th>
                                         <th>Nominal</th>
                                         <th>Catatan</th>
+                                        <th style="width: 240px;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -162,10 +169,57 @@
                                             <td>{{ $payment['payment_date'] }}</td>
                                             <td>Rp{{ $payment['amount_formatted'] }}</td>
                                             <td>{{ $payment['notes'] ?? '-' }}</td>
+                                            <td>
+                                                <form action="{{ route('admin.employee-debt-payments.reverse.store', ['paymentId' => $payment['id']]) }}" method="post" class="d-grid gap-2">
+                                                    @csrf
+                                                    <textarea name="reason" rows="2" class="form-control @error('reason') is-invalid @enderror" placeholder="Alasan reversal" required>{{ old('reason') }}</textarea>
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">Batalkan Pembayaran</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted py-4">Belum ada pembayaran hutang.</td>
+                                            <td colspan="5" class="text-center text-muted py-4">Belum ada pembayaran hutang aktif.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Riwayat Reversal Pembayaran</h4>
+                        <p class="mb-0 text-muted">Daftar pembayaran hutang yang sudah dibatalkan secara resmi.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr class="text-nowrap">
+                                        <th style="width: 64px;">No</th>
+                                        <th>Waktu Reversal</th>
+                                        <th>Tanggal Bayar</th>
+                                        <th>Nominal</th>
+                                        <th>Catatan Pembayaran</th>
+                                        <th>Alasan Reversal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($paymentReversals as $reversal)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $reversal['recorded_at'] }}</td>
+                                            <td>{{ $reversal['payment_date'] }}</td>
+                                            <td>Rp{{ $reversal['amount_formatted'] }}</td>
+                                            <td>{{ $reversal['payment_notes'] ?? '-' }}</td>
+                                            <td>{{ $reversal['reason'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">Belum ada reversal pembayaran hutang.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
