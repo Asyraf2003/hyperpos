@@ -23,26 +23,20 @@
   const focusField = (field) => {
     if (!field) return;
 
-    window.requestAnimationFrame(() => {
-      field.focus();
+    field.focus();
 
-      if (typeof field.showPicker === "function" && field.type === "date") {
-        try {
-          field.showPicker();
-        } catch (_) {
-        }
-      }
-
-      if (!isTextarea(field) && typeof field.select === "function" && field.tagName !== "SELECT") {
-        field.select();
-      }
-    });
+    if (!isTextarea(field) && typeof field.select === "function") {
+      field.select();
+    }
   };
 
   const focusFirstField = () => {
     const first = fields[0];
     if (!first) return;
-    focusField(first);
+
+    window.requestAnimationFrame(() => {
+      focusField(first);
+    });
   };
 
   const moveToNextField = (currentField) => {

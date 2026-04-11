@@ -19,7 +19,7 @@
                     Detail Karyawan
                 </a>
                 <a
-                    href="{{ route('admin.payrolls.create') }}"
+                    href="{{ route('admin.payrolls.create', ['employee_id' => $detail['summary']['id']]) }}"
                     class="btn btn-primary"
                 >
                     Catat Gaji
@@ -79,29 +79,6 @@
             </div>
         </div>
 
-        @if ($errors->has('payroll_reversal'))
-            <div class="alert alert-danger">
-                {{ $errors->first('payroll_reversal') }}
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="alert alert-light-warning mb-0">
-                    <div class="fw-semibold mb-1">Kebijakan Koreksi Payroll</div>
-                    <div class="small">
-                        Edit langsung payroll tidak tersedia. Koreksi dilakukan dengan reversal lalu catat ulang payroll yang benar.
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="card">
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
@@ -109,7 +86,7 @@
                         <h5 class="card-title mb-1">Riwayat Gaji Karyawan</h5>
                         <p class="mb-0 text-muted">Daftar riwayat gaji khusus {{ $employee['employee_name'] }}.</p>
                     </div>
-                    <a href="{{ route('admin.payrolls.create') }}" class="btn btn-primary">Catat Gaji</a>
+                    <a href="{{ route('admin.payrolls.create', ['employee_id' => $detail['summary']['id']]) }}" class="btn btn-primary">Catat Gaji</a>
                 </div>
             </div>
 

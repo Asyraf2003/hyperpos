@@ -33,7 +33,7 @@
                                 type="hidden"
                                 id="employee_id"
                                 name="employee_id"
-                                value="{{ old('employee_id') }}"
+                                value="{{ old('employee_id', request('employee_id')) }}"
                             >
 
                             <div class="form-group mb-4">

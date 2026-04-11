@@ -49,25 +49,6 @@
     }
   };
 
-  const focusField = (field) => {
-    if (!field) return;
-
-    window.requestAnimationFrame(() => {
-      field.focus();
-
-      if (typeof field.showPicker === 'function' && field.type === 'date') {
-        try {
-          field.showPicker();
-        } catch (_) {
-        }
-      }
-
-      if (typeof field.select === 'function' && field.tagName !== 'SELECT') {
-        field.select();
-      }
-    });
-  };
-
   const employees = c.employees.map((employee) => ({
     id: String(employee.id ?? ''),
     employee_name: String(employee.employee_name ?? ''),
@@ -129,7 +110,8 @@
     employeeSearch.value = employee.employee_name;
     renderSelected(employee);
     hideResults();
-    focusField(amount);
+    amount.focus();
+    amount.select();
   };
 
   const runSearch = () => {
@@ -167,9 +149,11 @@
   const moveFocusOnEnter = (current, next) => {
     current.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
-      if (e.altKey || e.metaKey || e.shiftKey || e.ctrlKey) return;
       e.preventDefault();
-      focusField(next);
+      next.focus();
+      if (typeof next.select === 'function') {
+        next.select();
+      }
     });
   };
 
@@ -221,25 +205,18 @@
 
   notes.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
-    if (e.altKey || e.metaKey || e.shiftKey || e.ctrlKey) return;
     e.preventDefault();
-
-    if (typeof form.requestSubmit === 'function') {
-      form.requestSubmit();
-      return;
-    }
-
-    form.submit();
+    form.requestSubmit();
   });
 
   const oldEmployee = employees.find((employee) => employee.id === employeeId.value);
   if (oldEmployee) {
     employeeSearch.value = oldEmployee.employee_name;
     renderSelected(oldEmployee);
-    focusField(amount);
-    return;
+  } else {
+    renderSelected(null);
   }
 
-  renderSelected(null);
-  focusField(employeeSearch);
+  employeeSearch.focus();
+  employeeSearch.select();
 })();
