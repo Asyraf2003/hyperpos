@@ -26,13 +26,13 @@ final class StorePayrollReversalController extends Controller
                 (string) $request->user()->getAuthIdentifier(),
             );
         } catch (Throwable $e) {
-            $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Pembatalan pencairan gaji gagal dicatat.';
+            $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Reversal pencairan gaji gagal dicatat.';
 
             return back()
                 ->withErrors(['payroll_reversal' => $message])
                 ->withInput();
         }
 
-        return back()->with('success', 'Pencairan gaji berhasil dibatalkan.');
+        return back()->with('success', 'Reversal pencairan gaji berhasil dicatat.');
     }
 }

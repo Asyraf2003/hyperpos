@@ -22,6 +22,18 @@
             </div>
 
             <div class="card-body">
+                @if ($errors->has('payroll_reversal'))
+                    <div class="alert alert-danger">
+                        {{ $errors->first('payroll_reversal') }}
+                    </div>
+                @endif
+
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <div class="table-responsive">
                     <table class="table table-lg" id="payroll-table">
                         <thead>
@@ -35,12 +47,63 @@
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="payroll-table-body"><tr><td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td></tr></tbody>
+                        <tbody id="payroll-table-body">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
+
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                     <small id="payroll-table-summary" class="text-muted">Total: -</small>
                     <div id="payroll-table-pagination"></div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="modal fade"
+            id="payroll-reversal-modal"
+            tabindex="-1"
+            aria-labelledby="payroll-reversal-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <form id="payroll-reversal-form" method="POST" action="#">
+                        @csrf
+
+                        <div class="modal-header border-0 pb-0 px-4 pt-4">
+                            <div class="w-100">
+                                <h3 class="modal-title fw-bold mb-1" id="payroll-reversal-modal-title">Reversal Gaji</h3>
+                                <p class="mb-0 text-muted fs-6" id="payroll-reversal-modal-subtitle">
+                                    Isi alasan pembatalan pencairan gaji.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                        </div>
+
+                        <div class="modal-body px-4 pb-3 pt-3">
+                            <div class="mb-3">
+                                <label for="payroll-reversal-reason" class="form-label">Alasan</label>
+                                <textarea
+                                    name="reason"
+                                    id="payroll-reversal-reason"
+                                    class="form-control"
+                                    rows="4"
+                                    required
+                                    placeholder="Tulis alasan pembatalan pencairan gaji"
+                                >{{ old('reason') }}</textarea>
+                                <div class="form-text">Alasan wajib diisi untuk kebutuhan audit koreksi payroll.</div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                            <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-danger">Simpan Reversal</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -52,7 +115,8 @@
         window.payrollTableConfig = {
             endpoint: @json(route('admin.payrolls.table')),
             employeeDetailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__'])),
-            employeePayrollDetailBaseUrl: @json(route('admin.employees.payrolls.show', ['employeeId' => '__ID__']))
+            employeePayrollDetailBaseUrl: @json(route('admin.employees.payrolls.show', ['employeeId' => '__ID__'])),
+            reverseStoreBaseUrl: @json(route('admin.payrolls.reverse.store', ['payrollId' => '__ID__']))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-payrolls-table.js') }}"></script>

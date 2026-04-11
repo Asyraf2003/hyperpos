@@ -8,18 +8,8 @@
   const body = $('payroll-table-body');
   const sum = $('payroll-table-summary');
   const pag = $('payroll-table-pagination');
-
-  const reversalModalEl = $('payroll-reversal-modal');
-  const reversalForm = $('payroll-reversal-form');
-  const reversalReason = $('payroll-reversal-reason');
-  const reversalSubtitle = $('payroll-reversal-modal-subtitle');
-  const reversalModal = reversalModalEl && window.bootstrap?.Modal
-    ? new window.bootstrap.Modal(reversalModalEl)
-    : null;
-
   const sortKeys = new Set(['disbursement_date', 'employee_name', 'amount', 'mode']);
   const sortDirs = new Set(['asc', 'desc']);
-
   let timer = null;
   let req = 0;
 
@@ -40,7 +30,6 @@
 
   const employeeDetailUrl = (id) => c.employeeDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const employeePayrollDetailUrl = (id) => c.employeePayrollDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
-  const reverseStoreUrl = (id) => c.reverseStoreBaseUrl.replace('__ID__', encodeURIComponent(id));
 
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
@@ -131,27 +120,11 @@
         ? `<div class="small text-danger mt-1">Dibatalkan${r.reversal_created_at ? ` • ${esc(r.reversal_created_at)}` : ''}</div>`
         : '<div class="small text-success mt-1">Aktif</div>';
 
-      const reversalButtonHtml = r.is_reversed
-        ? ''
-        : `
-          <button
-            type="button"
-            class="btn btn-sm btn-light-danger js-open-payroll-reversal"
-            data-payroll-id="${esc(r.id)}"
-            data-employee-name="${esc(r.employee_name)}"
-            data-disbursement-date="${esc(r.disbursement_date)}"
-            data-amount-formatted="${esc(r.amount_formatted)}"
-          >
-            Reversal
-          </button>
-        `;
-
       const actionHtml = r.employee_id
         ? `
           <div class="d-flex flex-column align-items-center gap-1">
             <a href="${employeeDetailUrl(r.employee_id)}" class="btn btn-sm btn-light-primary">Detail Karyawan</a>
             <a href="${employeePayrollDetailUrl(r.employee_id)}" class="btn btn-sm btn-light-secondary">Detail Gaji</a>
-            ${reversalButtonHtml}
             <span class="badge ${r.is_reversed ? 'bg-light-danger text-danger' : 'bg-light-success text-success'}">
               ${r.is_reversed ? 'Dibatalkan' : 'Aktif'}
             </span>
@@ -193,11 +166,7 @@
     renderSummary(json.data.meta || {});
     renderPager(json.data.meta || {});
     renderSort();
-
-    if (q) {
-      q.value = s.q;
-    }
-
+    q.value = s.q;
     updateUrl(replace);
   };
 
@@ -251,44 +220,6 @@
     if (!b) return;
     s.page = Number(b.dataset.page);
     load();
-  });
-
-  document.addEventListener('click', (e) => {
-    const button = e.target.closest('.js-open-payroll-reversal');
-    if (!button || !reversalModal || !reversalForm) return;
-
-    const payrollId = trim(button.dataset.payrollId);
-    const employeeName = trim(button.dataset.employeeName) || 'Karyawan';
-    const disbursementDate = trim(button.dataset.disbursementDate) || '-';
-    const amountFormatted = trim(button.dataset.amountFormatted) || '0';
-
-    if (payrollId === '') return;
-
-    reversalForm.action = reverseStoreUrl(payrollId);
-
-    if (reversalReason) {
-      reversalReason.value = '';
-    }
-
-    if (reversalSubtitle) {
-      reversalSubtitle.textContent = `${employeeName} • ${disbursementDate} • Rp${amountFormatted}`;
-    }
-
-    reversalModal.show();
-  });
-
-  reversalModalEl?.addEventListener('hidden.bs.modal', () => {
-    if (reversalForm) {
-      reversalForm.action = '#';
-    }
-
-    if (reversalReason) {
-      reversalReason.value = '';
-    }
-
-    if (reversalSubtitle) {
-      reversalSubtitle.textContent = 'Isi alasan pembatalan pencairan gaji.';
-    }
   });
 
   load(true);
