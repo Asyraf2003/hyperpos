@@ -45,14 +45,15 @@ final class CreatePayrollPageFeatureTest extends TestCase
             ->get(route('admin.payrolls.create'));
 
         $response->assertOk();
+        $response->assertSee('Form Pencairan Gaji');
         $response->assertSee('Pilih Karyawan');
-        $response->assertSee('Detail Batch Pencairan');
-        $response->assertSee('Mode Batch Default');
-        $response->assertSee('Karyawan Dipilih');
-        $response->assertSee('admin-payroll-create.js');
+        $response->assertSee('Nominal Pencairan');
+        $response->assertSee('Tanggal Pencairan');
+        $response->assertSee('Mode Pencairan');
+        $response->assertSee('Simpan Pencairan Gaji');
     }
 
-    public function test_admin_can_store_batch_payroll_from_create_page(): void
+    public function test_admin_can_store_single_payroll_from_create_page(): void
     {
         $employeeId = (string) Str::uuid();
 
@@ -68,26 +69,22 @@ final class CreatePayrollPageFeatureTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->createUserWithRole('admin-payroll-store@example.test', 'admin'))
-            ->post(route('admin.payrolls.batch.store'), [
+            ->post(route('admin.payrolls.store'), [
+                'employee_id' => $employeeId,
+                'amount' => 5000000,
                 'disbursement_date_string' => '2026-03-25',
                 'mode_value' => 'monthly',
-                'notes' => 'Batch Maret 2026',
-                'rows' => [
-                    [
-                        'employee_id' => $employeeId,
-                        'amount' => 5000000,
-                    ],
-                ],
+                'notes' => 'Gaji Maret 2026',
             ]);
 
         $response->assertRedirect(route('admin.payrolls.index'));
-        $response->assertSessionHas('success', 'Batch payroll berhasil dicatat.');
+        $response->assertSessionHas('success', 'Pencairan gaji berhasil dicatat.');
 
         $this->assertDatabaseHas('payroll_disbursements', [
             'employee_id' => $employeeId,
             'amount' => 5000000,
             'mode' => 'monthly',
-            'notes' => 'Batch Maret 2026',
+            'notes' => 'Gaji Maret 2026',
         ]);
     }
 
