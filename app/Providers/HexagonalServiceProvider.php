@@ -293,6 +293,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
         $this->app->singleton(EmployeeDebtAdjustmentWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentWriterAdapter::class);
         $this->app->singleton(EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtPaymentReversalWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtPaymentReversalWriterAdapter::class);
         $this->app->singleton(EmployeePayrollTableReaderPort::class, DatabaseEmployeePayrollTableReaderAdapter::class); 
         $this->app->singleton(PayrollDisbursementWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementWriterAdapter::class);
         $this->app->singleton(PayrollDisbursementReversalWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabasePayrollDisbursementReversalWriterAdapter::class);

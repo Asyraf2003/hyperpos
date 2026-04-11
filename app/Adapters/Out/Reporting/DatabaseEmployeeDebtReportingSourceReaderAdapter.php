@@ -14,8 +14,15 @@ final class DatabaseEmployeeDebtReportingSourceReaderAdapter implements Employee
         string $toRecordedDate,
     ): array {
         $paymentTotalsSubquery = DB::table('employee_debt_payments')
-            ->selectRaw('employee_debt_id, COALESCE(SUM(amount), 0) as total_paid_amount')
-            ->groupBy('employee_debt_id');
+            ->leftJoin(
+                'employee_debt_payment_reversals',
+                'employee_debt_payment_reversals.employee_debt_payment_id',
+                '=',
+                'employee_debt_payments.id'
+            )
+            ->whereNull('employee_debt_payment_reversals.id')
+            ->selectRaw('employee_debt_payments.employee_debt_id, COALESCE(SUM(employee_debt_payments.amount), 0) as total_paid_amount')
+            ->groupBy('employee_debt_payments.employee_debt_id');
 
         return DB::table('employee_debts')
             ->leftJoinSub($paymentTotalsSubquery, 'payment_totals', function ($join): void {
@@ -74,6 +81,13 @@ final class DatabaseEmployeeDebtReportingSourceReaderAdapter implements Employee
             ->joinSub($filteredDebtsSubquery, 'filtered_debts', function ($join): void {
                 $join->on('filtered_debts.id', '=', 'employee_debt_payments.employee_debt_id');
             })
+            ->leftJoin(
+                'employee_debt_payment_reversals',
+                'employee_debt_payment_reversals.employee_debt_payment_id',
+                '=',
+                'employee_debt_payments.id'
+            )
+            ->whereNull('employee_debt_payment_reversals.id')
             ->selectRaw('COALESCE(SUM(employee_debt_payments.amount), 0) as total_paid_amount')
             ->first();
 

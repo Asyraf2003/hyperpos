@@ -39,10 +39,23 @@ final class DatabaseEmployeeDebtDetailPageQuery
     private function payments(string $debtId): array
     {
         return DB::table('employee_debt_payments')
-            ->select(['id', 'amount', 'payment_date', 'notes'])
-            ->where('employee_debt_id', $debtId)
-            ->orderByDesc('payment_date')
-            ->orderByDesc('created_at')
+            ->leftJoin(
+                'employee_debt_payment_reversals',
+                'employee_debt_payment_reversals.employee_debt_payment_id',
+                '=',
+                'employee_debt_payments.id'
+            )
+            ->select([
+                'employee_debt_payments.id',
+                'employee_debt_payments.amount',
+                'employee_debt_payments.payment_date',
+                'employee_debt_payments.notes',
+                'employee_debt_payments.created_at',
+            ])
+            ->where('employee_debt_payments.employee_debt_id', $debtId)
+            ->whereNull('employee_debt_payment_reversals.id')
+            ->orderByDesc('employee_debt_payments.payment_date')
+            ->orderByDesc('employee_debt_payments.created_at')
             ->get()
             ->map(function (object $payment): array {
                 $amount = (int) $payment->amount;

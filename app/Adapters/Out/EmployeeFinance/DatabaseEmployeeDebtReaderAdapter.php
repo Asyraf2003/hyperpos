@@ -26,8 +26,20 @@ final class DatabaseEmployeeDebtReaderAdapter implements EmployeeDebtReaderPort
         }
 
         $paymentRows = DB::table('employee_debt_payments')
-            ->select(['id', 'amount', 'payment_date', 'notes'])
-            ->where('employee_debt_id', $id)
+            ->leftJoin(
+                'employee_debt_payment_reversals',
+                'employee_debt_payment_reversals.employee_debt_payment_id',
+                '=',
+                'employee_debt_payments.id'
+            )
+            ->select([
+                'employee_debt_payments.id',
+                'employee_debt_payments.amount',
+                'employee_debt_payments.payment_date',
+                'employee_debt_payments.notes',
+            ])
+            ->where('employee_debt_payments.employee_debt_id', $id)
+            ->whereNull('employee_debt_payment_reversals.id')
             ->get();
 
         $payments = [];
