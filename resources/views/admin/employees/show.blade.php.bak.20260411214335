@@ -18,12 +18,24 @@
                 >
                     Edit Karyawan
                 </a>
+                <a
+                    href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
+                    class="btn btn-light-primary"
+                >
+                    Detail Gaji
+                </a>
+                <a
+                    href="{{ route('admin.employee-debts.index') }}"
+                    class="btn btn-light-secondary"
+                >
+                    Lihat Hutang Karyawan
+                </a>
             </div>
         </div>
 
-        <div class="row g-4">
+        <div class="row g-4 mb-4">
             <div class="col-12 col-xl-5">
-                <div class="card">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Identitas Saat Ini</h5>
                     </div>
@@ -64,9 +76,94 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
-                    <div class="card mt-4">
+            <div class="col-12 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <h5 class="card-title mb-0">Ringkasan Hutang</h5>
+                            <a
+                                href="{{ route('admin.employee-debts.index') }}"
+                                class="btn btn-sm btn-light-secondary"
+                            >
+                                Buka
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Record</small>
+                            <div class="fw-semibold">{{ $debtSummary['total_debt_records'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Hutang Aktif</small>
+                            <div class="fw-semibold">{{ $debtSummary['active_debt_count'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Hutang Lunas</small>
+                            <div class="fw-semibold">{{ $debtSummary['paid_debt_count'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Nominal</small>
+                            <div class="fw-semibold">Rp{{ $debtSummary['total_debt_amount_formatted'] }}</div>
+                        </div>
+
+                        <div>
+                            <small class="text-muted d-block">Sisa Hutang</small>
+                            <div class="fw-semibold">Rp{{ $debtSummary['total_remaining_balance_formatted'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <h5 class="card-title mb-0">Ringkasan Gaji</h5>
+                            <a
+                                href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
+                                class="btn btn-sm btn-light-primary"
+                            >
+                                Buka
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Payroll Aktif</small>
+                            <div class="fw-semibold">{{ $payrollSummary['total_payroll_records'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Total Nominal Cair</small>
+                            <div class="fw-semibold">Rp{{ $payrollSummary['total_disbursed_amount_formatted'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Pencairan Terakhir</small>
+                            <div class="fw-semibold">{{ $payrollSummary['latest_disbursement_date'] ?? '-' }}</div>
+                        </div>
+
+                        <div class="alert alert-light-warning mb-0">
+                            <div class="fw-semibold mb-1">Modul Gaji Dipisah</div>
+                            <div class="small">
+                                Riwayat gaji karyawan dibuka dari halaman detail gaji agar detail karyawan tetap fokus pada identitas dan ringkasan umum.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
+                <div class="col-12 col-xl-5">
+                    <div class="card h-100">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center gap-2">
                                 <h5 class="card-title mb-0">{{ $page['initial_identity_meta']['title'] }}</h5>
@@ -125,10 +222,50 @@
                             @endif
                         </div>
                     </div>
-                @endif
-            </div>
+                </div>
+            @endif
 
-            <div class="col-12 col-xl-7">
+            <div class="col-12 {{ ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null) ? 'col-xl-7' : 'col-xl-12' }}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Navigasi Modul Karyawan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="{{ route('admin.employees.payrolls.show', ['employeeId' => $detail['summary']['id']]) }}"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
+                                    <div class="small opacity-75">Buka riwayat gaji, status pencairan, dan koreksi payroll khusus karyawan ini.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="{{ route('admin.employee-debts.index') }}"
+                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Hutang Karyawan</div>
+                                    <div class="small opacity-75">Buka modul hutang untuk melihat riwayat dan tindak lanjut hutang karyawan.</div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light-info mt-4 mb-0">
+                            <div class="fw-semibold mb-1">Halaman Detail Karyawan</div>
+                            <div class="small">
+                                Halaman ini difokuskan untuk identitas, ringkasan umum, dan riwayat versi karyawan. Riwayat gaji dipisah ke halaman detail gaji.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Riwayat Versi Karyawan</h5>
