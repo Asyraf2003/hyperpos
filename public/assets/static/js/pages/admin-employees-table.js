@@ -137,10 +137,16 @@
         <td>${esc(row.salary_basis_label)}</td>
         <td>${esc(row.employment_status_label)}</td>
         <td class="text-center">
-          <div class="d-inline-flex gap-1">
-            <a href="${detailUrl(row.id)}" class="btn btn-sm btn-light-primary">Detail</a>
-            <a href="${editUrl(row.id)}" class="btn btn-sm btn-light-secondary">Edit</a>
-          </div>
+          <button
+            type="button"
+            class="btn btn-sm btn-light-primary js-open-employee-action"
+            data-employee-id="${esc(row.id)}"
+            data-employee-name="${esc(row.employee_name)}"
+            data-salary-basis-label="${esc(row.salary_basis_label)}"
+            data-employment-status-label="${esc(row.employment_status_label)}"
+          >
+            Aksi
+          </button>
         </td>
       </tr>
     `).join('');

@@ -76,6 +76,76 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="employee-action-modal"
+            tabindex="-1"
+            aria-labelledby="employee-action-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="employee-action-modal-title">Aksi Karyawan</h3>
+                            <p class="mb-0 text-muted fs-6" id="employee-action-modal-subtitle">
+                                Pilih tindakan untuk data karyawan.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="employee-action-detail-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Detail Karyawan</div>
+                                    <div class="small opacity-75">Lihat ringkasan profil, status, dan histori terkait.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="employee-action-edit-link"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Edit Karyawan</div>
+                                    <div class="small opacity-75">Perbarui master karyawan beserta catatan perubahan.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="employee-action-payroll-link"
+                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Buka Modul Gaji</div>
+                                    <div class="small opacity-75">Masuk ke daftar gaji admin untuk tindak lanjut pencairan.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a
+                                    href="#"
+                                    id="employee-action-debt-link"
+                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Buka Modul Hutang</div>
+                                    <div class="small opacity-75">Masuk ke daftar hutang karyawan untuk pencatatan dan pelunasan.</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
@@ -84,8 +154,11 @@
         window.employeeTableConfig = {
             endpoint: @json(route('admin.employees.table')),
             detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__'])),
-            editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__']))
+            editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__'])),
+            payrollIndexUrl: @json(route('admin.payrolls.index')),
+            employeeDebtIndexUrl: @json(route('admin.employee-debts.index'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-employees-table.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-employee-table-actions.js') }}"></script>
 @endpush
