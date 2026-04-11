@@ -156,7 +156,7 @@
             detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__'])),
             editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__'])),
             payrollIndexUrl: @json(route('admin.payrolls.index')),
-            employeeDebtIndexUrl: @json(route('admin.employee-debts.index'))
+            employeeDebtCreateUrl: @json(route('admin.employee-debts.create'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-employees-table.js') }}"></script>

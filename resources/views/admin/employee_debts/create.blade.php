@@ -38,14 +38,14 @@
                                             type="hidden"
                                             id="employee_id"
                                             name="employee_id"
-                                            value="{{ old('employee_id') }}"
+                                            value="{{ old('employee_id', $prefilledEmployeeId ?? '') }}"
                                         >
 
                                         <input
                                             type="text"
                                             id="employee_picker_query"
                                             name="employee_lookup"
-                                            value="{{ old('employee_lookup') }}"
+                                            value="{{ old('employee_lookup', $prefilledEmployeeName ?? '') }}"
                                             class="form-control @error('employee_id') is-invalid @enderror"
                                             placeholder="Ketik minimal 2 huruf nama karyawan"
                                             autocomplete="off"

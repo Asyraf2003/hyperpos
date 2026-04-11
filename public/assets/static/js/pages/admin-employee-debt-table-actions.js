@@ -12,6 +12,7 @@
   const payrollLink = document.getElementById('employee-debt-action-payroll-link');
 
   const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
+  const createDebtUrl = (id) => `${c.createDebtUrl}?employee_id=${encodeURIComponent(id)}`;
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest('.js-open-employee-debt-action');
@@ -27,7 +28,7 @@
     subtitle.textContent = debtStatusSummary;
 
     detailLink.href = detailUrl(employeeId);
-    createLink.href = c.createDebtUrl;
+    createLink.href = createDebtUrl(employeeId);
     payrollLink.href = c.payrollIndexUrl;
 
     modal.show();
