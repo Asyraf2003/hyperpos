@@ -56,7 +56,7 @@ final class EmployeeEditPageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Data karyawan tidak ditemukan.');
     }
 
-    public function test_admin_can_update_employee_and_write_audit_log(): void
+    public function test_admin_can_update_employee_and_write_versioned_history_records(): void
     {
         $employeeId = $this->seedEmployee();
         $admin = $this->createUserWithRole('admin-employee-update@example.test', 'admin');
@@ -85,28 +85,92 @@ final class EmployeeEditPageFeatureTest extends TestCase
             'employment_status' => 'inactive',
         ]);
 
-        $this->assertDatabaseHas('audit_logs', [
-            'event' => 'employee_profile_updated',
+        $this->assertDatabaseHas('employee_versions', [
+            'employee_id' => $employeeId,
+            'revision_no' => 1,
+            'event_name' => 'employee_deactivated',
+            'changed_by_actor_id' => (string) $admin->getAuthIdentifier(),
+            'change_reason' => 'Cuti panjang sementara.',
         ]);
 
-        $audit = DB::table('audit_logs')
-            ->where('event', 'employee_profile_updated')
-            ->latest('id')
+        $this->assertDatabaseHas('audit_events', [
+            'aggregate_type' => 'employee',
+            'aggregate_id' => $employeeId,
+            'event_name' => 'employee_deactivated',
+            'bounded_context' => 'employee_finance',
+            'actor_id' => (string) $admin->getAuthIdentifier(),
+            'actor_role' => 'admin',
+            'reason' => 'Cuti panjang sementara.',
+            'source_channel' => 'admin_web',
+        ]);
+
+        $auditEventId = (string) DB::table('audit_events')
+            ->where('aggregate_type', 'employee')
+            ->where('aggregate_id', $employeeId)
+            ->where('event_name', 'employee_deactivated')
+            ->value('id');
+
+        $this->assertNotSame('', $auditEventId);
+
+        $this->assertDatabaseHas('audit_event_snapshots', [
+            'audit_event_id' => $auditEventId,
+            'snapshot_kind' => 'before',
+        ]);
+
+        $this->assertDatabaseHas('audit_event_snapshots', [
+            'audit_event_id' => $auditEventId,
+            'snapshot_kind' => 'after',
+        ]);
+
+        $beforePayload = (string) DB::table('audit_event_snapshots')
+            ->where('audit_event_id', $auditEventId)
+            ->where('snapshot_kind', 'before')
+            ->value('payload_json');
+
+        $afterPayload = (string) DB::table('audit_event_snapshots')
+            ->where('audit_event_id', $auditEventId)
+            ->where('snapshot_kind', 'after')
+            ->value('payload_json');
+
+        $beforeSnapshot = json_decode($beforePayload, true, 512, JSON_THROW_ON_ERROR);
+        $afterSnapshot = json_decode($afterPayload, true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame('Budi Santoso', $beforeSnapshot['employee_name']);
+        $this->assertSame('081211111111', $beforeSnapshot['phone']);
+        $this->assertSame('weekly', $beforeSnapshot['salary_basis_type']);
+        $this->assertSame(5000000, $beforeSnapshot['default_salary_amount']);
+        $this->assertSame('active', $beforeSnapshot['employment_status']);
+        $this->assertNull($beforeSnapshot['started_at']);
+        $this->assertNull($beforeSnapshot['ended_at']);
+
+        $this->assertSame('Budi Santoso Update', $afterSnapshot['employee_name']);
+        $this->assertSame('081299999999', $afterSnapshot['phone']);
+        $this->assertSame('monthly', $afterSnapshot['salary_basis_type']);
+        $this->assertSame(5500000, $afterSnapshot['default_salary_amount']);
+        $this->assertSame('inactive', $afterSnapshot['employment_status']);
+        $this->assertNull($afterSnapshot['started_at']);
+        $this->assertNull($afterSnapshot['ended_at']);
+
+        $version = DB::table('employee_versions')
+            ->where('employee_id', $employeeId)
+            ->where('revision_no', 1)
             ->first();
 
-        $this->assertNotNull($audit);
+        $this->assertNotNull($version);
 
-        $context = json_decode((string) $audit->context, true, 512, JSON_THROW_ON_ERROR);
+        $versionSnapshot = json_decode((string) $version->snapshot_json, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertSame($employeeId, $context['employee_id']);
-        $this->assertSame((string) $admin->getAuthIdentifier(), $context['performed_by_actor_id']);
-        $this->assertSame('Cuti panjang sementara.', $context['reason']);
-        $this->assertSame('Budi Santoso', $context['before']['name']);
-        $this->assertSame('weekly', $context['before']['pay_period_value']);
-        $this->assertSame('active', $context['before']['status_value']);
-        $this->assertSame('Budi Santoso Update', $context['after']['name']);
-        $this->assertSame('monthly', $context['after']['pay_period_value']);
-        $this->assertSame('inactive', $context['after']['status_value']);
+        $this->assertSame('Budi Santoso Update', $versionSnapshot['employee_name']);
+        $this->assertSame('081299999999', $versionSnapshot['phone']);
+        $this->assertSame('monthly', $versionSnapshot['salary_basis_type']);
+        $this->assertSame(5500000, $versionSnapshot['default_salary_amount']);
+        $this->assertSame('inactive', $versionSnapshot['employment_status']);
+        $this->assertNull($versionSnapshot['started_at']);
+        $this->assertNull($versionSnapshot['ended_at']);
+
+        $this->assertDatabaseMissing('audit_logs', [
+            'event' => 'employee_profile_updated',
+        ]);
     }
 
     public function test_admin_cannot_update_employee_when_change_reason_is_blank(): void
@@ -138,6 +202,15 @@ final class EmployeeEditPageFeatureTest extends TestCase
             'default_salary_amount' => 5000000,
             'salary_basis_type' => 'weekly',
             'employment_status' => 'active',
+        ]);
+
+        $this->assertDatabaseMissing('employee_versions', [
+            'employee_id' => $employeeId,
+        ]);
+
+        $this->assertDatabaseMissing('audit_events', [
+            'aggregate_type' => 'employee',
+            'aggregate_id' => $employeeId,
         ]);
 
         $this->assertDatabaseMissing('audit_logs', [

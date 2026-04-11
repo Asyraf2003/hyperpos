@@ -24,6 +24,7 @@ final class StoreEmployeeDebtPaymentController extends Controller
                 $debtId,
                 (int) $data['payment_amount'],
                 isset($data['notes']) && $data['notes'] !== '' ? (string) $data['notes'] : null,
+                $request->user() !== null ? (string) $request->user()->getAuthIdentifier() : null,
             );
         } catch (Throwable $e) {
             $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Pembayaran hutang gagal dicatat.';

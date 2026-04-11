@@ -110,6 +110,7 @@ use App\Ports\Out\ClockPort;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtAdjustmentWriterPort;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtReaderPort;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort;
+use App\Ports\Out\EmployeeFinance\EmployeeDebtPaymentReversalWriterPort;
 use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
 use App\Ports\Out\EmployeeFinance\EmployeeWriterPort;
 use App\Ports\Out\EmployeeFinance\PayrollDisbursementWriterPort;

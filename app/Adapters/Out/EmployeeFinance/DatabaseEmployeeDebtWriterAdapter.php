@@ -6,8 +6,8 @@ namespace App\Adapters\Out\EmployeeFinance;
 
 use App\Core\EmployeeFinance\EmployeeDebt\EmployeeDebt;
 use App\Ports\Out\EmployeeFinance\EmployeeDebtWriterPort;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 final class DatabaseEmployeeDebtWriterAdapter implements EmployeeDebtWriterPort
 {
@@ -34,7 +34,6 @@ final class DatabaseEmployeeDebtWriterAdapter implements EmployeeDebtWriterPort
             ->whereNull('created_at')
             ->update(['created_at' => $now]);
 
-        // Simpan setiap child payment
         foreach ($debt->getPayments() as $payment) {
             $paymentRecord = [
                 'id' => $payment->getId(),
@@ -42,17 +41,11 @@ final class DatabaseEmployeeDebtWriterAdapter implements EmployeeDebtWriterPort
                 'amount' => $payment->getAmount()->amount(),
                 'payment_date' => $payment->getPaymentDate()->format('Y-m-d H:i:s'),
                 'notes' => $payment->getNotes(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ];
 
-            DB::table('employee_debt_payments')->updateOrInsert(
-                ['id' => $payment->getId()],
-                array_merge($paymentRecord, ['updated_at' => $now])
-            );
-
-            DB::table('employee_debt_payments')
-                ->where('id', $payment->getId())
-                ->whereNull('created_at')
-                ->update(['created_at' => $now]);
+            DB::table('employee_debt_payments')->insertOrIgnore($paymentRecord);
         }
     }
 }

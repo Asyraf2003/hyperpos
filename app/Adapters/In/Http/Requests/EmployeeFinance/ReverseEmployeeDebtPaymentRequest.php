@@ -6,7 +6,7 @@ namespace App\Adapters\In\Http\Requests\EmployeeFinance;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateEmployeeBaseSalaryRequest extends FormRequest
+final class ReverseEmployeeDebtPaymentRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,8 +16,7 @@ class UpdateEmployeeBaseSalaryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'new_salary_amount' => 'required|integer|min:1',
-            'reason' => 'nullable|string',
+            'reason' => 'required|string',
         ];
     }
 }
