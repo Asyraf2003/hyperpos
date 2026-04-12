@@ -39,12 +39,18 @@
       payLink.href = debtShowUrl(latestUnpaidDebtId);
       payLink.classList.remove('disabled');
       payLink.removeAttribute('aria-disabled');
-      payEmpty.classList.add('d-none');
+
+      if (payEmpty) {
+        payEmpty.classList.add('d-none');
+      }
     } else {
       payLink.href = '#';
       payLink.classList.add('disabled');
       payLink.setAttribute('aria-disabled', 'true');
-      payEmpty.classList.remove('d-none');
+
+      if (payEmpty) {
+        payEmpty.classList.remove('d-none');
+      }
     }
 
     modal.show();

@@ -144,10 +144,6 @@
                                 </a>
                             </div>
                         </div>
-
-                        <div id="employee-debt-action-pay-empty" class="alert alert-warning mt-3 d-none mb-0">
-                            Karyawan ini belum punya hutang aktif yang bisa dibayar.
-                        </div>
                     </div>
                 </div>
             </div>
