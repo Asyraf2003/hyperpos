@@ -126,9 +126,9 @@
                                 <a
                                     href="#"
                                     id="employee-debt-action-payroll-link"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
-                                    <div class="fw-bold fs-5 mb-1">Buka Modul Gaji</div>
+                                    <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
                                     <div class="small opacity-75">Masuk ke daftar gaji admin untuk tindak lanjut pencairan.</div>
                                 </a>
                             </div>

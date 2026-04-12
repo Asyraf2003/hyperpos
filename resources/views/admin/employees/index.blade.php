@@ -116,7 +116,7 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Edit Karyawan</div>
-                                    <div class="small opacity-75">Perbarui master karyawan beserta catatan perubahan.</div>
+                                    <div class="small opacity-75">Perbarui karyawan dengan catatan perubahan.</div>
                                 </a>
                             </div>
 
@@ -124,7 +124,7 @@
                                 <a
                                     href="#"
                                     id="employee-action-payroll-link"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
                                     <div class="small opacity-75">Buka riwayat gaji khusus karyawan ini.</div>
@@ -135,10 +135,10 @@
                                 <a
                                     href="#"
                                     id="employee-action-debt-link"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
-                                    <div class="fw-bold fs-5 mb-1">Buka Modul Hutang</div>
-                                    <div class="small opacity-75">Masuk ke daftar hutang karyawan untuk pencatatan dan pelunasan.</div>
+                                    <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
+                                    <div class="small opacity-75">Masuk ke daftar hutang karyawan.</div>
                                 </a>
                             </div>
                         </div>
