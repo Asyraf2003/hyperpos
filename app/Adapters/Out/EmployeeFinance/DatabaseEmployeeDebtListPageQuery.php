@@ -19,6 +19,16 @@ final class DatabaseEmployeeDebtListPageQuery
                 'employees.employee_name as employee_name',
             ])
             ->selectSub(
+                DB::table('employee_debts as debt_target')
+                    ->select('debt_target.id')
+                    ->whereColumn('debt_target.employee_id', 'employee_debts.employee_id')
+                    ->orderByRaw("CASE WHEN debt_target.status = 'unpaid' THEN 0 ELSE 1 END")
+                    ->orderByDesc('debt_target.created_at')
+                    ->orderByDesc('debt_target.id')
+                    ->limit(1),
+                'debt_detail_id'
+            )
+            ->selectSub(
                 DB::table('employee_debts as latest_unpaid_debts')
                     ->select('latest_unpaid_debts.id')
                     ->whereColumn('latest_unpaid_debts.employee_id', 'employee_debts.employee_id')
@@ -58,6 +68,9 @@ final class DatabaseEmployeeDebtListPageQuery
             'rows' => collect($paginator->items())->map(fn (object $row): array => [
                 'employee_id' => (string) $row->employee_id,
                 'employee_name' => (string) $row->employee_name,
+                'debt_detail_id' => $row->debt_detail_id !== null
+                    ? (string) $row->debt_detail_id
+                    : null,
                 'latest_unpaid_debt_id' => $row->latest_unpaid_debt_id !== null
                     ? (string) $row->latest_unpaid_debt_id
                     : null,
