@@ -47,7 +47,7 @@ final class ReversePayrollDisbursementFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('success', 'Reversal pencairan gaji berhasil dicatat.');
+        $response->assertSessionHas('success', 'Pencairan gaji berhasil dibatalkan.');
 
         $this->assertDatabaseHas('payroll_disbursement_reversals', [
             'payroll_disbursement_id' => $payrollId,
