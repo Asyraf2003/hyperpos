@@ -18,6 +18,9 @@ final class UpdateEmployeeProfileRequest extends FormRequest
         $employeeName = $this->trimOrNull('employee_name') ?? $this->trimOrNull('name');
         $salaryBasisType = $this->trimOrNull('salary_basis_type') ?? $this->trimOrNull('pay_period_value');
         $defaultSalaryAmount = $this->integerOrNull('default_salary_amount') ?? $this->integerOrNull('base_salary_amount');
+        $startedAt = $this->trimOrNull('started_at');
+        $endedAt = $this->trimOrNull('ended_at');
+        $employmentStatus = $this->trimOrNull('employment_status') ?? ($endedAt !== null ? 'inactive' : 'active');
 
         $this->merge([
             'employee_name' => $employeeName,
@@ -27,9 +30,10 @@ final class UpdateEmployeeProfileRequest extends FormRequest
             'pay_period_value' => $salaryBasisType,
             'default_salary_amount' => $defaultSalaryAmount,
             'base_salary_amount' => $defaultSalaryAmount,
+            'employment_status' => $employmentStatus,
             'change_reason' => $this->trimOrNull('change_reason'),
-            'started_at' => $this->trimOrNull('started_at'),
-            'ended_at' => $this->trimOrNull('ended_at'),
+            'started_at' => $startedAt,
+            'ended_at' => $endedAt,
         ]);
     }
 
@@ -43,6 +47,7 @@ final class UpdateEmployeeProfileRequest extends FormRequest
             'pay_period_value' => ['required', 'string', 'in:daily,weekly,monthly,manual'],
             'default_salary_amount' => ['present', 'nullable', 'integer', 'min:1'],
             'base_salary_amount' => ['present', 'nullable', 'integer', 'min:1'],
+            'employment_status' => ['required', 'string', 'in:active,inactive'],
             'change_reason' => ['present', 'nullable', 'string'],
             'started_at' => ['nullable', 'date'],
             'ended_at' => ['nullable', 'date', 'after_or_equal:started_at'],

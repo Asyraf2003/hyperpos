@@ -31,6 +31,7 @@ final class UpdateEmployeeProfileHandler
         ?string $phone,
         ?int $defaultSalaryAmount,
         string $salaryBasisType,
+        string $employmentStatus,
         string $changeReason,
         string $performedByActorId,
         ?string $startedAt = null,
@@ -58,6 +59,14 @@ final class UpdateEmployeeProfileHandler
                 $this->valueCaster->parseOptionalDate($startedAt),
                 $this->valueCaster->parseOptionalDate($endedAt),
             );
+
+            $resolvedEmploymentStatus = $endedAt !== null ? 'inactive' : $employmentStatus;
+
+            if ($resolvedEmploymentStatus === 'inactive') {
+                $employee->deactivate();
+            } else {
+                $employee->activate();
+            }
 
             $employee->updateDefaultSalaryAmount(
                 $this->valueCaster->toNullableMoney($defaultSalaryAmount),

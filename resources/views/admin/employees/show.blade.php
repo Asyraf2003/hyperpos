@@ -38,6 +38,7 @@
                 <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Ringkasan Karyawan</h5>
+                        <p class="text-muted mb-0 mt-1">Identitas Saat Ini</p>
                     </div>
 
                     <div class="card-body">

@@ -108,6 +108,24 @@
                                     </div>
                                 </div>
 
+                                <div class="col-12">
+                                    <div class="form-group mb-4">
+                                        <label for="employment_status" class="form-label">Status</label>
+                                        <select
+                                            id="employment_status"
+                                            name="employment_status"
+                                            class="form-select @error('employment_status') is-invalid @enderror"
+                                            required
+                                        >
+                                            <option value="active" @selected(old('employment_status', $employee->getEmploymentStatus()->value) === 'active')>Aktif</option>
+                                            <option value="inactive" @selected(old('employment_status', $employee->getEmploymentStatus()->value) === 'inactive')>Nonaktif</option>
+                                        </select>
+                                        @error('employment_status')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="col-12 col-md-6">
                                     <div class="form-group mb-4">
                                         <label for="started_at" class="form-label">Mulai Kerja</label>

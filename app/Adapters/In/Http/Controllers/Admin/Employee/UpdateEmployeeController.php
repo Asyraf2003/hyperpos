@@ -26,6 +26,7 @@ final class UpdateEmployeeController extends Controller
                 isset($data['phone']) && $data['phone'] !== '' ? (string) $data['phone'] : null,
                 isset($data['default_salary_amount']) ? (int) $data['default_salary_amount'] : null,
                 (string) $data['salary_basis_type'],
+                (string) $data['employment_status'],
                 (string) $data['change_reason'],
                 (string) $request->user()->getAuthIdentifier(),
                 isset($data['started_at']) && $data['started_at'] !== '' ? (string) $data['started_at'] : null,
