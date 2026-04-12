@@ -138,7 +138,7 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
-                                    <div class="small opacity-75">Buka detail hutang karyawan atau buat data hutang pertama.</div>
+                                    <div class="small opacity-75">Buka detail hutang atau buat data hutang.</div>
                                 </a>
                             </div>
                         </div>
