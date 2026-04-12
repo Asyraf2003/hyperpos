@@ -21,9 +21,10 @@ final class DatabaseEmployeeDebtListPageQuery
             ->selectSub(
                 DB::table('employee_debts as latest_unpaid_debts')
                     ->select('latest_unpaid_debts.id')
-                    ->whereColumn('latest_unpaid_debts.employee_id', 'employees.id')
+                    ->whereColumn('latest_unpaid_debts.employee_id', 'employee_debts.employee_id')
                     ->where('latest_unpaid_debts.status', 'unpaid')
                     ->orderByDesc('latest_unpaid_debts.created_at')
+                    ->orderByDesc('latest_unpaid_debts.id')
                     ->limit(1),
                 'latest_unpaid_debt_id'
             )
