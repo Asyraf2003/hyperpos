@@ -79,6 +79,8 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Karyawan</li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.employees.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.employees.index') }}" class="sidebar-link">
                         <i class="bi bi-people-fill"></i>
@@ -89,14 +91,14 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.payrolls.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.payrolls.index') }}" class="sidebar-link">
                         <i class="bi bi-cash-stack"></i>
-                        <span>Gaji</span>
+                        <span>Gaji Karyawan</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.employee-debts.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.employee-debts.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
-                        <span>Hutang</span>
+                        <span>Hutang Karyawan</span>
                     </a>
                 </li>
 
