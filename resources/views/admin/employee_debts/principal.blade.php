@@ -5,22 +5,7 @@
 
 @section('content')
     <section class="section">
-        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-            <div>
-                <h4 class="mb-1">Tambah atau Kurangi Hutang</h4>
-                <p class="text-muted mb-0">Gunakan halaman ini untuk menambah atau mengurangi nominal hutang karyawan dengan alasan yang jelas.</p>
-            </div>
-
-            <div class="d-flex flex-column flex-sm-row gap-2">
-                <a
-                    href="{{ route('admin.employee-debts.show', ['debtId' => $detail['summary']['id']]) }}"
-                    class="btn btn-light-secondary"
-                >
-                    Kembali ke Detail Hutang
-                </a>
-            </div>
-        </div>
-
+       
         <div class="row g-4">
             <div class="col-12 col-xl-5">
                 <div class="card mb-4">
@@ -124,7 +109,7 @@
             </div>
 
             <div class="col-12 col-xl-7">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-1">Riwayat Perubahan Hutang</h5>
                         <p class="mb-0 text-muted">Semua perubahan nominal hutang akan tercatat di sini.</p>
