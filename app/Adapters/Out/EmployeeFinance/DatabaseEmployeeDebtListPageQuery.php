@@ -18,6 +18,15 @@ final class DatabaseEmployeeDebtListPageQuery
                 'employee_debts.employee_id',
                 'employees.employee_name as employee_name',
             ])
+            ->selectSub(
+                DB::table('employee_debts as latest_unpaid_debts')
+                    ->select('latest_unpaid_debts.id')
+                    ->whereColumn('latest_unpaid_debts.employee_id', 'employees.id')
+                    ->where('latest_unpaid_debts.status', 'unpaid')
+                    ->orderByDesc('latest_unpaid_debts.created_at')
+                    ->limit(1),
+                'latest_unpaid_debt_id'
+            )
             ->selectRaw('COUNT(*) as total_debt_records')
             ->selectRaw('SUM(employee_debts.total_debt) as total_debt_amount')
             ->selectRaw('SUM(employee_debts.remaining_balance) as total_remaining_balance')
@@ -48,6 +57,9 @@ final class DatabaseEmployeeDebtListPageQuery
             'rows' => collect($paginator->items())->map(fn (object $row): array => [
                 'employee_id' => (string) $row->employee_id,
                 'employee_name' => (string) $row->employee_name,
+                'latest_unpaid_debt_id' => $row->latest_unpaid_debt_id !== null
+                    ? (string) $row->latest_unpaid_debt_id
+                    : null,
                 'total_debt_records' => (int) $row->total_debt_records,
                 'total_debt_amount_formatted' => number_format((int) $row->total_debt_amount, 0, ',', '.'),
                 'total_remaining_balance_formatted' => number_format((int) $row->total_remaining_balance, 0, ',', '.'),
