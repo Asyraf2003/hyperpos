@@ -25,7 +25,7 @@
                                 <div>
                                     <h4 class="card-title mb-1">Rincian Nota</h4>
                                     <p class="mb-0 text-muted">
-                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Jika produk belum ada, buka form product lewat tombol di atas.
+                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Jika produk belum ada.
                                     </p>
                                 </div>
 

@@ -16,6 +16,7 @@
   const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const createDebtUrl = (id) => `${c.createDebtUrl}?employee_id=${encodeURIComponent(id)}`;
   const debtShowUrl = (id) => c.debtShowBaseUrl.replace('__ID__', encodeURIComponent(id));
+  const payrollDetailUrl = (id) => c.employeePayrollDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest('.js-open-employee-debt-action');
@@ -33,24 +34,18 @@
 
     detailLink.href = detailUrl(employeeId);
     createLink.href = createDebtUrl(employeeId);
-    payrollLink.href = c.payrollIndexUrl;
+    payrollLink.href = payrollDetailUrl(employeeId);
 
     if (latestUnpaidDebtId !== '') {
       payLink.href = debtShowUrl(latestUnpaidDebtId);
       payLink.classList.remove('disabled');
       payLink.removeAttribute('aria-disabled');
-
-      if (payEmpty) {
-        payEmpty.classList.add('d-none');
-      }
+      if (payEmpty) payEmpty.classList.add('d-none');
     } else {
       payLink.href = '#';
       payLink.classList.add('disabled');
       payLink.setAttribute('aria-disabled', 'true');
-
-      if (payEmpty) {
-        payEmpty.classList.remove('d-none');
-      }
+      if (payEmpty) payEmpty.classList.remove('d-none');
     }
 
     modal.show();

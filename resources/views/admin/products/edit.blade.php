@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Product')
-@section('heading', 'Edit Product')
+@section('title', 'Edit Produk')
+@section('heading', 'Edit Produk')
 
 @section('content')
     <section class="section">
@@ -11,7 +11,7 @@
                     <div class="card-header">
                         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                             <div>
-                                <h4 class="card-title mb-1">Edit Product</h4>
+                                <h4 class="card-title mb-1">Edit Produk</h4>
                                 <p class="mb-0 text-muted">
                                     Ubah data identitas produk.
                                 </p>

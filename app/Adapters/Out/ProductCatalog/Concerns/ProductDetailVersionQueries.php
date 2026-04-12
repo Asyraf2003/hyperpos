@@ -12,7 +12,7 @@ trait ProductDetailVersionQueries
     {
         return DB::table('product_versions')
             ->where('product_id', $productId)
-            ->where('event_name', 'product_created')
+            ->where('event_name', 'Produk dibuat')
             ->orderBy('revision_no')
             ->first(['event_name', 'changed_at', 'snapshot_json']);
     }

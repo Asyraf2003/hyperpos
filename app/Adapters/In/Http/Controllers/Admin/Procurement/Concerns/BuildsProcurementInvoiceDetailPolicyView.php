@@ -29,8 +29,8 @@ trait BuildsProcurementInvoiceDetailPolicyView
             'label' => $policyState === 'locked' ? 'Locked' : 'Editable',
             'allowed_actions' => array_map(
                 fn (string $action): string => match ($action) {
-                    'edit' => 'Edit invoice',
-                    'void' => 'Void invoice',
+                    'edit' => 'Edit nota',
+                    'void' => 'Hapus nota',
                     'correction' => 'Correction / reversal',
                     default => $action,
                 },

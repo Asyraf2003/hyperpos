@@ -33,11 +33,11 @@ final class DatabaseVersionedProductWriterAdapter implements ProductWriterPort, 
 
     public function create(Product $product): void
     {
-        $this->persist($product, 'product_created', true);
+        $this->persist($product, 'Produk dibuat', true);
     }
 
     public function update(Product $product): void
     {
-        $this->persist($product, 'product_updated', false);
+        $this->persist($product, 'Produk diperbarui', false);
     }
 }

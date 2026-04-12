@@ -62,7 +62,7 @@ final class ProductEditPageFeatureTest extends TestCase
             ->get(route('admin.products.edit', ['productId' => 'product-1']));
 
         $response->assertOk();
-        $response->assertSee('Edit Product');
+        $response->assertSee('Edit Produk');
         $response->assertSee('Supra');
         $response->assertSee('Federal');
         $response->assertSee('15000');

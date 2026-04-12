@@ -143,8 +143,8 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Bukti Pembayaran');
         $response->assertSee('Belum ada pembayaran pemasok.');
         $response->assertSee('Aksi yang Diizinkan');
-        $response->assertSee('Edit invoice');
-        $response->assertSee('Void invoice');
+        $response->assertSee('Edit nota');
+        $response->assertSee('Hapus nota');
         $response->assertSee('Alasan Penguncian');
         $response->assertSee('Belum ada efek turunan primer.');
     }
