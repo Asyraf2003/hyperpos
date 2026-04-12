@@ -100,7 +100,7 @@
 
                     <div class="modal-body px-4 pb-4 pt-3">
                         <div class="row g-3">
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <a
                                     href="#"
                                     id="employee-debt-action-detail-link"
@@ -111,7 +111,7 @@
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <a
                                     href="#"
                                     id="employee-debt-action-create-link"
@@ -122,7 +122,18 @@
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
+                                <a
+                                    href="#"
+                                    id="employee-debt-action-pay-link"
+                                    class="btn btn-outline-success w-100 text-start py-3 px-4 h-100"
+                                >
+                                    <div class="fw-bold fs-5 mb-1">Bayar Hutang</div>
+                                    <div class="small opacity-75">Buka hutang aktif terbaru untuk langsung bayar.</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-3">
                                 <a
                                     href="#"
                                     id="employee-debt-action-payroll-link"
@@ -132,6 +143,10 @@
                                     <div class="small opacity-75">Masuk ke daftar gaji admin untuk tindak lanjut pencairan.</div>
                                 </a>
                             </div>
+                        </div>
+
+                        <div id="employee-debt-action-pay-empty" class="alert alert-warning mt-3 d-none mb-0">
+                            Karyawan ini belum punya hutang aktif yang bisa dibayar.
                         </div>
                     </div>
                 </div>
@@ -146,6 +161,7 @@
             endpoint: @json(route('admin.employee-debts.table')),
             detailBaseUrl: @json(route('admin.employees.show', ['employeeId' => '__ID__'])),
             createDebtUrl: @json(route('admin.employee-debts.create')),
+            debtShowBaseUrl: @json(route('admin.employee-debts.show', ['debtId' => '__ID__'])),
             payrollIndexUrl: @json(route('admin.payrolls.index'))
         };
     </script>

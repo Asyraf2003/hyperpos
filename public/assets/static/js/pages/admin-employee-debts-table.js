@@ -133,6 +133,7 @@
               data-employee-id="${esc(r.employee_id)}"
               data-employee-name="${esc(r.employee_name)}"
               data-debt-status-summary="${esc(debtStatusSummary)}"
+              data-latest-unpaid-debt-id="${esc(r.latest_unpaid_debt_id ?? '')}"
             >
               Aksi
             </button>

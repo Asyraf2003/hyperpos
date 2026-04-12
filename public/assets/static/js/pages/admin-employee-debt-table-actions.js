@@ -9,10 +9,13 @@
   const subtitle = document.getElementById('employee-debt-action-modal-subtitle');
   const detailLink = document.getElementById('employee-debt-action-detail-link');
   const createLink = document.getElementById('employee-debt-action-create-link');
+  const payLink = document.getElementById('employee-debt-action-pay-link');
   const payrollLink = document.getElementById('employee-debt-action-payroll-link');
+  const payEmpty = document.getElementById('employee-debt-action-pay-empty');
 
   const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const createDebtUrl = (id) => `${c.createDebtUrl}?employee_id=${encodeURIComponent(id)}`;
+  const debtShowUrl = (id) => c.debtShowBaseUrl.replace('__ID__', encodeURIComponent(id));
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest('.js-open-employee-debt-action');
@@ -21,6 +24,7 @@
     const employeeId = String(button.dataset.employeeId || '').trim();
     const employeeName = String(button.dataset.employeeName || 'Karyawan').trim();
     const debtStatusSummary = String(button.dataset.debtStatusSummary || '-').trim();
+    const latestUnpaidDebtId = String(button.dataset.latestUnpaidDebtId || '').trim();
 
     if (employeeId === '') return;
 
@@ -30,6 +34,18 @@
     detailLink.href = detailUrl(employeeId);
     createLink.href = createDebtUrl(employeeId);
     payrollLink.href = c.payrollIndexUrl;
+
+    if (latestUnpaidDebtId !== '') {
+      payLink.href = debtShowUrl(latestUnpaidDebtId);
+      payLink.classList.remove('disabled');
+      payLink.removeAttribute('aria-disabled');
+      payEmpty.classList.add('d-none');
+    } else {
+      payLink.href = '#';
+      payLink.classList.add('disabled');
+      payLink.setAttribute('aria-disabled', 'true');
+      payEmpty.classList.remove('d-none');
+    }
 
     modal.show();
   });
