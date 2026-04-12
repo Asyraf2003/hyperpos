@@ -102,6 +102,7 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Keuangan</li>
                 <li class="sidebar-item {{ request()->routeIs('admin.expenses.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.expenses.index') }}" class="sidebar-link">
                         <i class="bi bi-cash-coin"></i>
