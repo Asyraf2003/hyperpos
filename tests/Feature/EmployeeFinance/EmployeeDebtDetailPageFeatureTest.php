@@ -61,9 +61,13 @@ final class EmployeeDebtDetailPageFeatureTest extends TestCase
         $response->assertSee('Rp250.000');
         $response->assertSee('Rp750.000');
         $response->assertSee('Cicilan pertama');
-        $response->assertSee('Batalkan Pembayaran');
+        $response->assertSee('Riwayat Pembayaran');
         $response->assertSee('Riwayat Reversal Pembayaran');
         $response->assertSee('Belum ada reversal pembayaran hutang.');
+
+        $response->assertDontSee('Batalkan Pembayaran');
+        $response->assertDontSee('Catat Pembayaran Hutang');
+        $response->assertDontSee('Simpan Pembayaran');
     }
 
     public function test_admin_can_store_employee_debt_payment_from_detail_page(): void
@@ -170,7 +174,10 @@ final class EmployeeDebtDetailPageFeatureTest extends TestCase
         $response->assertSee('Salah input pembayaran');
         $response->assertSee('Pembayaran salah input');
         $response->assertSee('Rp250.000');
-        $response->assertSee('Belum ada pembayaran hutang aktif.');
+        $response->assertSee('Riwayat Pembayaran');
+
+        $response->assertDontSee('Belum ada pembayaran hutang aktif.');
+        $response->assertDontSee('Batalkan Pembayaran');
     }
 
     private function createUserWithRole(string $email, string $role): User

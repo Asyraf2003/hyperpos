@@ -115,7 +115,7 @@
     }
 
     body.innerHTML = rows.map((r, i) => {
-      const debtStatusSummary = `${r.active_debt_count} aktif / ${r.paid_debt_count} lunas`;
+      const debtStatusSummary = String(r.status_label ?? '-');
 
       return `
         <tr>
