@@ -35,9 +35,6 @@
     return Number.isNaN(n) || n < 1 ? f : n;
   };
 
-  const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
-  const editUrl = (id) => c.editBaseUrl.replace('__ID__', encodeURIComponent(id));
-
   const stateFromUrl = () => {
     const p = new URLSearchParams(window.location.search);
     const sortBy = trim(p.get('sort_by'));
@@ -144,6 +141,7 @@
             data-employee-name="${esc(row.employee_name)}"
             data-salary-basis-label="${esc(row.salary_basis_label)}"
             data-employment-status-label="${esc(row.employment_status_label)}"
+            data-latest-unpaid-debt-id="${esc(row.latest_unpaid_debt_id ?? '')}"
           >
             Aksi
           </button>

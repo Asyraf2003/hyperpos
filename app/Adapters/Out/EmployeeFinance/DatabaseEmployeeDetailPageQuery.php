@@ -37,10 +37,13 @@ final class DatabaseEmployeeDetailPageQuery
             return null;
         }
 
+        $latestUnpaidDebtId = $this->latestUnpaidDebtId($employeeId);
         $versionRows = $this->versionLookup->timelineRows($employeeId);
         $createdVersion = $this->versionLookup->createdVersion($employeeId);
         $firstRecordedVersion = $this->versionLookup->firstRecordedVersion($employeeId);
         $currentIdentity = $this->currentIdentityMapper->map($row);
+        $currentIdentity['latest_unpaid_debt_id'] = $latestUnpaidDebtId;
+
         $initialSource = $createdVersion ?? $firstRecordedVersion;
         $initialIdentity = $initialSource === null ? null : $this->versionIdentityMapper->map($initialSource);
         $initialIdentitySource = $this->initialIdentityMetaFactory->sourceLabel($createdVersion, $firstRecordedVersion);
@@ -60,5 +63,17 @@ final class DatabaseEmployeeDetailPageQuery
                     ->all(),
             ],
         ];
+    }
+
+    private function latestUnpaidDebtId(string $employeeId): ?string
+    {
+        $debtId = DB::table('employee_debts')
+            ->where('employee_id', $employeeId)
+            ->where('status', 'unpaid')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->value('id');
+
+        return $debtId !== null ? (string) $debtId : null;
     }
 }

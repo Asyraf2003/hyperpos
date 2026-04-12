@@ -15,6 +15,7 @@
   const detailUrl = (id) => c.detailBaseUrl.replace('__ID__', encodeURIComponent(id));
   const editUrl = (id) => c.editBaseUrl.replace('__ID__', encodeURIComponent(id));
   const payrollDetailUrl = (id) => c.payrollDetailBaseUrl.replace('__ID__', encodeURIComponent(id));
+  const debtShowUrl = (id) => c.debtShowBaseUrl.replace('__ID__', encodeURIComponent(id));
   const debtIndexUrl = (id) => `${c.employeeDebtIndexUrl}?employee_id=${encodeURIComponent(id)}`;
 
   document.addEventListener('click', (event) => {
@@ -25,6 +26,7 @@
     const employeeName = String(button.dataset.employeeName || 'Karyawan').trim();
     const salaryBasisLabel = String(button.dataset.salaryBasisLabel || '-').trim();
     const employmentStatusLabel = String(button.dataset.employmentStatusLabel || '-').trim();
+    const latestUnpaidDebtId = String(button.dataset.latestUnpaidDebtId || '').trim();
 
     if (employeeId === '') return;
 
@@ -34,7 +36,9 @@
     detailLink.href = detailUrl(employeeId);
     editLink.href = editUrl(employeeId);
     payrollLink.href = payrollDetailUrl(employeeId);
-    debtLink.href = debtIndexUrl(employeeId);
+    debtLink.href = latestUnpaidDebtId !== ''
+      ? debtShowUrl(latestUnpaidDebtId)
+      : debtIndexUrl(employeeId);
 
     modal.show();
   });

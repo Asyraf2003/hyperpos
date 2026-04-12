@@ -25,7 +25,11 @@
                     Catat Gaji
                 </a>
                 <a
-                    href="{{ route('admin.employee-debts.index', ['employee_id' => $detail['summary']['id']]) }}"
+                    @if (($detail['summary']['latest_unpaid_debt_id'] ?? null) !== null)
+                        href="{{ route('admin.employee-debts.show', ['debtId' => $detail['summary']['latest_unpaid_debt_id']]) }}"
+                    @else
+                        href="{{ route('admin.employee-debts.index', ['employee_id' => $detail['summary']['id']]) }}"
+                    @endif
                     class="btn btn-light-secondary"
                 >
                     Lihat Hutang Karyawan
@@ -113,7 +117,11 @@
                         </div>
 
                         <a
-                            href="{{ route('admin.employee-debts.index', ['employee_id' => $detail['summary']['id']]) }}"
+                            @if (($detail['summary']['latest_unpaid_debt_id'] ?? null) !== null)
+                                href="{{ route('admin.employee-debts.show', ['debtId' => $detail['summary']['latest_unpaid_debt_id']]) }}"
+                            @else
+                                href="{{ route('admin.employee-debts.index', ['employee_id' => $detail['summary']['id']]) }}"
+                            @endif
                             class="btn btn-light-secondary btn-sm"
                         >
                             Lihat Hutang Karyawan

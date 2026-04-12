@@ -12,19 +12,30 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
 {
     public function search(EmployeeTableQuery $query): array
     {
-        $builder = DB::table('employees')->select([
-            'id',
-            'employee_name',
-            'phone',
-            'salary_basis_type',
-            'default_salary_amount',
-            'employment_status',
-        ]);
+        $builder = DB::table('employees')
+            ->select([
+                'employees.id',
+                'employees.employee_name',
+                'employees.phone',
+                'employees.salary_basis_type',
+                'employees.default_salary_amount',
+                'employees.employment_status',
+            ])
+            ->selectSub(
+                DB::table('employee_debts as latest_unpaid_debts')
+                    ->select('latest_unpaid_debts.id')
+                    ->whereColumn('latest_unpaid_debts.employee_id', 'employees.id')
+                    ->where('latest_unpaid_debts.status', 'unpaid')
+                    ->orderByDesc('latest_unpaid_debts.created_at')
+                    ->orderByDesc('latest_unpaid_debts.id')
+                    ->limit(1),
+                'latest_unpaid_debt_id'
+            );
 
         if ($query->q() !== null) {
             foreach (preg_split('/\s+/', $query->q()) ?: [] as $term) {
                 $builder->where(function ($where) use ($term): void {
-                    $like = '%' . $term . '%';
+                    $like = '%'.$term.'%';
 
                     $where->where('employee_name', 'like', $like)
                         ->orWhere('phone', 'like', $like)
@@ -50,6 +61,9 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
                     : null,
                 'employment_status' => (string) $row->employment_status,
                 'employment_status_label' => $this->employmentStatusLabel((string) $row->employment_status),
+                'latest_unpaid_debt_id' => $row->latest_unpaid_debt_id !== null
+                    ? (string) $row->latest_unpaid_debt_id
+                    : null,
             ])->values()->all(),
             'meta' => [
                 'page' => $paginator->currentPage(),
