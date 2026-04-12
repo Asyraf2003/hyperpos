@@ -16,7 +16,7 @@ final class AdjustEmployeeDebtPrincipalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'adjustment_type' => 'required|string|in:increase,decrease',
+            'adjustment_type' => 'required|string|in:increase',
             'amount' => 'required|integer|min:1',
             'reason' => 'required|string',
         ];

@@ -20,25 +20,25 @@ final class AdjustEmployeeDebtFeatureTest extends TestCase
 
         $response = $this->actingAs($this->user('admin-debt-adjust@example.test', 'admin'))
             ->post(route('admin.employee-debts.adjustments.store', ['debtId' => $debtId]), [
-                'adjustment_type' => 'decrease',
+                'adjustment_type' => 'increase',
                 'amount' => 100000,
-                'reason' => 'Koreksi pencatatan awal',
+                'reason' => 'Tambahan hutang operasional',
             ]);
 
         $response->assertRedirect(route('admin.employee-debts.show', ['debtId' => $debtId]));
-        $response->assertSessionHas('success', 'Koreksi hutang berhasil dicatat.');
+        $response->assertSessionHas('success', 'Penambahan hutang berhasil dicatat.');
 
         $this->assertDatabaseHas('employee_debt_adjustments', [
             'employee_debt_id' => $debtId,
-            'adjustment_type' => 'decrease',
+            'adjustment_type' => 'increase',
             'amount' => 100000,
-            'reason' => 'Koreksi pencatatan awal',
+            'reason' => 'Tambahan hutang operasional',
         ]);
 
         $this->assertDatabaseHas('employee_debts', [
             'id' => $debtId,
-            'total_debt' => 900000,
-            'remaining_balance' => 900000,
+            'total_debt' => 1100000,
+            'remaining_balance' => 1100000,
             'status' => 'unpaid',
         ]);
 
@@ -54,14 +54,14 @@ final class AdjustEmployeeDebtFeatureTest extends TestCase
         DB::table('employee_debt_adjustments')->insert([
             'id' => (string) Str::uuid(),
             'employee_debt_id' => $debtId,
-            'adjustment_type' => 'decrease',
+            'adjustment_type' => 'increase',
             'amount' => 100000,
-            'reason' => 'Koreksi pencatatan awal',
+            'reason' => 'Tambahan hutang operasional',
             'performed_by_actor_id' => '1',
             'before_total_debt' => 1000000,
-            'after_total_debt' => 900000,
+            'after_total_debt' => 1100000,
             'before_remaining_balance' => 1000000,
-            'after_remaining_balance' => 900000,
+            'after_remaining_balance' => 1100000,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -71,8 +71,8 @@ final class AdjustEmployeeDebtFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Riwayat Koreksi Hutang');
-        $response->assertSee('Pengurangan Principal');
-        $response->assertSee('Koreksi pencatatan awal');
+        $response->assertSee('Tambah Hutang');
+        $response->assertSee('Tambahan hutang operasional');
         $response->assertSee('Rp100.000');
     }
 

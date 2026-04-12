@@ -21,7 +21,9 @@ final class DatabaseEmployeeDebtAdjustmentListQuery
 
                 return [
                     'adjustment_type' => $type,
-                    'adjustment_type_label' => $type === 'increase' ? 'Penambahan Principal' : 'Pengurangan Principal',
+                    'adjustment_type_label' => $type === 'increase'
+                        ? 'Tambah Hutang'
+                        : 'Pengurangan Hutang (data lama)',
                     'amount_formatted' => number_format((int) $row->amount, 0, ',', '.'),
                     'reason' => (string) $row->reason,
                     'recorded_at' => Carbon::parse((string) $row->created_at)->format('Y-m-d H:i'),

@@ -1,17 +1,32 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah atau Kurangi Hutang Karyawan')
-@section('heading', 'Tambah atau Kurangi Hutang Karyawan')
+@section('title', 'Tambah Hutang Karyawan')
+@section('heading', 'Tambah Hutang Karyawan')
 
 @section('content')
     <section class="section">
-       
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+                <h4 class="mb-1">Tambah Hutang</h4>
+                <p class="text-muted mb-0">Gunakan halaman ini untuk menambah nominal hutang karyawan dengan alasan yang jelas.</p>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <a
+                    href="{{ route('admin.employee-debts.show', ['debtId' => $detail['summary']['id']]) }}"
+                    class="btn btn-light-secondary"
+                >
+                    Kembali ke Detail Hutang
+                </a>
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-12 col-xl-5">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-1">Form Perubahan Hutang</h5>
-                        <p class="mb-0 text-muted">Pilih mau menambah atau mengurangi nominal hutang.</p>
+                        <h5 class="card-title mb-1">Form Tambah Hutang</h5>
+                        <p class="mb-0 text-muted">Tambahkan nominal hutang baru ke data hutang yang sudah ada.</p>
                     </div>
 
                     <div class="card-body">
@@ -23,20 +38,10 @@
 
                         <form action="{{ route('admin.employee-debts.adjustments.store', ['debtId' => $detail['summary']['id']]) }}" method="post">
                             @csrf
-
-                            <div class="form-group mb-4">
-                                <label for="adjustment_type" class="form-label">Pilih Aksi</label>
-                                <select id="adjustment_type" name="adjustment_type" class="form-select @error('adjustment_type') is-invalid @enderror" required>
-                                    <option value="increase" @selected(old('adjustment_type') === 'increase')>Tambah Hutang</option>
-                                    <option value="decrease" @selected(old('adjustment_type') === 'decrease')>Kurangi Hutang</option>
-                                </select>
-                                @error('adjustment_type')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <input type="hidden" name="adjustment_type" value="increase">
 
                             <div class="form-group mb-4" data-money-input-group>
-                                <label for="adjustment_amount_display" class="form-label">Nominal</label>
+                                <label for="adjustment_amount_display" class="form-label">Nominal Tambahan</label>
                                 <input type="hidden" id="adjustment_amount" name="amount" value="{{ old('amount') }}" data-money-raw>
                                 <input
                                     type="text"
@@ -54,13 +59,13 @@
                             </div>
 
                             <div class="form-group mb-4">
-                                <label for="reason" class="form-label">Alasan</label>
+                                <label for="reason" class="form-label">Alasan Penambahan</label>
                                 <textarea
                                     id="reason"
                                     name="reason"
                                     rows="3"
                                     class="form-control @error('reason') is-invalid @enderror"
-                                    placeholder="Tulis alasan perubahan hutang"
+                                    placeholder="Tulis alasan penambahan hutang"
                                     required
                                 >{{ old('reason') }}</textarea>
                                 @error('reason')
@@ -68,7 +73,7 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-warning">Simpan Perubahan</button>
+                            <button type="submit" class="btn btn-warning">Simpan Penambahan</button>
                         </form>
                     </div>
                 </div>
@@ -76,7 +81,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-1">Ringkasan Hutang</h5>
-                        <p class="mb-0 text-muted">Informasi hutang saat ini sebelum Anda melakukan perubahan.</p>
+                        <p class="mb-0 text-muted">Informasi hutang saat ini sebelum Anda menambah nominal hutang.</p>
                     </div>
 
                     <div class="card-body">
@@ -109,10 +114,10 @@
             </div>
 
             <div class="col-12 col-xl-7">
-                <div class="card">
+                <div class="card h-100">
                     <div class="card-header">
                         <h5 class="card-title mb-1">Riwayat Perubahan Hutang</h5>
-                        <p class="mb-0 text-muted">Semua perubahan nominal hutang akan tercatat di sini.</p>
+                        <p class="mb-0 text-muted">Semua penambahan hutang tercatat di sini. Data lama pengurangan tetap ditampilkan sebagai riwayat lama.</p>
                     </div>
 
                     <div class="card-body">

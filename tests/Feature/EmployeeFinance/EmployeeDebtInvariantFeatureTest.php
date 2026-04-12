@@ -54,15 +54,7 @@ final class EmployeeDebtInvariantFeatureTest extends TestCase
             $debtId,
             'increase',
             50000,
-            'Tambah principal untuk koreksi pencatatan',
-            $actorId,
-        );
-
-        $adjustHandler->handle(
-            $debtId,
-            'decrease',
-            25000,
-            'Kurangi principal untuk koreksi lanjutan',
+            'Tambah hutang untuk koreksi pencatatan',
             $actorId,
         );
 
@@ -83,8 +75,8 @@ final class EmployeeDebtInvariantFeatureTest extends TestCase
             ]);
 
         $this->assertNotNull($debt);
-        $this->assertSame(1025000, (int) $debt->total_debt);
-        $this->assertSame(825000, (int) $debt->remaining_balance);
+        $this->assertSame(1050000, (int) $debt->total_debt);
+        $this->assertSame(850000, (int) $debt->remaining_balance);
         $this->assertSame('unpaid', (string) $debt->status);
 
         $activePaymentTotal = (int) DB::table('employee_debt_payments')

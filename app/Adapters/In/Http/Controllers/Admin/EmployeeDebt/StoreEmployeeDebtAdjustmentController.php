@@ -28,7 +28,7 @@ final class StoreEmployeeDebtAdjustmentController extends Controller
                 (string) $request->user()->getAuthIdentifier(),
             );
         } catch (Throwable $e) {
-            $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Koreksi hutang gagal dicatat.';
+            $message = trim($e->getMessage()) !== '' ? $e->getMessage() : 'Penambahan hutang gagal dicatat.';
 
             return back()
                 ->withErrors(['debt_adjustment' => $message])
@@ -37,6 +37,6 @@ final class StoreEmployeeDebtAdjustmentController extends Controller
 
         return redirect()
             ->route('admin.employee-debts.show', ['debtId' => $debtId])
-            ->with('success', 'Koreksi hutang berhasil dicatat.');
+            ->with('success', 'Penambahan hutang berhasil dicatat.');
     }
 }

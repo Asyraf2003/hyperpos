@@ -30,8 +30,12 @@ final class AdjustEmployeeDebtPrincipalHandler
 
     public function handle(string $debtId, string $type, int $amount, string $reason, string $actorId): string
     {
+        if ($type !== 'increase') {
+            throw new DomainException('Pengurangan hutang harus lewat pembayaran, bukan lewat halaman tambah hutang.');
+        }
+
         if (trim($reason) === '') {
-            throw new DomainException('Catatan koreksi wajib diisi.');
+            throw new DomainException('Catatan penambahan hutang wajib diisi.');
         }
 
         $this->transactionManager->begin();
