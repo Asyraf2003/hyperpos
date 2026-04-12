@@ -138,7 +138,7 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
-                                    <div class="small opacity-75">Buka detail hutang aktif terbaru atau fallback ke riwayat hutang.</div>
+                                    <div class="small opacity-75">Buka detail hutang aktif terbaru.</div>
                                 </a>
                             </div>
                         </div>
