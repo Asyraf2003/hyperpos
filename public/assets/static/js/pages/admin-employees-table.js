@@ -141,7 +141,7 @@
             data-employee-name="${esc(row.employee_name)}"
             data-salary-basis-label="${esc(row.salary_basis_label)}"
             data-employment-status-label="${esc(row.employment_status_label)}"
-            data-latest-unpaid-debt-id="${esc(row.latest_unpaid_debt_id ?? '')}"
+            data-debt-detail-id="${esc(row.debt_detail_id ?? '')}"
           >
             Aksi
           </button>
@@ -171,9 +171,7 @@
     renderPager(json.data.meta || {});
     renderSort();
 
-    if (q) {
-      q.value = s.q;
-    }
+    if (q) q.value = s.q;
 
     updateUrl(replace);
   };

@@ -22,14 +22,14 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
                 'employees.employment_status',
             ])
             ->selectSub(
-                DB::table('employee_debts as latest_unpaid_debts')
-                    ->select('latest_unpaid_debts.id')
-                    ->whereColumn('latest_unpaid_debts.employee_id', 'employees.id')
-                    ->where('latest_unpaid_debts.status', 'unpaid')
-                    ->orderByDesc('latest_unpaid_debts.created_at')
-                    ->orderByDesc('latest_unpaid_debts.id')
+                DB::table('employee_debts as debt_target')
+                    ->select('debt_target.id')
+                    ->whereColumn('debt_target.employee_id', 'employees.id')
+                    ->orderByRaw("CASE WHEN debt_target.status = 'unpaid' THEN 0 ELSE 1 END")
+                    ->orderByDesc('debt_target.created_at')
+                    ->orderByDesc('debt_target.id')
                     ->limit(1),
-                'latest_unpaid_debt_id'
+                'debt_detail_id'
             );
 
         if ($query->q() !== null) {
@@ -61,9 +61,7 @@ final class DatabaseEmployeeTableReaderAdapter implements EmployeeTableReaderPor
                     : null,
                 'employment_status' => (string) $row->employment_status,
                 'employment_status_label' => $this->employmentStatusLabel((string) $row->employment_status),
-                'latest_unpaid_debt_id' => $row->latest_unpaid_debt_id !== null
-                    ? (string) $row->latest_unpaid_debt_id
-                    : null,
+                'debt_detail_id' => $row->debt_detail_id !== null ? (string) $row->debt_detail_id : null,
             ])->values()->all(),
             'meta' => [
                 'page' => $paginator->currentPage(),

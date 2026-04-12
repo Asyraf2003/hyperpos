@@ -138,7 +138,7 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
-                                    <div class="small opacity-75">Buka detail hutang aktif terbaru.</div>
+                                    <div class="small opacity-75">Buka detail hutang karyawan atau buat data hutang pertama.</div>
                                 </a>
                             </div>
                         </div>
@@ -157,7 +157,7 @@
             editBaseUrl: @json(route('admin.employees.edit', ['employeeId' => '__ID__'])),
             payrollDetailBaseUrl: @json(route('admin.employees.payrolls.show', ['employeeId' => '__ID__'])),
             debtShowBaseUrl: @json(route('admin.employee-debts.show', ['debtId' => '__ID__'])),
-            employeeDebtIndexUrl: @json(route('admin.employee-debts.index'))
+            createDebtUrl: @json(route('admin.employee-debts.create'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-employees-table.js') }}"></script>
