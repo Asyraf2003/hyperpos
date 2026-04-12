@@ -13,6 +13,7 @@ final class DatabaseEmployeeDetailPageQuery
         private EmployeeDetailVersionIdentityMapper $versionIdentityMapper,
         private EmployeeDetailInitialIdentityMetaFactory $initialIdentityMetaFactory,
         private EmployeeDetailTimelineEntryMapper $timelineEntryMapper,
+        private EmployeeDetailVersionLookup $versionLookup,
     ) {
     }
 
@@ -36,22 +37,9 @@ final class DatabaseEmployeeDetailPageQuery
             return null;
         }
 
-        $versionRows = DB::table('employee_versions')
-            ->select([
-                'id',
-                'revision_no',
-                'event_name',
-                'changed_by_actor_id',
-                'change_reason',
-                'changed_at',
-                'snapshot_json',
-            ])
-            ->where('employee_id', $employeeId)
-            ->orderByDesc('revision_no')
-            ->get();
-
-        $createdVersion = $this->createdVersion($employeeId);
-        $firstRecordedVersion = $this->firstRecordedVersion($employeeId);
+        $versionRows = $this->versionLookup->timelineRows($employeeId);
+        $createdVersion = $this->versionLookup->createdVersion($employeeId);
+        $firstRecordedVersion = $this->versionLookup->firstRecordedVersion($employeeId);
         $currentIdentity = $this->currentIdentityMapper->map($row);
         $initialSource = $createdVersion ?? $firstRecordedVersion;
         $initialIdentity = $initialSource === null ? null : $this->versionIdentityMapper->map($initialSource);
@@ -72,36 +60,5 @@ final class DatabaseEmployeeDetailPageQuery
                     ->all(),
             ],
         ];
-    }
-
-    private function createdVersion(string $employeeId): ?object
-    {
-        return DB::table('employee_versions')
-            ->where('employee_id', $employeeId)
-            ->where('event_name', 'employee_created')
-            ->orderBy('revision_no')
-            ->first([
-                'revision_no',
-                'event_name',
-                'changed_by_actor_id',
-                'change_reason',
-                'changed_at',
-                'snapshot_json',
-            ]);
-    }
-
-    private function firstRecordedVersion(string $employeeId): ?object
-    {
-        return DB::table('employee_versions')
-            ->where('employee_id', $employeeId)
-            ->orderBy('revision_no')
-            ->first([
-                'revision_no',
-                'event_name',
-                'changed_by_actor_id',
-                'change_reason',
-                'changed_at',
-                'snapshot_json',
-            ]);
     }
 }
