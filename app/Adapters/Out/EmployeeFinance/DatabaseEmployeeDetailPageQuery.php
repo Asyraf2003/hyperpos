@@ -101,14 +101,19 @@ final class DatabaseEmployeeDetailPageQuery
 
     private function identityFromCurrentRow(object $row): array
     {
-        $defaultSalaryAmount = $row->default_salary_amount !== null ? (int) $row->default_salary_amount : null;
+        $defaultSalaryAmountRaw = $row->default_salary_amount ?? null;
+        $phone = $row->phone ?? null;
+        $startedAt = $row->started_at ?? null;
+        $endedAt = $row->ended_at ?? null;
+
+        $defaultSalaryAmount = $defaultSalaryAmountRaw === null ? null : (int) $defaultSalaryAmountRaw;
         $salaryBasisType = (string) $row->salary_basis_type;
         $employmentStatus = (string) $row->employment_status;
 
         return [
             'id' => (string) $row->id,
             'employee_name' => (string) $row->employee_name,
-            'phone' => $row->phone !== null ? (string) $row->phone : null,
+            'phone' => $phone === null ? null : (string) $phone,
             'salary_basis_type' => $salaryBasisType,
             'salary_basis_label' => $this->salaryBasisLabel($salaryBasisType),
             'default_salary_amount' => $defaultSalaryAmount,
@@ -120,23 +125,24 @@ final class DatabaseEmployeeDetailPageQuery
                 : '-',
             'employment_status' => $employmentStatus,
             'employment_status_label' => $this->employmentStatusLabel($employmentStatus),
-            'started_at' => $row->started_at !== null ? (string) $row->started_at : null,
-            'ended_at' => $row->ended_at !== null ? (string) $row->ended_at : null,
+            'started_at' => $startedAt === null ? null : (string) $startedAt,
+            'ended_at' => $endedAt === null ? null : (string) $endedAt,
         ];
     }
 
     private function identityFromVersionRow(object $row): array
     {
         $snapshot = $this->decodeSnapshot((string) $row->snapshot_json);
-        $defaultSalaryAmount = isset($snapshot['default_salary_amount']) && $snapshot['default_salary_amount'] !== null
-            ? (int) $snapshot['default_salary_amount']
-            : null;
+        $defaultSalaryAmount = $this->snapshotNullableInt($snapshot, 'default_salary_amount');
         $salaryBasisType = (string) ($snapshot['salary_basis_type'] ?? 'manual');
         $employmentStatus = (string) ($snapshot['employment_status'] ?? 'active');
+        $phone = $this->snapshotNullableString($snapshot, 'phone');
+        $startedAt = $this->snapshotNullableString($snapshot, 'started_at');
+        $endedAt = $this->snapshotNullableString($snapshot, 'ended_at');
 
         return [
             'employee_name' => (string) ($snapshot['employee_name'] ?? '-'),
-            'phone' => isset($snapshot['phone']) && $snapshot['phone'] !== null ? (string) $snapshot['phone'] : null,
+            'phone' => $phone,
             'salary_basis_type' => $salaryBasisType,
             'salary_basis_label' => $this->salaryBasisLabel($salaryBasisType),
             'default_salary_amount' => $defaultSalaryAmount,
@@ -148,8 +154,8 @@ final class DatabaseEmployeeDetailPageQuery
                 : '-',
             'employment_status' => $employmentStatus,
             'employment_status_label' => $this->employmentStatusLabel($employmentStatus),
-            'started_at' => isset($snapshot['started_at']) && $snapshot['started_at'] !== null ? (string) $snapshot['started_at'] : null,
-            'ended_at' => isset($snapshot['ended_at']) && $snapshot['ended_at'] !== null ? (string) $snapshot['ended_at'] : null,
+            'started_at' => $startedAt,
+            'ended_at' => $endedAt,
             'changed_at' => Carbon::parse((string) $row->changed_at)->format('Y-m-d H:i'),
         ];
     }
@@ -197,28 +203,28 @@ final class DatabaseEmployeeDetailPageQuery
     private function timelineEntry(object $row): array
     {
         $snapshot = $this->decodeSnapshot((string) $row->snapshot_json);
-        $defaultSalaryAmount = isset($snapshot['default_salary_amount']) && $snapshot['default_salary_amount'] !== null
-            ? (int) $snapshot['default_salary_amount']
-            : null;
+        $defaultSalaryAmount = $this->snapshotNullableInt($snapshot, 'default_salary_amount');
         $salaryBasisType = (string) ($snapshot['salary_basis_type'] ?? 'manual');
         $employmentStatus = (string) ($snapshot['employment_status'] ?? 'active');
+        $changedByActorId = $row->changed_by_actor_id ?? null;
+        $changeReason = $row->change_reason ?? null;
 
         return [
             'revision_label' => 'Revisi '.(int) $row->revision_no,
             'event_name' => $this->eventLabel((string) $row->event_name),
             'changed_at' => Carbon::parse((string) $row->changed_at)->format('Y-m-d H:i'),
-            'actor_label' => $row->changed_by_actor_id !== null ? 'Actor '.$row->changed_by_actor_id : null,
-            'reason_label' => $row->change_reason !== null ? (string) $row->change_reason : null,
+            'actor_label' => $changedByActorId === null ? null : 'Actor '.(string) $changedByActorId,
+            'reason_label' => $changeReason === null ? null : (string) $changeReason,
             'snapshot' => [
                 'employee_name' => (string) ($snapshot['employee_name'] ?? '-'),
-                'phone' => isset($snapshot['phone']) && $snapshot['phone'] !== null ? (string) $snapshot['phone'] : '-',
+                'phone' => $this->snapshotStringOr($snapshot, 'phone', '-'),
                 'salary_basis_label' => $this->salaryBasisLabel($salaryBasisType),
                 'default_salary_amount_label' => $defaultSalaryAmount !== null
                     ? 'Rp'.number_format($defaultSalaryAmount, 0, ',', '.')
                     : '-',
                 'employment_status_label' => $this->employmentStatusLabel($employmentStatus),
-                'started_at' => isset($snapshot['started_at']) && $snapshot['started_at'] !== null ? (string) $snapshot['started_at'] : '-',
-                'ended_at' => isset($snapshot['ended_at']) && $snapshot['ended_at'] !== null ? (string) $snapshot['ended_at'] : '-',
+                'started_at' => $this->snapshotStringOr($snapshot, 'started_at', '-'),
+                'ended_at' => $this->snapshotStringOr($snapshot, 'ended_at', '-'),
             ],
         ];
     }
@@ -228,6 +234,31 @@ final class DatabaseEmployeeDetailPageQuery
         $decoded = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function snapshotNullableInt(array $snapshot, string $key): ?int
+    {
+        if (!array_key_exists($key, $snapshot) || $snapshot[$key] === null) {
+            return null;
+        }
+
+        return (int) $snapshot[$key];
+    }
+
+    private function snapshotNullableString(array $snapshot, string $key): ?string
+    {
+        if (!array_key_exists($key, $snapshot) || $snapshot[$key] === null) {
+            return null;
+        }
+
+        return (string) $snapshot[$key];
+    }
+
+    private function snapshotStringOr(array $snapshot, string $key, string $fallback): string
+    {
+        $value = $this->snapshotNullableString($snapshot, $key);
+
+        return $value ?? $fallback;
     }
 
     private function salaryBasisLabel(string $value): string
