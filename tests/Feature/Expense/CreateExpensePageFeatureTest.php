@@ -49,9 +49,11 @@ final class CreateExpensePageFeatureTest extends TestCase
         $response->assertSee('Listrik Bengkel (EXP-ELEC)');
         $response->assertDontSee('Lain-lain (EXP-MISC)');
         $response->assertDontSee('Status');
+        $response->assertSee('expense-create-config', false);
         $response->assertSee('expense-category-search-input', false);
-        $response->assertSee('admin-money-input.js');
-        $response->assertSee('admin-expense-create.js');
+        $response->assertSee('admin-expense-create/category-search.js');
+        $response->assertSee('admin-expense-create/flow.js');
+        $response->assertSee('admin-expense-create/boot.js');
         $response->assertSee('cash');
         $response->assertSee('tf');
     }

@@ -79,6 +79,44 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="expense-delete-modal"
+            tabindex="-1"
+            aria-labelledby="expense-delete-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="expense-delete-modal-title">Hapus Pengeluaran</h3>
+                            <p class="mb-0 text-muted fs-6" id="expense-delete-modal-subtitle">
+                                Pilih pengeluaran yang ingin dihapus.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <p class="mb-4 text-muted">
+                            Data pengeluaran akan disembunyikan dari daftar aktif dan tidak lagi dihitung di laporan.
+                        </p>
+
+                        <form id="expense-delete-form" method="post">
+                            @csrf
+                            @method('DELETE')
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-danger">Ya, hapus pengeluaran</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 

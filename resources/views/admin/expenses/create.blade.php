@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="{{ route('admin.expenses.store') }}" method="post">
+                        <form id="expense-create-form" action="{{ route('admin.expenses.store') }}" method="post">
                             @csrf
 
                             <div class="row">
@@ -38,7 +38,7 @@
                                                 autocomplete="off"
                                             >
                                             <small id="expense-category-search-helper" class="text-muted d-block mt-2">
-                                                Ketik minimal 2 karakter untuk cari kategori.
+                                                Ketik minimal 2 karakter untuk cari kategori. Enter pilih hasil. Jika tidak ada, Enter ke form kategori baru.
                                             </small>
                                             <div id="expense-category-search-results" class="list-group mt-2 d-none"></div>
                                         </div>
@@ -52,7 +52,7 @@
                                             >
                                                 <option value="">Pilih kategori</option>
                                                 @foreach ($categoryOptions as $option)
-                                                    <option value="{{ $option['id'] }}" @selected(old('category_id') === $option['id'])>
+                                                    <option value="{{ $option['id'] }}" @selected(($selectedCategoryId ?? '') === $option['id'])>
                                                         {{ $option['label'] }}
                                                     </option>
                                                 @endforeach
@@ -172,16 +172,20 @@
                 </div>
             </div>
         </div>
+
+        <script id="expense-create-config" type="application/json">{!!
+            json_encode([
+                'categoryOptions' => $categoryOptions,
+                'selectedCategoryId' => $selectedCategoryId ?? '',
+                'createCategoryBaseUrl' => $createCategoryUrl ?? route('admin.expenses.categories.create'),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        !!}</script>
     </section>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
-    <script>
-        window.expenseCreateConfig = {
-            categoryOptions: @json($categoryOptions),
-        };
-        window.AdminMoneyInput?.bindBySelector(document);
-    </script>
-    <script src="{{ asset('assets/static/js/pages/admin-expense-create.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-expense-create/category-search.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-expense-create/flow.js') }}"></script>
+    <script src="{{ asset('assets/static/js/pages/admin-expense-create/boot.js') }}"></script>
 @endpush

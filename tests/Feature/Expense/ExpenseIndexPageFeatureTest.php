@@ -39,6 +39,8 @@ final class ExpenseIndexPageFeatureTest extends TestCase
         $response->assertSee('expense-table-body', false);
         $response->assertSee('admin-expenses-table.js');
         $response->assertSee(json_encode(route('admin.expenses.table')), false);
+        $response->assertSee('expense-delete-modal', false);
+        $response->assertSee('expense-delete-form', false);
         $response->assertSee('Listrik Bengkel (EXP-ELEC)');
         $response->assertDontSee('Lain-lain (EXP-MISC)');
     }

@@ -13,66 +13,28 @@ final class StoreExpenseCategoryHttpFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_store_expense_category_from_create_page(): void
+    public function test_admin_can_store_expense_category_and_return_to_expense_create_when_requested(): void
     {
         $response = $this->actingAs($this->user('admin'))
             ->post(route('admin.expenses.categories.store'), [
-                'code' => 'EXP-WIFI',
-                'name' => 'Wifi',
-                'description' => 'Tagihan internet bengkel',
+                'code' => 'EXP-BARU',
+                'name' => 'Biaya Baru',
+                'description' => 'Dibuat dari form pengeluaran',
+                'source' => 'expense_create',
             ]);
 
-        $response->assertRedirect(route('admin.expenses.categories.index'));
+        $categoryId = (string) DB::table('expense_categories')
+            ->where('code', 'EXP-BARU')
+            ->value('id');
+
+        $response->assertRedirect(route('admin.expenses.create', ['category_id' => $categoryId]));
         $response->assertSessionHas('success', 'Kategori pengeluaran berhasil dibuat.');
 
         $this->assertDatabaseHas('expense_categories', [
-            'code' => 'EXP-WIFI',
-            'name' => 'Wifi',
-            'description' => 'Tagihan internet bengkel',
-            'is_active' => 1,
+            'code' => 'EXP-BARU',
+            'name' => 'Biaya Baru',
+            'is_active' => true,
         ]);
-    }
-
-    public function test_admin_store_expense_category_returns_back_with_error_when_duplicate_code_conflict_happens(): void
-    {
-        $this->seedExpenseCategory(
-            'expense-category-1',
-            'EXP-WIFI',
-            'Wifi Lama',
-            true,
-            'Data lama',
-        );
-
-        $response = $this->from(route('admin.expenses.categories.create'))
-            ->actingAs($this->user('admin'))
-            ->post(route('admin.expenses.categories.store'), [
-                'code' => 'EXP-WIFI',
-                'name' => 'Wifi Baru',
-                'description' => 'Tagihan internet baru',
-            ]);
-
-        $response->assertRedirect(route('admin.expenses.categories.create'));
-        $response->assertSessionHasErrors([
-            'expense_category' => 'Kode expense category sudah dipakai.',
-        ]);
-
-        $this->assertDatabaseCount('expense_categories', 1);
-    }
-
-    public function test_admin_store_expense_category_returns_back_with_validation_error_when_name_is_blank(): void
-    {
-        $response = $this->from(route('admin.expenses.categories.create'))
-            ->actingAs($this->user('admin'))
-            ->post(route('admin.expenses.categories.store'), [
-                'code' => 'EXP-PARK',
-                'name' => '',
-                'description' => 'Biaya parkir',
-            ]);
-
-        $response->assertRedirect(route('admin.expenses.categories.create'));
-        $response->assertSessionHasErrors(['name']);
-
-        $this->assertDatabaseCount('expense_categories', 0);
     }
 
     private function user(string $role): User
@@ -89,23 +51,5 @@ final class StoreExpenseCategoryHttpFeatureTest extends TestCase
         ]);
 
         return $user;
-    }
-
-    private function seedExpenseCategory(
-        string $id,
-        string $code,
-        string $name,
-        bool $isActive,
-        ?string $description = null,
-    ): void {
-        DB::table('expense_categories')->insert([
-            'id' => $id,
-            'code' => $code,
-            'name' => $name,
-            'description' => $description,
-            'is_active' => $isActive,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
     }
 }

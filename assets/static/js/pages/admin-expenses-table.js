@@ -32,6 +32,13 @@
   const hiddenFromInput = $("filter-date-from");
   const hiddenToInput = $("filter-date-to");
 
+  const deleteModalElement = $("expense-delete-modal");
+  const deleteModalSubtitle = $("expense-delete-modal-subtitle");
+  const deleteForm = $("expense-delete-form");
+  const deleteModal = deleteModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(deleteModalElement)
+    : null;
+
   let searchDebounceTimer = null;
   let requestCounter = 0;
 
@@ -146,13 +153,14 @@
     if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
-  const actionHtml = (r) => `
-    <form action="${esc(deleteUrl(r.id))}" method="post" onsubmit="return confirm('Hapus pengeluaran ini?')">
-      <input type="hidden" name="_token" value="${esc(c.csrfToken)}">
-      <input type="hidden" name="_method" value="DELETE">
-      <button type="submit" class="btn btn-sm btn-light-danger">Hapus</button>
-    </form>
-  `;
+  const configureDeleteModal = (expense) => {
+    if (!deleteForm || !deleteModalSubtitle) {
+      return;
+    }
+
+    deleteForm.action = deleteUrl(expense.id);
+    deleteModalSubtitle.textContent = `${expense.category_name} • ${expense.expense_date} • ${rupiah(expense.amount_rupiah)}`;
+  };
 
   const rowHtml = (r, i, meta) => `
     <tr>
@@ -162,7 +170,19 @@
       <td>${esc(r.description)}</td>
       <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>
       <td>${esc(r.payment_method)}</td>
-      <td>${actionHtml(r)}</td>
+      <td>
+        <button
+          type="button"
+          class="btn btn-sm btn-light-danger"
+          data-expense-delete-open="1"
+          data-expense-id="${esc(r.id)}"
+          data-expense-category-name="${esc(r.category_name)}"
+          data-expense-date="${esc(r.expense_date)}"
+          data-expense-amount="${esc(r.amount_rupiah)}"
+        >
+          Hapus
+        </button>
+      </td>
     </tr>
   `;
 
@@ -283,22 +303,13 @@
     input?.addEventListener("change", syncStateFromFallbackDates);
   });
 
-  const btnOpenFilter = $("open-expense-filter");
-  if (btnOpenFilter) {
-    btnOpenFilter.addEventListener("click", () => {
-      drawOpen(true);
-      refreshDateUi();
-    });
-  }
+  $("open-expense-filter")?.addEventListener("click", () => {
+    drawOpen(true);
+    refreshDateUi();
+  });
 
-  const btnCloseFilter = $("close-expense-filter");
-  if (btnCloseFilter) {
-    btnCloseFilter.addEventListener("click", () => drawOpen(false));
-  }
-
-  if (backdrop) {
-    backdrop.addEventListener("click", () => drawOpen(false));
-  }
+  $("close-expense-filter")?.addEventListener("click", () => drawOpen(false));
+  backdrop?.addEventListener("click", () => drawOpen(false));
 
   filterForm?.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -318,35 +329,52 @@
     load();
   });
 
-  const btnResetFilter = $("reset-expense-filter");
-  if (btnResetFilter) {
-    btnResetFilter.addEventListener("click", () => {
-      filterForm?.reset();
+  $("reset-expense-filter")?.addEventListener("click", () => {
+    filterForm?.reset();
 
-      ["category_id", "date_from", "date_to"].forEach((k) => {
-        s[k] = "";
-      });
-
-      syncInputsFromState();
-      s.page = 1;
-      drawOpen(false);
-      load();
+    ["category_id", "date_from", "date_to"].forEach((k) => {
+      s[k] = "";
     });
-  }
 
-  const tableHeader = document.querySelector("#expense-table thead");
-  if (tableHeader) {
-    tableHeader.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-sort-by]");
-      if (!btn) return;
+    syncInputsFromState();
+    s.page = 1;
+    drawOpen(false);
+    load();
+  });
 
-      const key = btn.dataset.sortBy;
-      s.sort_dir = s.sort_by === key && s.sort_dir === "asc" ? "desc" : "asc";
-      s.sort_by = key;
-      s.page = 1;
-      load();
-    });
-  }
+  document.querySelector("#expense-table thead")?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-sort-by]");
+    if (!btn) return;
+
+    const key = btn.dataset.sortBy;
+    s.sort_dir = s.sort_by === key && s.sort_dir === "asc" ? "desc" : "asc";
+    s.sort_by = key;
+    s.page = 1;
+    load();
+  });
+
+  body?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-expense-delete-open='1']");
+    if (!btn) return;
+
+    const expense = {
+      id: btn.dataset.expenseId || "",
+      category_name: btn.dataset.expenseCategoryName || "",
+      expense_date: btn.dataset.expenseDate || "",
+      amount_rupiah: btn.dataset.expenseAmount || "0",
+    };
+
+    configureDeleteModal(expense);
+
+    if (deleteModal) {
+      deleteModal.show();
+      return;
+    }
+
+    if (deleteForm) {
+      deleteForm.action = deleteUrl(expense.id);
+    }
+  });
 
   pager?.addEventListener("click", (e) => {
     const link = e.target.closest("[data-page]");

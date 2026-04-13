@@ -33,6 +33,17 @@ final class StoreExpenseCategoryController extends Controller
                 ->withInput();
         }
 
+        $source = trim((string) $request->input('source', ''));
+        $payload = $result->data();
+        $categoryData = is_array($payload['expense_category'] ?? null) ? $payload['expense_category'] : [];
+        $categoryId = trim((string) ($categoryData['id'] ?? ''));
+
+        if ($source === 'expense_create' && $categoryId !== '') {
+            return redirect()
+                ->route('admin.expenses.create', ['category_id' => $categoryId])
+                ->with('success', 'Kategori pengeluaran berhasil dibuat.');
+        }
+
         return redirect()
             ->route('admin.expenses.categories.index')
             ->with('success', 'Kategori pengeluaran berhasil dibuat.');

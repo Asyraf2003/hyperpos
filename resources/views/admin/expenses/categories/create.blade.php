@@ -20,8 +20,15 @@
                     </div>
 
                     <div class="card-body">
+                        @if (($source ?? '') === 'expense_create')
+                            <div class="alert alert-light-primary mb-4">
+                                Anda datang dari form pengeluaran. Setelah kategori disimpan, halaman akan kembali ke form pengeluaran dan kategori baru langsung dipilih.
+                            </div>
+                        @endif
+
                         <form action="{{ route('admin.expenses.categories.store') }}" method="post">
                             @csrf
+                            <input type="hidden" name="source" value="{{ $source ?? '' }}">
 
                             <div class="row">
                                 <div class="col-12">
@@ -51,7 +58,7 @@
                                             type="text"
                                             id="name"
                                             name="name"
-                                            value="{{ old('name') }}"
+                                            value="{{ old('name', $prefillKeyword ?? '') }}"
                                             class="form-control @error('name') is-invalid @enderror"
                                             placeholder="Contoh: Listrik Bengkel"
                                             required
@@ -87,7 +94,7 @@
                                 <button type="submit" class="btn btn-primary">
                                     Simpan Kategori
                                 </button>
-                                <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">
+                                <a href="{{ $backUrl ?? route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">
                                     Batal
                                 </a>
                             </div>
