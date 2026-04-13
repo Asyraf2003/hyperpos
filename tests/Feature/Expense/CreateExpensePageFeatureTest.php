@@ -48,9 +48,12 @@ final class CreateExpensePageFeatureTest extends TestCase
         $response->assertSee(now()->format('Y-m-d'), false);
         $response->assertSee('Listrik Bengkel (EXP-ELEC)');
         $response->assertDontSee('Lain-lain (EXP-MISC)');
-        $response->assertDontSee('Referensi');
-        $response->assertDontSee('Submit expense akan diaktifkan pada batch berikutnya.');
+        $response->assertDontSee('Status');
+        $response->assertSee('expense-category-search-input', false);
         $response->assertSee('admin-money-input.js');
+        $response->assertSee('admin-expense-create.js');
+        $response->assertSee('cash');
+        $response->assertSee('tf');
     }
 
     private function user(string $role): User

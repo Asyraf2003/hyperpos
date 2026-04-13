@@ -27,22 +27,40 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-group mb-4">
-                                        <label for="category_id" class="form-label">Kategori</label>
-                                        <select
-                                            id="category_id"
-                                            name="category_id"
-                                            class="form-select @error('category_id') is-invalid @enderror"
-                                            required
-                                        >
-                                            <option value="">Pilih kategori</option>
-                                            @foreach ($categoryOptions as $option)
-                                                <option value="{{ $option['id'] }}" @selected(old('category_id') === $option['id'])>
-                                                    {{ $option['label'] }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <label class="form-label" for="expense-category-search-input">Kategori</label>
+
+                                        <div id="expense-category-search-wrap" class="d-none">
+                                            <input
+                                                type="text"
+                                                id="expense-category-search-input"
+                                                class="form-control"
+                                                placeholder="Ketik minimal 2 karakter nama atau kode kategori"
+                                                autocomplete="off"
+                                            >
+                                            <small id="expense-category-search-helper" class="text-muted d-block mt-2">
+                                                Ketik minimal 2 karakter untuk cari kategori.
+                                            </small>
+                                            <div id="expense-category-search-results" class="list-group mt-2 d-none"></div>
+                                        </div>
+
+                                        <div id="expense-category-select-wrap">
+                                            <select
+                                                id="category_id"
+                                                name="category_id"
+                                                class="form-select @error('category_id') is-invalid @enderror"
+                                                required
+                                            >
+                                                <option value="">Pilih kategori</option>
+                                                @foreach ($categoryOptions as $option)
+                                                    <option value="{{ $option['id'] }}" @selected(old('category_id') === $option['id'])>
+                                                        {{ $option['label'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
                                         @error('category_id')
-                                            <div class="invalid-feedback">
+                                            <div class="invalid-feedback d-block">
                                                 {{ $message }}
                                             </div>
                                         @enderror
@@ -111,9 +129,7 @@
                                         >
                                             <option value="">Pilih metode bayar</option>
                                             <option value="cash" @selected(old('payment_method') === 'cash')>cash</option>
-                                            <option value="transfer" @selected(old('payment_method') === 'transfer')>transfer</option>
-                                            <option value="qris" @selected(old('payment_method') === 'qris')>qris</option>
-                                            <option value="other" @selected(old('payment_method') === 'other')>other</option>
+                                            <option value="tf" @selected(old('payment_method') === 'tf')>tf</option>
                                         </select>
                                         @error('payment_method')
                                             <div class="invalid-feedback">
@@ -162,6 +178,10 @@
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
+        window.expenseCreateConfig = {
+            categoryOptions: @json($categoryOptions),
+        };
         window.AdminMoneyInput?.bindBySelector(document);
     </script>
+    <script src="{{ asset('assets/static/js/pages/admin-expense-create.js') }}"></script>
 @endpush
