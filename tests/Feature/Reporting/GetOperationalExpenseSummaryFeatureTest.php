@@ -27,7 +27,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'Bayar listrik workshop',
             'cash',
             'INV-001',
-            'posted',
             null,
         );
 
@@ -36,10 +35,9 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'expense-category-1',
             100000,
             '2026-03-15',
-            'Draft biaya listrik',
+            'Biaya listrik dihapus',
             'cash',
             'INV-002',
-            'draft',
             '2026-03-15 12:00:00',
         );
 
@@ -48,10 +46,9 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'expense-category-2',
             20000,
             '2026-03-15',
-            'Biaya makan batal',
+            'Biaya makan dihapus',
             'cash',
             'INV-003',
-            'cancelled',
             '2026-03-15 13:00:00',
         );
 
@@ -63,7 +60,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'Makan lembur tim',
             'transfer',
             null,
-            'posted',
             null,
         );
 
@@ -75,7 +71,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'Di luar scope tanggal',
             'cash',
             'INV-999',
-            'posted',
             null,
         );
 
@@ -141,7 +136,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
         string $description,
         string $paymentMethod,
         ?string $referenceNo,
-        string $status,
         ?string $deletedAt,
     ): void {
         DB::table('operational_expenses')->insert([
@@ -152,7 +146,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'description' => $description,
             'payment_method' => $paymentMethod,
             'reference_no' => $referenceNo,
-            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
             'deleted_at' => $deletedAt,

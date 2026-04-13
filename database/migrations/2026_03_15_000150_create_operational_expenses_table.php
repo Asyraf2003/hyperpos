@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('description');
             $table->string('payment_method');
             $table->string('reference_no')->nullable();
-            $table->string('status', 20);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('category_id')
                 ->references('id')
@@ -29,8 +29,8 @@ return new class extends Migration
                 ->restrictOnDelete();
 
             $table->index('expense_date');
-            $table->index('status');
             $table->index('category_id');
+            $table->index('deleted_at');
         });
     }
 

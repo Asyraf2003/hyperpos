@@ -29,7 +29,7 @@ final class ExpenseTableDataAccessFeatureTest extends TestCase
     public function test_admin_can_get_expense_table_json(): void
     {
         $this->seedCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel');
-        $this->seedExpense('expense-1', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 250000, '2026-03-23', 'Bayar token listrik', 'cash', 'posted');
+        $this->seedExpense('expense-1', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 250000, '2026-03-23', 'Bayar token listrik', 'cash');
 
         $response = $this->actingAs($this->user('admin'))->get(route('admin.expenses.table'));
 
@@ -77,7 +77,6 @@ final class ExpenseTableDataAccessFeatureTest extends TestCase
         string $date,
         string $description,
         string $paymentMethod,
-        string $status,
     ): void {
         DB::table('operational_expenses')->insert([
             'id' => $id,
@@ -88,9 +87,9 @@ final class ExpenseTableDataAccessFeatureTest extends TestCase
             'expense_date' => $date,
             'description' => $description,
             'payment_method' => $paymentMethod,
-            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
+            'deleted_at' => null,
         ]);
     }
 }

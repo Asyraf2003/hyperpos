@@ -49,7 +49,6 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             'expense_date' => '2026-03-17',
             'description' => 'Bayar token listrik workshop',
             'payment_method' => 'cash',
-            'status' => 'posted',
             'deleted_at' => null,
         ]);
     }

@@ -23,6 +23,4 @@ trait OperationalExpenseSummaryRowAccessors
     public function paymentMethod(): string { return $this->paymentMethod; }
 
     public function referenceNo(): ?string { return $this->referenceNo; }
-
-    public function status(): string { return $this->status; }
 }

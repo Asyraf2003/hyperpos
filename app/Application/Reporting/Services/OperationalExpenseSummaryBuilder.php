@@ -18,8 +18,7 @@ final class OperationalExpenseSummaryBuilder
      *   amount_rupiah:int,
      *   description:string,
      *   payment_method:string,
-     *   reference_no:?string,
-     *   status:string
+     *   reference_no:?string
      * }> $rows
      * @return list<OperationalExpenseSummaryRow>
      */
@@ -36,7 +35,6 @@ final class OperationalExpenseSummaryBuilder
                 $row['description'],
                 $row['payment_method'],
                 $row['reference_no'],
-                $row['status'],
             ),
             $rows,
         );

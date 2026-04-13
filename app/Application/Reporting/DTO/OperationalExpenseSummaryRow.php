@@ -20,7 +20,6 @@ final class OperationalExpenseSummaryRow
         private readonly string $description,
         private readonly string $paymentMethod,
         private readonly ?string $referenceNo,
-        private readonly string $status,
     ) {
     }
 
@@ -36,7 +35,6 @@ final class OperationalExpenseSummaryRow
             'description' => $this->description,
             'payment_method' => $this->paymentMethod,
             'reference_no' => $this->referenceNo,
-            'status' => $this->status,
         ];
     }
 }

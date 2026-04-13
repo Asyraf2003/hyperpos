@@ -26,7 +26,6 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
             '2026-03-23',
             'Bayar token listrik',
             'cash',
-            'posted',
             null,
         );
 
@@ -39,7 +38,6 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
             '2026-03-22',
             'Bayar listrik lama',
             'transfer',
-            'posted',
             '2026-03-24 10:00:00',
         );
 
@@ -60,8 +58,8 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
     public function test_admin_can_sort_expense_table_by_amount_desc(): void
     {
         $this->seedCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel');
-        $this->seedExpense('expense-1', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 250000, '2026-03-23', 'Bayar token listrik', 'cash', 'posted');
-        $this->seedExpense('expense-2', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 450000, '2026-03-22', 'Bayar genset', 'cash', 'posted');
+        $this->seedExpense('expense-1', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 250000, '2026-03-23', 'Bayar token listrik', 'cash');
+        $this->seedExpense('expense-2', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 450000, '2026-03-22', 'Bayar genset', 'cash');
 
         $response = $this->actingAs($this->admin())->get(route('admin.expenses.table', [
             'sort_by' => 'amount_rupiah',
@@ -87,7 +85,6 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
                 '2026-03-' . str_pad((string) min($i, 28), 2, '0', STR_PAD_LEFT),
                 'Expense ' . $i,
                 'cash',
-                'posted',
             );
         }
 
@@ -137,7 +134,6 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
         string $date,
         string $description,
         string $paymentMethod,
-        string $status,
         ?string $deletedAt = null,
     ): void {
         DB::table('operational_expenses')->insert([
@@ -149,7 +145,6 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
             'expense_date' => $date,
             'description' => $description,
             'payment_method' => $paymentMethod,
-            'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
             'deleted_at' => $deletedAt,
