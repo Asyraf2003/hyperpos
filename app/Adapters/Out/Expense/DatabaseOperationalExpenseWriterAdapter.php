@@ -29,4 +29,19 @@ final class DatabaseOperationalExpenseWriterAdapter implements OperationalExpens
             'deleted_at' => null,
         ]);
     }
+
+    public function softDelete(string $expenseId): bool
+    {
+        $now = Carbon::now();
+
+        $affected = DB::table('operational_expenses')
+            ->where('id', $expenseId)
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+        return $affected > 0;
+    }
 }

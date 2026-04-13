@@ -62,11 +62,12 @@
                                     </button>
                                 </th>
                                 <th>Metode Bayar</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="expense-table-body">
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Sedang memuat data...</td>
+                                <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -84,7 +85,9 @@
 @push('scripts')
     <script>
         window.expenseTableConfig = {
-            endpoint: @json(route('admin.expenses.table'))
+            endpoint: @json(route('admin.expenses.table')),
+            deleteUrlTemplate: @json(route('admin.expenses.delete', ['expenseId' => '__EXPENSE_ID__'])),
+            csrfToken: @json(csrf_token())
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-expenses-table.js') }}"></script>

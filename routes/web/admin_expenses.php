@@ -11,6 +11,7 @@ use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseCategoryIndexPageContr
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseCategoryTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\ExpenseTableDataController;
+use App\Adapters\In\Http\Controllers\Admin\Expense\SoftDeleteOperationalExpenseController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\StoreExpenseCategoryController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\StoreExpenseController;
 use App\Adapters\In\Http\Controllers\Admin\Expense\UpdateExpenseCategoryController;
@@ -25,6 +26,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/expenses', StoreExpenseController::class)
         ->name('admin.expenses.store');
+
+    Route::delete('/admin/expenses/{expenseId}', SoftDeleteOperationalExpenseController::class)
+        ->name('admin.expenses.delete');
 
     Route::post('/admin/expenses/categories', StoreExpenseCategoryController::class)
         ->name('admin.expenses.categories.store');

@@ -45,6 +45,7 @@
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const trimValue = (v) => String(v ?? "").trim();
+  const deleteUrl = (id) => String(c.deleteUrlTemplate || "").replace("__EXPENSE_ID__", encodeURIComponent(String(id)));
 
   const intOrDefault = (v, fallback) => {
     const n = Number.parseInt(String(v ?? ""), 10);
@@ -145,6 +146,14 @@
     if (backdrop) backdrop.classList.toggle("d-none", !open);
   };
 
+  const actionHtml = (r) => `
+    <form action="${esc(deleteUrl(r.id))}" method="post" onsubmit="return confirm('Hapus pengeluaran ini?')">
+      <input type="hidden" name="_token" value="${esc(c.csrfToken)}">
+      <input type="hidden" name="_method" value="DELETE">
+      <button type="submit" class="btn btn-sm btn-light-danger">Hapus</button>
+    </form>
+  `;
+
   const rowHtml = (r, i, meta) => `
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
@@ -153,12 +162,13 @@
       <td>${esc(r.description)}</td>
       <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>
       <td>${esc(r.payment_method)}</td>
+      <td>${actionHtml(r)}</td>
     </tr>
   `;
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada pengeluaran yang cocok.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada pengeluaran yang cocok.</td></tr>`;
       return;
     }
 
@@ -205,7 +215,7 @@
 
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
-    body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+    body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
@@ -216,7 +226,7 @@
     if (currentRequest !== requestCounter) return;
 
     if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
       return;
     }
 

@@ -9,4 +9,6 @@ use App\Core\Expense\OperationalExpense\OperationalExpense;
 interface OperationalExpenseWriterPort
 {
     public function create(OperationalExpense $operationalExpense): void;
+
+    public function softDelete(string $expenseId): bool;
 }
