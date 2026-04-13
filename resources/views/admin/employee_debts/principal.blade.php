@@ -114,7 +114,7 @@
             </div>
 
             <div class="col-12 col-xl-7">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-1">Riwayat Perubahan Hutang</h5>
                         <p class="mb-0 text-muted">Semua penambahan hutang tercatat di sini. Data lama pengurangan tetap ditampilkan sebagai riwayat lama.</p>

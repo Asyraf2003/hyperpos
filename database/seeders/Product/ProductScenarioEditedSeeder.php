@@ -7,6 +7,7 @@ namespace Database\Seeders\Product;
 use App\Application\ProductCatalog\UseCases\CreateProductHandler;
 use App\Application\ProductCatalog\UseCases\UpdateProductHandler;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class ProductScenarioEditedSeeder extends Seeder
@@ -18,28 +19,35 @@ final class ProductScenarioEditedSeeder extends Seeder
         $items = ProductSeedCatalog::all()['active_edited'];
 
         foreach ($items as $item) {
-            $created = $createHandler->handle(
-                kodeBarang: $item['create']['code'],
-                namaBarang: $item['create']['name'],
-                merek: $item['create']['brand'],
-                ukuran: $item['create']['size'],
-                hargaJual: $item['create']['price'],
+            $productId = $this->resolveExistingProductId(
+                createCode: $item['create']['code'],
+                updateCode: $item['update']['code'],
             );
 
-            if ($created->isFailure()) {
-                Log::warning('ProductScenarioEditedSeeder create gagal.', [
-                    'message' => $created->message(),
-                    'item' => $item,
-                ]);
-                continue;
+            if ($productId === null) {
+                $created = $createHandler->handle(
+                    kodeBarang: $item['create']['code'],
+                    namaBarang: $item['create']['name'],
+                    merek: $item['create']['brand'],
+                    ukuran: $item['create']['size'],
+                    hargaJual: $item['create']['price'],
+                );
+
+                if ($created->isFailure()) {
+                    Log::warning('ProductScenarioEditedSeeder create gagal.', [
+                        'message' => $created->message(),
+                        'item' => $item,
+                    ]);
+                    continue;
+                }
+
+                $productId = $created->data()['id'] ?? null;
             }
 
-            $productId = $created->data()['id'] ?? null;
-
             if (! is_string($productId) || trim($productId) === '') {
-                Log::warning('ProductScenarioEditedSeeder tidak mendapat product id setelah create.', [
+                Log::warning('ProductScenarioEditedSeeder tidak mendapat product id sebelum update.', [
                     'item' => $item,
-                    'data' => $created->data(),
+                    'resolved_product_id' => $productId,
                 ]);
                 continue;
             }
@@ -61,5 +69,26 @@ final class ProductScenarioEditedSeeder extends Seeder
                 ]);
             }
         }
+    }
+
+    private function resolveExistingProductId(string $createCode, string $updateCode): ?string
+    {
+        $existingId = DB::table('products')
+            ->where('kode_barang', trim($createCode))
+            ->value('id');
+
+        if (is_string($existingId) && trim($existingId) !== '') {
+            return $existingId;
+        }
+
+        $updatedId = DB::table('products')
+            ->where('kode_barang', trim($updateCode))
+            ->value('id');
+
+        if (is_string($updatedId) && trim($updatedId) !== '') {
+            return $updatedId;
+        }
+
+        return null;
     }
 }

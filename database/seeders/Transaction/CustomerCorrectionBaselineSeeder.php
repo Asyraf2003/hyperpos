@@ -262,7 +262,7 @@ final class CustomerCorrectionBaselineSeeder extends Seeder
                 ->min('transaction_date')
         );
 
-        $dayIndex = $startDate->diffInDays($transactionDate);
+        $dayIndex = (int) $startDate->diffInDays($transactionDate);
 
         return [
             sprintf('Servis Ringan D%02d S01', $dayIndex + 1),

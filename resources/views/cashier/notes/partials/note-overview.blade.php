@@ -60,7 +60,7 @@
     </div>
 
     <div class="col-12 col-xl-6">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 <h4 class="card-title mb-1">Ringkasan Pembayaran</h4>
                 <p class="mb-0 text-muted">Susunan angka dibuat menurun supaya lebih cepat dibaca kasir.</p>

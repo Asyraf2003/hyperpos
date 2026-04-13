@@ -256,7 +256,7 @@
                 </div>
 
                 <div class="col-12 col-xl-4 order-1 order-xl-2">
-                    <div class="card h-100">
+                    <div class="card">
                         <div class="card-header">
                             <div>
                                 <h4 class="card-title mb-1">Informasi Nota</h4>

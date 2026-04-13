@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 final class ProcurementLoadSeeder extends Seeder
 {
+    private const INT_MAX = 2147483647;
     public function run(): void
     {
         $suppliers = DB::table('suppliers')
@@ -214,9 +215,9 @@ final class ProcurementLoadSeeder extends Seeder
         for ($lineNo = 1; $lineNo <= $lineCount; $lineNo++) {
             $productIndex = (($invoiceRunningNo * 5) + ($lineNo * 7) + $dayIndex) % $products->count();
             $product = $products[$productIndex];
-            $qty = 8 + (($invoiceRunningNo + ($lineNo * 3) + $slot) % 28);
-            $baseCost = max(1000, (int) floor(((int) $product->harga_jual) * 0.58));
-            $unitCost = $baseCost + ((($dayIndex + $lineNo + $slot) % 9) * 1200);
+            $qty = 3 + (($invoiceRunningNo + ($lineNo * 3) + $slot) % 10);
+            $baseCost = max(1000, (int) floor(((int) $product->harga_jual) * 0.32));
+            $unitCost = $baseCost + ((($dayIndex + $lineNo + $slot) % 7) * 500);
             $lineTotal = $qty * $unitCost;
 
             $lines[] = [
@@ -268,7 +269,8 @@ final class ProcurementLoadSeeder extends Seeder
             $currentValue = (int) (DB::table('product_inventory_costing')->where('product_id', $productId)->value('inventory_value_rupiah') ?? 0);
 
             $newQty = $currentQty + (int) $delta['qty'];
-            $newValue = $currentValue + (int) $delta['cost'];
+            $newValueRaw = $currentValue + (int) $delta['cost'];
+            $newValue = min(self::INT_MAX, max(0, $newValueRaw));
             $avgCost = $newQty > 0 ? (int) floor($newValue / $newQty) : 0;
 
             DB::table('product_inventory')->updateOrInsert(
@@ -300,7 +302,7 @@ final class ProcurementLoadSeeder extends Seeder
             $currentValue = (int) (DB::table('product_inventory_costing')->where('product_id', $productId)->value('inventory_value_rupiah') ?? 0);
 
             $newQty = max(0, $currentQty - (int) $movement->qty_total);
-            $newValue = max(0, $currentValue - (int) $movement->cost_total);
+            $newValue = min(self::INT_MAX, max(0, $currentValue - (int) $movement->cost_total));
             $avgCost = $newQty > 0 ? (int) floor($newValue / $newQty) : 0;
 
             DB::table('product_inventory')->updateOrInsert(

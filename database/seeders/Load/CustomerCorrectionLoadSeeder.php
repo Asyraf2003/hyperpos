@@ -288,7 +288,7 @@ final class CustomerCorrectionLoadSeeder extends Seeder
         }
 
         $slot = $this->extractSlotFromNoteId($noteId);
-        $dayIndex = $this->loadStartDate->diffInDays($transactionDate);
+        $dayIndex = (int) $this->loadStartDate->diffInDays($transactionDate);
         $scenario = ($dayIndex + $slot) % 8;
 
         [$label, $basePrice] = match ($scenario) {
@@ -302,7 +302,7 @@ final class CustomerCorrectionLoadSeeder extends Seeder
             )),
         };
 
-        $resolvedPrice = $basePrice + (($dayIndex % 9) * 1500) + (($slot % 5) * 1000);
+        $resolvedPrice = (int) ($basePrice + (($dayIndex % 9) * 1500) + (($slot % 5) * 1000));
 
         return [
             sprintf('%s D%03d S%02d', $label, $dayIndex + 1, $slot),

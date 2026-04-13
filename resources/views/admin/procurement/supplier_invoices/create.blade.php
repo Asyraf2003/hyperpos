@@ -17,7 +17,7 @@
 
             <div class="row g-4">
                 <div class="col-12 col-xl-8 order-2 order-xl-1">
-                    <div class="card h-100">
+                    <div class="card">
                         <div class="card-header">
                             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                                 <div>
@@ -253,7 +253,7 @@
                 </div>
 
                 <div class="col-12 col-xl-4 order-1 order-xl-2">
-                    <div class="card h-100">
+                    <div class="card">
                         <div class="card-header">
                             <div>
                                 <h4 class="card-title mb-1">Informasi Nota</h4>

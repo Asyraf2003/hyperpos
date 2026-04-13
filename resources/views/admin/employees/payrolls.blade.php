@@ -29,7 +29,7 @@
 
         <div class="row g-4 mb-4">
             <div class="col-12 col-md-6 col-xl-3">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Basis Gaji</h5>
                     </div>
@@ -41,7 +41,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-3">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Default Gaji</h5>
                     </div>
@@ -53,7 +53,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-3">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Total Riwayat</h5>
                     </div>
@@ -65,7 +65,7 @@
             </div>
 
             <div class="col-12 col-md-6 col-xl-3">
-                <div class="card h-100">
+                <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Total Dicairkan</h5>
                     </div>
