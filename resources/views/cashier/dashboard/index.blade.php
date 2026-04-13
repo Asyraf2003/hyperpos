@@ -44,10 +44,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="alert alert-light mt-4 mb-0">
-                        Dashboard kasir sengaja dibuat ringan supaya navigasi utama tidak berisik.
-                    </div>
                 </div>
             </div>
         </div>
