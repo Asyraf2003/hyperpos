@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Transaction;
 
+use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
 use Carbon\CarbonImmutable;
 use Database\Seeders\Support\SeedDensity;
 use Illuminate\Database\Seeder;
@@ -39,10 +40,10 @@ final class CustomerPaymentBaselineSeeder extends Seeder
             $noteDate = CarbonImmutable::parse((string) $note->transaction_date);
             $total = (int) $note->total_rupiah;
 
-            $fullThreshold = $distribution['full'];
-            $partialThreshold = $distribution['full'] + $distribution['partial'];
+            $fullThreshold = (int) ($distribution['full'] / 5);
+            $partialThreshold = $fullThreshold + (int) ($distribution['partial'] / 5);
 
-            if ($pattern < $fullThreshold / 5) {
+            if ($pattern < $fullThreshold) {
                 if ($pattern === 0) {
                     $first = max(1000, intdiv($total * 40, 100));
                     $second = $total - $first;
@@ -77,7 +78,7 @@ final class CustomerPaymentBaselineSeeder extends Seeder
                 continue;
             }
 
-            if ($pattern < ($partialThreshold / 5)) {
+            if ($pattern < $partialThreshold) {
                 $partial = max(1000, intdiv($total * 55, 100));
 
                 if ($partial >= $total) {
@@ -98,7 +99,7 @@ final class CustomerPaymentBaselineSeeder extends Seeder
             // unpaid: sengaja tidak dibuat payment
         }
 
-        $this->command?->info('CustomerPaymentBaselineSeeder selesai: baseline payment/allocation 7 hari dibuat.');
+        $this->command?->info('CustomerPaymentBaselineSeeder selesai: baseline payment/allocation/component allocation 7 hari dibuat.');
     }
 
     private function purgeSeededPayments(): void
@@ -154,15 +155,258 @@ final class CustomerPaymentBaselineSeeder extends Seeder
             ]
         );
 
+        $componentAllocations = $this->allocateAcrossComponents($paymentId, $noteId, $amount);
+
+        foreach ($componentAllocations as $allocation) {
+            DB::table('payment_component_allocations')->updateOrInsert(
+                ['id' => $allocation['id']],
+                [
+                    'customer_payment_id' => $allocation['customer_payment_id'],
+                    'note_id' => $allocation['note_id'],
+                    'work_item_id' => $allocation['work_item_id'],
+                    'component_type' => $allocation['component_type'],
+                    'component_ref_id' => $allocation['component_ref_id'],
+                    'component_amount_rupiah_snapshot' => $allocation['component_amount_rupiah_snapshot'],
+                    'allocated_amount_rupiah' => $allocation['allocated_amount_rupiah'],
+                    'allocation_priority' => $allocation['allocation_priority'],
+                ]
+            );
+        }
+
         DB::table('audit_logs')->insert([
             'event' => 'payment_allocated',
             'context' => json_encode([
                 'payment_id' => $paymentId,
                 'note_id' => $noteId,
                 'amount' => $amount,
+                'allocation_count' => count($componentAllocations),
                 'seed_source' => self::class,
             ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
         ]);
+    }
+
+    /**
+     * @return list<array{
+     *   id:string,
+     *   customer_payment_id:string,
+     *   note_id:string,
+     *   work_item_id:string,
+     *   component_type:string,
+     *   component_ref_id:string,
+     *   component_amount_rupiah_snapshot:int,
+     *   allocated_amount_rupiah:int,
+     *   allocation_priority:int
+     * }>
+     */
+    private function allocateAcrossComponents(string $paymentId, string $noteId, int $amount): array
+    {
+        $components = $this->loadPayableComponents($noteId);
+        $existing = DB::table('payment_component_allocations')
+            ->select('component_type', 'component_ref_id', DB::raw('SUM(allocated_amount_rupiah) as total'))
+            ->where('note_id', $noteId)
+            ->groupBy('component_type', 'component_ref_id')
+            ->get();
+
+        $allocatedByComponent = [];
+        foreach ($existing as $row) {
+            $key = $this->componentKey((string) $row->component_type, (string) $row->component_ref_id);
+            $allocatedByComponent[$key] = (int) $row->total;
+        }
+
+        $remaining = $amount;
+        $priority = 1;
+        $allocations = [];
+
+        foreach ($components as $component) {
+            $key = $this->componentKey($component['component_type'], $component['component_ref_id']);
+            $already = $allocatedByComponent[$key] ?? 0;
+            $available = max($component['component_amount_rupiah_snapshot'] - $already, 0);
+
+            if ($available === 0) {
+                continue;
+            }
+
+            $take = min($remaining, $available);
+
+            if ($take <= 0) {
+                break;
+            }
+
+            $allocations[] = [
+                'id' => sprintf('seed-pay-comp-bl-%s-%02d', str_replace('seed-pay-bl-', '', $paymentId), $priority),
+                'customer_payment_id' => $paymentId,
+                'note_id' => $noteId,
+                'work_item_id' => $component['work_item_id'],
+                'component_type' => $component['component_type'],
+                'component_ref_id' => $component['component_ref_id'],
+                'component_amount_rupiah_snapshot' => $component['component_amount_rupiah_snapshot'],
+                'allocated_amount_rupiah' => $take,
+                'allocation_priority' => $priority,
+            ];
+
+            $allocatedByComponent[$key] = $already + $take;
+            $remaining -= $take;
+            $priority++;
+
+            if ($remaining === 0) {
+                break;
+            }
+        }
+
+        if ($remaining > 0) {
+            throw new \RuntimeException(sprintf(
+                'Payment baseline [%s] untuk note [%s] tidak bisa dialokasikan penuh ke komponen note.',
+                $paymentId,
+                $noteId
+            ));
+        }
+
+        return $allocations;
+    }
+
+    /**
+     * @return list<array{
+     *   work_item_id:string,
+     *   component_type:string,
+     *   component_ref_id:string,
+     *   component_amount_rupiah_snapshot:int,
+     *   order_no:int
+     * }>
+     */
+    private function loadPayableComponents(string $noteId): array
+    {
+        $workItems = DB::table('work_items')
+            ->select('id', 'transaction_type', 'subtotal_rupiah', 'line_no')
+            ->where('note_id', $noteId)
+            ->orderBy('line_no')
+            ->get();
+
+        $components = [];
+        $orderNo = 1;
+
+        foreach ($workItems as $item) {
+            $workItemId = (string) $item->id;
+            $type = (string) $item->transaction_type;
+
+            if ($type === 'store_stock_sale_only') {
+                $components[] = [
+                    'work_item_id' => $workItemId,
+                    'component_type' => PaymentComponentType::PRODUCT_ONLY_WORK_ITEM,
+                    'component_ref_id' => $workItemId,
+                    'component_amount_rupiah_snapshot' => (int) $item->subtotal_rupiah,
+                    'order_no' => $orderNo++,
+                ];
+                continue;
+            }
+
+            if ($type === 'service_with_store_stock_part') {
+                $stockLines = DB::table('work_item_store_stock_lines')
+                    ->select('id', 'line_total_rupiah')
+                    ->where('work_item_id', $workItemId)
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($stockLines as $line) {
+                    $components[] = [
+                        'work_item_id' => $workItemId,
+                        'component_type' => PaymentComponentType::SERVICE_STORE_STOCK_PART,
+                        'component_ref_id' => (string) $line->id,
+                        'component_amount_rupiah_snapshot' => (int) $line->line_total_rupiah,
+                        'order_no' => $orderNo++,
+                    ];
+                }
+
+                $serviceDetail = DB::table('work_item_service_details')
+                    ->select('service_price_rupiah')
+                    ->where('work_item_id', $workItemId)
+                    ->first();
+
+                if ($serviceDetail === null) {
+                    throw new \RuntimeException(sprintf('Service detail tidak ditemukan untuk work item [%s].', $workItemId));
+                }
+
+                $components[] = [
+                    'work_item_id' => $workItemId,
+                    'component_type' => PaymentComponentType::SERVICE_FEE,
+                    'component_ref_id' => $workItemId,
+                    'component_amount_rupiah_snapshot' => (int) $serviceDetail->service_price_rupiah,
+                    'order_no' => $orderNo++,
+                ];
+
+                continue;
+            }
+
+            if ($type === 'service_with_external_purchase') {
+                $externalLines = DB::table('work_item_external_purchase_lines')
+                    ->select('id', 'unit_cost_rupiah', 'qty')
+                    ->where('work_item_id', $workItemId)
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($externalLines as $line) {
+                    $components[] = [
+                        'work_item_id' => $workItemId,
+                        'component_type' => PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART,
+                        'component_ref_id' => (string) $line->id,
+                        'component_amount_rupiah_snapshot' => ((int) $line->unit_cost_rupiah) * ((int) $line->qty),
+                        'order_no' => $orderNo++,
+                    ];
+                }
+
+                $serviceDetail = DB::table('work_item_service_details')
+                    ->select('service_price_rupiah')
+                    ->where('work_item_id', $workItemId)
+                    ->first();
+
+                if ($serviceDetail === null) {
+                    throw new \RuntimeException(sprintf('Service detail tidak ditemukan untuk work item [%s].', $workItemId));
+                }
+
+                $components[] = [
+                    'work_item_id' => $workItemId,
+                    'component_type' => PaymentComponentType::SERVICE_FEE,
+                    'component_ref_id' => $workItemId,
+                    'component_amount_rupiah_snapshot' => (int) $serviceDetail->service_price_rupiah,
+                    'order_no' => $orderNo++,
+                ];
+
+                continue;
+            }
+
+            if ($type === 'service_only') {
+                $serviceDetail = DB::table('work_item_service_details')
+                    ->select('service_price_rupiah')
+                    ->where('work_item_id', $workItemId)
+                    ->first();
+
+                if ($serviceDetail === null) {
+                    throw new \RuntimeException(sprintf('Service detail tidak ditemukan untuk work item [%s].', $workItemId));
+                }
+
+                $components[] = [
+                    'work_item_id' => $workItemId,
+                    'component_type' => PaymentComponentType::SERVICE_FEE,
+                    'component_ref_id' => $workItemId,
+                    'component_amount_rupiah_snapshot' => (int) $serviceDetail->service_price_rupiah,
+                    'order_no' => $orderNo++,
+                ];
+
+                continue;
+            }
+
+            throw new \RuntimeException(sprintf(
+                'Transaction type [%s] belum didukung untuk payable component baseline note [%s].',
+                $type,
+                $noteId
+            ));
+        }
+
+        usort(
+            $components,
+            static fn (array $a, array $b): int => $a['order_no'] <=> $b['order_no']
+        );
+
+        return $components;
     }
 
     private function paymentId(string $noteId, int $sequence): string
@@ -173,5 +417,10 @@ final class CustomerPaymentBaselineSeeder extends Seeder
     private function allocationId(string $noteId, int $sequence): string
     {
         return sprintf('seed-pay-alloc-bl-%s-%02d', str_replace('seed-note-bl-', '', $noteId), $sequence);
+    }
+
+    private function componentKey(string $componentType, string $componentRefId): string
+    {
+        return $componentType.'::'.$componentRefId;
     }
 }
