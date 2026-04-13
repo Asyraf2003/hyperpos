@@ -16,8 +16,7 @@ interface OperationalExpenseReportingSourceReaderPort
      *   amount_rupiah:int,
      *   description:string,
      *   payment_method:string,
-     *   reference_no:?string,
-     *   status:string
+     *   reference_no:?string
      * }>
      */
     public function getOperationalExpenseSummaryRows(

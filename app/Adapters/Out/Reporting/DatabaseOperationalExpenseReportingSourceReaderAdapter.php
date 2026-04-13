@@ -41,6 +41,7 @@ final class DatabaseOperationalExpenseReportingSourceReaderAdapter implements Op
                 'payment_method' => (string) $row->payment_method,
                 'reference_no' => $row->reference_no !== null ? (string) $row->reference_no : null,
             ])
+            ->values()
             ->all();
     }
 
