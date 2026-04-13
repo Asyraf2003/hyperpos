@@ -26,7 +26,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('admin.expenses.categories.store') }}" method="post">
+                        <form id="expense-category-create-form" action="{{ route('admin.expenses.categories.store') }}" method="post">
                             @csrf
                             <input type="hidden" name="source" value="{{ $source ?? '' }}">
 
@@ -106,3 +106,7 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/static/js/pages/admin-expense-category-create.js') }}"></script>
+@endpush

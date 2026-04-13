@@ -26,6 +26,8 @@ final class CreateExpenseCategoryPageFeatureTest extends TestCase
         $response->assertSee('Biaya Karung');
         $response->assertSee('expense_create');
         $response->assertSee(route('admin.expenses.create'), false);
+        $response->assertSee('expense-category-create-form', false);
+        $response->assertSee('admin-expense-category-create.js');
     }
 
     private function user(string $role): User
