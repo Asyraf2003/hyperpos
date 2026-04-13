@@ -11,7 +11,7 @@ trait OperationalExpenseTableOrdering
 {
     private function applyTableSorting(Builder $builder, ExpenseTableQuery $query): Builder
     {
-        $sortable = ['expense_date', 'amount_rupiah', 'status'];
+        $sortable = ['expense_date', 'amount_rupiah'];
         $sortBy = in_array($query->sortBy(), $sortable, true) ? $query->sortBy() : 'expense_date';
         $sortDir = $query->sortDir() === 'asc' ? 'asc' : 'desc';
 

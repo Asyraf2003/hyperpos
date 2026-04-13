@@ -57,9 +57,9 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         ]);
 
         DB::table('operational_expenses')->insert([
-            ['id' => 'expense-1', 'category_id' => 'expense-category-1', 'amount_rupiah' => 20000, 'expense_date' => '2026-03-15', 'description' => 'Listrik', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'posted', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 'expense-2', 'category_id' => 'expense-category-1', 'amount_rupiah' => 5000, 'expense_date' => '2026-03-16', 'description' => 'Draft', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'draft', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 'expense-3', 'category_id' => 'expense-category-1', 'amount_rupiah' => 999999, 'expense_date' => '2026-03-18', 'description' => 'Luar scope', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'posted', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 'expense-1', 'category_id' => 'expense-category-1', 'amount_rupiah' => 20000, 'expense_date' => '2026-03-15', 'description' => 'Listrik', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'posted', 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null],
+            ['id' => 'expense-2', 'category_id' => 'expense-category-1', 'amount_rupiah' => 5000, 'expense_date' => '2026-03-16', 'description' => 'Expense dihapus', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'draft', 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => '2026-03-16 09:00:00'],
+            ['id' => 'expense-3', 'category_id' => 'expense-category-1', 'amount_rupiah' => 999999, 'expense_date' => '2026-03-18', 'description' => 'Luar scope', 'payment_method' => 'cash', 'reference_no' => null, 'status' => 'posted', 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null],
         ]);
 
         DB::table('payroll_disbursements')->insert([

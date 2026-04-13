@@ -15,7 +15,6 @@ trait OperationalExpenseValidation
         Money $amountRupiah,
         string $description,
         string $paymentMethod,
-        string $status,
     ): void {
         if (trim($id) === '') {
             throw new DomainException('Operational expense id wajib ada.');
@@ -36,16 +35,5 @@ trait OperationalExpenseValidation
         if (trim($paymentMethod) === '') {
             throw new DomainException('Payment method operational expense wajib ada.');
         }
-
-        if (OperationalExpenseStatus::isValid($status) === false) {
-            throw new DomainException('Status operational expense tidak valid.');
-        }
-    }
-
-    private static function normalizeReferenceNo(?string $referenceNo): ?string
-    {
-        $normalized = trim((string) $referenceNo);
-
-        return $normalized === '' ? null : $normalized;
     }
 }

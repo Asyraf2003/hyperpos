@@ -13,12 +13,35 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_search_and_filter_expense_table(): void
+    public function test_admin_can_search_and_filter_active_expense_table(): void
     {
         $this->seedCategory('expense-category-1', 'EXP-ELEC', 'Listrik Bengkel');
-        $this->seedCategory('expense-category-2', 'EXP-WIFI', 'Wifi');
-        $this->seedExpense('expense-1', 'expense-category-1', 'EXP-ELEC', 'Listrik Bengkel', 250000, '2026-03-23', 'Bayar token listrik', 'cash', 'posted');
-        $this->seedExpense('expense-2', 'expense-category-2', 'EXP-WIFI', 'Wifi', 350000, '2026-03-20', 'Bayar internet bulanan', 'transfer', 'draft');
+
+        $this->seedExpense(
+            'expense-1',
+            'expense-category-1',
+            'EXP-ELEC',
+            'Listrik Bengkel',
+            250000,
+            '2026-03-23',
+            'Bayar token listrik',
+            'cash',
+            'posted',
+            null,
+        );
+
+        $this->seedExpense(
+            'expense-2',
+            'expense-category-1',
+            'EXP-ELEC',
+            'Listrik Bengkel',
+            350000,
+            '2026-03-22',
+            'Bayar listrik lama',
+            'transfer',
+            'posted',
+            '2026-03-24 10:00:00',
+        );
 
         $response = $this->actingAs($this->admin())->get(route('admin.expenses.table', [
             'q' => 'Bayar',
@@ -115,6 +138,7 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
         string $description,
         string $paymentMethod,
         string $status,
+        ?string $deletedAt = null,
     ): void {
         DB::table('operational_expenses')->insert([
             'id' => $id,
@@ -128,6 +152,7 @@ final class ExpenseTableDataQueryFeatureTest extends TestCase
             'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
+            'deleted_at' => $deletedAt,
         ]);
     }
 }

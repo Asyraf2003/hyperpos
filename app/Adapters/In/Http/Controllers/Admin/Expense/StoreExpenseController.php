@@ -21,7 +21,6 @@ final class StoreExpenseController extends Controller
             (string) $data['expense_date'],
             (string) $data['description'],
             (string) $data['payment_method'],
-            (string) $data['status'],
         );
 
         if ($result->isFailure()) {

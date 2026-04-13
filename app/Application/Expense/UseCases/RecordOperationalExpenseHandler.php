@@ -6,7 +6,6 @@ namespace App\Application\Expense\UseCases;
 
 use App\Application\Shared\DTO\Result;
 use App\Core\Expense\OperationalExpense\OperationalExpense;
-use App\Core\Expense\OperationalExpense\OperationalExpenseStatus;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
@@ -29,7 +28,6 @@ final class RecordOperationalExpenseHandler
         string $expenseDate,
         string $description,
         string $paymentMethod,
-        string $status = OperationalExpenseStatus::POSTED,
     ): Result {
         $category = $this->expenseCategoryReader->findById($categoryId);
 
@@ -51,7 +49,6 @@ final class RecordOperationalExpenseHandler
                 $this->parseExpenseDate($expenseDate),
                 $description,
                 $paymentMethod,
-                $status,
             );
         } catch (DomainException $e) {
             return Result::failure($e->getMessage(), ['expense' => ['INVALID_OPERATIONAL_EXPENSE']]);
@@ -69,7 +66,6 @@ final class RecordOperationalExpenseHandler
                 'expense_date' => $expense->expenseDate()->format('Y-m-d'),
                 'description' => $expense->description(),
                 'payment_method' => $expense->paymentMethod(),
-                'status' => $expense->status(),
             ],
         ], 'Operational expense berhasil dicatat.');
     }

@@ -15,7 +15,7 @@ final class DatabaseOperationalExpenseReportingSourceReaderAdapter implements Op
     ): array {
         return DB::table('operational_expenses')
             ->join('expense_categories', 'expense_categories.id', '=', 'operational_expenses.category_id')
-            ->where('operational_expenses.status', 'posted')
+            ->whereNull('operational_expenses.deleted_at')
             ->whereBetween('operational_expenses.expense_date', [$fromExpenseDate, $toExpenseDate])
             ->orderBy('operational_expenses.expense_date')
             ->orderBy('operational_expenses.id')
@@ -29,7 +29,6 @@ final class DatabaseOperationalExpenseReportingSourceReaderAdapter implements Op
                 'operational_expenses.description',
                 'operational_expenses.payment_method',
                 'operational_expenses.reference_no',
-                'operational_expenses.status',
             ])
             ->map(static fn (object $row): array => [
                 'expense_id' => (string) $row->expense_id,
@@ -41,7 +40,6 @@ final class DatabaseOperationalExpenseReportingSourceReaderAdapter implements Op
                 'description' => (string) $row->description,
                 'payment_method' => (string) $row->payment_method,
                 'reference_no' => $row->reference_no !== null ? (string) $row->reference_no : null,
-                'status' => (string) $row->status,
             ])
             ->all();
     }
@@ -51,7 +49,7 @@ final class DatabaseOperationalExpenseReportingSourceReaderAdapter implements Op
         string $toExpenseDate,
     ): array {
         $totals = DB::table('operational_expenses')
-            ->where('status', 'posted')
+            ->whereNull('deleted_at')
             ->whereBetween('expense_date', [$fromExpenseDate, $toExpenseDate])
             ->selectRaw('COUNT(*) as total_rows, COALESCE(SUM(amount_rupiah), 0) as total_amount_rupiah')
             ->first();

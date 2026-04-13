@@ -8,7 +8,6 @@ use App\Adapters\Out\Expense\DatabaseExpenseCategoryReaderAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
 use App\Application\Expense\UseCases\RecordOperationalExpenseHandler;
 use App\Application\Shared\DTO\Result;
-use App\Core\Expense\OperationalExpense\OperationalExpenseStatus;
 use App\Ports\Out\UuidPort;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +17,7 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_record_operational_expense_handler_stores_posted_expense(): void
+    public function test_record_operational_expense_handler_stores_active_expense(): void
     {
         $this->seedCategory('expense-category-1', 'LISTRIK', 'Listrik', true);
 
@@ -36,7 +35,6 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             '2026-03-17',
             'Bayar token listrik workshop',
             'cash',
-            OperationalExpenseStatus::POSTED,
         );
 
         $this->assertInstanceOf(Result::class, $result);
@@ -51,7 +49,8 @@ final class RecordOperationalExpenseFeatureTest extends TestCase
             'expense_date' => '2026-03-17',
             'description' => 'Bayar token listrik workshop',
             'payment_method' => 'cash',
-            'status' => OperationalExpenseStatus::POSTED,
+            'status' => 'posted',
+            'deleted_at' => null,
         ]);
     }
 

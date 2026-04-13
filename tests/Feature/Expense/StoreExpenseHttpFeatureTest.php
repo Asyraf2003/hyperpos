@@ -24,7 +24,6 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'status' => 'posted',
             ]);
 
         $response->assertRedirect(route('admin.expenses.index'));
@@ -39,6 +38,7 @@ final class StoreExpenseHttpFeatureTest extends TestCase
             'description' => 'Bayar token listrik workshop',
             'payment_method' => 'cash',
             'status' => 'posted',
+            'deleted_at' => null,
         ]);
     }
 
@@ -54,7 +54,6 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'status' => 'posted',
             ]);
 
         $response->assertRedirect(route('admin.expenses.create'));
@@ -74,7 +73,6 @@ final class StoreExpenseHttpFeatureTest extends TestCase
                 'expense_date' => '2026-03-23',
                 'description' => 'Bayar token listrik workshop',
                 'payment_method' => 'cash',
-                'status' => 'posted',
             ]);
 
         $response->assertRedirect(route('admin.expenses.create'));

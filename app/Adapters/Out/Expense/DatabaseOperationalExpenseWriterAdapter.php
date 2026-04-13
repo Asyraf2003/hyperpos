@@ -24,9 +24,10 @@ final class DatabaseOperationalExpenseWriterAdapter implements OperationalExpens
             'expense_date' => $operationalExpense->expenseDate()->format('Y-m-d'),
             'description' => $operationalExpense->description(),
             'payment_method' => $operationalExpense->paymentMethod(),
-            'status' => $operationalExpense->status(),
+            'status' => 'posted',
             'created_at' => $now,
             'updated_at' => $now,
+            'deleted_at' => null,
         ]);
     }
 }

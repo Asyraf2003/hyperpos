@@ -19,9 +19,6 @@ trait OperationalExpenseTablePayload
             'description' => (string) $row->description,
             'amount_rupiah' => (int) $row->amount_rupiah,
             'payment_method' => (string) $row->payment_method,
-            'status' => (string) $row->status,
-            'status_label' => $this->statusLabel((string) $row->status),
-            'status_badge_class' => $this->statusBadgeClass((string) $row->status),
         ], $paginator->items());
 
         return [
@@ -41,25 +38,5 @@ trait OperationalExpenseTablePayload
                 ],
             ],
         ];
-    }
-
-    private function statusLabel(string $status): string
-    {
-        return match ($status) {
-            'posted' => 'Posted',
-            'draft' => 'Draft',
-            'cancelled' => 'Cancelled',
-            default => ucfirst($status),
-        };
-    }
-
-    private function statusBadgeClass(string $status): string
-    {
-        return match ($status) {
-            'posted' => 'bg-light-success text-success',
-            'draft' => 'bg-light-warning text-warning',
-            'cancelled' => 'bg-light-danger text-danger',
-            default => 'bg-light-secondary text-secondary',
-        };
     }
 }

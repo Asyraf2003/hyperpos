@@ -29,7 +29,7 @@ final class ExpenseTableQueryRequest extends FormRequest
             'q' => ['nullable', 'string'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
-            'sort_by' => ['nullable', 'in:expense_date,amount_rupiah,status'],
+            'sort_by' => ['nullable', 'in:expense_date,amount_rupiah'],
             'sort_dir' => ['nullable', 'in:asc,desc'],
             'category_id' => ['nullable', 'string'],
             'date_from' => ['nullable', 'date_format:Y-m-d'],
@@ -55,7 +55,11 @@ final class ExpenseTableQueryRequest extends FormRequest
     private function trimOrNull(string $key): ?string
     {
         $value = $this->input($key);
-        if (! is_string($value)) return null;
+
+        if (! is_string($value)) {
+            return null;
+        }
+
         $trimmed = trim($value);
 
         return $trimmed === '' ? null : $trimmed;

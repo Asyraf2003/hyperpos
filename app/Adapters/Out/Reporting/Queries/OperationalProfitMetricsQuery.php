@@ -67,7 +67,7 @@ final class OperationalProfitMetricsQuery
     private function operationalExpense(string $fromDate, string $toDate): int
     {
         return (int) (DB::table('operational_expenses')
-            ->where('status', 'posted')
+            ->whereNull('deleted_at')
             ->whereBetween('expense_date', [$fromDate, $toDate])
             ->sum('amount_rupiah') ?? 0);
     }

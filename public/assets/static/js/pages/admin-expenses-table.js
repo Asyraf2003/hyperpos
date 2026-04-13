@@ -12,7 +12,7 @@
     date_to: ""
   };
 
-  const allowedSortBy = new Set(["expense_date", "amount_rupiah", "status"]);
+  const allowedSortBy = new Set(["expense_date", "amount_rupiah"]);
   const allowedSortDir = new Set(["asc", "desc"]);
 
   const $ = (id) => document.getElementById(id);
@@ -35,7 +35,7 @@
   let searchDebounceTimer = null;
   let requestCounter = 0;
 
-  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+  const esc = (v) => String(v ?? "").replace(/[&<>\"']/g, (m) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -151,15 +151,14 @@
       <td class="text-nowrap">${esc(r.expense_date)}</td>
       <td>${esc(r.category_name)}<br><small class="text-muted">${esc(r.category_code)}</small></td>
       <td>${esc(r.description)}</td>
-      <td class="text-nowrap fw-bold text-end">${rupiah(r.amount_rupiah)}</td>
+      <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>
       <td>${esc(r.payment_method)}</td>
-      <td><span class="badge ${esc(r.status_badge_class)}">${esc(r.status_label)}</span></td>
     </tr>
   `;
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Tidak ada pengeluaran yang cocok.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Tidak ada pengeluaran yang cocok.</td></tr>`;
       return;
     }
 
@@ -206,7 +205,7 @@
 
   const load = async (replaceUrl = false) => {
     const currentRequest = ++requestCounter;
-    body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Memuat data...</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
     const res = await fetch(`${c.endpoint}?${paramsString()}`, {
       headers: { Accept: "application/json" }
@@ -217,7 +216,7 @@
     if (currentRequest !== requestCounter) return;
 
     if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
       return;
     }
 

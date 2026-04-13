@@ -62,17 +62,11 @@
                                     </button>
                                 </th>
                                 <th>Metode Bayar</th>
-                                <th>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="status">
-                                        Status
-                                        <span class="ms-1 text-muted" data-sort-indicator="status">↕</span>
-                                    </button>
-                                </th>
                             </tr>
                         </thead>
                         <tbody id="expense-table-body">
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">Sedang memuat data...</td>
+                                <td colspan="6" class="text-center text-muted py-4">Sedang memuat data...</td>
                             </tr>
                         </tbody>
                     </table>

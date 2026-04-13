@@ -14,7 +14,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_operational_expense_summary_handler_returns_posted_expenses_only_and_passes_reconciliation(): void
+    public function test_get_operational_expense_summary_handler_returns_active_expenses_only_and_passes_reconciliation(): void
     {
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik', true);
         $this->seedExpenseCategory('expense-category-2', 'MAKAN', 'Makan', true);
@@ -28,6 +28,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'cash',
             'INV-001',
             'posted',
+            null,
         );
 
         $this->seedOperationalExpense(
@@ -39,6 +40,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'cash',
             'INV-002',
             'draft',
+            '2026-03-15 12:00:00',
         );
 
         $this->seedOperationalExpense(
@@ -50,6 +52,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'cash',
             'INV-003',
             'cancelled',
+            '2026-03-15 13:00:00',
         );
 
         $this->seedOperationalExpense(
@@ -61,6 +64,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'transfer',
             null,
             'posted',
+            null,
         );
 
         $this->seedOperationalExpense(
@@ -72,6 +76,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'cash',
             'INV-999',
             'posted',
+            null,
         );
 
         $result = app(GetOperationalExpenseSummaryHandler::class)
@@ -96,7 +101,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
                 'description' => 'Bayar listrik workshop',
                 'payment_method' => 'cash',
                 'reference_no' => 'INV-001',
-                'status' => 'posted',
             ],
             [
                 'expense_id' => 'expense-4',
@@ -108,7 +112,6 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
                 'description' => 'Makan lembur tim',
                 'payment_method' => 'transfer',
                 'reference_no' => null,
-                'status' => 'posted',
             ],
         ], $data['rows']);
     }
@@ -139,6 +142,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
         string $paymentMethod,
         ?string $referenceNo,
         string $status,
+        ?string $deletedAt,
     ): void {
         DB::table('operational_expenses')->insert([
             'id' => $id,
@@ -151,6 +155,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             'status' => $status,
             'created_at' => now(),
             'updated_at' => now(),
+            'deleted_at' => $deletedAt,
         ]);
     }
 }

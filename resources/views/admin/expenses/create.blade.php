@@ -123,27 +123,6 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-md-6">
-                                    <div class="form-group mb-4">
-                                        <label for="status" class="form-label">Status</label>
-                                        <select
-                                            id="status"
-                                            name="status"
-                                            class="form-select @error('status') is-invalid @enderror"
-                                            required
-                                        >
-                                            <option value="posted" @selected(old('status', 'posted') === 'posted')>posted</option>
-                                            <option value="draft" @selected(old('status') === 'draft')>draft</option>
-                                            <option value="cancelled" @selected(old('status') === 'cancelled')>cancelled</option>
-                                        </select>
-                                        @error('status')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-
                                 <div class="col-12">
                                     <div class="form-group mb-4">
                                         <label for="description" class="form-label">Deskripsi</label>

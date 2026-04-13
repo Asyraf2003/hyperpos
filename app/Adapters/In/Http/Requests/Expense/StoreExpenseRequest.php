@@ -18,7 +18,6 @@ final class StoreExpenseRequest extends FormRequest
             'expense_date' => ['required', 'date_format:Y-m-d'],
             'description' => ['required', 'string', 'max:255'],
             'payment_method' => ['required', 'string', 'max:50'],
-            'status' => ['required', 'in:draft,posted,cancelled'],
         ];
     }
 }

@@ -21,8 +21,8 @@ final class OperationalExpense
         private DateTimeImmutable $expenseDate,
         private string $description,
         private string $paymentMethod,
-        private string $status,
-    ) {}
+    ) {
+    }
 
     public static function create(
         string $id,
@@ -33,7 +33,6 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        string $status = OperationalExpenseStatus::POSTED,
     ): self {
         return self::build(
             $id,
@@ -44,7 +43,6 @@ final class OperationalExpense
             $expenseDate,
             $description,
             $paymentMethod,
-            $status,
         );
     }
 
@@ -57,7 +55,6 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        string $status,
     ): self {
         return self::build(
             $id,
@@ -68,7 +65,6 @@ final class OperationalExpense
             $expenseDate,
             $description,
             $paymentMethod,
-            $status,
         );
     }
 
@@ -81,13 +77,18 @@ final class OperationalExpense
         DateTimeImmutable $expenseDate,
         string $description,
         string $paymentMethod,
-        string $status,
     ): self {
-        self::assertValid($id, $categoryId, $amountRupiah, $description, $paymentMethod, $status);
+        self::assertValid($id, $categoryId, $amountRupiah, $description, $paymentMethod);
 
         return new self(
-            trim($id), trim($categoryId), trim($categoryCodeSnapshot), trim($categoryNameSnapshot),
-            $amountRupiah, $expenseDate, trim($description), trim($paymentMethod), $status,
+            trim($id),
+            trim($categoryId),
+            trim($categoryCodeSnapshot),
+            trim($categoryNameSnapshot),
+            $amountRupiah,
+            $expenseDate,
+            trim($description),
+            trim($paymentMethod),
         );
     }
 }

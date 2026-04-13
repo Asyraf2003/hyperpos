@@ -42,7 +42,6 @@ final class CreateExpensePageFeatureTest extends TestCase
         $response->assertSee('Tanggal');
         $response->assertSee('Nominal');
         $response->assertSee('Metode Bayar');
-        $response->assertSee('Status');
         $response->assertSee('Simpan Pengeluaran');
 
         $response->assertSee(route('admin.expenses.store'), false);

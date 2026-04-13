@@ -17,5 +17,4 @@ trait OperationalExpenseAccessors
     public function expenseDate(): DateTimeImmutable { return $this->expenseDate; }
     public function description(): string { return $this->description; }
     public function paymentMethod(): string { return $this->paymentMethod; }
-    public function status(): string { return $this->status; }
 }
