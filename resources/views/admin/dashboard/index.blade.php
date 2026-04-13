@@ -791,7 +791,7 @@
 
         <div class="col-12 col-xl-3">
             <div class="card profile-card h-100">
-                <div class="card-body p-4">
+                <div class="card-body p-3">
                     <div class="profile-top">
                         <img
                             src="{{ asset('assets/compiled/jpg/1.jpg') }}"
@@ -821,10 +821,6 @@
                             <div class="summary-mini-label">Status</div>
                             <p class="summary-mini-value">Online</p>
                         </div>
-                    </div>
-
-                    <div class="helper-note mt-3">
-                        Fokus utama hari ini: stok aman, harga sehat, kas bergerak, dan produk laris tetap terpantau.
                     </div>
 
                     <hr class="my-4">
