@@ -29,12 +29,12 @@ final class CustomerTransactionLoadSeeder extends Seeder
             ->select('id', 'nama_barang', 'harga_jual')
             ->whereNull('deleted_at')
             ->orderBy('nama_barang')
-            ->limit(8)
+            ->limit(24)
             ->get()
             ->values();
 
-        if ($products->count() < 6) {
-            $this->command?->warn('CustomerTransactionLoadSeeder dilewati: butuh minimal 6 product aktif.');
+        if ($products->count() < 10) {
+            $this->command?->warn('CustomerTransactionLoadSeeder dilewati: butuh minimal 10 product aktif.');
             return;
         }
 
@@ -240,12 +240,12 @@ final class CustomerTransactionLoadSeeder extends Seeder
      */
     private function scenarioItems(int $dayIndex, int $slot, Collection $products, int $maxItemsPerNote): array
     {
-        $a = $products[0];
-        $b = $products[1];
-        $c = $products[2];
-        $d = $products[3];
-        $e = $products[4];
-        $f = $products[5];
+        $a = $this->pickProduct($products, $dayIndex + $slot + 1);
+        $b = $this->pickProduct($products, $dayIndex + ($slot * 2) + 3);
+        $c = $this->pickProduct($products, $dayIndex + ($slot * 3) + 5);
+        $d = $this->pickProduct($products, $dayIndex + ($slot * 4) + 7);
+        $e = $this->pickProduct($products, $dayIndex + ($slot * 5) + 9);
+        $f = $this->pickProduct($products, $dayIndex + ($slot * 6) + 11);
 
         $scenario = ($dayIndex + $slot) % 8;
 
@@ -286,6 +286,17 @@ final class CustomerTransactionLoadSeeder extends Seeder
 
         return array_slice($items, 0, $maxItemsPerNote);
     }
+
+    /**
+     * @param Collection<int, object> $products
+     */
+    private function pickProduct(Collection $products, int $seed): object
+    {
+        $index = $seed % $products->count();
+
+        return $products[$index];
+    }
+
 
     /**
      * @param object $product
@@ -333,6 +344,17 @@ final class CustomerTransactionLoadSeeder extends Seeder
             'sto' => [],
         ];
     }
+
+    /**
+     * @param Collection<int, object> $products
+     */
+    private function pickProduct(Collection $products, int $seed): object
+    {
+        $index = $seed % $products->count();
+
+        return $products[$index];
+    }
+
 
     /**
      * @param object $product
