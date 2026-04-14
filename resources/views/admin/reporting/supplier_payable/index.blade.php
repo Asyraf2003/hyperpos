@@ -1,87 +1,16 @@
 @extends('layouts.app')
+@include('layouts.partials.date-picker-assets')
 
 @section('title', 'Hutang Supplier')
 @section('heading', 'Hutang Supplier')
 
 @section('content')
-<div class="row g-3 mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0 ps-3">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form
-                    method="get"
-                    action="{{ route('admin.reports.supplier_payable.index') }}"
-                    class="row g-3"
-                    id="supplier-payable-report-filter-form"
-                >
-                    <div class="col-12 col-lg-3">
-                        <label for="period_mode" class="form-label">Mode Periode</label>
-                        <select name="period_mode" id="period_mode" class="form-select">
-                            <option value="daily" {{ $filters['period_mode'] === 'daily' ? 'selected' : '' }}>Harian</option>
-                            <option value="weekly" {{ $filters['period_mode'] === 'weekly' ? 'selected' : '' }}>Mingguan</option>
-                            <option value="monthly" {{ $filters['period_mode'] === 'monthly' ? 'selected' : '' }}>Bulanan</option>
-                            <option value="custom" {{ $filters['period_mode'] === 'custom' ? 'selected' : '' }}>Custom</option>
-                        </select>
-                    </div>
-
-                    <div class="col-12 col-lg-3">
-                        <label for="reference_date" class="form-label">Reference Date</label>
-                        <input
-                            type="date"
-                            name="reference_date"
-                            id="reference_date"
-                            class="form-control"
-                            value="{{ $filters['reference_date'] }}"
-                        >
-                    </div>
-
-                    <div class="col-12 col-lg-3">
-                        <label for="date_from" class="form-label">Tanggal Mulai</label>
-                        <input
-                            type="date"
-                            name="date_from"
-                            id="date_from"
-                            class="form-control"
-                            value="{{ $filters['date_from'] }}"
-                        >
-                    </div>
-
-                    <div class="col-12 col-lg-3">
-                        <label for="date_to" class="form-label">Tanggal Akhir</label>
-                        <input
-                            type="date"
-                            name="date_to"
-                            id="date_to"
-                            class="form-control"
-                            value="{{ $filters['date_to'] }}"
-                        >
-                    </div>
-
-                    <div class="col-12 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                        <a href="{{ route('admin.reports.supplier_payable.index') }}" class="btn btn-outline-secondary">
-                            Reset
-                        </a>
-                    </div>
-                </form>
-
-                <div class="alert alert-light border mt-3 mb-0">
-                    Rentang aktif: <strong>{{ $filters['range_label'] }}</strong>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@include('admin.reporting.partials.period_filter', [
+    'formId' => 'supplier-payable-report-filter-form',
+    'action' => route('admin.reports.supplier_payable.index'),
+    'resetUrl' => route('admin.reports.supplier_payable.index'),
+    'rangeLabelText' => 'Rentang aktif',
+])
 
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
