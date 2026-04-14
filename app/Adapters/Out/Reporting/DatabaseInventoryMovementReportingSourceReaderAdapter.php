@@ -78,4 +78,38 @@ final class DatabaseInventoryMovementReportingSourceReaderAdapter implements Inv
             'net_cost_delta_rupiah' => (int) ($totals->net_cost_delta_rupiah ?? 0),
         ];
     }
+
+    public function getInventoryCurrentSnapshotRows(): array
+    {
+        return DB::table('products')
+            ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'products.id')
+            ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'products.id')
+            ->where(function ($query): void {
+                $query
+                    ->whereNotNull('product_inventory.product_id')
+                    ->orWhereNotNull('product_inventory_costing.product_id');
+            })
+            ->orderBy('products.id')
+            ->get([
+                'products.id as product_id',
+                'products.kode_barang',
+                'products.nama_barang',
+                'products.merek',
+                'products.ukuran',
+                DB::raw('COALESCE(product_inventory.qty_on_hand, 0) as current_qty_on_hand'),
+                DB::raw('COALESCE(product_inventory_costing.avg_cost_rupiah, 0) as current_avg_cost_rupiah'),
+                DB::raw('COALESCE(product_inventory_costing.inventory_value_rupiah, 0) as current_inventory_value_rupiah'),
+            ])
+            ->map(static fn (object $row): array => [
+                'product_id' => (string) $row->product_id,
+                'kode_barang' => $row->kode_barang !== null ? (string) $row->kode_barang : null,
+                'nama_barang' => (string) $row->nama_barang,
+                'merek' => (string) $row->merek,
+                'ukuran' => $row->ukuran !== null ? (int) $row->ukuran : null,
+                'current_qty_on_hand' => (int) $row->current_qty_on_hand,
+                'current_avg_cost_rupiah' => (int) $row->current_avg_cost_rupiah,
+                'current_inventory_value_rupiah' => (int) $row->current_inventory_value_rupiah,
+            ])
+            ->all();
+    }
 }

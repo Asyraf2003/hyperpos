@@ -40,4 +40,18 @@ interface InventoryMovementReportingSourceReaderPort
         string $fromMutationDate,
         string $toMutationDate,
     ): array;
+
+    /**
+     * @return list<array{
+     *   product_id:string,
+     *   kode_barang:?string,
+     *   nama_barang:string,
+     *   merek:string,
+     *   ukuran:?int,
+     *   current_qty_on_hand:int,
+     *   current_avg_cost_rupiah:int,
+     *   current_inventory_value_rupiah:int
+     * }>
+     */
+    public function getInventoryCurrentSnapshotRows(): array;
 }
