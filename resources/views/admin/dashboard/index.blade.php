@@ -758,21 +758,21 @@
                                 Laporan stok, aset, penjualan, harga, dan perputaran keuangan dalam satu layar.
                             </h2>
                             <p class="mb-0 text-white" style="opacity:.88;">
-                                Tampilan ini fokus ke ringkasan visual yang cepat dibaca. Belum ada query atau logic backend, jadi aman untuk tahap UI-only.
+                                Dashboard ini sudah menarik ringkasan dari report aktif. Beberapa panel analitik lanjutan di bawah masih dipertahankan sebagai UI-only sampai kontrak backend-nya terkunci penuh.
                             </p>
 
                             <div class="hero-grid">
                                 <div class="hero-metric">
                                     <div class="hero-metric-label">Total Penjualan Bulan Ini</div>
-                                    <h4 class="hero-metric-value">Rp 124.850.000</h4>
+                                    <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_gross_transaction_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                                 <div class="hero-metric">
-                                    <div class="hero-metric-label">Barang Terjual</div>
-                                    <h4 class="hero-metric-value">1.284 Unit</h4>
+                                    <div class="hero-metric-label">Net Cash Bulan Ini</div>
+                                    <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_net_cash_collected_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                                 <div class="hero-metric">
-                                    <div class="hero-metric-label">Perputaran Kas</div>
-                                    <h4 class="hero-metric-value">4.7x / Bulan</h4>
+                                    <div class="hero-metric-label">Outstanding Bulan Ini</div>
+                                    <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                             </div>
                         </div>
@@ -845,11 +845,11 @@
                         <i class="bi bi-box-seam"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Laporan Stok Barang</div>
-                        <div class="stat-value">2.480 Item</div>
-                        <p class="stat-meta meta-up">
-                            <i class="bi bi-arrow-up-right"></i>
-                            Naik 8.4% dari minggu lalu
+                        <div class="stat-title">Total Qty On Hand</div>
+                        <div class="stat-value">{{ number_format($dashboard['stats']['total_qty_on_hand'] ?? 0, 0, ',', '.') }} Unit</div>
+                        <p class="stat-meta meta-flat">
+                            <i class="bi bi-boxes"></i>
+                            Snapshot stok saat ini
                         </p>
                     </div>
                 </div>
@@ -863,11 +863,11 @@
                         <i class="bi bi-buildings"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Nilai Aset</div>
-                        <div class="stat-value">Rp 845.000.000</div>
-                        <p class="stat-meta meta-up">
-                            <i class="bi bi-arrow-up-right"></i>
-                            Aset produktif dominan
+                        <div class="stat-title">Nilai Persediaan</div>
+                        <div class="stat-value">Rp {{ number_format($dashboard['stats']['total_inventory_value_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                        <p class="stat-meta meta-flat">
+                            <i class="bi bi-buildings"></i>
+                            Nilai inventory snapshot saat ini
                         </p>
                     </div>
                 </div>
@@ -881,11 +881,11 @@
                         <i class="bi bi-wallet2"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Uang Masuk</div>
-                        <div class="stat-value">Rp 38.750.000</div>
-                        <p class="stat-meta meta-up">
-                            <i class="bi bi-arrow-up-right"></i>
-                            Cash in hari ini kuat
+                        <div class="stat-title">Uang Masuk Hari Ini</div>
+                        <div class="stat-value">Rp {{ number_format($dashboard['stats']['daily_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                        <p class="stat-meta meta-flat">
+                            <i class="bi bi-wallet2"></i>
+                            Berdasarkan arus kas transaksi hari ini
                         </p>
                     </div>
                 </div>
@@ -899,11 +899,11 @@
                         <i class="bi bi-repeat"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Perputaran Keuangan</div>
-                        <div class="stat-value">4.7x</div>
+                        <div class="stat-title">Laba Operasional Bulan Ini</div>
+                        <div class="stat-value">Rp {{ number_format($dashboard['stats']['monthly_net_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
-                            <i class="bi bi-dash-circle"></i>
-                            Stabil dibanding periode lalu
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Ringkasan profit operasional periode berjalan
                         </p>
                     </div>
                 </div>
@@ -1326,38 +1326,38 @@
 
                     <div class="finance-grid">
                         <div class="finance-box">
-                            <div class="finance-label">Kas Masuk</div>
-                            <div class="finance-value">Rp 38.750.000</div>
+                            <div class="finance-label">Kas Masuk Bulan Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-up">
                                 <i class="bi bi-arrow-up-right"></i>
-                                Order dan pembayaran masuk
+                                Arus kas transaksi masuk periode berjalan
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Kas Keluar</div>
-                            <div class="finance-value">Rp 21.420.000</div>
+                            <div class="finance-label">Kas Keluar Bulan Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_out_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-down">
                                 <i class="bi bi-arrow-down-right"></i>
-                                Pembelian stok dan operasional
+                                Refund transaksi pada periode berjalan
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Perputaran Modal</div>
-                            <div class="finance-value">Rp 97.300.000</div>
+                            <div class="finance-label">Gross Revenue Bulan Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_gross_revenue_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-flat">
                                 <i class="bi bi-arrow-repeat"></i>
-                                Terjadi dalam satu periode
+                                Revenue kotor operasional periode berjalan
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Net Cash Flow</div>
-                            <div class="finance-value">Rp 17.330.000</div>
+                            <div class="finance-label">Net Cash Flow Bulan Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_net_cash_flow_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-up">
                                 <i class="bi bi-graph-up-arrow"></i>
-                                Posisi kas positif
+                                Selisih kas masuk dan kas keluar periode berjalan
                             </p>
                         </div>
                     </div>
@@ -1406,8 +1406,8 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Laporan Aset</h5>
-                            <p class="section-subtitle">Komposisi aset usaha yang tampil simpel tapi tetap kelihatan berkelas</p>
+                            <h5 class="section-title">Ringkasan Posisi Bulan Ini</h5>
+                            <p class="section-subtitle">Bagian ini sudah memakai data report aktif yang paling aman untuk dibaca cepat</p>
                         </div>
                         <span class="badge-soft bg-soft-primary">
                             <i class="bi bi-clipboard-data"></i>
@@ -1423,21 +1423,21 @@
                                         <span class="product-avatar bg-soft-primary"><i class="bi bi-box2-heart"></i></span>
                                         <div>
                                             <div class="asset-title">Persediaan Barang</div>
-                                            <p class="asset-subtitle">Nilai stok yang tersedia</p>
+                                            <p class="asset-subtitle">Nilai inventory snapshot saat ini</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 320.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['inventory_value_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
 
                                 <div class="asset-item">
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-success"><i class="bi bi-cash-coin"></i></span>
                                         <div>
-                                            <div class="asset-title">Kas & Bank</div>
-                                            <p class="asset-subtitle">Saldo likuid usaha</p>
+                                            <div class="asset-title">Outstanding Transaksi</div>
+                                            <p class="asset-subtitle">Sisa tagihan transaksi bulan ini</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 145.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['transaction_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -1448,22 +1448,22 @@
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-warning"><i class="bi bi-tools"></i></span>
                                         <div>
-                                            <div class="asset-title">Peralatan Operasional</div>
-                                            <p class="asset-subtitle">Mesin, tools, workstation</p>
+                                            <div class="asset-title">Outstanding Supplier</div>
+                                            <p class="asset-subtitle">Hutang supplier bulan ini</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 210.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['supplier_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
 
                                 <div class="asset-item">
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-info"><i class="bi bi-truck"></i></span>
                                         <div>
-                                            <div class="asset-title">Kendaraan Operasional</div>
-                                            <p class="asset-subtitle">Distribusi dan support</p>
+                                            <div class="asset-title">Hutang Karyawan</div>
+                                            <p class="asset-subtitle">Sisa hutang karyawan bulan ini</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 95.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['employee_debt_remaining_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -1474,29 +1474,29 @@
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-danger"><i class="bi bi-receipt-cutoff"></i></span>
                                         <div>
-                                            <div class="asset-title">Piutang Dagang</div>
-                                            <p class="asset-subtitle">Tagihan yang belum lunas</p>
+                                            <div class="asset-title">Refund Bulan Ini</div>
+                                            <p class="asset-subtitle">Refund transaksi yang sudah terjadi</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 75.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['monthly_refunded_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
 
                                 <div class="asset-item">
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-primary"><i class="bi bi-pie-chart"></i></span>
                                         <div>
-                                            <div class="asset-title">Aset Lainnya</div>
-                                            <p class="asset-subtitle">Cadangan dan kebutuhan lain</p>
+                                            <div class="asset-title">Biaya Operasional</div>
+                                            <p class="asset-subtitle">Biaya operasional bulan ini</p>
                                         </div>
                                     </div>
-                                    <p class="asset-value">Rp 45.000.000</p>
+                                    <p class="asset-value">Rp {{ number_format($dashboard['position']['monthly_operational_expense_rupiah'] ?? 0, 0, ',', '.') }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="helper-note mt-4">
-                        Struktur UI ini sudah memisahkan stok, aset, uang masuk, barang paling laku, grafik penjualan, trend, harga, dan perputaran keuangan. Jadi nanti tinggal kamu sambungkan ke data backend tanpa bongkar layout lagi.
+                        Dashboard v1 ini sudah mulai terhubung ke report backend untuk ringkasan utama. Panel analitik lanjutan seperti top sales, margin, dan klasifikasi stok masih dipertahankan sebagai UI-only sampai kontraknya benar-benar final.
                     </div>
                 </div>
             </div>
