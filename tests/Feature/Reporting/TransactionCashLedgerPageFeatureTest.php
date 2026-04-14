@@ -30,66 +30,9 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
     public function test_admin_can_access_transaction_cash_ledger_page_and_see_report_data(): void
     {
-        $this->seedNote('note-1', 'Budi', '2026-04-02', 26000);
-        $this->seedNote('note-2', 'Sari', '2026-04-03', 10000);
-
-        $this->seedWorkItem('wi-1', 'note-1', 1, 5000);
-        $this->seedWorkItem('wi-2', 'note-1', 2, 3000);
-        $this->seedWorkItem('wi-3', 'note-2', 1, 10000);
-
-        $this->seedCustomerPayment('pay-1', 8000, '2026-04-02');
-        $this->seedCustomerPayment('pay-2', 4000, '2026-04-03');
-        $this->seedCustomerRefund('ref-1', 'pay-1', 'note-1', 1000, '2026-04-04', 'Refund');
-
-        DB::table('payment_component_allocations')->insert([
-            [
-                'id' => 'p1',
-                'customer_payment_id' => 'pay-1',
-                'note_id' => 'note-1',
-                'work_item_id' => 'wi-1',
-                'component_type' => 'product_only_work_item',
-                'component_ref_id' => 'wi-1',
-                'component_amount_rupiah_snapshot' => 5000,
-                'allocated_amount_rupiah' => 5000,
-                'allocation_priority' => 1,
-            ],
-            [
-                'id' => 'p2',
-                'customer_payment_id' => 'pay-1',
-                'note_id' => 'note-1',
-                'work_item_id' => 'wi-2',
-                'component_type' => 'service_store_stock_part',
-                'component_ref_id' => 'sto-2',
-                'component_amount_rupiah_snapshot' => 3000,
-                'allocated_amount_rupiah' => 3000,
-                'allocation_priority' => 2,
-            ],
-            [
-                'id' => 'p3',
-                'customer_payment_id' => 'pay-2',
-                'note_id' => 'note-2',
-                'work_item_id' => 'wi-3',
-                'component_type' => 'service_fee',
-                'component_ref_id' => 'wi-3',
-                'component_amount_rupiah_snapshot' => 10000,
-                'allocated_amount_rupiah' => 4000,
-                'allocation_priority' => 1,
-            ],
-        ]);
-
-        DB::table('refund_component_allocations')->insert([
-            [
-                'id' => 'r1',
-                'customer_refund_id' => 'ref-1',
-                'customer_payment_id' => 'pay-1',
-                'note_id' => 'note-1',
-                'work_item_id' => 'wi-2',
-                'component_type' => 'service_fee',
-                'component_ref_id' => 'wi-2',
-                'refunded_amount_rupiah' => 1000,
-                'refund_priority' => 1,
-            ],
-        ]);
+        $this->seedCashInEvent('note-1', 'wi-1', 'pay-1', '2026-04-02', 8000, 'Budi');
+        $this->seedCashInEvent('note-2', 'wi-2', 'pay-2', '2026-04-03', 4000, 'Sari');
+        $this->seedCashOutEvent('note-1', 'wi-1', 'pay-1', 'ref-1', '2026-04-04', 1000, 'Refund');
 
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.transaction_cash_ledger.index', [
@@ -114,6 +57,95 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('Rp 11.000');
     }
 
+    public function test_daily_mode_uses_reference_date_only(): void
+    {
+        $this->seedCashInEvent('note-daily-1', 'wi-daily-1', 'pay-daily-1', '2026-04-02', 7000, 'Daily A');
+        $this->seedCashInEvent('note-daily-2', 'wi-daily-2', 'pay-daily-2', '2026-04-03', 9000, 'Daily B');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'daily',
+                'reference_date' => '2026-04-02',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-02 s/d 2026-04-02');
+        $response->assertSee('note-daily-1');
+        $response->assertDontSee('note-daily-2');
+        $response->assertSee('Rp 7.000');
+        $response->assertDontSee('Rp 9.000');
+    }
+
+    public function test_weekly_mode_uses_monday_to_sunday_range(): void
+    {
+        $this->seedCashInEvent('note-week-1', 'wi-week-1', 'pay-week-1', '2026-04-06', 5000, 'Week Mon');
+        $this->seedCashInEvent('note-week-2', 'wi-week-2', 'pay-week-2', '2026-04-09', 6000, 'Week Thu');
+        $this->seedCashInEvent('note-week-3', 'wi-week-3', 'pay-week-3', '2026-04-13', 11000, 'Next Week');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'weekly',
+                'reference_date' => '2026-04-09',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-06 s/d 2026-04-12');
+        $response->assertSee('note-week-1');
+        $response->assertSee('note-week-2');
+        $response->assertDontSee('note-week-3');
+        $response->assertSee('Rp 11.000');
+    }
+
+    public function test_monthly_mode_uses_first_to_last_day_of_month(): void
+    {
+        $this->seedCashInEvent('note-month-1', 'wi-month-1', 'pay-month-1', '2026-04-01', 3000, 'Month Start');
+        $this->seedCashInEvent('note-month-2', 'wi-month-2', 'pay-month-2', '2026-04-29', 4000, 'Month End');
+        $this->seedCashInEvent('note-month-3', 'wi-month-3', 'pay-month-3', '2026-05-01', 9000, 'Next Month');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2026-04-11',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-01 s/d 2026-04-30');
+        $response->assertSee('note-month-1');
+        $response->assertSee('note-month-2');
+        $response->assertDontSee('note-month-3');
+        $response->assertSee('Rp 7.000');
+    }
+
+    public function test_custom_mode_requires_both_dates(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.transaction_cash_ledger.index'))
+            ->get(route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2026-04-01',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
+    public function test_date_from_cannot_be_greater_than_date_to(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.transaction_cash_ledger.index'))
+            ->get(route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2026-04-30',
+                'date_to' => '2026-04-01',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
@@ -128,6 +160,67 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         ]);
 
         return $user;
+    }
+
+    private function seedCashInEvent(
+        string $noteId,
+        string $workItemId,
+        string $paymentId,
+        string $paidAt,
+        int $amountRupiah,
+        string $customerName
+    ): void {
+        $this->seedNote($noteId, $customerName, $paidAt, $amountRupiah);
+        $this->seedWorkItem($workItemId, $noteId, 1, $amountRupiah);
+
+        DB::table('customer_payments')->insert([
+            'id' => $paymentId,
+            'amount_rupiah' => $amountRupiah,
+            'paid_at' => $paidAt,
+        ]);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'alloc-' . $paymentId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'work_item_id' => $workItemId,
+            'component_type' => 'service_fee',
+            'component_ref_id' => $workItemId,
+            'component_amount_rupiah_snapshot' => $amountRupiah,
+            'allocated_amount_rupiah' => $amountRupiah,
+            'allocation_priority' => 1,
+        ]);
+    }
+
+    private function seedCashOutEvent(
+        string $noteId,
+        string $workItemId,
+        string $paymentId,
+        string $refundId,
+        string $refundedAt,
+        int $amountRupiah,
+        string $reason
+    ): void {
+        DB::table('customer_refunds')->insert([
+            'id' => $refundId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'amount_rupiah' => $amountRupiah,
+            'refunded_at' => $refundedAt,
+            'reason' => $reason,
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            'id' => 'refund-alloc-' . $refundId,
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'work_item_id' => $workItemId,
+            'component_type' => 'service_fee',
+            'component_ref_id' => $workItemId,
+            'refunded_amount_rupiah' => $amountRupiah,
+            'refund_priority' => 1,
+        ]);
     }
 
     private function seedNote(string $id, string $customerName, string $transactionDate, int $totalRupiah): void
@@ -149,33 +242,6 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
             'transaction_type' => 'service_only',
             'status' => 'open',
             'subtotal_rupiah' => $subtotalRupiah,
-        ]);
-    }
-
-    private function seedCustomerPayment(string $id, int $amountRupiah, string $paidAt): void
-    {
-        DB::table('customer_payments')->insert([
-            'id' => $id,
-            'amount_rupiah' => $amountRupiah,
-            'paid_at' => $paidAt,
-        ]);
-    }
-
-    private function seedCustomerRefund(
-        string $id,
-        string $paymentId,
-        string $noteId,
-        int $amountRupiah,
-        string $refundedAt,
-        string $reason
-    ): void {
-        DB::table('customer_refunds')->insert([
-            'id' => $id,
-            'customer_payment_id' => $paymentId,
-            'note_id' => $noteId,
-            'amount_rupiah' => $amountRupiah,
-            'refunded_at' => $refundedAt,
-            'reason' => $reason,
         ]);
     }
 }
