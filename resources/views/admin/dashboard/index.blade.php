@@ -917,7 +917,7 @@
                 <div class="chart-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Grafik Penjualan</h5>
+                            <h5 class="section-title">Grafik Penjualan beta</h5>
                             <p class="section-subtitle">Visual penjualan 7 periode terakhir</p>
                         </div>
                         <div class="card-toolbar">
@@ -990,7 +990,7 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Trend</h5>
+                            <h5 class="section-title">Trend beta</h5>
                             <p class="section-subtitle">Arah performa harian yang perlu diperhatikan</p>
                         </div>
                         <span class="badge-soft bg-soft-primary">
@@ -1063,7 +1063,7 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Laporan Stok Barang</h5>
+                            <h5 class="section-title">Laporan Stok Barang beta</h5>
                             <p class="section-subtitle">Ringkasan stok aman, stok menipis, dan stok kritis</p>
                         </div>
                         <span class="badge-soft bg-soft-primary">
@@ -1145,7 +1145,7 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Barang Paling Laku</h5>
+                            <h5 class="section-title">Barang Paling Laku beta</h5>
                             <p class="section-subtitle">Produk dengan kontribusi penjualan tertinggi</p>
                         </div>
                         <span class="badge-soft bg-soft-success">
@@ -1249,7 +1249,7 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Harga & Performa Margin</h5>
+                            <h5 class="section-title">Harga & Performa Margin beta</h5>
                             <p class="section-subtitle">Bagian “kemudian harga” yang kamu minta, saya taruh jadi panel sendiri</p>
                         </div>
                         <span class="badge-soft bg-soft-warning">
@@ -1315,7 +1315,7 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Keuangan & Perputarannya</h5>
+                            <h5 class="section-title">Keuangan & Perputarannya beta</h5>
                             <p class="section-subtitle">Bagian posisi kas dan seberapa cepat uang berputar</p>
                         </div>
                         <span class="badge-soft bg-soft-info">
