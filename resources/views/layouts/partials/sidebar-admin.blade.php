@@ -154,6 +154,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_summary.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.transaction_summary.index') }}" class="sidebar-link">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Laporan Transaksi</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
