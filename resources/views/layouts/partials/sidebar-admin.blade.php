@@ -140,6 +140,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.supplier_payable.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.supplier_payable.index') }}" class="sidebar-link">
+                        <i class="bi bi-receipt"></i>
+                        <span>Hutang Supplier</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
