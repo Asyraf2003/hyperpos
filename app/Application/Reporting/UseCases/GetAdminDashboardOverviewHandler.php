@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use Carbon\CarbonImmutable;
-
 final class GetAdminDashboardOverviewHandler
 {
     public function __construct(
@@ -21,129 +19,49 @@ final class GetAdminDashboardOverviewHandler
 
     public function handle(): array
     {
-        [$monthFrom, $monthTo] = $this->currentMonthRange();
-        $today = CarbonImmutable::today()->toDateString();
+        $period = AdminDashboardOverviewPeriod::build();
 
-        $transactionSummary = $this->extractSummary(
-            $this->transactionReport->handle($monthFrom, $monthTo)
+        $transactionSummary = ReportingResultDataExtractor::summary(
+            $this->transactionReport->handle($period['from'], $period['to'])
         );
 
-        $inventorySummary = $this->extractSummary(
-            $this->inventoryStockValue->handle($monthFrom, $monthTo)
+        $inventorySummary = ReportingResultDataExtractor::summary(
+            $this->inventoryStockValue->handle($period['from'], $period['to'])
         );
 
-        $operationalProfitRow = $this->extractRow(
-            $this->operationalProfit->handle($monthFrom, $monthTo)
+        $operationalProfitRow = ReportingResultDataExtractor::row(
+            $this->operationalProfit->handle($period['from'], $period['to'])
         );
 
-        $supplierPayableSummary = $this->extractSummary(
-            $this->supplierPayable->handle($monthFrom, $monthTo)
+        $supplierPayableSummary = ReportingResultDataExtractor::summary(
+            $this->supplierPayable->handle($period['from'], $period['to'])
         );
 
-        $employeeDebtSummary = $this->extractSummary(
-            $this->employeeDebt->handle($monthFrom, $monthTo)
+        $employeeDebtSummary = ReportingResultDataExtractor::summary(
+            $this->employeeDebt->handle($period['from'], $period['to'])
         );
 
-        $operationalExpenseSummary = $this->extractSummary(
-            $this->operationalExpense->handle($monthFrom, $monthTo)
+        $operationalExpenseSummary = ReportingResultDataExtractor::summary(
+            $this->operationalExpense->handle($period['from'], $period['to'])
         );
 
-        $todayCash = $this->sumLedger(
-            $this->extractRows($this->transactionCashLedger->handle($today, $today))
+        $todayCash = DashboardCashLedgerTotals::fromReportResult(
+            $this->transactionCashLedger->handle($period['today'], $period['today'])
         );
 
-        $monthCash = $this->sumLedger(
-            $this->extractRows($this->transactionCashLedger->handle($monthFrom, $monthTo))
+        $monthCash = DashboardCashLedgerTotals::fromReportResult(
+            $this->transactionCashLedger->handle($period['from'], $period['to'])
         );
 
-        return [
-            'hero' => [
-                'monthly_gross_transaction_rupiah' => (int) ($transactionSummary['gross_transaction_rupiah'] ?? 0),
-                'monthly_net_cash_collected_rupiah' => (int) ($transactionSummary['net_cash_collected_rupiah'] ?? 0),
-                'monthly_outstanding_rupiah' => (int) ($transactionSummary['outstanding_rupiah'] ?? 0),
-            ],
-            'stats' => [
-                'total_qty_on_hand' => (int) ($inventorySummary['total_qty_on_hand'] ?? 0),
-                'total_inventory_value_rupiah' => (int) ($inventorySummary['total_inventory_value_rupiah'] ?? 0),
-                'daily_cash_in_rupiah' => (int) ($todayCash['total_in_rupiah'] ?? 0),
-                'monthly_net_operational_profit_rupiah' => (int) ($operationalProfitRow['net_operational_profit_rupiah'] ?? 0),
-            ],
-            'finance' => [
-                'monthly_cash_in_rupiah' => (int) ($monthCash['total_in_rupiah'] ?? 0),
-                'monthly_cash_out_rupiah' => (int) ($monthCash['total_out_rupiah'] ?? 0),
-                'monthly_gross_revenue_rupiah' => (int) ($operationalProfitRow['gross_revenue_rupiah'] ?? 0),
-                'monthly_net_cash_flow_rupiah' => (int) (($monthCash['total_in_rupiah'] ?? 0) - ($monthCash['total_out_rupiah'] ?? 0)),
-            ],
-            'position' => [
-                'inventory_value_rupiah' => (int) ($inventorySummary['total_inventory_value_rupiah'] ?? 0),
-                'transaction_outstanding_rupiah' => (int) ($transactionSummary['outstanding_rupiah'] ?? 0),
-                'supplier_outstanding_rupiah' => (int) ($supplierPayableSummary['outstanding_rupiah'] ?? 0),
-                'employee_debt_remaining_rupiah' => (int) ($employeeDebtSummary['total_remaining_balance'] ?? 0),
-                'monthly_refunded_rupiah' => (int) ($transactionSummary['refunded_rupiah'] ?? 0),
-                'monthly_operational_expense_rupiah' => (int) ($operationalExpenseSummary['total_amount_rupiah'] ?? 0),
-            ],
-        ];
-    }
-
-    private function currentMonthRange(): array
-    {
-        $today = CarbonImmutable::today();
-
-        return [
-            $today->startOfMonth()->toDateString(),
-            $today->endOfMonth()->toDateString(),
-        ];
-    }
-
-    private function extractSummary(object $result): array
-    {
-        $data = method_exists($result, 'data') ? $result->data() : null;
-
-        return is_array($data) && is_array($data['summary'] ?? null)
-            ? $data['summary']
-            : [];
-    }
-
-    private function extractRow(object $result): array
-    {
-        $data = method_exists($result, 'data') ? $result->data() : null;
-
-        return is_array($data) && is_array($data['row'] ?? null)
-            ? $data['row']
-            : [];
-    }
-
-    private function extractRows(object $result): array
-    {
-        $data = method_exists($result, 'data') ? $result->data() : null;
-
-        return is_array($data) && is_array($data['rows'] ?? null)
-            ? $data['rows']
-            : [];
-    }
-
-    private function sumLedger(array $rows): array
-    {
-        $totalIn = 0;
-        $totalOut = 0;
-
-        foreach ($rows as $row) {
-            $direction = (string) ($row['direction'] ?? '');
-            $amount = (int) ($row['event_amount_rupiah'] ?? 0);
-
-            if ($direction === 'in') {
-                $totalIn += $amount;
-                continue;
-            }
-
-            if ($direction === 'out') {
-                $totalOut += $amount;
-            }
-        }
-
-        return [
-            'total_in_rupiah' => $totalIn,
-            'total_out_rupiah' => $totalOut,
-        ];
+        return AdminDashboardOverviewPayload::fromSources(
+            $transactionSummary,
+            $inventorySummary,
+            $operationalProfitRow,
+            $supplierPayableSummary,
+            $employeeDebtSummary,
+            $operationalExpenseSummary,
+            $todayCash,
+            $monthCash,
+        );
     }
 }

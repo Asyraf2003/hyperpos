@@ -1,0 +1,44 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Adapters\Out\Reporting;
+
+use Illuminate\Support\Facades\DB;
+
+final class InventoryMovementSummaryDatabaseQuery
+{
+    public static function get(string $fromMutationDate, string $toMutationDate): array
+    {
+        return DB::table('inventory_movements')
+            ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'inventory_movements.product_id')
+            ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'inventory_movements.product_id')
+            ->whereBetween('inventory_movements.tanggal_mutasi', [$fromMutationDate, $toMutationDate])
+            ->groupBy(
+                'inventory_movements.product_id',
+                'product_inventory.qty_on_hand',
+                'product_inventory_costing.avg_cost_rupiah',
+                'product_inventory_costing.inventory_value_rupiah',
+            )
+            ->orderBy('inventory_movements.product_id')
+            ->get(self::columns())
+            ->map(static fn (object $row): array => InventoryMovementSummaryRowMapper::map($row))
+            ->all();
+    }
+
+    private static function columns(): array
+    {
+        return [
+            'inventory_movements.product_id',
+            DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.qty_delta > 0 THEN inventory_movements.qty_delta ELSE 0 END), 0) as qty_in'),
+            DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.qty_delta < 0 THEN ABS(inventory_movements.qty_delta) ELSE 0 END), 0) as qty_out'),
+            DB::raw('COALESCE(SUM(inventory_movements.qty_delta), 0) as net_qty_delta'),
+            DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.total_cost_rupiah > 0 THEN inventory_movements.total_cost_rupiah ELSE 0 END), 0) as total_in_cost_rupiah'),
+            DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.total_cost_rupiah < 0 THEN ABS(inventory_movements.total_cost_rupiah) ELSE 0 END), 0) as total_out_cost_rupiah'),
+            DB::raw('COALESCE(SUM(inventory_movements.total_cost_rupiah), 0) as net_cost_delta_rupiah'),
+            DB::raw('COALESCE(product_inventory.qty_on_hand, 0) as current_qty_on_hand'),
+            DB::raw('COALESCE(product_inventory_costing.avg_cost_rupiah, 0) as current_avg_cost_rupiah'),
+            DB::raw('COALESCE(product_inventory_costing.inventory_value_rupiah, 0) as current_inventory_value_rupiah'),
+        ];
+    }
+}
