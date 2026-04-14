@@ -58,7 +58,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
             25000,
             '2026-03-16',
             'Makan lembur tim',
-            'transfer',
+            'tf',
             null,
             null,
         );
@@ -105,7 +105,7 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
                 'category_name' => 'Makan',
                 'amount_rupiah' => 25000,
                 'description' => 'Makan lembur tim',
-                'payment_method' => 'transfer',
+                'payment_method' => 'tf',
                 'reference_no' => null,
             ],
         ], $data['rows']);
@@ -141,6 +141,8 @@ final class GetOperationalExpenseSummaryFeatureTest extends TestCase
         DB::table('operational_expenses')->insert([
             'id' => $id,
             'category_id' => $categoryId,
+            'category_code_snapshot' => 'SNAP',
+            'category_name_snapshot' => 'Snapshot',
             'amount_rupiah' => $amountRupiah,
             'expense_date' => $expenseDate,
             'description' => $description,
