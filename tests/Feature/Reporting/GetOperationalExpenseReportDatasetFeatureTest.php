@@ -50,7 +50,7 @@ final class GetOperationalExpenseReportDatasetFeatureTest extends TestCase
             'total_amount_rupiah' => 215000,
             'top_category_name' => 'Listrik',
             'top_category_amount_rupiah' => 175000,
-            'average_daily_rupiah' => null,
+            'average_daily_rupiah' => 6935,
         ], $summary);
 
         $this->assertSame([
@@ -101,6 +101,11 @@ final class GetOperationalExpenseReportDatasetFeatureTest extends TestCase
         $this->assertSame(
             $summary['total_amount_rupiah'],
             array_sum(array_column($categoryRows, 'total_amount_rupiah'))
+        );
+
+        $this->assertSame(
+            6935,
+            intdiv($summary['total_amount_rupiah'], 31)
         );
     }
 

@@ -36,7 +36,12 @@ final class GetOperationalExpenseReportDatasetHandler
 
         return Result::success([
             'rows' => $rows,
-            'summary' => $this->summary->build($rows, $categoryRows),
+            'summary' => $this->summary->build(
+                $rows,
+                $categoryRows,
+                $fromExpenseDate,
+                $toExpenseDate,
+            ),
             'period_rows' => $this->periods->build($rows),
             'category_rows' => $categoryRows,
         ]);
