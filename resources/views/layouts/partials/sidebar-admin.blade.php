@@ -119,10 +119,17 @@
 
                 <li class="sidebar-title">Laporan</li>
 
-                <li class="sidebar-item">
-                    <a href="#" class="sidebar-link">
-                        <i class="bi bi-file-earmark-text"></i>
-                        <span>Laporan Transaksi</span>
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_cash_ledger.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.transaction_cash_ledger.index') }}" class="sidebar-link">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Arus Kas Transaksi</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.employee_debt.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.employee_debt.index') }}" class="sidebar-link">
+                        <i class="bi bi-wallet2"></i>
+                        <span>Laporan Hutang Karyawan</span>
                     </a>
                 </li>
 
