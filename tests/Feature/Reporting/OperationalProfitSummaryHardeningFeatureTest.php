@@ -84,9 +84,7 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
             'net_operational_profit_rupiah' => 130000,
         ], $daily);
 
-        $this->assertSame([
-            'from_date' => '2030-01-07',
-            'to_date' => '2030-01-13',
+        $weeklyExpectedMetrics = [
             'gross_revenue_rupiah' => 300000,
             'refunded_rupiah' => 10000,
             'net_revenue_rupiah' => 290000,
@@ -97,19 +95,35 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
             'operational_expense_rupiah' => 20000,
             'payroll_disbursement_rupiah' => 40000,
             'net_operational_profit_rupiah' => 150000,
-        ], $weekly);
+        ];
 
-        $this->assertSame($weekly, $monthly);
+        $this->assertSame(
+            array_merge([
+                'from_date' => '2030-01-07',
+                'to_date' => '2030-01-13',
+            ], $weeklyExpectedMetrics),
+            $weekly
+        );
+
+        $this->assertSame(
+            array_merge([
+                'from_date' => '2030-01-01',
+                'to_date' => '2030-01-31',
+            ], $weeklyExpectedMetrics),
+            $monthly
+        );
+
         $this->assertSame($monthly, $custom);
     }
 
     public function test_operational_profit_summary_excludes_reversed_payroll_and_soft_deleted_expense_from_totals(): void
     {
         $this->seedEmployee('employee-2', 'Montir Reversal');
+        $this->seedExpenseCategory('expense-category-2', 'MISC', 'Misc');
 
         DB::table('operational_expenses')->insert([
-            ['id' => 'expense-x1', 'category_id' => null, 'amount_rupiah' => 15000, 'expense_date' => '2030-02-10', 'description' => 'Expense aktif', 'payment_method' => 'cash', 'reference_no' => null, 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null],
-            ['id' => 'expense-x2', 'category_id' => null, 'amount_rupiah' => 22000, 'expense_date' => '2030-02-10', 'description' => 'Expense dihapus', 'payment_method' => 'cash', 'reference_no' => null, 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => '2030-02-10 09:00:00'],
+            ['id' => 'expense-x1', 'category_id' => 'expense-category-2', 'amount_rupiah' => 15000, 'expense_date' => '2030-02-10', 'description' => 'Expense aktif', 'payment_method' => 'cash', 'reference_no' => null, 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => null],
+            ['id' => 'expense-x2', 'category_id' => 'expense-category-2', 'amount_rupiah' => 22000, 'expense_date' => '2030-02-10', 'description' => 'Expense dihapus', 'payment_method' => 'cash', 'reference_no' => null, 'created_at' => now(), 'updated_at' => now(), 'deleted_at' => '2030-02-10 09:00:00'],
         ]);
 
         DB::table('payroll_disbursements')->insert([
