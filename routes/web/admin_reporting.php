@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerPageController;
@@ -20,4 +21,7 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/supplier-payables', SupplierPayableReportPageController::class)
         ->name('admin.reports.supplier_payable.index');
+
+    Route::get('/admin/reports/inventory-stock-value', InventoryStockValueReportPageController::class)
+        ->name('admin.reports.inventory_stock_value.index');
 });

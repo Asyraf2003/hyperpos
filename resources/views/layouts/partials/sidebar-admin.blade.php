@@ -147,6 +147,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.inventory_stock_value.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.inventory_stock_value.index') }}" class="sidebar-link">
+                        <i class="bi bi-box-seam"></i>
+                        <span>Stok dan Nilai Persediaan</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
