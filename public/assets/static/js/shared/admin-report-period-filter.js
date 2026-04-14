@@ -3,6 +3,11 @@
 
   const getForms = () => Array.from(document.querySelectorAll(selector));
 
+  const byId = (id) => {
+    const value = String(id || '').trim();
+    return value === '' ? null : document.getElementById(value);
+  };
+
   const syncFallbackFromHidden = (form) => {
     const hiddenFrom = form.querySelector('input[name="date_from"]');
     const hiddenTo = form.querySelector('input[name="date_to"]');
@@ -31,21 +36,25 @@
     hiddenTo.value = String(fallbackTo.value || '').trim();
   };
 
-  const togglePickerMode = (form) => {
+  const updateDateUiMode = (form) => {
     const enhancedWrap = form.querySelector('[data-report-range-enhanced-wrap]');
     const fallbackWrap = form.querySelector('[data-report-range-fallback-wrap]');
-    const enhancedAvailable = typeof window.flatpickr === 'function' && !!window.AdminDateInput;
+    const enhancedInput = form.querySelector('[data-ui-date="range-single"]');
+    const enhancedReady = Boolean(enhancedInput && enhancedInput._flatpickr);
 
-    if (enhancedAvailable) {
-      enhancedWrap?.classList.remove('d-none');
-      fallbackWrap?.classList.add('d-none');
-      window.AdminDateInput.bindBySelector(form);
-      window.AdminDateInput.refreshWithin(form);
-      return;
-    }
+    enhancedWrap?.classList.toggle('d-none', !enhancedReady);
+    fallbackWrap?.classList.toggle('d-none', enhancedReady);
+  };
 
-    enhancedWrap?.classList.add('d-none');
-    fallbackWrap?.classList.remove('d-none');
+  const refreshDateUi = (form) => {
+    window.AdminDateInput?.bindBySelector(form);
+    window.AdminDateInput?.refreshWithin(form);
+    updateDateUiMode(form);
+  };
+
+  const drawOpen = (drawer, backdrop, open) => {
+    drawer?.classList.toggle('d-none', !open);
+    backdrop?.classList.toggle('d-none', !open);
   };
 
   const bindForm = (form) => {
@@ -53,15 +62,34 @@
       return;
     }
 
-    syncFallbackFromHidden(form);
-    togglePickerMode(form);
-
+    const openButton = byId(form.dataset.filterOpenButtonId);
+    const closeButton = byId(form.dataset.filterCloseButtonId);
+    const drawer = byId(form.dataset.filterDrawerId);
+    const backdrop = byId(form.dataset.filterBackdropId);
+    const fallbackWrap = form.querySelector('[data-report-range-fallback-wrap]');
     const fallbackFrom = form.querySelector('[data-report-date-fallback-from]');
     const fallbackTo = form.querySelector('[data-report-date-fallback-to]');
-    const fallbackWrap = form.querySelector('[data-report-range-fallback-wrap]');
+
+    syncFallbackFromHidden(form);
+    refreshDateUi(form);
+
+    openButton?.addEventListener('click', () => {
+      refreshDateUi(form);
+      drawOpen(drawer, backdrop, true);
+    });
+
+    closeButton?.addEventListener('click', () => {
+      drawOpen(drawer, backdrop, false);
+    });
+
+    backdrop?.addEventListener('click', () => {
+      drawOpen(drawer, backdrop, false);
+    });
 
     fallbackFrom?.addEventListener('input', () => syncHiddenFromFallback(form));
     fallbackTo?.addEventListener('input', () => syncHiddenFromFallback(form));
+    fallbackFrom?.addEventListener('change', () => syncHiddenFromFallback(form));
+    fallbackTo?.addEventListener('change', () => syncHiddenFromFallback(form));
 
     form.addEventListener('submit', () => {
       if (!fallbackWrap || fallbackWrap.classList.contains('d-none')) {
