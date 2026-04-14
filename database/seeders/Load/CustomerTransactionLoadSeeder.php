@@ -348,12 +348,6 @@ final class CustomerTransactionLoadSeeder extends Seeder
     /**
      * @param Collection<int, object> $products
      */
-    private function pickProduct(Collection $products, int $seed): object
-    {
-        $index = $seed % $products->count();
-
-        return $products[$index];
-    }
 
 
     /**
