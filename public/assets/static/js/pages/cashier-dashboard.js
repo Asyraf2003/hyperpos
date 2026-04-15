@@ -10,7 +10,7 @@
     const results = root.querySelector('[data-product-search-results]');
     const status = root.querySelector('[data-search-status]');
 
-    if (!endpoint || !input || !results || !status) {
+    if (!endpoint || !input || !results) {
         return;
     }
 
@@ -56,10 +56,18 @@
     }
 
     function setStatus(message) {
+        if (!status) {
+            return;
+        }
+
         status.innerHTML = '<span>' + escapeHtml(message) + '</span>';
     }
 
     function setLoadingStatus() {
+        if (!status) {
+            return;
+        }
+
         status.innerHTML = ''
             + '<span class="spinner-border spinner-border-sm cashier-search-spinner" aria-hidden="true"></span>'
             + '<span>Mencari produk...</span>';
