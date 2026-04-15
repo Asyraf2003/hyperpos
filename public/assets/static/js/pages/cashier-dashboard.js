@@ -7,11 +7,10 @@
 
     const endpoint = root.dataset.productLookupEndpoint || '';
     const input = root.querySelector('[data-product-search-input]');
-    const resetButton = root.querySelector('[data-product-reset-button]');
     const results = root.querySelector('[data-product-search-results]');
     const status = root.querySelector('[data-search-status]');
 
-    if (!endpoint || !input || !resetButton || !results || !status) {
+    if (!endpoint || !input || !results || !status) {
         return;
     }
 
@@ -247,10 +246,6 @@
             clearTimeout(debounceTimer);
             runSearch(input.value.trim());
         }
-    });
-
-    resetButton.addEventListener('click', function () {
-        resetSearch();
     });
 
     renderInitialState();

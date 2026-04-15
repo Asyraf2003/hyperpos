@@ -316,6 +316,7 @@
             align-items: center;
             justify-content: flex-end;
             min-height: 100%;
+            text-align: right;
         }
 
         .cashier-results-wrap {
@@ -433,9 +434,7 @@
                 align-items: stretch;
             }
 
-            .cashier-search-actions .btn {
-                width: 100%;
-            }
+            
 
             .cashier-user-name {
                 font-size: 1.02rem;
@@ -545,14 +544,10 @@
 
                         <div class="col-12 col-lg-4">
                             <div class="cashier-search-actions">
-                                <div class="small cashier-section-desc">
+                                <div class="small cashier-section-desc mb-0">
                                     Hasil akan muncul otomatis saat Anda mengetik minimal 2 karakter.
+                                    Hapus isi input untuk kembali ke keadaan awal.
                                 </div>
-
-                                <button type="button" class="btn btn-outline-secondary cashier-main-btn flex-fill" data-product-reset-button>
-                                    <i class="bi bi-arrow-counterclockwise me-2"></i>
-                                    Reset
-                                </button>
                             </div>
                         </div>
                     </div>
