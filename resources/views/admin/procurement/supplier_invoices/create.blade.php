@@ -38,9 +38,8 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1.8fr) 104px 220px 56px; gap: 16px;"
                             >
-                                <div>Baris</div>
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
                                 <div>Total Rincian</div>
@@ -59,15 +58,8 @@
 
                                         <div
                                             class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                            style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                            style="grid-template-columns: minmax(0, 1.8fr) 104px 220px 56px;"
                                         >
-                                            <div class="w-100">
-                                                <label class="form-label d-xl-none">Baris</label>
-                                                <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
-                                                    <span data-line-label>{{ $lineView['line_no'] }}</span>
-                                                </div>
-                                            </div>
-
                                             <div class="w-100 position-relative">
                                                 <label class="form-label d-xl-none">Produk</label>
 
@@ -144,10 +136,13 @@
                                                 <label class="form-label d-xl-none">Aksi</label>
                                                 <button
                                                     type="button"
-                                                    class="btn btn-light-danger w-100"
+                                                    class="btn btn-light-danger w-100 d-inline-flex align-items-center justify-content-center"
                                                     data-remove-line
+                                                    aria-label="Hapus rincian"
+                                                    title="Hapus rincian"
                                                 >
-                                                    Hapus
+                                                    <i class="bi bi-trash"></i>
+                                                    <span class="d-xl-none ms-1">Hapus</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -166,15 +161,8 @@
 
                                     <div
                                         class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                        style="grid-template-columns: minmax(0, 1.8fr) 104px 220px 56px;"
                                     >
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Baris</label>
-                                            <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
-                                                <span data-line-label>__LINE_NO__</span>
-                                            </div>
-                                        </div>
-
                                         <div class="w-100 position-relative">
                                             <label class="form-label d-xl-none">Produk</label>
 
