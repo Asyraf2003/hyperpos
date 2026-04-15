@@ -11,6 +11,8 @@ final class CashierDashboardPageController extends Controller
 {
     public function __invoke(): View
     {
-        return view('cashier.dashboard.index');
+        return view('cashier.dashboard.index', [
+            'productLookupEndpoint' => route('cashier.notes.products.lookup'),
+        ]);
     }
 }
