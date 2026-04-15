@@ -267,7 +267,7 @@
         background:
             linear-gradient(to top, rgba(67, 94, 190, .04), rgba(67, 94, 190, .01)),
             #fbfcff;
-        border: 1px solid #edf1f7;
+        border: 1px solid var(--report-border);
         padding: 1rem 1rem .75rem;
     }
 
@@ -324,8 +324,8 @@
         gap: .8rem;
         padding: .9rem 1rem;
         border-radius: 16px;
-        background: #fbfcff;
-        border: 1px solid #edf1f7;
+        background: var(--report-surface-soft);
+        border: 1px solid var(--report-border);
     }
 
     .dashboard-report .trend-item-left {
@@ -423,8 +423,8 @@
     .dashboard-report .inventory-item {
         padding: .9rem 1rem;
         border-radius: 16px;
-        background: #fbfcff;
-        border: 1px solid #edf1f7;
+        background: var(--report-surface-soft);
+        border: 1px solid var(--report-border);
     }
 
     .dashboard-report .inventory-top {
@@ -536,8 +536,8 @@
     .dashboard-report .finance-box {
         padding: 1rem;
         border-radius: 18px;
-        border: 1px solid #edf1f7;
-        background: #fbfcff;
+        border: 1px solid var(--report-border);
+        background: var(--report-surface-soft);
     }
 
     .dashboard-report .finance-label {
@@ -599,8 +599,8 @@
         gap: .8rem;
         padding: .95rem 1rem;
         border-radius: 16px;
-        border: 1px solid #edf1f7;
-        background: #fbfcff;
+        border: 1px solid var(--report-border);
+        background: var(--report-surface-soft);
     }
 
     .dashboard-report .asset-left {
@@ -629,6 +629,146 @@
         margin: 0;
     }
 
+
+    .dashboard-report {
+        --admin-radius-xl: 1.6rem;
+        --admin-radius-lg: 1.25rem;
+        --admin-radius-md: 1rem;
+    }
+
+    .dashboard-report,
+    .dashboard-report input,
+    .dashboard-report button,
+    .dashboard-report select,
+    .dashboard-report textarea {
+        font-family: "Nunito", "Inter", "Segoe UI", sans-serif;
+    }
+
+    .dashboard-report .section-title,
+    .dashboard-report .chart-title,
+    .dashboard-report .inventory-title,
+    .dashboard-report .asset-title,
+    .dashboard-report .finance-title,
+    .dashboard-report .profile-name,
+    .dashboard-report .summary-mini-value,
+    .dashboard-report .metric-value,
+    .dashboard-report .insight-value {
+        color: color-mix(in srgb, var(--report-text) 88%, white 12%);
+        font-weight: 800;
+        letter-spacing: .01em;
+    }
+
+    .dashboard-report .section-subtitle,
+    .dashboard-report .summary-mini-label,
+    .dashboard-report .profile-mail,
+    .dashboard-report .metric-label,
+    .dashboard-report .trend-meta,
+    .dashboard-report .inventory-meta,
+    .dashboard-report .asset-label,
+    .dashboard-report .finance-label {
+        color: color-mix(in srgb, var(--report-text-muted) 72%, white 28%);
+        font-weight: 700;
+    }
+
+    .dashboard-report .profile-card {
+        border-radius: var(--admin-radius-xl);
+        overflow: hidden;
+    }
+
+    .dashboard-report .admin-profile-top {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+            135deg,
+            rgba(var(--bs-primary-rgb), .96) 0%,
+            rgba(var(--bs-primary-rgb), .78) 100%
+        );
+        padding: 1.35rem;
+    }
+
+    .dashboard-report .admin-profile-top::after {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        right: -55px;
+        top: -70px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, 0) 70%);
+    }
+
+    .dashboard-report .admin-avatar-wrap {
+        width: 74px;
+        height: 74px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, .58);
+        background: rgba(255, 255, 255, .16);
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .12);
+    }
+
+    .dashboard-report .admin-avatar-wrap .profile-avatar {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .dashboard-report .profile-name {
+        margin: 0;
+        color: #fff;
+        font-size: 1.12rem;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    .dashboard-report .profile-mail {
+        color: rgba(255, 255, 255, .88);
+        font-size: .94rem;
+        word-break: break-word;
+    }
+
+    .dashboard-report .summary-strip {
+        gap: .9rem;
+    }
+
+    .dashboard-report .summary-mini {
+        border-radius: var(--admin-radius-lg);
+        padding: 1rem 1.05rem;
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .06)),
+            var(--report-surface);
+    }
+
+    .dashboard-report .summary-mini-label {
+        margin-bottom: .28rem;
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .dashboard-report .summary-mini-value {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .dashboard-report .admin-main-btn {
+        min-height: 52px;
+        border-radius: 999px;
+        font-weight: 800;
+        letter-spacing: .01em;
+    }
+
+    .dashboard-report .chart-shell,
+    .dashboard-report .trend-item,
+    .dashboard-report .inventory-item,
+    .dashboard-report .asset-item,
+    .dashboard-report .finance-box,
+    .dashboard-report .summary-mini {
+        border-radius: var(--admin-radius-lg);
+    }
     .dashboard-report .profile-card {
         background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
     }
@@ -683,8 +823,8 @@
     .dashboard-report .summary-mini {
         padding: .85rem .9rem;
         border-radius: 16px;
-        background: #fbfcff;
-        border: 1px solid #edf1f7;
+        background: var(--report-surface-soft);
+        border: 1px solid var(--report-border);
     }
 
     .dashboard-report .summary-mini-label {
@@ -741,6 +881,55 @@
             flex-direction: column;
         }
     }
+
+    .dashboard-report .chart-shell,
+    .dashboard-report .trend-item,
+    .dashboard-report .inventory-item,
+    .dashboard-report .asset-item,
+    .dashboard-report .finance-box,
+    .dashboard-report .profile-card,
+    .dashboard-report .summary-mini,
+    .dashboard-report .insight-card,
+    .dashboard-report .beta-card {
+        border-color: var(--report-border);
+        background: var(--report-surface);
+        color: var(--report-text);
+    }
+
+    .dashboard-report .section-subtitle,
+    .dashboard-report .summary-mini-label,
+    .dashboard-report .profile-mail,
+    .dashboard-report .trend-meta,
+    .dashboard-report .inventory-meta,
+    .dashboard-report .asset-label,
+    .dashboard-report .finance-label {
+        color: var(--report-text-muted);
+    }
+
+    .dashboard-report .chart-shell,
+    .dashboard-report .trend-item,
+    .dashboard-report .inventory-item,
+    .dashboard-report .asset-item,
+    .dashboard-report .finance-box,
+    .dashboard-report .profile-card,
+    .dashboard-report .summary-mini {
+        border-radius: 1.25rem;
+    }
+
+    .dashboard-report .chart-shell,
+    .dashboard-report .trend-item,
+    .dashboard-report .inventory-item,
+    .dashboard-report .asset-item,
+    .dashboard-report .finance-box,
+    .dashboard-report .profile-card {
+        box-shadow: 0 .5rem 1.2rem rgba(15, 23, 42, .05);
+    }
+
+    .dashboard-report .profile-card,
+    .dashboard-report .chart-shell,
+    .dashboard-report .finance-box {
+        overflow: hidden;
+    }
 </style>
 
 <div class="dashboard-report">
@@ -791,31 +980,34 @@
 
         <div class="col-12 col-xl-3">
             <div class="card profile-card h-100">
-                <div class="card-body p-3">
-                    <div class="profile-top">
-                        <img
-                            src="{{ asset('assets/compiled/jpg/1.jpg') }}"
-                            alt="Foto profil pengguna"
-                            class="profile-avatar"
-                            width="64"
-                            height="64"
-                            loading="lazy"
-                            decoding="async"
-                        >
-                        <div>
-                            <div class="profile-name">{{ $appShell['actor_label'] ?? 'Asyraf Admin' }}</div>
-                            <div class="profile-mail">{{ $appShell['user_email'] ?? 'admin@asyrafcloud.com' }}</div>
-                            <span class="profile-badge">
-                                <i class="bi bi-patch-check-fill"></i>
-                                Akun Aktif
-                            </span>
+                <div class="admin-profile-top">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="admin-avatar-wrap">
+                            <img
+                                src="{{ asset('assets/compiled/jpg/1.jpg') }}"
+                                alt="Foto profil pengguna"
+                                class="profile-avatar"
+                                width="72"
+                                height="72"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                        </div>
+
+                        <div class="min-w-0">
+                            <div class="mb-1">
+                                <div class="profile-name">{{ $appShell['actor_label'] ?? 'Admin' }}</div>
+                            </div>
+                            <div class="profile-mail">{{ $appShell['user_email'] ?? '-' }}</div>
                         </div>
                     </div>
+                </div>
 
+                <div class="card-body p-4">
                     <div class="summary-strip">
                         <div class="summary-mini">
-                            <div class="summary-mini-label">Cabang</div>
-                            <p class="summary-mini-value">Pusat</p>
+                            <div class="summary-mini-label">Role</div>
+                            <p class="summary-mini-value">Admin</p>
                         </div>
                         <div class="summary-mini">
                             <div class="summary-mini-label">Status</div>
@@ -823,13 +1015,19 @@
                         </div>
                     </div>
 
-                    <hr class="my-4">
+                    <div class="mt-4 mb-3">
+                        <div class="summary-mini-label">Akun sedang digunakan</div>
+                        <p class="section-subtitle mb-0">
+                            Pastikan keluar dari akun setelah selesai menggunakan dashboard admin,
+                            terutama bila perangkat dipakai bergantian.
+                        </p>
+                    </div>
 
                     <form action="{{ route('logout') }}" method="post" class="d-grid">
                         @csrf
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-box-arrow-right me-1"></i>
-                            Keluar
+                        <button type="submit" class="btn btn-outline-danger admin-main-btn">
+                            <i class="bi bi-box-arrow-right me-2"></i>
+                            Keluar Akun
                         </button>
                     </form>
                 </div>
