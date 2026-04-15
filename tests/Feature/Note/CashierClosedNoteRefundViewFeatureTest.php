@@ -28,14 +28,16 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Refund Nota')
             ->assertSee('Mode Refund')
             ->assertSee('Mode Close')
+            ->assertSee('Detail Close')
             ->assertSee('Status Operasional')
             ->assertSee('close')
             ->assertSee('customer_payment_id', false)
             ->assertSee('payment-1', false)
-            ->assertDontSee('Bayar Sekarang');
+            ->assertDontSee('Bayar Sekarang')
+            ->assertDontSee('Mode Payment');
     }
 
-    public function test_open_note_detail_shows_open_mode_and_edit_action(): void
+    public function test_open_note_detail_shows_open_mode_edit_action_and_payment_panel(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenPartialPaidServiceOnlyNote();
@@ -44,10 +46,13 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
             ->assertSee('Mode Open')
+            ->assertSee('Detail Open')
             ->assertSee('Status Operasional')
             ->assertSee('open')
             ->assertSee('Edit Nota')
+            ->assertSee('Mode Payment')
             ->assertSee('Bayar Sekarang')
+            ->assertSee('Net Paid')
             ->assertDontSee('Refund Nota');
     }
 

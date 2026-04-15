@@ -1,22 +1,40 @@
 @if ($note['can_show_payment_form'])
     <div class="card">
+        <div class="card-header">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                    <h4 class="card-title mb-1">Pembayaran Nota</h4>
+                    <p class="mb-0 text-muted">
+                        Catat pembayaran untuk nota open tanpa keluar dari halaman detail kasir.
+                    </p>
+                </div>
+
+                <span class="badge bg-light text-dark border">Mode Payment</span>
+            </div>
+
+            <p class="mt-2 mb-0 text-muted small">
+                Pilih bayar penuh atau sebagian. Status note akan dihitung ulang dari outstanding terbaru setelah pembayaran dicatat.
+            </p>
+        </div>
+
         <div class="card-body">
             <form method="POST" action="{{ $paymentAction }}" id="note-payment-form">
                 @csrf
 
-                <div class="fw-bold mb-1">Pembayaran Nota</div>
-                <div class="text-muted small mb-3">
-                    Catat pembayaran dari panel kanan tanpa mengubah struktur kerja utama di sisi kiri.
-                </div>
+                @if ($errors->has('payment'))
+                    <div class="alert alert-danger py-2 px-3 mb-3">
+                        {{ $errors->first('payment') }}
+                    </div>
+                @endif
 
-                <div class="border rounded p-3 mb-3">
+                <div class="border rounded p-3 mb-4">
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <span class="text-muted">Grand Total</span>
                         <strong>{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <span class="text-muted">Sudah Dibayar</span>
+                        <span class="text-muted">Net Paid</span>
                         <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
                     </div>
 
@@ -103,24 +121,20 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mt-1">
-                    <div class="col-12">
-                        <div class="border rounded p-3">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <span class="text-muted">Dibayar Sekarang</span>
-                                <strong id="selected-payment-total">0</strong>
-                            </div>
+                <div class="border rounded p-3 mt-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                        <span class="text-muted">Dibayar Sekarang</span>
+                        <strong id="selected-payment-total">0</strong>
+                    </div>
 
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <span class="text-muted">Sisa Setelah Bayar</span>
-                                <strong id="payment-remaining-text">0</strong>
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                        <span class="text-muted">Sisa Setelah Bayar</span>
+                        <strong id="payment-remaining-text">0</strong>
+                    </div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Kembalian Cash</span>
-                                <strong id="payment-change-text">0</strong>
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Kembalian Cash</span>
+                        <strong id="payment-change-text">0</strong>
                     </div>
                 </div>
 
@@ -128,30 +142,6 @@
                     <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
                 </div>
             </form>
-        </div>
-    </div>
-@else
-    <div class="card">
-        <div class="card-body">
-            <div class="fw-bold mb-1">Pembayaran Nota</div>
-
-            @if ($note['is_closed'])
-                <div class="text-muted small mb-3">
-                    Nota sudah ditutup. Pembayaran tidak bisa dicatat dari halaman kasir ini.
-                </div>
-
-                <div class="border rounded p-3 bg-light">
-                    <span class="fw-semibold">Nota sudah ditutup.</span>
-                </div>
-            @else
-                <div class="text-muted small mb-3">
-                    Status pembayaran sudah selesai untuk nota ini.
-                </div>
-
-                <div class="border rounded p-3 bg-light">
-                    <span class="fw-semibold">Nota sudah lunas.</span>
-                </div>
-            @endif
         </div>
     </div>
 @endif
