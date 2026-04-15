@@ -50,6 +50,8 @@
         box-shadow: var(--report-shadow);
         overflow: hidden;
         background: var(--report-surface);
+        background-clip: padding-box;
+        transform: translateZ(0);
     }
 
     .dashboard-report .section-title {
@@ -246,6 +248,8 @@
             linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .06)),
             var(--report-surface);
         border: 1px solid var(--report-border);
+        background-clip: padding-box;
+        transform: translateZ(0);
     }
 
     .dashboard-report .summary-mini-label {
@@ -269,6 +273,9 @@
         border-radius: 999px;
         font-weight: 800;
         letter-spacing: .01em;
+        overflow: hidden;
+        background-clip: padding-box;
+        transform: translateZ(0);
     }
 
     .dashboard-report .stat-card {
@@ -373,6 +380,8 @@
             linear-gradient(180deg, rgba(var(--bs-primary-rgb), .02), rgba(var(--bs-primary-rgb), .045)),
             var(--report-surface);
         box-shadow: var(--report-shadow);
+        background-clip: padding-box;
+        transform: translateZ(0);
     }
 
     .dashboard-report .chart-shell {
