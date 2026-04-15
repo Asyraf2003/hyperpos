@@ -590,15 +590,10 @@
                             </div>
 
                             <div class="min-w-0">
-                                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <div class="mb-1">
                                     <h5 class="cashier-user-name">
                                         {{ $appShell['actor_label'] ?? 'Pengguna' }}
                                     </h5>
-
-                                    <span class="badge bg-light text-primary border border-light-subtle">
-                                        <i class="bi bi-patch-check-fill me-1"></i>
-                                        Aktif
-                                    </span>
                                 </div>
 
                                 <div class="cashier-user-email">
