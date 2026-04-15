@@ -13,7 +13,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteReaderPort $notes,
         private readonly NoteOperationalStatusResolver $operationalStatuses,
         private readonly NotePaymentStatusResolver $paymentStatuses,
-        private readonly NoteRowSettlementSummaryBuilder $rowSettlements,
+        private readonly NoteOperationalRowSettlementProjector $rowSettlements,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
     ) {
@@ -51,6 +51,10 @@ final class NoteDetailPageDataBuilder
                 'total_refunded_rupiah' => $operational['total_refunded_rupiah'],
                 'net_paid_rupiah' => $operational['net_paid_rupiah'],
                 'outstanding_rupiah' => $operational['outstanding_rupiah'],
+                'refund_required_rupiah' => max(
+                    $operational['net_paid_rupiah'] - $operational['grand_total_rupiah'],
+                    0
+                ),
                 'payment_status' => $paymentStatus,
                 'can_add_rows' => $operational['is_open'],
                 'can_show_edit_actions' => $operational['is_open'],
