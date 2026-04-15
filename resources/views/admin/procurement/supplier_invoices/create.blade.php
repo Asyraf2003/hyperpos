@@ -38,7 +38,7 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: minmax(0, 1.8fr) 88px 180px 52px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1fr) 84px 156px 44px; gap: 16px;"
                             >
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
@@ -58,7 +58,7 @@
 
                                         <div
                                             class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                            style="grid-template-columns: minmax(0, 1.8fr) 88px 180px 52px;"
+                                            style="grid-template-columns: minmax(0, 1fr) 84px 156px 44px;"
                                         >
                                             <div class="w-100 position-relative">
                                                 <label class="form-label d-xl-none">Produk</label>
@@ -100,6 +100,7 @@
                                                     class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
                                                     placeholder="Contoh: 2"
                                                     data-qty-input
+                                                    style="text-align: center;"
                                                     required
                                                 >
                                                 @error('lines.' . $lineView['index'] . '.qty_pcs')
@@ -124,6 +125,7 @@
                                                     class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
                                                     placeholder="Contoh: 150.000"
                                                     data-money-display
+                                                    style="text-align: right;"
                                                     required
                                                 >
 
@@ -136,16 +138,12 @@
                                                 <label class="form-label d-xl-none">Aksi</label>
                                                 <button
                                                     type="button"
-                                                    class="btn btn-light-danger w-100 d-inline-flex align-items-center justify-content-center px-0"
+                                                    class="btn icon btn-danger"
                                                     data-remove-line
                                                     aria-label="Hapus rincian"
                                                     title="Hapus rincian"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
-                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 0V6A.5.5 0 0 1 8 5.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
-                                                        <path d="M14 3a1 1 0 0 1-1 1h-.538l-.853 10.66A2 2 0 0 1 9.615 16h-3.23a2 2 0 0 1-1.994-1.34L3.538 4H3a1 1 0 0 1 0-2h3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1H13a1 1 0 0 1 1 1ZM4.538 4l.84 10.5a1 1 0 0 0 .997.84h3.25a1 1 0 0 0 .997-.84l.84-10.5H4.538Z"/>
-                                                    </svg>
-                                                    <span class="d-xl-none ms-1">Hapus</span>
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -164,7 +162,7 @@
 
                                     <div
                                         class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: minmax(0, 1.8fr) 104px 220px 56px;"
+                                        style="grid-template-columns: minmax(0, 1fr) 84px 156px 44px;"
                                     >
                                         <div class="w-100 position-relative">
                                             <label class="form-label d-xl-none">Produk</label>
@@ -201,6 +199,7 @@
                                                 class="form-control"
                                                 placeholder="Contoh: 2"
                                                 data-qty-input
+                                                style="text-align: center;"
                                                 required
                                             >
                                         </div>
@@ -222,6 +221,7 @@
                                                 class="form-control"
                                                 placeholder="Contoh: 150.000"
                                                 data-money-display
+                                                style="text-align: right;"
                                                 required
                                             >
                                         </div>
@@ -230,16 +230,12 @@
                                             <label class="form-label d-xl-none">Aksi</label>
                                             <button
                                                     type="button"
-                                                    class="btn btn-light-danger w-100 d-inline-flex align-items-center justify-content-center px-0"
+                                                    class="btn icon btn-danger"
                                                     data-remove-line
                                                     aria-label="Hapus rincian"
                                                     title="Hapus rincian"
                                                 >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
-                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 0V6A.5.5 0 0 1 8 5.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
-                                                        <path d="M14 3a1 1 0 0 1-1 1h-.538l-.853 10.66A2 2 0 0 1 9.615 16h-3.23a2 2 0 0 1-1.994-1.34L3.538 4H3a1 1 0 0 1 0-2h3.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1H13a1 1 0 0 1 1 1ZM4.538 4l.84 10.5a1 1 0 0 0 .997.84h3.25a1 1 0 0 0 .997-.84l.84-10.5H4.538Z"/>
-                                                    </svg>
-                                                    <span class="d-xl-none ms-1">Hapus</span>
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                         </div>
                                     </div>
