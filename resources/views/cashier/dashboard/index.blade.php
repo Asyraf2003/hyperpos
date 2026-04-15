@@ -537,6 +537,12 @@
                         </div>
                     </div>
 
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="cashier-search-status" data-search-status>
+                            <span>Siap digunakan</span>
+                        </div>
+                    </div>
+
                     <div class="cashier-results-wrap" data-product-search-results>
                         <div class="cashier-empty-state">
                             <div class="fw-semibold mb-1">Belum ada pencarian</div>
