@@ -660,7 +660,6 @@
     const hiddenInput = item.querySelector("[data-product-id]");
     const resultsBox = item.querySelector("[data-product-results]");
     const qtyInput = item.querySelector("[data-qty-input]");
-    const createProductLink = item.querySelector("a[href*='/admin/products/create']");
 
     if (!searchInput || !hiddenInput || !resultsBox) return;
 
@@ -672,9 +671,10 @@
     const createProductButton = () => resultsBox.querySelector("[data-create-product-action]");
 
     const openCreateProduct = () => {
-      const href = createProductLink?.getAttribute("href");
-      if (!href) return;
+      const href = typeof config.createProductUrl === "string" ? config.createProductUrl.trim() : "";
+      if (href === "") return;
 
+      persistDraftNow();
       window.location.assign(href);
     };
 
@@ -700,9 +700,7 @@
 
     const renderResults = (rows) => {
       if (!rows.length) {
-        const createHref = createProductLink?.getAttribute("href");
-
-        resultsBox.innerHTML = createHref
+        resultsBox.innerHTML = config.createProductUrl
           ? '<button type="button" class="list-group-item list-group-item-action" data-create-product-action><div class="fw-semibold">Produk tidak ditemukan</div><small class="text-muted">Tekan Enter untuk buat product baru.</small></button>'
           : '<div class="list-group-item text-muted">Produk tidak ditemukan.</div>';
 
@@ -839,7 +837,7 @@
       }
 
       if (createButton instanceof HTMLElement) {
-        createButton.click();
+        openCreateProduct();
         return;
       }
 
