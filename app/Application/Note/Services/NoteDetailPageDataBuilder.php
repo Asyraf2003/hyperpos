@@ -14,6 +14,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteOperationalStatusResolver $operationalStatuses,
         private readonly NotePaymentStatusResolver $paymentStatuses,
         private readonly NoteOperationalRowSettlementProjector $rowSettlements,
+        private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
     ) {
@@ -60,6 +61,8 @@ final class NoteDetailPageDataBuilder
                 'can_show_edit_actions' => $operational['is_open'],
                 'can_edit_workspace' => $operational['is_open'],
                 'can_show_payment_form' => $operational['is_open'] && $operational['outstanding_rupiah'] > 0,
+                'can_show_refund_form' => $operational['is_close'],
+                'refund_payment_options' => $this->refundPaymentOptions->build($note->id()),
                 'can_show_correction_actions' => false,
                 'correction_notice' => $operational['is_close']
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
