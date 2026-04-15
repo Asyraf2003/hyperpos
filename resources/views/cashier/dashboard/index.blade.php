@@ -49,6 +49,8 @@
             position: relative;
             border: 1px solid var(--cashier-border);
             background: var(--cashier-card-bg);
+            background-clip: padding-box; 
+            transform: translateZ(0);
         }
 
         .cashier-hero-card,
@@ -453,7 +455,7 @@
     >
         <div class="row g-4">
             <div class="col-12 col-xl-8">
-                <div class="card cashier-hero-card mb-4">
+                <div class="cashier-hero-card mb-4">
                     <div class="card-body p-4 p-lg-5">
 
                         <div class="mb-4">

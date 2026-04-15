@@ -61,7 +61,7 @@ final class NoteDetailPageDataBuilder
                 'can_edit_workspace' => $operational['is_open'],
                 'can_show_payment_form' => $operational['is_open'] && $operational['outstanding_rupiah'] > 0,
                 'can_show_correction_actions' => false,
-                'correction_notice' => $operational['is_closed']
+                'correction_notice' => $operational['is_close']
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
                     : null,
                 'rows' => $this->mapRows($note->workItems(), $rowSettlements),
