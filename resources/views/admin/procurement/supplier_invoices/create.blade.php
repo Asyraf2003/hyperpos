@@ -404,6 +404,13 @@
     </section>
 @endsection
 
+@php
+    $procurementCreateReturnUrl = route('admin.products.create', [
+        'return_to' => route('admin.procurement.supplier-invoices.create'),
+        'return_label' => 'Kembali ke Nota Pemasok',
+    ]);
+@endphp
+
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
@@ -411,10 +418,7 @@
             lookupEndpoint: @json(route('admin.procurement.products.lookup')),
             supplierLookupEndpoint: @json(route('admin.procurement.suppliers.lookup')),
             clearDraftOnLoad: @json((bool) session('clear_procurement_create_draft')),
-            createProductUrl: @json(route('admin.products.create', [
-                'return_to' => route('admin.procurement.supplier-invoices.create'),
-                'return_label' => 'Kembali ke Nota Pemasok',
-            ]))
+            createProductUrl: @json($procurementCreateReturnUrl)
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-create.js') }}"></script>
