@@ -16,11 +16,28 @@
         --dash-danger-soft: #fef2f2;
         --dash-info: #06b6d4;
         --dash-info-soft: #ecfeff;
-        --dash-dark: #111827;
-        --dash-muted: #6b7280;
-        --dash-border: #e5e7eb;
-        --dash-surface: #ffffff;
-        --dash-bg: #f7f9fc;
+    }
+
+    .dashboard-report {
+        --report-surface: var(--bs-body-bg);
+        --report-surface-soft: var(--bs-tertiary-bg, var(--bs-secondary-bg));
+        --report-border: color-mix(in srgb, var(--bs-border-color) 82%, var(--bs-primary) 18%);
+        --report-text: color-mix(in srgb, var(--bs-body-color) 88%, white 12%);
+        --report-text-muted: color-mix(in srgb, var(--bs-secondary-color) 72%, white 28%);
+        --report-radius-xl: 1.6rem;
+        --report-radius-lg: 1.25rem;
+        --report-radius-md: 1rem;
+        --report-shadow: 0 .5rem 1.2rem rgba(15, 23, 42, .05);
+        --report-shadow-hover: 0 1rem 2rem rgba(15, 23, 42, .10);
+    }
+
+    .dashboard-report,
+    .dashboard-report input,
+    .dashboard-report button,
+    .dashboard-report select,
+    .dashboard-report textarea,
+    .dashboard-report table {
+        font-family: "Nunito", "Inter", "Segoe UI", sans-serif;
     }
 
     .dashboard-report * {
@@ -28,23 +45,28 @@
     }
 
     .dashboard-report .card {
-        border: 0;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        border: 1px solid var(--report-border);
+        border-radius: var(--report-radius-xl);
+        box-shadow: var(--report-shadow);
         overflow: hidden;
+        background: var(--report-surface);
     }
 
     .dashboard-report .section-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--dash-dark);
-        margin-bottom: .25rem;
+        font-size: 1.03rem;
+        font-weight: 800;
+        color: var(--report-text);
+        margin-bottom: .3rem;
+        letter-spacing: .01em;
+        line-height: 1.35;
     }
 
     .dashboard-report .section-subtitle {
-        font-size: .88rem;
-        color: var(--dash-muted);
+        font-size: .92rem;
+        color: var(--report-text-muted);
         margin-bottom: 0;
+        font-weight: 700;
+        line-height: 1.65;
     }
 
     .dashboard-report .hero-card {
@@ -54,6 +76,8 @@
             radial-gradient(circle at bottom left, rgba(255,255,255,.14), transparent 30%),
             linear-gradient(135deg, #435ebe 0%, #5f7df3 55%, #7c94ff 100%);
         color: #fff;
+        border: 0;
+        box-shadow: 0 1rem 2.2rem rgba(67, 94, 190, .18);
     }
 
     .dashboard-report .hero-card::after {
@@ -92,7 +116,7 @@
         background: rgba(255,255,255,.16);
         color: #fff;
         font-size: .82rem;
-        font-weight: 600;
+        font-weight: 700;
         backdrop-filter: blur(6px);
     }
 
@@ -112,9 +136,10 @@
     }
 
     .dashboard-report .hero-metric-label {
-        font-size: .78rem;
-        opacity: .88;
+        font-size: .79rem;
+        opacity: .9;
         margin-bottom: .25rem;
+        font-weight: 700;
     }
 
     .dashboard-report .hero-metric-value {
@@ -141,538 +166,13 @@
         background: rgba(255,255,255,.12);
         color: #fff;
         font-size: .82rem;
-        font-weight: 600;
-    }
-
-    .dashboard-report .stat-card {
-        height: 100%;
-        background: var(--dash-surface);
-    }
-
-    .dashboard-report .stat-card-body {
-        padding: 1.2rem;
-        display: flex;
-        gap: 1rem;
-        align-items: flex-start;
-    }
-
-    .dashboard-report .stat-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
-    }
-
-    .dashboard-report .stat-title {
-        font-size: .86rem;
-        font-weight: 600;
-        color: var(--dash-muted);
-        margin-bottom: .3rem;
-    }
-
-    .dashboard-report .stat-value {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: var(--dash-dark);
-        line-height: 1.2;
-        margin-bottom: .35rem;
-    }
-
-    .dashboard-report .stat-meta {
-        font-size: .8rem;
-        font-weight: 600;
-        margin-bottom: 0;
-    }
-
-    .dashboard-report .meta-up {
-        color: var(--dash-success);
-    }
-
-    .dashboard-report .meta-down {
-        color: var(--dash-danger);
-    }
-
-    .dashboard-report .meta-flat {
-        color: var(--dash-warning);
-    }
-
-    .dashboard-report .bg-soft-primary {
-        background: var(--dash-primary-soft);
-        color: var(--dash-primary);
-    }
-
-    .dashboard-report .bg-soft-success {
-        background: var(--dash-success-soft);
-        color: var(--dash-success);
-    }
-
-    .dashboard-report .bg-soft-warning {
-        background: var(--dash-warning-soft);
-        color: var(--dash-warning);
-    }
-
-    .dashboard-report .bg-soft-danger {
-        background: var(--dash-danger-soft);
-        color: var(--dash-danger);
-    }
-
-    .dashboard-report .bg-soft-info {
-        background: var(--dash-info-soft);
-        color: var(--dash-info);
-    }
-
-    .dashboard-report .chart-card-body,
-    .dashboard-report .panel-card-body {
-        padding: 1.25rem;
-    }
-
-    .dashboard-report .card-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .dashboard-report .card-toolbar {
-        display: flex;
-        gap: .5rem;
-        flex-wrap: wrap;
-    }
-
-    .dashboard-report .toolbar-pill {
-        padding: .45rem .75rem;
-        border-radius: 999px;
-        border: 1px solid var(--dash-border);
-        background: #fff;
-        color: var(--dash-muted);
-        font-size: .78rem;
-        font-weight: 700;
-    }
-
-    .dashboard-report .toolbar-pill.active {
-        background: var(--dash-primary-soft);
-        color: var(--dash-primary);
-        border-color: rgba(67, 94, 190, .18);
-    }
-
-    .dashboard-report .chart-shell {
-        position: relative;
-        min-height: 320px;
-        border-radius: 18px;
-        background:
-            linear-gradient(to top, rgba(67, 94, 190, .04), rgba(67, 94, 190, .01)),
-            #fbfcff;
-        border: 1px solid var(--report-border);
-        padding: 1rem 1rem .75rem;
-    }
-
-    .dashboard-report .chart-header-inline {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-bottom: .75rem;
-    }
-
-    .dashboard-report .legend-item {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        font-size: .82rem;
-        color: var(--dash-muted);
-        font-weight: 600;
-    }
-
-    .dashboard-report .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .dashboard-report .chart-svg {
-        width: 100%;
-        height: 230px;
-        display: block;
-    }
-
-    .dashboard-report .axis-labels {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: .25rem;
-        font-size: .78rem;
-        color: var(--dash-muted);
-        font-weight: 600;
-        margin-top: .25rem;
-        text-align: center;
-    }
-
-    .dashboard-report .trend-list {
-        display: grid;
-        gap: .85rem;
-    }
-
-    .dashboard-report .trend-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .8rem;
-        padding: .9rem 1rem;
-        border-radius: 16px;
-        background: var(--report-surface-soft);
-        border: 1px solid var(--report-border);
-    }
-
-    .dashboard-report .trend-item-left {
-        display: flex;
-        align-items: center;
-        gap: .85rem;
-    }
-
-    .dashboard-report .trend-badge {
-        width: 42px;
-        height: 42px;
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-
-    .dashboard-report .trend-label {
-        font-size: .86rem;
-        color: var(--dash-muted);
-        margin-bottom: .15rem;
-    }
-
-    .dashboard-report .trend-value {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--dash-dark);
-        margin: 0;
-    }
-
-    .dashboard-report .stock-grid {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .dashboard-report .stock-ring-wrap {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .dashboard-report .stock-ring {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        background:
-            conic-gradient(
-                var(--dash-primary) 0 46%,
-                var(--dash-success) 46% 73%,
-                var(--dash-warning) 73% 88%,
-                #dbe3ff 88% 100%
-            );
-        display: grid;
-        place-items: center;
-        position: relative;
-    }
-
-    .dashboard-report .stock-ring::after {
-        content: "";
-        width: 118px;
-        height: 118px;
-        border-radius: 50%;
-        background: #fff;
-        box-shadow: inset 0 0 0 1px rgba(17, 24, 39, .04);
-    }
-
-    .dashboard-report .stock-ring-center {
-        position: absolute;
-        text-align: center;
-        z-index: 2;
-    }
-
-    .dashboard-report .stock-ring-center h3 {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--dash-dark);
-        margin-bottom: .15rem;
-    }
-
-    .dashboard-report .stock-ring-center p {
-        margin: 0;
-        font-size: .82rem;
-        color: var(--dash-muted);
-        font-weight: 600;
-    }
-
-    .dashboard-report .inventory-list {
-        display: grid;
-        gap: .85rem;
-    }
-
-    .dashboard-report .inventory-item {
-        padding: .9rem 1rem;
-        border-radius: 16px;
-        background: var(--report-surface-soft);
-        border: 1px solid var(--report-border);
-    }
-
-    .dashboard-report .inventory-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .75rem;
-        margin-bottom: .55rem;
-    }
-
-    .dashboard-report .inventory-title {
-        font-size: .92rem;
-        font-weight: 700;
-        color: var(--dash-dark);
-        margin: 0;
-    }
-
-    .dashboard-report .inventory-meta {
-        font-size: .78rem;
-        color: var(--dash-muted);
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .dashboard-report .progress-slim {
-        height: 8px;
-        border-radius: 999px;
-        background: #e8edf5;
-        overflow: hidden;
-    }
-
-    .dashboard-report .progress-slim > span {
-        display: block;
-        height: 100%;
-        border-radius: 999px;
-    }
-
-    .dashboard-report .table-modern {
-        margin-bottom: 0;
-        vertical-align: middle;
-    }
-
-    .dashboard-report .table-modern thead th {
-        border-bottom: 1px solid var(--dash-border);
-        color: var(--dash-muted);
-        font-size: .76rem;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        font-weight: 800;
-        padding-top: .85rem;
-        padding-bottom: .85rem;
-        white-space: nowrap;
-    }
-
-    .dashboard-report .table-modern tbody td {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        border-color: #f0f2f6;
-    }
-
-    .dashboard-report .product-inline {
-        display: flex;
-        align-items: center;
-        gap: .8rem;
-    }
-
-    .dashboard-report .product-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
-
-    .dashboard-report .product-name {
-        font-size: .92rem;
-        font-weight: 700;
-        color: var(--dash-dark);
-        margin-bottom: .15rem;
-    }
-
-    .dashboard-report .product-sku {
-        font-size: .78rem;
-        color: var(--dash-muted);
-        margin: 0;
-    }
-
-    .dashboard-report .badge-soft {
-        display: inline-flex;
-        align-items: center;
-        gap: .35rem;
-        padding: .4rem .7rem;
-        border-radius: 999px;
-        font-size: .76rem;
-        font-weight: 800;
-    }
-
-    .dashboard-report .finance-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .dashboard-report .finance-box {
-        padding: 1rem;
-        border-radius: 18px;
-        border: 1px solid var(--report-border);
-        background: var(--report-surface-soft);
-    }
-
-    .dashboard-report .finance-label {
-        font-size: .82rem;
-        color: var(--dash-muted);
-        font-weight: 700;
-        margin-bottom: .35rem;
-    }
-
-    .dashboard-report .finance-value {
-        font-size: 1.15rem;
-        color: var(--dash-dark);
-        font-weight: 800;
-        margin-bottom: .35rem;
-    }
-
-    .dashboard-report .finance-note {
-        font-size: .78rem;
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .dashboard-report .rotation-list {
-        display: grid;
-        gap: .9rem;
-    }
-
-    .dashboard-report .rotation-item {
-        display: grid;
-        grid-template-columns: 132px 1fr 78px;
-        align-items: center;
-        gap: .85rem;
-    }
-
-    .dashboard-report .rotation-label {
-        font-size: .83rem;
-        font-weight: 700;
-        color: var(--dash-dark);
-        margin: 0;
-    }
-
-    .dashboard-report .rotation-percent {
-        font-size: .8rem;
-        color: var(--dash-muted);
-        font-weight: 800;
-        text-align: right;
-        margin: 0;
-    }
-
-    .dashboard-report .asset-list {
-        display: grid;
-        gap: .85rem;
-    }
-
-    .dashboard-report .asset-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .8rem;
-        padding: .95rem 1rem;
-        border-radius: 16px;
-        border: 1px solid var(--report-border);
-        background: var(--report-surface-soft);
-    }
-
-    .dashboard-report .asset-left {
-        display: flex;
-        align-items: center;
-        gap: .85rem;
-    }
-
-    .dashboard-report .asset-title {
-        font-size: .92rem;
-        font-weight: 700;
-        color: var(--dash-dark);
-        margin-bottom: .15rem;
-    }
-
-    .dashboard-report .asset-subtitle {
-        font-size: .78rem;
-        color: var(--dash-muted);
-        margin: 0;
-    }
-
-    .dashboard-report .asset-value {
-        font-size: .95rem;
-        font-weight: 800;
-        color: var(--dash-dark);
-        margin: 0;
-    }
-
-
-    .dashboard-report {
-        --admin-radius-xl: 1.6rem;
-        --admin-radius-lg: 1.25rem;
-        --admin-radius-md: 1rem;
-    }
-
-    .dashboard-report,
-    .dashboard-report input,
-    .dashboard-report button,
-    .dashboard-report select,
-    .dashboard-report textarea {
-        font-family: "Nunito", "Inter", "Segoe UI", sans-serif;
-    }
-
-    .dashboard-report .section-title,
-    .dashboard-report .chart-title,
-    .dashboard-report .inventory-title,
-    .dashboard-report .asset-title,
-    .dashboard-report .finance-title,
-    .dashboard-report .profile-name,
-    .dashboard-report .summary-mini-value,
-    .dashboard-report .metric-value,
-    .dashboard-report .insight-value {
-        color: color-mix(in srgb, var(--report-text) 88%, white 12%);
-        font-weight: 800;
-        letter-spacing: .01em;
-    }
-
-    .dashboard-report .section-subtitle,
-    .dashboard-report .summary-mini-label,
-    .dashboard-report .profile-mail,
-    .dashboard-report .metric-label,
-    .dashboard-report .trend-meta,
-    .dashboard-report .inventory-meta,
-    .dashboard-report .asset-label,
-    .dashboard-report .finance-label {
-        color: color-mix(in srgb, var(--report-text-muted) 72%, white 28%);
         font-weight: 700;
     }
 
     .dashboard-report .profile-card {
-        border-radius: var(--admin-radius-xl);
+        border-radius: var(--report-radius-xl);
         overflow: hidden;
+        background: linear-gradient(180deg, var(--report-surface) 0%, var(--report-surface-soft) 100%);
     }
 
     .dashboard-report .admin-profile-top {
@@ -713,6 +213,7 @@
         height: 100%;
         object-fit: cover;
         display: block;
+        border-radius: 50%;
     }
 
     .dashboard-report .profile-name {
@@ -721,30 +222,38 @@
         font-size: 1.12rem;
         font-weight: 800;
         line-height: 1.3;
+        letter-spacing: .01em;
     }
 
     .dashboard-report .profile-mail {
         color: rgba(255, 255, 255, .88);
         font-size: .94rem;
         word-break: break-word;
+        font-weight: 700;
     }
 
     .dashboard-report .summary-strip {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: .9rem;
+        margin-top: 0;
     }
 
     .dashboard-report .summary-mini {
-        border-radius: var(--admin-radius-lg);
+        border-radius: var(--report-radius-lg);
         padding: 1rem 1.05rem;
         background:
             linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .06)),
             var(--report-surface);
+        border: 1px solid var(--report-border);
     }
 
     .dashboard-report .summary-mini-label {
         margin-bottom: .28rem;
         font-size: .82rem;
         font-weight: 700;
+        color: var(--report-text-muted);
+        letter-spacing: .01em;
     }
 
     .dashboard-report .summary-mini-value {
@@ -752,6 +261,7 @@
         font-size: 1rem;
         font-weight: 800;
         line-height: 1.4;
+        color: var(--report-text);
     }
 
     .dashboard-report .admin-main-btn {
@@ -761,94 +271,410 @@
         letter-spacing: .01em;
     }
 
+    .dashboard-report .stat-card {
+        height: 100%;
+        background: var(--report-surface);
+    }
+
+    .dashboard-report .stat-card-body {
+        padding: 1.2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .dashboard-report .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .dashboard-report .stat-title {
+        font-size: .87rem;
+        font-weight: 700;
+        color: var(--report-text-muted);
+        margin-bottom: .3rem;
+        line-height: 1.45;
+    }
+
+    .dashboard-report .stat-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--report-text);
+        line-height: 1.2;
+        margin-bottom: .35rem;
+    }
+
+    .dashboard-report .stat-meta {
+        font-size: .82rem;
+        font-weight: 700;
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    .dashboard-report .meta-up { color: var(--dash-success); }
+    .dashboard-report .meta-down { color: var(--dash-danger); }
+    .dashboard-report .meta-flat { color: var(--dash-warning); }
+
+    .dashboard-report .bg-soft-primary { background: var(--dash-primary-soft); color: var(--dash-primary); }
+    .dashboard-report .bg-soft-success { background: var(--dash-success-soft); color: var(--dash-success); }
+    .dashboard-report .bg-soft-warning { background: var(--dash-warning-soft); color: var(--dash-warning); }
+    .dashboard-report .bg-soft-danger { background: var(--dash-danger-soft); color: var(--dash-danger); }
+    .dashboard-report .bg-soft-info { background: var(--dash-info-soft); color: var(--dash-info); }
+
+    .dashboard-report .chart-card-body,
+    .dashboard-report .panel-card-body {
+        padding: 1.25rem;
+    }
+
+    .dashboard-report .card-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-report .card-toolbar {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-report .toolbar-pill {
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        border: 1px solid var(--report-border);
+        background: var(--report-surface);
+        color: var(--report-text-muted);
+        font-size: .78rem;
+        font-weight: 800;
+    }
+
+    .dashboard-report .toolbar-pill.active {
+        background: var(--dash-primary-soft);
+        color: var(--dash-primary);
+        border-color: rgba(67, 94, 190, .18);
+    }
+
     .dashboard-report .chart-shell,
     .dashboard-report .trend-item,
     .dashboard-report .inventory-item,
     .dashboard-report .asset-item,
-    .dashboard-report .finance-box,
-    .dashboard-report .summary-mini {
-        border-radius: var(--admin-radius-lg);
-    }
-    .dashboard-report .profile-card {
-        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    .dashboard-report .finance-box {
+        border: 1px solid var(--report-border);
+        border-radius: var(--report-radius-lg);
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .02), rgba(var(--bs-primary-rgb), .045)),
+            var(--report-surface);
+        box-shadow: var(--report-shadow);
     }
 
-    .dashboard-report .profile-top {
+    .dashboard-report .chart-shell {
+        position: relative;
+        min-height: 320px;
+        padding: 1rem 1rem .75rem;
+    }
+
+    .dashboard-report .chart-header-inline {
         display: flex;
         align-items: center;
         gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: .75rem;
     }
 
-    .dashboard-report .profile-avatar {
-        width: 64px;
-        height: 64px;
-        border-radius: 20px;
-        object-fit: cover;
-        display: block;
-        box-shadow: 0 10px 20px rgba(67, 94, 190, .16);
-    }
-
-    .dashboard-report .profile-name {
-        font-size: 1.02rem;
-        font-weight: 800;
-        color: var(--dash-dark);
-        margin-bottom: .2rem;
-    }
-
-    .dashboard-report .profile-mail {
-        font-size: .82rem;
-        color: var(--dash-muted);
-        margin-bottom: .5rem;
-    }
-
-    .dashboard-report .profile-badge {
+    .dashboard-report .legend-item {
         display: inline-flex;
         align-items: center;
-        gap: .4rem;
-        padding: .4rem .7rem;
+        gap: .45rem;
+        font-size: .82rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+    }
+
+    .dashboard-report .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dashboard-report .chart-svg {
+        width: 100%;
+        height: 230px;
+        display: block;
+    }
+
+    .dashboard-report .axis-labels {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: .25rem;
+        font-size: .79rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+        margin-top: .25rem;
+        text-align: center;
+    }
+
+    .dashboard-report .trend-list,
+    .dashboard-report .inventory-list,
+    .dashboard-report .rotation-list,
+    .dashboard-report .asset-list {
+        display: grid;
+        gap: .85rem;
+    }
+
+    .dashboard-report .trend-item,
+    .dashboard-report .asset-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .8rem;
+        padding: .95rem 1rem;
+    }
+
+    .dashboard-report .inventory-item,
+    .dashboard-report .finance-box {
+        padding: .95rem 1rem;
+    }
+
+    .dashboard-report .trend-item-left,
+    .dashboard-report .asset-left {
+        display: flex;
+        align-items: center;
+        gap: .85rem;
+    }
+
+    .dashboard-report .trend-badge,
+    .dashboard-report .product-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+        font-weight: 700;
+    }
+
+    .dashboard-report .trend-label,
+    .dashboard-report .inventory-meta,
+    .dashboard-report .asset-subtitle,
+    .dashboard-report .finance-label,
+    .dashboard-report .rotation-percent,
+    .dashboard-report .product-sku {
+        font-size: .8rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .dashboard-report .trend-value,
+    .dashboard-report .inventory-title,
+    .dashboard-report .asset-title,
+    .dashboard-report .asset-value,
+    .dashboard-report .finance-value,
+    .dashboard-report .rotation-label,
+    .dashboard-report .product-name {
+        color: var(--report-text);
+        font-weight: 800;
+    }
+
+    .dashboard-report .trend-value {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .dashboard-report .stock-grid {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .dashboard-report .stock-ring-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .dashboard-report .stock-ring {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background:
+            conic-gradient(
+                var(--dash-primary) 0 46%,
+                var(--dash-success) 46% 73%,
+                var(--dash-warning) 73% 88%,
+                #dbe3ff 88% 100%
+            );
+        display: grid;
+        place-items: center;
+        position: relative;
+    }
+
+    .dashboard-report .stock-ring::after {
+        content: "";
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        background: var(--report-surface);
+        box-shadow: inset 0 0 0 1px rgba(17, 24, 39, .04);
+    }
+
+    .dashboard-report .stock-ring-center {
+        position: absolute;
+        text-align: center;
+        z-index: 2;
+    }
+
+    .dashboard-report .stock-ring-center h3 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--report-text);
+        margin-bottom: .15rem;
+    }
+
+    .dashboard-report .stock-ring-center p {
+        margin: 0;
+        font-size: .82rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+    }
+
+    .dashboard-report .inventory-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        margin-bottom: .55rem;
+    }
+
+    .dashboard-report .inventory-title,
+    .dashboard-report .asset-title,
+    .dashboard-report .product-name {
+        font-size: .94rem;
+        margin-bottom: .15rem;
+        line-height: 1.45;
+    }
+
+    .dashboard-report .progress-slim {
+        height: 8px;
         border-radius: 999px;
-        background: var(--dash-primary-soft);
-        color: var(--dash-primary);
+        background: color-mix(in srgb, var(--bs-border-color) 78%, white 22%);
+        overflow: hidden;
+    }
+
+    .dashboard-report .progress-slim > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .dashboard-report .table-modern {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .dashboard-report .table-modern thead th {
+        border-bottom: 1px solid var(--report-border);
+        color: var(--report-text-muted);
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-weight: 800;
+        padding-top: .85rem;
+        padding-bottom: .85rem;
+        white-space: nowrap;
+    }
+
+    .dashboard-report .table-modern tbody td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        border-color: color-mix(in srgb, var(--report-border) 82%, transparent 18%);
+        color: var(--report-text);
+        font-weight: 700;
+    }
+
+    .dashboard-report .product-inline {
+        display: flex;
+        align-items: center;
+        gap: .8rem;
+    }
+
+    .dashboard-report .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .42rem .74rem;
+        border-radius: 999px;
         font-size: .76rem;
         font-weight: 800;
     }
 
-    .dashboard-report .summary-strip {
+    .dashboard-report .finance-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: .75rem;
-        margin-top: 1rem;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
 
-    .dashboard-report .summary-mini {
-        padding: .85rem .9rem;
-        border-radius: 16px;
-        background: var(--report-surface-soft);
-        border: 1px solid var(--report-border);
+    .dashboard-report .finance-value {
+        font-size: 1.15rem;
+        margin-bottom: .35rem;
+        line-height: 1.3;
     }
 
-    .dashboard-report .summary-mini-label {
-        font-size: .78rem;
-        color: var(--dash-muted);
+    .dashboard-report .finance-note {
+        font-size: .79rem;
         font-weight: 700;
-        margin-bottom: .25rem;
+        margin: 0;
+        line-height: 1.5;
     }
 
-    .dashboard-report .summary-mini-value {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--dash-dark);
+    .dashboard-report .rotation-item {
+        display: grid;
+        grid-template-columns: 132px 1fr 78px;
+        align-items: center;
+        gap: .85rem;
+    }
+
+    .dashboard-report .rotation-label {
+        font-size: .84rem;
         margin: 0;
     }
 
+    .dashboard-report .rotation-percent {
+        text-align: right;
+    }
+
     .dashboard-report .helper-note {
-        padding: .9rem 1rem;
-        border-radius: 16px;
+        padding: .95rem 1rem;
+        border-radius: var(--report-radius-lg);
         background: linear-gradient(90deg, rgba(67, 94, 190, .08), rgba(6, 182, 212, .08));
-        color: #334155;
-        font-size: .83rem;
-        font-weight: 600;
-        border: 1px solid rgba(67, 94, 190, .08);
+        color: var(--report-text-muted);
+        font-size: .84rem;
+        font-weight: 700;
+        border: 1px solid rgba(67, 94, 190, .10);
+        line-height: 1.6;
+    }
+
+    .dashboard-report .chart-shell:hover,
+    .dashboard-report .trend-item:hover,
+    .dashboard-report .inventory-item:hover,
+    .dashboard-report .asset-item:hover,
+    .dashboard-report .finance-box:hover,
+    .dashboard-report .stat-card:hover {
+        box-shadow: var(--report-shadow-hover);
     }
 
     @media (max-width: 1199.98px) {
@@ -882,38 +708,110 @@
         }
     }
 
+    .dashboard-report .stat-card,
     .dashboard-report .chart-shell,
     .dashboard-report .trend-item,
     .dashboard-report .inventory-item,
     .dashboard-report .asset-item,
     .dashboard-report .finance-box,
-    .dashboard-report .profile-card,
-    .dashboard-report .summary-mini,
-    .dashboard-report .insight-card,
-    .dashboard-report .beta-card {
-        border-color: var(--report-border);
-        background: var(--report-surface);
-        color: var(--report-text);
-    }
-
-    .dashboard-report .section-subtitle,
-    .dashboard-report .summary-mini-label,
-    .dashboard-report .profile-mail,
-    .dashboard-report .trend-meta,
-    .dashboard-report .inventory-meta,
-    .dashboard-report .asset-label,
-    .dashboard-report .finance-label {
-        color: var(--report-text-muted);
-    }
-
-    .dashboard-report .chart-shell,
-    .dashboard-report .trend-item,
-    .dashboard-report .inventory-item,
-    .dashboard-report .asset-item,
-    .dashboard-report .finance-box,
-    .dashboard-report .profile-card,
     .dashboard-report .summary-mini {
-        border-radius: 1.25rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-report .stat-card::before,
+    .dashboard-report .chart-shell::before,
+    .dashboard-report .finance-box::before,
+    .dashboard-report .asset-item::before,
+    .dashboard-report .inventory-item::before,
+    .dashboard-report .trend-item::before {
+        content: "";
+        position: absolute;
+        width: 160px;
+        height: 160px;
+        right: -52px;
+        top: -68px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(var(--bs-primary-rgb), .10) 0%, rgba(var(--bs-primary-rgb), 0) 72%);
+        pointer-events: none;
+    }
+
+    .dashboard-report .stat-card {
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .03), rgba(var(--bs-primary-rgb), .055)),
+            var(--report-surface);
+    }
+
+    .dashboard-report .stat-card-body {
+        position: relative;
+        z-index: 1;
+        padding: 1.3rem;
+    }
+
+    .dashboard-report .stat-title,
+    .dashboard-report .table-modern thead th,
+    .dashboard-report .legend-item,
+    .dashboard-report .axis-labels,
+    .dashboard-report .trend-label,
+    .dashboard-report .inventory-meta,
+    .dashboard-report .asset-subtitle,
+    .dashboard-report .finance-label,
+    .dashboard-report .product-sku,
+    .dashboard-report .rotation-percent {
+        color: var(--report-text-muted);
+        font-weight: 700;
+    }
+
+    .dashboard-report .stat-value,
+    .dashboard-report .table-modern tbody td,
+    .dashboard-report .product-name,
+    .dashboard-report .rotation-label,
+    .dashboard-report .finance-value,
+    .dashboard-report .asset-value,
+    .dashboard-report .trend-value,
+    .dashboard-report .inventory-title,
+    .dashboard-report .asset-title {
+        color: var(--report-text);
+        font-weight: 800;
+    }
+
+    .dashboard-report .table-modern tbody tr:hover td {
+        background: rgba(var(--bs-primary-rgb), .04);
+    }
+
+    .dashboard-report .table-modern tbody td {
+        transition: background-color .2s ease;
+    }
+
+    .dashboard-report .card-head {
+        margin-bottom: 1.1rem;
+    }
+
+    .dashboard-report .panel-card-body,
+    .dashboard-report .chart-card-body {
+        padding: 1.35rem;
+    }
+
+    .dashboard-report .badge-soft,
+    .dashboard-report .toolbar-pill,
+    .dashboard-report .filter-chip {
+        letter-spacing: .01em;
+        font-weight: 800;
+    }
+
+    .dashboard-report .helper-note {
+        color: color-mix(in srgb, var(--report-text-muted) 78%, white 22%);
+    }
+
+    .dashboard-report .section-title,
+    .dashboard-report .hero-metric-value,
+    .dashboard-report .stat-value,
+    .dashboard-report .finance-value,
+    .dashboard-report .asset-value,
+    .dashboard-report .trend-value,
+    .dashboard-report .inventory-title,
+    .dashboard-report .product-name {
+        text-shadow: 0 0 0 rgba(0,0,0,0);
     }
 
     .dashboard-report .chart-shell,
@@ -921,14 +819,26 @@
     .dashboard-report .inventory-item,
     .dashboard-report .asset-item,
     .dashboard-report .finance-box,
-    .dashboard-report .profile-card {
-        box-shadow: 0 .5rem 1.2rem rgba(15, 23, 42, .05);
+    .dashboard-report .stat-card {
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
 
-    .dashboard-report .profile-card,
-    .dashboard-report .chart-shell,
-    .dashboard-report .finance-box {
-        overflow: hidden;
+    .dashboard-report .chart-shell:hover,
+    .dashboard-report .trend-item:hover,
+    .dashboard-report .inventory-item:hover,
+    .dashboard-report .asset-item:hover,
+    .dashboard-report .finance-box:hover,
+    .dashboard-report .stat-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(var(--bs-primary-rgb), .28);
+    }
+
+    @media (max-width: 767.98px) {
+        .dashboard-report .panel-card-body,
+        .dashboard-report .chart-card-body,
+        .dashboard-report .stat-card-body {
+            padding: 1.1rem;
+        }
     }
 </style>
 
