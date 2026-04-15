@@ -73,6 +73,7 @@
   const partialAmountInput = () => byId("inline_payment_amount_paid_display");
   const receivedAmountInput = () => byId("inline_payment_amount_received_display");
   const modalEl = () => byId("workspace-payment-modal");
+  const dialogEl = () => byId("workspace-payment-modal-dialog");
   const formEl = () => byId("cashier-note-workspace-form");
   const choiceButtons = () =>
     Array.from(document.querySelectorAll("[data-payment-choice]"));
@@ -377,10 +378,26 @@
     focusElement(byId("workspace-payment-choice-full"), false);
   };
 
+  const syncDialogWidth = () => {
+    const dialog = dialogEl();
+    if (!dialog) return;
+
+    dialog.classList.toggle("modal-xl", !NS.paymentState.cashStep);
+
+    if (NS.paymentState.cashStep) {
+      dialog.style.maxWidth = "560px";
+      dialog.style.width = "calc(100% - 2rem)";
+    } else {
+      dialog.style.maxWidth = "";
+      dialog.style.width = "";
+    }
+  };
+
   NS.refreshPaymentUi = (total = grandTotal()) => {
     const noteDate = byId("note_transaction_date")?.value || "";
     updateHidden("inline_payment_paid_at_hidden", noteDate);
 
+    syncDialogWidth();
     renderLineSummary();
     syncChoiceButtons();
     updateHeaderText();

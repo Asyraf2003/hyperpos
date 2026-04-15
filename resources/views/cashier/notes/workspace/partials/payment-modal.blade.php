@@ -1,5 +1,5 @@
 <div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-xl" id="workspace-payment-modal-dialog">
         <div class="modal-content">
             <input
                 type="hidden"
