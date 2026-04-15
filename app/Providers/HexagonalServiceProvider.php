@@ -18,6 +18,9 @@ use App\Adapters\Out\Expense\DatabaseExpenseCategoryTableReaderAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseWriterAdapter;
 use App\Adapters\Out\Expense\DatabaseOperationalExpenseTableReaderAdapter;
 use App\Adapters\Out\EmployeeFinance\DatabaseEmployeePayrollTableReaderAdapter;
+use App\Adapters\Out\IdentityAccess\CachedActorAccessReaderAdapter;
+use App\Adapters\Out\IdentityAccess\CachedAdminCashierAreaAccessStateAdapter;
+use App\Adapters\Out\IdentityAccess\CachedAdminTransactionCapabilityStateAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseActorAccessReaderAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminCashierAreaAccessStateAdapter;
 use App\Adapters\Out\IdentityAccess\DatabaseAdminTransactionCapabilityStateAdapter;
@@ -223,9 +226,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierReceiptFactory::class);
         $this->app->scoped(SupplierInvoiceChangeContext::class, fn (): SupplierInvoiceChangeContext => new SupplierInvoiceChangeContext());
 
-        $this->app->singleton(ActorAccessReaderPort::class, DatabaseActorAccessReaderAdapter::class);
-        $this->app->singleton(AdminTransactionCapabilityStatePort::class, DatabaseAdminTransactionCapabilityStateAdapter::class);
-        $this->app->singleton(AdminCashierAreaAccessStatePort::class, DatabaseAdminCashierAreaAccessStateAdapter::class);
+        $this->app->scoped(ActorAccessReaderPort::class, CachedActorAccessReaderAdapter::class);
+        $this->app->scoped(AdminTransactionCapabilityStatePort::class, CachedAdminTransactionCapabilityStateAdapter::class);
+        $this->app->scoped(AdminCashierAreaAccessStatePort::class, CachedAdminCashierAreaAccessStateAdapter::class);
 
         $this->app->singleton(ProductReaderPort::class, DatabaseProductReaderAdapter::class);
         $this->app->singleton(ProductDetailReaderPort::class, DatabaseProductDetailReaderAdapter::class);
