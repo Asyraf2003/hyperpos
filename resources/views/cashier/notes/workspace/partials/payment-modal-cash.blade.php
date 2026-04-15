@@ -13,26 +13,20 @@
         </div>
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-12 col-lg-4">
-            <div class="border rounded p-4 h-100">
-                <div class="small text-muted mb-2">Tagihan</div>
-                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-payable-text">0</div>
-            </div>
+    <div class="d-grid gap-3 mb-4">
+        <div class="border rounded p-4">
+            <div class="small text-muted mb-2">Tagihan</div>
+            <div class="fs-1 fw-bold lh-sm" id="workspace-cash-payable-text">0</div>
         </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="border rounded p-4 h-100">
-                <div class="small text-muted mb-2">Uang Pelanggan</div>
-                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-received-text">0</div>
-            </div>
+        <div class="border rounded p-4">
+            <div class="small text-muted mb-2">Uang Pelanggan</div>
+            <div class="fs-1 fw-bold lh-sm" id="workspace-cash-received-text">0</div>
         </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="border rounded p-4 h-100">
-                <div class="small text-muted mb-2">Kembalian</div>
-                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-change-text">0</div>
-            </div>
+        <div class="border rounded p-4">
+            <div class="small text-muted mb-2">Kembalian</div>
+            <div class="fs-1 fw-bold lh-sm" id="workspace-cash-change-text">0</div>
         </div>
     </div>
 

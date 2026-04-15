@@ -52,6 +52,16 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
+  const formatActiveMoneyInput = (input) => {
+    if (!(input instanceof HTMLInputElement)) {
+      return 0;
+    }
+
+    const numeric = digits(input.value || "");
+    input.value = numeric > 0 ? format(numeric) : "";
+    return numeric;
+  };
+
   NS.paymentState = NS.paymentState || { mode: "", cashStep: false };
 
   const updateHidden = (id, value) => {
@@ -498,11 +508,12 @@
     bindPaymentModalLifecycle();
     hydrateStateFromHidden();
 
+    NS.paymentState.cashStep = false;
+    clearPaymentMethod();
+    clearReceivedAmount();
+
     if (!["full", "partial", "skip"].includes(NS.paymentState.mode)) {
       NS.paymentState.mode = "";
-      NS.paymentState.cashStep = false;
-      clearPaymentMethod();
-      clearReceivedAmount();
     }
 
     NS.refreshPaymentUi();
@@ -549,19 +560,15 @@
 
   document.addEventListener("input", (event) => {
     if (event.target.id === "inline_payment_amount_paid_display") {
-      updateHidden(
-        "inline_payment_amount_paid_rupiah",
-        digits(partialAmountInput()?.value || "")
-      );
+      const numeric = formatActiveMoneyInput(partialAmountInput());
+      updateHidden("inline_payment_amount_paid_rupiah", numeric);
       NS.refreshPaymentUi();
       return;
     }
 
     if (event.target.id === "inline_payment_amount_received_display") {
-      updateHidden(
-        "inline_payment_amount_received_rupiah",
-        digits(receivedAmountInput()?.value || "")
-      );
+      const numeric = formatActiveMoneyInput(receivedAmountInput());
+      updateHidden("inline_payment_amount_received_rupiah", numeric);
       NS.refreshPaymentUi();
       return;
     }

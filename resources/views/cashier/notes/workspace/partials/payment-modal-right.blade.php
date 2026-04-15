@@ -50,7 +50,7 @@
                         type="text"
                         id="inline_payment_amount_paid_display"
                         value="{{ !empty($oldInlinePayment['amount_paid_rupiah']) ? number_format((int) $oldInlinePayment['amount_paid_rupiah'], 0, ',', '.') : '' }}"
-                        class="form-control"
+                        class="form-control form-control-lg fs-2 fw-bold py-3"
                         inputmode="numeric"
                         placeholder="Masukkan nominal pembayaran sebagian"
                     >
