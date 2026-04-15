@@ -179,6 +179,8 @@
             border-radius: 999px;
             font-weight: 800;
             letter-spacing: .01em;
+            background-clip: padding-box;
+            transform: translateZ(0);
         }
 
         .cashier-info-box {
@@ -300,6 +302,8 @@
             color: var(--cashier-text-strong);
             border-color: var(--cashier-border);
             background: color-mix(in srgb, var(--cashier-card-bg) 92%, white 8%);
+            background-clip: padding-box;
+            transform: translateZ(0);
         }
 
         .cashier-search-input::placeholder {

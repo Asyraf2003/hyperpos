@@ -11,7 +11,6 @@
             <div class="d-flex flex-column gap-4">
                 @include('cashier.notes.partials.note-overview')
                 @include('cashier.notes.partials.note-rows-table')
-                @include('cashier.notes.partials.correction-actions')
                 @include('cashier.notes.partials.correction-history')
             </div>
         </div>
@@ -19,7 +18,14 @@
         <div class="col-12 col-xl-4">
             <div class="d-flex flex-column gap-4">
                 @include('cashier.notes.partials.add-rows-form')
-                @include('cashier.notes.partials.payment-form')
+
+                @if ($note['is_open'])
+                    @include('cashier.notes.partials.payment-form')
+                @endif
+
+                @if ($note['can_show_refund_form'] ?? false)
+                    @include('cashier.notes.partials.refund-form')
+                @endif
             </div>
         </div>
     </div>

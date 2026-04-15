@@ -1,0 +1,131 @@
+<div class="card">
+    <div class="card-header">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+                <h4 class="card-title mb-1">Refund Nota</h4>
+                <p class="mb-0 text-muted">
+                    Catat pembalikan dana untuk nota close tanpa mengubah histori pembayaran yang sudah tercatat.
+                </p>
+            </div>
+
+            <span class="badge bg-light text-dark border">Mode Refund</span>
+        </div>
+
+        <p class="mt-2 mb-0 text-muted small">
+            Pilih sumber pembayaran yang masih punya sisa refundable, isi nominal refund, lalu simpan alasan.
+        </p>
+    </div>
+
+    <div class="card-body">
+        @if ($errors->has('refund') || $errors->has('customer_payment_id') || $errors->has('amount_rupiah') || $errors->has('refunded_at') || $errors->has('reason'))
+            <div class="alert alert-danger py-2 px-3 mb-3">
+                @if ($errors->has('refund'))
+                    <div>{{ $errors->first('refund') }}</div>
+                @endif
+                @if ($errors->has('customer_payment_id'))
+                    <div>{{ $errors->first('customer_payment_id') }}</div>
+                @endif
+                @if ($errors->has('amount_rupiah'))
+                    <div>{{ $errors->first('amount_rupiah') }}</div>
+                @endif
+                @if ($errors->has('refunded_at'))
+                    <div>{{ $errors->first('refunded_at') }}</div>
+                @endif
+                @if ($errors->has('reason'))
+                    <div>{{ $errors->first('reason') }}</div>
+                @endif
+            </div>
+        @endif
+
+        <div class="border rounded p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted">Net Paid</span>
+                <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                <span class="text-muted">Total Refund</span>
+                <strong>{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-2">
+                <span class="fw-semibold">Refund Wajib</span>
+                <strong class="fs-5">{{ number_format($note['refund_required_rupiah'], 0, ',', '.') }}</strong>
+            </div>
+        </div>
+
+        @if (($note['refund_payment_options'] ?? []) !== [])
+            <form method="POST" action="{{ $refundAction }}">
+                @csrf
+
+                <div class="form-group mb-4">
+                    <label for="refund_customer_payment_id" class="form-label">Sumber Pembayaran</label>
+                    <select
+                        id="refund_customer_payment_id"
+                        name="customer_payment_id"
+                        class="form-select"
+                        required
+                    >
+                        @foreach ($note['refund_payment_options'] as $option)
+                            <option
+                                value="{{ $option['value'] }}"
+                                {{ old('customer_payment_id') === $option['value'] ? 'selected' : '' }}
+                            >
+                                {{ $option['label'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="refund_refunded_at" class="form-label">Tanggal Refund</label>
+                    <input
+                        type="date"
+                        id="refund_refunded_at"
+                        name="refunded_at"
+                        value="{{ old('refunded_at', $refundDateDefault) }}"
+                        class="form-control"
+                        required
+                    >
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="refund_amount_rupiah" class="form-label">Nominal Refund</label>
+                    <input
+                        type="number"
+                        min="1"
+                        id="refund_amount_rupiah"
+                        name="amount_rupiah"
+                        value="{{ old('amount_rupiah', $note['refund_required_rupiah'] > 0 ? $note['refund_required_rupiah'] : '') }}"
+                        class="form-control"
+                        placeholder="Contoh: 50000"
+                        required
+                    >
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="refund_reason" class="form-label">Alasan Refund</label>
+                    <textarea
+                        id="refund_reason"
+                        name="reason"
+                        rows="3"
+                        class="form-control"
+                        placeholder="Jelaskan alasan pembalikan dana"
+                        required
+                    >{{ old('reason') }}</textarea>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Simpan Refund</button>
+                </div>
+            </form>
+        @else
+            <div class="border rounded p-3 bg-light">
+                <div class="fw-semibold mb-1">Belum ada sumber refund yang bisa dipilih</div>
+                <div class="text-muted small">
+                    Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran belum tersedia untuk flow refund.
+                </div>
+            </div>
+        @endif
+    </div>
+</div>

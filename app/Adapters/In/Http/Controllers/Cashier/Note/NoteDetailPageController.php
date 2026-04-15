@@ -40,6 +40,8 @@ final class NoteDetailPageController extends Controller
             'oldRows' => array_values(old('rows', [['line_type' => 'service']])),
             'paymentAction' => route('cashier.notes.payments.store', ['noteId' => $noteId]),
             'paymentDateDefault' => date('Y-m-d'),
+            'refundAction' => route('cashier.notes.refunds.store', ['noteId' => $noteId]),
+            'refundDateDefault' => date('Y-m-d'),
             'statusCorrectionAction' => route('cashier.notes.corrections.status.store', ['noteId' => $noteId]),
             'serviceOnlyCorrectionAction' => route('cashier.notes.corrections.service-only.store', ['noteId' => $noteId]),
         ] + $options->build());

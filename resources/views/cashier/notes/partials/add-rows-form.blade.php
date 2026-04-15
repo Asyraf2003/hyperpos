@@ -24,13 +24,13 @@
 
                 @if ($note['is_closed'])
                     <div class="text-muted small">
-                        Nota sudah ditutup. Perubahan hanya bisa dilanjutkan setelah dibuka ulang oleh admin.
+                        Nota sudah close. Perubahan rincian tidak dilakukan dari halaman ini. Gunakan refund bila perlu pembalikan dana.
                     </div>
                 @elseif ($note['correction_notice'] !== null)
                     <div class="text-muted small">{{ $note['correction_notice'] }}</div>
                 @else
                     <div class="text-muted small">
-                        Gunakan alur koreksi atau pembayaran sesuai status transaksi saat ini.
+                        Gunakan alur edit workspace atau pembayaran sesuai status transaksi saat ini.
                     </div>
                 @endif
             </div>
