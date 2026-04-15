@@ -1,41 +1,60 @@
-<div id="workspace-payment-panel-cash" class="d-none">
-    <div class="border rounded p-3 mb-3">
-        <div class="fw-semibold mb-1">Kalkulator Cash</div>
-        <div class="text-muted small">Masukkan uang pelanggan untuk menghitung kembalian.</div>
-    </div>
+<div class="border rounded p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <div class="fw-semibold fs-4">Kalkulator Cash</div>
+            <div class="text-muted">
+                Masukkan uang pelanggan. Format nominal akan otomatis dirapikan.
+            </div>
+        </div>
 
-    <div class="row g-3 mb-3">
-        <div class="col-12 col-md-4">
-            <div class="border rounded p-3 h-100">
-                <div class="small text-muted">Tagihan</div>
-                <div class="fs-5 fw-bold" id="workspace-cash-payable-text">0</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="border rounded p-3 h-100">
-                <div class="small text-muted">Uang Pelanggan</div>
-                <div class="fs-5 fw-bold" id="workspace-cash-received-text">0</div>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="border rounded p-3 h-100">
-                <div class="small text-muted">Kembalian</div>
-                <div class="fs-5 fw-bold" id="workspace-cash-change-text">0</div>
-            </div>
+        <div class="text-start text-xl-end">
+            <div class="small text-muted">Mode Pembayaran</div>
+            <div class="fw-semibold fs-5" id="workspace-cash-mode-text">Bayar Penuh</div>
         </div>
     </div>
 
-    <div class="form-group mb-0" data-money-input-group>
-        <label for="inline_payment_amount_received_display" class="form-label">Uang Dari Pelanggan</label>
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-4">
+            <div class="border rounded p-4 h-100">
+                <div class="small text-muted mb-2">Tagihan</div>
+                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-payable-text">0</div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="border rounded p-4 h-100">
+                <div class="small text-muted mb-2">Uang Pelanggan</div>
+                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-received-text">0</div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="border rounded p-4 h-100">
+                <div class="small text-muted mb-2">Kembalian</div>
+                <div class="fs-1 fw-bold lh-sm" id="workspace-cash-change-text">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="border rounded p-4" data-money-input-group>
+        <label for="inline_payment_amount_received_display" class="form-label fw-semibold fs-5 mb-3">
+            Uang Dari Pelanggan
+        </label>
+
         <input type="hidden" value="" data-money-raw data-cash-received-raw>
+
         <input
             type="text"
             id="inline_payment_amount_received_display"
             value=""
-            class="form-control"
+            class="form-control form-control-lg fs-2 fw-bold py-3"
             inputmode="numeric"
             placeholder="Masukkan uang dari pelanggan"
             data-money-display
         >
+
+        <div class="form-text mt-3">
+            Tekan Enter untuk simpan pembayaran cash saat nominal sudah cukup.
+        </div>
     </div>
 </div>

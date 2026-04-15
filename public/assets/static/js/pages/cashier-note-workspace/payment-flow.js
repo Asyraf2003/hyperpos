@@ -10,6 +10,11 @@
     if (el) el.textContent = format(value);
   };
 
+  const setHtml = (id, value) => {
+    const el = byId(id);
+    if (el) el.innerHTML = value;
+  };
+
   const toggle = (id, show) => {
     const el = byId(id);
     if (el) el.classList.toggle("d-none", !show);
@@ -149,18 +154,17 @@
   };
 
   const renderLineSummary = () => {
-    const summaryRoot = byId("workspace-payment-line-summary");
-    if (!summaryRoot) return;
-
     const rows = currentRows();
 
     if (!rows.length) {
-      summaryRoot.innerHTML =
-        '<div class="p-3 text-muted small">Belum ada rincian nota.</div>';
+      setHtml(
+        "workspace-payment-line-summary",
+        '<div class="p-3 text-muted small">Belum ada rincian nota.</div>'
+      );
       return;
     }
 
-    summaryRoot.innerHTML = rows
+    const html = rows
       .map(
         (item) => `
           <div class="p-3 border-bottom">
@@ -175,6 +179,8 @@
         `
       )
       .join("");
+
+    setHtml("workspace-payment-line-summary", html);
   };
 
   const syncChoiceButtons = () => {
@@ -199,7 +205,6 @@
 
   const clearPaymentMethod = () => {
     updateHidden("inline_payment_method_hidden", "");
-    clearReceivedAmount();
   };
 
   const syncPartialAmount = (total) => {
@@ -229,20 +234,44 @@
       updateHidden("inline_payment_decision_hidden", "skip");
       updateHidden("inline_payment_amount_paid_rupiah", "");
       clearPaymentMethod();
+      clearReceivedAmount();
     }
 
     if (mode === "full") {
       updateHidden("inline_payment_decision_hidden", "pay_full");
       updateHidden("inline_payment_amount_paid_rupiah", "");
       clearPaymentMethod();
+      clearReceivedAmount();
     }
 
     if (mode === "partial") {
       updateHidden("inline_payment_decision_hidden", "pay_partial");
       clearPaymentMethod();
+      clearReceivedAmount();
     }
 
     NS.refreshPaymentUi();
+  };
+
+  const openCashStep = () => {
+    updateHidden("inline_payment_method_hidden", "cash");
+    NS.paymentState.cashStep = true;
+    NS.refreshPaymentUi();
+    focusElement(receivedAmountInput());
+  };
+
+  const closeCashStep = () => {
+    NS.paymentState.cashStep = false;
+    clearPaymentMethod();
+    clearReceivedAmount();
+    NS.refreshPaymentUi();
+
+    if (NS.paymentState.mode === "partial") {
+      focusElement(partialAmountInput());
+      return;
+    }
+
+    focusElement(byId("workspace-payment-submit-transfer"), false);
   };
 
   const hydrateStateFromHidden = () => {
@@ -254,9 +283,64 @@
         ? "partial"
         : decision === "pay_full"
           ? "full"
-          : "";
+          : decision === "skip"
+            ? "skip"
+            : "";
 
     NS.paymentState.cashStep = method === "cash";
+  };
+
+  const updateHeaderText = () => {
+    const title = byId("workspace-payment-modal-title");
+    const subtitle = byId("workspace-payment-modal-subtitle");
+
+    if (!title || !subtitle) return;
+
+    if (NS.paymentState.cashStep) {
+      title.textContent = "Pembayaran Cash";
+      subtitle.textContent =
+        "Masukkan uang pelanggan, cek kembalian, lalu tekan Enter atau simpan cash.";
+      return;
+    }
+
+    title.textContent = "Proses Nota";
+    subtitle.textContent =
+      "Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.";
+  };
+
+  const updateModeText = () => {
+    const standardModeText = byId("workspace-payment-mode-text");
+    const cashModeText = byId("workspace-cash-mode-text");
+    const hint = byId("workspace-payment-action-hint");
+
+    const standardLabel =
+      NS.paymentState.mode === "full"
+        ? "Bayar Penuh"
+        : NS.paymentState.mode === "partial"
+          ? "Bayar Sebagian"
+          : NS.paymentState.mode === "skip"
+            ? "Simpan Tanpa Pembayaran"
+            : "Belum dipilih";
+
+    if (standardModeText) {
+      standardModeText.textContent = standardLabel;
+    }
+
+    if (cashModeText) {
+      cashModeText.textContent =
+        NS.paymentState.mode === "partial" ? "Bayar Sebagian" : "Bayar Penuh";
+    }
+
+    if (hint) {
+      hint.textContent =
+        NS.paymentState.mode === "full"
+          ? "Pilih Bayar Transfer atau Bayar Cash."
+          : NS.paymentState.mode === "partial"
+            ? "Isi nominal lalu pilih Bayar Transfer atau Bayar Cash."
+            : NS.paymentState.mode === "skip"
+              ? "Simpan nota tanpa pembayaran."
+              : "Pilih aksi nota terlebih dahulu.";
+    }
   };
 
   const focusByState = () => {
@@ -289,46 +373,34 @@
 
     renderLineSummary();
     syncChoiceButtons();
+    updateHeaderText();
+    updateModeText();
 
-    if (NS.paymentState.mode !== "partial") {
+    if (NS.paymentState.mode === "partial") {
+      syncPartialAmount(total);
+    } else {
       updateHidden("inline_payment_amount_paid_rupiah", "");
       const input = partialAmountInput();
       if (input && document.activeElement !== input) {
         input.value = "";
       }
-    } else {
-      syncPartialAmount(total);
     }
 
     if (NS.paymentState.cashStep) {
       syncReceivedAmount();
-    } else {
-      clearReceivedAmount();
     }
 
     const payable = payableAmount(total);
     const received = digits(hiddenValue("inline_payment_amount_received_rupiah"));
-    const badge = byId("workspace-payment-mode-badge");
-
-    if (badge) {
-      badge.textContent =
-        NS.paymentState.mode === "full"
-          ? "Bayar Penuh"
-          : NS.paymentState.mode === "partial"
-            ? "Bayar Sebagian"
-            : NS.paymentState.mode === "skip"
-              ? "Tanpa Pembayaran"
-              : "Pilih Aksi";
-    }
 
     setText("workspace-modal-total-text", total);
     setText("workspace-cash-payable-text", payable);
     setText("workspace-cash-received-text", received);
     setText("workspace-cash-change-text", Math.max(received - payable, 0));
 
-    toggle("workspace-payment-panel-partial", NS.paymentState.mode === "partial");
-    toggle("workspace-cash-shell-hint", !NS.paymentState.cashStep);
-    toggle("workspace-payment-panel-cash", NS.paymentState.cashStep);
+    toggle("workspace-payment-standard-view", !NS.paymentState.cashStep);
+    toggle("workspace-payment-cash-view", NS.paymentState.cashStep);
+    toggle("workspace-payment-panel-partial", NS.paymentState.mode === "partial" && !NS.paymentState.cashStep);
 
     toggleFlex("workspace-payment-footer-main", !NS.paymentState.cashStep);
     toggleFlex("workspace-payment-footer-cash", NS.paymentState.cashStep);
@@ -378,6 +450,23 @@
     }
   };
 
+  const bindPaymentModalLifecycle = () => {
+    const el = modalEl();
+    if (!el || el.dataset.paymentLifecycleBound === "1") return;
+
+    el.dataset.paymentLifecycleBound = "1";
+
+    el.addEventListener("shown.bs.modal", () => {
+      window.AdminMoneyInput?.bindBySelector?.(el);
+      NS.refreshPaymentUi();
+      focusByState();
+    });
+
+    el.addEventListener("hidden.bs.modal", () => {
+      deferCleanupResidualModalArtifacts();
+    });
+  };
+
   const showPaymentModal = () => {
     cleanupResidualModalArtifacts();
 
@@ -387,34 +476,20 @@
     instance.show();
   };
 
-  NS.handlePaymentModalShown = () => {
-    NS.refreshPaymentUi();
-    focusByState();
-  };
-
-  const bindPaymentModalLifecycle = () => {
-    const el = modalEl();
-    if (!el || el.dataset.paymentLifecycleBound === "1") return;
-
-    el.dataset.paymentLifecycleBound = "1";
-
-    el.addEventListener("shown.bs.modal", () => {
-      NS.handlePaymentModalShown?.();
-    });
-
-    el.addEventListener("hidden.bs.modal", () => {
-      deferCleanupResidualModalArtifacts();
-    });
-  };
-
   const reopenModalIfNeeded = () => {
     const decision = hiddenValue("inline_payment_decision_hidden");
+    const method = hiddenValue("inline_payment_method_hidden");
 
     if (!["pay_full", "pay_partial"].includes(decision)) {
       return;
     }
 
     hydrateStateFromHidden();
+
+    if (method !== "cash") {
+      NS.paymentState.cashStep = false;
+    }
+
     NS.refreshPaymentUi();
     showPaymentModal();
   };
@@ -423,10 +498,11 @@
     bindPaymentModalLifecycle();
     hydrateStateFromHidden();
 
-    if (!["full", "partial"].includes(NS.paymentState.mode)) {
+    if (!["full", "partial", "skip"].includes(NS.paymentState.mode)) {
       NS.paymentState.mode = "";
       NS.paymentState.cashStep = false;
       clearPaymentMethod();
+      clearReceivedAmount();
     }
 
     NS.refreshPaymentUi();
@@ -457,18 +533,12 @@
     }
 
     if (event.target.closest("#workspace-payment-open-cash")) {
-      updateHidden("inline_payment_method_hidden", "cash");
-      NS.paymentState.cashStep = true;
-      NS.refreshPaymentUi();
-      focusElement(receivedAmountInput());
+      openCashStep();
       return;
     }
 
     if (event.target.closest("#workspace-payment-back-cash")) {
-      clearPaymentMethod();
-      NS.paymentState.cashStep = false;
-      NS.refreshPaymentUi();
-      focusElement(byId("workspace-payment-submit-transfer"), false);
+      closeCashStep();
       return;
     }
 

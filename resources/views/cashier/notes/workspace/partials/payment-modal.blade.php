@@ -1,5 +1,5 @@
 <div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <input
                 type="hidden"
@@ -34,8 +34,8 @@
 
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title mb-1">Proses Nota</h5>
-                    <p class="mb-0 text-muted small">
+                    <h5 class="modal-title mb-1" id="workspace-payment-modal-title">Proses Nota</h5>
+                    <p class="mb-0 text-muted small" id="workspace-payment-modal-subtitle">
                         Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.
                     </p>
                 </div>
@@ -43,9 +43,15 @@
             </div>
 
             <div class="modal-body">
-                <div class="row g-4">
-                    @include('cashier.notes.workspace.partials.payment-modal-left')
-                    @include('cashier.notes.workspace.partials.payment-modal-right')
+                <div id="workspace-payment-standard-view">
+                    <div class="row g-4">
+                        @include('cashier.notes.workspace.partials.payment-modal-left')
+                        @include('cashier.notes.workspace.partials.payment-modal-right')
+                    </div>
+                </div>
+
+                <div id="workspace-payment-cash-view" class="d-none">
+                    @include('cashier.notes.workspace.partials.payment-modal-cash')
                 </div>
             </div>
 
