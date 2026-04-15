@@ -455,10 +455,6 @@
             <div class="col-12 col-xl-8">
                 <div class="card cashier-hero-card mb-4">
                     <div class="card-body p-4 p-lg-5">
-                        <div class="cashier-hero-badge mb-3">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                            Workspace Kasir
-                        </div>
 
                         <div class="mb-4">
                             <h3 class="cashier-section-title fw-bold mb-2">
@@ -557,24 +553,6 @@
                             <div class="fw-semibold mb-1">Belum ada pencarian</div>
                             <div class="cashier-section-desc small mb-0">
                                 Masukkan kata kunci untuk melihat harga jual dan stok produk yang tersedia.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="cashier-info-box p-3 p-lg-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="cashier-tip-icon">
-                            <i class="bi bi-info-circle-fill"></i>
-                        </div>
-
-                        <div>
-                            <div class="fw-semibold mb-1">Panduan cepat</div>
-                            <div class="cashier-section-desc small mb-0">
-                                Gunakan <strong>Buat Nota Baru</strong> untuk transaksi baru.
-                                Gunakan <strong>Riwayat Nota Aktif</strong> untuk melanjutkan transaksi.
-                                Gunakan <strong>Cari Produk Cepat</strong> untuk cek harga jual dan stok
-                                sebelum membuka workspace nota.
                             </div>
                         </div>
                     </div>
