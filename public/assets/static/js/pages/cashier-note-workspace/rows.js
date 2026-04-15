@@ -4,6 +4,20 @@
   const replaceIndex = (html, index) => html.replaceAll("__INDEX__", String(index));
   const titleByType = (type, number) => `Rincian ${number} · ${NS.labelByType(type)}`;
 
+  const focusElement = (element, select = true) => {
+    if (!(element instanceof HTMLElement)) return;
+
+    window.requestAnimationFrame(() => {
+      element.focus();
+
+      if (select && typeof element.select === "function") {
+        element.select();
+      }
+    });
+  };
+
+  NS.focusElement = focusElement;
+
   NS.labelByType = (type) =>
     ({
       product: "Produk",
@@ -19,15 +33,42 @@
     return "service";
   };
 
+  NS.firstFieldForRow = (row) => {
+    const type = row?.dataset?.itemType || "";
+
+    if (type === "product") {
+      return (
+        row.querySelector("[data-product-search]") ||
+        row.querySelector("[data-qty-input]") ||
+        row.querySelector("textarea")
+      );
+    }
+
+    return (
+      row.querySelector('input[name$="[service][name]"]') ||
+      row.querySelector("[data-product-search]") ||
+      row.querySelector('input[name$="[external_purchase_lines][0][label]"]') ||
+      row.querySelector("textarea")
+    );
+  };
+
   NS.addRow = (type, initial = {}) => {
     const root = document.getElementById("workspace-line-items");
     const template = document.getElementById(`workspace-template-${type}`);
     const emptyState = document.getElementById("workspace-empty-state");
+
+    if (!root || !template || !emptyState) return null;
+
     const index = Number(root.dataset.nextIndex || "0");
     const wrapper = document.createElement("div");
 
     wrapper.innerHTML = replaceIndex(template.innerHTML, index);
     const row = wrapper.firstElementChild;
+
+    if (!(row instanceof HTMLElement)) {
+      return null;
+    }
+
     row.dataset.rowIndex = String(index);
     root.appendChild(row);
     root.dataset.nextIndex = String(index + 1);
@@ -38,6 +79,17 @@
     NS.bindProductSearch?.(row);
     NS.renumberRows();
     NS.updateSummary?.();
+
+    const hasInitialValues =
+      !!initial &&
+      typeof initial === "object" &&
+      Object.keys(initial).length > 0;
+
+    if (!hasInitialValues) {
+      focusElement(NS.firstFieldForRow(row));
+    }
+
+    return row;
   };
 
   NS.applyInitialValues = (row, type, item) => {
@@ -47,18 +99,21 @@
     };
 
     set('textarea[name$="[description]"]', item?.description || "");
-    set('[data-pay-now]', item?.pay_now || "0");
+    set("[data-pay-now]", item?.pay_now || "0");
     set('input[name$="[service][name]"]', item?.service?.name || "");
     set('textarea[name$="[service][notes]"]', item?.service?.notes || "");
-    set('[data-product-search]', item?.selected_label || "");
-    set('[data-product-id]', item?.product_lines?.[0]?.product_id || "");
+    set("[data-product-search]", item?.selected_label || "");
+    set("[data-product-id]", item?.product_lines?.[0]?.product_id || "");
     set('input[name$="[external_purchase_lines][0][label]"]', item?.external_purchase_lines?.[0]?.label || "");
     set('input[name$="[external_purchase_lines][0][qty]"]', item?.external_purchase_lines?.[0]?.qty || "1");
     set('input[name$="[product_lines][0][qty]"]', item?.product_lines?.[0]?.qty || "1");
     set('input[name$="[service][price_rupiah]"]', item?.service?.price_rupiah || "");
     set('input[name$="[product_lines][0][unit_price_rupiah]"]', item?.product_lines?.[0]?.unit_price_rupiah || "");
     set('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]', item?.external_purchase_lines?.[0]?.unit_cost_rupiah || "");
-    if (type === "product" || type === "service_store_stock") NS.updateStockText(row, item?.available_stock || 0);
+
+    if (type === "product" || type === "service_store_stock") {
+      NS.updateStockText(row, item?.available_stock || 0);
+    }
   };
 
   NS.renumberRows = () => {
@@ -71,7 +126,7 @@
   NS.removeRow = (row) => {
     row.remove();
     const emptyState = document.getElementById("workspace-empty-state");
-    if (!document.querySelector("[data-line-item]")) emptyState.classList.remove("d-none");
+    if (!document.querySelector("[data-line-item]")) emptyState?.classList.remove("d-none");
     NS.renumberRows();
     NS.updateSummary?.();
   };

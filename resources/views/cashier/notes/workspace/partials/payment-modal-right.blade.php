@@ -1,22 +1,12 @@
 <div class="col-12 col-xl-5">
     <div class="border rounded p-3 h-100 d-flex flex-column">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-                <div class="fw-semibold">Kalkulator Cash</div>
-                <div class="text-muted small">Hitung uang pelanggan dan kembalian.</div>
-            </div>
-            <span class="badge bg-light text-dark" id="workspace-cash-status-badge">Siaga</span>
+        <div class="fw-semibold mb-1">Pembayaran Cash</div>
+        <div class="text-muted small mb-3">
+            Dipakai kalau pelanggan bayar tunai.
         </div>
 
-        @if (($workspaceMode ?? 'create') === 'edit')
-            <div class="alert alert-warning mb-3">
-                Layout pembayaran tetap ditampilkan agar posisi create dan edit konsisten.
-                Aktivasi pembayaran dari workspace edit mengikuti status transaksi.
-            </div>
-        @endif
-
         <div id="workspace-cash-shell-hint" class="alert alert-light border mb-3">
-            Pilih tombol <strong>Bayar Cash</strong> untuk mengaktifkan kalkulator.
+            Pilih <strong>Bayar Cash</strong> setelah menentukan aksi nota.
         </div>
 
         <div id="workspace-payment-panel-cash" class="d-none mt-auto">
@@ -47,6 +37,9 @@
                     placeholder="Masukkan uang dari pelanggan"
                     data-money-display
                 >
+                <div class="form-text">
+                    Tekan Enter kalau nominal sudah pas atau cukup untuk kembalian.
+                </div>
             </div>
         </div>
     </div>

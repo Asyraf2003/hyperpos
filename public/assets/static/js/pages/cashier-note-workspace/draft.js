@@ -86,7 +86,7 @@
     const itemType = row.dataset.itemType || "service";
     const base = {
       description: valueOf('textarea[name$="[description]"]', row),
-      pay_now: valueOf('[data-pay-now]', row) || "0",
+      pay_now: valueOf("[data-pay-now]", row) || "0",
     };
 
     if (itemType === "product") {
@@ -94,10 +94,10 @@
         ...base,
         entry_mode: "product",
         part_source: "store_stock",
-        selected_label: valueOf('[data-product-search]', row),
+        selected_label: valueOf("[data-product-search]", row),
         product_lines: [
           {
-            product_id: valueOf('[data-product-id]', row),
+            product_id: valueOf("[data-product-id]", row),
             qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
             unit_price_rupiah: numberText(valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row)),
           },
@@ -115,10 +115,10 @@
           notes: valueOf('textarea[name$="[service][notes]"]', row),
           price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
         },
-        selected_label: valueOf('[data-product-search]', row),
+        selected_label: valueOf("[data-product-search]", row),
         product_lines: [
           {
-            product_id: valueOf('[data-product-id]', row),
+            product_id: valueOf("[data-product-id]", row),
             qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
             unit_price_rupiah: numberText(valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row)),
           },
@@ -231,7 +231,7 @@
       if (
         event.target.closest("[data-add-item-type]")
         || event.target.closest("[data-remove-line]")
-        || event.target.closest("[data-open-payment]")
+        || event.target.closest("[data-payment-choice]")
         || event.target.closest("#workspace-payment-open-cash")
         || event.target.closest("#workspace-payment-back-cash")
       ) {

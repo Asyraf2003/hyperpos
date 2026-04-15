@@ -1,22 +1,28 @@
 <div class="modal-footer">
     <div class="w-100 d-flex justify-content-between align-items-center gap-2" id="workspace-payment-footer-main">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
 
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2 justify-content-end">
             <button
                 type="submit"
-                class="btn btn-outline-primary"
+                class="btn btn-outline-primary d-none"
+                id="workspace-payment-submit-skip"
+            >
+                Simpan Nota
+            </button>
+
+            <button
+                type="submit"
+                class="btn btn-outline-primary d-none"
                 id="workspace-payment-submit-transfer"
-                @if (($workspaceMode ?? 'create') === 'edit') disabled @endif
             >
                 Bayar Transfer
             </button>
 
             <button
                 type="button"
-                class="btn btn-primary"
+                class="btn btn-primary d-none"
                 id="workspace-payment-open-cash"
-                @if (($workspaceMode ?? 'create') === 'edit') disabled @endif
             >
                 Bayar Cash
             </button>
@@ -30,7 +36,6 @@
             type="submit"
             class="btn btn-primary"
             id="workspace-payment-submit-cash"
-            @if (($workspaceMode ?? 'create') === 'edit') disabled @endif
         >
             Simpan Pembayaran Cash
         </button>

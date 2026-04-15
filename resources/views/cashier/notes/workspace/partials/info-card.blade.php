@@ -5,7 +5,7 @@
                 <div>
                     <h4 class="card-title mb-1">Informasi Nota</h4>
                     <p class="mb-0 text-muted">
-                        Perbarui informasi header dan cek total nota sebelum menyimpan.
+                        Isi nama customer, lanjut no. HP, lalu pilih rincian dengan keyboard sebelum simpan.
                     </p>
                 </div>
 
@@ -18,7 +18,7 @@
                 {{
                     ($workspaceMode ?? 'create') === 'edit'
                         ? 'Perubahan pembayaran tidak dilakukan dari workspace edit.'
-                        : 'Gunakan aksi di bawah untuk simpan tanpa pembayaran atau lanjut ke pembayaran.'
+                        : 'Tombol Bayar membuka pilihan bayar penuh, bayar sebagian, atau simpan tanpa pembayaran.'
                 }}
             </p>
         </div>
@@ -70,12 +70,8 @@
                     <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
                 @else
-                    <button type="button" class="btn btn-primary" id="workspace-submit-skip">Simpan Tanpa Pembayaran</button>
-                    <button type="button" class="btn btn-outline-primary" data-open-payment="partial">
-                        Bayar Sebagian
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" data-open-payment="full">
-                        Bayar Penuh
+                    <button type="button" class="btn btn-primary" id="workspace-open-payment-dialog">
+                        Bayar
                     </button>
                     <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
                 @endif

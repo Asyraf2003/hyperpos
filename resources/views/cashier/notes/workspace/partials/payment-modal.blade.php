@@ -1,5 +1,5 @@
 <div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <input
                 type="hidden"
@@ -34,8 +34,10 @@
 
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title mb-1">Pembayaran Nota</h5>
-                    <p class="mb-0 text-muted small">Pilih metode dan isi nominal pembayaran sesuai transaksi.</p>
+                    <h5 class="modal-title mb-1">Proses Nota</h5>
+                    <p class="mb-0 text-muted small">
+                        Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.
+                    </p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
