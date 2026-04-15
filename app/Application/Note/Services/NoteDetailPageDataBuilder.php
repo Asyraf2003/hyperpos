@@ -6,16 +6,13 @@ namespace App\Application\Note\Services;
 
 use App\Core\Note\WorkItem\WorkItem;
 use App\Ports\Out\Note\NoteReaderPort;
-use App\Ports\Out\Payment\CustomerRefundReaderPort;
-use App\Ports\Out\Payment\PaymentAllocationReaderPort;
 
 final class NoteDetailPageDataBuilder
 {
     public function __construct(
         private readonly NoteReaderPort $notes,
-        private readonly PaymentAllocationReaderPort $allocations,
-        private readonly CustomerRefundReaderPort $refunds,
-        private readonly NotePaymentStatusResolver $statuses,
+        private readonly NoteOperationalStatusResolver $operationalStatuses,
+        private readonly NotePaymentStatusResolver $paymentStatuses,
         private readonly NoteRowSettlementSummaryBuilder $rowSettlements,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
@@ -25,14 +22,17 @@ final class NoteDetailPageDataBuilder
     public function build(string $noteId): ?array
     {
         $note = $this->notes->getById(trim($noteId));
-        if ($note === null) return null;
-        $grandTotal = $note->totalRupiah()->amount();
-        $allocated = $this->allocations->getTotalAllocatedAmountByNoteId($note->id())->amount();
-        $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id())->amount();
-        $netPaid = max($allocated - $refunded, 0);
-        $status = $this->statuses->resolve($grandTotal, $netPaid);
-        $isOpen = $note->isOpen();
-        $isClosed = $note->isClosed();
+
+        if ($note === null) {
+            return null;
+        }
+
+        $operational = $this->operationalStatuses->resolve($note);
+        $paymentStatus = $this->paymentStatuses->resolve(
+            $operational['grand_total_rupiah'],
+            $operational['net_paid_rupiah'],
+        );
+
         $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
 
         return [
@@ -43,20 +43,23 @@ final class NoteDetailPageDataBuilder
                 'customer_phone' => $note->customerPhone(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'note_state' => $note->noteState(),
-                'is_open' => $isOpen,
-                'is_closed' => $isClosed,
-                'grand_total_rupiah' => $grandTotal,
-                'total_allocated_rupiah' => $allocated,
-                'total_refunded_rupiah' => $refunded,
-                'net_paid_rupiah' => $netPaid,
-                'outstanding_rupiah' => max($grandTotal - $netPaid, 0),
-                'payment_status' => $status,
-                'can_add_rows' => $status !== 'paid',
-                'can_show_edit_actions' => $isOpen,
-                'can_edit_workspace' => $isOpen && $allocated === 0,
-                'can_show_payment_form' => $isOpen && max($grandTotal - $netPaid, 0) > 0,
-                'can_show_correction_actions' => $isOpen && $status === 'paid',
-                'correction_notice' => $status === 'paid' ? 'Nota sudah lunas. Perubahan hanya boleh lewat correction flow.' : null,
+                'operational_status' => $operational['operational_status'],
+                'is_open' => $operational['is_open'],
+                'is_closed' => $operational['is_close'],
+                'grand_total_rupiah' => $operational['grand_total_rupiah'],
+                'total_allocated_rupiah' => $operational['total_allocated_rupiah'],
+                'total_refunded_rupiah' => $operational['total_refunded_rupiah'],
+                'net_paid_rupiah' => $operational['net_paid_rupiah'],
+                'outstanding_rupiah' => $operational['outstanding_rupiah'],
+                'payment_status' => $paymentStatus,
+                'can_add_rows' => $operational['is_open'],
+                'can_show_edit_actions' => $operational['is_open'],
+                'can_edit_workspace' => $operational['is_open'],
+                'can_show_payment_form' => $operational['is_open'] && $operational['outstanding_rupiah'] > 0,
+                'can_show_correction_actions' => false,
+                'correction_notice' => $operational['is_closed']
+                    ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
+                    : null,
                 'rows' => $this->mapRows($note->workItems(), $rowSettlements),
                 'correction_history' => $this->history->build($note->id()),
             ],
@@ -66,6 +69,7 @@ final class NoteDetailPageDataBuilder
 
     /**
      * @param array<int, WorkItem> $rows
+     * @param array<string, array<string, mixed>> $settlements
      * @return list<array<string, mixed>>
      */
     private function mapRows(array $rows, array $settlements): array
@@ -79,6 +83,7 @@ final class NoteDetailPageDataBuilder
                     'outstanding_rupiah' => $item->subtotalRupiah()->amount(),
                     'settlement_label' => 'hutang',
                 ];
+
                 return [
                     'id' => $item->id(),
                     'line_no' => $item->lineNo(),
