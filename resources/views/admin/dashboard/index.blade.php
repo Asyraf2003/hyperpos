@@ -849,10 +849,6 @@
                 <div class="card-body p-4 p-lg-5 hero-content">
                     <div class="row g-4 align-items-start">
                         <div class="col-12 col-lg-8">
-                            <span class="hero-badge">
-                                <i class="bi bi-stars"></i>
-                                Dashboard Insight Bisnis
-                            </span>
                             <h2 class="mt-3 mb-2 fw-bold text-white">
                                 Laporan stok, aset, penjualan, harga, dan perputaran keuangan dalam satu layar.
                             </h2>
