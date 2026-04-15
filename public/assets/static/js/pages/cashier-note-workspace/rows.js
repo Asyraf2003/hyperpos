@@ -52,6 +52,85 @@
     );
   };
 
+  const rowFieldSequence = (row) => {
+    const type = row?.dataset?.itemType || "";
+    const moneyInputs = Array.from(row.querySelectorAll("[data-money-display]"));
+
+    if (type === "product") {
+      return [
+        row.querySelector("[data-product-search]"),
+        row.querySelector("[data-qty-input]"),
+        row.querySelector("[data-price-input]"),
+        row.querySelector('textarea[name$="[description]"]'),
+      ].filter(Boolean);
+    }
+
+    if (type === "service_store_stock") {
+      return [
+        row.querySelector('input[name$="[service][name]"]'),
+        moneyInputs[0],
+        row.querySelector("[data-product-search]"),
+        row.querySelector("[data-qty-input]"),
+        row.querySelector("[data-price-input]"),
+        row.querySelector('textarea[name$="[service][notes]"]'),
+      ].filter(Boolean);
+    }
+
+    if (type === "service_external") {
+      return [
+        row.querySelector('input[name$="[service][name]"]'),
+        moneyInputs[0],
+        row.querySelector('input[name$="[external_purchase_lines][0][label]"]'),
+        row.querySelector('input[name$="[external_purchase_lines][0][qty]"]'),
+        moneyInputs[1],
+        row.querySelector('textarea[name$="[service][notes]"]'),
+      ].filter(Boolean);
+    }
+
+    return [
+      row.querySelector('input[name$="[service][name]"]'),
+      moneyInputs[0],
+      row.querySelector('textarea[name$="[service][notes]"]'),
+    ].filter(Boolean);
+  };
+
+  NS.bindRowKeyboard = (row) => {
+    if (!(row instanceof HTMLElement)) return;
+    if (row.dataset.keyboardBound === "1") return;
+
+    row.dataset.keyboardBound = "1";
+
+    rowFieldSequence(row).forEach((field, index, fields) => {
+      if (!(field instanceof HTMLElement)) return;
+
+      field.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+        if (event.ctrlKey || event.altKey || event.metaKey) return;
+
+        event.preventDefault();
+
+        if (event.shiftKey) {
+          const prev = fields[index - 1];
+          if (prev) {
+            focusElement(prev);
+          }
+          return;
+        }
+
+        const next = fields[index + 1];
+        if (next) {
+          focusElement(next);
+          return;
+        }
+
+        const addButton = document.getElementById("workspace-add-button");
+        if (addButton) {
+          focusElement(addButton, false);
+        }
+      });
+    });
+  };
+
   NS.addRow = (type, initial = {}) => {
     const root = document.getElementById("workspace-line-items");
     const template = document.getElementById(`workspace-template-${type}`);
@@ -77,6 +156,7 @@
     NS.applyInitialValues(row, type, initial);
     window.AdminMoneyInput?.bindBySelector?.(row);
     NS.bindProductSearch?.(row);
+    NS.bindRowKeyboard?.(row);
     NS.renumberRows();
     NS.updateSummary?.();
 

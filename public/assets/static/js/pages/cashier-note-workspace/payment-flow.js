@@ -405,7 +405,6 @@
 
     setText("workspace-modal-total-text", total);
     setText("workspace-cash-payable-text", payable);
-    setText("workspace-cash-received-text", received);
     setText("workspace-cash-change-text", Math.max(received - payable, 0));
 
     toggle("workspace-payment-standard-view", !NS.paymentState.cashStep);
@@ -506,15 +505,13 @@
 
   const openPaymentModal = () => {
     bindPaymentModalLifecycle();
-    hydrateStateFromHidden();
 
+    NS.paymentState.mode = "";
     NS.paymentState.cashStep = false;
+    updateHidden("inline_payment_decision_hidden", "skip");
+    updateHidden("inline_payment_amount_paid_rupiah", "");
     clearPaymentMethod();
     clearReceivedAmount();
-
-    if (!["full", "partial", "skip"].includes(NS.paymentState.mode)) {
-      NS.paymentState.mode = "";
-    }
 
     NS.refreshPaymentUi();
     showPaymentModal();
