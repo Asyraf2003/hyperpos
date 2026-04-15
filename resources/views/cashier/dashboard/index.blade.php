@@ -512,14 +512,6 @@
                     <div class="d-flex flex-column flex-lg-row align-items-lg-start justify-content-between gap-3 mb-3">
                         <div>
                             <h5 class="cashier-section-title fw-bold mb-1">Cari Produk Cepat</h5>
-                            <p class="cashier-section-desc mb-0">
-                                Ketik minimal 2 huruf awal nama, merek, ukuran, atau kode produk.
-                                Hanya produk dengan stok tersedia yang akan ditampilkan.
-                            </p>
-                        </div>
-
-                        <div class="cashier-search-status d-flex align-items-center gap-2" data-search-status>
-                            <span>Siap digunakan</span>
                         </div>
                     </div>
 
@@ -536,15 +528,6 @@
                                 autocomplete="off"
                                 data-product-search-input
                             >
-                        </div>
-
-                        <div class="col-12 col-lg-4">
-                            <div class="cashier-search-actions">
-                                <div class="small cashier-section-desc mb-0">
-                                    Hasil akan muncul otomatis saat Anda mengetik minimal 2 karakter.
-                                    Hapus isi input untuk kembali ke keadaan awal.
-                                </div>
-                            </div>
                         </div>
                     </div>
 

@@ -18,6 +18,7 @@ use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidServiceOnlyWorkItemController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidWorkItemStatusController;
 use App\Adapters\In\Http\Controllers\Note\CreateNoteController;
+use App\Adapters\In\Http\Controllers\Note\RecordClosedNoteRefundController;
 use App\Adapters\In\Http\Controllers\Note\RecordNotePaymentController;
 use App\Adapters\In\Http\Controllers\Note\StoreTransactionWorkspaceController;
 use App\Adapters\In\Http\Controllers\Note\UpdateTransactionWorkspaceController;
@@ -54,6 +55,8 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
         Route::get('/workspace/draft', GetTransactionWorkspaceDraftController::class)->name('workspace.draft.show');
         Route::post('/workspace/draft', SaveTransactionWorkspaceDraftController::class)->name('workspace.draft.save');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');
+
+        Route::post('/{noteId}/refunds', RecordClosedNoteRefundController::class)->name('refunds.store');
 
         Route::middleware(EnsureCashierNoteAccess::class)->group(function (): void {
             Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
