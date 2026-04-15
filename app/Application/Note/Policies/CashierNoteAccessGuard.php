@@ -10,18 +10,33 @@ use DateTimeImmutable;
 
 final class CashierNoteAccessGuard
 {
+    public function assertCanView(Note $note, DateTimeImmutable $today): void
+    {
+        if (!$this->isWithinCashierDateWindow($note, $today)) {
+            throw new DomainException('Kasir hanya boleh mengakses note untuk hari ini dan kemarin.');
+        }
+    }
+
+    public function assertCanMutateOpenNote(Note $note, DateTimeImmutable $today): void
+    {
+        $this->assertCanView($note, $today);
+
+        if ($note->isClosed()) {
+            throw new DomainException('Kasir tidak boleh memproses note yang sudah ditutup lewat route ini.');
+        }
+    }
+
     public function assertCanAccess(Note $note, DateTimeImmutable $today): void
     {
-        if ($note->isClosed()) {
-            throw new DomainException('Kasir tidak boleh mengakses note yang sudah ditutup.');
-        }
+        $this->assertCanMutateOpenNote($note, $today);
+    }
 
+    private function isWithinCashierDateWindow(Note $note, DateTimeImmutable $today): bool
+    {
         $noteDate = $note->transactionDate()->format('Y-m-d');
         $todayDate = $today->format('Y-m-d');
         $yesterdayDate = $today->modify('-1 day')->format('Y-m-d');
 
-        if (!in_array($noteDate, [$todayDate, $yesterdayDate], true)) {
-            throw new DomainException('Kasir hanya boleh mengakses note open untuk hari ini dan kemarin.');
-        }
+        return in_array($noteDate, [$todayDate, $yesterdayDate], true);
     }
 }

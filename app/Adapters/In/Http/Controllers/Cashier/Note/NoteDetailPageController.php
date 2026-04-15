@@ -27,7 +27,7 @@ final class NoteDetailPageController extends Controller
         abort_if($note === null, 404);
 
         try {
-            $guard->assertCanAccess($note, $clock->now());
+            $guard->assertCanView($note, $clock->now());
         } catch (DomainException $e) {
             abort(403, $e->getMessage());
         }

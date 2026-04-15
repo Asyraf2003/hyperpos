@@ -15,6 +15,16 @@ final class CashierProtectedNoteRoutesAccessGuardFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_cashier_can_open_detail_for_closed_note_within_date_window(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedServiceOnlyNote('note-closed', date('Y-m-d'), 'closed');
+
+        $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-closed']))
+            ->assertOk();
+    }
+
     public function test_cashier_cannot_open_workspace_edit_for_closed_note(): void
     {
         $user = $this->seedKasir();
@@ -22,6 +32,17 @@ final class CashierProtectedNoteRoutesAccessGuardFeatureTest extends TestCase
 
         $this->actingAs($user)
             ->get(route('cashier.notes.workspace.edit', ['noteId' => 'note-closed']))
+            ->assertForbidden();
+    }
+
+    public function test_cashier_cannot_view_note_older_than_two_days_even_if_closed(): void
+    {
+        $user = $this->seedKasir();
+        $oldDate = date('Y-m-d', strtotime('-2 day'));
+        $this->seedServiceOnlyNote('note-old-closed', $oldDate, 'closed');
+
+        $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-old-closed']))
             ->assertForbidden();
     }
 
