@@ -21,6 +21,8 @@ final class ProductScenarioActiveBasicSeeder extends Seeder
                 merek: $item['brand'],
                 ukuran: $item['size'],
                 hargaJual: $item['price'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($result->isFailure()) {

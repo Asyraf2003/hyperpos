@@ -30,6 +30,8 @@ final class ProductLoadSeeder extends Seeder
                 merek: $payload['merek'],
                 ukuran: $payload['ukuran'],
                 hargaJual: $payload['hargaJual'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($created->isFailure()) {
@@ -56,6 +58,8 @@ final class ProductLoadSeeder extends Seeder
                 merek: $createPayload['merek'],
                 ukuran: $createPayload['ukuran'],
                 hargaJual: $createPayload['hargaJual'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($created->isFailure()) {
@@ -86,6 +90,8 @@ final class ProductLoadSeeder extends Seeder
                 merek: $updatePayload['merek'],
                 ukuran: $updatePayload['ukuran'],
                 hargaJual: $updatePayload['hargaJual'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($updated->isFailure()) {
