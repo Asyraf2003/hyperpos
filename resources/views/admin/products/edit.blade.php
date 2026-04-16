@@ -141,6 +141,57 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="col-12">
+                                    <div class="border rounded p-3 bg-light-subtle mb-4">
+                                        <div class="fw-semibold mb-1">Threshold Stok</div>
+                                        <small class="text-muted d-block">
+                                            Isi reorder point dan batas kritis secara berpasangan. Produk tanpa threshold akan dianggap belum dikonfigurasi.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group mb-4">
+                                        <label for="reorder_point_qty" class="form-label">Reorder Point Qty</label>
+                                        <input
+                                            type="number"
+                                            id="reorder_point_qty"
+                                            name="reorder_point_qty"
+                                            value="{{ old('reorder_point_qty', $product->reorderPointQty()) }}"
+                                            class="form-control @error('reorder_point_qty') is-invalid @enderror"
+                                            placeholder="Contoh: 10"
+                                            min="0"
+                                            step="1"
+                                        >
+                                        @error('reorder_point_qty')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group mb-4">
+                                        <label for="critical_threshold_qty" class="form-label">Critical Threshold Qty</label>
+                                        <input
+                                            type="number"
+                                            id="critical_threshold_qty"
+                                            name="critical_threshold_qty"
+                                            value="{{ old('critical_threshold_qty', $product->criticalThresholdQty()) }}"
+                                            class="form-control @error('critical_threshold_qty') is-invalid @enderror"
+                                            placeholder="Contoh: 3"
+                                            min="0"
+                                            step="1"
+                                        >
+                                        @error('critical_threshold_qty')
+                                            <div class="invalid-feedback">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-start gap-2">
