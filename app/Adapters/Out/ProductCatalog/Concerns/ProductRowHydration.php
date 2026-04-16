@@ -33,6 +33,8 @@ trait ProductRowHydration
             (string) $row->merek,
             $row->ukuran !== null ? (int) $row->ukuran : null,
             Money::fromInt((int) $row->harga_jual),
+            $row->reorder_point_qty !== null ? (int) $row->reorder_point_qty : null,
+            $row->critical_threshold_qty !== null ? (int) $row->critical_threshold_qty : null,
         );
     }
 }

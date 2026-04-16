@@ -27,6 +27,8 @@ final class CreateProductHandler
         string $merek,
         ?int $ukuran,
         int $hargaJual,
+        ?int $reorderPointQty,
+        ?int $criticalThresholdQty,
     ): Result {
         $normalizedKodeBarang = $this->normalizeKodeBarang($kodeBarang);
         $normalizedNamaBarang = trim($namaBarang);
@@ -52,6 +54,8 @@ final class CreateProductHandler
                 $normalizedMerek,
                 $ukuran,
                 Money::fromInt($hargaJual),
+                $reorderPointQty,
+                $criticalThresholdQty,
             );
         } catch (DomainException $e) {
             return Result::failure(
@@ -70,6 +74,8 @@ final class CreateProductHandler
                 'merek' => $product->merek(),
                 'ukuran' => $product->ukuran(),
                 'harga_jual' => $product->hargaJual()->amount(),
+                'reorder_point_qty' => $product->reorderPointQty(),
+                'critical_threshold_qty' => $product->criticalThresholdQty(),
             ],
             'Product master berhasil dibuat.'
         );

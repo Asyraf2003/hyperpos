@@ -35,6 +35,8 @@ final class StoreProductController extends Controller
             (string) $data['merek'],
             isset($data['ukuran']) ? (int) $data['ukuran'] : null,
             (int) $data['harga_jual'],
+            isset($data['reorder_point_qty']) ? (int) $data['reorder_point_qty'] : null,
+            isset($data['critical_threshold_qty']) ? (int) $data['critical_threshold_qty'] : null,
         );
 
         if ($result->isFailure()) {

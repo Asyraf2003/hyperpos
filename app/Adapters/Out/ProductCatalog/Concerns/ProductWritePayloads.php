@@ -22,6 +22,8 @@ trait ProductWritePayloads
             'merek_normalized' => $this->normalizeForSearch($product->merek()),
             'ukuran' => $product->ukuran(),
             'harga_jual' => $product->hargaJual()->amount(),
+            'reorder_point_qty' => $product->reorderPointQty(),
+            'critical_threshold_qty' => $product->criticalThresholdQty(),
         ];
     }
 
@@ -32,7 +34,9 @@ trait ProductWritePayloads
      *     nama_barang:string,
      *     merek:string,
      *     ukuran:?int,
-     *     harga_jual:int
+     *     harga_jual:int,
+     *     reorder_point_qty:?int,
+     *     critical_threshold_qty:?int
      * }
      */
     private function toSnapshot(Product $product): array
@@ -44,6 +48,8 @@ trait ProductWritePayloads
             'merek' => $product->merek(),
             'ukuran' => $product->ukuran(),
             'harga_jual' => $product->hargaJual()->amount(),
+            'reorder_point_qty' => $product->reorderPointQty(),
+            'critical_threshold_qty' => $product->criticalThresholdQty(),
         ];
     }
 
@@ -62,6 +68,8 @@ trait ProductWritePayloads
             'merek' => (string) $row->merek,
             'ukuran' => $row->ukuran !== null ? (int) $row->ukuran : null,
             'harga_jual' => (int) $row->harga_jual,
+            'reorder_point_qty' => $row->reorder_point_qty !== null ? (int) $row->reorder_point_qty : null,
+            'critical_threshold_qty' => $row->critical_threshold_qty !== null ? (int) $row->critical_threshold_qty : null,
             'deleted_at' => $deletedAt,
             'deleted_by_actor_id' => $actorId,
         ];

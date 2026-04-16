@@ -27,6 +27,8 @@ final class UpdateProductHandler
         string $merek,
         ?int $ukuran,
         int $hargaJual,
+        ?int $reorderPointQty,
+        ?int $criticalThresholdQty,
     ): Result {
         $product = $this->products->getById($productId);
 
@@ -61,6 +63,8 @@ final class UpdateProductHandler
                 $normalizedMerek,
                 $ukuran,
                 Money::fromInt($hargaJual),
+                $reorderPointQty,
+                $criticalThresholdQty,
             );
         } catch (DomainException $e) {
             return Result::failure(
@@ -79,6 +83,8 @@ final class UpdateProductHandler
                 'merek' => $product->merek(),
                 'ukuran' => $product->ukuran(),
                 'harga_jual' => $product->hargaJual()->amount(),
+                'reorder_point_qty' => $product->reorderPointQty(),
+                'critical_threshold_qty' => $product->criticalThresholdQty(),
             ],
             'Product master berhasil diperbarui.'
         );

@@ -24,6 +24,8 @@ final class UpdateProductRequest extends FormRequest
             'merek' => ['required', 'string'],
             'ukuran' => ['nullable', 'integer'],
             'harga_jual' => ['required', 'integer', 'min:1'],
+            'reorder_point_qty' => ['nullable', 'integer', 'min:0'],
+            'critical_threshold_qty' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

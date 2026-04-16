@@ -13,7 +13,16 @@ trait ProductListQuery
     {
         return DB::table('products')
             ->whereNull('deleted_at')
-            ->select(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual']);
+            ->select([
+                'id',
+                'kode_barang',
+                'nama_barang',
+                'merek',
+                'ukuran',
+                'harga_jual',
+                'reorder_point_qty',
+                'critical_threshold_qty',
+            ]);
     }
 
     private function applySearch(Builder $query, string $keyword): Builder

@@ -15,6 +15,8 @@ trait ProductState
         private string $merek,
         private ?int $ukuran,
         private Money $hargaJual,
+        private ?int $reorderPointQty,
+        private ?int $criticalThresholdQty,
     ) {}
 
     public function id(): string { return $this->id; }
@@ -23,4 +25,6 @@ trait ProductState
     public function merek(): string { return $this->merek; }
     public function ukuran(): ?int { return $this->ukuran; }
     public function hargaJual(): Money { return $this->hargaJual; }
+    public function reorderPointQty(): ?int { return $this->reorderPointQty; }
+    public function criticalThresholdQty(): ?int { return $this->criticalThresholdQty; }
 }
