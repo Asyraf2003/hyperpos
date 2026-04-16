@@ -66,7 +66,7 @@ final class AdminDashboardOverviewPayload
         return array_values(array_map(
             static fn (array $row): array => [
                 'product_id' => (string) ($row['product_id'] ?? ''),
-                'kode_barang' => isset($row['kode_barang']) && $row['kode_barang'] !== null
+                'kode_barang' => array_key_exists('kode_barang', $row) && $row['kode_barang'] !== null
                     ? (string) $row['kode_barang']
                     : null,
                 'nama_barang' => (string) ($row['nama_barang'] ?? '-'),
