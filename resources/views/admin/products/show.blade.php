@@ -54,12 +54,12 @@
                         </div>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Reorder Point Qty</small>
+                            <small class="text-muted d-block">Mulai Perlu Restok (Reorder Point)</small>
                             <div class="fw-semibold">{{ $page['current_identity']['reorder_point_qty'] }}</div>
                         </div>
 
                         <div>
-                            <small class="text-muted d-block">Critical Threshold Qty</small>
+                            <small class="text-muted d-block">Batas Stok Kritis</small>
                             <div class="fw-semibold">{{ $page['current_identity']['critical_threshold_qty'] }}</div>
                         </div>
                     </div>
@@ -109,12 +109,12 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <small class="text-muted d-block">Reorder Point Qty</small>
+                                    <small class="text-muted d-block">Mulai Perlu Restok (Reorder Point)</small>
                                     <div class="fw-semibold">{{ $page['initial_identity']['reorder_point_qty'] }}</div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <small class="text-muted d-block">Critical Threshold Qty</small>
+                                    <small class="text-muted d-block">Batas Stok Kritis</small>
                                     <div class="fw-semibold">{{ $page['initial_identity']['critical_threshold_qty'] }}</div>
                                 </div>
 
@@ -188,12 +188,12 @@
                                                 </div>
 
                                                 <div class="col-12 col-md-6">
-                                                    <small class="text-muted d-block">Reorder Point Qty</small>
+                                                    <small class="text-muted d-block">Mulai Perlu Restok (Reorder Point)</small>
                                                     <div class="fw-semibold">{{ $entry['snapshot']['reorder_point_qty'] }}</div>
                                                 </div>
 
                                                 <div class="col-12 col-md-6">
-                                                    <small class="text-muted d-block">Critical Threshold Qty</small>
+                                                    <small class="text-muted d-block">Batas Stok Kritis</small>
                                                     <div class="fw-semibold">{{ $entry['snapshot']['critical_threshold_qty'] }}</div>
                                                 </div>
 
