@@ -58,6 +58,8 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Master</li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.products.index') }}" class="sidebar-link">
                         <i class="bi bi-box-seam-fill"></i>
@@ -72,6 +74,8 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Operasional</li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.procurement.supplier-invoices.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="sidebar-link">
                         <i class="bi bi-receipt"></i>
@@ -79,7 +83,12 @@
                     </a>
                 </li>
 
-                <li class="sidebar-title">Karyawan</li>
+                <li class="sidebar-item {{ request()->routeIs('admin.notes.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.notes.index') }}" class="sidebar-link">
+                        <i class="bi bi-journal-text"></i>
+                        <span>Nota Pelanggan</span>
+                    </a>
+                </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.employees.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.employees.index') }}" class="sidebar-link">
@@ -102,18 +111,10 @@
                     </a>
                 </li>
 
-                <li class="sidebar-title">Keuangan</li>
                 <li class="sidebar-item {{ request()->routeIs('admin.expenses.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.expenses.index') }}" class="sidebar-link">
                         <i class="bi bi-cash-coin"></i>
                         <span>Biaya Operasional</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-item {{ request()->routeIs('admin.notes.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.notes.index') }}" class="sidebar-link">
-                        <i class="bi bi-journal-text"></i>
-                        <span>Riwayat Nota</span>
                     </a>
                 </li>
 
@@ -122,21 +123,21 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_cash_ledger.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.transaction_cash_ledger.index') }}" class="sidebar-link">
                         <i class="bi bi-arrow-left-right"></i>
-                        <span>Arus Kas Transaksi</span>
+                        <span>Ledger Kas Transaksi</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.payroll.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.payroll.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
-                        <span>Laporan Gaji</span>
+                        <span>Rekap Gaji</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.employee_debt.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.employee_debt.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
-                        <span>Laporan Hutang Karyawan</span>
+                        <span>Rekap Hutang Karyawan</span>
                     </a>
                 </li>
 
@@ -147,11 +148,10 @@
                     </a>
                 </li>
 
-
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.operational_expense.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.operational_expense.index') }}" class="sidebar-link">
                         <i class="bi bi-cash-coin"></i>
-                        <span>Biaya Operasional</span>
+                        <span>Rekap Biaya Operasional</span>
                     </a>
                 </li>
 
@@ -172,7 +172,7 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_summary.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.transaction_summary.index') }}" class="sidebar-link">
                         <i class="bi bi-journal-text"></i>
-                        <span>Laporan Transaksi</span>
+                        <span>Rekap Transaksi per Nota</span>
                     </a>
                 </li>
 
