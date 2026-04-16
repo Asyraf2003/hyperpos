@@ -24,6 +24,8 @@ trait FormatsProductDetailIdentity
             'merek' => $product['merek'],
             'ukuran' => $product['ukuran'] !== null ? (string) $product['ukuran'] : '-',
             'harga_jual_label' => $this->rupiah((int) $product['harga_jual']),
+            'reorder_point_qty' => $this->qtyLabel($product['reorder_point_qty'] ?? null),
+            'critical_threshold_qty' => $this->qtyLabel($product['critical_threshold_qty'] ?? null),
         ];
     }
 
@@ -39,6 +41,8 @@ trait FormatsProductDetailIdentity
             'merek' => $initial['merek'],
             'ukuran' => $initial['ukuran'] !== null ? (string) $initial['ukuran'] : '-',
             'harga_jual_label' => $this->rupiah((int) $initial['harga_jual']),
+            'reorder_point_qty' => $this->qtyLabel($initial['reorder_point_qty'] ?? null),
+            'critical_threshold_qty' => $this->qtyLabel($initial['critical_threshold_qty'] ?? null),
             'changed_at' => $initial['changed_at'],
         ];
     }
@@ -55,5 +59,10 @@ trait FormatsProductDetailIdentity
     private function rupiah(int $amount): string
     {
         return 'Rp ' . number_format($amount, 0, ',', '.');
+    }
+
+    private function qtyLabel(?int $value): string
+    {
+        return $value !== null ? number_format($value, 0, ',', '.') : '-';
     }
 }

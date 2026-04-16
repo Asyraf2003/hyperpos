@@ -15,6 +15,8 @@ trait ProductDetailSnapshotMapper
             'merek' => (string) $product->merek,
             'ukuran' => $product->ukuran !== null ? (int) $product->ukuran : null,
             'harga_jual' => (int) $product->harga_jual,
+            'reorder_point_qty' => $product->reorder_point_qty !== null ? (int) $product->reorder_point_qty : null,
+            'critical_threshold_qty' => $product->critical_threshold_qty !== null ? (int) $product->critical_threshold_qty : null,
         ];
     }
 
@@ -28,6 +30,8 @@ trait ProductDetailSnapshotMapper
             'merek' => (string) ($snapshot['merek'] ?? ''),
             'ukuran' => isset($snapshot['ukuran']) ? (int) $snapshot['ukuran'] : null,
             'harga_jual' => isset($snapshot['harga_jual']) ? (int) $snapshot['harga_jual'] : 0,
+            'reorder_point_qty' => isset($snapshot['reorder_point_qty']) ? (int) $snapshot['reorder_point_qty'] : null,
+            'critical_threshold_qty' => isset($snapshot['critical_threshold_qty']) ? (int) $snapshot['critical_threshold_qty'] : null,
             'changed_at' => (string) $version->changed_at,
         ];
     }
@@ -47,7 +51,17 @@ trait ProductDetailSnapshotMapper
 
     private function identityChanged(array $current, array $initial): bool
     {
-        foreach (['kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual'] as $key) {
+        foreach (
+            [
+                'kode_barang',
+                'nama_barang',
+                'merek',
+                'ukuran',
+                'harga_jual',
+                'reorder_point_qty',
+                'critical_threshold_qty',
+            ] as $key
+        ) {
             if (($current[$key] ?? null) !== ($initial[$key] ?? null)) {
                 return true;
             }

@@ -33,6 +33,12 @@ trait FormatsProductDetailTimeline
             'merek' => (string) ($snapshot['merek'] ?? '-'),
             'ukuran' => isset($snapshot['ukuran']) ? (string) $snapshot['ukuran'] : '-',
             'harga_jual_label' => $this->rupiah((int) ($snapshot['harga_jual'] ?? 0)),
+            'reorder_point_qty' => $this->qtyLabel(
+                isset($snapshot['reorder_point_qty']) ? (int) $snapshot['reorder_point_qty'] : null
+            ),
+            'critical_threshold_qty' => $this->qtyLabel(
+                isset($snapshot['critical_threshold_qty']) ? (int) $snapshot['critical_threshold_qty'] : null
+            ),
             'deleted_at' => array_key_exists('deleted_at', $snapshot)
                 ? (($snapshot['deleted_at'] ?? null) ?: '-')
                 : null,

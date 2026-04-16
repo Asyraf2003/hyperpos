@@ -48,9 +48,19 @@
                             <div class="fw-semibold">{{ $page['current_identity']['ukuran'] }}</div>
                         </div>
 
-                        <div>
+                        <div class="mb-3">
                             <small class="text-muted d-block">Harga Jual</small>
                             <div class="fw-semibold">{{ $page['current_identity']['harga_jual_label'] }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Reorder Point Qty</small>
+                            <div class="fw-semibold">{{ $page['current_identity']['reorder_point_qty'] }}</div>
+                        </div>
+
+                        <div>
+                            <small class="text-muted d-block">Critical Threshold Qty</small>
+                            <div class="fw-semibold">{{ $page['current_identity']['critical_threshold_qty'] }}</div>
                         </div>
                     </div>
                 </div>
@@ -96,6 +106,16 @@
                                 <div class="mb-3">
                                     <small class="text-muted d-block">Harga Jual</small>
                                     <div class="fw-semibold">{{ $page['initial_identity']['harga_jual_label'] }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Reorder Point Qty</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['reorder_point_qty'] }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">Critical Threshold Qty</small>
+                                    <div class="fw-semibold">{{ $page['initial_identity']['critical_threshold_qty'] }}</div>
                                 </div>
 
                                 <div>
@@ -165,6 +185,16 @@
                                                 <div class="col-12 col-md-6">
                                                     <small class="text-muted d-block">Harga Jual</small>
                                                     <div class="fw-semibold">{{ $entry['snapshot']['harga_jual_label'] }}</div>
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Reorder Point Qty</small>
+                                                    <div class="fw-semibold">{{ $entry['snapshot']['reorder_point_qty'] }}</div>
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Critical Threshold Qty</small>
+                                                    <div class="fw-semibold">{{ $entry['snapshot']['critical_threshold_qty'] }}</div>
                                                 </div>
 
                                                 @if ($entry['snapshot']['deleted_at'] !== null)

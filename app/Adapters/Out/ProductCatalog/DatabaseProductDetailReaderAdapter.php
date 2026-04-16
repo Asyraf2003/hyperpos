@@ -18,7 +18,16 @@ final class DatabaseProductDetailReaderAdapter implements ProductDetailReaderPor
     {
         $product = DB::table('products')
             ->where('id', $productId)
-            ->first(['id', 'kode_barang', 'nama_barang', 'merek', 'ukuran', 'harga_jual']);
+            ->first([
+                'id',
+                'kode_barang',
+                'nama_barang',
+                'merek',
+                'ukuran',
+                'harga_jual',
+                'reorder_point_qty',
+                'critical_threshold_qty',
+            ]);
 
         if ($product === null) {
             return null;
