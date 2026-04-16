@@ -28,7 +28,7 @@ final class OperationalProfitReportPageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_operational_profit_report_page_and_see_sidebar_routes(): void
+    public function test_admin_can_access_operational_profit_report_page_and_see_cash_based_metrics(): void
     {
         $this->seedEmployee('employee-1', 'Montir Profit');
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
@@ -69,6 +69,10 @@ final class OperationalProfitReportPageFeatureTest extends TestCase
             ['id' => 'payroll-1', 'employee_id' => 'employee-1', 'amount' => 40000, 'disbursement_date' => '2030-01-08 12:00:00', 'mode' => 'weekly', 'notes' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
+        DB::table('employee_debts')->insert([
+            ['id' => 'debt-1', 'employee_id' => 'employee-1', 'total_debt' => 15000, 'remaining_balance' => 15000, 'status' => 'unpaid', 'notes' => 'Kasbon report', 'created_at' => '2030-01-08 08:00:00', 'updated_at' => '2030-01-08 08:00:00'],
+        ]);
+
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.operational_profit.index', [
                 'period_mode' => 'custom',
@@ -81,13 +85,15 @@ final class OperationalProfitReportPageFeatureTest extends TestCase
         $response->assertSee('Laba Kas Operasional');
         $response->assertSee('operational-profit-report-filter-form', false);
         $response->assertSee('2030-01-01 s/d 2030-01-31');
-        $response->assertSee('Rp 300.000');
+        $response->assertSee('Rp 200.000');
         $response->assertSee('Rp 10.000');
-        $response->assertSee('Rp 290.000');
-        $response->assertSee('Rp 20.000');
-        $response->assertSee('Rp 210.000');
+        $response->assertSee('Rp 50.000');
+        $response->assertSee('Rp 30.000');
         $response->assertSee('Rp 80.000');
-        $response->assertSee('Rp 150.000');
+        $response->assertSee('Rp 20.000');
+        $response->assertSee('Rp 40.000');
+        $response->assertSee('Rp 15.000');
+        $response->assertSee('Rp 35.000');
         $response->assertSee(route('admin.reports.transaction_cash_ledger.index'), false);
         $response->assertSee(route('admin.reports.employee_debt.index'), false);
         $response->assertSee(route('admin.reports.operational_profit.index'), false);

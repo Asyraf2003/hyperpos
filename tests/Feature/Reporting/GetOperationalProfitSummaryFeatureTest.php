@@ -14,7 +14,7 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_get_operational_profit_summary_handler_returns_exact_period_profit_row(): void
+    public function test_get_operational_profit_summary_handler_returns_exact_cash_based_period_profit_row(): void
     {
         $this->seedEmployee('11111111-1111-1111-1111-111111111111', 'Montir A');
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
@@ -67,6 +67,15 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
             ['id' => '33333333-3333-3333-3333-333333333333', 'employee_id' => '11111111-1111-1111-1111-111111111111', 'amount' => 999999, 'disbursement_date' => '2026-03-18 12:00:00', 'mode' => 'weekly', 'notes' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
+        DB::table('employee_debts')->insert([
+            ['id' => 'debt-1', 'employee_id' => '11111111-1111-1111-1111-111111111111', 'total_debt' => 15000, 'remaining_balance' => 10000, 'status' => 'unpaid', 'notes' => 'Kasbon periode', 'created_at' => '2026-03-16 08:00:00', 'updated_at' => '2026-03-16 08:00:00'],
+            ['id' => 'debt-2', 'employee_id' => '11111111-1111-1111-1111-111111111111', 'total_debt' => 999999, 'remaining_balance' => 999999, 'status' => 'unpaid', 'notes' => 'Luar scope', 'created_at' => '2026-03-18 08:00:00', 'updated_at' => '2026-03-18 08:00:00'],
+        ]);
+
+        DB::table('employee_debt_payments')->insert([
+            ['id' => 'debt-payment-1', 'employee_debt_id' => 'debt-1', 'amount' => 5000, 'payment_date' => '2026-03-16 09:00:00', 'notes' => 'Bayar sebagian', 'created_at' => '2026-03-16 09:00:00', 'updated_at' => '2026-03-16 09:00:00'],
+        ]);
+
         $result = app(GetOperationalProfitSummaryHandler::class)
             ->handle('2026-03-15', '2026-03-16');
 
@@ -81,16 +90,15 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         $this->assertSame([
             'from_date' => '2026-03-15',
             'to_date' => '2026-03-16',
-            'gross_revenue_rupiah' => 300000,
+            'cash_in_rupiah' => 200000,
             'refunded_rupiah' => 10000,
-            'net_revenue_rupiah' => 290000,
             'external_purchase_cost_rupiah' => 50000,
             'store_stock_cogs_rupiah' => 30000,
-            'direct_cost_rupiah' => 80000,
-            'gross_profit_rupiah' => 210000,
+            'product_purchase_cost_rupiah' => 80000,
             'operational_expense_rupiah' => 20000,
             'payroll_disbursement_rupiah' => 40000,
-            'net_operational_profit_rupiah' => 150000,
+            'employee_debt_cash_out_rupiah' => 15000,
+            'cash_operational_profit_rupiah' => 35000,
         ], $data['row']);
     }
 
@@ -141,16 +149,15 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         $this->assertSame([
             'from_date' => '2026-03-15',
             'to_date' => '2026-03-16',
-            'gross_revenue_rupiah' => 0,
+            'cash_in_rupiah' => 0,
             'refunded_rupiah' => 0,
-            'net_revenue_rupiah' => 0,
             'external_purchase_cost_rupiah' => 0,
             'store_stock_cogs_rupiah' => 0,
-            'direct_cost_rupiah' => 0,
-            'gross_profit_rupiah' => 0,
+            'product_purchase_cost_rupiah' => 0,
             'operational_expense_rupiah' => 0,
             'payroll_disbursement_rupiah' => 10000,
-            'net_operational_profit_rupiah' => -10000,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => -10000,
         ], $data['row']);
     }
 

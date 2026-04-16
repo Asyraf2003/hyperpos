@@ -24,16 +24,15 @@ final class DatabaseOperationalProfitReportingSourceReaderAdapter implements Ope
         $summary = $this->metricsQuery->summary($fromDate, $toDate);
 
         return [
-            'gross_revenue_rupiah' => $summary['gross_revenue_rupiah'],
+            'cash_in_rupiah' => $summary['cash_in_rupiah'],
             'refunded_rupiah' => $summary['refunded_rupiah'],
-            'net_revenue_rupiah' => $summary['net_revenue_rupiah'],
             'external_purchase_cost_rupiah' => $summary['external_purchase_cost_rupiah'],
             'store_stock_cogs_rupiah' => $summary['store_stock_cogs_rupiah'],
-            'direct_cost_rupiah' => $summary['direct_cost_rupiah'],
-            'gross_profit_rupiah' => $summary['gross_profit_rupiah'],
+            'product_purchase_cost_rupiah' => $summary['product_purchase_cost_rupiah'],
             'operational_expense_rupiah' => $summary['operational_expense_rupiah'],
             'payroll_disbursement_rupiah' => $summary['payroll_disbursement_rupiah'],
-            'net_operational_profit_rupiah' => $summary['net_operational_profit_rupiah'],
+            'employee_debt_cash_out_rupiah' => $summary['employee_debt_cash_out_rupiah'],
+            'cash_operational_profit_rupiah' => $summary['cash_operational_profit_rupiah'],
         ];
     }
 }

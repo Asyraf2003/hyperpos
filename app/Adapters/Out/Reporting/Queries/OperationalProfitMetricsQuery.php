@@ -10,40 +10,47 @@ final class OperationalProfitMetricsQuery
 {
     public function summary(string $fromDate, string $toDate): array
     {
-        $grossRevenue = $this->grossRevenue($fromDate, $toDate);
-        $refunded = $this->refunded($fromDate, $toDate);
-        $externalPurchaseCost = $this->externalPurchaseCost($fromDate, $toDate);
+        $cashIn = $this->cashIn($fromDate, $toDate);
+        $refund = $this->refund($fromDate, $toDate);
+        $externalPurchase = $this->externalPurchaseCost($fromDate, $toDate);
         $storeStockCogs = $this->storeStockCogs($fromDate, $toDate);
+        $productPurchaseCost = $externalPurchase + $storeStockCogs;
         $operationalExpense = $this->operationalExpense($fromDate, $toDate);
         $payroll = $this->payrollDisbursement($fromDate, $toDate);
-        $netRevenue = $grossRevenue - $refunded;
-        $directCost = $externalPurchaseCost + $storeStockCogs;
-        $grossProfit = $netRevenue - $directCost;
+        $employeeDebtCashOut = $this->employeeDebtCashOut($fromDate, $toDate);
 
         return [
             'from_date' => $fromDate,
             'to_date' => $toDate,
-            'gross_revenue_rupiah' => $grossRevenue,
-            'refunded_rupiah' => $refunded,
-            'net_revenue_rupiah' => $netRevenue,
-            'external_purchase_cost_rupiah' => $externalPurchaseCost,
+            'cash_in_rupiah' => $cashIn,
+            'refunded_rupiah' => $refund,
+            'external_purchase_cost_rupiah' => $externalPurchase,
             'store_stock_cogs_rupiah' => $storeStockCogs,
-            'direct_cost_rupiah' => $directCost,
-            'gross_profit_rupiah' => $grossProfit,
+            'product_purchase_cost_rupiah' => $productPurchaseCost,
             'operational_expense_rupiah' => $operationalExpense,
             'payroll_disbursement_rupiah' => $payroll,
-            'net_operational_profit_rupiah' => $grossProfit - $operationalExpense - $payroll,
+            'employee_debt_cash_out_rupiah' => $employeeDebtCashOut,
+            'cash_operational_profit_rupiah' => $cashIn
+                - $refund
+                - $productPurchaseCost
+                - $operationalExpense
+                - $payroll
+                - $employeeDebtCashOut,
         ];
     }
 
-    private function grossRevenue(string $fromDate, string $toDate): int
+    private function cashIn(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('notes')->whereBetween('transaction_date', [$fromDate, $toDate])->sum('total_rupiah') ?? 0);
+        return (int) (DB::table('customer_payments')
+            ->whereBetween(DB::raw('DATE(paid_at)'), [$fromDate, $toDate])
+            ->sum('amount_rupiah') ?? 0);
     }
 
-    private function refunded(string $fromDate, string $toDate): int
+    private function refund(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('customer_refunds')->whereBetween(DB::raw('DATE(refunded_at)'), [$fromDate, $toDate])->sum('amount_rupiah') ?? 0);
+        return (int) (DB::table('customer_refunds')
+            ->whereBetween(DB::raw('DATE(refunded_at)'), [$fromDate, $toDate])
+            ->sum('amount_rupiah') ?? 0);
     }
 
     private function externalPurchaseCost(string $fromDate, string $toDate): int
@@ -84,5 +91,12 @@ final class OperationalProfitMetricsQuery
             ->whereNull('payroll_disbursement_reversals.id')
             ->whereBetween(DB::raw('DATE(payroll_disbursements.disbursement_date)'), [$fromDate, $toDate])
             ->sum('payroll_disbursements.amount') ?? 0);
+    }
+
+    private function employeeDebtCashOut(string $fromDate, string $toDate): int
+    {
+        return (int) (DB::table('employee_debts')
+            ->whereBetween(DB::raw('DATE(employee_debts.created_at)'), [$fromDate, $toDate])
+            ->sum('employee_debts.total_debt') ?? 0);
     }
 }

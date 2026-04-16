@@ -9,16 +9,15 @@ final class OperationalProfitSummaryRow
     public function __construct(
         private readonly string $fromDate,
         private readonly string $toDate,
-        private readonly int $grossRevenueRupiah,
+        private readonly int $cashInRupiah,
         private readonly int $refundedRupiah,
-        private readonly int $netRevenueRupiah,
         private readonly int $externalPurchaseCostRupiah,
         private readonly int $storeStockCogsRupiah,
-        private readonly int $directCostRupiah,
-        private readonly int $grossProfitRupiah,
+        private readonly int $productPurchaseCostRupiah,
         private readonly int $operationalExpenseRupiah,
         private readonly int $payrollDisbursementRupiah,
-        private readonly int $netOperationalProfitRupiah,
+        private readonly int $employeeDebtCashOutRupiah,
+        private readonly int $cashOperationalProfitRupiah,
     ) {
     }
 
@@ -27,27 +26,25 @@ final class OperationalProfitSummaryRow
         return [
             'from_date' => $this->fromDate,
             'to_date' => $this->toDate,
-            'gross_revenue_rupiah' => $this->grossRevenueRupiah,
+            'cash_in_rupiah' => $this->cashInRupiah,
             'refunded_rupiah' => $this->refundedRupiah,
-            'net_revenue_rupiah' => $this->netRevenueRupiah,
             'external_purchase_cost_rupiah' => $this->externalPurchaseCostRupiah,
             'store_stock_cogs_rupiah' => $this->storeStockCogsRupiah,
-            'direct_cost_rupiah' => $this->directCostRupiah,
-            'gross_profit_rupiah' => $this->grossProfitRupiah,
+            'product_purchase_cost_rupiah' => $this->productPurchaseCostRupiah,
             'operational_expense_rupiah' => $this->operationalExpenseRupiah,
             'payroll_disbursement_rupiah' => $this->payrollDisbursementRupiah,
-            'net_operational_profit_rupiah' => $this->netOperationalProfitRupiah,
+            'employee_debt_cash_out_rupiah' => $this->employeeDebtCashOutRupiah,
+            'cash_operational_profit_rupiah' => $this->cashOperationalProfitRupiah,
         ];
     }
 
-    public function grossRevenueRupiah(): int { return $this->grossRevenueRupiah; }
+    public function cashInRupiah(): int { return $this->cashInRupiah; }
     public function refundedRupiah(): int { return $this->refundedRupiah; }
-    public function netRevenueRupiah(): int { return $this->netRevenueRupiah; }
     public function externalPurchaseCostRupiah(): int { return $this->externalPurchaseCostRupiah; }
     public function storeStockCogsRupiah(): int { return $this->storeStockCogsRupiah; }
-    public function directCostRupiah(): int { return $this->directCostRupiah; }
-    public function grossProfitRupiah(): int { return $this->grossProfitRupiah; }
+    public function productPurchaseCostRupiah(): int { return $this->productPurchaseCostRupiah; }
     public function operationalExpenseRupiah(): int { return $this->operationalExpenseRupiah; }
     public function payrollDisbursementRupiah(): int { return $this->payrollDisbursementRupiah; }
-    public function netOperationalProfitRupiah(): int { return $this->netOperationalProfitRupiah; }
+    public function employeeDebtCashOutRupiah(): int { return $this->employeeDebtCashOutRupiah; }
+    public function cashOperationalProfitRupiah(): int { return $this->cashOperationalProfitRupiah; }
 }

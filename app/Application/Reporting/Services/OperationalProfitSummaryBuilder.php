@@ -13,16 +13,15 @@ final class OperationalProfitSummaryBuilder
         return new OperationalProfitSummaryRow(
             $row['from_date'],
             $row['to_date'],
-            $row['gross_revenue_rupiah'],
+            $row['cash_in_rupiah'],
             $row['refunded_rupiah'],
-            $row['net_revenue_rupiah'],
             $row['external_purchase_cost_rupiah'],
             $row['store_stock_cogs_rupiah'],
-            $row['direct_cost_rupiah'],
-            $row['gross_profit_rupiah'],
+            $row['product_purchase_cost_rupiah'],
             $row['operational_expense_rupiah'],
             $row['payroll_disbursement_rupiah'],
-            $row['net_operational_profit_rupiah'],
+            $row['employee_debt_cash_out_rupiah'],
+            $row['cash_operational_profit_rupiah'],
         );
     }
 }

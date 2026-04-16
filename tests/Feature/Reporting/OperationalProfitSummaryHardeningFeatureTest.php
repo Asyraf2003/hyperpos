@@ -13,7 +13,7 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_operational_profit_summary_period_parity_matches_expected_totals(): void
+    public function test_operational_profit_summary_period_parity_matches_expected_cash_totals(): void
     {
         $this->seedEmployee('employee-1', 'Montir Profit');
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
@@ -64,6 +64,11 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
             ['id' => 'payroll-2', 'employee_id' => 'employee-1', 'amount' => 999999, 'disbursement_date' => '2030-02-01 12:00:00', 'mode' => 'weekly', 'notes' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
+        DB::table('employee_debts')->insert([
+            ['id' => 'debt-1', 'employee_id' => 'employee-1', 'total_debt' => 15000, 'remaining_balance' => 10000, 'status' => 'unpaid', 'notes' => 'Kasbon weekly', 'created_at' => '2030-01-08 08:00:00', 'updated_at' => '2030-01-08 08:00:00'],
+            ['id' => 'debt-2', 'employee_id' => 'employee-1', 'total_debt' => 999999, 'remaining_balance' => 999999, 'status' => 'unpaid', 'notes' => 'Luar scope', 'created_at' => '2030-02-01 08:00:00', 'updated_at' => '2030-02-01 08:00:00'],
+        ]);
+
         $daily = $this->profitRow('2030-01-07', '2030-01-07');
         $weekly = $this->profitRow('2030-01-07', '2030-01-13');
         $monthly = $this->profitRow('2030-01-01', '2030-01-31');
@@ -72,29 +77,27 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
         $this->assertSame([
             'from_date' => '2030-01-07',
             'to_date' => '2030-01-07',
-            'gross_revenue_rupiah' => 200000,
+            'cash_in_rupiah' => 200000,
             'refunded_rupiah' => 0,
-            'net_revenue_rupiah' => 200000,
             'external_purchase_cost_rupiah' => 50000,
             'store_stock_cogs_rupiah' => 0,
-            'direct_cost_rupiah' => 50000,
-            'gross_profit_rupiah' => 150000,
+            'product_purchase_cost_rupiah' => 50000,
             'operational_expense_rupiah' => 20000,
             'payroll_disbursement_rupiah' => 0,
-            'net_operational_profit_rupiah' => 130000,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => 130000,
         ], $daily);
 
         $weeklyExpectedMetrics = [
-            'gross_revenue_rupiah' => 300000,
+            'cash_in_rupiah' => 200000,
             'refunded_rupiah' => 10000,
-            'net_revenue_rupiah' => 290000,
             'external_purchase_cost_rupiah' => 50000,
             'store_stock_cogs_rupiah' => 30000,
-            'direct_cost_rupiah' => 80000,
-            'gross_profit_rupiah' => 210000,
+            'product_purchase_cost_rupiah' => 80000,
             'operational_expense_rupiah' => 20000,
             'payroll_disbursement_rupiah' => 40000,
-            'net_operational_profit_rupiah' => 150000,
+            'employee_debt_cash_out_rupiah' => 15000,
+            'cash_operational_profit_rupiah' => 35000,
         ];
 
         $this->assertSame(
@@ -163,16 +166,15 @@ final class OperationalProfitSummaryHardeningFeatureTest extends TestCase
         $this->assertSame([
             'from_date' => '2030-02-10',
             'to_date' => '2030-02-10',
-            'gross_revenue_rupiah' => 0,
+            'cash_in_rupiah' => 0,
             'refunded_rupiah' => 0,
-            'net_revenue_rupiah' => 0,
             'external_purchase_cost_rupiah' => 0,
             'store_stock_cogs_rupiah' => 0,
-            'direct_cost_rupiah' => 0,
-            'gross_profit_rupiah' => 0,
+            'product_purchase_cost_rupiah' => 0,
             'operational_expense_rupiah' => 15000,
             'payroll_disbursement_rupiah' => 10000,
-            'net_operational_profit_rupiah' => -25000,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => -25000,
         ], $row);
     }
 
