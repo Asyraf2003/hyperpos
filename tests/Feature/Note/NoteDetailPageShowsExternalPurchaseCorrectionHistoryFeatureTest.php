@@ -71,7 +71,7 @@ final class NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest exte
         $response = $this->actingAs($user)->get('/cashier/notes/note-1');
 
         $response->assertOk();
-        $response->assertSee('Riwayat Correction');
+        $response->assertSee('Riwayat Mutasi Nota');
         $response->assertSee('Correction Fee Service + Part External');
         $response->assertSee('Koreksi fee jasa external');
         $response->assertSee('actor-1');
