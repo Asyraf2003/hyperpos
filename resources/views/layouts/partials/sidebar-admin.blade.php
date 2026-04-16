@@ -126,6 +126,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.payroll.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.payroll.index') }}" class="sidebar-link">
+                        <i class="bi bi-wallet2"></i>
+                        <span>Laporan Gaji</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.employee_debt.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.employee_debt.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
