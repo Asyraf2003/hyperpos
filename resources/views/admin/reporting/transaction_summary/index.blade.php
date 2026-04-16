@@ -10,6 +10,8 @@
     'action' => route('admin.reports.transaction_summary.index'),
     'resetUrl' => route('admin.reports.transaction_summary.index'),
     'rangeLabelText' => 'Rentang transaksi aktif',
+    'basisDateLabel' => 'Tanggal transaksi nota',
+    'basisDateNote' => 'Mode harian hanya menghitung nota pada tanggal transaksi tersebut.',
 ])
 
 <div class="row g-3 mb-4">

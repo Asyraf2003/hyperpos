@@ -9,7 +9,9 @@
     'formId' => 'employee-debt-report-filter-form',
     'action' => route('admin.reports.employee_debt.index'),
     'resetUrl' => route('admin.reports.employee_debt.index'),
-    'rangeLabelText' => 'Rentang aktif',
+    'rangeLabelText' => 'Rentang pencatatan aktif',
+    'basisDateLabel' => 'Tanggal pencatatan hutang',
+    'basisDateNote' => 'Mode harian hanya menghitung hutang yang dicatat pada tanggal tersebut. Data tidak dibawa ke hari berikutnya.',
 ])
 
 <div class="row g-3 mb-4">

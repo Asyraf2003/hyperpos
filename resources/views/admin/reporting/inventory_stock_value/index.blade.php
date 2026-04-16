@@ -10,6 +10,8 @@
     'action' => route('admin.reports.inventory_stock_value.index'),
     'resetUrl' => route('admin.reports.inventory_stock_value.index'),
     'rangeLabelText' => 'Rentang movement aktif',
+    'basisDateLabel' => 'Tanggal mutasi movement',
+    'basisDateNote' => 'Filter memengaruhi ringkasan movement periodik. Snapshot stok saat ini tetap menampilkan posisi stok terbaru.',
 ])
 
 <div class="row g-3 mb-4">

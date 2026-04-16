@@ -9,8 +9,9 @@
     'formId' => 'transaction-cash-ledger-filter-form',
     'action' => route('admin.reports.transaction_cash_ledger.index'),
     'resetUrl' => route('admin.reports.transaction_cash_ledger.index'),
-    'rangeLabelText' => 'Rentang aktif',
-    'noteText' => 'Screen ini memakai handler report existing.',
+    'rangeLabelText' => 'Rentang event aktif',
+    'basisDateLabel' => 'Tanggal event kas',
+    'basisDateNote' => 'Mode harian hanya menghitung event kas pada tanggal tersebut, bukan akumulasi hari sebelumnya.',
 ])
 
 <div class="row g-3 mb-4">

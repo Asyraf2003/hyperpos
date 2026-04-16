@@ -9,7 +9,9 @@
     'formId' => 'supplier-payable-report-filter-form',
     'action' => route('admin.reports.supplier_payable.index'),
     'resetUrl' => route('admin.reports.supplier_payable.index'),
-    'rangeLabelText' => 'Rentang aktif',
+    'rangeLabelText' => 'Rentang pengiriman aktif',
+    'basisDateLabel' => 'Tanggal pengiriman invoice',
+    'basisDateNote' => 'Data invoice masuk dihitung dari tanggal pengiriman. Status jatuh tempo dievaluasi terhadap tanggal referensi.',
 ])
 
 <div class="row g-3 mb-4">

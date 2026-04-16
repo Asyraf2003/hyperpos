@@ -9,7 +9,9 @@
     'formId' => 'operational-profit-report-filter-form',
     'action' => route('admin.reports.operational_profit.index'),
     'resetUrl' => route('admin.reports.operational_profit.index'),
-    'rangeLabelText' => 'Rentang aktif',
+    'rangeLabelText' => 'Rentang event aktif',
+    'basisDateLabel' => 'Tanggal event komponen kas dan biaya',
+    'basisDateNote' => 'Mode harian hanya menghitung event yang jatuh tepat pada hari itu. Tidak ada carry-forward ke hari berikutnya.',
 ])
 
 <div class="row g-3">
