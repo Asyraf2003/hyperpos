@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Application\Reporting\UseCases\Concerns\FormatsAdminDashboardTopSellingRows;
+
 final class AdminDashboardOverviewPayload
 {
+    use FormatsAdminDashboardTopSellingRows;
+
     public static function fromSources(
         array $transactionSummary,
         array $inventorySummary,
@@ -65,22 +69,6 @@ final class AdminDashboardOverviewPayload
             'monthly_cash_operational_profit_rupiah' => (int) ($operationalProfitRow['cash_operational_profit_rupiah'] ?? 0),
             'monthly_net_cash_flow_rupiah' => (int) (($monthCash['total_in_rupiah'] ?? 0) - ($monthCash['total_out_rupiah'] ?? 0)),
         ];
-    }
-
-    private static function topSellingRows(array $rows): array
-    {
-        return array_values(array_map(
-            static fn (array $row): array => [
-                'product_id' => (string) ($row['product_id'] ?? ''),
-                'kode_barang' => array_key_exists('kode_barang', $row) && $row['kode_barang'] !== null
-                    ? (string) $row['kode_barang']
-                    : null,
-                'nama_barang' => (string) ($row['nama_barang'] ?? '-'),
-                'sold_qty' => (int) ($row['sold_qty'] ?? 0),
-                'gross_revenue_rupiah' => (int) ($row['gross_revenue_rupiah'] ?? 0),
-            ],
-            $rows
-        ));
     }
 
     private static function position(

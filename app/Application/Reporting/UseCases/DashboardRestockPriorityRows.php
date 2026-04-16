@@ -35,31 +35,34 @@ final class DashboardRestockPriorityRows
         }
 
         usort($rows, static function (array $left, array $right): int {
-            $severityCompare = ($left['status_rank'] ?? 99) <=> ($right['status_rank'] ?? 99);
+            $severityCompare = $left['status_rank'] <=> $right['status_rank'];
 
             if ($severityCompare !== 0) {
                 return $severityCompare;
             }
 
-            $qtyCompare = ($left['current_qty_on_hand'] ?? 0) <=> ($right['current_qty_on_hand'] ?? 0);
+            $qtyCompare = $left['current_qty_on_hand'] <=> $right['current_qty_on_hand'];
 
             if ($qtyCompare !== 0) {
                 return $qtyCompare;
             }
 
-            return strcmp((string) ($left['product_id'] ?? ''), (string) ($right['product_id'] ?? ''));
+            return strcmp($left['product_id'], $right['product_id']);
         });
 
-        return array_slice(array_map(static fn (array $row): array => [
-            'product_id' => $row['product_id'],
-            'kode_barang' => $row['kode_barang'],
-            'nama_barang' => $row['nama_barang'],
-            'current_qty_on_hand' => $row['current_qty_on_hand'],
-            'reorder_point_qty' => $row['reorder_point_qty'],
-            'critical_threshold_qty' => $row['critical_threshold_qty'],
-            'status' => $row['status'],
-            'status_label' => $row['status_label'],
-        ], $rows), 0, $limit);
+        return array_slice(array_map(
+            static fn (array $row): array => [
+                'product_id' => $row['product_id'],
+                'kode_barang' => $row['kode_barang'],
+                'nama_barang' => $row['nama_barang'],
+                'current_qty_on_hand' => $row['current_qty_on_hand'],
+                'reorder_point_qty' => $row['reorder_point_qty'],
+                'critical_threshold_qty' => $row['critical_threshold_qty'],
+                'status' => $row['status'],
+                'status_label' => $row['status_label'],
+            ],
+            $rows
+        ), 0, $limit);
     }
 
     /**
