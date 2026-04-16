@@ -1079,6 +1079,69 @@
         </div>
     </section>
 
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Barang Paling Laku</h5>
+                            <p class="section-subtitle">Produk dengan qty terjual dan omzet tertinggi pada periode berjalan</p>
+                        </div>
+                        <span class="badge-soft bg-soft-success">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Terjual</th>
+                                    <th>Omzet</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($dashboard['top_selling_rows'] ?? []) === 0)
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            Belum ada data penjualan produk pada periode ini.
+                                        </td>
+                                    </tr>
+                                @else
+                                    @foreach (($dashboard['top_selling_rows'] ?? []) as $row)
+                                        <tr>
+                                            <td>
+                                                <div class="product-inline">
+                                                    <span class="product-avatar bg-soft-primary">{{ $loop->iteration }}</span>
+                                                    <div>
+                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
+                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ number_format($row['sold_qty'], 0, ',', '.') }} Unit</td>
+                                            <td>Rp {{ number_format($row['gross_revenue_rupiah'], 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge-soft bg-soft-success">
+                                                    <i class="bi bi-bar-chart-line"></i>
+                                                    Live
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="row g-4">
         <div class="col-12">
             <div class="card">

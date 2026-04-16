@@ -62,6 +62,12 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Hutang Karyawan');
             $response->assertSee('Rp 60.000');
             $response->assertSee('Biaya Operasional');
+            $response->assertSee('Barang Paling Laku');
+            $response->assertSee('Supra');
+            $response->assertSee('Vario');
+            $response->assertSee('2 Unit');
+            $response->assertSee('1 Unit');
+            $response->assertSee('Rp 17.000');
         } finally {
             Carbon::setTestNow();
         }
@@ -92,6 +98,23 @@ final class AdminDashboardPageFeatureTest extends TestCase
                 'unit_cost_rupiah' => 20000,
                 'qty' => 1,
                 'line_total_rupiah' => 20000,
+            ],
+        ]);
+
+        DB::table('work_item_store_stock_lines')->insert([
+            [
+                'id' => 'sto1',
+                'work_item_id' => 'wi-1',
+                'product_id' => 'product-1',
+                'qty' => 2,
+                'line_total_rupiah' => 30000,
+            ],
+            [
+                'id' => 'sto2',
+                'work_item_id' => 'wi-2',
+                'product_id' => 'product-2',
+                'qty' => 1,
+                'line_total_rupiah' => 17000,
             ],
         ]);
 

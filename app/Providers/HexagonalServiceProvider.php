@@ -75,6 +75,7 @@ use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseVersionedProductWriterAdapter;
 use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
+use App\Adapters\Out\Reporting\DatabaseDashboardTopSellingProductReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalProfitReportingSourceReaderAdapter;
@@ -177,6 +178,7 @@ use App\Ports\Out\ProductCatalog\ProductDetailReaderPort;
 use App\Ports\Out\ProductCatalog\ProductTableReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
 use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
+use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
 use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
 use App\Ports\Out\Reporting\OperationalProfitReportingSourceReaderPort;
@@ -285,6 +287,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentComponentAllocationWriterPort::class, DatabasePaymentComponentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentComponentAllocationReaderPort::class, DatabasePaymentComponentAllocationReaderAdapter::class);
 
+        $this->app->singleton(DashboardTopSellingProductReaderPort::class, DatabaseDashboardTopSellingProductReaderAdapter::class);
         $this->app->singleton(TransactionReportingSourceReaderPort::class, DatabaseTransactionReportingSourceReaderAdapter::class);
         $this->app->singleton(OperationalExpenseReportingSourceReaderPort::class, DatabaseOperationalExpenseReportingSourceReaderAdapter::class);
         $this->app->singleton(EmployeeDebtReportingSourceReaderPort::class, DatabaseEmployeeDebtReportingSourceReaderAdapter::class);

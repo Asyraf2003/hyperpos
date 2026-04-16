@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 use Illuminate\Support\Facades\Cache;
 
 final class GetAdminDashboardOverviewHandler
@@ -11,6 +12,7 @@ final class GetAdminDashboardOverviewHandler
     public function __construct(
         private readonly GetTransactionReportDatasetHandler $transactionReport,
         private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
+        private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
         private readonly GetInventoryStockValueReportDatasetHandler $inventoryStockValue,
         private readonly GetOperationalProfitSummaryHandler $operationalProfit,
         private readonly GetSupplierPayableReportDatasetHandler $supplierPayable,
@@ -82,6 +84,12 @@ final class GetAdminDashboardOverviewHandler
             $this->transactionCashLedger->handle($period['from'], $period['to'])
         );
 
+        $topSellingRows = $this->topSellingProducts->getTopSellingProducts(
+            $period['from'],
+            $period['to'],
+            5,
+        );
+
         return AdminDashboardOverviewPayload::fromSources(
             $transactionSummary,
             $inventorySummary,
@@ -91,6 +99,7 @@ final class GetAdminDashboardOverviewHandler
             $operationalExpenseSummary,
             $todayCash,
             $monthCash,
+            $topSellingRows,
         );
     }
 }
