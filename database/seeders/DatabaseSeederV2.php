@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Database\Seeders\Product\ProductVolumeSeeder;
+use Database\Seeders\Load\ProductLoadSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeederV2 extends Seeder
@@ -11,7 +11,7 @@ class DatabaseSeederV2 extends Seeder
     {
         $this->call([
             DatabaseSeeder::class,
-            ProductVolumeSeeder::class,
+            ProductLoadSeeder::class,
             SupplierInvoiceAnnualDenseSeeder::class,
         ]);
     }

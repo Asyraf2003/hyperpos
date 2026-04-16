@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders\Product;
+namespace Database\Seeders\Load;
 
 use App\Application\ProductCatalog\UseCases\CreateProductHandler;
 use App\Application\ProductCatalog\UseCases\UpdateProductHandler;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 
-final class ProductVolumeSeeder extends Seeder
+final class ProductLoadSeeder extends Seeder
 {
     public function run(
         CreateProductHandler $createHandler,
@@ -33,7 +33,7 @@ final class ProductVolumeSeeder extends Seeder
             );
 
             if ($created->isFailure()) {
-                Log::warning('ProductVolumeSeeder active clean gagal.', [
+                Log::warning('ProductLoadSeeder active clean gagal.', [
                     'message' => $created->message(),
                     'index' => $i,
                     'kode_barang' => $payload['kodeBarang'],
@@ -59,7 +59,7 @@ final class ProductVolumeSeeder extends Seeder
             );
 
             if ($created->isFailure()) {
-                Log::warning('ProductVolumeSeeder active edited create gagal.', [
+                Log::warning('ProductLoadSeeder active edited create gagal.', [
                     'message' => $created->message(),
                     'index' => $i,
                     'kode_barang' => $createPayload['kodeBarang'],
@@ -70,7 +70,7 @@ final class ProductVolumeSeeder extends Seeder
             $productId = $created->data()['id'] ?? null;
 
             if (! is_string($productId) || trim($productId) === '') {
-                Log::warning('ProductVolumeSeeder active edited tidak mendapat product id.', [
+                Log::warning('ProductLoadSeeder active edited tidak mendapat product id.', [
                     'index' => $i,
                     'data' => $created->data(),
                 ]);
@@ -89,7 +89,7 @@ final class ProductVolumeSeeder extends Seeder
             );
 
             if ($updated->isFailure()) {
-                Log::warning('ProductVolumeSeeder active edited update gagal.', [
+                Log::warning('ProductLoadSeeder active edited update gagal.', [
                     'message' => $updated->message(),
                     'product_id' => $productId,
                     'index' => $i,
