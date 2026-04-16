@@ -12,8 +12,6 @@
                                         Mingguan
                                     @elseif (($filters['period_mode'] ?? 'daily') === 'monthly')
                                         Bulanan
-                                    @elseif (($filters['period_mode'] ?? 'daily') === 'custom')
-                                        Custom
                                     @else
                                         Harian
                                     @endif
@@ -106,7 +104,6 @@
             data-mode-help-daily="{{ $modeHelpDaily ?? 'Menampilkan data tepat pada tanggal ini.' }}"
             data-mode-help-weekly="{{ $modeHelpWeekly ?? 'Sistem mengambil Senin sampai Minggu dari minggu tanggal ini.' }}"
             data-mode-help-monthly="{{ $modeHelpMonthly ?? 'Sistem mengambil seluruh bulan dari tanggal ini.' }}"
-            data-mode-help-custom="{{ $modeHelpCustom ?? 'Pilih tanggal mulai dan tanggal akhir.' }}"
             class="d-grid gap-3"
         >
             <div class="form-group">
@@ -120,7 +117,6 @@
                     <option value="daily" {{ $filters['period_mode'] === 'daily' ? 'selected' : '' }}>Harian</option>
                     <option value="weekly" {{ $filters['period_mode'] === 'weekly' ? 'selected' : '' }}>Mingguan</option>
                     <option value="monthly" {{ $filters['period_mode'] === 'monthly' ? 'selected' : '' }}>Bulanan</option>
-                    <option value="custom" {{ $filters['period_mode'] === 'custom' ? 'selected' : '' }}>Custom</option>
                 </select>
             </div>
 
@@ -133,17 +129,12 @@
                     {{ $modeHelpWeekly ?? 'Sistem mengambil Senin sampai Minggu dari minggu tanggal ini.' }}
                 @elseif (($filters['period_mode'] ?? 'daily') === 'monthly')
                     {{ $modeHelpMonthly ?? 'Sistem mengambil seluruh bulan dari tanggal ini.' }}
-                @elseif (($filters['period_mode'] ?? 'daily') === 'custom')
-                    {{ $modeHelpCustom ?? 'Pilih tanggal mulai dan tanggal akhir.' }}
                 @else
                     {{ $modeHelpDaily ?? 'Menampilkan data tepat pada tanggal ini.' }}
                 @endif
             </div>
 
-            <div
-                class="form-group {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? 'd-none' : '' }}"
-                data-report-reference-group
-            >
+            <div class="form-group" data-report-reference-group>
                 <label for="{{ $formId }}-reference-date" class="form-label">Tanggal Referensi</label>
                 <input
                     type="date"
@@ -154,87 +145,7 @@
                     data-ui-date="single"
                     data-ui-date-placeholder="Pilih tanggal referensi"
                     data-report-reference-input
-                    {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? 'disabled' : '' }}
                     autocomplete="off"
-                >
-            </div>
-
-            <div
-                class="form-group {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'd-none' }}"
-                data-report-range-group
-            >
-                <label class="form-label" for="{{ $formId }}-date-range">Rentang Tanggal</label>
-
-                <div data-report-range-enhanced-wrap class="d-none">
-                    <input
-                        type="text"
-                        id="{{ $formId }}-date-range"
-                        class="form-control"
-                        data-ui-date="range-single"
-                        data-ui-date-placeholder="Pilih rentang tanggal"
-                        data-range-start-name="date_from"
-                        data-range-end-name="date_to"
-                        data-report-range-input
-                        {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'disabled' }}
-                        autocomplete="off"
-                    >
-                </div>
-
-                <div data-report-range-fallback-wrap class="row g-2">
-                    <div class="col-6">
-                        <label
-                            class="form-label small text-muted"
-                            for="{{ $formId }}-date-from-fallback"
-                        >
-                            Dari
-                        </label>
-                        <input
-                            type="date"
-                            id="{{ $formId }}-date-from-fallback"
-                            class="form-control"
-                            data-report-date-fallback-from
-                            value="{{ $filters['date_from'] }}"
-                            {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'disabled' }}
-                            autocomplete="off"
-                        >
-                    </div>
-
-                    <div class="col-6">
-                        <label
-                            class="form-label small text-muted"
-                            for="{{ $formId }}-date-to-fallback"
-                        >
-                            Sampai
-                        </label>
-                        <input
-                            type="date"
-                            id="{{ $formId }}-date-to-fallback"
-                            class="form-control"
-                            data-report-date-fallback-to
-                            value="{{ $filters['date_to'] }}"
-                            {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'disabled' }}
-                            autocomplete="off"
-                        >
-                    </div>
-
-                    <div class="col-12">
-                        <small class="text-muted">Fallback tanggal aktif bila kalender tidak tersedia.</small>
-                    </div>
-                </div>
-
-                <input
-                    type="hidden"
-                    name="date_from"
-                    value="{{ $filters['date_from'] }}"
-                    data-report-hidden-date-from
-                    {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'disabled' }}
-                >
-                <input
-                    type="hidden"
-                    name="date_to"
-                    value="{{ $filters['date_to'] }}"
-                    data-report-hidden-date-to
-                    {{ ($filters['period_mode'] ?? 'daily') === 'custom' ? '' : 'disabled' }}
                 >
             </div>
 
