@@ -46,6 +46,10 @@ final class AdminDashboardOverviewPayload
         return [
             'total_qty_on_hand' => (int) ($inventorySummary['total_qty_on_hand'] ?? 0),
             'total_inventory_value_rupiah' => (int) ($inventorySummary['total_inventory_value_rupiah'] ?? 0),
+            'stock_safe_product_rows' => (int) ($inventorySummary['stock_safe_product_rows'] ?? 0),
+            'stock_low_product_rows' => (int) ($inventorySummary['stock_low_product_rows'] ?? 0),
+            'stock_critical_product_rows' => (int) ($inventorySummary['stock_critical_product_rows'] ?? 0),
+            'stock_unconfigured_product_rows' => (int) ($inventorySummary['stock_unconfigured_product_rows'] ?? 0),
             'daily_cash_in_rupiah' => (int) ($todayCash['total_in_rupiah'] ?? 0),
             'monthly_cash_operational_profit_rupiah' => (int) ($operationalProfitRow['cash_operational_profit_rupiah'] ?? 0),
         ];
