@@ -210,12 +210,10 @@
         box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .12);
     }
 
-    .dashboard-report .admin-avatar-wrap .profile-avatar {
+    .dashboard-report .admin-avatar-wrap img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
-        border-radius: 50%;
     }
 
     .dashboard-report .admin-avatar-placeholder {
@@ -901,10 +899,9 @@
             <div class="card profile-card h-100">
                 <div class="admin-profile-top">
                     <div class="d-flex align-items-center gap-3">
+
                         <div class="admin-avatar-wrap">
-                            <div class="admin-avatar-placeholder" aria-hidden="true">
-                                <i class="bi bi-person-fill"></i>
-                            </div>
+                            <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna">
                         </div>
 
                         <div class="min-w-0">

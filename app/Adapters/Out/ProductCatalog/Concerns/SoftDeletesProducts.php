@@ -27,6 +27,8 @@ trait SoftDeletesProducts
                     'merek',
                     'ukuran',
                     'harga_jual',
+                    'reorder_point_qty',
+                    'critical_threshold_qty',
                 ]);
 
             if ($row === null) {
