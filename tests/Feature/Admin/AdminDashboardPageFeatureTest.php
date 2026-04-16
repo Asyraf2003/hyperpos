@@ -57,6 +57,9 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Stok Kritis');
             $response->assertSee('Belum Diatur');
             $response->assertSee('Prioritas Restok');
+            $response->assertSee('Lihat Detail');
+            $response->assertSee(route('admin.products.show', ['productId' => 'product-2']), false);
+            $response->assertSee(route('admin.products.show', ['productId' => 'product-3']), false);
             $response->assertSee('Vario');
             $response->assertSee('Beat');
             $response->assertSee('Kritis');
