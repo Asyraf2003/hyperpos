@@ -38,7 +38,7 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: minmax(0, 1fr) 72px 156px 44px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px; gap: 16px;"
                             >
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
@@ -58,7 +58,7 @@
 
                                         <div
                                             class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                            style="grid-template-columns: minmax(0, 1fr) 72px 156px 44px;"
+                                            style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
                                         >
                                             <div class="w-100 position-relative">
                                                 <label class="form-label d-xl-none">Produk</label>
@@ -162,7 +162,7 @@
 
                                     <div
                                         class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 72px minmax(0, 1fr) 72px 156px 44px;"
+                                        style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
                                     >
                                         <div class="w-100 position-relative">
                                             <label class="form-label d-xl-none">Produk</label>
