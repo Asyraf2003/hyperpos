@@ -1077,7 +1077,7 @@
     </section>
 
     <section class="row g-4 mb-4">
-        <div class="col-12">
+        <div class="col-12 col-lg-6">
             <div class="card h-100">
                 <div class="panel-card-body">
                     <div class="card-head">
@@ -1137,10 +1137,8 @@
                 </div>
             </div>
         </div>
-    </section>
 
-    <section class="row g-4 mb-4">
-        <div class="col-12">
+        <div class="col-12 col-lg-6">
             <div class="card h-100">
                 <div class="panel-card-body">
                     <div class="card-head">
