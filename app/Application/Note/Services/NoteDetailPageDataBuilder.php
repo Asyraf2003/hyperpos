@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
-use App\Core\Note\WorkItem\WorkItem;
 use App\Ports\Out\Note\NoteReaderPort;
 
 final class NoteDetailPageDataBuilder
@@ -17,6 +16,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
+        private readonly NoteDetailRowMapper $rowMapper,
     ) {
     }
 
@@ -52,10 +52,7 @@ final class NoteDetailPageDataBuilder
                 'total_refunded_rupiah' => $operational['total_refunded_rupiah'],
                 'net_paid_rupiah' => $operational['net_paid_rupiah'],
                 'outstanding_rupiah' => $operational['outstanding_rupiah'],
-                'refund_required_rupiah' => max(
-                    $operational['net_paid_rupiah'] - $operational['grand_total_rupiah'],
-                    0
-                ),
+                'refund_required_rupiah' => max($operational['net_paid_rupiah'] - $operational['grand_total_rupiah'], 0),
                 'payment_status' => $paymentStatus,
                 'can_add_rows' => $operational['is_open'],
                 'can_show_edit_actions' => $operational['is_open'],
@@ -67,46 +64,10 @@ final class NoteDetailPageDataBuilder
                 'correction_notice' => $operational['is_close']
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
                     : null,
-                'rows' => $this->mapRows($note->workItems(), $rowSettlements),
+                'rows' => $this->rowMapper->map($note->workItems(), $rowSettlements),
                 'correction_history' => $this->history->build($note->id()),
             ],
             'productOptions' => $this->products->build(),
         ];
-    }
-
-    /**
-     * @param array<int, WorkItem> $rows
-     * @param array<string, array<string, mixed>> $settlements
-     * @return list<array<string, mixed>>
-     */
-    private function mapRows(array $rows, array $settlements): array
-    {
-        return array_map(
-            function (WorkItem $item) use ($settlements): array {
-                $settlement = $settlements[$item->id()] ?? [
-                    'allocated_rupiah' => 0,
-                    'refunded_rupiah' => 0,
-                    'net_paid_rupiah' => 0,
-                    'outstanding_rupiah' => $item->subtotalRupiah()->amount(),
-                    'settlement_label' => 'hutang',
-                ];
-
-                return [
-                    'id' => $item->id(),
-                    'line_no' => $item->lineNo(),
-                    'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
-                    'transaction_type' => $item->transactionType(),
-                    'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
-                    'status' => $item->status(),
-                    'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
-                    'allocated_rupiah' => $settlement['allocated_rupiah'],
-                    'refunded_rupiah' => $settlement['refunded_rupiah'],
-                    'net_paid_rupiah' => $settlement['net_paid_rupiah'],
-                    'outstanding_rupiah' => $settlement['outstanding_rupiah'],
-                    'settlement_label' => $settlement['settlement_label'],
-                ];
-            },
-            $rows
-        );
     }
 }
