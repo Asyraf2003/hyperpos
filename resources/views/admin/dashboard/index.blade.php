@@ -1012,11 +1012,11 @@
                         <i class="bi bi-repeat"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Laba Operasional Bulan Ini</div>
-                        <div class="stat-value">Rp {{ number_format($dashboard['stats']['monthly_net_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                        <div class="stat-title">Laba Kas Operasional Bulan Ini</div>
+                        <div class="stat-value">Rp {{ number_format($dashboard['stats']['monthly_cash_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-graph-up-arrow"></i>
-                            Ringkasan profit operasional periode berjalan
+                            Ringkasan laba kas operasional periode berjalan
                         </p>
                     </div>
                 </div>
@@ -1457,11 +1457,11 @@
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Gross Revenue Bulan Ini</div>
-                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_gross_revenue_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                            <div class="finance-label">Laba Kas Operasional Bulan Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-flat">
                                 <i class="bi bi-arrow-repeat"></i>
-                                Revenue kotor operasional periode berjalan
+                                Laba kas operasional periode berjalan
                             </p>
                         </div>
 

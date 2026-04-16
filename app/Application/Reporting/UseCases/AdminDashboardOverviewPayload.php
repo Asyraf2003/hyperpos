@@ -45,7 +45,7 @@ final class AdminDashboardOverviewPayload
             'total_qty_on_hand' => (int) ($inventorySummary['total_qty_on_hand'] ?? 0),
             'total_inventory_value_rupiah' => (int) ($inventorySummary['total_inventory_value_rupiah'] ?? 0),
             'daily_cash_in_rupiah' => (int) ($todayCash['total_in_rupiah'] ?? 0),
-            'monthly_net_operational_profit_rupiah' => (int) ($operationalProfitRow['net_operational_profit_rupiah'] ?? 0),
+            'monthly_cash_operational_profit_rupiah' => (int) ($operationalProfitRow['cash_operational_profit_rupiah'] ?? 0),
         ];
     }
 
@@ -54,7 +54,7 @@ final class AdminDashboardOverviewPayload
         return [
             'monthly_cash_in_rupiah' => (int) ($monthCash['total_in_rupiah'] ?? 0),
             'monthly_cash_out_rupiah' => (int) ($monthCash['total_out_rupiah'] ?? 0),
-            'monthly_gross_revenue_rupiah' => (int) ($operationalProfitRow['gross_revenue_rupiah'] ?? 0),
+            'monthly_cash_operational_profit_rupiah' => (int) ($operationalProfitRow['cash_operational_profit_rupiah'] ?? 0),
             'monthly_net_cash_flow_rupiah' => (int) (($monthCash['total_in_rupiah'] ?? 0) - ($monthCash['total_out_rupiah'] ?? 0)),
         ];
     }
