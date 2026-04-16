@@ -56,6 +56,24 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Mulai Perlu Restok');
             $response->assertSee('Stok Kritis');
             $response->assertSee('Belum Diatur');
+            $response->assertSee('Prioritas Restok');
+            $response->assertSee('Vario');
+            $response->assertSee('Beat');
+            $response->assertSee('Kritis');
+            $response->assertSee('Mulai Perlu Restok');
+            $response->assertSeeInOrder([
+                'Prioritas Restok',
+                'Vario',
+                '3 Unit',
+                '4',
+                '3',
+                'Kritis',
+                'Beat',
+                '5 Unit',
+                '5',
+                '2',
+                'Mulai Perlu Restok',
+            ]);
             $response->assertSee('Uang Masuk Hari Ini');
             $response->assertSee('Rp 50.000');
             $response->assertSee('Laba Kas Operasional Bulan Ini');
