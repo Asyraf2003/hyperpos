@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ProductSeeder::class,
+            ProductInventoryThresholdBackfillSeeder::class,
             SupplierSeeder::class,
             EmployeeFinanceBaselineSeeder::class,
             SupplierInvoiceScenarioSeeder::class,
