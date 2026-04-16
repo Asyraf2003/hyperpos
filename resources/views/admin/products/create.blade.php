@@ -158,16 +158,16 @@
 
                                 <div class="col-12">
                                     <div class="border rounded p-3 bg-light-subtle mb-4">
-                                        <div class="fw-semibold mb-1">Threshold Stok</div>
+                                        <div class="fw-semibold mb-1">Aturan Batas Stok</div>
                                         <small class="text-muted d-block">
-                                            Opsional. Isi reorder point dan batas kritis secara berpasangan. Bila belum ingin dipakai, kosongkan keduanya.
+                                            Isi dua angka ini bila produk ingin dipantau stoknya. Reorder Point adalah batas saat stok mulai perlu dibeli lagi. Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok. Kosongkan keduanya bila belum ingin dipakai.
                                         </small>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-lg-6">
                                     <div class="form-group mb-4">
-                                        <label for="reorder_point_qty" class="form-label">Reorder Point Qty</label>
+                                        <label for="reorder_point_qty" class="form-label">Mulai Perlu Restok (Reorder Point)</label>
                                         <input
                                             type="number"
                                             id="reorder_point_qty"
@@ -188,7 +188,7 @@
 
                                 <div class="col-12 col-lg-6">
                                     <div class="form-group mb-4">
-                                        <label for="critical_threshold_qty" class="form-label">Critical Threshold Qty</label>
+                                        <label for="critical_threshold_qty" class="form-label">Batas Stok Kritis</label>
                                         <input
                                             type="number"
                                             id="critical_threshold_qty"
