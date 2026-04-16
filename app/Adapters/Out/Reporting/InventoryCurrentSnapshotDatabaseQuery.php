@@ -32,6 +32,8 @@ final class InventoryCurrentSnapshotDatabaseQuery
             'products.nama_barang',
             'products.merek',
             'products.ukuran',
+            'products.reorder_point_qty',
+            'products.critical_threshold_qty',
             DB::raw('COALESCE(product_inventory.qty_on_hand, 0) as current_qty_on_hand'),
             DB::raw('COALESCE(product_inventory_costing.avg_cost_rupiah, 0) as current_avg_cost_rupiah'),
             DB::raw('COALESCE(product_inventory_costing.inventory_value_rupiah, 0) as current_inventory_value_rupiah'),
