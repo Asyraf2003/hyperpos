@@ -46,14 +46,14 @@ final class CashierNoteDetailAccessGuardFeatureTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_cashier_cannot_access_closed_note_even_if_today(): void
+    public function test_cashier_can_access_closed_note_if_still_within_date_window(): void
     {
         $user = $this->seedKasir();
         $this->seedMinimalNote('note-4', date('Y-m-d'), 'closed');
 
         $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-4']))
-            ->assertForbidden();
+            ->assertOk();
     }
 
     private function seedKasir(): User

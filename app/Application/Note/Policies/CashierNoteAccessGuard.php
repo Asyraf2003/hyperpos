@@ -15,15 +15,15 @@ final class CashierNoteAccessGuard
         if (! $this->isWithinCashierDateWindow($note, $today)) {
             throw new DomainException('Kasir hanya boleh mengakses note untuk hari ini dan kemarin.');
         }
-
-        if ($note->isClosed()) {
-            throw new DomainException('Kasir tidak boleh membuka detail note yang sudah ditutup.');
-        }
     }
 
     public function assertCanMutateOpenNote(Note $note, DateTimeImmutable $today): void
     {
         $this->assertCanView($note, $today);
+
+        if ($note->isClosed()) {
+            throw new DomainException('Kasir tidak boleh memproses note yang sudah ditutup lewat route ini.');
+        }
     }
 
     public function assertCanAccess(Note $note, DateTimeImmutable $today): void

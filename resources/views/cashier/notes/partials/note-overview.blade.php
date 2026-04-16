@@ -55,7 +55,9 @@
                 </div>
 
                 <div class="border rounded p-3 mt-3">
-                    <div class="small text-muted">Nilai Nota Saat Ini</div>
+                    <div class="small text-muted">
+                        {{ $note['is_closed'] ? 'Detail Close' : 'Detail Open' }}
+                    </div>
                     <div class="fs-4 fw-bold">{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</div>
                 </div>
 
@@ -93,7 +95,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <span class="text-muted">Sudah Dibayar</span>
+                    <span class="text-muted">Sudah Dibayar (Net Paid)</span>
                     <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
                 </div>
 
