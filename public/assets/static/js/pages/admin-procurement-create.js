@@ -522,7 +522,14 @@
 
     const syncActiveChoice = () => {
       resultButtons().forEach((button, index) => {
-        button.classList.toggle("active", index === activeChoiceIndex);
+        const isActive = index === activeChoiceIndex;
+        button.classList.toggle("active", isActive);
+
+        const meta = button.querySelector("small");
+        if (meta) {
+          meta.classList.toggle("text-white", isActive);
+          meta.classList.toggle("text-muted", !isActive);
+        }
       });
     };
 
@@ -680,7 +687,14 @@
 
     const syncActiveChoice = () => {
       choiceButtons().forEach((button, index) => {
-        button.classList.toggle("active", index === activeChoiceIndex);
+        const isActive = index === activeChoiceIndex;
+        button.classList.toggle("active", isActive);
+
+        const meta = button.querySelector("small");
+        if (meta) {
+          meta.classList.toggle("text-white", isActive);
+          meta.classList.toggle("text-muted", !isActive);
+        }
       });
     };
 
