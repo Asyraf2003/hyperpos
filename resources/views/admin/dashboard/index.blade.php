@@ -949,8 +949,8 @@
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card stat-card h-100">
                 <div class="stat-card-body">
-                    <div class="stat-icon bg-soft-primary">
-                        <i class="bi bi-box-seam"></i>
+                    <div class="stats-icon blue mb-2">
+                        <i class="bi-box-seam"></i>
                     </div>
                     <div>
                         <div class="stat-title">Total Qty On Hand</div>
@@ -967,8 +967,8 @@
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card stat-card h-100">
                 <div class="stat-card-body">
-                    <div class="stat-icon bg-soft-success">
-                        <i class="bi bi-buildings"></i>
+                    <div class="stats-icon red mb-2">
+                        <i class="bi-buildings"></i>
                     </div>
                     <div>
                         <div class="stat-title">Nilai Persediaan</div>
@@ -985,14 +985,14 @@
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card stat-card h-100">
                 <div class="stat-card-body">
-                    <div class="stat-icon bg-soft-warning">
-                        <i class="bi bi-wallet2"></i>
+                    <div class="stats-icon green mb-2">
+                        <i class="bi-wallet2"></i>
                     </div>
                     <div>
                         <div class="stat-title">Uang Masuk Hari Ini</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['daily_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
-                            <i class="bi bi-wallet2"></i>
+                            <i class="bi-wallet2"></i>
                             Berdasarkan arus kas transaksi hari ini
                         </p>
                     </div>
@@ -1003,15 +1003,15 @@
         <div class="col-12 col-md-6 col-xl-3">
             <div class="card stat-card h-100">
                 <div class="stat-card-body">
-                    <div class="stat-icon bg-soft-info">
-                        <i class="bi bi-repeat"></i>
+                    <div class="stats-icon blue mb-2">
+                        <i class="bi-repeat"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Laba Kas Operasional Bulan Ini</div>
+                        <div class="stat-title">Laba Bulan Ini</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['monthly_cash_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-graph-up-arrow"></i>
-                            Ringkasan laba kas operasional periode berjalan
+                            Ringkasan laba periode berjalan
                         </p>
                     </div>
                 </div>
@@ -1261,7 +1261,7 @@
                                         <div class="inventory-title">Stok Kritis</div>
                                         <p class="inventory-meta">Produk yang sudah berada di batas stok kritis atau lebih rendah</p>
                                     </div>
-                                    <span class="product-avatar bg-soft-danger"><i class="bi bi-exclamation-triangle"></i></span>
+                                    <span class="product-avatar bg-2"><i class="bi bi-exclamation-triangle"></i></span>
                                 </div>
                                 <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_critical_product_rows'] ?? 0, 0, ',', '.') }}</div>
                                 <p class="inventory-meta mb-0">Produk</p>
