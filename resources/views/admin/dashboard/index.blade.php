@@ -1142,6 +1142,83 @@
         </div>
     </section>
 
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Status Stok Saat Ini</h5>
+                            <p class="section-subtitle">Klasifikasi stok berdasarkan batas restok dan batas stok kritis pada master produk.</p>
+                        </div>
+                        <span class="badge-soft bg-soft-success">
+                            <i class="bi bi-box-seam"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="inventory-top">
+                                    <div>
+                                        <div class="inventory-title">Stok Aman</div>
+                                        <p class="inventory-meta">Produk yang masih di atas batas mulai restok</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-success"><i class="bi bi-check2-circle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_safe_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="inventory-top">
+                                    <div>
+                                        <div class="inventory-title">Mulai Perlu Restok</div>
+                                        <p class="inventory-meta">Produk yang sudah menyentuh batas reorder point</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-warning"><i class="bi bi-exclamation-circle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_low_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="inventory-top">
+                                    <div>
+                                        <div class="inventory-title">Stok Kritis</div>
+                                        <p class="inventory-meta">Produk yang sudah berada di batas stok kritis atau lebih rendah</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-danger"><i class="bi bi-exclamation-triangle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_critical_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="inventory-top">
+                                    <div>
+                                        <div class="inventory-title">Belum Diatur</div>
+                                        <p class="inventory-meta">Produk yang belum punya batas mulai restok dan batas stok kritis</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-info"><i class="bi bi-sliders"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_unconfigured_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="row g-4">
         <div class="col-12">
             <div class="card">
@@ -1238,7 +1315,7 @@
                     </div>
 
                     <div class="helper-note mt-4">
-                        Dashboard v1 ini sudah mulai terhubung ke report backend untuk ringkasan utama. Panel analitik lanjutan seperti top sales, margin, dan klasifikasi stok masih dipertahankan sebagai UI-only sampai kontraknya benar-benar final.
+                        Dashboard v1 ini sudah terhubung ke report backend untuk ringkasan utama, top sales, dan klasifikasi stok dasar. Panel lanjutan seperti margin, grafik, dan slow moving masih dihidupkan bertahap setelah kontraknya final.
                     </div>
                 </div>
             </div>
