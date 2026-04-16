@@ -1120,6 +1120,12 @@
                                                     <div>
                                                         <div class="product-name">{{ $row['nama_barang'] }}</div>
                                                         <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
+                                                        <a
+                                                            href="{{ route('admin.products.show', ['productId' => $row['product_id']]) }}"
+                                                            class="btn btn-sm btn-light-primary mt-2"
+                                                        >
+                                                            Lihat Detail
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </td>
