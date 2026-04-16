@@ -29,9 +29,9 @@ final class AdminDashboardOverviewPayloadBuilder
             $this->transactionReport->handle($period['from'], $period['to'])
         );
 
-        $inventorySummary = ReportingResultDataExtractor::summary(
-            $this->inventoryStockValue->handle($period['from'], $period['to'])
-        );
+        $inventoryResult = $this->inventoryStockValue->handle($period['from'], $period['to']);
+        $inventorySummary = ReportingResultDataExtractor::summary($inventoryResult);
+        $inventorySnapshotRows = ReportingResultDataExtractor::snapshotRows($inventoryResult);
 
         $operationalProfitRow = ReportingResultDataExtractor::row(
             $this->operationalProfit->handle($period['from'], $period['to'])
@@ -73,6 +73,7 @@ final class AdminDashboardOverviewPayloadBuilder
             $todayCash,
             $monthCash,
             $topSellingRows,
+            DashboardRestockPriorityRows::fromSnapshotRows($inventorySnapshotRows, 5),
         );
     }
 }

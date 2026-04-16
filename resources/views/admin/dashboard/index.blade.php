@@ -1219,6 +1219,73 @@
         </div>
     </section>
 
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Prioritas Restok</h5>
+                            <p class="section-subtitle">Produk yang perlu diperhatikan lebih dulu berdasarkan batas mulai restok dan batas stok kritis.</p>
+                        </div>
+                        <span class="badge-soft bg-soft-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Qty Saat Ini</th>
+                                    <th>Mulai Restok</th>
+                                    <th>Batas Kritis</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($dashboard['restock_priority_rows'] ?? []) === 0)
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            Belum ada produk yang masuk prioritas restok pada snapshot saat ini.
+                                        </td>
+                                    </tr>
+                                @else
+                                    @foreach (($dashboard['restock_priority_rows'] ?? []) as $row)
+                                        <tr>
+                                            <td>
+                                                <div class="product-inline">
+                                                    <span class="product-avatar {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
+                                                        <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-triangle' : 'bi-arrow-repeat' }}"></i>
+                                                    </span>
+                                                    <div>
+                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
+                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ number_format($row['current_qty_on_hand'] ?? 0, 0, ',', '.') }} Unit</td>
+                                            <td>{{ number_format($row['reorder_point_qty'] ?? 0, 0, ',', '.') }}</td>
+                                            <td>{{ number_format($row['critical_threshold_qty'] ?? 0, 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge-soft {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
+                                                    <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-octagon' : 'bi-arrow-repeat' }}"></i>
+                                                    {{ $row['status_label'] ?? '-' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="row g-4">
         <div class="col-12">
             <div class="card">

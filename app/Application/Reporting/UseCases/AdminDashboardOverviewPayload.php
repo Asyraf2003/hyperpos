@@ -16,12 +16,14 @@ final class AdminDashboardOverviewPayload
         array $todayCash,
         array $monthCash,
         array $topSellingRows,
+        array $restockPriorityRows,
     ): array {
         return [
             'hero' => self::hero($transactionSummary),
             'stats' => self::stats($inventorySummary, $todayCash, $operationalProfitRow),
             'finance' => self::finance($monthCash, $operationalProfitRow),
             'top_selling_rows' => self::topSellingRows($topSellingRows),
+            'restock_priority_rows' => $restockPriorityRows,
             'position' => self::position(
                 $inventorySummary,
                 $transactionSummary,

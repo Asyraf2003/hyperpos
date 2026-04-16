@@ -21,6 +21,11 @@ final class ReportingResultDataExtractor
         return self::section($result, 'rows');
     }
 
+    public static function snapshotRows(object $result): array
+    {
+        return self::section($result, 'snapshot_rows');
+    }
+
     private static function section(object $result, string $key): array
     {
         $data = method_exists($result, 'data') ? $result->data() : null;
