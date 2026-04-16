@@ -446,7 +446,7 @@ Fokus:
 - bahan uji pagination/report dan demo operasional
 
 Deliverable closure:
-- `DatabaseSeederV2` untuk stress/demo
+- `DatabaseLoadSeeder` untuk stress/demo
 - baseline tetap ringan
 - dense tetap deterministik
 

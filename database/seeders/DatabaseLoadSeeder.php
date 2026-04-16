@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Database\Seeders\Load\ProductLoadSeeder;
 use Illuminate\Database\Seeder;
 
-class DatabaseSeederV2 extends Seeder
+class DatabaseLoadSeeder extends Seeder
 {
     public function run(): void
     {
