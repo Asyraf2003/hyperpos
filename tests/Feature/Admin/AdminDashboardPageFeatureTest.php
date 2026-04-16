@@ -51,6 +51,11 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('21 Unit');
             $response->assertSee('Nilai Persediaan');
             $response->assertSee('Rp 211.000');
+            $response->assertSee('Status Stok Saat Ini');
+            $response->assertSee('Stok Aman');
+            $response->assertSee('Mulai Perlu Restok');
+            $response->assertSee('Stok Kritis');
+            $response->assertSee('Belum Diatur');
             $response->assertSee('Uang Masuk Hari Ini');
             $response->assertSee('Rp 50.000');
             $response->assertSee('Laba Kas Operasional Bulan Ini');
@@ -68,6 +73,16 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('2 Unit');
             $response->assertSee('1 Unit');
             $response->assertSee('Rp 17.000');
+            $response->assertSeeInOrder([
+                'Stok Aman',
+                '1',
+                'Mulai Perlu Restok',
+                '1',
+                'Stok Kritis',
+                '1',
+                'Belum Diatur',
+                '1',
+            ]);
         } finally {
             Carbon::setTestNow();
         }
@@ -77,10 +92,10 @@ final class AdminDashboardPageFeatureTest extends TestCase
     {
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
         $this->seedEmployee('employee-1', 'Montir A');
-        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
-        $this->seedProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000);
-        $this->seedProduct('product-3', 'KB-003', 'Beat', 'Federal', 80, 16000);
-        $this->seedProduct('product-4', 'KB-004', 'Scoopy', 'Federal', 85, 18000);
+        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000, 5, 2);
+        $this->seedProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000, 4, 3);
+        $this->seedProduct('product-3', 'KB-003', 'Beat', 'Federal', 80, 16000, 5, 2);
+        $this->seedProduct('product-4', 'KB-004', 'Scoopy', 'Federal', 85, 18000, null, null);
 
         $this->seedNote('note-1', 'Budi', '2030-01-07', 100000);
         $this->seedNote('note-2', 'Siti', '2030-01-09', 50000);
@@ -329,6 +344,8 @@ final class AdminDashboardPageFeatureTest extends TestCase
         string $merek,
         ?int $ukuran,
         int $hargaJual,
+        ?int $reorderPointQty,
+        ?int $criticalThresholdQty,
     ): void {
         DB::table('products')->insert([
             'id' => $id,
@@ -339,6 +356,8 @@ final class AdminDashboardPageFeatureTest extends TestCase
             'merek_normalized' => mb_strtolower(trim($merek)),
             'ukuran' => $ukuran,
             'harga_jual' => $hargaJual,
+            'reorder_point_qty' => $reorderPointQty,
+            'critical_threshold_qty' => $criticalThresholdQty,
             'deleted_at' => null,
             'deleted_by_actor_id' => null,
             'delete_reason' => null,
