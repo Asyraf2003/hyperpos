@@ -24,6 +24,8 @@ final class ProductScenarioRecreatedSeeder extends Seeder
                 merek: $item['original']['brand'],
                 ukuran: $item['original']['size'],
                 hargaJual: $item['original']['price'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($original->isFailure()) {
@@ -61,6 +63,8 @@ final class ProductScenarioRecreatedSeeder extends Seeder
                 merek: $item['replacement']['brand'],
                 ukuran: $item['replacement']['size'],
                 hargaJual: $item['replacement']['price'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($replacement->isFailure()) {

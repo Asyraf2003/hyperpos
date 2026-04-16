@@ -24,6 +24,8 @@ final class ProductScenarioSoftDeletedSeeder extends Seeder
                 merek: $item['create']['brand'],
                 ukuran: $item['create']['size'],
                 hargaJual: $item['create']['price'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($created->isFailure()) {

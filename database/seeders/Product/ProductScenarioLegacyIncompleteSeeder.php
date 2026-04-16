@@ -48,6 +48,8 @@ final class ProductScenarioLegacyIncompleteSeeder extends Seeder
                 merek: $item['update']['brand'],
                 ukuran: $item['update']['size'],
                 hargaJual: $item['update']['price'],
+                reorderPointQty: null,
+                criticalThresholdQty: null,
             );
 
             if ($updated->isFailure()) {
