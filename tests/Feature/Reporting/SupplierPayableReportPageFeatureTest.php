@@ -61,7 +61,7 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.supplier_payable.index', [
                 'period_mode' => 'monthly',
-                'reference_date' => '2030-01-01',
+                'reference_date' => '2030-01-31',
             ])
         );
 
