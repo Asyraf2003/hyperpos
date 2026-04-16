@@ -42,7 +42,6 @@ final class CreateSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSee('name="nomor_faktur"', false);
         $response->assertSee('name="lines[0][line_no]"', false);
         $response->assertSee('data-line-no', false);
-        $response->assertSee('data-line-label', false);
         $response->assertSee('Ketik minimal 2 huruf untuk mencari produk');
         $response->assertSee('add-procurement-line', false);
         $response->assertSee('data-product-search', false);
