@@ -43,7 +43,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         $this->seedSupplierReceiptLine('receipt-line-3', 'receipt-3', 'invoice-line-3', 5);
 
         $result = app(GetSupplierPayableSummaryHandler::class)
-            ->handle('2026-03-15', '2026-03-16');
+            ->handle('2026-03-15', '2026-03-16', '2026-03-16');
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertTrue($result->isSuccess());
@@ -64,6 +64,8 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
                 'outstanding_rupiah' => 30000,
                 'receipt_count' => 2,
                 'total_received_qty' => 3,
+                'due_status' => 'not_due',
+                'due_status_label' => 'Belum Jatuh Tempo',
             ],
             [
                 'supplier_invoice_id' => 'invoice-2',
@@ -75,6 +77,8 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
                 'outstanding_rupiah' => 0,
                 'receipt_count' => 1,
                 'total_received_qty' => 5,
+                'due_status' => 'settled',
+                'due_status_label' => 'Lunas',
             ],
         ], $data['rows']);
     }
@@ -130,7 +134,6 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
             'grand_total_rupiah' => $grandTotalRupiah,
         ]);
     }
-
 
     private function seedSupplierInvoiceLine(
         string $id,

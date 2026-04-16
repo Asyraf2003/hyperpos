@@ -18,14 +18,17 @@ final class GetSupplierPayableSummaryHandler
     ) {
     }
 
-    public function handle(string $fromShipmentDate, string $toShipmentDate): Result
-    {
+    public function handle(
+        string $fromShipmentDate,
+        string $toShipmentDate,
+        string $referenceDate,
+    ): Result {
         $rawRows = $this->sourceReader->getSupplierPayableSummaryRows(
             $fromShipmentDate,
             $toShipmentDate,
         );
 
-        $rows = $this->builder->build($rawRows);
+        $rows = $this->builder->build($rawRows, $referenceDate);
 
         $expected = $this->sourceReader->getSupplierPayableSummaryReconciliation(
             $fromShipmentDate,

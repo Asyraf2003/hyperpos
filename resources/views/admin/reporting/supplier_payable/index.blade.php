@@ -11,7 +11,8 @@
     'resetUrl' => route('admin.reports.supplier_payable.index'),
     'rangeLabelText' => 'Rentang pengiriman aktif',
     'basisDateLabel' => 'Tanggal pengiriman invoice',
-    'basisDateNote' => 'Data invoice masuk dihitung dari tanggal pengiriman. Status jatuh tempo dievaluasi terhadap tanggal referensi.',
+    'basisDateNote' => 'Data invoice masuk dihitung dari tanggal pengiriman.',
+    'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . ($filters['reference_date'] ?? '-') . '.',
 ])
 
 <div class="row g-3 mb-4">
@@ -54,8 +55,8 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Open</div>
-                <div class="fs-5 fw-bold">{{ number_format($summary['open_rows'] ?? 0, 0, ',', '.') }}</div>
+                <div class="text-muted small">Belum Jatuh Tempo</div>
+                <div class="fs-5 fw-bold">{{ number_format($summary['not_due_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
@@ -63,8 +64,44 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Settled</div>
-                <div class="fs-5 fw-bold">{{ number_format($summary['settled_rows'] ?? 0, 0, ',', '.') }}</div>
+                <div class="text-muted small">Jatuh Tempo Hari Ini</div>
+                <div class="fs-5 fw-bold">{{ number_format($summary['due_today_rows'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-muted small">Lewat Jatuh Tempo</div>
+                <div class="fs-5 fw-bold text-danger">{{ number_format($summary['overdue_rows'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-muted small">Outstanding Overdue</div>
+                <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['overdue_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-muted small">Open</div>
+                <div class="fs-5 fw-bold">{{ number_format($summary['open_rows'] ?? 0, 0, ',', '.') }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="text-muted small">Lunas</div>
+                <div class="fs-5 fw-bold text-success">{{ number_format($summary['settled_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
@@ -150,6 +187,7 @@
                                 <th>Supplier ID</th>
                                 <th>Shipment</th>
                                 <th>Due Date</th>
+                                <th>Status</th>
                                 <th class="text-end">Grand Total</th>
                                 <th class="text-end">Dibayar</th>
                                 <th class="text-end">Outstanding</th>
@@ -162,13 +200,24 @@
                                     <td>{{ $row['supplier_id'] }}</td>
                                     <td>{{ $row['shipment_date'] }}</td>
                                     <td>{{ $row['due_date'] }}</td>
+                                    <td>
+                                        @if (($row['due_status'] ?? '') === 'settled')
+                                            <span class="badge bg-success">{{ $row['due_status_label'] }}</span>
+                                        @elseif (($row['due_status'] ?? '') === 'overdue')
+                                            <span class="badge bg-danger">{{ $row['due_status_label'] }}</span>
+                                        @elseif (($row['due_status'] ?? '') === 'due_today')
+                                            <span class="badge bg-warning text-dark">{{ $row['due_status_label'] }}</span>
+                                        @else
+                                            <span class="badge bg-primary">{{ $row['due_status_label'] }}</span>
+                                        @endif
+                                    </td>
                                     <td class="text-end">Rp {{ number_format($row['grand_total_rupiah'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['total_paid_rupiah'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">Belum ada invoice pada periode ini.</td>
+                                    <td colspan="8" class="text-center text-muted">Belum ada invoice pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

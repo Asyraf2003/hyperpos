@@ -28,29 +28,35 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_access_supplier_payable_report_page_and_see_sidebar_routes(): void
+    public function test_admin_can_access_supplier_payable_report_page_and_see_due_status_buckets(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 50000);
         $this->seedSupplier('supplier-1', 'PT Sumber Makmur');
         $this->seedSupplier('supplier-2', 'PT Sentosa Jaya');
 
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2030-01-07', '2030-02-07', 100000);
-        $this->seedSupplierInvoice('invoice-2', 'supplier-2', '2030-01-09', '2030-02-09', 50000);
+        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2030-01-07', '2030-01-20', 100000);
+        $this->seedSupplierInvoice('invoice-2', 'supplier-2', '2030-01-09', '2030-01-31', 50000);
+        $this->seedSupplierInvoice('invoice-3', 'supplier-1', '2030-01-11', '2030-02-05', 20000);
+        $this->seedSupplierInvoice('invoice-4', 'supplier-2', '2030-01-12', '2030-01-15', 30000);
 
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 100000, 50000);
         $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-2', 'product-1', 5, 50000, 10000);
+        $this->seedSupplierInvoiceLine('invoice-line-3', 'invoice-3', 'product-1', 2, 20000, 10000);
+        $this->seedSupplierInvoiceLine('invoice-line-4', 'invoice-4', 'product-1', 3, 30000, 10000);
 
-        $this->seedSupplierPayment('payment-1', 'invoice-1', 60000, '2030-01-07', 'pending');
-        $this->seedSupplierPayment('payment-2', 'invoice-1', 10000, '2030-01-10', 'uploaded');
-        $this->seedSupplierPayment('payment-3', 'invoice-2', 50000, '2030-01-09', 'pending');
+        $this->seedSupplierPayment('payment-1', 'invoice-1', 70000, '2030-01-07', 'pending');
+        $this->seedSupplierPayment('payment-2', 'invoice-2', 40000, '2030-01-10', 'uploaded');
+        $this->seedSupplierPayment('payment-3', 'invoice-4', 30000, '2030-01-12', 'pending');
 
         $this->seedSupplierReceipt('receipt-1', 'invoice-1', '2030-01-07');
-        $this->seedSupplierReceipt('receipt-2', 'invoice-1', '2030-01-08');
-        $this->seedSupplierReceipt('receipt-3', 'invoice-2', '2030-01-09');
+        $this->seedSupplierReceipt('receipt-2', 'invoice-2', '2030-01-09');
+        $this->seedSupplierReceipt('receipt-3', 'invoice-3', '2030-01-11');
+        $this->seedSupplierReceipt('receipt-4', 'invoice-4', '2030-01-12');
 
         $this->seedSupplierReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-1', 2);
-        $this->seedSupplierReceiptLine('receipt-line-2', 'receipt-2', 'invoice-line-1', 1);
-        $this->seedSupplierReceiptLine('receipt-line-3', 'receipt-3', 'invoice-line-2', 5);
+        $this->seedSupplierReceiptLine('receipt-line-2', 'receipt-2', 'invoice-line-2', 5);
+        $this->seedSupplierReceiptLine('receipt-line-3', 'receipt-3', 'invoice-line-3', 2);
+        $this->seedSupplierReceiptLine('receipt-line-4', 'receipt-4', 'invoice-line-4', 3);
 
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.supplier_payable.index', [
@@ -64,13 +70,15 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertSee('Hutang Supplier');
         $response->assertSee('supplier-payable-report-filter-form', false);
         $response->assertSee('2030-01-01 s/d 2030-01-31');
-        $response->assertSee('Rp 150.000');
-        $response->assertSee('Rp 120.000');
+        $response->assertSee('Status jatuh tempo dievaluasi terhadap tanggal referensi 2030-01-31.');
+        $response->assertSee('Rp 200.000');
+        $response->assertSee('Rp 140.000');
+        $response->assertSee('Rp 60.000');
+        $response->assertSee('Belum Jatuh Tempo');
+        $response->assertSee('Jatuh Tempo Hari Ini');
+        $response->assertSee('Lewat Jatuh Tempo');
+        $response->assertSee('Lunas');
         $response->assertSee('Rp 30.000');
-        $response->assertSee('invoice-1');
-        $response->assertSee('invoice-2');
-        $response->assertSee('supplier-1');
-        $response->assertSee('supplier-2');
         $response->assertSee(route('admin.reports.transaction_cash_ledger.index'), false);
         $response->assertSee(route('admin.reports.employee_debt.index'), false);
         $response->assertSee(route('admin.reports.operational_profit.index'), false);

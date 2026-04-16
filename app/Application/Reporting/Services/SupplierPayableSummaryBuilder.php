@@ -8,36 +8,34 @@ use App\Application\Reporting\DTO\SupplierPayableSummaryRow;
 
 final class SupplierPayableSummaryBuilder
 {
-    /**
-     * @param list<array{
-     *   supplier_invoice_id:string,
-     *   supplier_id:string,
-     *   shipment_date:string,
-     *   due_date:string,
-     *   grand_total_rupiah:int,
-     *   total_paid_rupiah:int,
-     *   receipt_count:int,
-     *   total_received_qty:int
-     * }> $rows
-     * @return list<SupplierPayableSummaryRow>
-     */
-    public function build(array $rows): array
+    public function __construct(
+        private readonly SupplierPayableDueStatusResolver $statusResolver,
+    ) {
+    }
+
+    public function build(array $rows, string $referenceDate): array
     {
-        return array_map(
-            static function (array $row): SupplierPayableSummaryRow {
-                return new SupplierPayableSummaryRow(
-                    $row['supplier_invoice_id'],
-                    $row['supplier_id'],
-                    $row['shipment_date'],
-                    $row['due_date'],
-                    $row['grand_total_rupiah'],
-                    $row['total_paid_rupiah'],
-                    $row['grand_total_rupiah'] - $row['total_paid_rupiah'],
-                    $row['receipt_count'],
-                    $row['total_received_qty'],
-                );
-            },
-            $rows,
-        );
+        return array_map(function (array $row) use ($referenceDate): SupplierPayableSummaryRow {
+            $outstanding = $row['grand_total_rupiah'] - $row['total_paid_rupiah'];
+            $status = $this->statusResolver->resolve(
+                $row['due_date'],
+                $outstanding,
+                $referenceDate,
+            );
+
+            return new SupplierPayableSummaryRow(
+                $row['supplier_invoice_id'],
+                $row['supplier_id'],
+                $row['shipment_date'],
+                $row['due_date'],
+                $row['grand_total_rupiah'],
+                $row['total_paid_rupiah'],
+                $outstanding,
+                $row['receipt_count'],
+                $row['total_received_qty'],
+                $status['due_status'],
+                $status['due_status_label'],
+            );
+        }, $rows);
     }
 }

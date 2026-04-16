@@ -16,67 +16,23 @@ final class SupplierPayableSummaryRow
         private readonly int $outstandingRupiah,
         private readonly int $receiptCount,
         private readonly int $totalReceivedQty,
+        private readonly string $dueStatus,
+        private readonly string $dueStatusLabel,
     ) {
     }
 
-    public function supplierInvoiceId(): string
-    {
-        return $this->supplierInvoiceId;
-    }
+    public function supplierInvoiceId(): string { return $this->supplierInvoiceId; }
+    public function supplierId(): string { return $this->supplierId; }
+    public function shipmentDate(): string { return $this->shipmentDate; }
+    public function dueDate(): string { return $this->dueDate; }
+    public function grandTotalRupiah(): int { return $this->grandTotalRupiah; }
+    public function totalPaidRupiah(): int { return $this->totalPaidRupiah; }
+    public function outstandingRupiah(): int { return $this->outstandingRupiah; }
+    public function receiptCount(): int { return $this->receiptCount; }
+    public function totalReceivedQty(): int { return $this->totalReceivedQty; }
+    public function dueStatus(): string { return $this->dueStatus; }
+    public function dueStatusLabel(): string { return $this->dueStatusLabel; }
 
-    public function supplierId(): string
-    {
-        return $this->supplierId;
-    }
-
-    public function shipmentDate(): string
-    {
-        return $this->shipmentDate;
-    }
-
-    public function dueDate(): string
-    {
-        return $this->dueDate;
-    }
-
-    public function grandTotalRupiah(): int
-    {
-        return $this->grandTotalRupiah;
-    }
-
-    public function totalPaidRupiah(): int
-    {
-        return $this->totalPaidRupiah;
-    }
-
-    public function outstandingRupiah(): int
-    {
-        return $this->outstandingRupiah;
-    }
-
-    public function receiptCount(): int
-    {
-        return $this->receiptCount;
-    }
-
-    public function totalReceivedQty(): int
-    {
-        return $this->totalReceivedQty;
-    }
-
-    /**
-     * @return array{
-     *   supplier_invoice_id:string,
-     *   supplier_id:string,
-     *   shipment_date:string,
-     *   due_date:string,
-     *   grand_total_rupiah:int,
-     *   total_paid_rupiah:int,
-     *   outstanding_rupiah:int,
-     *   receipt_count:int,
-     *   total_received_qty:int
-     * }
-     */
     public function toArray(): array
     {
         return [
@@ -89,6 +45,8 @@ final class SupplierPayableSummaryRow
             'outstanding_rupiah' => $this->outstandingRupiah(),
             'receipt_count' => $this->receiptCount(),
             'total_received_qty' => $this->totalReceivedQty(),
+            'due_status' => $this->dueStatus(),
+            'due_status_label' => $this->dueStatusLabel(),
         ];
     }
 }

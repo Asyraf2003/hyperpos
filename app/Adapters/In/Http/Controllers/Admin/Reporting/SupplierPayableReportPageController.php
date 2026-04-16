@@ -17,7 +17,11 @@ final class SupplierPayableReportPageController extends Controller
         GetSupplierPayableReportDatasetHandler $useCase,
     ): View {
         $query = SupplierPayableReportPageQuery::fromValidated($request->validated());
-        $result = $useCase->handle($query->fromShipmentDate(), $query->toShipmentDate());
+        $result = $useCase->handle(
+            $query->fromShipmentDate(),
+            $query->toShipmentDate(),
+            $query->referenceDate(),
+        );
         $payload = is_array($result->data()) ? $result->data() : [];
 
         return view('admin.reporting.supplier_payable.index', [

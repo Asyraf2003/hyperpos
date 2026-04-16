@@ -10,16 +10,35 @@ final class SupplierPayableReportSummaryBuilder
     {
         $openRows = 0;
         $settledRows = 0;
+        $notDueRows = 0;
+        $dueTodayRows = 0;
+        $overdueRows = 0;
+        $overdueOutstanding = 0;
 
         foreach ($rows as $row) {
             $outstanding = (int) ($row['outstanding_rupiah'] ?? 0);
+            $dueStatus = (string) ($row['due_status'] ?? '');
 
             if ($outstanding > 0) {
                 $openRows++;
+            } else {
+                $settledRows++;
+            }
+
+            if ($dueStatus === 'not_due') {
+                $notDueRows++;
                 continue;
             }
 
-            $settledRows++;
+            if ($dueStatus === 'due_today') {
+                $dueTodayRows++;
+                continue;
+            }
+
+            if ($dueStatus === 'overdue') {
+                $overdueRows++;
+                $overdueOutstanding += $outstanding;
+            }
         }
 
         return [
@@ -31,6 +50,10 @@ final class SupplierPayableReportSummaryBuilder
             'total_received_qty' => array_sum(array_column($rows, 'total_received_qty')),
             'open_rows' => $openRows,
             'settled_rows' => $settledRows,
+            'not_due_rows' => $notDueRows,
+            'due_today_rows' => $dueTodayRows,
+            'overdue_rows' => $overdueRows,
+            'overdue_outstanding_rupiah' => $overdueOutstanding,
         ];
     }
 }

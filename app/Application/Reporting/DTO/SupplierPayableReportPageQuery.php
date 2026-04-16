@@ -57,11 +57,20 @@ final class SupplierPayableReportPageQuery
         };
     }
 
+    public function referenceDate(): string
+    {
+        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
+            return $this->dateTo;
+        }
+
+        return $this->resolvedReferenceDate()->toDateString();
+    }
+
     public function toViewData(): array
     {
         return [
             'period_mode' => $this->periodMode,
-            'reference_date' => $this->resolvedReferenceDate()->toDateString(),
+            'reference_date' => $this->referenceDate(),
             'date_from' => $this->fromShipmentDate(),
             'date_to' => $this->toShipmentDate(),
             'range_label' => $this->fromShipmentDate() . ' s/d ' . $this->toShipmentDate(),

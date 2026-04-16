@@ -19,9 +19,16 @@ final class GetSupplierPayableReportDatasetHandler
     ) {
     }
 
-    public function handle(string $fromShipmentDate, string $toShipmentDate): Result
-    {
-        $result = $this->summaryHandler->handle($fromShipmentDate, $toShipmentDate);
+    public function handle(
+        string $fromShipmentDate,
+        string $toShipmentDate,
+        string $referenceDate,
+    ): Result {
+        $result = $this->summaryHandler->handle(
+            $fromShipmentDate,
+            $toShipmentDate,
+            $referenceDate,
+        );
 
         if ($result->isFailure()) {
             return $result;
