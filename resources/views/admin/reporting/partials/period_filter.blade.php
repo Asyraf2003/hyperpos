@@ -2,7 +2,7 @@
     <div class="card-body">
         <div class="row g-3 align-items-start">
             <div class="col-12 col-xl-9">
-                <div class="alert alert-light border mb-0">
+                <div class="border rounded p-3 bg-light-subtle mb-0">
                     <div class="d-flex flex-column gap-2">
                         <div class="d-flex flex-column flex-md-row gap-3">
                             <div>
