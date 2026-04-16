@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\ProductCatalog\UseCases;
 
+use App\Application\ProductCatalog\UseCases\Concerns\NormalizesProductMasterInput;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
@@ -13,6 +14,8 @@ use App\Ports\Out\ProductCatalog\ProductWriterPort;
 
 final class UpdateProductHandler
 {
+    use NormalizesProductMasterInput;
+
     public function __construct(
         private readonly ProductReaderPort $products,
         private readonly ProductWriterPort $writer,
@@ -88,16 +91,5 @@ final class UpdateProductHandler
             ],
             'Product master berhasil diperbarui.'
         );
-    }
-
-    private function normalizeKodeBarang(?string $kodeBarang): ?string
-    {
-        if ($kodeBarang === null) {
-            return null;
-        }
-
-        $normalized = trim($kodeBarang);
-
-        return $normalized === '' ? null : $normalized;
     }
 }
