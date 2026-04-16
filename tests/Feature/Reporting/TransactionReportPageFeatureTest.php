@@ -74,9 +74,8 @@ final class TransactionReportPageFeatureTest extends TestCase
 
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.transaction_summary.index', [
-                'period_mode' => 'custom',
-                'date_from' => '2030-01-01',
-                'date_to' => '2030-01-31',
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
             ])
         );
 
