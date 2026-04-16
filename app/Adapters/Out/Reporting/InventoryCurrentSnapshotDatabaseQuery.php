@@ -11,6 +11,7 @@ final class InventoryCurrentSnapshotDatabaseQuery
     public static function get(): array
     {
         return DB::table('products')
+            ->whereNull('products.deleted_at')
             ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'products.id')
             ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'products.id')
             ->where(static function ($query): void {
