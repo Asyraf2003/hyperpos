@@ -140,6 +140,14 @@
                     </a>
                 </li>
 
+
+                <li class="sidebar-item {{ request()->routeIs('admin.reports.operational_expense.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.reports.operational_expense.index') }}" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Biaya Operasional</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.supplier_payable.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.supplier_payable.index') }}" class="sidebar-link">
                         <i class="bi bi-receipt"></i>
