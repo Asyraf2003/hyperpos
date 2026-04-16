@@ -13,6 +13,12 @@ final class ExpenseSeeder extends Seeder
 {
     public function run(): void
     {
+        if ($this->baselineAlreadySeeded()) {
+            $this->command?->info('ExpenseSeeder dilewati: baseline expense categories sudah ada.');
+
+            return;
+        }
+
         $now = Carbon::now();
 
         $categoriesData = [
@@ -98,5 +104,12 @@ final class ExpenseSeeder extends Seeder
         }
 
         $this->command?->info('Berhasil menanamkan ' . count($expenses) . ' baris pengeluaran operasional!');
+    }
+
+    private function baselineAlreadySeeded(): bool
+    {
+        return DB::table('expense_categories')
+            ->where('code', 'EXP-ELEC')
+            ->exists();
     }
 }
