@@ -41,7 +41,7 @@ final class PayrollReportPageRequest extends FormRequest
 
     private function validateFilters(Validator $validator): void
     {
-        $mode = $this->input('period_mode', 'daily');
+        $mode = $this->input('period_mode', 'monthly');
         $from = $this->input('date_from');
         $to = $this->input('date_to');
 

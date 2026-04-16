@@ -18,7 +18,7 @@ final class TransactionCashLedgerPageQuery
     public static function fromValidated(array $validated): self
     {
         return new self(
-            is_string($validated['period_mode'] ?? null) ? $validated['period_mode'] : 'daily',
+            is_string($validated['period_mode'] ?? null) ? $validated['period_mode'] : 'monthly',
             is_string($validated['reference_date'] ?? null) ? $validated['reference_date'] : null,
         );
     }

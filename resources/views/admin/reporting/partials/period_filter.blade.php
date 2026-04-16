@@ -8,9 +8,9 @@
                             <div>
                                 <div class="text-muted small">Mode Aktif</div>
                                 <div class="fw-semibold">
-                                    @if (($filters['period_mode'] ?? 'daily') === 'weekly')
+                                    @if (($filters['period_mode'] ?? 'monthly') === 'weekly')
                                         Mingguan
-                                    @elseif (($filters['period_mode'] ?? 'daily') === 'monthly')
+                                    @elseif (($filters['period_mode'] ?? 'monthly') === 'monthly')
                                         Bulanan
                                     @else
                                         Harian
@@ -114,9 +114,9 @@
                     class="form-select"
                     data-report-period-mode-select
                 >
-                    <option value="daily" {{ $filters['period_mode'] === 'daily' ? 'selected' : '' }}>Harian</option>
-                    <option value="weekly" {{ $filters['period_mode'] === 'weekly' ? 'selected' : '' }}>Mingguan</option>
-                    <option value="monthly" {{ $filters['period_mode'] === 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                    <option value="daily" {{ ($filters['period_mode'] ?? 'monthly') === 'daily' ? 'selected' : '' }}>Harian</option>
+                    <option value="weekly" {{ ($filters['period_mode'] ?? 'monthly') === 'weekly' ? 'selected' : '' }}>Mingguan</option>
+                    <option value="monthly" {{ ($filters['period_mode'] ?? 'monthly') === 'monthly' ? 'selected' : '' }}>Bulanan</option>
                 </select>
             </div>
 
@@ -125,9 +125,9 @@
                 data-report-mode-help
                 aria-live="polite"
             >
-                @if (($filters['period_mode'] ?? 'daily') === 'weekly')
+                @if (($filters['period_mode'] ?? 'monthly') === 'weekly')
                     {{ $modeHelpWeekly ?? 'Sistem mengambil Senin sampai Minggu dari minggu tanggal ini.' }}
-                @elseif (($filters['period_mode'] ?? 'daily') === 'monthly')
+                @elseif (($filters['period_mode'] ?? 'monthly') === 'monthly')
                     {{ $modeHelpMonthly ?? 'Sistem mengambil seluruh bulan dari tanggal ini.' }}
                 @else
                     {{ $modeHelpDaily ?? 'Menampilkan data tepat pada tanggal ini.' }}
