@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Adapters\In\Http\Controllers\Admin\Reporting;
+
+use App\Adapters\In\Http\Requests\Reporting\PayrollReportPageRequest;
+use App\Application\Reporting\DTO\PayrollReportPageQuery;
+use App\Application\Reporting\UseCases\GetPayrollReportDatasetHandler;
+use Illuminate\Contracts\View\View;
+use Illuminate\Routing\Controller;
+
+final class PayrollReportPageController extends Controller
+{
+    public function __invoke(
+        PayrollReportPageRequest $request,
+        GetPayrollReportDatasetHandler $useCase,
+    ): View {
+        $query = PayrollReportPageQuery::fromValidated($request->validated());
+        $result = $useCase->handle($query->fromDisbursementDate(), $query->toDisbursementDate());
+        $payload = is_array($result->data()) ? $result->data() : [];
+
+        return view('admin.reporting.payroll.index', [
+            'filters' => $query->toViewData(),
+            'summary' => is_array($payload['summary'] ?? null) ? $payload['summary'] : [],
+            'periodRows' => is_array($payload['period_rows'] ?? null) ? $payload['period_rows'] : [],
+            'modeRows' => is_array($payload['mode_rows'] ?? null) ? $payload['mode_rows'] : [],
+            'rows' => is_array($payload['rows'] ?? null) ? $payload['rows'] : [],
+        ]);
+    }
+}

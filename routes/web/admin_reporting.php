@@ -6,6 +6,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPageContr
 use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportPageController;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
     Route::get('/admin/reports/transaction-cash-ledger', TransactionCashLedgerPageController::class)
         ->name('admin.reports.transaction_cash_ledger.index');
+
+
+    Route::get('/admin/reports/payrolls', PayrollReportPageController::class)
+        ->name('admin.reports.payroll.index');
 
     Route::get('/admin/reports/employee-debts', EmployeeDebtReportPageController::class)
         ->name('admin.reports.employee_debt.index');
