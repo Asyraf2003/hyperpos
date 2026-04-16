@@ -29,9 +29,6 @@ final class SupplierPayableReportPageQuery
 
     public function fromShipmentDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateFrom !== null) {
-            return $this->dateFrom;
-        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -44,9 +41,6 @@ final class SupplierPayableReportPageQuery
 
     public function toShipmentDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
-            return $this->dateTo;
-        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -59,9 +53,6 @@ final class SupplierPayableReportPageQuery
 
     public function referenceDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
-            return $this->dateTo;
-        }
 
         return $this->resolvedReferenceDate()->toDateString();
     }

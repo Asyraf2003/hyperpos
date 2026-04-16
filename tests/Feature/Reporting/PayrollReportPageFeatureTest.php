@@ -34,9 +34,8 @@ final class PayrollReportPageFeatureTest extends TestCase
         $this->seedPayroll('payroll-3', 'employee-1', 10000, '2030-01-07 10:00:00', 'daily', 'Harian A2');
 
         $response = $this->actingAs($this->user('admin'))->get(route('admin.reports.payroll.index', [
-            'period_mode' => 'custom',
-            'date_from' => '2030-01-01',
-            'date_to' => '2030-01-31',
+            'period_mode' => 'monthly',
+            'reference_date' => '2030-01-01',
         ]));
 
         $response->assertOk();

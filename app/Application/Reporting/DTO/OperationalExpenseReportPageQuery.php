@@ -29,9 +29,6 @@ final class OperationalExpenseReportPageQuery
 
     public function fromExpenseDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateFrom !== null) {
-            return $this->dateFrom;
-        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -44,9 +41,6 @@ final class OperationalExpenseReportPageQuery
 
     public function toExpenseDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
-            return $this->dateTo;
-        }
 
         $reference = $this->resolvedReferenceDate();
 

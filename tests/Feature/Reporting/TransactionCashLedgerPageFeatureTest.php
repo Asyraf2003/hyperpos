@@ -36,9 +36,8 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
         $response = $this->actingAs($this->user('admin'))->get(
             route('admin.reports.transaction_cash_ledger.index', [
-                'period_mode' => 'custom',
-                'date_from' => '2026-04-01',
-                'date_to' => '2026-04-30',
+                'period_mode' => 'monthly',
+                'reference_date' => '2026-04-01',
             ])
         );
 
@@ -119,32 +118,33 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('Rp 7.000');
     }
 
-    public function test_custom_mode_requires_both_dates(): void
+    public function test_custom_mode_is_rejected(): void
     {
         $response = $this->actingAs($this->user('admin'))
             ->from(route('admin.reports.transaction_cash_ledger.index'))
             ->get(route('admin.reports.transaction_cash_ledger.index', [
                 'period_mode' => 'custom',
-                'date_from' => '2026-04-01',
+                'reference_date' => '2026-04-01',
             ]));
 
         $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
-        $response->assertSessionHasErrors(['date_from']);
+        $response->assertSessionHasErrors(['period_mode']);
     }
 
-    public function test_date_from_cannot_be_greater_than_date_to(): void
+
+    public function test_unknown_period_mode_is_rejected(): void
     {
         $response = $this->actingAs($this->user('admin'))
             ->from(route('admin.reports.transaction_cash_ledger.index'))
             ->get(route('admin.reports.transaction_cash_ledger.index', [
-                'period_mode' => 'custom',
-                'date_from' => '2026-04-30',
-                'date_to' => '2026-04-01',
+                'period_mode' => 'quarterly',
+                'reference_date' => '2026-04-01',
             ]));
 
         $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
-        $response->assertSessionHasErrors(['date_from']);
+        $response->assertSessionHasErrors(['period_mode']);
     }
+
 
     private function user(string $role): User
     {

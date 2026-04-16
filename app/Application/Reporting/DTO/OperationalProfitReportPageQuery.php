@@ -29,9 +29,6 @@ final class OperationalProfitReportPageQuery
 
     public function fromDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateFrom !== null) {
-            return $this->dateFrom;
-        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -44,9 +41,6 @@ final class OperationalProfitReportPageQuery
 
     public function toDate(): string
     {
-        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
-            return $this->dateTo;
-        }
 
         $reference = $this->resolvedReferenceDate();
 

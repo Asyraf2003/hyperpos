@@ -27,7 +27,7 @@ final class TransactionReportPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'period_mode' => ['nullable', 'in:daily,weekly,monthly,custom'],
+            'period_mode' => ['nullable', 'in:daily,weekly,monthly'],
             'reference_date' => ['nullable', 'date_format:Y-m-d'],
             'date_from' => ['nullable', 'date_format:Y-m-d'],
             'date_to' => ['nullable', 'date_format:Y-m-d'],
@@ -44,13 +44,6 @@ final class TransactionReportPageRequest extends FormRequest
         $mode = $this->input('period_mode', 'daily');
         $from = $this->input('date_from');
         $to = $this->input('date_to');
-
-        if ($mode === 'custom' && ($from === null || $to === null)) {
-            $validator->errors()->add(
-                'date_from',
-                'Mode custom wajib mengisi tanggal mulai dan tanggal akhir.'
-            );
-        }
 
         if ($from !== null && $to !== null && (string) $from > (string) $to) {
             $validator->errors()->add(
