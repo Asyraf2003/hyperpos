@@ -12,8 +12,6 @@ final class EmployeeDebtReportPageQuery
     private function __construct(
         private readonly string $periodMode,
         private readonly ?string $referenceDate,
-        private readonly ?string $dateFrom,
-        private readonly ?string $dateTo,
     ) {
     }
 
@@ -22,8 +20,6 @@ final class EmployeeDebtReportPageQuery
         return new self(
             is_string($validated['period_mode'] ?? null) ? $validated['period_mode'] : 'daily',
             is_string($validated['reference_date'] ?? null) ? $validated['reference_date'] : null,
-            is_string($validated['date_from'] ?? null) ? $validated['date_from'] : null,
-            is_string($validated['date_to'] ?? null) ? $validated['date_to'] : null,
         );
     }
 
