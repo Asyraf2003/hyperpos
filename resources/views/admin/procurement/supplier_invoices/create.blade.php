@@ -229,14 +229,14 @@
                                         <div class="w-100">
                                             <label class="form-label d-xl-none">Aksi</label>
                                             <button
-                                                    type="button"
-                                                    class="btn icon btn-danger"
-                                                    data-remove-line
-                                                    aria-label="Hapus rincian"
-                                                    title="Hapus rincian"
-                                                >
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
+                                                type="button"
+                                                class="btn icon btn-danger"
+                                                data-remove-line
+                                                aria-label="Hapus rincian"
+                                                title="Hapus rincian"
+                                            >
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -397,13 +397,6 @@
     </section>
 @endsection
 
-@php
-    $procurementCreateReturnUrl = route('admin.products.create', [
-        'return_to' => route('admin.procurement.supplier-invoices.create'),
-        'return_label' => 'Kembali ke Nota Pemasok',
-    ]);
-@endphp
-
 @push('scripts')
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
@@ -411,7 +404,10 @@
             lookupEndpoint: @json(route('admin.procurement.products.lookup')),
             supplierLookupEndpoint: @json(route('admin.procurement.suppliers.lookup')),
             clearDraftOnLoad: @json((bool) session('clear_procurement_create_draft')),
-            createProductUrl: @json($procurementCreateReturnUrl)
+            createProductUrl: @json(route('admin.products.create', [
+                'return_to' => route('admin.procurement.supplier-invoices.create'),
+                'return_label' => 'Kembali ke Nota Pemasok',
+            ]))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-create.js') }}"></script>
