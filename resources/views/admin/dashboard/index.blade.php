@@ -218,6 +218,17 @@
         border-radius: 50%;
     }
 
+    .dashboard-report .admin-avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+
     .dashboard-report .profile-name {
         margin: 0;
         color: #fff;
@@ -857,12 +868,12 @@
             <div class="card hero-card h-100">
                 <div class="card-body p-4 p-lg-5 hero-content">
                     <div class="row g-4 align-items-start">
-                        <div class="col-12 col-lg-8">
+                        <div class="col-12">
                             <h2 class="mt-3 mb-2 fw-bold text-white">
                                 Laporan stok, aset, penjualan, harga, dan perputaran keuangan dalam satu layar.
                             </h2>
                             <p class="mb-0 text-white" style="opacity:.88;">
-                                Dashboard ini sudah menarik ringkasan dari report aktif. Beberapa panel analitik lanjutan di bawah masih dipertahankan sebagai UI-only sampai kontrak backend-nya terkunci penuh.
+                                Dashboard ini menampilkan ringkasan utama yang sudah terhubung ke report aktif. Panel analitik lanjutan akan dihidupkan bertahap setelah kontrak backend-nya benar-benar siap.
                             </p>
 
                             <div class="hero-grid">
@@ -881,13 +892,6 @@
                             </div>
                         </div>
 
-                        <div class="col-12 col-lg-4">
-                            <div class="hero-actions">
-                                <span class="filter-chip"><i class="bi bi-calendar-day"></i> Hari Ini</span>
-                                <span class="filter-chip"><i class="bi bi-calendar-week"></i> Mingguan</span>
-                                <span class="filter-chip"><i class="bi bi-bar-chart-line"></i> Bulanan</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -898,15 +902,9 @@
                 <div class="admin-profile-top">
                     <div class="d-flex align-items-center gap-3">
                         <div class="admin-avatar-wrap">
-                            <img
-                                src="{{ asset('assets/compiled/jpg/1.jpg') }}"
-                                alt="Foto profil pengguna"
-                                class="profile-avatar"
-                                width="72"
-                                height="72"
-                                loading="lazy"
-                                decoding="async"
-                            >
+                            <div class="admin-avatar-placeholder" aria-hidden="true">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
                         </div>
 
                         <div class="min-w-0">
@@ -1025,415 +1023,17 @@
     </section>
 
     <section class="row g-4 mb-4">
-        <div class="col-12 col-xl-8">
-            <div class="card h-100">
-                <div class="chart-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Grafik Penjualan beta</h5>
-                            <p class="section-subtitle">Visual penjualan 7 periode terakhir</p>
-                        </div>
-                        <div class="card-toolbar">
-                            <span class="toolbar-pill active">Revenue</span>
-                            <span class="toolbar-pill">Order</span>
-                            <span class="toolbar-pill">Unit</span>
-                        </div>
-                    </div>
-
-                    <div class="chart-shell">
-                        <div class="chart-header-inline">
-                            <span class="legend-item">
-                                <span class="legend-dot" style="background:#435ebe;"></span>
-                                Penjualan
-                            </span>
-                            <span class="legend-item">
-                                <span class="legend-dot" style="background:#16a34a;"></span>
-                                Target
-                            </span>
-                        </div>
-
-                        <svg class="chart-svg" viewBox="0 0 900 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Grafik penjualan">
-                            <line x1="40" y1="220" x2="860" y2="220" stroke="#DCE3F1" stroke-width="1.5"/>
-                            <line x1="40" y1="175" x2="860" y2="175" stroke="#EDF1F7" stroke-width="1.2"/>
-                            <line x1="40" y1="130" x2="860" y2="130" stroke="#EDF1F7" stroke-width="1.2"/>
-                            <line x1="40" y1="85" x2="860" y2="85" stroke="#EDF1F7" stroke-width="1.2"/>
-                            <line x1="40" y1="40" x2="860" y2="40" stroke="#EDF1F7" stroke-width="1.2"/>
-
-                            <path d="M70 195 C120 170, 155 120, 200 130 C245 140, 285 85, 330 90 C380 96, 415 150, 460 138 C505 126, 545 68, 590 60 C640 52, 680 110, 725 102 C770 95, 805 38, 850 48 L850 220 L70 220 Z"
-                                  fill="url(#areaFill)"/>
-
-                            <path d="M70 195 C120 170, 155 120, 200 130 C245 140, 285 85, 330 90 C380 96, 415 150, 460 138 C505 126, 545 68, 590 60 C640 52, 680 110, 725 102 C770 95, 805 38, 850 48"
-                                  stroke="#435ebe" stroke-width="4.5" stroke-linecap="round"/>
-
-                            <path d="M70 180 C120 165, 155 150, 200 145 C245 140, 285 120, 330 118 C380 116, 415 124, 460 115 C505 106, 545 96, 590 92 C640 88, 680 83, 725 78 C770 73, 805 68, 850 66"
-                                  stroke="#16a34a" stroke-width="3.2" stroke-dasharray="8 8" stroke-linecap="round"/>
-
-                            <circle cx="70" cy="195" r="6" fill="#435ebe"/>
-                            <circle cx="200" cy="130" r="6" fill="#435ebe"/>
-                            <circle cx="330" cy="90" r="6" fill="#435ebe"/>
-                            <circle cx="460" cy="138" r="6" fill="#435ebe"/>
-                            <circle cx="590" cy="60" r="6" fill="#435ebe"/>
-                            <circle cx="725" cy="102" r="6" fill="#435ebe"/>
-                            <circle cx="850" cy="48" r="6" fill="#435ebe"/>
-
-                            <defs>
-                                <linearGradient id="areaFill" x1="460" y1="40" x2="460" y2="220" gradientUnits="userSpaceOnUse">
-                                    <stop stop-color="#435EBE" stop-opacity="0.28"/>
-                                    <stop offset="1" stop-color="#435EBE" stop-opacity="0.02"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        <div class="axis-labels">
-                            <span>Sen</span>
-                            <span>Sel</span>
-                            <span>Rab</span>
-                            <span>Kam</span>
-                            <span>Jum</span>
-                            <span>Sab</span>
-                            <span>Min</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-xl-4">
+        <div class="col-12">
             <div class="card h-100">
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Trend beta</h5>
-                            <p class="section-subtitle">Arah performa harian yang perlu diperhatikan</p>
-                        </div>
-                        <span class="badge-soft bg-soft-primary">
-                            <i class="bi bi-activity"></i>
-                            Live UI
-                        </span>
-                    </div>
-
-                    <div class="trend-list">
-                        <div class="trend-item">
-                            <div class="trend-item-left">
-                                <span class="trend-badge bg-soft-success">
-                                    <i class="bi bi-arrow-up-right"></i>
-                                </span>
-                                <div>
-                                    <div class="trend-label">Penjualan naik</div>
-                                    <p class="trend-value">+18.6%</p>
-                                </div>
-                            </div>
-                            <span class="badge-soft bg-soft-success">Positif</span>
-                        </div>
-
-                        <div class="trend-item">
-                            <div class="trend-item-left">
-                                <span class="trend-badge bg-soft-warning">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                </span>
-                                <div>
-                                    <div class="trend-label">Stok tipis kategori cepat laku</div>
-                                    <p class="trend-value">12 Item</p>
-                                </div>
-                            </div>
-                            <span class="badge-soft bg-soft-warning">Waspada</span>
-                        </div>
-
-                        <div class="trend-item">
-                            <div class="trend-item-left">
-                                <span class="trend-badge bg-soft-info">
-                                    <i class="bi bi-cash-stack"></i>
-                                </span>
-                                <div>
-                                    <div class="trend-label">Perputaran kas</div>
-                                    <p class="trend-value">Sehat</p>
-                                </div>
-                            </div>
-                            <span class="badge-soft bg-soft-info">Stabil</span>
-                        </div>
-
-                        <div class="trend-item">
-                            <div class="trend-item-left">
-                                <span class="trend-badge bg-soft-danger">
-                                    <i class="bi bi-arrow-down-right"></i>
-                                </span>
-                                <div>
-                                    <div class="trend-label">Margin produk tertentu</div>
-                                    <p class="trend-value">-4.2%</p>
-                                </div>
-                            </div>
-                            <span class="badge-soft bg-soft-danger">Turun</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="row g-4 mb-4">
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Laporan Stok Barang beta</h5>
-                            <p class="section-subtitle">Ringkasan stok aman, stok menipis, dan stok kritis</p>
-                        </div>
-                        <span class="badge-soft bg-soft-primary">
-                            <i class="bi bi-boxes"></i>
-                            Inventory
-                        </span>
-                    </div>
-
-                    <div class="stock-grid">
-                        <div class="stock-ring-wrap">
-                            <div class="stock-ring">
-                                <div class="stock-ring-center">
-                                    <h3>2.480</h3>
-                                    <p>Total SKU</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="inventory-list">
-                            <div class="inventory-item">
-                                <div class="inventory-top">
-                                    <div>
-                                        <p class="inventory-title">Stok Aman</p>
-                                        <p class="inventory-meta">Barang dengan persediaan sehat</p>
-                                    </div>
-                                    <span class="badge-soft bg-soft-success">1.140 Item</span>
-                                </div>
-                                <div class="progress-slim">
-                                    <span style="width: 78%; background:#16a34a;"></span>
-                                </div>
-                            </div>
-
-                            <div class="inventory-item">
-                                <div class="inventory-top">
-                                    <div>
-                                        <p class="inventory-title">Stok Menipis</p>
-                                        <p class="inventory-meta">Perlu restock dalam waktu dekat</p>
-                                    </div>
-                                    <span class="badge-soft bg-soft-warning">286 Item</span>
-                                </div>
-                                <div class="progress-slim">
-                                    <span style="width: 44%; background:#f59e0b;"></span>
-                                </div>
-                            </div>
-
-                            <div class="inventory-item">
-                                <div class="inventory-top">
-                                    <div>
-                                        <p class="inventory-title">Stok Kritis</p>
-                                        <p class="inventory-meta">Prioritas pembelian atau suplai</p>
-                                    </div>
-                                    <span class="badge-soft bg-soft-danger">74 Item</span>
-                                </div>
-                                <div class="progress-slim">
-                                    <span style="width: 19%; background:#ef4444;"></span>
-                                </div>
-                            </div>
-
-                            <div class="inventory-item">
-                                <div class="inventory-top">
-                                    <div>
-                                        <p class="inventory-title">Barang Slow Moving</p>
-                                        <p class="inventory-meta">Lama tersimpan dan perlu perhatian</p>
-                                    </div>
-                                    <span class="badge-soft bg-soft-info">132 Item</span>
-                                </div>
-                                <div class="progress-slim">
-                                    <span style="width: 31%; background:#06b6d4;"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Barang Paling Laku beta</h5>
-                            <p class="section-subtitle">Produk dengan kontribusi penjualan tertinggi</p>
-                        </div>
-                        <span class="badge-soft bg-soft-success">
-                            <i class="bi bi-trophy"></i>
-                            Top Sales
-                        </span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Terjual</th>
-                                    <th>Omzet</th>
-                                    <th>Trend</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="product-inline">
-                                            <span class="product-avatar bg-soft-primary">A</span>
-                                            <div>
-                                                <div class="product-name">Oli Mesin Racing</div>
-                                                <p class="product-sku">SKU-OLI-001</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>328 Unit</td>
-                                    <td>Rp 24.600.000</td>
-                                    <td><span class="badge-soft bg-soft-success"><i class="bi bi-arrow-up-right"></i> 12%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="product-inline">
-                                            <span class="product-avatar bg-soft-warning">B</span>
-                                            <div>
-                                                <div class="product-name">Ban Tubeless Sport</div>
-                                                <p class="product-sku">SKU-BAN-014</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>241 Unit</td>
-                                    <td>Rp 31.330.000</td>
-                                    <td><span class="badge-soft bg-soft-success"><i class="bi bi-arrow-up-right"></i> 9%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="product-inline">
-                                            <span class="product-avatar bg-soft-info">C</span>
-                                            <div>
-                                                <div class="product-name">Kampas Rem Premium</div>
-                                                <p class="product-sku">SKU-REM-032</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>188 Unit</td>
-                                    <td>Rp 14.100.000</td>
-                                    <td><span class="badge-soft bg-soft-primary"><i class="bi bi-graph-up"></i> Stabil</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="product-inline">
-                                            <span class="product-avatar bg-soft-danger">D</span>
-                                            <div>
-                                                <div class="product-name">Aki Motor 12V</div>
-                                                <p class="product-sku">SKU-AKI-011</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>142 Unit</td>
-                                    <td>Rp 22.010.000</td>
-                                    <td><span class="badge-soft bg-soft-warning"><i class="bi bi-exclamation-circle"></i> Hot</span></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="product-inline">
-                                            <span class="product-avatar bg-soft-success">E</span>
-                                            <div>
-                                                <div class="product-name">Lampu LED White</div>
-                                                <p class="product-sku">SKU-LMP-008</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>124 Unit</td>
-                                    <td>Rp 8.680.000</td>
-                                    <td><span class="badge-soft bg-soft-danger"><i class="bi bi-arrow-down-right"></i> 3%</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="row g-4 mb-4">
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Harga & Performa Margin beta</h5>
-                            <p class="section-subtitle">Bagian “kemudian harga” yang kamu minta, saya taruh jadi panel sendiri</p>
-                        </div>
-                        <span class="badge-soft bg-soft-warning">
-                            <i class="bi bi-tags"></i>
-                            Price Watch
-                        </span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Harga Beli</th>
-                                    <th>Harga Jual</th>
-                                    <th>Margin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Oli Mesin Racing</td>
-                                    <td>Rp 52.000</td>
-                                    <td>Rp 75.000</td>
-                                    <td><span class="badge-soft bg-soft-success">30.6%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Ban Tubeless Sport</td>
-                                    <td>Rp 410.000</td>
-                                    <td>Rp 520.000</td>
-                                    <td><span class="badge-soft bg-soft-success">21.1%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Kampas Rem Premium</td>
-                                    <td>Rp 44.000</td>
-                                    <td>Rp 68.000</td>
-                                    <td><span class="badge-soft bg-soft-success">35.3%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Aki Motor 12V</td>
-                                    <td>Rp 315.000</td>
-                                    <td>Rp 390.000</td>
-                                    <td><span class="badge-soft bg-soft-warning">19.2%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Lampu LED White</td>
-                                    <td>Rp 24.000</td>
-                                    <td>Rp 35.000</td>
-                                    <td><span class="badge-soft bg-soft-danger">31.4%</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="helper-note mt-3">
-                        Nanti kalau backend sudah siap, bagian ini paling enak diisi dari harga beli, harga jual, dan margin per SKU.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-xl-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Keuangan & Perputarannya beta</h5>
-                            <p class="section-subtitle">Bagian posisi kas dan seberapa cepat uang berputar</p>
+                            <h5 class="section-title">Posisi Keuangan Bulan Ini</h5>
+                            <p class="section-subtitle">Ringkasan keuangan yang sudah terhubung ke data report aktif.</p>
                         </div>
                         <span class="badge-soft bg-soft-info">
                             <i class="bi bi-bank"></i>
-                            Cash Flow
+                            Live
                         </span>
                     </div>
 
@@ -1472,40 +1072,6 @@
                                 <i class="bi bi-graph-up-arrow"></i>
                                 Selisih kas masuk dan kas keluar periode berjalan
                             </p>
-                        </div>
-                    </div>
-
-                    <div class="rotation-list">
-                        <div class="rotation-item">
-                            <p class="rotation-label">Kas Operasional</p>
-                            <div class="progress-slim">
-                                <span style="width: 82%; background:#435ebe;"></span>
-                            </div>
-                            <p class="rotation-percent">82%</p>
-                        </div>
-
-                        <div class="rotation-item">
-                            <p class="rotation-label">Modal Berputar</p>
-                            <div class="progress-slim">
-                                <span style="width: 74%; background:#16a34a;"></span>
-                            </div>
-                            <p class="rotation-percent">74%</p>
-                        </div>
-
-                        <div class="rotation-item">
-                            <p class="rotation-label">Aset Produktif</p>
-                            <div class="progress-slim">
-                                <span style="width: 68%; background:#06b6d4;"></span>
-                            </div>
-                            <p class="rotation-percent">68%</p>
-                        </div>
-
-                        <div class="rotation-item">
-                            <p class="rotation-label">Piutang Tertagih</p>
-                            <div class="progress-slim">
-                                <span style="width: 59%; background:#f59e0b;"></span>
-                            </div>
-                            <p class="rotation-percent">59%</p>
                         </div>
                     </div>
                 </div>
