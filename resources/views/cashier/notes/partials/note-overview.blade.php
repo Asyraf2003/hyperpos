@@ -69,7 +69,7 @@
                         </a>
                     @else
                         <button type="button" class="btn btn-light" disabled>
-                            Edit Nota Nonaktif
+                            Workspace Nonaktif
                         </button>
                     @endif
                 </div>
@@ -93,7 +93,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <span class="text-muted">Net Paid</span>
+                    <span class="text-muted">Sudah Dibayar</span>
                     <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
                 </div>
 

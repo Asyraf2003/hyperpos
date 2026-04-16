@@ -39,7 +39,7 @@
                             <div class="text-muted">Status Nota</div>
                             <div class="text-end">
                                 <span class="badge bg-light text-dark text-uppercase">
-                                    {{ $note['is_closed'] ? 'closed' : 'open' }}
+                                    {{ $note['note_state'] === 'closed' ? 'closed' : 'open' }}
                                 </span>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                     <div class="card-body">
                         <div class="fw-bold mb-1">Status Operasional</div>
 
-                        @if ($note['is_closed'])
+                        @if ($note['note_state'] === 'closed')
                             <div class="text-muted small mb-3">
                                 Nota ini sedang ditutup. Admin wajib memberi alasan sebelum membuka ulang note.
                             </div>
@@ -89,7 +89,7 @@
                             </form>
                         @else
                             <div class="text-muted small">
-                                Nota ini sedang terbuka. Reopen tidak diperlukan.
+                                Reopen tidak diperlukan.
                             </div>
                         @endif
                     </div>

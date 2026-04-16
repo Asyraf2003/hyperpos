@@ -1,7 +1,7 @@
 @if ($note['correction_history'] !== [])
     <div class="card mt-3">
         <div class="card-body">
-            <div class="fw-bold mb-3">Riwayat Mutasi Nota</div>
+            <div class="fw-bold mb-3">Riwayat Correction</div>
 
             <div class="d-flex flex-column gap-3">
                 @foreach ($note['correction_history'] as $entry)
