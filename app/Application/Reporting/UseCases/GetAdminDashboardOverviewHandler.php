@@ -63,7 +63,7 @@ final class GetAdminDashboardOverviewHandler
         );
 
         $supplierPayableSummary = ReportingResultDataExtractor::summary(
-            $this->supplierPayable->handle($period['from'], $period['to'])
+            $this->supplierPayable->handle($period['from'], $period['to'], $period['today'])
         );
 
         $employeeDebtSummary = ReportingResultDataExtractor::summary(

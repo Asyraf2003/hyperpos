@@ -10,16 +10,15 @@ interface OperationalProfitReportingSourceReaderPort
      * @return array{
      *   from_date:string,
      *   to_date:string,
-     *   gross_revenue_rupiah:int,
+     *   cash_in_rupiah:int,
      *   refunded_rupiah:int,
-     *   net_revenue_rupiah:int,
      *   external_purchase_cost_rupiah:int,
      *   store_stock_cogs_rupiah:int,
-     *   direct_cost_rupiah:int,
-     *   gross_profit_rupiah:int,
+     *   product_purchase_cost_rupiah:int,
      *   operational_expense_rupiah:int,
      *   payroll_disbursement_rupiah:int,
-     *   net_operational_profit_rupiah:int
+     *   employee_debt_cash_out_rupiah:int,
+     *   cash_operational_profit_rupiah:int
      * }
      */
     public function getOperationalProfitSummary(
@@ -29,16 +28,15 @@ interface OperationalProfitReportingSourceReaderPort
 
     /**
      * @return array{
-     *   gross_revenue_rupiah:int,
+     *   cash_in_rupiah:int,
      *   refunded_rupiah:int,
-     *   net_revenue_rupiah:int,
      *   external_purchase_cost_rupiah:int,
      *   store_stock_cogs_rupiah:int,
-     *   direct_cost_rupiah:int,
-     *   gross_profit_rupiah:int,
+     *   product_purchase_cost_rupiah:int,
      *   operational_expense_rupiah:int,
      *   payroll_disbursement_rupiah:int,
-     *   net_operational_profit_rupiah:int
+     *   employee_debt_cash_out_rupiah:int,
+     *   cash_operational_profit_rupiah:int
      * }
      */
     public function getOperationalProfitReconciliation(

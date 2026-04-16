@@ -78,7 +78,7 @@ final class SupplierPayableSummaryHardeningFeatureTest extends TestCase
 
     private function summaryTotals(string $from, string $to): array
     {
-        $result = app(GetSupplierPayableSummaryHandler::class)->handle($from, $to);
+        $result = app(GetSupplierPayableSummaryHandler::class)->handle($from, $to, $to);
 
         $this->assertTrue($result->isSuccess());
 

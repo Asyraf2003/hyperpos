@@ -43,7 +43,7 @@ final class GetSupplierPayableReportDatasetFeatureTest extends TestCase
         $this->seedSupplierReceiptLine('receipt-line-3', 'receipt-3', 'invoice-line-2', 5);
 
         $result = app(GetSupplierPayableReportDatasetHandler::class)
-            ->handle('2030-01-01', '2030-01-31');
+            ->handle('2030-01-01', '2030-01-31', '2030-01-31');
 
         $this->assertTrue($result->isSuccess());
 
@@ -71,6 +71,10 @@ final class GetSupplierPayableReportDatasetFeatureTest extends TestCase
             'total_received_qty' => 8,
             'open_rows' => 1,
             'settled_rows' => 1,
+            'not_due_rows' => 1,
+            'due_today_rows' => 0,
+            'overdue_rows' => 0,
+            'overdue_outstanding_rupiah' => 0,
         ], $summary);
 
         $this->assertSame([
