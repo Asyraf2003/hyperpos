@@ -7,6 +7,7 @@ namespace Database\Seeders\Load;
 use App\Application\ProductCatalog\UseCases\CreateProductHandler;
 use App\Application\ProductCatalog\UseCases\UpdateProductHandler;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 final class ProductLoadSeeder extends Seeder
@@ -15,28 +16,58 @@ final class ProductLoadSeeder extends Seeder
         CreateProductHandler $createHandler,
         UpdateProductHandler $updateHandler,
     ): void {
-        $this->seedActiveClean($createHandler, 270);
+        $this->seedActiveClean($createHandler, $updateHandler, 270);
         $this->seedActiveEdited($createHandler, $updateHandler, 30);
     }
 
-    private function seedActiveClean(CreateProductHandler $handler, int $count): void
-    {
+    private function seedActiveClean(
+        CreateProductHandler $createHandler,
+        UpdateProductHandler $updateHandler,
+        int $count,
+    ): void {
         for ($i = 1; $i <= $count; $i++) {
             $payload = $this->buildCleanPayload($i);
+            $thresholds = $this->thresholdPayload($i);
+            $productId = $this->findProductIdByCode($payload['kodeBarang']);
 
-            $created = $handler->handle(
+            if ($productId === null) {
+                $created = $createHandler->handle(
+                    kodeBarang: $payload['kodeBarang'],
+                    namaBarang: $payload['namaBarang'],
+                    merek: $payload['merek'],
+                    ukuran: $payload['ukuran'],
+                    hargaJual: $payload['hargaJual'],
+                    reorderPointQty: $thresholds['reorderPointQty'],
+                    criticalThresholdQty: $thresholds['criticalThresholdQty'],
+                );
+
+                if ($created->isFailure()) {
+                    Log::warning('ProductLoadSeeder active clean create gagal.', [
+                        'message' => $created->message(),
+                        'index' => $i,
+                        'kode_barang' => $payload['kodeBarang'],
+                    ]);
+                    continue;
+                }
+
+                continue;
+            }
+
+            $updated = $updateHandler->handle(
+                productId: $productId,
                 kodeBarang: $payload['kodeBarang'],
                 namaBarang: $payload['namaBarang'],
                 merek: $payload['merek'],
                 ukuran: $payload['ukuran'],
                 hargaJual: $payload['hargaJual'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
-            if ($created->isFailure()) {
-                Log::warning('ProductLoadSeeder active clean gagal.', [
-                    'message' => $created->message(),
+            if ($updated->isFailure()) {
+                Log::warning('ProductLoadSeeder active clean update gagal.', [
+                    'message' => $updated->message(),
+                    'product_id' => $productId,
                     'index' => $i,
                     'kode_barang' => $payload['kodeBarang'],
                 ]);
@@ -51,37 +82,45 @@ final class ProductLoadSeeder extends Seeder
     ): void {
         for ($i = 1; $i <= $count; $i++) {
             $createPayload = $this->buildEditedCreatePayload($i);
+            $updatePayload = $this->buildEditedUpdatePayload($i);
+            $thresholds = $this->thresholdPayload($i);
 
-            $created = $createHandler->handle(
-                kodeBarang: $createPayload['kodeBarang'],
-                namaBarang: $createPayload['namaBarang'],
-                merek: $createPayload['merek'],
-                ukuran: $createPayload['ukuran'],
-                hargaJual: $createPayload['hargaJual'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+            $productId = $this->resolveEditedProductId(
+                createCode: $createPayload['kodeBarang'],
+                updateCode: $updatePayload['kodeBarang'],
             );
 
-            if ($created->isFailure()) {
-                Log::warning('ProductLoadSeeder active edited create gagal.', [
-                    'message' => $created->message(),
-                    'index' => $i,
-                    'kode_barang' => $createPayload['kodeBarang'],
-                ]);
-                continue;
-            }
+            if ($productId === null) {
+                $created = $createHandler->handle(
+                    kodeBarang: $createPayload['kodeBarang'],
+                    namaBarang: $createPayload['namaBarang'],
+                    merek: $createPayload['merek'],
+                    ukuran: $createPayload['ukuran'],
+                    hargaJual: $createPayload['hargaJual'],
+                    reorderPointQty: $thresholds['reorderPointQty'],
+                    criticalThresholdQty: $thresholds['criticalThresholdQty'],
+                );
 
-            $productId = $created->data()['id'] ?? null;
+                if ($created->isFailure()) {
+                    Log::warning('ProductLoadSeeder active edited create gagal.', [
+                        'message' => $created->message(),
+                        'index' => $i,
+                        'kode_barang' => $createPayload['kodeBarang'],
+                    ]);
+                    continue;
+                }
+
+                $productId = $created->data()['id'] ?? null;
+            }
 
             if (! is_string($productId) || trim($productId) === '') {
                 Log::warning('ProductLoadSeeder active edited tidak mendapat product id.', [
                     'index' => $i,
-                    'data' => $created->data(),
+                    'create_payload' => $createPayload,
+                    'update_payload' => $updatePayload,
                 ]);
                 continue;
             }
-
-            $updatePayload = $this->buildEditedUpdatePayload($i);
 
             $updated = $updateHandler->handle(
                 productId: $productId,
@@ -90,8 +129,8 @@ final class ProductLoadSeeder extends Seeder
                 merek: $updatePayload['merek'],
                 ukuran: $updatePayload['ukuran'],
                 hargaJual: $updatePayload['hargaJual'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($updated->isFailure()) {
@@ -105,6 +144,21 @@ final class ProductLoadSeeder extends Seeder
         }
     }
 
+    /**
+     * @return array{reorderPointQty:int,criticalThresholdQty:int}
+     */
+    private function thresholdPayload(int $index): array
+    {
+        return match ($index % 3) {
+            0 => ['reorderPointQty' => 5, 'criticalThresholdQty' => 2],
+            1 => ['reorderPointQty' => 8, 'criticalThresholdQty' => 3],
+            default => ['reorderPointQty' => 12, 'criticalThresholdQty' => 5],
+        };
+    }
+
+    /**
+     * @return array{kodeBarang:string,namaBarang:string,merek:string,ukuran:?int,hargaJual:int}
+     */
     private function buildCleanPayload(int $index): array
     {
         return [
@@ -116,6 +170,9 @@ final class ProductLoadSeeder extends Seeder
         ];
     }
 
+    /**
+     * @return array{kodeBarang:string,namaBarang:string,merek:string,ukuran:?int,hargaJual:int}
+     */
     private function buildEditedCreatePayload(int $index): array
     {
         return [
@@ -127,6 +184,9 @@ final class ProductLoadSeeder extends Seeder
         ];
     }
 
+    /**
+     * @return array{kodeBarang:string,namaBarang:string,merek:string,ukuran:?int,hargaJual:int}
+     */
     private function buildEditedUpdatePayload(int $index): array
     {
         return [
@@ -165,5 +225,27 @@ final class ProductLoadSeeder extends Seeder
         $brands = ['Federal', 'Astra', 'Nissin', 'NGK', 'Stanley', 'Bando', 'Yamaha', 'YGP', 'DID', 'Mikuni', 'FIM', 'KYB', 'FDR', 'Showa', 'BRT', 'FCC'];
 
         return $brands[$index % count($brands)];
+    }
+
+    private function findProductIdByCode(string $kodeBarang): ?string
+    {
+        $productId = DB::table('products')
+            ->where('kode_barang', trim($kodeBarang))
+            ->value('id');
+
+        return is_string($productId) && trim($productId) !== ''
+            ? $productId
+            : null;
+    }
+
+    private function resolveEditedProductId(string $createCode, string $updateCode): ?string
+    {
+        $createdId = $this->findProductIdByCode($createCode);
+
+        if ($createdId !== null) {
+            return $createdId;
+        }
+
+        return $this->findProductIdByCode($updateCode);
     }
 }

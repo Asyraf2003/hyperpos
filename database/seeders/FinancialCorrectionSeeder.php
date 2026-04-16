@@ -13,6 +13,12 @@ final class FinancialCorrectionSeeder extends Seeder
 {
     public function run(): void
     {
+        if ($this->alreadySeeded()) {
+            $this->command?->info('FinancialCorrectionSeeder dilewati: koreksi finansial baseline sudah ada.');
+
+            return;
+        }
+
         $now = Carbon::now();
         
         // Ambil ID Admin yang valid sebagai pelaku koreksi
@@ -104,5 +110,11 @@ final class FinancialCorrectionSeeder extends Seeder
             DB::table('payroll_disbursement_reversals')->insert($reversals);
             $this->command->info('Berhasil menanamkan ' . count($reversals) . ' data pembatalan pencairan gaji.');
         }
+    }
+
+    private function alreadySeeded(): bool
+    {
+        return DB::table('employee_debt_adjustments')->exists()
+            || DB::table('payroll_disbursement_reversals')->exists();
     }
 }
