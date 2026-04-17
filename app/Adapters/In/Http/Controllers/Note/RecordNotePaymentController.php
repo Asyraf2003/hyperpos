@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
-use App\Application\Note\Services\NoteOutstandingPaymentAmountResolver;
 use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
 use Illuminate\Http\RedirectResponse;
@@ -17,16 +16,18 @@ final class RecordNotePaymentController extends Controller
         string $noteId,
         RecordNotePaymentRequest $request,
         SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
-        NoteOutstandingPaymentAmountResolver $outstandingResolver,
         RecordAndAllocateNotePaymentHandler $flow,
     ): RedirectResponse {
         $data = $request->validated();
 
-        $amountResult = $this->resolveAmount(
+        $selectedRowIds = is_array($data['selected_row_ids'] ?? null)
+            ? array_values($data['selected_row_ids'])
+            : [];
+
+        $amountResult = $selectedRowsResolver->resolve(
             $noteId,
-            $data,
-            $selectedRowsResolver,
-            $outstandingResolver
+            $selectedRowIds,
+            (int) ($data['amount_paid'] ?? 0),
         );
 
         if ($amountResult->isFailure()) {
@@ -39,7 +40,12 @@ final class RecordNotePaymentController extends Controller
             return back()->withErrors(['payment' => 'Uang masuk cash tidak boleh kurang dari total yang dibayar.'])->withInput();
         }
 
-        $result = $flow->handle($noteId, $amount, (string) $data['paid_at']);
+        $result = $flow->handle(
+            $noteId,
+            $amount,
+            (string) $data['paid_at'],
+            $selectedRowIds,
+        );
 
         if ($result->isFailure()) {
             return back()->withErrors(['payment' => $result->message() ?? 'Pembayaran gagal dicatat.'])->withInput();
@@ -48,30 +54,6 @@ final class RecordNotePaymentController extends Controller
         return redirect()
             ->route('cashier.notes.show', ['noteId' => $noteId])
             ->with('success', $this->successMessage($data, $amount));
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function resolveAmount(
-        string $noteId,
-        array $data,
-        SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
-        NoteOutstandingPaymentAmountResolver $outstandingResolver,
-    ) {
-        $selectedRowIds = $data['selected_row_ids'] ?? [];
-
-        if (is_array($selectedRowIds) && $selectedRowIds !== []) {
-            return $selectedRowsResolver->resolve($noteId, $selectedRowIds);
-        }
-
-        $paymentScope = (string) ($data['payment_scope'] ?? 'full');
-
-        if ($paymentScope === 'partial') {
-            return $outstandingResolver->resolvePartial($noteId, (int) ($data['amount_paid'] ?? 0));
-        }
-
-        return $outstandingResolver->resolveFull($noteId);
     }
 
     /**

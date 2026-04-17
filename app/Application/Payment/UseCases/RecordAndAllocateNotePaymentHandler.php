@@ -41,7 +41,10 @@ final class RecordAndAllocateNotePaymentHandler
     ) {
     }
 
-    public function handle(string $noteId, int $amountRupiah, string $paidAt): Result
+    /**
+     * @param list<string> $selectedRowIds
+     */
+    public function handle(string $noteId, int $amountRupiah, string $paidAt, array $selectedRowIds = []): Result
     {
         $started = false;
 
@@ -67,7 +70,11 @@ final class RecordAndAllocateNotePaymentHandler
                 $this->allocations->getTotalAllocatedAmountByNoteId($note->id()),
             );
 
-            $allocations = $this->allocator->allocate($payment->id(), $note->id(), $amount, $this->components->fromNote($note));
+            $components = $selectedRowIds === []
+                ? $this->components->fromNote($note)
+                : $this->components->fromSelectedRows($note, $selectedRowIds);
+
+            $allocations = $this->allocator->allocate($payment->id(), $note->id(), $amount, $components);
 
             $this->payments->create($payment);
             $this->allocationWriter->createMany($allocations);
@@ -78,6 +85,7 @@ final class RecordAndAllocateNotePaymentHandler
                 'note_id' => $note->id(),
                 'amount' => $amountRupiah,
                 'allocation_count' => count($allocations),
+                'selected_row_ids' => $selectedRowIds,
             ]);
 
             $this->transactions->commit();
@@ -87,10 +95,16 @@ final class RecordAndAllocateNotePaymentHandler
                 'allocation_count' => count($allocations),
             ], 'Pembayaran berhasil dicatat.');
         } catch (DomainException $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
+
             return $this->errors->classify($e);
         } catch (Throwable $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
+
             throw $e;
         }
     }

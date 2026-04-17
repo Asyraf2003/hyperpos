@@ -24,12 +24,12 @@ final class RecordNotePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'selected_row_ids' => ['nullable', 'array'],
-            'selected_row_ids.*' => ['string'],
-            'payment_scope' => ['nullable', 'string', 'in:full,partial'],
+            'selected_row_ids' => ['required', 'array', 'min:1'],
+            'selected_row_ids.*' => ['string', 'distinct'],
+            'payment_scope' => ['nullable', 'string', 'in:partial'],
             'payment_method' => ['required', 'string', 'in:cash,tf,transfer'],
             'paid_at' => ['required', 'date_format:Y-m-d'],
-            'amount_paid' => ['nullable', 'integer', 'min:1'],
+            'amount_paid' => ['required', 'integer', 'min:1'],
             'amount_received' => ['nullable', 'integer', 'min:1'],
         ];
     }

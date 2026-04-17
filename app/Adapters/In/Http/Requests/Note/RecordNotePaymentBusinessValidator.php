@@ -15,44 +15,12 @@ final class RecordNotePaymentBusinessValidator
     {
         $selectedRowIds = $payload['selected_row_ids'] ?? [];
 
-        if (is_array($selectedRowIds) && $selectedRowIds !== []) {
-            self::validateLegacySelectedRowsFlow($payload, $validator);
-            return;
-        }
-
-        self::validateNoteLevelFlow($payload, $validator);
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private static function validateLegacySelectedRowsFlow(array $payload, Validator $validator): void
-    {
-        $selectedRowIds = $payload['selected_row_ids'] ?? [];
-
         if (! is_array($selectedRowIds) || $selectedRowIds === []) {
-            $validator->errors()->add('selected_row_ids', 'Minimal satu baris harus dipilih.');
+            $validator->errors()->add('selected_row_ids', 'Minimal satu line open harus dipilih.');
         }
 
-        if (($payload['payment_method'] ?? null) === 'cash' && ($payload['amount_received'] ?? null) === null) {
-            $validator->errors()->add('amount_received', 'Uang masuk wajib diisi untuk pembayaran cash.');
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private static function validateNoteLevelFlow(array $payload, Validator $validator): void
-    {
-        $paymentScope = $payload['payment_scope'] ?? null;
-
-        if (! is_string($paymentScope) || trim($paymentScope) === '') {
-            $validator->errors()->add('payment_scope', 'payment scope wajib diisi.');
-            return;
-        }
-
-        if ($paymentScope === 'partial' && ($payload['amount_paid'] ?? null) === null) {
-            $validator->errors()->add('amount_paid', 'Nominal pembayaran wajib diisi untuk pembayaran sebagian.');
+        if (($payload['amount_paid'] ?? null) === null) {
+            $validator->errors()->add('amount_paid', 'Nominal pembayaran wajib diisi.');
         }
 
         if (($payload['payment_method'] ?? null) === 'cash' && ($payload['amount_received'] ?? null) === null) {
