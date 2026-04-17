@@ -1722,4 +1722,8 @@
         </div>
     </section>
 </div>
+@push('scripts')
+    <script src="{{ asset('assets/static/js/admin/dashboard-analytics.js') }}?v={{ filemtime(public_path('assets/static/js/admin/dashboard-analytics.js')) }}"></script>
+@endpush
+
 @endsection
