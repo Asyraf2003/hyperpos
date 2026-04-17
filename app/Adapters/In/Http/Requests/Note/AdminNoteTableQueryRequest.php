@@ -20,9 +20,7 @@ final class AdminNoteTableQueryRequest extends FormRequest
             'date_from' => $this->trimOrNull('date_from'),
             'date_to' => $this->trimOrNull('date_to'),
             'search' => $this->trimOrNull('search'),
-            'payment_status' => $this->trimOrNull('payment_status'),
-            'editability' => $this->trimOrNull('editability'),
-            'work_summary' => $this->trimOrNull('work_summary'),
+            'line_status' => $this->trimOrNull('line_status'),
         ]);
     }
 
@@ -32,9 +30,7 @@ final class AdminNoteTableQueryRequest extends FormRequest
             'date_from' => ['nullable', 'date_format:Y-m-d'],
             'date_to' => ['nullable', 'date_format:Y-m-d'],
             'search' => ['nullable', 'string'],
-            'payment_status' => ['nullable', 'in:unpaid,partial,paid'],
-            'editability' => ['nullable', 'in:editable_normal,admin_strict,correction_only'],
-            'work_summary' => ['nullable', 'in:has_open,has_done,has_canceled'],
+            'line_status' => ['nullable', 'in:open,close,refund'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
         ];

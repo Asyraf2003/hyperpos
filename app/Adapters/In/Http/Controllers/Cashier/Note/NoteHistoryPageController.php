@@ -12,17 +12,13 @@ final class NoteHistoryPageController extends Controller
 {
     public function __invoke(Request $request): View
     {
-        $today = date('Y-m-d');
-
         $filters = [
-            'date' => $this->resolveString($request, 'date') ?? $today,
             'search' => $this->resolveString($request, 'search') ?? '',
-            'payment_status' => $this->resolveString($request, 'payment_status') ?? '',
-            'work_status' => $this->resolveString($request, 'work_status') ?? '',
+            'line_status' => $this->resolveString($request, 'line_status') ?? '',
         ];
 
         return view('cashier.notes.index', [
-            'pageTitle' => 'Riwayat Nota',
+            'pageTitle' => 'Daftar Nota',
             'filters' => $filters,
         ]);
     }

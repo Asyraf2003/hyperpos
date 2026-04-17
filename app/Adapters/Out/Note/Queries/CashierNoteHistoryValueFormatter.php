@@ -27,6 +27,25 @@ final class CashierNoteHistoryValueFormatter
         );
     }
 
+    public function lineSummary(int $openCount, int $closeCount, int $refundCount): string
+    {
+        $parts = [];
+
+        if ($openCount > 0) {
+            $parts[] = sprintf('%d Open', $openCount);
+        }
+
+        if ($closeCount > 0) {
+            $parts[] = sprintf('%d Close', $closeCount);
+        }
+
+        if ($refundCount > 0) {
+            $parts[] = sprintf('%d Refund', $refundCount);
+        }
+
+        return $parts === [] ? 'Belum ada line.' : implode(', ', $parts);
+    }
+
     public function paymentStatusLabel(string $paymentStatus): string
     {
         return match ($paymentStatus) {

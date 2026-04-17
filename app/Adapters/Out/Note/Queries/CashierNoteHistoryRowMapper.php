@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Note\Queries;
 
-use App\Application\Note\Services\NotePaymentStatusResolver;
+use App\Application\Note\Services\WorkItemOperationalStatusResolver;
 
 final class CashierNoteHistoryRowMapper
 {
     public function __construct(
-        private readonly NotePaymentStatusResolver $paymentStatuses,
         private readonly CashierNoteHistoryValueFormatter $formatter,
     ) {
     }
@@ -28,26 +27,18 @@ final class CashierNoteHistoryRowMapper
             $refunded = (int) ($row->refunded_rupiah ?? 0);
             $netPaid = max($allocated - $refunded, 0);
             $outstanding = max($grandTotal - $netPaid, 0);
-            $paymentStatus = $this->paymentStatuses->resolve($grandTotal, $netPaid);
             $transactionDate = (string) $row->transaction_date;
-            $noteState = (string) ($row->note_state ?? 'open');
 
-            $isAnchorDate = $transactionDate === $criteria->anchorDateText;
-            $isPreviousOpen = $transactionDate === $criteria->previousDateText && $noteState === 'open';
+            $lineOpenCount = (int) ($row->line_open_count ?? 0);
+            $lineCloseCount = (int) ($row->line_close_count ?? 0);
+            $lineRefundCount = (int) ($row->line_refund_count ?? 0);
 
-            if (! $isAnchorDate && ! $isPreviousOpen) {
-                continue;
-            }
-
-            $openCount = (int) ($row->open_count ?? 0);
-            $doneCount = (int) ($row->done_count ?? 0);
-            $canceledCount = (int) ($row->canceled_count ?? 0);
-
-            if ($criteria->paymentStatus !== '' && $paymentStatus !== $criteria->paymentStatus) {
-                continue;
-            }
-
-            if (! $this->matchesWorkStatusFilter($criteria->workStatus, $openCount, $doneCount, $canceledCount)) {
+            if (! $this->matchesLineStatusFilter(
+                $criteria->lineStatus,
+                $lineOpenCount,
+                $lineCloseCount,
+                $lineRefundCount
+            )) {
                 continue;
             }
 
@@ -62,9 +53,28 @@ final class CashierNoteHistoryRowMapper
                 'grand_total_text' => $this->formatter->rupiah($grandTotal),
                 'total_paid_text' => $this->formatter->rupiah($netPaid),
                 'outstanding_text' => $this->formatter->rupiah($outstanding),
-                'payment_status_label' => $this->formatter->paymentStatusLabel($paymentStatus),
-                'work_status_label' => $this->formatter->workSummary($openCount, $doneCount, $canceledCount),
-                'action_label' => 'Buka Detail',
+
+                // new line-centric summary fields
+                'line_summary_label' => $this->formatter->lineSummary(
+                    $lineOpenCount,
+                    $lineCloseCount,
+                    $lineRefundCount,
+                ),
+                'line_summary_counts' => [
+                    'open' => $lineOpenCount,
+                    'close' => $lineCloseCount,
+                    'refund' => $lineRefundCount,
+                ],
+
+                // legacy fields kept temporarily for UI transition
+                'payment_status_label' => $outstanding <= 0 ? 'Lunas' : ($netPaid > 0 ? 'Dibayar Sebagian' : 'Belum Dibayar'),
+                'work_status_label' => $this->formatter->workSummary(
+                    (int) ($row->open_count ?? 0),
+                    (int) ($row->done_count ?? 0),
+                    (int) ($row->canceled_count ?? 0),
+                ),
+
+                'action_label' => 'Pilih',
                 'action_url' => route('cashier.notes.show', ['noteId' => (string) $row->id]),
             ];
         }
@@ -72,12 +82,16 @@ final class CashierNoteHistoryRowMapper
         return $items;
     }
 
-    private function matchesWorkStatusFilter(string $filter, int $openCount, int $doneCount, int $canceledCount): bool
-    {
+    private function matchesLineStatusFilter(
+        string $filter,
+        int $lineOpenCount,
+        int $lineCloseCount,
+        int $lineRefundCount
+    ): bool {
         return match ($filter) {
-            'open' => $openCount > 0,
-            'done' => $doneCount > 0,
-            'canceled' => $canceledCount > 0,
+            WorkItemOperationalStatusResolver::STATUS_OPEN => $lineOpenCount > 0,
+            WorkItemOperationalStatusResolver::STATUS_CLOSE => $lineCloseCount > 0,
+            WorkItemOperationalStatusResolver::STATUS_REFUND => $lineRefundCount > 0,
             '' => true,
             default => true,
         };

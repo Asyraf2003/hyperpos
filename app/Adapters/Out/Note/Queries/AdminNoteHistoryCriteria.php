@@ -10,9 +10,7 @@ final class AdminNoteHistoryCriteria
         public readonly string $dateFromText,
         public readonly string $dateToText,
         public readonly string $search,
-        public readonly string $paymentStatus,
-        public readonly string $editability,
-        public readonly string $workSummary,
+        public readonly string $lineStatus,
         public readonly int $page,
         public readonly int $perPage,
     ) {
@@ -27,9 +25,7 @@ final class AdminNoteHistoryCriteria
             self::resolveDate($filters, 'date_from'),
             self::resolveDate($filters, 'date_to'),
             self::resolveString($filters, 'search'),
-            self::resolveString($filters, 'payment_status'),
-            self::resolveString($filters, 'editability'),
-            self::resolveString($filters, 'work_summary'),
+            self::resolveString($filters, 'line_status'),
             self::resolvePositiveInt($filters, 'page', 1),
             self::resolvePositiveInt($filters, 'per_page', 10),
         );

@@ -1,6 +1,4 @@
 @extends('layouts.app')
-@include('layouts.partials.date-picker-assets')
-
 @section('title', $pageTitle)
 @section('heading', $pageTitle)
 
@@ -10,10 +8,9 @@
         <div class="card-header">
             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                 <div>
-                    <h4 class="card-title mb-1">Riwayat Nota Kasir</h4>
+                    <h4 class="card-title mb-1">Daftar Nota Kasir</h4>
                     <p class="mb-0 text-muted">
-                        Menampilkan hanya note open dalam window kasir hari ini dan kemarin.
-                        Note yang sudah closed tidak ditampilkan di area kasir.
+                        Area kerja kasir untuk memilih nota hari ini dan kemarin, lalu lanjut ke panel kerja per line.
                     </p>
                 </div>
 
@@ -52,15 +49,14 @@
                             <th class="text-end">Grand Total</th>
                             <th class="text-end">Sudah Dibayar</th>
                             <th class="text-end">Sisa Tagihan</th>
-                            <th>Status Bayar</th>
-                            <th>Ringkasan Pengerjaan</th>
+                            <th>Ringkasan Line</th>
                             <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="cashier-note-table-body">
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">
-                                Sedang menyiapkan riwayat nota kasir...
+                            <td colspan="9" class="text-center text-muted py-4">
+                                Sedang menyiapkan daftar nota kasir...
                             </td>
                         </tr>
                     </tbody>
@@ -69,7 +65,7 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="cashier-note-table-summary" class="text-muted">
-                    Memuat ringkasan riwayat kasir...
+                    Memuat ringkasan daftar nota kasir...
                 </small>
                 <div id="cashier-note-table-pagination"></div>
             </div>

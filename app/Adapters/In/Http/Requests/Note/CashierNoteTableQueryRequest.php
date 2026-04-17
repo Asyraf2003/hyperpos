@@ -16,20 +16,16 @@ final class CashierNoteTableQueryRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'date' => $this->trimOrNull('date'),
             'search' => $this->trimOrNull('search'),
-            'payment_status' => $this->trimOrNull('payment_status'),
-            'work_status' => $this->trimOrNull('work_status'),
+            'line_status' => $this->trimOrNull('line_status'),
         ]);
     }
 
     public function rules(): array
     {
         return [
-            'date' => ['nullable', 'date_format:Y-m-d'],
             'search' => ['nullable', 'string'],
-            'payment_status' => ['nullable', 'in:unpaid,partial,paid'],
-            'work_status' => ['nullable', 'in:open,done,canceled'],
+            'line_status' => ['nullable', 'in:open,close,refund'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
         ];

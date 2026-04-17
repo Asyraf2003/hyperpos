@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const configNode = document.getElementById('cashier-note-index-config');
     const searchForm = document.getElementById('cashier-note-search-form');
     const searchInput = document.getElementById('cashier-note-search-input');
-    const dateInput = document.getElementById('cashier-note-date');
-    const paymentStatusInput = document.getElementById('cashier-note-payment-status');
-    const workStatusInput = document.getElementById('cashier-note-work-status');
+    const lineStatusInput = document.getElementById('cashier-note-line-status');
     const tableBody = document.getElementById('cashier-note-table-body');
     const summaryNode = document.getElementById('cashier-note-table-summary');
     const paginationNode = document.getElementById('cashier-note-table-pagination');
@@ -19,9 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         !configNode
         || !searchForm
         || !searchInput
-        || !dateInput
-        || !paymentStatusInput
-        || !workStatusInput
+        || !lineStatusInput
         || !tableBody
         || !summaryNode
         || !paginationNode
@@ -58,10 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
 
         return {
-            date: normalize(params.get('date') || filters.date),
             search: normalize(params.get('search') || filters.search),
-            payment_status: normalize(params.get('payment_status') || filters.payment_status),
-            work_status: normalize(params.get('work_status') || filters.work_status),
+            line_status: normalize(params.get('line_status') || filters.line_status),
             page: intOrDefault(params.get('page'), 1),
             per_page: intOrDefault(params.get('per_page'), 10),
         };
@@ -74,15 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fillControlsFromState = () => {
         searchInput.value = state.search;
-        dateInput.value = state.date;
-        paymentStatusInput.value = state.payment_status;
-        workStatusInput.value = state.work_status;
+        lineStatusInput.value = state.line_status;
     };
 
-    const syncDrawerState = () => {
-        state.date = normalize(dateInput.value);
-        state.payment_status = normalize(paymentStatusInput.value);
-        state.work_status = normalize(workStatusInput.value);
+    const syncFilterState = () => {
+        state.line_status = normalize(lineStatusInput.value);
         state.page = 1;
     };
 
@@ -97,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             per_page: String(state.per_page),
         };
 
-        ['date', 'search', 'payment_status', 'work_status'].forEach((key) => {
+        ['search', 'line_status'].forEach((key) => {
             const value = normalize(state[key]);
             if (value !== '') {
                 obj[key] = value;
@@ -129,20 +119,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderLoading = () => {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="10" class="text-center text-muted py-4">Sedang memuat riwayat nota...</td>
+                <td colspan="9" class="text-center text-muted py-4">Sedang memuat daftar nota...</td>
             </tr>
         `;
-        summaryNode.textContent = 'Memuat ringkasan riwayat kasir...';
+        summaryNode.textContent = 'Memuat ringkasan daftar nota kasir...';
         paginationNode.innerHTML = '<span class="text-muted small">Memuat pagination...</span>';
     };
 
     const renderError = () => {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="10" class="text-center text-danger py-4">Riwayat nota gagal dimuat.</td>
+                <td colspan="9" class="text-center text-danger py-4">Daftar nota gagal dimuat.</td>
             </tr>
         `;
-        summaryNode.textContent = 'Gagal memuat ringkasan riwayat kasir.';
+        summaryNode.textContent = 'Gagal memuat ringkasan daftar nota kasir.';
         paginationNode.innerHTML = '<span class="text-muted small">Pagination belum tersedia.</span>';
     };
 
@@ -155,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderAction = (item) => {
         if (typeof item.action_url === 'string' && item.action_url !== '') {
-            return `<a href="${escapeHtml(item.action_url)}" class="btn btn-sm btn-outline-primary">${escapeHtml(item.action_label ?? 'Buka')}</a>`;
+            return `<a href="${escapeHtml(item.action_url)}" class="btn btn-sm btn-outline-primary">${escapeHtml(item.action_label ?? 'Pilih')}</a>`;
         }
 
         return escapeHtml(item.action_label ?? '-');
@@ -190,8 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!Array.isArray(items) || items.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="10" class="text-center text-muted py-4">
-                        ${escapeHtml(summaryLabel || 'Belum ada data riwayat kasir.')}
+                    <td colspan="9" class="text-center text-muted py-4">
+                        ${escapeHtml(summaryLabel || 'Belum ada data daftar nota kasir.')}
                     </td>
                 </tr>
             `;
@@ -208,14 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="text-end">${escapeHtml(item.grand_total_text ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.total_paid_text ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.outstanding_text ?? '-')}</td>
-                    <td>${escapeHtml(item.payment_status_label ?? '-')}</td>
-                    <td>${escapeHtml(item.work_status_label ?? '-')}</td>
+                    <td>${escapeHtml(item.line_summary_label ?? '-')}</td>
                     <td>${renderAction(item)}</td>
                 </tr>
             `).join('');
         }
 
-        summaryNode.textContent = summaryLabel || 'Riwayat kasir siap.';
+        summaryNode.textContent = summaryLabel || 'Daftar nota kasir siap.';
         renderPager(pagination);
     };
 
@@ -258,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = Array.isArray(data.items) ? data.items : [];
             const summaryLabel = typeof data?.summary?.label === 'string'
                 ? data.summary.label
-                : 'Riwayat kasir siap.';
+                : 'Daftar nota kasir siap.';
             const pagination = typeof data.pagination === 'object' && data.pagination !== null
                 ? data.pagination
                 : { page: 1, per_page: 10, total: 0, last_page: 1 };
@@ -308,17 +297,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        syncDrawerState();
+        syncFilterState();
         drawOpen(false);
         loadTable();
     });
 
     resetFilterButton.addEventListener('click', () => {
         filterForm.reset();
-        dateInput.value = normalize(filters.date);
-        paymentStatusInput.value = '';
-        workStatusInput.value = '';
-        syncDrawerState();
+        lineStatusInput.value = '';
+        syncFilterState();
         drawOpen(false);
         loadTable();
     });

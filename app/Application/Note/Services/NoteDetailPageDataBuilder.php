@@ -17,6 +17,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
         private readonly NoteDetailRowMapper $rowMapper,
+        private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
     ) {
     }
 
@@ -34,16 +35,27 @@ final class NoteDetailPageDataBuilder
             $operational['net_paid_rupiah'],
         );
 
+        // legacy calculation kept temporarily for transition safety
         $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
+
+        // new line-centric workspace source
+        $workspacePanel = $this->workspacePanel->build($noteId);
+
+        if ($workspacePanel === null) {
+            return null;
+        }
 
         return [
             'pageTitle' => 'Detail Nota',
+            'workspace_panel' => $workspacePanel,
             'note' => [
                 'id' => $note->id(),
                 'customer_name' => $note->customerName(),
                 'customer_phone' => $note->customerPhone(),
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'note_state' => $note->noteState(),
+
+                // legacy note-centric fields kept temporarily
                 'operational_status' => $operational['operational_status'],
                 'is_open' => $operational['is_open'],
                 'is_closed' => $operational['is_close'],
@@ -64,7 +76,12 @@ final class NoteDetailPageDataBuilder
                 'correction_notice' => $operational['is_close']
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
                     : null,
-                'rows' => $this->rowMapper->map($note->workItems(), $rowSettlements),
+
+                // new line-centric transition fields
+                'line_summary' => $workspacePanel['line_summary'],
+                'rows' => $workspacePanel['rows'],
+
+                // legacy history remains
                 'correction_history' => $this->history->build($note->id()),
             ],
             'productOptions' => $this->products->build(),
