@@ -22,10 +22,29 @@
     };
 
     const charts = payload && typeof payload === 'object' ? payload.charts || {} : {};
-    const chartInstances = {};
+    const instances = {};
 
     const formatNumber = (value) => new Intl.NumberFormat('id-ID').format(Number(value || 0));
     const formatRupiah = (value) => `Rp ${formatNumber(value)}`;
+
+    const compactNumber = (value) => {
+        const number = Number(value || 0);
+        const abs = Math.abs(number);
+
+        if (abs >= 1000000000) {
+            return `${(number / 1000000000).toFixed(abs >= 10000000000 ? 0 : 1).replace('.0', '')} M`;
+        }
+
+        if (abs >= 1000000) {
+            return `${(number / 1000000).toFixed(abs >= 10000000 ? 0 : 1).replace('.0', '')} Jt`;
+        }
+
+        if (abs >= 1000) {
+            return `${(number / 1000).toFixed(abs >= 10000 ? 0 : 1).replace('.0', '')} Rb`;
+        }
+
+        return formatNumber(number);
+    };
 
     const getCssValue = (name, fallback) => {
         const root = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -46,18 +65,22 @@
         );
     };
 
-    const theme = () => ({
+    const palette = () => ({
         primary: getCssValue('--bs-primary', '#435ebe'),
-        success: getCssValue('--bs-success', '#16a34a'),
-        warning: getCssValue('--bs-warning', '#f59e0b'),
-        danger: getCssValue('--bs-danger', '#ef4444'),
-        info: getCssValue('--bs-info', '#06b6d4'),
+        success: getCssValue('--bs-success', '#28c76f'),
+        warning: getCssValue('--bs-warning', '#fdac41'),
+        danger: getCssValue('--bs-danger', '#ea5455'),
+        info: getCssValue('--bs-info', '#00cfe8'),
         text: getCssValue('--bs-body-color', '#25396f'),
         muted: getCssValue('--bs-secondary-color', '#7c8db5'),
-        border: getCssValue('--bs-border-color', '#dce7f1'),
-        surface: getCssValue('--bs-body-bg', '#ffffff'),
-        soft: getCssValue('--bs-tertiary-bg', '#f2f7ff'),
+        border: getCssValue('--bs-border-color', '#ebeef5'),
     });
+
+    const truncateLabel = (value, max = 14) => {
+        const text = String(value || '');
+
+        return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+    };
 
     const shortDate = (value) => {
         const text = String(value || '');
@@ -65,10 +88,10 @@
         return text.length >= 10 ? text.slice(-2) : text;
     };
 
-    const destroyChart = (key) => {
-        if (chartInstances[key]) {
-            chartInstances[key].destroy();
-            chartInstances[key] = null;
+    const destroy = (key) => {
+        if (instances[key]) {
+            instances[key].destroy();
+            instances[key] = null;
         }
     };
 
@@ -79,13 +102,13 @@
 
         container.innerHTML = `
             <div style="
-                min-height: 260px;
+                min-height: 340px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
                 color: ${colors.muted};
-                font-size: .84rem;
+                font-size: .9rem;
                 font-weight: 700;
                 line-height: 1.6;
                 padding: 1rem;
@@ -95,24 +118,29 @@
         `;
     };
 
-    const buildCommonOptions = (colors) => ({
+    const baseOptions = (colors) => ({
         chart: {
             fontFamily: 'Nunito, Inter, Segoe UI, sans-serif',
             foreColor: colors.muted,
+            background: 'transparent',
             toolbar: {
                 show: false,
             },
-            background: 'transparent',
+            zoom: {
+                enabled: false,
+            },
             animations: {
                 enabled: true,
                 easing: 'easeinout',
-                speed: 450,
+                speed: 500,
             },
+            parentHeightOffset: 0,
         },
         legend: {
             position: 'bottom',
             horizontalAlign: 'center',
             fontSize: '12px',
+            fontWeight: 700,
             labels: {
                 colors: colors.muted,
             },
@@ -122,25 +150,21 @@
                 radius: 99,
             },
             itemMargin: {
-                horizontal: 12,
+                horizontal: 10,
                 vertical: 6,
             },
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 3,
         },
         dataLabels: {
             enabled: false,
         },
         grid: {
             borderColor: colors.border,
-            strokeDashArray: 4,
+            strokeDashArray: 3,
             padding: {
-                left: 6,
+                left: 8,
                 right: 12,
-                top: 6,
-                bottom: 0,
+                top: 8,
+                bottom: 2,
             },
         },
         tooltip: {
@@ -158,15 +182,15 @@
         },
     });
 
-    const renderStockDonut = () => {
+    const renderStock = () => {
         const key = 'stock';
         const container = containers.stock;
         const data = charts.stock_status_donut || {};
-        const colors = theme();
+        const colors = palette();
         const segments = Array.isArray(data.segments) ? data.segments : [];
         const values = segments.map((segment) => Number(segment?.value || 0));
 
-        destroyChart(key);
+        destroy(key);
 
         if (!container || !segments.length || values.every((value) => value === 0)) {
             emptyState(container, 'Belum ada data status stok untuk divisualisasikan.', colors);
@@ -175,40 +199,39 @@
 
         container.innerHTML = '';
 
-        chartInstances[key] = new ApexCharts(container, {
-            ...buildCommonOptions(colors),
+        instances[key] = new ApexCharts(container, {
+            ...baseOptions(colors),
             chart: {
-                ...buildCommonOptions(colors).chart,
+                ...baseOptions(colors).chart,
                 type: 'donut',
-                height: 280,
+                height: 340,
             },
             series: values,
             labels: segments.map((segment) => `${segment?.label || '-'} (${formatNumber(segment?.value || 0)})`),
-            colors: [
-                colors.success,
-                colors.warning,
-                colors.danger,
-                colors.info,
-            ],
+            colors: [colors.success, colors.warning, colors.danger, colors.info],
+            stroke: {
+                width: 0,
+            },
             plotOptions: {
                 pie: {
+                    expandOnClick: false,
                     donut: {
-                        size: '70%',
+                        size: '72%',
                         labels: {
                             show: true,
                             name: {
                                 show: true,
+                                offsetY: 16,
                                 color: colors.muted,
                                 fontSize: '14px',
                                 fontWeight: 700,
-                                offsetY: 18,
                             },
                             value: {
                                 show: true,
+                                offsetY: -14,
                                 color: colors.text,
-                                fontSize: '28px',
+                                fontSize: '32px',
                                 fontWeight: 800,
-                                offsetY: -10,
                                 formatter: () => formatNumber(data.total_value || 0),
                             },
                             total: {
@@ -224,9 +247,6 @@
                     },
                 },
             },
-            stroke: {
-                width: 0,
-            },
             tooltip: {
                 theme: isDark() ? 'dark' : 'light',
                 y: {
@@ -235,19 +255,20 @@
             },
         });
 
-        chartInstances[key].render();
+        instances[key].render();
     };
 
-    const renderTopSellingBar = () => {
+    const renderTopSelling = () => {
         const key = 'topSelling';
         const container = containers.topSelling;
         const data = charts.top_selling_bar || {};
+        const colors = palette();
         const categories = Array.isArray(data.categories) ? data.categories : [];
+        const details = Array.isArray(data.detail) ? data.detail : [];
         const seriesRow = Array.isArray(data.series) && data.series[0] ? data.series[0] : null;
         const values = Array.isArray(seriesRow?.values) ? seriesRow.values.map((value) => Number(value || 0)) : [];
-        const colors = theme();
 
-        destroyChart(key);
+        destroy(key);
 
         if (!container || !categories.length || !values.length) {
             emptyState(container, 'Belum ada data produk terjual pada bulan aktif.', colors);
@@ -256,12 +277,12 @@
 
         container.innerHTML = '';
 
-        chartInstances[key] = new ApexCharts(container, {
-            ...buildCommonOptions(colors),
+        instances[key] = new ApexCharts(container, {
+            ...baseOptions(colors),
             chart: {
-                ...buildCommonOptions(colors).chart,
+                ...baseOptions(colors).chart,
                 type: 'bar',
-                height: 320,
+                height: 340,
             },
             series: [
                 {
@@ -269,35 +290,29 @@
                     data: values,
                 },
             ],
-            colors: [colors.primary],
+            colors: [colors.primary, colors.info, colors.success, colors.warning, colors.danger],
             plotOptions: {
                 bar: {
-                    horizontal: true,
-                    borderRadius: 8,
-                    barHeight: '55%',
-                    distributed: false,
-                    dataLabels: {
-                        position: 'top',
-                    },
+                    horizontal: false,
+                    borderRadius: 10,
+                    columnWidth: '72%',
+                    distributed: true,
                 },
             },
-            dataLabels: {
-                enabled: true,
-                style: {
-                    fontSize: '11px',
-                    fontWeight: 800,
-                },
-                formatter: (value) => formatNumber(value),
-                offsetX: 12,
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent'],
             },
             xaxis: {
-                categories: categories.map((row) => row?.label || '-'),
+                categories: categories.map((row) => truncateLabel(row?.label || '-', 12)),
                 labels: {
                     style: {
-                        colors: colors.muted,
-                        fontSize: '11px',
+                        colors: categories.map(() => colors.text),
+                        fontSize: '12px',
+                        fontWeight: 800,
                     },
-                    formatter: (value) => formatNumber(value),
+                    rotate: 0,
                 },
                 axisBorder: {
                     color: colors.border,
@@ -309,19 +324,31 @@
             yaxis: {
                 labels: {
                     style: {
-                        colors: colors.text,
+                        colors: [colors.muted],
                         fontSize: '12px',
-                        fontWeight: 700,
+                        fontWeight: 800,
                     },
-                    maxWidth: 220,
+                    formatter: (value) => compactNumber(value),
                 },
+            },
+            dataLabels: {
+                enabled: true,
+                offsetY: -20,
+                style: {
+                    fontSize: '12px',
+                    fontWeight: 800,
+                    colors: [colors.text],
+                },
+                formatter: (value) => compactNumber(value),
+            },
+            legend: {
+                show: false,
             },
             tooltip: {
                 theme: isDark() ? 'dark' : 'light',
                 y: {
                     formatter: (value, opts) => {
-                        const index = opts.dataPointIndex;
-                        const detail = Array.isArray(data.detail) ? data.detail[index] || {} : {};
+                        const detail = details[opts.dataPointIndex] || {};
 
                         return `${formatNumber(value)} Unit | ${formatRupiah(detail.gross_revenue_rupiah || 0)}`;
                     },
@@ -329,66 +356,71 @@
             },
         });
 
-        chartInstances[key].render();
+        instances[key].render();
     };
 
-    const renderCashflowLine = () => {
+    const renderOperationalArea = () => {
         const key = 'cashflow';
         const container = containers.cashflow;
-        const data = charts.cashflow_line || {};
+        const data = charts.operational_performance_bar || {};
+        const colors = palette();
         const labels = Array.isArray(data.labels) ? data.labels : [];
         const series = Array.isArray(data.series) ? data.series : [];
-        const colors = theme();
 
-        destroyChart(key);
+        destroy(key);
 
         if (!container || !labels.length || !series.length) {
-            emptyState(container, 'Belum ada data tren arus kas pada bulan aktif.', colors);
+            emptyState(container, 'Belum ada data laba operasional pada bulan aktif.', colors);
             return;
         }
 
         container.innerHTML = '';
 
-        const seriesColors = {
-            cash_in: colors.success,
-            cash_out: colors.danger,
-            net_cash_flow: colors.info,
+        const colorMap = {
+            operational_profit: colors.primary,
+            operational_expense: colors.warning,
+            refund: colors.danger,
         };
 
-        chartInstances[key] = new ApexCharts(container, {
-            ...buildCommonOptions(colors),
+        instances[key] = new ApexCharts(container, {
+            ...baseOptions(colors),
             chart: {
-                ...buildCommonOptions(colors).chart,
+                ...baseOptions(colors).chart,
                 type: 'area',
-                height: 320,
+                height: 340,
             },
             series: series.map((row) => ({
                 name: row?.label || '-',
                 data: Array.isArray(row?.values) ? row.values.map((value) => Number(value || 0)) : [],
             })),
-            colors: series.map((row) => seriesColors[row?.key] || colors.primary),
+            colors: series.map((row) => colorMap[row?.key] || colors.info),
+            stroke: {
+                curve: 'smooth',
+                width: 3,
+            },
             fill: {
                 type: 'gradient',
                 gradient: {
                     shadeIntensity: 1,
-                    opacityFrom: 0.34,
+                    opacityFrom: 0.26,
                     opacityTo: 0.06,
                     stops: [0, 90, 100],
                 },
             },
             markers: {
-                size: 4,
+                size: 3.5,
                 strokeWidth: 0,
                 hover: {
-                    size: 6,
+                    size: 5.5,
                 },
             },
             xaxis: {
                 categories: labels.map((label) => shortDate(label)),
                 labels: {
                     style: {
-                        colors: colors.muted,
+                        colors: labels.map(() => colors.muted),
                         fontSize: '11px',
+                        fontWeight: 800,
                     },
                 },
                 axisBorder: {
@@ -401,13 +433,16 @@
             yaxis: {
                 labels: {
                     style: {
-                        colors: colors.muted,
+                        colors: [colors.muted],
                         fontSize: '11px',
+                        fontWeight: 800,
                     },
-                    formatter: (value) => formatNumber(value),
+                    formatter: (value) => compactNumber(value),
                 },
             },
             tooltip: {
+                shared: true,
+                intersect: false,
                 theme: isDark() ? 'dark' : 'light',
                 y: {
                     formatter: (value) => formatRupiah(value),
@@ -415,18 +450,18 @@
             },
         });
 
-        chartInstances[key].render();
+        instances[key].render();
     };
 
     const renderOperationalBar = () => {
         const key = 'operational';
         const container = containers.operational;
         const data = charts.operational_performance_bar || {};
+        const colors = palette();
         const labels = Array.isArray(data.labels) ? data.labels : [];
         const series = Array.isArray(data.series) ? data.series : [];
-        const colors = theme();
 
-        destroyChart(key);
+        destroy(key);
 
         if (!container || !labels.length || !series.length) {
             emptyState(container, 'Belum ada data kinerja operasional pada bulan aktif.', colors);
@@ -435,37 +470,43 @@
 
         container.innerHTML = '';
 
-        const seriesColors = {
+        const colorMap = {
             operational_profit: colors.primary,
-            operational_expense: colors.warning,
-            refund: colors.danger,
+            operational_expense: colors.success,
+            refund: colors.warning,
         };
 
-        chartInstances[key] = new ApexCharts(container, {
-            ...buildCommonOptions(colors),
+        instances[key] = new ApexCharts(container, {
+            ...baseOptions(colors),
             chart: {
-                ...buildCommonOptions(colors).chart,
+                ...baseOptions(colors).chart,
                 type: 'bar',
-                height: 320,
+                height: 340,
             },
             series: series.map((row) => ({
                 name: row?.label || '-',
                 data: Array.isArray(row?.values) ? row.values.map((value) => Number(value || 0)) : [],
             })),
-            colors: series.map((row) => seriesColors[row?.key] || colors.info),
+            colors: series.map((row) => colorMap[row?.key] || colors.info),
             plotOptions: {
                 bar: {
                     horizontal: false,
-                    borderRadius: 6,
-                    columnWidth: '52%',
+                    borderRadius: 8,
+                    columnWidth: '72%',
                 },
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent'],
             },
             xaxis: {
                 categories: labels.map((label) => shortDate(label)),
                 labels: {
                     style: {
-                        colors: colors.muted,
+                        colors: labels.map(() => colors.text),
                         fontSize: '11px',
+                        fontWeight: 800,
                     },
                 },
                 axisBorder: {
@@ -478,13 +519,16 @@
             yaxis: {
                 labels: {
                     style: {
-                        colors: colors.muted,
+                        colors: [colors.muted],
                         fontSize: '11px',
+                        fontWeight: 800,
                     },
-                    formatter: (value) => formatNumber(value),
+                    formatter: (value) => compactNumber(value),
                 },
             },
             tooltip: {
+                shared: true,
+                intersect: false,
                 theme: isDark() ? 'dark' : 'light',
                 y: {
                     formatter: (value) => formatRupiah(value),
@@ -492,13 +536,13 @@
             },
         });
 
-        chartInstances[key].render();
+        instances[key].render();
     };
 
     const renderAll = () => {
-        renderStockDonut();
-        renderTopSellingBar();
-        renderCashflowLine();
+        renderStock();
+        renderTopSelling();
+        renderOperationalArea();
         renderOperationalBar();
     };
 

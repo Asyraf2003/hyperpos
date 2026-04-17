@@ -976,6 +976,68 @@
         }
     }
 
+    /* analytics-apex-polish-start */
+    .dashboard-report .analytics-stage-card {
+        padding: 1.35rem;
+        border-radius: 1.25rem;
+    }
+
+    .dashboard-report .analytics-stage-head .section-title {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--report-text);
+        letter-spacing: .01em;
+    }
+
+    .dashboard-report .analytics-stage-range {
+        font-size: .82rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+    }
+
+    .dashboard-report .chart-shell.chart-placeholder {
+        min-height: 340px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .dashboard-report .chart-canvas-shell {
+        min-height: 340px;
+        padding: .2rem 0 0;
+        border: 0;
+        background: transparent;
+    }
+
+    .dashboard-report .analytics-summary-list {
+        display: none !important;
+    }
+
+    .dashboard-report .analytics-stage-card .apexcharts-canvas,
+    .dashboard-report .analytics-stage-card .apexcharts-svg {
+        border-radius: 18px;
+    }
+
+    .dashboard-report .analytics-stage-card .apexcharts-text tspan,
+    .dashboard-report .analytics-stage-card .apexcharts-legend-text {
+        font-weight: 800 !important;
+    }
+
+    .dashboard-report .analytics-stage-card .apexcharts-xaxis-label,
+    .dashboard-report .analytics-stage-card .apexcharts-yaxis-label {
+        fill: var(--report-text-muted) !important;
+    }
+
+    .dashboard-report .analytics-stage-card .apexcharts-gridline {
+        stroke-opacity: .85;
+    }
+
+    .dashboard-report .analytics-stage-card .apexcharts-toolbar {
+        display: none !important;
+    }
+    /* analytics-apex-polish-end */
+
 </style>
 
 <div class="dashboard-report">
@@ -1093,7 +1155,7 @@
                         <div class="analytics-stage-card">
                             <div class="analytics-stage-head">
                                 <div>
-                                    <h6 class="section-title mb-1">Tren Arus Kas Bulan Ini</h6>
+                                    <h6 class="section-title mb-1">Laba Operasional Bulan Ini</h6>
                                     <p class="analytics-stage-range">
                                         Range:
                                         {{ $dashboard['analytics']['charts']['cashflow_line']['range']['date_from'] ?? '-' }}
@@ -1103,7 +1165,7 @@
                                 </div>
                                 <span class="badge-soft bg-soft-info">
                                     <i class="bi bi-activity"></i>
-                                    {{ count($dashboard['analytics']['charts']['cashflow_line']['labels'] ?? []) }} Titik
+                                    {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
                                 </span>
                             </div>
 
