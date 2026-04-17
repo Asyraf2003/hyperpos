@@ -36,7 +36,7 @@
 
                 @include('cashier.notes.partials.add-rows-form')
 
-                @if ($note['is_open'])
+                @if ($note['can_show_payment_form'])
                     @include('cashier.notes.partials.payment-form')
                 @endif
 
@@ -51,4 +51,5 @@
 
 @push('scripts')
 <script src="{{ asset('assets/static/js/pages/cashier-note-payment.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-payment.js')) }}"></script>
+<script src="{{ asset('assets/static/js/pages/cashier-note-refund.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-refund.js')) }}"></script>
 @endpush

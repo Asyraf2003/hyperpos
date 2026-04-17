@@ -37,8 +37,10 @@
                     @forelse ($note['rows'] as $row)
                         @php
                             $canPay = (bool) ($row['can_pay'] ?? false);
+                            $canRefund = (bool) ($row['can_refund'] ?? false);
                             $rowId = (string) ($row['id'] ?? '');
                             $rowOutstanding = (int) ($row['outstanding_rupiah'] ?? 0);
+                            $rowRefundable = (int) ($row['net_paid_rupiah'] ?? 0);
                         @endphp
                         <tr>
                             <td>
@@ -52,6 +54,18 @@
                                             data-outstanding-rupiah="{{ $rowOutstanding }}"
                                             data-line-status="{{ $row['line_status'] ?? '' }}"
                                             aria-label="Pilih line {{ $row['line_no'] }} untuk pembayaran"
+                                        >
+                                    </div>
+                                @elseif ($canRefund && $rowId !== '')
+                                    <div class="form-check d-flex justify-content-center mb-0">
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input js-refund-row-selector"
+                                            value="{{ $rowId }}"
+                                            data-row-id="{{ $rowId }}"
+                                            data-refundable-rupiah="{{ $rowRefundable }}"
+                                            data-line-status="{{ $row['line_status'] ?? '' }}"
+                                            aria-label="Pilih line {{ $row['line_no'] }} untuk refund"
                                         >
                                     </div>
                                 @else
@@ -108,7 +122,7 @@
         </div>
 
         <div class="small text-muted mt-3">
-            Centang line Open yang ingin dibayar. Wiring final ke request, controller, dan allocator akan dikunci di langkah berikutnya.
+            Centang line Open untuk pembayaran atau line Close untuk refund. Wiring final ke request dan controller sekarang sudah line-centric.
         </div>
     </div>
 </div>

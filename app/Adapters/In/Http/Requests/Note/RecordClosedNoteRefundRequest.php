@@ -19,6 +19,8 @@ final class RecordClosedNoteRefundRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'selected_row_ids' => ['required', 'array', 'min:1'],
+            'selected_row_ids.*' => ['string', 'distinct'],
             'customer_payment_id' => ['required', 'string'],
             'amount_rupiah' => ['required', 'integer', 'min:1'],
             'refunded_at' => ['required', 'date_format:Y-m-d'],

@@ -29,12 +29,12 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Panel Kerja Nota')
             ->assertSee('Header Nota')
             ->assertSee('Daftar Line Nota')
-            ->assertSee('Refund Line Tertutup')
+            ->assertSee('Refund Line Close Terpilih')
             ->assertSee('Panel Refund')
             ->assertSee('Ringkasan Line')
             ->assertSee('customer_payment_id', false)
             ->assertSee('payment-1', false)
-            ->assertDontSee('Pembayaran Line Terpilih')
+            ->assertDontSee('Pembayaran Line Open Terpilih')
             ->assertDontSee('Panel Bayar');
     }
 
@@ -52,10 +52,10 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Daftar Line Nota')
             ->assertSee('Aksi Workspace')
             ->assertSee('Edit Workspace')
-            ->assertSee('Pembayaran Line Terpilih')
+            ->assertSee('Pembayaran Line Open Terpilih')
             ->assertSee('Panel Bayar')
             ->assertSee('Sudah Dibayar')
-            ->assertDontSee('Refund Line Tertutup');
+            ->assertDontSee('Refund Line Close Terpilih');
     }
 
     private function seedKasir(): User

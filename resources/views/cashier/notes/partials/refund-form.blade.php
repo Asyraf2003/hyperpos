@@ -2,9 +2,9 @@
     <div class="card-header">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
-                <h4 class="card-title mb-1">Refund Line Tertutup</h4>
+                <h4 class="card-title mb-1">Refund Line Close Terpilih</h4>
                 <p class="mb-0 text-muted">
-                    Form ini menjadi jembatan menuju flow refund per-line. Fokus refund diarahkan ke line yang sudah close, tanpa memutus histori pembayaran yang sudah tercatat.
+                    Form ini membaca line Close yang dipilih dari tabel line. Refund dicatat untuk line yang dicentang, sambil tetap menjaga histori sumber pembayaran.
                 </p>
             </div>
 
@@ -12,15 +12,18 @@
         </div>
 
         <p class="mt-2 mb-0 text-muted small">
-            Pada tahap ini form refund masih memakai sumber pembayaran lama. Finalisasi refund per-line akan dikunci di paket berikutnya.
+            Sumber pembayaran lama tetap dipakai sebagai jejak histori, tetapi pilihan line Close sekarang menjadi input utama refund.
         </p>
     </div>
 
     <div class="card-body">
-        @if ($errors->has('refund') || $errors->has('customer_payment_id') || $errors->has('amount_rupiah') || $errors->has('refunded_at') || $errors->has('reason'))
+        @if ($errors->has('refund') || $errors->has('selected_row_ids') || $errors->has('customer_payment_id') || $errors->has('amount_rupiah') || $errors->has('refunded_at') || $errors->has('reason'))
             <div class="alert alert-danger py-2 px-3 mb-3">
                 @if ($errors->has('refund'))
                     <div>{{ $errors->first('refund') }}</div>
+                @endif
+                @if ($errors->has('selected_row_ids'))
+                    <div>{{ $errors->first('selected_row_ids') }}</div>
                 @endif
                 @if ($errors->has('customer_payment_id'))
                     <div>{{ $errors->first('customer_payment_id') }}</div>
@@ -37,38 +40,40 @@
             </div>
         @endif
 
-        <div class="border rounded p-3 mb-4">
-            <div class="small text-muted mb-2">Ringkasan Refund Saat Ini</div>
+        <form method="POST" action="{{ $refundAction }}" id="note-refund-form">
+            @csrf
 
-            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted">Sudah Dibayar</span>
-                <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
+            <div id="selected-refund-row-inputs"></div>
+
+            <div class="border rounded p-3 mb-4">
+                <div class="small text-muted mb-2">Ringkasan Line Refund Terpilih</div>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Jumlah Line Dipilih</span>
+                    <strong id="selected-refund-row-count">0</strong>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Total Refundable Line Dipilih</span>
+                    <strong id="selected-refund-refundable-total">0</strong>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-2">
+                    <span class="fw-semibold">Nominal Refund Sekarang</span>
+                    <strong id="selected-refund-total">0</strong>
+                </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted">Total Refund</span>
-                <strong>{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
+            <div class="border rounded p-3 mb-4 bg-light">
+                <div class="fw-semibold mb-1">Catatan Transisi Selesai</div>
+                <div class="small text-muted">
+                    Refund sekarang mengikuti line Close yang dipilih. Sumber pembayaran tetap dipakai untuk memastikan histori refund tetap konsisten dengan alokasi payment sebelumnya.
+                </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center pt-2">
-                <span class="fw-semibold">Refund Wajib Saat Ini</span>
-                <strong class="fs-5">{{ number_format($note['refund_required_rupiah'], 0, ',', '.') }}</strong>
-            </div>
-        </div>
-
-        <div class="border rounded p-3 mb-4 bg-light">
-            <div class="fw-semibold mb-1">Catatan Transisi</div>
-            <div class="small text-muted">
-                Setelah flow refund line final selesai, area ini akan membaca line close yang dipilih langsung dari daftar line. Untuk sekarang, sumber pembayaran lama tetap dipakai agar alur refund tidak terputus.
-            </div>
-        </div>
-
-        @if (($note['refund_payment_options'] ?? []) !== [])
-            <form method="POST" action="{{ $refundAction }}">
-                @csrf
-
+            @if (($note['refund_payment_options'] ?? []) !== [])
                 <div class="form-group mb-4">
-                    <label for="refund_customer_payment_id" class="form-label">Sumber Pembayaran Lama</label>
+                    <label for="refund_customer_payment_id" class="form-label">Sumber Pembayaran Histori</label>
                     <select
                         id="refund_customer_payment_id"
                         name="customer_payment_id"
@@ -84,10 +89,6 @@
                             </option>
                         @endforeach
                     </select>
-
-                    <div class="form-text">
-                        Sumber ini masih dipakai sementara untuk menjaga konsistensi histori refund sebelum flow line final selesai.
-                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -109,15 +110,11 @@
                         min="1"
                         id="refund_amount_rupiah"
                         name="amount_rupiah"
-                        value="{{ old('amount_rupiah', $note['refund_required_rupiah'] > 0 ? $note['refund_required_rupiah'] : '') }}"
+                        value="{{ old('amount_rupiah') }}"
                         class="form-control"
-                        placeholder="Contoh: 50000"
+                        placeholder="Isi nominal refund untuk line Close yang dipilih"
                         required
                     >
-
-                    <div class="form-text">
-                        Isi nominal yang dibalikkan sesuai kebutuhan line yang sedang direview.
-                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -133,16 +130,16 @@
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Catat Refund</button>
+                    <button type="submit" class="btn btn-primary" id="note-refund-submit">Catat Refund Line</button>
                 </div>
-            </form>
-        @else
-            <div class="border rounded p-3 bg-light">
-                <div class="fw-semibold mb-1">Belum ada sumber refund yang bisa dipilih</div>
-                <div class="text-muted small">
-                    Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran lama belum tersedia untuk flow refund transisi.
+            @else
+                <div class="border rounded p-3 bg-light">
+                    <div class="fw-semibold mb-1">Belum ada sumber refund yang bisa dipilih</div>
+                    <div class="text-muted small">
+                        Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran lama belum tersedia untuk flow refund.
+                    </div>
                 </div>
-            </div>
-        @endif
+            @endif
+        </form>
     </div>
 </div>

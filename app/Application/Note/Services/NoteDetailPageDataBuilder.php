@@ -34,15 +34,16 @@ final class NoteDetailPageDataBuilder
             $operational['net_paid_rupiah'],
         );
 
-        // legacy calculation kept temporarily for transition safety
         $this->rowSettlements->build($note->id(), $note->workItems());
 
-        // new line-centric workspace source
         $workspacePanel = $this->workspacePanel->build($noteId);
 
         if ($workspacePanel === null) {
             return null;
         }
+
+        $openLineCount = (int) ($workspacePanel['line_summary']['open_count'] ?? 0);
+        $closeLineCount = (int) ($workspacePanel['line_summary']['close_count'] ?? 0);
 
         return [
             'pageTitle' => 'Detail Nota',
@@ -54,7 +55,6 @@ final class NoteDetailPageDataBuilder
                 'transaction_date' => $note->transactionDate()->format('Y-m-d'),
                 'note_state' => $note->noteState(),
 
-                // legacy note-centric fields kept temporarily
                 'operational_status' => $operational['operational_status'],
                 'is_open' => $operational['is_open'],
                 'is_closed' => $operational['is_close'],
@@ -68,19 +68,16 @@ final class NoteDetailPageDataBuilder
                 'can_add_rows' => $operational['is_open'],
                 'can_show_edit_actions' => $operational['is_open'],
                 'can_edit_workspace' => $operational['is_open'],
-                'can_show_payment_form' => $operational['is_open'] && $operational['outstanding_rupiah'] > 0,
-                'can_show_refund_form' => $operational['is_close'],
+                'can_show_payment_form' => $openLineCount > 0 && $operational['outstanding_rupiah'] > 0,
+                'can_show_refund_form' => $closeLineCount > 0,
                 'refund_payment_options' => $this->refundPaymentOptions->build($note->id()),
                 'can_show_correction_actions' => false,
                 'correction_notice' => $operational['is_close']
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
                     : null,
 
-                // new line-centric transition fields
                 'line_summary' => $workspacePanel['line_summary'],
                 'rows' => $workspacePanel['rows'],
-
-                // legacy history remains
                 'correction_history' => $this->history->build($note->id()),
             ],
             'productOptions' => $this->products->build(),
