@@ -6,6 +6,14 @@
 
 @section('content')
 <div class="page-content">
+    <div class="mb-4">
+        <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
+        <h3 class="mb-1">Panel Kerja Nota</h3>
+        <div class="text-muted">
+            Pilih tindakan berdasarkan status masing-masing line. Nota dibaca sebagai wadah, sedangkan operasi harian mengikuti line.
+        </div>
+    </div>
+
     <div class="row g-4 align-items-start">
         <div class="col-12 col-xl-8">
             <div class="d-flex flex-column gap-4">
@@ -17,6 +25,15 @@
 
         <div class="col-12 col-xl-4">
             <div class="d-flex flex-column gap-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Panel Aksi Workspace</h4>
+                        <p class="mb-0 text-muted">
+                            Area samping dipakai untuk tindakan lanjutan workspace dan form transisi sebelum flow line final selesai.
+                        </p>
+                    </div>
+                </div>
+
                 @include('cashier.notes.partials.add-rows-form')
 
                 @if ($note['is_open'])

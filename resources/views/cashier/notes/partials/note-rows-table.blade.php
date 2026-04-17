@@ -2,19 +2,19 @@
     <div class="card-header">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
-                <h4 class="card-title mb-1">Rincian Nota</h4>
+                <h4 class="card-title mb-1">Daftar Line Nota</h4>
                 <p class="mb-0 text-muted">
-                    Rincian baris membaca struktur nota terbaru dan ringkasan settlement operasional per baris.
+                    Setiap line menjadi unit kerja utama. Aksi harian dibaca dari status line, bukan dari status nota.
                 </p>
             </div>
 
             <span class="badge bg-light text-dark border">
-                {{ $note['is_closed'] ? 'Detail Close' : 'Detail Open' }}
+                {{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}
             </span>
         </div>
 
         <p class="mt-2 mb-0 text-muted small">
-            Angka per baris di bawah ini dipakai untuk membaca posisi operasional nota saat ini, bukan untuk mengubah histori ledger pembayaran.
+            Open dapat diedit dan dibayar. Close siap untuk refund. Refund hanya dibuka untuk melihat detail line.
         </p>
     </div>
 
@@ -23,33 +23,69 @@
             <table class="table table-striped align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Baris</th>
+                        <th>Line</th>
                         <th>Tipe</th>
-                        <th>Status Item</th>
+                        <th>Status Line</th>
                         <th class="text-end">Subtotal</th>
-                        <th class="text-end">Net Paid</th>
+                        <th class="text-end">Sudah Dibayar</th>
                         <th class="text-end">Sisa</th>
-                        <th class="text-end">Settlement</th>
+                        <th style="width: 220px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($note['rows'] as $row)
+                    @forelse ($note['rows'] as $row)
                         <tr>
                             <td>{{ $row['line_no'] }}</td>
                             <td>{{ $row['type_label'] }}</td>
-                            <td>{{ $row['status'] }}</td>
-                            <td class="text-end">{{ number_format($row['subtotal_rupiah'], 0, ',', '.') }}</td>
-                            <td class="text-end">{{ number_format($row['net_paid_rupiah'], 0, ',', '.') }}</td>
-                            <td class="text-end">{{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
-                            <td class="text-end">
+                            <td>
                                 <span class="badge bg-light text-dark border text-uppercase">
-                                    {{ $row['settlement_label'] }}
+                                    {{ $row['line_status'] ?? '-' }}
                                 </span>
                             </td>
+                            <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
+                            <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
+                            <td class="text-end">{{ number_format((int) ($row['outstanding_rupiah'] ?? 0), 0, ',', '.') }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if ($row['can_edit'] ?? false)
+                                        <button type="button" class="btn btn-sm btn-outline-primary" disabled>
+                                            Edit
+                                        </button>
+                                    @endif
+
+                                    @if ($row['can_pay'] ?? false)
+                                        <button type="button" class="btn btn-sm btn-outline-success" disabled>
+                                            Bayar
+                                        </button>
+                                    @endif
+
+                                    @if ($row['can_refund'] ?? false)
+                                        <button type="button" class="btn btn-sm btn-outline-warning" disabled>
+                                            Refund
+                                        </button>
+                                    @endif
+
+                                    @if ($row['can_view_detail'] ?? false)
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                            Detail
+                                        </button>
+                                    @endif
+                                </div>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Belum ada line pada nota ini.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="small text-muted mt-3">
+            Tombol aksi line sedang dipindahkan ke flow kerja baru. Pada tahap ini fokusnya memastikan tampilan line-centric sudah terbaca jelas di halaman detail.
         </div>
     </div>
 </div>

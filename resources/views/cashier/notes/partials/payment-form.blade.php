@@ -3,17 +3,17 @@
         <div class="card-header">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                 <div>
-                    <h4 class="card-title mb-1">Pembayaran Nota</h4>
+                    <h4 class="card-title mb-1">Pembayaran Line Terpilih</h4>
                     <p class="mb-0 text-muted">
-                        Catat pembayaran untuk nota open tanpa keluar dari halaman detail kasir.
+                        Form ini dipakai sebagai jembatan menuju flow pembayaran line-centric. Fokus pembayaran tetap untuk line open yang dipilih dari workspace.
                     </p>
                 </div>
 
-                <span class="badge bg-light text-dark border">Mode Payment</span>
+                <span class="badge bg-light text-dark border">Panel Bayar</span>
             </div>
 
             <p class="mt-2 mb-0 text-muted small">
-                Pilih bayar penuh atau sebagian. Status note akan dihitung ulang dari outstanding terbaru setelah pembayaran dicatat.
+                Mode penuh atau sebagian masih dipertahankan sementara untuk kompatibilitas flow lama. Finalisasi pembayaran multi-line open akan dikunci di paket berikutnya.
             </p>
         </div>
 
@@ -28,13 +28,15 @@
                 @endif
 
                 <div class="border rounded p-3 mb-4">
+                    <div class="small text-muted mb-2">Ringkasan Nota Saat Ini</div>
+
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <span class="text-muted">Grand Total</span>
                         <strong>{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                        <span class="text-muted">Net Paid</span>
+                        <span class="text-muted">Sudah Dibayar</span>
                         <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
                     </div>
 
@@ -46,9 +48,16 @@
                     </div>
                 </div>
 
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="fw-semibold mb-1">Catatan Transisi</div>
+                    <div class="small text-muted">
+                        Setelah flow line final selesai, area ini akan membaca line open yang dipilih langsung dari tabel line. Untuk sekarang, form pembayaran tetap dipertahankan agar alur lama tidak putus mendadak.
+                    </div>
+                </div>
+
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label d-block mb-2">Jenis Pembayaran</label>
+                        <label class="form-label d-block mb-2">Mode Pembayaran Sementara</label>
 
                         <div class="d-flex flex-wrap gap-3">
                             <div class="form-check">
@@ -74,6 +83,10 @@
                                 >
                                 <label class="form-check-label" for="payment-scope-partial">Bayar Sebagian</label>
                             </div>
+                        </div>
+
+                        <div class="form-text">
+                            Opsi ini masih hidup untuk kompatibilitas flow lama. Target akhir tetap pembayaran untuk line open yang dipilih.
                         </div>
                     </div>
 
@@ -104,7 +117,7 @@
                             name="amount_paid"
                             id="amount-paid"
                             value="{{ old('amount_paid') }}"
-                            placeholder="Isi jika bayar sebagian"
+                            placeholder="Isi jika pembayaran belum menutup seluruh tagihan"
                         >
                     </div>
 
@@ -139,7 +152,7 @@
                 </div>
 
                 <div class="d-grid mt-3">
-                    <button type="submit" class="btn btn-primary">Bayar Sekarang</button>
+                    <button type="submit" class="btn btn-primary">Catat Pembayaran</button>
                 </div>
             </form>
         </div>

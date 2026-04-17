@@ -2,17 +2,17 @@
     <div class="card-header">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
-                <h4 class="card-title mb-1">Refund Nota</h4>
+                <h4 class="card-title mb-1">Refund Line Tertutup</h4>
                 <p class="mb-0 text-muted">
-                    Catat pembalikan dana untuk nota close tanpa mengubah histori pembayaran yang sudah tercatat.
+                    Form ini menjadi jembatan menuju flow refund per-line. Fokus refund diarahkan ke line yang sudah close, tanpa memutus histori pembayaran yang sudah tercatat.
                 </p>
             </div>
 
-            <span class="badge bg-light text-dark border">Mode Refund</span>
+            <span class="badge bg-light text-dark border">Panel Refund</span>
         </div>
 
         <p class="mt-2 mb-0 text-muted small">
-            Pilih sumber pembayaran yang masih punya sisa refundable, isi nominal refund, lalu simpan alasan.
+            Pada tahap ini form refund masih memakai sumber pembayaran lama. Finalisasi refund per-line akan dikunci di paket berikutnya.
         </p>
     </div>
 
@@ -38,8 +38,10 @@
         @endif
 
         <div class="border rounded p-3 mb-4">
+            <div class="small text-muted mb-2">Ringkasan Refund Saat Ini</div>
+
             <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                <span class="text-muted">Net Paid</span>
+                <span class="text-muted">Sudah Dibayar</span>
                 <strong>{{ number_format($note['net_paid_rupiah'], 0, ',', '.') }}</strong>
             </div>
 
@@ -49,8 +51,15 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-2">
-                <span class="fw-semibold">Refund Wajib</span>
+                <span class="fw-semibold">Refund Wajib Saat Ini</span>
                 <strong class="fs-5">{{ number_format($note['refund_required_rupiah'], 0, ',', '.') }}</strong>
+            </div>
+        </div>
+
+        <div class="border rounded p-3 mb-4 bg-light">
+            <div class="fw-semibold mb-1">Catatan Transisi</div>
+            <div class="small text-muted">
+                Setelah flow refund line final selesai, area ini akan membaca line close yang dipilih langsung dari daftar line. Untuk sekarang, sumber pembayaran lama tetap dipakai agar alur refund tidak terputus.
             </div>
         </div>
 
@@ -59,7 +68,7 @@
                 @csrf
 
                 <div class="form-group mb-4">
-                    <label for="refund_customer_payment_id" class="form-label">Sumber Pembayaran</label>
+                    <label for="refund_customer_payment_id" class="form-label">Sumber Pembayaran Lama</label>
                     <select
                         id="refund_customer_payment_id"
                         name="customer_payment_id"
@@ -75,6 +84,10 @@
                             </option>
                         @endforeach
                     </select>
+
+                    <div class="form-text">
+                        Sumber ini masih dipakai sementara untuk menjaga konsistensi histori refund sebelum flow line final selesai.
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -101,6 +114,10 @@
                         placeholder="Contoh: 50000"
                         required
                     >
+
+                    <div class="form-text">
+                        Isi nominal yang dibalikkan sesuai kebutuhan line yang sedang direview.
+                    </div>
                 </div>
 
                 <div class="form-group mb-4">
@@ -110,20 +127,20 @@
                         name="reason"
                         rows="3"
                         class="form-control"
-                        placeholder="Jelaskan alasan pembalikan dana"
+                        placeholder="Jelaskan line atau kejadian yang menjadi alasan refund"
                         required
                     >{{ old('reason') }}</textarea>
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Simpan Refund</button>
+                    <button type="submit" class="btn btn-primary">Catat Refund</button>
                 </div>
             </form>
         @else
             <div class="border rounded p-3 bg-light">
                 <div class="fw-semibold mb-1">Belum ada sumber refund yang bisa dipilih</div>
                 <div class="text-muted small">
-                    Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran belum tersedia untuk flow refund.
+                    Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran lama belum tersedia untuk flow refund transisi.
                 </div>
             </div>
         @endif
