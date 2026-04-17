@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Note\Queries;
 
-use App\Application\Note\Services\NotePaymentStatusResolver;
+use App\Application\Note\Services\WorkItemOperationalStatusResolver;
 
 final class AdminNoteHistoryRowMapper
 {
     public function __construct(
-        private readonly NotePaymentStatusResolver $paymentStatuses,
         private readonly CashierNoteHistoryValueFormatter $formatter,
-        private readonly AdminNoteHistoryEditabilityResolver $editability,
-        private readonly AdminNoteHistoryWorkSummaryFilter $workSummaryFilter,
     ) {
     }
 
@@ -30,22 +27,17 @@ final class AdminNoteHistoryRowMapper
             $refunded = (int) ($row->refunded_rupiah ?? 0);
             $netPaid = max($allocated - $refunded, 0);
             $outstanding = max($grandTotal - $netPaid, 0);
-            $paymentStatus = $this->paymentStatuses->resolve($grandTotal, $netPaid);
-            $noteState = (string) ($row->note_state ?? 'open');
-            $openCount = (int) ($row->open_count ?? 0);
-            $doneCount = (int) ($row->done_count ?? 0);
-            $canceledCount = (int) ($row->canceled_count ?? 0);
-            $editabilityKey = $this->editability->key($noteState, $paymentStatus);
 
-            if ($criteria->paymentStatus !== '' && $paymentStatus !== $criteria->paymentStatus) {
-                continue;
-            }
+            $lineOpenCount = (int) ($row->line_open_count ?? 0);
+            $lineCloseCount = (int) ($row->line_close_count ?? 0);
+            $lineRefundCount = (int) ($row->line_refund_count ?? 0);
 
-            if ($criteria->editability !== '' && $editabilityKey !== $criteria->editability) {
-                continue;
-            }
-
-            if (! $this->workSummaryFilter->matches($criteria->workSummary, $openCount, $doneCount, $canceledCount)) {
+            if (! $this->matchesLineStatusFilter(
+                $criteria->lineStatus,
+                $lineOpenCount,
+                $lineCloseCount,
+                $lineRefundCount
+            )) {
                 continue;
             }
 
@@ -60,15 +52,36 @@ final class AdminNoteHistoryRowMapper
                 'grand_total_text' => $this->formatter->rupiah($grandTotal),
                 'total_paid_text' => $this->formatter->rupiah($netPaid),
                 'outstanding_text' => $this->formatter->rupiah($outstanding),
-                'payment_status_label' => $this->formatter->paymentStatusLabel($paymentStatus),
-                'work_status_label' => $this->formatter->workSummary($openCount, $doneCount, $canceledCount),
-                'editability_key' => $editabilityKey,
-                'editability_label' => $this->editability->label($editabilityKey),
-                'action_label' => 'Buka Detail',
+                'line_summary_label' => $this->formatter->lineSummary(
+                    $lineOpenCount,
+                    $lineCloseCount,
+                    $lineRefundCount,
+                ),
+                'line_summary_counts' => [
+                    'open' => $lineOpenCount,
+                    'close' => $lineCloseCount,
+                    'refund' => $lineRefundCount,
+                ],
+                'action_label' => 'Pilih',
                 'action_url' => route('admin.notes.show', ['noteId' => (string) $row->id]),
             ];
         }
 
         return $items;
+    }
+
+    private function matchesLineStatusFilter(
+        string $filter,
+        int $lineOpenCount,
+        int $lineCloseCount,
+        int $lineRefundCount
+    ): bool {
+        return match ($filter) {
+            WorkItemOperationalStatusResolver::STATUS_OPEN => $lineOpenCount > 0,
+            WorkItemOperationalStatusResolver::STATUS_CLOSE => $lineCloseCount > 0,
+            WorkItemOperationalStatusResolver::STATUS_REFUND => $lineRefundCount > 0,
+            '' => true,
+            default => true,
+        };
     }
 }
