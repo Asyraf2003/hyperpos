@@ -21,7 +21,7 @@ final class CashierNoteHistoryPageFeatureTest extends TestCase
         $response = $this->actingAs($user)->get(route('cashier.notes.index'));
 
         $response->assertOk();
-        $response->assertSee('Riwayat Nota Kasir');
+        $response->assertSee('Daftar Nota Kasir');
         $response->assertSee('cashier-note-search-input', false);
         $response->assertSee('cashier-note-table-body', false);
         $response->assertSee('cashier-note-index.js');
