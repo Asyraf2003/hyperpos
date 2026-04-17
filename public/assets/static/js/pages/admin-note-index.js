@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('admin-note-search-input');
     const dateFromInput = document.getElementById('admin-note-date-from');
     const dateToInput = document.getElementById('admin-note-date-to');
-    const paymentStatusInput = document.getElementById('admin-note-payment-status');
-    const editabilityInput = document.getElementById('admin-note-editability');
-    const workSummaryInput = document.getElementById('admin-note-work-summary');
+    const lineStatusInput = document.getElementById('admin-note-line-status');
     const tableBody = document.getElementById('admin-note-table-body');
     const summaryNode = document.getElementById('admin-note-table-summary');
     const paginationNode = document.getElementById('admin-note-table-pagination');
@@ -23,9 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         || !searchInput
         || !dateFromInput
         || !dateToInput
-        || !paymentStatusInput
-        || !editabilityInput
-        || !workSummaryInput
+        || !lineStatusInput
         || !tableBody
         || !summaryNode
         || !paginationNode
@@ -65,9 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             date_from: normalize(params.get('date_from') || filters.date_from),
             date_to: normalize(params.get('date_to') || filters.date_to),
             search: normalize(params.get('search') || filters.search),
-            payment_status: normalize(params.get('payment_status') || filters.payment_status),
-            editability: normalize(params.get('editability') || filters.editability),
-            work_summary: normalize(params.get('work_summary') || filters.work_summary),
+            line_status: normalize(params.get('line_status') || filters.line_status),
             page: intOrDefault(params.get('page'), 1),
             per_page: intOrDefault(params.get('per_page'), 10),
         };
@@ -82,17 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.value = state.search;
         dateFromInput.value = state.date_from;
         dateToInput.value = state.date_to;
-        paymentStatusInput.value = state.payment_status;
-        editabilityInput.value = state.editability;
-        workSummaryInput.value = state.work_summary;
+        lineStatusInput.value = state.line_status;
     };
 
-    const syncDrawerState = () => {
+    const syncFilterState = () => {
         state.date_from = normalize(dateFromInput.value);
         state.date_to = normalize(dateToInput.value);
-        state.payment_status = normalize(paymentStatusInput.value);
-        state.editability = normalize(editabilityInput.value);
-        state.work_summary = normalize(workSummaryInput.value);
+        state.line_status = normalize(lineStatusInput.value);
         state.page = 1;
     };
 
@@ -107,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             per_page: String(state.per_page),
         };
 
-        ['date_from', 'date_to', 'search', 'payment_status', 'editability', 'work_summary'].forEach((key) => {
+        ['date_from', 'date_to', 'search', 'line_status'].forEach((key) => {
             const value = normalize(state[key]);
             if (value !== '') {
                 obj[key] = value;
@@ -139,20 +129,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderLoading = () => {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="11" class="text-center text-muted py-4">Sedang memuat riwayat nota admin...</td>
+                <td colspan="9" class="text-center text-muted py-4">Sedang memuat daftar nota admin...</td>
             </tr>
         `;
-        summaryNode.textContent = 'Memuat ringkasan riwayat admin...';
+        summaryNode.textContent = 'Memuat ringkasan daftar nota admin...';
         paginationNode.innerHTML = '<span class="text-muted small">Memuat pagination...</span>';
     };
 
     const renderError = () => {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="11" class="text-center text-danger py-4">Riwayat nota admin gagal dimuat.</td>
+                <td colspan="9" class="text-center text-danger py-4">Daftar nota admin gagal dimuat.</td>
             </tr>
         `;
-        summaryNode.textContent = 'Gagal memuat ringkasan riwayat admin.';
+        summaryNode.textContent = 'Gagal memuat ringkasan daftar nota admin.';
         paginationNode.innerHTML = '<span class="text-muted small">Pagination belum tersedia.</span>';
     };
 
@@ -165,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderAction = (item) => {
         if (typeof item.action_url === 'string' && item.action_url !== '') {
-            return `<a href="${escapeHtml(item.action_url)}" class="btn btn-sm btn-outline-primary">${escapeHtml(item.action_label ?? 'Buka')}</a>`;
+            return `<a href="${escapeHtml(item.action_url)}" class="btn btn-sm btn-outline-primary">${escapeHtml(item.action_label ?? 'Pilih')}</a>`;
         }
 
         return escapeHtml(item.action_label ?? '-');
@@ -200,8 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!Array.isArray(items) || items.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="11" class="text-center text-muted py-4">
-                        ${escapeHtml(summaryLabel || 'Belum ada data riwayat admin.')}
+                    <td colspan="9" class="text-center text-muted py-4">
+                        ${escapeHtml(summaryLabel || 'Belum ada data daftar nota admin.')}
                     </td>
                 </tr>
             `;
@@ -218,15 +208,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="text-end">${escapeHtml(item.grand_total_text ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.total_paid_text ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.outstanding_text ?? '-')}</td>
-                    <td>${escapeHtml(item.payment_status_label ?? '-')}</td>
-                    <td>${escapeHtml(item.work_status_label ?? '-')}</td>
-                    <td>${escapeHtml(item.editability_label ?? '-')}</td>
+                    <td>${escapeHtml(item.line_summary_label ?? '-')}</td>
                     <td>${renderAction(item)}</td>
                 </tr>
             `).join('');
         }
 
-        summaryNode.textContent = summaryLabel || 'Riwayat admin siap.';
+        summaryNode.textContent = summaryLabel || 'Daftar nota admin siap.';
         renderPager(pagination);
     };
 
@@ -269,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const items = Array.isArray(data.items) ? data.items : [];
             const summaryLabel = typeof data?.summary?.label === 'string'
                 ? data.summary.label
-                : 'Riwayat admin siap.';
+                : 'Daftar nota admin siap.';
             const pagination = typeof data.pagination === 'object' && data.pagination !== null
                 ? data.pagination
                 : { page: 1, per_page: 10, total: 0, last_page: 1 };
@@ -319,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        syncDrawerState();
+        syncFilterState();
         drawOpen(false);
         loadTable();
     });
@@ -328,10 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filterForm.reset();
         dateFromInput.value = normalize(filters.date_from);
         dateToInput.value = normalize(filters.date_to);
-        paymentStatusInput.value = '';
-        editabilityInput.value = '';
-        workSummaryInput.value = '';
-        syncDrawerState();
+        lineStatusInput.value = '';
+        syncFilterState();
         drawOpen(false);
         loadTable();
     });

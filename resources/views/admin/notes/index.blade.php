@@ -10,10 +10,9 @@
         <div class="card-header">
             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                 <div>
-                    <h4 class="card-title mb-1">Riwayat Nota Admin</h4>
+                    <h4 class="card-title mb-1">Daftar Nota Admin</h4>
                     <p class="mb-0 text-muted">
-                        Workspace operasional admin untuk membuka nota, memantau status pembayaran,
-                        melihat histori perubahan, dan menangani mode edit sesuai policy.
+                        Area kerja admin untuk membuka daftar nota penuh, memfilter berdasarkan rentang tanggal, dan lanjut ke panel kerja per line.
                     </p>
                 </div>
 
@@ -48,16 +47,14 @@
                             <th class="text-end">Grand Total</th>
                             <th class="text-end">Sudah Dibayar</th>
                             <th class="text-end">Sisa Tagihan</th>
-                            <th>Status Bayar</th>
-                            <th>Ringkasan Pengerjaan</th>
-                            <th>Mode Edit</th>
+                            <th>Ringkasan Line</th>
                             <th style="width: 120px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="admin-note-table-body">
                         <tr>
-                            <td colspan="11" class="text-center text-muted py-4">
-                                Sedang menyiapkan riwayat nota admin...
+                            <td colspan="9" class="text-center text-muted py-4">
+                                Sedang menyiapkan daftar nota admin...
                             </td>
                         </tr>
                     </tbody>
@@ -66,7 +63,7 @@
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-3">
                 <small id="admin-note-table-summary" class="text-muted">
-                    Memuat ringkasan riwayat admin...
+                    Memuat ringkasan daftar nota admin...
                 </small>
                 <div id="admin-note-table-pagination"></div>
             </div>

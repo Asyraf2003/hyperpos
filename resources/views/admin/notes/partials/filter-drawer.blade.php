@@ -3,7 +3,7 @@
 <div id="admin-note-filter-drawer" class="position-fixed top-0 end-0 h-100 bg-body border-start shadow d-none" style="width: 360px; z-index: 1050; overflow-y: auto;">
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Filter Nota Admin</h5>
+            <h5 class="mb-0">Filter Daftar Nota Admin</h5>
             <button type="button" id="close-admin-note-filter" class="btn btn-sm btn-light-secondary">Tutup</button>
         </div>
 
@@ -14,8 +14,8 @@
                     type="date"
                     id="admin-note-date-from"
                     class="form-control"
-                    data-ui-date="single"
                     value="{{ $filters['date_from'] }}"
+                    data-ui-date="single"
                 >
             </div>
 
@@ -25,38 +25,18 @@
                     type="date"
                     id="admin-note-date-to"
                     class="form-control"
-                    data-ui-date="single"
                     value="{{ $filters['date_to'] }}"
+                    data-ui-date="single"
                 >
             </div>
 
-            <div class="form-group mb-3">
-                <label for="admin-note-payment-status" class="form-label">Status Pembayaran</label>
-                <select id="admin-note-payment-status" class="form-select">
-                    <option value="" @selected($filters['payment_status'] === '')>Semua Status</option>
-                    <option value="unpaid" @selected($filters['payment_status'] === 'unpaid')>Belum Dibayar</option>
-                    <option value="partial" @selected($filters['payment_status'] === 'partial')>Dibayar Sebagian</option>
-                    <option value="paid" @selected($filters['payment_status'] === 'paid')>Lunas</option>
-                </select>
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="admin-note-editability" class="form-label">Mode Edit</label>
-                <select id="admin-note-editability" class="form-select">
-                    <option value="" @selected($filters['editability'] === '')>Semua Mode</option>
-                    <option value="editable_normal" @selected($filters['editability'] === 'editable_normal')>Editable Normal</option>
-                    <option value="admin_strict" @selected($filters['editability'] === 'admin_strict')>Admin Ketat</option>
-                    <option value="correction_only" @selected($filters['editability'] === 'correction_only')>Correction Only</option>
-                </select>
-            </div>
-
             <div class="form-group mb-4">
-                <label for="admin-note-work-summary" class="form-label">Ringkasan Pengerjaan</label>
-                <select id="admin-note-work-summary" class="form-select">
-                    <option value="" @selected($filters['work_summary'] === '')>Semua Ringkasan</option>
-                    <option value="has_open" @selected($filters['work_summary'] === 'has_open')>Ada Open</option>
-                    <option value="has_done" @selected($filters['work_summary'] === 'has_done')>Ada Selesai</option>
-                    <option value="has_canceled" @selected($filters['work_summary'] === 'has_canceled')>Ada Batal</option>
+                <label for="admin-note-line-status" class="form-label">Status Line</label>
+                <select id="admin-note-line-status" class="form-select">
+                    <option value="" @selected($filters['line_status'] === '')>Semua Status</option>
+                    <option value="open" @selected($filters['line_status'] === 'open')>Open</option>
+                    <option value="close" @selected($filters['line_status'] === 'close')>Close</option>
+                    <option value="refund" @selected($filters['line_status'] === 'refund')>Refund</option>
                 </select>
             </div>
 

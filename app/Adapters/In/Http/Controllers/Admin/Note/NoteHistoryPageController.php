@@ -18,13 +18,11 @@ final class NoteHistoryPageController extends Controller
             'date_from' => $this->resolveString($request, 'date_from') ?? $today,
             'date_to' => $this->resolveString($request, 'date_to') ?? $today,
             'search' => $this->resolveString($request, 'search') ?? '',
-            'payment_status' => $this->resolveString($request, 'payment_status') ?? '',
-            'editability' => $this->resolveString($request, 'editability') ?? '',
-            'work_summary' => $this->resolveString($request, 'work_summary') ?? '',
+            'line_status' => $this->resolveString($request, 'line_status') ?? '',
         ];
 
         return view('admin.notes.index', [
-            'pageTitle' => 'Riwayat Nota',
+            'pageTitle' => 'Daftar Nota',
             'filters' => $filters,
         ]);
     }
