@@ -12,13 +12,13 @@
     :root {
         --dash-primary: #435ebe;
         --dash-primary-soft: #eef2ff;
-        --dash-success: #16a34a;
+        --dash-success: #28c76f;
         --dash-success-soft: #ecfdf3;
-        --dash-warning: #f59e0b;
-        --dash-warning-soft: #fff8e7;
-        --dash-danger: #ef4444;
-        --dash-danger-soft: #fef2f2;
-        --dash-info: #06b6d4;
+        --dash-warning: #fdac41;
+        --dash-warning-soft: #fff7e8;
+        --dash-danger: #ea5455;
+        --dash-danger-soft: #fff1f2;
+        --dash-info: #00cfe8;
         --dash-info-soft: #ecfeff;
     }
 
@@ -48,7 +48,8 @@
         box-sizing: border-box;
     }
 
-    .dashboard-report .card {
+    .dashboard-report .card,
+    .dashboard-report .analytics-stage-card {
         border: 1px solid var(--report-border);
         border-radius: var(--report-radius-xl);
         box-shadow: var(--report-shadow);
@@ -56,6 +57,19 @@
         background: var(--report-surface);
         background-clip: padding-box;
         transform: translateZ(0);
+    }
+
+    .dashboard-report .card:hover,
+    .dashboard-report .analytics-stage-card:hover {
+        box-shadow: var(--report-shadow-hover);
+        border-color: rgba(var(--bs-primary-rgb), .26);
+        transform: translateY(-2px);
+    }
+
+    .dashboard-report .panel-card-body,
+    .dashboard-report .chart-card-body,
+    .dashboard-report .stat-card-body {
+        padding: 1.35rem;
     }
 
     .dashboard-report .section-title {
@@ -74,6 +88,32 @@
         font-weight: 700;
         line-height: 1.65;
     }
+
+    .dashboard-report .card-head,
+    .dashboard-report .analytics-stage-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-report .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .42rem .74rem;
+        border-radius: 999px;
+        font-size: .76rem;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .dashboard-report .bg-soft-primary { background: var(--dash-primary-soft); color: var(--dash-primary); }
+    .dashboard-report .bg-soft-success { background: var(--dash-success-soft); color: var(--dash-success); }
+    .dashboard-report .bg-soft-warning { background: var(--dash-warning-soft); color: var(--dash-warning); }
+    .dashboard-report .bg-soft-danger { background: var(--dash-danger-soft); color: var(--dash-danger); }
+    .dashboard-report .bg-soft-info { background: var(--dash-info-soft); color: var(--dash-info); }
 
     .dashboard-report .hero-card {
         position: relative;
@@ -113,19 +153,6 @@
         z-index: 2;
     }
 
-    .dashboard-report .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        padding: .55rem .9rem;
-        border-radius: 999px;
-        background: rgba(255,255,255,.16);
-        color: #fff;
-        font-size: .82rem;
-        font-weight: 700;
-        backdrop-filter: blur(6px);
-    }
-
     .dashboard-report .hero-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -153,26 +180,7 @@
         font-weight: 800;
         margin: 0;
         letter-spacing: .2px;
-    }
-
-    .dashboard-report .hero-actions {
-        display: flex;
-        gap: .6rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    .dashboard-report .filter-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        padding: .65rem .9rem;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.18);
-        background: rgba(255,255,255,.12);
         color: #fff;
-        font-size: .82rem;
-        font-weight: 700;
     }
 
     .dashboard-report .profile-card {
@@ -220,17 +228,6 @@
         object-fit: cover;
     }
 
-    .dashboard-report .admin-avatar-placeholder {
-        width: 100%;
-        height: 100%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 1.6rem;
-        line-height: 1;
-    }
-
     .dashboard-report .profile-name {
         margin: 0;
         color: #fff;
@@ -261,8 +258,6 @@
             linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .06)),
             var(--report-surface);
         border: 1px solid var(--report-border);
-        background-clip: padding-box;
-        transform: translateZ(0);
     }
 
     .dashboard-report .summary-mini-label {
@@ -270,7 +265,6 @@
         font-size: .82rem;
         font-weight: 700;
         color: var(--report-text-muted);
-        letter-spacing: .01em;
     }
 
     .dashboard-report .summary-mini-value {
@@ -286,32 +280,19 @@
         border-radius: 999px;
         font-weight: 800;
         letter-spacing: .01em;
-        overflow: hidden;
-        background-clip: padding-box;
-        transform: translateZ(0);
     }
 
     .dashboard-report .stat-card {
         height: 100%;
-        background: var(--report-surface);
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .03), rgba(var(--bs-primary-rgb), .055)),
+            var(--report-surface);
     }
 
     .dashboard-report .stat-card-body {
-        padding: 1.2rem;
         display: flex;
         gap: 1rem;
         align-items: flex-start;
-    }
-
-    .dashboard-report .stat-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
     }
 
     .dashboard-report .stat-title {
@@ -330,10 +311,16 @@
         margin-bottom: .35rem;
     }
 
-    .dashboard-report .stat-meta {
-        font-size: .82rem;
+    .dashboard-report .stat-meta,
+    .dashboard-report .inventory-meta,
+    .dashboard-report .asset-subtitle,
+    .dashboard-report .finance-label,
+    .dashboard-report .product-sku,
+    .dashboard-report .analytics-stage-range {
+        font-size: .8rem;
+        color: var(--report-text-muted);
         font-weight: 700;
-        margin-bottom: 0;
+        margin: 0;
         line-height: 1.5;
     }
 
@@ -341,139 +328,64 @@
     .dashboard-report .meta-down { color: var(--dash-danger); }
     .dashboard-report .meta-flat { color: var(--dash-warning); }
 
-    .dashboard-report .bg-soft-primary { background: var(--dash-primary-soft); color: var(--dash-primary); }
-    .dashboard-report .bg-soft-success { background: var(--dash-success-soft); color: var(--dash-success); }
-    .dashboard-report .bg-soft-warning { background: var(--dash-warning-soft); color: var(--dash-warning); }
-    .dashboard-report .bg-soft-danger { background: var(--dash-danger-soft); color: var(--dash-danger); }
-    .dashboard-report .bg-soft-info { background: var(--dash-info-soft); color: var(--dash-info); }
-
-    .dashboard-report .chart-card-body,
-    .dashboard-report .panel-card-body {
-        padding: 1.25rem;
-    }
-
-    .dashboard-report .card-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
+    .dashboard-report .finance-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
-        margin-bottom: 1rem;
     }
 
-    .dashboard-report .card-toolbar {
-        display: flex;
-        gap: .5rem;
-        flex-wrap: wrap;
-    }
-
-    .dashboard-report .toolbar-pill {
-        padding: .45rem .75rem;
-        border-radius: 999px;
-        border: 1px solid var(--report-border);
-        background: var(--report-surface);
-        color: var(--report-text-muted);
-        font-size: .78rem;
-        font-weight: 800;
-    }
-
-    .dashboard-report .toolbar-pill.active {
-        background: var(--dash-primary-soft);
-        color: var(--dash-primary);
-        border-color: rgba(67, 94, 190, .18);
-    }
-
-    .dashboard-report .chart-shell,
-    .dashboard-report .trend-item,
+    .dashboard-report .finance-box,
     .dashboard-report .inventory-item,
-    .dashboard-report .asset-item,
-    .dashboard-report .finance-box {
+    .dashboard-report .asset-item {
         border: 1px solid var(--report-border);
         border-radius: var(--report-radius-lg);
         background:
             linear-gradient(180deg, rgba(var(--bs-primary-rgb), .02), rgba(var(--bs-primary-rgb), .045)),
             var(--report-surface);
-        box-shadow: var(--report-shadow);
-        background-clip: padding-box;
-        transform: translateZ(0);
+        padding: .95rem 1rem;
     }
 
-    .dashboard-report .chart-shell {
-        position: relative;
-        min-height: 320px;
-        padding: 1rem 1rem .75rem;
+    .dashboard-report .finance-value,
+    .dashboard-report .asset-value,
+    .dashboard-report .inventory-title,
+    .dashboard-report .asset-title,
+    .dashboard-report .product-name {
+        color: var(--report-text);
+        font-weight: 800;
     }
 
-    .dashboard-report .chart-header-inline {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-        margin-bottom: .75rem;
+    .dashboard-report .finance-value {
+        font-size: 1.15rem;
+        margin-bottom: .35rem;
+        line-height: 1.3;
     }
 
-    .dashboard-report .legend-item {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        font-size: .82rem;
-        color: var(--report-text-muted);
-        font-weight: 700;
-    }
-
-    .dashboard-report .legend-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-    }
-
-    .dashboard-report .chart-svg {
-        width: 100%;
-        height: 230px;
-        display: block;
-    }
-
-    .dashboard-report .axis-labels {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: .25rem;
+    .dashboard-report .finance-note {
         font-size: .79rem;
-        color: var(--report-text-muted);
         font-weight: 700;
-        margin-top: .25rem;
-        text-align: center;
+        margin: 0;
+        line-height: 1.5;
     }
 
-    .dashboard-report .trend-list,
-    .dashboard-report .inventory-list,
-    .dashboard-report .rotation-list,
     .dashboard-report .asset-list {
         display: grid;
         gap: .85rem;
     }
 
-    .dashboard-report .trend-item,
     .dashboard-report .asset-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: .8rem;
-        padding: .95rem 1rem;
     }
 
-    .dashboard-report .inventory-item,
-    .dashboard-report .finance-box {
-        padding: .95rem 1rem;
-    }
-
-    .dashboard-report .trend-item-left,
-    .dashboard-report .asset-left {
+    .dashboard-report .asset-left,
+    .dashboard-report .product-inline {
         display: flex;
         align-items: center;
-        gap: .85rem;
+        gap: .8rem;
     }
 
-    .dashboard-report .trend-badge,
     .dashboard-report .product-avatar {
         width: 42px;
         height: 42px;
@@ -486,120 +398,15 @@
         font-weight: 700;
     }
 
-    .dashboard-report .trend-label,
-    .dashboard-report .inventory-meta,
-    .dashboard-report .asset-subtitle,
-    .dashboard-report .finance-label,
-    .dashboard-report .rotation-percent,
-    .dashboard-report .product-sku {
-        font-size: .8rem;
+    .dashboard-report .helper-note {
+        padding: .95rem 1rem;
+        border-radius: var(--report-radius-lg);
+        background: linear-gradient(90deg, rgba(67, 94, 190, .08), rgba(6, 182, 212, .08));
         color: var(--report-text-muted);
+        font-size: .84rem;
         font-weight: 700;
-        margin: 0;
-        line-height: 1.5;
-    }
-
-    .dashboard-report .trend-value,
-    .dashboard-report .inventory-title,
-    .dashboard-report .asset-title,
-    .dashboard-report .asset-value,
-    .dashboard-report .finance-value,
-    .dashboard-report .rotation-label,
-    .dashboard-report .product-name {
-        color: var(--report-text);
-        font-weight: 800;
-    }
-
-    .dashboard-report .trend-value {
-        font-size: 1rem;
-        margin: 0;
-    }
-
-    .dashboard-report .stock-grid {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .dashboard-report .stock-ring-wrap {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .dashboard-report .stock-ring {
-        width: 180px;
-        height: 180px;
-        border-radius: 50%;
-        background:
-            conic-gradient(
-                var(--dash-primary) 0 46%,
-                var(--dash-success) 46% 73%,
-                var(--dash-warning) 73% 88%,
-                #dbe3ff 88% 100%
-            );
-        display: grid;
-        place-items: center;
-        position: relative;
-    }
-
-    .dashboard-report .stock-ring::after {
-        content: "";
-        width: 118px;
-        height: 118px;
-        border-radius: 50%;
-        background: var(--report-surface);
-        box-shadow: inset 0 0 0 1px rgba(17, 24, 39, .04);
-    }
-
-    .dashboard-report .stock-ring-center {
-        position: absolute;
-        text-align: center;
-        z-index: 2;
-    }
-
-    .dashboard-report .stock-ring-center h3 {
-        font-size: 1.4rem;
-        font-weight: 800;
-        color: var(--report-text);
-        margin-bottom: .15rem;
-    }
-
-    .dashboard-report .stock-ring-center p {
-        margin: 0;
-        font-size: .82rem;
-        color: var(--report-text-muted);
-        font-weight: 700;
-    }
-
-    .dashboard-report .inventory-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: .75rem;
-        margin-bottom: .55rem;
-    }
-
-    .dashboard-report .inventory-title,
-    .dashboard-report .asset-title,
-    .dashboard-report .product-name {
-        font-size: .94rem;
-        margin-bottom: .15rem;
-        line-height: 1.45;
-    }
-
-    .dashboard-report .progress-slim {
-        height: 8px;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--bs-border-color) 78%, white 22%);
-        overflow: hidden;
-    }
-
-    .dashboard-report .progress-slim > span {
-        display: block;
-        height: 100%;
-        border-radius: 999px;
+        border: 1px solid rgba(67, 94, 190, .10);
+        line-height: 1.6;
     }
 
     .dashboard-report .table-modern {
@@ -627,372 +434,17 @@
         font-weight: 700;
     }
 
-    .dashboard-report .product-inline {
-        display: flex;
-        align-items: center;
-        gap: .8rem;
-    }
-
-    .dashboard-report .badge-soft {
-        display: inline-flex;
-        align-items: center;
-        gap: .35rem;
-        padding: .42rem .74rem;
-        border-radius: 999px;
-        font-size: .76rem;
-        font-weight: 800;
-    }
-
-    .dashboard-report .finance-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .dashboard-report .finance-value {
-        font-size: 1.15rem;
-        margin-bottom: .35rem;
-        line-height: 1.3;
-    }
-
-    .dashboard-report .finance-note {
-        font-size: .79rem;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.5;
-    }
-
-    .dashboard-report .rotation-item {
-        display: grid;
-        grid-template-columns: 132px 1fr 78px;
-        align-items: center;
-        gap: .85rem;
-    }
-
-    .dashboard-report .rotation-label {
-        font-size: .84rem;
-        margin: 0;
-    }
-
-    .dashboard-report .rotation-percent {
-        text-align: right;
-    }
-
-    .dashboard-report .helper-note {
-        padding: .95rem 1rem;
-        border-radius: var(--report-radius-lg);
-        background: linear-gradient(90deg, rgba(67, 94, 190, .08), rgba(6, 182, 212, .08));
-        color: var(--report-text-muted);
-        font-size: .84rem;
-        font-weight: 700;
-        border: 1px solid rgba(67, 94, 190, .10);
-        line-height: 1.6;
-    }
-
-    .dashboard-report .chart-shell:hover,
-    .dashboard-report .trend-item:hover,
-    .dashboard-report .inventory-item:hover,
-    .dashboard-report .asset-item:hover,
-    .dashboard-report .finance-box:hover,
-    .dashboard-report .stat-card:hover {
-        box-shadow: var(--report-shadow-hover);
-    }
-
-    @media (max-width: 1199.98px) {
-        .dashboard-report .hero-grid,
-        .dashboard-report .finance-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .dashboard-report .stock-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 767.98px) {
-        .dashboard-report .hero-grid,
-        .dashboard-report .finance-grid,
-        .dashboard-report .summary-strip {
-            grid-template-columns: 1fr;
-        }
-
-        .dashboard-report .hero-actions {
-            justify-content: flex-start;
-        }
-
-        .dashboard-report .rotation-item {
-            grid-template-columns: 1fr;
-        }
-
-        .dashboard-report .card-head {
-            flex-direction: column;
-        }
-    }
-
-    .dashboard-report .stat-card,
-    .dashboard-report .chart-shell,
-    .dashboard-report .trend-item,
-    .dashboard-report .inventory-item,
-    .dashboard-report .asset-item,
-    .dashboard-report .finance-box,
-    .dashboard-report .summary-mini {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .dashboard-report .stat-card::before,
-    .dashboard-report .chart-shell::before,
-    .dashboard-report .finance-box::before,
-    .dashboard-report .asset-item::before,
-    .dashboard-report .inventory-item::before,
-    .dashboard-report .trend-item::before {
-        content: "";
-        position: absolute;
-        width: 160px;
-        height: 160px;
-        right: -52px;
-        top: -68px;
-        border-radius: 999px;
-        background: radial-gradient(circle, rgba(var(--bs-primary-rgb), .10) 0%, rgba(var(--bs-primary-rgb), 0) 72%);
-        pointer-events: none;
-    }
-
-    .dashboard-report .stat-card {
-        background:
-            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .03), rgba(var(--bs-primary-rgb), .055)),
-            var(--report-surface);
-    }
-
-    .dashboard-report .stat-card-body {
-        position: relative;
-        z-index: 1;
-        padding: 1.3rem;
-    }
-
-    .dashboard-report .stat-title,
-    .dashboard-report .table-modern thead th,
-    .dashboard-report .legend-item,
-    .dashboard-report .axis-labels,
-    .dashboard-report .trend-label,
-    .dashboard-report .inventory-meta,
-    .dashboard-report .asset-subtitle,
-    .dashboard-report .finance-label,
-    .dashboard-report .product-sku,
-    .dashboard-report .rotation-percent {
-        color: var(--report-text-muted);
-        font-weight: 700;
-    }
-
-    .dashboard-report .stat-value,
-    .dashboard-report .table-modern tbody td,
-    .dashboard-report .product-name,
-    .dashboard-report .rotation-label,
-    .dashboard-report .finance-value,
-    .dashboard-report .asset-value,
-    .dashboard-report .trend-value,
-    .dashboard-report .inventory-title,
-    .dashboard-report .asset-title {
-        color: var(--report-text);
-        font-weight: 800;
-    }
-
     .dashboard-report .table-modern tbody tr:hover td {
         background: rgba(var(--bs-primary-rgb), .04);
     }
 
-    .dashboard-report .table-modern tbody td {
-        transition: background-color .2s ease;
-    }
-
-    .dashboard-report .card-head {
-        margin-bottom: 1.1rem;
-    }
-
-    .dashboard-report .panel-card-body,
-    .dashboard-report .chart-card-body {
-        padding: 1.35rem;
-    }
-
-    .dashboard-report .badge-soft,
-    .dashboard-report .toolbar-pill,
-    .dashboard-report .filter-chip {
-        letter-spacing: .01em;
-        font-weight: 800;
-    }
-
-    .dashboard-report .helper-note {
-        color: color-mix(in srgb, var(--report-text-muted) 78%, white 22%);
-    }
-
-    .dashboard-report .section-title,
-    .dashboard-report .hero-metric-value,
-    .dashboard-report .stat-value,
-    .dashboard-report .finance-value,
-    .dashboard-report .asset-value,
-    .dashboard-report .trend-value,
-    .dashboard-report .inventory-title,
-    .dashboard-report .product-name {
-        text-shadow: 0 0 0 rgba(0,0,0,0);
-    }
-
-    .dashboard-report .chart-shell,
-    .dashboard-report .trend-item,
-    .dashboard-report .inventory-item,
-    .dashboard-report .asset-item,
-    .dashboard-report .finance-box,
-    .dashboard-report .stat-card {
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-
-    .dashboard-report .chart-shell:hover,
-    .dashboard-report .trend-item:hover,
-    .dashboard-report .inventory-item:hover,
-    .dashboard-report .asset-item:hover,
-    .dashboard-report .finance-box:hover,
-    .dashboard-report .stat-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(var(--bs-primary-rgb), .28);
-    }
-
-    @media (max-width: 767.98px) {
-        .dashboard-report .panel-card-body,
-        .dashboard-report .chart-card-body,
-        .dashboard-report .stat-card-body {
-            padding: 1.1rem;
-        }
-    }
-
-    .dashboard-report .analytics-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-    }
-
-    .dashboard-report .analytics-stage-card {
-        border: 1px solid var(--report-border);
-        border-radius: var(--report-radius-lg);
-        background:
-            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .055)),
-            var(--report-surface);
-        box-shadow: var(--report-shadow);
-        padding: 1.1rem;
-        height: 100%;
-    }
-
-    .dashboard-report .analytics-stage-head {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: .75rem;
-        margin-bottom: 1rem;
-    }
-
-    .dashboard-report .analytics-stage-range {
-        font-size: .8rem;
-        color: var(--report-text-muted);
-        font-weight: 700;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    .dashboard-report .chart-placeholder {
-        min-height: 240px;
-        padding: .9rem;
-    }
-
-    .dashboard-report .chart-canvas-shell {
-        min-height: 220px;
-        border: 1px dashed color-mix(in srgb, var(--report-border) 78%, rgba(var(--bs-primary-rgb), .22) 22%);
-        border-radius: var(--report-radius-lg);
-        background:
-            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .03), rgba(var(--bs-primary-rgb), .06)),
-            var(--report-surface);
-        color: var(--report-text-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 1rem;
-        font-size: .84rem;
-        font-weight: 700;
-        line-height: 1.6;
-    }
-
-    .dashboard-report .analytics-summary-list {
-        display: grid;
-        gap: .75rem;
-        margin-top: 1rem;
-    }
-
-    .dashboard-report .analytics-summary-item {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: .75rem;
-        padding: .85rem 1rem;
-        border: 1px solid var(--report-border);
-        border-radius: var(--report-radius-md);
-        background: var(--report-surface);
-    }
-
-    .dashboard-report .analytics-summary-label,
-    .dashboard-report .analytics-summary-value {
-        margin: 0;
-        line-height: 1.5;
-    }
-
-    .dashboard-report .analytics-summary-label {
-        font-size: .82rem;
-        color: var(--report-text-muted);
-        font-weight: 700;
-    }
-
-    .dashboard-report .analytics-summary-value {
-        font-size: .92rem;
-        color: var(--report-text);
-        font-weight: 800;
-        text-align: right;
-    }
-
-    .dashboard-report .analytics-empty {
-        padding: .85rem 1rem;
-        border: 1px dashed var(--report-border);
-        border-radius: var(--report-radius-md);
-        color: var(--report-text-muted);
-        font-size: .83rem;
-        font-weight: 700;
-        line-height: 1.6;
-        background: var(--report-surface);
-    }
-
-    .dashboard-report .analytics-json {
-        display: none;
-    }
-
-    @media (max-width: 991.98px) {
-        .dashboard-report .analytics-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* analytics-apex-polish-start */
     .dashboard-report .analytics-stage-card {
         padding: 1.35rem;
         border-radius: 1.25rem;
-    }
-
-    .dashboard-report .analytics-stage-head .section-title {
-        font-size: 1rem;
-        font-weight: 800;
-        color: var(--report-text);
-        letter-spacing: .01em;
-    }
-
-    .dashboard-report .analytics-stage-range {
-        font-size: .82rem;
-        color: var(--report-text-muted);
-        font-weight: 700;
+        height: 100%;
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .055)),
+            var(--report-surface);
     }
 
     .dashboard-report .chart-shell.chart-placeholder {
@@ -1010,6 +462,7 @@
         background: transparent;
     }
 
+    .dashboard-report .analytics-json,
     .dashboard-report .analytics-summary-list {
         display: none !important;
     }
@@ -1036,229 +489,35 @@
     .dashboard-report .analytics-stage-card .apexcharts-toolbar {
         display: none !important;
     }
-    /* analytics-apex-polish-end */
 
+    @media (max-width: 1199.98px) {
+        .dashboard-report .hero-grid,
+        .dashboard-report .finance-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .dashboard-report .hero-grid,
+        .dashboard-report .finance-grid,
+        .dashboard-report .summary-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-report .card-head,
+        .dashboard-report .analytics-stage-head {
+            flex-direction: column;
+        }
+
+        .dashboard-report .panel-card-body,
+        .dashboard-report .chart-card-body,
+        .dashboard-report .stat-card-body {
+            padding: 1.1rem;
+        }
+    }
 </style>
 
 <div class="dashboard-report">
-
-    <section class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Analitik Dashboard Bulan Ini</h5>
-                            <p class="section-subtitle">
-                                Blok baru ini hanya membaca data bulan aktif dari tanggal 1 sampai hari ini.
-                                Dashboard lama di bawah tetap dibiarkan apa adanya.
-                            </p>
-                        </div>
-                        <span class="badge-soft bg-soft-primary">
-                            <i class="bi bi-graph-up"></i>
-                            {{ $dashboard['analytics']['period']['active_month'] ?? '-' }}
-                        </span>
-                    </div>
-
-                    <div class="helper-note mb-4">
-                        Window aktif:
-                        {{ $dashboard['analytics']['period']['date_from'] ?? '-' }}
-                        s.d.
-                        {{ $dashboard['analytics']['period']['date_to'] ?? '-' }}.
-                        Saat masuk tanggal 1 bulan baru, blok ini akan mulai kosong lagi lalu terisi bertahap.
-                    </div>
-
-                    <div class="analytics-grid">
-                        <div class="analytics-stage-card">
-                            <div class="analytics-stage-head">
-                                <div>
-                                    <h6 class="section-title mb-1">Distribusi Status Stok</h6>
-                                    <p class="analytics-stage-range">
-                                        Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
-                                    </p>
-                                </div>
-                                <span class="badge-soft bg-soft-success">
-                                    <i class="bi bi-pie-chart"></i>
-                                    {{ number_format((int) ($dashboard['analytics']['charts']['stock_status_donut']['total_value'] ?? 0), 0, ',', '.') }} Produk
-                                </span>
-                            </div>
-
-                            <div class="chart-shell chart-placeholder">
-                                <div
-                                    class="chart-canvas-shell"
-                                    id="admin-chart-stock-status-donut"
-                                    data-chart-key="stock_status_donut"
-                                >
-                                    Container chart donut siap dipakai renderer analytics dashboard.
-                                </div>
-                            </div>
-
-                            <div class="analytics-summary-list">
-                                @forelse (($dashboard['analytics']['charts']['stock_status_donut']['segments'] ?? []) as $segment)
-                                    <div class="analytics-summary-item">
-                                        <p class="analytics-summary-label">{{ $segment['label'] ?? '-' }}</p>
-                                        <p class="analytics-summary-value">
-                                            {{ number_format((int) ($segment['value'] ?? 0), 0, ',', '.') }} Produk
-                                        </p>
-                                    </div>
-                                @empty
-                                    <div class="analytics-empty">
-                                        Belum ada data segmen stok untuk blok analytics baru ini.
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-
-                        <div class="analytics-stage-card">
-                            <div class="analytics-stage-head">
-                                <div>
-                                    <h6 class="section-title mb-1">Top Produk Terjual Bulan Ini</h6>
-                                    <p class="analytics-stage-range">
-                                        Range:
-                                        {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
-                                        s.d.
-                                        {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
-                                    </p>
-                                </div>
-                                <span class="badge-soft bg-soft-warning">
-                                    <i class="bi bi-bar-chart-line"></i>
-                                    {{ count($dashboard['analytics']['charts']['top_selling_bar']['categories'] ?? []) }} Produk
-                                </span>
-                            </div>
-
-                            <div class="chart-shell chart-placeholder">
-                                <div
-                                    class="chart-canvas-shell"
-                                    id="admin-chart-top-selling-bar"
-                                    data-chart-key="top_selling_bar"
-                                >
-                                    Container chart batang siap dipakai renderer analytics dashboard.
-                                </div>
-                            </div>
-
-                            <div class="analytics-summary-list">
-                                @forelse (($dashboard['analytics']['charts']['top_selling_bar']['detail'] ?? []) as $row)
-                                    <div class="analytics-summary-item">
-                                        <p class="analytics-summary-label">{{ $row['label'] ?? '-' }}</p>
-                                        <p class="analytics-summary-value">
-                                            {{ number_format((int) ($row['sold_qty'] ?? 0), 0, ',', '.') }} Unit
-                                        </p>
-                                    </div>
-                                @empty
-                                    <div class="analytics-empty">
-                                        Belum ada data produk terjual untuk bulan aktif.
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-
-                        <div class="analytics-stage-card">
-                            <div class="analytics-stage-head">
-                                <div>
-                                    <h6 class="section-title mb-1">Laba Operasional Bulan Ini</h6>
-                                    <p class="analytics-stage-range">
-                                        Range:
-                                        {{ $dashboard['analytics']['charts']['cashflow_line']['range']['date_from'] ?? '-' }}
-                                        s.d.
-                                        {{ $dashboard['analytics']['charts']['cashflow_line']['range']['date_to'] ?? '-' }}
-                                    </p>
-                                </div>
-                                <span class="badge-soft bg-soft-info">
-                                    <i class="bi bi-activity"></i>
-                                    {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
-                                </span>
-                            </div>
-
-                            <div class="chart-shell chart-placeholder">
-                                <div
-                                    class="chart-canvas-shell"
-                                    id="admin-chart-cashflow-line"
-                                    data-chart-key="cashflow_line"
-                                >
-                                    Container chart garis siap dipakai renderer analytics dashboard.
-                                </div>
-                            </div>
-
-                            <div class="analytics-summary-list">
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Kas Masuk</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_cash_in_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Kas Keluar</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_cash_out_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Net Cash Flow</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_net_cash_flow_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="analytics-stage-card">
-                            <div class="analytics-stage-head">
-                                <div>
-                                    <h6 class="section-title mb-1">Kinerja Operasional Bulan Ini</h6>
-                                    <p class="analytics-stage-range">
-                                        Range:
-                                        {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
-                                        s.d.
-                                        {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
-                                    </p>
-                                </div>
-                                <span class="badge-soft bg-soft-danger">
-                                    <i class="bi bi-graph-down-arrow"></i>
-                                    {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
-                                </span>
-                            </div>
-
-                            <div class="chart-shell chart-placeholder">
-                                <div
-                                    class="chart-canvas-shell"
-                                    id="admin-chart-operational-performance-bar"
-                                    data-chart-key="operational_performance_bar"
-                                >
-                                    Container chart kinerja operasional siap dipakai renderer analytics dashboard.
-                                </div>
-                            </div>
-
-                            <div class="analytics-summary-list">
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Laba Operasional</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_profit_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Biaya Operasional</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_expense_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                                <div class="analytics-summary-item">
-                                    <p class="analytics-summary-label">Total Refund</p>
-                                    <p class="analytics-summary-value">
-                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_refund_rupiah'] ?? 0), 0, ',', '.') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
-                        @json($dashboard['analytics'] ?? [])
-                    </script>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section class="row g-4 mb-4">
         <div class="col-12 col-xl-9">
             <div class="card hero-card h-100">
@@ -1269,7 +528,7 @@
                                 Laporan stok, aset, penjualan, harga, dan perputaran keuangan dalam satu layar.
                             </h2>
                             <p class="mb-0 text-white" style="opacity:.88;">
-                                Dashboard ini menampilkan ringkasan utama yang sudah terhubung ke report aktif. Panel analitik lanjutan akan dihidupkan bertahap setelah kontrak backend-nya benar-benar siap.
+                                Dashboard ini menampilkan ringkasan utama yang sudah terhubung ke report aktif. Panel analitik lanjutan ada di section bawah sesuai layout dashboard admin.
                             </p>
 
                             <div class="hero-grid">
@@ -1287,7 +546,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -1297,7 +555,6 @@
             <div class="card profile-card h-100">
                 <div class="admin-profile-top">
                     <div class="d-flex align-items-center gap-3">
-
                         <div class="admin-avatar-wrap">
                             <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna">
                         </div>
@@ -1326,8 +583,7 @@
                     <div class="mt-4 mb-3">
                         <div class="summary-mini-label">Akun sedang digunakan</div>
                         <p class="section-subtitle mb-0">
-                            Pastikan keluar dari akun setelah selesai menggunakan dashboard admin,
-                            terutama bila perangkat dipakai bergantian.
+                            Pastikan keluar dari akun setelah selesai menggunakan dashboard admin, terutama bila perangkat dipakai bergantian.
                         </p>
                     </div>
 
@@ -1390,7 +646,7 @@
                         <div class="stat-title">Uang Masuk Hari Ini</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['daily_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
-                            <i class="bi-wallet2"></i>
+                            <i class="bi bi-wallet2"></i>
                             Berdasarkan arus kas transaksi hari ini
                         </p>
                     </div>
@@ -1475,217 +731,6 @@
     </section>
 
     <section class="row g-4 mb-4">
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Barang Paling Laku</h5>
-                            <p class="section-subtitle">Produk dengan qty terjual dan omzet tertinggi pada periode berjalan</p>
-                        </div>
-                        <span class="badge-soft bg-soft-success">
-                            <i class="bi bi-bar-chart-line"></i>
-                            Live
-                        </span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Terjual</th>
-                                    <th>Omzet</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (count($dashboard['top_selling_rows'] ?? []) === 0)
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            Belum ada data penjualan produk pada periode ini.
-                                        </td>
-                                    </tr>
-                                @else
-                                    @foreach (($dashboard['top_selling_rows'] ?? []) as $row)
-                                        <tr>
-                                            <td>
-                                                <div class="product-inline">
-                                                    <span class="product-avatar bg-soft-primary">{{ $loop->iteration }}</span>
-                                                    <div>
-                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
-                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ number_format($row['sold_qty'], 0, ',', '.') }} Unit</td>
-                                            <td>Rp {{ number_format($row['gross_revenue_rupiah'], 0, ',', '.') }}</td>
-                                            <td>
-                                                <span class="badge-soft bg-soft-success">
-                                                    <i class="bi bi-bar-chart-line"></i>
-                                                    Live
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-lg-6">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Prioritas Restok</h5>
-                            <p class="section-subtitle">Produk yang perlu diperhatikan lebih dulu berdasarkan batas mulai restok dan batas stok kritis.</p>
-                        </div>
-                        <span class="badge-soft bg-soft-warning">
-                            <i class="bi bi-exclamation-triangle"></i>
-                            Live
-                        </span>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-modern">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Qty Saat Ini</th>
-                                    <th>Mulai Restok</th>
-                                    <th>Batas Kritis</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (count($dashboard['restock_priority_rows'] ?? []) === 0)
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted py-4">
-                                            Belum ada produk yang masuk prioritas restok pada snapshot saat ini.
-                                        </td>
-                                    </tr>
-                                @else
-                                    @foreach (($dashboard['restock_priority_rows'] ?? []) as $row)
-                                        <tr>
-                                            <td>
-                                                <div class="product-inline">
-                                                    <span class="product-avatar {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
-                                                        <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-triangle' : 'bi-arrow-repeat' }}"></i>
-                                                    </span>
-                                                    <div>
-                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
-                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
-                                                        <a
-                                                            href="{{ route('admin.products.show', ['productId' => $row['product_id']]) }}"
-                                                            class="btn btn-sm btn-light-primary mt-2"
-                                                        >
-                                                            Lihat Detail
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ number_format($row['current_qty_on_hand'] ?? 0, 0, ',', '.') }} Unit</td>
-                                            <td>{{ number_format($row['reorder_point_qty'] ?? 0, 0, ',', '.') }}</td>
-                                            <td>{{ number_format($row['critical_threshold_qty'] ?? 0, 0, ',', '.') }}</td>
-                                            <td>
-                                                <span class="badge-soft {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
-                                                    <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-octagon' : 'bi-arrow-repeat' }}"></i>
-                                                    {{ $row['status_label'] ?? '-' }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Status Stok Saat Ini</h5>
-                            <p class="section-subtitle">Klasifikasi stok berdasarkan batas restok dan batas stok kritis pada master produk.</p>
-                        </div>
-                        <span class="badge-soft bg-soft-success">
-                            <i class="bi bi-box-seam"></i>
-                            Live
-                        </span>
-                    </div>
-
-                    <div class="row g-3">
-                        <div class="col-12 col-md-6 col-xl-3">
-                            <div class="inventory-item h-100">
-                                <div class="inventory-top">
-                                    <div>
-                                        <div class="inventory-title">Stok Aman</div>
-                                        <p class="inventory-meta">Produk yang masih di atas batas mulai restok</p>
-                                    </div>
-                                    <span class="product-avatar bg-soft-success"><i class="bi bi-check2-circle"></i></span>
-                                </div>
-                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_safe_product_rows'] ?? 0, 0, ',', '.') }}</div>
-                                <p class="inventory-meta mb-0">Produk</p>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-6 col-xl-3">
-                            <div class="inventory-item h-100">
-                                <div class="inventory-top">
-                                    <div>
-                                        <div class="inventory-title">Mulai Perlu Restok</div>
-                                        <p class="inventory-meta">Produk yang sudah menyentuh batas reorder point</p>
-                                    </div>
-                                    <span class="product-avatar bg-soft-warning"><i class="bi bi-exclamation-circle"></i></span>
-                                </div>
-                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_low_product_rows'] ?? 0, 0, ',', '.') }}</div>
-                                <p class="inventory-meta mb-0">Produk</p>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-6 col-xl-3">
-                            <div class="inventory-item h-100">
-                                <div class="inventory-top">
-                                    <div>
-                                        <div class="inventory-title">Stok Kritis</div>
-                                        <p class="inventory-meta">Produk yang sudah berada di batas stok kritis atau lebih rendah</p>
-                                    </div>
-                                    <span class="product-avatar bg-2"><i class="bi bi-exclamation-triangle"></i></span>
-                                </div>
-                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_critical_product_rows'] ?? 0, 0, ',', '.') }}</div>
-                                <p class="inventory-meta mb-0">Produk</p>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-6 col-xl-3">
-                            <div class="inventory-item h-100">
-                                <div class="inventory-top">
-                                    <div>
-                                        <div class="inventory-title">Belum Diatur</div>
-                                        <p class="inventory-meta">Produk yang belum punya batas mulai restok dan batas stok kritis</p>
-                                    </div>
-                                    <span class="product-avatar bg-soft-info"><i class="bi bi-sliders"></i></span>
-                                </div>
-                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_unconfigured_product_rows'] ?? 0, 0, ',', '.') }}</div>
-                                <p class="inventory-meta mb-0">Produk</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="row g-4">
         <div class="col-12">
             <div class="card">
                 <div class="panel-card-body">
@@ -1781,16 +826,344 @@
                     </div>
 
                     <div class="helper-note mt-4">
-                        Dashboard v1 ini sudah terhubung ke report backend untuk ringkasan utama, top sales, dan klasifikasi stok dasar. Panel lanjutan seperti margin, grafik, dan slow moving masih dihidupkan bertahap setelah kontraknya final.
+                        Dashboard v1 ini sudah memakai report backend aktif yang paling aman untuk dibaca cepat.
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Barang Paling Laku</h5>
+                            <p class="section-subtitle">Produk dengan qty terjual dan omzet tertinggi pada periode berjalan</p>
+                        </div>
+                        <span class="badge-soft bg-soft-success">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Terjual</th>
+                                    <th>Omzet</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($dashboard['top_selling_rows'] ?? []) === 0)
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            Belum ada data penjualan produk pada periode ini.
+                                        </td>
+                                    </tr>
+                                @else
+                                    @foreach (($dashboard['top_selling_rows'] ?? []) as $row)
+                                        <tr>
+                                            <td>
+                                                <div class="product-inline">
+                                                    <span class="product-avatar bg-soft-primary">{{ $loop->iteration }}</span>
+                                                    <div>
+                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
+                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ number_format($row['sold_qty'], 0, ',', '.') }} Unit</td>
+                                            <td>Rp {{ number_format($row['gross_revenue_rupiah'], 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge-soft bg-soft-success">
+                                                    <i class="bi bi-bar-chart-line"></i>
+                                                    Live
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="analytics-stage-card h-100">
+                <div class="analytics-stage-head">
+                    <div>
+                        <h6 class="section-title mb-1">Top Produk Terjual Bulan Ini</h6>
+                        <p class="analytics-stage-range">
+                            Range:
+                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
+                            s.d.
+                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
+                        </p>
+                    </div>
+                    <span class="badge-soft bg-soft-warning">
+                        <i class="bi bi-bar-chart-line"></i>
+                        {{ count($dashboard['analytics']['charts']['top_selling_bar']['categories'] ?? []) }} Produk
+                    </span>
+                </div>
+
+                <div class="chart-shell chart-placeholder">
+                    <div
+                        class="chart-canvas-shell"
+                        id="admin-chart-top-selling-bar"
+                        data-chart-key="top_selling_bar"
+                    ></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="analytics-stage-card h-100">
+                <div class="analytics-stage-head">
+                    <div>
+                        <h6 class="section-title mb-1">Distribusi Status Stok</h6>
+                        <p class="analytics-stage-range">
+                            Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
+                        </p>
+                    </div>
+                    <span class="badge-soft bg-soft-success">
+                        <i class="bi bi-pie-chart"></i>
+                        {{ number_format((int) ($dashboard['analytics']['charts']['stock_status_donut']['total_value'] ?? 0), 0, ',', '.') }} Produk
+                    </span>
+                </div>
+
+                <div class="chart-shell chart-placeholder">
+                    <div
+                        class="chart-canvas-shell"
+                        id="admin-chart-stock-status-donut"
+                        data-chart-key="stock_status_donut"
+                    ></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Prioritas Restok</h5>
+                            <p class="section-subtitle">Produk yang perlu diperhatikan lebih dulu berdasarkan batas mulai restok dan batas stok kritis.</p>
+                        </div>
+                        <span class="badge-soft bg-soft-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Qty Saat Ini</th>
+                                    <th>Mulai Restok</th>
+                                    <th>Batas Kritis</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($dashboard['restock_priority_rows'] ?? []) === 0)
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            Belum ada produk yang masuk prioritas restok pada snapshot saat ini.
+                                        </td>
+                                    </tr>
+                                @else
+                                    @foreach (($dashboard['restock_priority_rows'] ?? []) as $row)
+                                        <tr>
+                                            <td>
+                                                <div class="product-inline">
+                                                    <span class="product-avatar {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
+                                                        <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-triangle' : 'bi-arrow-repeat' }}"></i>
+                                                    </span>
+                                                    <div>
+                                                        <div class="product-name">{{ $row['nama_barang'] }}</div>
+                                                        <p class="product-sku">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</p>
+                                                        <a
+                                                            href="{{ route('admin.products.show', ['productId' => $row['product_id']]) }}"
+                                                            class="btn btn-sm btn-light-primary mt-2"
+                                                        >
+                                                            Lihat Detail
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ number_format($row['current_qty_on_hand'] ?? 0, 0, ',', '.') }} Unit</td>
+                                            <td>{{ number_format($row['reorder_point_qty'] ?? 0, 0, ',', '.') }}</td>
+                                            <td>{{ number_format($row['critical_threshold_qty'] ?? 0, 0, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge-soft {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
+                                                    <i class="bi {{ ($row['status'] ?? null) === 'critical' ? 'bi-exclamation-octagon' : 'bi-arrow-repeat' }}"></i>
+                                                    {{ $row['status_label'] ?? '-' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Status Stok Saat Ini</h5>
+                            <p class="section-subtitle">Klasifikasi stok berdasarkan batas restok dan batas stok kritis pada master produk.</p>
+                        </div>
+                        <span class="badge-soft bg-soft-success">
+                            <i class="bi bi-box-seam"></i>
+                            Live
+                        </span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                    <div>
+                                        <div class="inventory-title">Stok Aman</div>
+                                        <p class="inventory-meta">Produk yang masih di atas batas mulai restok</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-success"><i class="bi bi-check2-circle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_safe_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                    <div>
+                                        <div class="inventory-title">Mulai Perlu Restok</div>
+                                        <p class="inventory-meta">Produk yang sudah menyentuh batas reorder point</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-warning"><i class="bi bi-exclamation-circle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_low_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                    <div>
+                                        <div class="inventory-title">Stok Kritis</div>
+                                        <p class="inventory-meta">Produk yang sudah berada di batas stok kritis atau lebih rendah</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-danger"><i class="bi bi-exclamation-triangle"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_critical_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="inventory-item h-100">
+                                <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                    <div>
+                                        <div class="inventory-title">Belum Diatur</div>
+                                        <p class="inventory-meta">Produk yang belum punya batas mulai restok dan batas stok kritis</p>
+                                    </div>
+                                    <span class="product-avatar bg-soft-info"><i class="bi bi-sliders"></i></span>
+                                </div>
+                                <div class="stat-value mb-1">{{ number_format($dashboard['stats']['stock_unconfigured_product_rows'] ?? 0, 0, ',', '.') }}</div>
+                                <p class="inventory-meta mb-0">Produk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="analytics-stage-card h-100">
+                <div class="analytics-stage-head">
+                    <div>
+                        <h6 class="section-title mb-1">Laba Operasional Bulan Ini</h6>
+                        <p class="analytics-stage-range">
+                            Range:
+                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+                            s.d.
+                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+                        </p>
+                    </div>
+                    <span class="badge-soft bg-soft-info">
+                        <i class="bi bi-activity"></i>
+                        {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
+                    </span>
+                </div>
+
+                <div class="chart-shell chart-placeholder">
+                    <div
+                        class="chart-canvas-shell"
+                        id="admin-chart-cashflow-line"
+                        data-chart-key="cashflow_line"
+                    ></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="analytics-stage-card h-100">
+                <div class="analytics-stage-head">
+                    <div>
+                        <h6 class="section-title mb-1">Kinerja Operasional Bulan Ini</h6>
+                        <p class="analytics-stage-range">
+                            Range:
+                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+                            s.d.
+                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+                        </p>
+                    </div>
+                    <span class="badge-soft bg-soft-danger">
+                        <i class="bi bi-graph-down-arrow"></i>
+                        {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
+                    </span>
+                </div>
+
+                <div class="chart-shell chart-placeholder">
+                    <div
+                        class="chart-canvas-shell"
+                        id="admin-chart-operational-performance-bar"
+                        data-chart-key="operational_performance_bar"
+                    ></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
+        @json($dashboard['analytics'] ?? [])
+    </script>
 </div>
+@endsection
+
 @push('scripts')
     <script src="{{ asset('assets/extensions/apexcharts/apexcharts.min.js') }}?v={{ filemtime(public_path('assets/extensions/apexcharts/apexcharts.min.js')) }}"></script>
     <script src="{{ asset('assets/static/js/admin/dashboard-analytics.js') }}?v={{ filemtime(public_path('assets/static/js/admin/dashboard-analytics.js')) }}"></script>
 @endpush
-
-@endsection
