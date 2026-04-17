@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
+use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
+use App\Application\Payment\Services\ResolveNotePayableComponents;
 use App\Core\Note\Note\Note;
 use App\Core\Payment\CustomerPayment\CustomerPayment;
-use App\Core\Payment\PaymentAllocation\PaymentAllocation;
 use App\Core\Payment\Policies\PaymentAllocationPolicy;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Payment\CustomerPaymentWriterPort;
-use App\Ports\Out\Payment\PaymentAllocationWriterPort;
+use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
 use App\Ports\Out\UuidPort;
 use DateTimeImmutable;
 
@@ -20,11 +21,14 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
 {
     public function __construct(
         private readonly CustomerPaymentWriterPort $payments,
-        private readonly PaymentAllocationWriterPort $allocations,
+        private readonly PaymentComponentAllocationWriterPort $componentAllocations,
         private readonly PaymentAllocationPolicy $policy,
         private readonly UuidPort $uuid,
         private readonly AuditLogPort $audit,
         private readonly CreateTransactionWorkspaceInlinePaymentAmountResolver $amounts,
+        private readonly ResolveNotePayableComponents $components,
+        private readonly AllocatePaymentAcrossComponents $allocator,
+        private readonly AutoCloseNoteWhenFullyPaid $autoClose,
     ) {
     }
 
@@ -54,18 +58,36 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         }
 
         $money = Money::fromInt($amount);
-        $customerPayment = CustomerPayment::create($this->uuid->generate(), $money, $this->parsePaidAt($payment['paid_at'] ?? null));
+        $customerPayment = CustomerPayment::create(
+            $this->uuid->generate(),
+            $money,
+            $this->parsePaidAt($payment['paid_at'] ?? null)
+        );
 
-        $this->policy->assertAllocatable($money, $customerPayment->amountRupiah(), Money::zero(), $note->totalRupiah(), Money::zero());
+        $this->policy->assertAllocatable(
+            $money,
+            $customerPayment->amountRupiah(),
+            Money::zero(),
+            $note->totalRupiah(),
+            Money::zero(),
+        );
+
+        $allocations = $this->allocator->allocate(
+            $customerPayment->id(),
+            $note->id(),
+            $money,
+            $this->components->fromNote($note),
+        );
+
         $this->payments->create($customerPayment);
-
-        $allocation = PaymentAllocation::create($this->uuid->generate(), $customerPayment->id(), $note->id(), $money);
-        $this->allocations->create($allocation);
+        $this->componentAllocations->createMany($allocations);
+        $this->autoClose->closeIfEligible($note, $customerPayment->id());
 
         $this->audit->record('payment_allocated', [
             'payment_id' => $customerPayment->id(),
             'note_id' => $note->id(),
             'amount' => $amount,
+            'allocation_count' => count($allocations),
             'source' => 'transaction_workspace',
             'decision' => $decision,
         ]);

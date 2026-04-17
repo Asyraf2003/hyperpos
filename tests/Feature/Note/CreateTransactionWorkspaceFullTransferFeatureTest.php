@@ -31,8 +31,24 @@ final class CreateTransactionWorkspaceFullTransferFeatureTest extends TestCase
         ]);
 
         $response->assertRedirect(route('cashier.notes.index'));
-        $this->assertDatabaseHas('customer_payments', ['amount_rupiah' => 150000, 'paid_at' => '2026-03-15']);
+
+        $this->assertDatabaseHas('customer_payments', [
+            'amount_rupiah' => 150000,
+            'paid_at' => '2026-03-15',
+        ]);
+
         $paymentId = (string) DB::table('customer_payments')->value('id');
-        $this->assertDatabaseHas('payment_allocations', ['customer_payment_id' => $paymentId, 'amount_rupiah' => 150000]);
+        $noteId = (string) DB::table('notes')->value('id');
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'allocated_amount_rupiah' => 150000,
+        ]);
+
+        $this->assertDatabaseMissing('payment_allocations', [
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+        ]);
     }
 }
