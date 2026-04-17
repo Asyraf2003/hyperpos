@@ -78,13 +78,11 @@
 
     const truncateLabel = (value, max = 14) => {
         const text = String(value || '');
-
         return text.length > max ? `${text.slice(0, max - 1)}…` : text;
     };
 
     const shortDate = (value) => {
         const text = String(value || '');
-
         return text.length >= 10 ? text.slice(-2) : text;
     };
 
@@ -349,7 +347,6 @@
                 y: {
                     formatter: (value, opts) => {
                         const detail = details[opts.dataPointIndex] || {};
-
                         return `${formatNumber(value)} Unit | ${formatRupiah(detail.gross_revenue_rupiah || 0)}`;
                     },
                 },
