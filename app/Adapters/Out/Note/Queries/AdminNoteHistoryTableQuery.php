@@ -38,9 +38,7 @@ final class AdminNoteHistoryTableQuery
                 'date_from' => $criteria->dateFromText,
                 'date_to' => $criteria->dateToText,
                 'search' => $criteria->search,
-                'payment_status' => $criteria->paymentStatus,
-                'editability' => $criteria->editability,
-                'work_summary' => $criteria->workSummary,
+                'line_status' => $criteria->lineStatus,
             ],
             'items' => $pagedItems,
             'pagination' => [
@@ -51,7 +49,7 @@ final class AdminNoteHistoryTableQuery
             ],
             'summary' => [
                 'label' => sprintf(
-                    'Riwayat admin %s sampai %s.',
+                    'Daftar nota admin %s sampai %s.',
                     $criteria->dateFromText,
                     $criteria->dateToText,
                 ),

@@ -35,10 +35,8 @@ final class CashierNoteHistoryTableQuery
 
         return [
             'filters' => [
-                'date' => $criteria->anchorDateText,
                 'search' => $criteria->search,
-                'payment_status' => $criteria->paymentStatus,
-                'work_status' => $criteria->workStatus,
+                'line_status' => $criteria->lineStatus,
             ],
             'items' => $pagedItems,
             'pagination' => [
@@ -49,7 +47,7 @@ final class CashierNoteHistoryTableQuery
             ],
             'summary' => [
                 'label' => sprintf(
-                    'Window kasir %s dan %s. Nota kemarin hanya ditampilkan bila masih open.',
+                    'Window kasir %s dan %s.',
                     $criteria->previousDateText,
                     $criteria->anchorDateText,
                 ),

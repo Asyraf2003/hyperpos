@@ -16,7 +16,6 @@ final class NoteDetailPageDataBuilder
         private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
-        private readonly NoteDetailRowMapper $rowMapper,
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
     ) {
     }
@@ -36,7 +35,7 @@ final class NoteDetailPageDataBuilder
         );
 
         // legacy calculation kept temporarily for transition safety
-        $rowSettlements = $this->rowSettlements->build($note->id(), $note->workItems());
+        $this->rowSettlements->build($note->id(), $note->workItems());
 
         // new line-centric workspace source
         $workspacePanel = $this->workspacePanel->build($noteId);
