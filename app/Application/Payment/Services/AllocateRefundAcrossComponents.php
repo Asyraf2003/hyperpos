@@ -21,6 +21,7 @@ final class AllocateRefundAcrossComponents
     }
 
     /**
+     * @param list<string> $selectedRowIds
      * @return list<RefundComponentAllocation>
      */
     public function allocate(
@@ -28,12 +29,22 @@ final class AllocateRefundAcrossComponents
         string $customerPaymentId,
         string $noteId,
         Money $amount,
+        array $selectedRowIds = [],
     ): array {
         $remaining = $amount->amount();
         $allocations = [];
-        $paymentAllocations = RefundablePaymentAllocations::forPayment($this->payments, $customerPaymentId, $noteId);
+        $paymentAllocations = RefundablePaymentAllocations::forPayment(
+            $this->payments,
+            $customerPaymentId,
+            $noteId,
+            $selectedRowIds,
+        );
         $alreadyRefunded = RefundedComponentTotals::build($this->refunds, $customerPaymentId, $noteId);
         $priority = 1;
+
+        if ($selectedRowIds !== [] && $paymentAllocations === []) {
+            throw new DomainException('Tidak ada komponen payment refundable untuk line yang dipilih.');
+        }
 
         foreach ($paymentAllocations as $paymentAllocation) {
             $key = ExistingPaymentComponentTotals::key($paymentAllocation->componentType(), $paymentAllocation->componentRefId());

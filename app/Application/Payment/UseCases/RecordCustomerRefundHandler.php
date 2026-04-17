@@ -39,6 +39,9 @@ final class RecordCustomerRefundHandler
     ) {
     }
 
+    /**
+     * @param list<string> $selectedRowIds
+     */
     public function handle(
         string $customerPaymentId,
         string $noteId,
@@ -46,20 +49,31 @@ final class RecordCustomerRefundHandler
         string $refundedAt,
         string $reason,
         string $performedByActorId,
+        array $selectedRowIds = [],
     ): Result {
-        if (trim($reason) === '') return Result::failure('Alasan refund wajib diisi.', ['refund' => ['AUDIT_REASON_REQUIRED']]);
+        if (trim($reason) === '') {
+            return Result::failure('Alasan refund wajib diisi.', ['refund' => ['AUDIT_REASON_REQUIRED']]);
+        }
+
         $started = false;
+
         try {
-            if (trim($performedByActorId) === '') throw new DomainException('Actor refund wajib ada.');
+            if (trim($performedByActorId) === '') {
+                throw new DomainException('Actor refund wajib ada.');
+            }
 
             $this->transactions->begin();
             $started = true;
 
             $payment = $this->customerPayments->getById(trim($customerPaymentId));
             $note = $this->notes->getById(trim($noteId));
-            if ($payment === null || $note === null) throw new DomainException('Target refund tidak ditemukan.');
+
+            if ($payment === null || $note === null) {
+                throw new DomainException('Target refund tidak ditemukan.');
+            }
 
             $amount = Money::fromInt($amountRupiah);
+
             RefundPairLimitGuard::assertWithinAllocated(
                 $this->allocations->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id()),
                 $this->refunds->getTotalRefundedAmountByCustomerPaymentIdAndNoteId($payment->id(), $note->id()),
@@ -75,24 +89,40 @@ final class RecordCustomerRefundHandler
                 trim($reason),
             );
 
-            $refundAllocations = $this->refundAllocator->allocate($refund->id(), $payment->id(), $note->id(), $amount);
+            $refundAllocations = $this->refundAllocator->allocate(
+                $refund->id(),
+                $payment->id(),
+                $note->id(),
+                $amount,
+                $selectedRowIds,
+            );
 
             $this->refundWriter->create($refund);
             $this->refundAllocationWriter->createMany($refundAllocations);
             $this->audit->record('customer_refund_recorded', array_merge(
                 $this->formatAuditPayload($refund, $performedByActorId),
-                ['refund_allocation_count' => count($refundAllocations)],
+                [
+                    'refund_allocation_count' => count($refundAllocations),
+                    'selected_row_ids' => $selectedRowIds,
+                ],
             ));
 
             $this->transactions->commit();
+
             return Result::success(array_merge($this->formatSuccessPayload($refund), [
                 'refund_allocation_count' => count($refundAllocations),
             ]), 'Customer refund berhasil dicatat.');
         } catch (DomainException $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
+
             return $this->classify($e);
         } catch (Throwable $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
+
             throw $e;
         }
     }
