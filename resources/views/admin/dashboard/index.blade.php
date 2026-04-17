@@ -3,6 +3,10 @@
 @section('title', 'Dashboard Laporan')
 @section('heading', 'Dashboard Laporan')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/extensions/apexcharts/apexcharts.css') }}?v={{ filemtime(public_path('assets/extensions/apexcharts/apexcharts.css')) }}">
+@endpush
+
 @section('content')
 <style>
     :root {
@@ -1723,6 +1727,7 @@
     </section>
 </div>
 @push('scripts')
+    <script src="{{ asset('assets/extensions/apexcharts/apexcharts.min.js') }}?v={{ filemtime(public_path('assets/extensions/apexcharts/apexcharts.min.js')) }}"></script>
     <script src="{{ asset('assets/static/js/admin/dashboard-analytics.js') }}?v={{ filemtime(public_path('assets/static/js/admin/dashboard-analytics.js')) }}"></script>
 @endpush
 
