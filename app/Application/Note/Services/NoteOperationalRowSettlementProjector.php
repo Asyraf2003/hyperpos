@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Core\Note\WorkItem\WorkItem;
-use App\Ports\Out\Payment\CustomerRefundReaderPort;
-use App\Ports\Out\Payment\PaymentAllocationReaderPort;
+use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 
 final class NoteOperationalRowSettlementProjector
 {
     public function __construct(
-        private readonly PaymentAllocationReaderPort $allocations,
-        private readonly CustomerRefundReaderPort $refunds,
+        private readonly PaymentComponentAllocationReaderPort $payments,
+        private readonly RefundComponentAllocationReaderPort $refunds,
     ) {
     }
 
@@ -23,33 +23,21 @@ final class NoteOperationalRowSettlementProjector
     public function build(string $noteId, array $rows): array
     {
         $orderedRows = $this->sortRowsByLineNo($rows);
-
-        $totalAllocated = $this->allocations->getTotalAllocatedAmountByNoteId($noteId);
-        $totalAllocated->ensureNotNegative('Total alokasi pada note tidak boleh negatif.');
-
-        $totalRefunded = $this->refunds->getTotalRefundedAmountByNoteId($noteId);
-        $totalRefunded->ensureNotNegative('Total refund pada note tidak boleh negatif.');
-
-        $allocatedRemainder = $totalAllocated->amount();
-        $refundedRemainder = $totalRefunded->amount();
-
+        $payments = $this->groupPaymentAllocations($noteId);
+        $refunds = $this->groupRefundAllocations($noteId);
         $summary = [];
 
         foreach ($orderedRows as $item) {
+            $workItemId = $item->id();
             $subtotal = $item->subtotalRupiah()->amount();
-
-            $projectedAllocated = min(max($allocatedRemainder, 0), $subtotal);
-            $allocatedRemainder -= $projectedAllocated;
-
-            $projectedRefunded = min(max($refundedRemainder, 0), $projectedAllocated);
-            $refundedRemainder -= $projectedRefunded;
-
-            $netPaid = max($projectedAllocated - $projectedRefunded, 0);
+            $allocated = $payments[$workItemId] ?? 0;
+            $refunded = $refunds[$workItemId] ?? 0;
+            $netPaid = max($allocated - $refunded, 0);
             $outstanding = max($subtotal - $netPaid, 0);
 
-            $summary[$item->id()] = [
-                'allocated_rupiah' => $projectedAllocated,
-                'refunded_rupiah' => $projectedRefunded,
+            $summary[$workItemId] = [
+                'allocated_rupiah' => $allocated,
+                'refunded_rupiah' => $refunded,
                 'net_paid_rupiah' => $netPaid,
                 'outstanding_rupiah' => $outstanding,
                 'settlement_label' => $this->label($subtotal, $netPaid),
@@ -71,6 +59,36 @@ final class NoteOperationalRowSettlementProjector
         );
 
         return $rows;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function groupPaymentAllocations(string $noteId): array
+    {
+        $totals = [];
+
+        foreach ($this->payments->listByNoteId($noteId) as $allocation) {
+            $workItemId = $allocation->workItemId();
+            $totals[$workItemId] = ($totals[$workItemId] ?? 0) + $allocation->allocatedAmountRupiah()->amount();
+        }
+
+        return $totals;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function groupRefundAllocations(string $noteId): array
+    {
+        $totals = [];
+
+        foreach ($this->refunds->listByNoteId($noteId) as $allocation) {
+            $workItemId = $allocation->workItemId();
+            $totals[$workItemId] = ($totals[$workItemId] ?? 0) + $allocation->refundedAmountRupiah()->amount();
+        }
+
+        return $totals;
     }
 
     private function label(int $subtotal, int $netPaid): string

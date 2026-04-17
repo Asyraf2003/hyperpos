@@ -7,22 +7,48 @@ namespace Tests\Unit\Application\Note\Services;
 use App\Application\Note\Services\NoteOperationalRowSettlementProjector;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
+use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
+use App\Core\Payment\RefundComponentAllocation\RefundComponentAllocation;
 use App\Core\Shared\ValueObjects\Money;
-use App\Ports\Out\Payment\CustomerRefundReaderPort;
-use App\Ports\Out\Payment\PaymentAllocationReaderPort;
+use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 use PHPUnit\Framework\TestCase;
 
 final class NoteOperationalRowSettlementProjectorTest extends TestCase
 {
-    public function test_it_projects_allocated_amount_across_current_rows_by_line_order(): void
+    public function test_it_projects_allocations_by_actual_work_item_not_by_line_order(): void
     {
-        $allocations = $this->createMock(PaymentAllocationReaderPort::class);
-        $refunds = $this->createMock(CustomerRefundReaderPort::class);
+        $payments = $this->createMock(PaymentComponentAllocationReaderPort::class);
+        $refunds = $this->createMock(RefundComponentAllocationReaderPort::class);
 
-        $allocations->method('getTotalAllocatedAmountByNoteId')->with('note-1')->willReturn(Money::fromInt(25000));
-        $refunds->method('getTotalRefundedAmountByNoteId')->with('note-1')->willReturn(Money::zero());
+        $payments->method('listByNoteId')->with('note-1')->willReturn([
+            PaymentComponentAllocation::rehydrate(
+                'pa-1',
+                'payment-1',
+                'note-1',
+                'row-2',
+                'service_fee',
+                'row-2',
+                Money::fromInt(15000),
+                Money::fromInt(15000),
+                1,
+            ),
+            PaymentComponentAllocation::rehydrate(
+                'pa-2',
+                'payment-1',
+                'note-1',
+                'row-1',
+                'service_fee',
+                'row-1',
+                Money::fromInt(10000),
+                Money::fromInt(10000),
+                2,
+            ),
+        ]);
 
-        $projector = new NoteOperationalRowSettlementProjector($allocations, $refunds);
+        $refunds->method('listByNoteId')->with('note-1')->willReturn([]);
+
+        $projector = new NoteOperationalRowSettlementProjector($payments, $refunds);
 
         $rows = [
             $this->makeServiceRow('row-2', 'note-1', 2, 15000),
@@ -48,15 +74,51 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
         $this->assertSame('hutang', $result['row-3']['settlement_label']);
     }
 
-    public function test_it_projects_refund_against_current_rows_without_mutating_history(): void
+    public function test_it_projects_refund_by_actual_work_item_not_by_note_remainder(): void
     {
-        $allocations = $this->createMock(PaymentAllocationReaderPort::class);
-        $refunds = $this->createMock(CustomerRefundReaderPort::class);
+        $payments = $this->createMock(PaymentComponentAllocationReaderPort::class);
+        $refunds = $this->createMock(RefundComponentAllocationReaderPort::class);
 
-        $allocations->method('getTotalAllocatedAmountByNoteId')->with('note-1')->willReturn(Money::fromInt(30000));
-        $refunds->method('getTotalRefundedAmountByNoteId')->with('note-1')->willReturn(Money::fromInt(5000));
+        $payments->method('listByNoteId')->with('note-1')->willReturn([
+            PaymentComponentAllocation::rehydrate(
+                'pa-1',
+                'payment-1',
+                'note-1',
+                'row-2',
+                'service_fee',
+                'row-2',
+                Money::fromInt(10000),
+                Money::fromInt(10000),
+                1,
+            ),
+            PaymentComponentAllocation::rehydrate(
+                'pa-2',
+                'payment-1',
+                'note-1',
+                'row-3',
+                'service_fee',
+                'row-3',
+                Money::fromInt(10000),
+                Money::fromInt(10000),
+                2,
+            ),
+        ]);
 
-        $projector = new NoteOperationalRowSettlementProjector($allocations, $refunds);
+        $refunds->method('listByNoteId')->with('note-1')->willReturn([
+            RefundComponentAllocation::rehydrate(
+                'ra-1',
+                'refund-1',
+                'payment-1',
+                'note-1',
+                'row-2',
+                'service_fee',
+                'row-2',
+                Money::fromInt(5000),
+                1,
+            ),
+        ]);
+
+        $projector = new NoteOperationalRowSettlementProjector($payments, $refunds);
 
         $rows = [
             $this->makeServiceRow('row-1', 'note-1', 1, 10000),
@@ -66,17 +128,17 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
 
         $result = $projector->build('note-1', $rows);
 
-        $this->assertSame(10000, $result['row-1']['allocated_rupiah']);
-        $this->assertSame(5000, $result['row-1']['refunded_rupiah']);
-        $this->assertSame(5000, $result['row-1']['net_paid_rupiah']);
-        $this->assertSame(5000, $result['row-1']['outstanding_rupiah']);
-        $this->assertSame('dp', $result['row-1']['settlement_label']);
+        $this->assertSame(0, $result['row-1']['allocated_rupiah']);
+        $this->assertSame(0, $result['row-1']['refunded_rupiah']);
+        $this->assertSame(0, $result['row-1']['net_paid_rupiah']);
+        $this->assertSame(10000, $result['row-1']['outstanding_rupiah']);
+        $this->assertSame('hutang', $result['row-1']['settlement_label']);
 
         $this->assertSame(10000, $result['row-2']['allocated_rupiah']);
-        $this->assertSame(0, $result['row-2']['refunded_rupiah']);
-        $this->assertSame(10000, $result['row-2']['net_paid_rupiah']);
-        $this->assertSame(0, $result['row-2']['outstanding_rupiah']);
-        $this->assertSame('lunas', $result['row-2']['settlement_label']);
+        $this->assertSame(5000, $result['row-2']['refunded_rupiah']);
+        $this->assertSame(5000, $result['row-2']['net_paid_rupiah']);
+        $this->assertSame(5000, $result['row-2']['outstanding_rupiah']);
+        $this->assertSame('dp', $result['row-2']['settlement_label']);
 
         $this->assertSame(10000, $result['row-3']['allocated_rupiah']);
         $this->assertSame(0, $result['row-3']['refunded_rupiah']);
