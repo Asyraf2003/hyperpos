@@ -17,7 +17,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_closed_note_detail_shows_refund_form_and_hides_payment_form(): void
+    public function test_closed_note_detail_shows_refund_panel_and_hides_payment_panel(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidServiceOnlyNote();
@@ -25,19 +25,20 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
-            ->assertSee('Refund Nota')
-            ->assertSee('Mode Refund')
-            ->assertSee('Mode Close')
-            ->assertSee('Detail Close')
-            ->assertSee('Status Operasional')
-            ->assertSee('close')
+            ->assertSee('Workspace Nota Kasir')
+            ->assertSee('Panel Kerja Nota')
+            ->assertSee('Header Nota')
+            ->assertSee('Daftar Line Nota')
+            ->assertSee('Refund Line Tertutup')
+            ->assertSee('Panel Refund')
+            ->assertSee('Ringkasan Line')
             ->assertSee('customer_payment_id', false)
             ->assertSee('payment-1', false)
-            ->assertDontSee('Bayar Sekarang')
-            ->assertDontSee('Mode Payment');
+            ->assertDontSee('Pembayaran Line Terpilih')
+            ->assertDontSee('Panel Bayar');
     }
 
-    public function test_open_note_detail_shows_open_mode_edit_action_and_payment_panel(): void
+    public function test_open_note_detail_shows_workspace_edit_and_payment_panel(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenPartialPaidServiceOnlyNote();
@@ -45,15 +46,16 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
-            ->assertSee('Mode Open')
-            ->assertSee('Detail Open')
-            ->assertSee('Status Operasional')
-            ->assertSee('open')
-            ->assertSee('Edit Nota')
-            ->assertSee('Mode Payment')
-            ->assertSee('Bayar Sekarang')
-            ->assertSee('Net Paid')
-            ->assertDontSee('Refund Nota');
+            ->assertSee('Workspace Nota Kasir')
+            ->assertSee('Panel Kerja Nota')
+            ->assertSee('Header Nota')
+            ->assertSee('Daftar Line Nota')
+            ->assertSee('Aksi Workspace')
+            ->assertSee('Edit Workspace')
+            ->assertSee('Pembayaran Line Terpilih')
+            ->assertSee('Panel Bayar')
+            ->assertSee('Sudah Dibayar')
+            ->assertDontSee('Refund Line Tertutup');
     }
 
     private function seedKasir(): User
