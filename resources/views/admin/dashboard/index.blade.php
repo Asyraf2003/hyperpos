@@ -858,9 +858,341 @@
             padding: 1.1rem;
         }
     }
+
+    .dashboard-report .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .dashboard-report .analytics-stage-card {
+        border: 1px solid var(--report-border);
+        border-radius: var(--report-radius-lg);
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .025), rgba(var(--bs-primary-rgb), .055)),
+            var(--report-surface);
+        box-shadow: var(--report-shadow);
+        padding: 1.1rem;
+        height: 100%;
+    }
+
+    .dashboard-report .analytics-stage-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-report .analytics-stage-range {
+        font-size: .8rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .dashboard-report .chart-placeholder {
+        min-height: 240px;
+        padding: .9rem;
+    }
+
+    .dashboard-report .chart-canvas-shell {
+        min-height: 220px;
+        border: 1px dashed color-mix(in srgb, var(--report-border) 78%, rgba(var(--bs-primary-rgb), .22) 22%);
+        border-radius: var(--report-radius-lg);
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .03), rgba(var(--bs-primary-rgb), .06)),
+            var(--report-surface);
+        color: var(--report-text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1rem;
+        font-size: .84rem;
+        font-weight: 700;
+        line-height: 1.6;
+    }
+
+    .dashboard-report .analytics-summary-list {
+        display: grid;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+    .dashboard-report .analytics-summary-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .85rem 1rem;
+        border: 1px solid var(--report-border);
+        border-radius: var(--report-radius-md);
+        background: var(--report-surface);
+    }
+
+    .dashboard-report .analytics-summary-label,
+    .dashboard-report .analytics-summary-value {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .dashboard-report .analytics-summary-label {
+        font-size: .82rem;
+        color: var(--report-text-muted);
+        font-weight: 700;
+    }
+
+    .dashboard-report .analytics-summary-value {
+        font-size: .92rem;
+        color: var(--report-text);
+        font-weight: 800;
+        text-align: right;
+    }
+
+    .dashboard-report .analytics-empty {
+        padding: .85rem 1rem;
+        border: 1px dashed var(--report-border);
+        border-radius: var(--report-radius-md);
+        color: var(--report-text-muted);
+        font-size: .83rem;
+        font-weight: 700;
+        line-height: 1.6;
+        background: var(--report-surface);
+    }
+
+    .dashboard-report .analytics-json {
+        display: none;
+    }
+
+    @media (max-width: 991.98px) {
+        .dashboard-report .analytics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 </style>
 
 <div class="dashboard-report">
+
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Analitik Dashboard Bulan Ini</h5>
+                            <p class="section-subtitle">
+                                Blok baru ini hanya membaca data bulan aktif dari tanggal 1 sampai hari ini.
+                                Dashboard lama di bawah tetap dibiarkan apa adanya.
+                            </p>
+                        </div>
+                        <span class="badge-soft bg-soft-primary">
+                            <i class="bi bi-graph-up"></i>
+                            {{ $dashboard['analytics']['period']['active_month'] ?? '-' }}
+                        </span>
+                    </div>
+
+                    <div class="helper-note mb-4">
+                        Window aktif:
+                        {{ $dashboard['analytics']['period']['date_from'] ?? '-' }}
+                        s.d.
+                        {{ $dashboard['analytics']['period']['date_to'] ?? '-' }}.
+                        Saat masuk tanggal 1 bulan baru, blok ini akan mulai kosong lagi lalu terisi bertahap.
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="analytics-stage-card">
+                            <div class="analytics-stage-head">
+                                <div>
+                                    <h6 class="section-title mb-1">Distribusi Status Stok</h6>
+                                    <p class="analytics-stage-range">
+                                        Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
+                                    </p>
+                                </div>
+                                <span class="badge-soft bg-soft-success">
+                                    <i class="bi bi-pie-chart"></i>
+                                    {{ number_format((int) ($dashboard['analytics']['charts']['stock_status_donut']['total_value'] ?? 0), 0, ',', '.') }} Produk
+                                </span>
+                            </div>
+
+                            <div class="chart-shell chart-placeholder">
+                                <div
+                                    class="chart-canvas-shell"
+                                    id="admin-chart-stock-status-donut"
+                                    data-chart-key="stock_status_donut"
+                                >
+                                    Container chart donut siap dipakai renderer analytics dashboard.
+                                </div>
+                            </div>
+
+                            <div class="analytics-summary-list">
+                                @forelse (($dashboard['analytics']['charts']['stock_status_donut']['segments'] ?? []) as $segment)
+                                    <div class="analytics-summary-item">
+                                        <p class="analytics-summary-label">{{ $segment['label'] ?? '-' }}</p>
+                                        <p class="analytics-summary-value">
+                                            {{ number_format((int) ($segment['value'] ?? 0), 0, ',', '.') }} Produk
+                                        </p>
+                                    </div>
+                                @empty
+                                    <div class="analytics-empty">
+                                        Belum ada data segmen stok untuk blok analytics baru ini.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="analytics-stage-card">
+                            <div class="analytics-stage-head">
+                                <div>
+                                    <h6 class="section-title mb-1">Top Produk Terjual Bulan Ini</h6>
+                                    <p class="analytics-stage-range">
+                                        Range:
+                                        {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
+                                        s.d.
+                                        {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
+                                    </p>
+                                </div>
+                                <span class="badge-soft bg-soft-warning">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                    {{ count($dashboard['analytics']['charts']['top_selling_bar']['categories'] ?? []) }} Produk
+                                </span>
+                            </div>
+
+                            <div class="chart-shell chart-placeholder">
+                                <div
+                                    class="chart-canvas-shell"
+                                    id="admin-chart-top-selling-bar"
+                                    data-chart-key="top_selling_bar"
+                                >
+                                    Container chart batang siap dipakai renderer analytics dashboard.
+                                </div>
+                            </div>
+
+                            <div class="analytics-summary-list">
+                                @forelse (($dashboard['analytics']['charts']['top_selling_bar']['detail'] ?? []) as $row)
+                                    <div class="analytics-summary-item">
+                                        <p class="analytics-summary-label">{{ $row['label'] ?? '-' }}</p>
+                                        <p class="analytics-summary-value">
+                                            {{ number_format((int) ($row['sold_qty'] ?? 0), 0, ',', '.') }} Unit
+                                        </p>
+                                    </div>
+                                @empty
+                                    <div class="analytics-empty">
+                                        Belum ada data produk terjual untuk bulan aktif.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="analytics-stage-card">
+                            <div class="analytics-stage-head">
+                                <div>
+                                    <h6 class="section-title mb-1">Tren Arus Kas Bulan Ini</h6>
+                                    <p class="analytics-stage-range">
+                                        Range:
+                                        {{ $dashboard['analytics']['charts']['cashflow_line']['range']['date_from'] ?? '-' }}
+                                        s.d.
+                                        {{ $dashboard['analytics']['charts']['cashflow_line']['range']['date_to'] ?? '-' }}
+                                    </p>
+                                </div>
+                                <span class="badge-soft bg-soft-info">
+                                    <i class="bi bi-activity"></i>
+                                    {{ count($dashboard['analytics']['charts']['cashflow_line']['labels'] ?? []) }} Titik
+                                </span>
+                            </div>
+
+                            <div class="chart-shell chart-placeholder">
+                                <div
+                                    class="chart-canvas-shell"
+                                    id="admin-chart-cashflow-line"
+                                    data-chart-key="cashflow_line"
+                                >
+                                    Container chart garis siap dipakai renderer analytics dashboard.
+                                </div>
+                            </div>
+
+                            <div class="analytics-summary-list">
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Kas Masuk</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_cash_in_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Kas Keluar</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_cash_out_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Net Cash Flow</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['cashflow_line']['summary']['total_net_cash_flow_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-stage-card">
+                            <div class="analytics-stage-head">
+                                <div>
+                                    <h6 class="section-title mb-1">Kinerja Operasional Bulan Ini</h6>
+                                    <p class="analytics-stage-range">
+                                        Range:
+                                        {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+                                        s.d.
+                                        {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+                                    </p>
+                                </div>
+                                <span class="badge-soft bg-soft-danger">
+                                    <i class="bi bi-graph-down-arrow"></i>
+                                    {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
+                                </span>
+                            </div>
+
+                            <div class="chart-shell chart-placeholder">
+                                <div
+                                    class="chart-canvas-shell"
+                                    id="admin-chart-operational-performance-bar"
+                                    data-chart-key="operational_performance_bar"
+                                >
+                                    Container chart kinerja operasional siap dipakai renderer analytics dashboard.
+                                </div>
+                            </div>
+
+                            <div class="analytics-summary-list">
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Laba Operasional</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_profit_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Biaya Operasional</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_expense_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="analytics-summary-item">
+                                    <p class="analytics-summary-label">Total Refund</p>
+                                    <p class="analytics-summary-value">
+                                        Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_refund_rupiah'] ?? 0), 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
+                        @json($dashboard['analytics'] ?? [])
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="row g-4 mb-4">
         <div class="col-12 col-xl-9">
             <div class="card hero-card h-100">
