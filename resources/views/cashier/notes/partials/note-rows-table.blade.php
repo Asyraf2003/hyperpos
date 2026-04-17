@@ -23,6 +23,7 @@
             <table class="table table-striped align-middle mb-0">
                 <thead>
                     <tr>
+                        <th style="width: 56px;">Pilih</th>
                         <th>Line</th>
                         <th>Tipe</th>
                         <th>Status Line</th>
@@ -34,7 +35,29 @@
                 </thead>
                 <tbody>
                     @forelse ($note['rows'] as $row)
+                        @php
+                            $canPay = (bool) ($row['can_pay'] ?? false);
+                            $rowId = (string) ($row['id'] ?? '');
+                            $rowOutstanding = (int) ($row['outstanding_rupiah'] ?? 0);
+                        @endphp
                         <tr>
+                            <td>
+                                @if ($canPay && $rowId !== '')
+                                    <div class="form-check d-flex justify-content-center mb-0">
+                                        <input
+                                            type="checkbox"
+                                            class="form-check-input js-payment-row-selector"
+                                            value="{{ $rowId }}"
+                                            data-row-id="{{ $rowId }}"
+                                            data-outstanding-rupiah="{{ $rowOutstanding }}"
+                                            data-line-status="{{ $row['line_status'] ?? '' }}"
+                                            aria-label="Pilih line {{ $row['line_no'] }} untuk pembayaran"
+                                        >
+                                    </div>
+                                @else
+                                    <span class="text-muted small">-</span>
+                                @endif
+                            </td>
                             <td>{{ $row['line_no'] }}</td>
                             <td>{{ $row['type_label'] }}</td>
                             <td>
@@ -44,7 +67,7 @@
                             </td>
                             <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
                             <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                            <td class="text-end">{{ number_format((int) ($row['outstanding_rupiah'] ?? 0), 0, ',', '.') }}</td>
+                            <td class="text-end">{{ number_format($rowOutstanding, 0, ',', '.') }}</td>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     @if ($row['can_edit'] ?? false)
@@ -75,7 +98,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
+                            <td colspan="8" class="text-center text-muted py-4">
                                 Belum ada line pada nota ini.
                             </td>
                         </tr>
@@ -85,7 +108,7 @@
         </div>
 
         <div class="small text-muted mt-3">
-            Tombol aksi line sedang dipindahkan ke flow kerja baru. Pada tahap ini fokusnya memastikan tampilan line-centric sudah terbaca jelas di halaman detail.
+            Centang line Open yang ingin dibayar. Wiring final ke request, controller, dan allocator akan dikunci di langkah berikutnya.
         </div>
     </div>
 </div>
