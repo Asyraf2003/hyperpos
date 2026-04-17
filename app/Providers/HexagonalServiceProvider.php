@@ -75,6 +75,7 @@ use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductWriterAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseVersionedProductWriterAdapter;
 use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
+use App\Adapters\Out\Reporting\DatabaseDashboardOperationalPerformanceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseDashboardTopSellingProductReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
@@ -178,6 +179,7 @@ use App\Ports\Out\ProductCatalog\ProductDetailReaderPort;
 use App\Ports\Out\ProductCatalog\ProductTableReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
 use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
+use App\Ports\Out\Reporting\DashboardOperationalPerformanceReaderPort;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
 use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
@@ -287,6 +289,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentComponentAllocationWriterPort::class, DatabasePaymentComponentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentComponentAllocationReaderPort::class, DatabasePaymentComponentAllocationReaderAdapter::class);
 
+        $this->app->singleton(DashboardOperationalPerformanceReaderPort::class, DatabaseDashboardOperationalPerformanceReaderAdapter::class);
         $this->app->singleton(DashboardTopSellingProductReaderPort::class, DatabaseDashboardTopSellingProductReaderAdapter::class);
         $this->app->singleton(TransactionReportingSourceReaderPort::class, DatabaseTransactionReportingSourceReaderAdapter::class);
         $this->app->singleton(OperationalExpenseReportingSourceReaderPort::class, DatabaseOperationalExpenseReportingSourceReaderAdapter::class);
