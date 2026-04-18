@@ -32,26 +32,13 @@ final class SelectedNoteRowsPaymentAmountResolver
             static fn (string $id): bool => trim($id) !== ''
         )));
 
-        if ($selectedIds === []) {
-            return Result::failure('Pilih minimal satu line open untuk dibayar.', ['payment' => ['INVALID_SELECTED_ROWS']]);
-        }
-
-        if ($requestedAmountRupiah <= 0) {
-            return Result::failure('Nominal pembayaran harus lebih besar dari 0.', ['payment' => ['INVALID_PAYMENT_AMOUNT']]);
-        }
-
+        $restrictToSelection = $selectedIds !== [];
         $settlements = $this->settlements->build($note->id(), $note->workItems());
 
         $matchedIds = [];
         $selectedOutstandingTotal = 0;
 
         foreach ($note->workItems() as $item) {
-            if (! in_array($item->id(), $selectedIds, true)) {
-                continue;
-            }
-
-            $matchedIds[] = $item->id();
-
             $settlement = $settlements[$item->id()] ?? [
                 'refunded_rupiah' => 0,
                 'outstanding_rupiah' => $item->subtotalRupiah()->amount(),
@@ -61,17 +48,30 @@ final class SelectedNoteRowsPaymentAmountResolver
             $outstandingRupiah = (int) ($settlement['outstanding_rupiah'] ?? 0);
             $status = $this->statuses->resolve($outstandingRupiah, $refundedRupiah);
 
-            if ($status !== WorkItemOperationalStatusResolver::STATUS_OPEN) {
-                return Result::failure(
-                    'Hanya line Open yang boleh dipilih untuk pembayaran.',
-                    ['payment' => ['INVALID_SELECTED_ROWS']]
-                );
+            if ($restrictToSelection) {
+                if (! in_array($item->id(), $selectedIds, true)) {
+                    continue;
+                }
+
+                $matchedIds[] = $item->id();
+
+                if ($status !== WorkItemOperationalStatusResolver::STATUS_OPEN) {
+                    return Result::failure(
+                        'Hanya line Open yang boleh dipilih untuk pembayaran.',
+                        ['payment' => ['INVALID_SELECTED_ROWS']]
+                    );
+                }
+
+                $selectedOutstandingTotal += $outstandingRupiah;
+                continue;
             }
 
-            $selectedOutstandingTotal += $outstandingRupiah;
+            if ($status === WorkItemOperationalStatusResolver::STATUS_OPEN) {
+                $selectedOutstandingTotal += $outstandingRupiah;
+            }
         }
 
-        if (array_values(array_diff($selectedIds, $matchedIds)) !== []) {
+        if ($restrictToSelection && array_values(array_diff($selectedIds, $matchedIds)) !== []) {
             return Result::failure('Line yang dipilih tidak valid untuk nota ini.', ['payment' => ['INVALID_SELECTED_ROWS']]);
         }
 
@@ -79,7 +79,11 @@ final class SelectedNoteRowsPaymentAmountResolver
             return Result::failure('Total outstanding line terpilih harus lebih besar dari 0.', ['payment' => ['INVALID_SELECTED_ROWS']]);
         }
 
-        if ($requestedAmountRupiah > $selectedOutstandingTotal) {
+        $effectiveAmountRupiah = $requestedAmountRupiah > 0
+            ? $requestedAmountRupiah
+            : $selectedOutstandingTotal;
+
+        if ($effectiveAmountRupiah > $selectedOutstandingTotal) {
             return Result::failure(
                 'Nominal pembayaran melebihi total outstanding line yang dipilih.',
                 ['payment' => ['INVALID_PAYMENT_AMOUNT']]
@@ -87,7 +91,7 @@ final class SelectedNoteRowsPaymentAmountResolver
         }
 
         return Result::success([
-            'amount_rupiah' => $requestedAmountRupiah,
+            'amount_rupiah' => $effectiveAmountRupiah,
             'selected_outstanding_total_rupiah' => $selectedOutstandingTotal,
         ]);
     }

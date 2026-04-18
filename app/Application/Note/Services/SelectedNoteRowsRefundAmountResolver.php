@@ -32,26 +32,17 @@ final class SelectedNoteRowsRefundAmountResolver
             static fn (string $id): bool => trim($id) !== ''
         )));
 
-        if ($selectedIds === []) {
-            return Result::failure('Pilih minimal satu line Close untuk refund.', ['refund' => ['INVALID_SELECTED_ROWS']]);
-        }
-
         if ($requestedAmountRupiah <= 0) {
             return Result::failure('Nominal refund harus lebih besar dari 0.', ['refund' => ['INVALID_REFUND_AMOUNT']]);
         }
 
+        $restrictToSelection = $selectedIds !== [];
         $settlements = $this->settlements->build($note->id(), $note->workItems());
 
         $matchedIds = [];
         $selectedRefundableTotal = 0;
 
         foreach ($note->workItems() as $item) {
-            if (! in_array($item->id(), $selectedIds, true)) {
-                continue;
-            }
-
-            $matchedIds[] = $item->id();
-
             $settlement = $settlements[$item->id()] ?? [
                 'refunded_rupiah' => 0,
                 'net_paid_rupiah' => 0,
@@ -63,17 +54,30 @@ final class SelectedNoteRowsRefundAmountResolver
             $outstandingRupiah = (int) ($settlement['outstanding_rupiah'] ?? 0);
             $status = $this->statuses->resolve($outstandingRupiah, $refundedRupiah);
 
-            if ($status !== WorkItemOperationalStatusResolver::STATUS_CLOSE) {
-                return Result::failure(
-                    'Hanya line Close yang boleh dipilih untuk refund.',
-                    ['refund' => ['INVALID_SELECTED_ROWS']]
-                );
+            if ($restrictToSelection) {
+                if (! in_array($item->id(), $selectedIds, true)) {
+                    continue;
+                }
+
+                $matchedIds[] = $item->id();
+
+                if ($status !== WorkItemOperationalStatusResolver::STATUS_CLOSE) {
+                    return Result::failure(
+                        'Hanya line Close yang boleh dipilih untuk refund.',
+                        ['refund' => ['INVALID_SELECTED_ROWS']]
+                    );
+                }
+
+                $selectedRefundableTotal += $netPaidRupiah;
+                continue;
             }
 
-            $selectedRefundableTotal += $netPaidRupiah;
+            if ($status === WorkItemOperationalStatusResolver::STATUS_CLOSE) {
+                $selectedRefundableTotal += $netPaidRupiah;
+            }
         }
 
-        if (array_values(array_diff($selectedIds, $matchedIds)) !== []) {
+        if ($restrictToSelection && array_values(array_diff($selectedIds, $matchedIds)) !== []) {
             return Result::failure('Line refund yang dipilih tidak valid untuk nota ini.', ['refund' => ['INVALID_SELECTED_ROWS']]);
         }
 
