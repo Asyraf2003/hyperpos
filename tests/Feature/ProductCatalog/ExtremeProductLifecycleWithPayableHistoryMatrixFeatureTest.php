@@ -133,14 +133,13 @@ final class ExtremeProductLifecycleWithPayableHistoryMatrixFeatureTest extends T
     private function admin(): User
     {
         $u = User::query()->create([
-            'id' => 'admin-product-lifecycle',
             'name' => 'Admin Product Lifecycle',
-            'email' => 'admin-product-lifecycle@example.test',
+            'email' => 'admin-product-lifecycle-' . uniqid() . '@example.test',
             'password' => 'password123',
         ]);
 
         DB::table('actor_accesses')->insert([
-            'actor_id' => 'admin-product-lifecycle',
+            'actor_id' => (string) $u->getAuthIdentifier(),
             'role' => 'admin',
         ]);
 
