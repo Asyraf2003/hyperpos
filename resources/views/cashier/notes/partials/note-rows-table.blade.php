@@ -4,7 +4,7 @@
             <div>
                 <h4 class="card-title mb-1">Daftar Line Nota</h4>
                 <p class="mb-0 text-muted">
-                    Setiap line menjadi unit kerja utama. Aksi harian dibaca dari status line, bukan dari status nota.
+                    Setiap line menjadi unit kerja utama. Pilih line yang ingin diproses, lalu lanjutkan dari panel samping.
                 </p>
             </div>
 
@@ -14,7 +14,7 @@
         </div>
 
         <p class="mt-2 mb-0 text-muted small">
-            Open dapat diedit dan dibayar. Close siap untuk refund. Refund hanya dibuka untuk melihat detail line.
+            Open dapat dipilih untuk pembayaran. Close dapat dipilih untuk refund. Refund penuh hanya berlaku untuk line yang benar-benar sudah masuk alur refund.
         </p>
     </div>
 
@@ -30,7 +30,6 @@
                         <th class="text-end">Subtotal</th>
                         <th class="text-end">Sudah Dibayar</th>
                         <th class="text-end">Sisa</th>
-                        <th style="width: 220px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,37 +81,10 @@
                             <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
                             <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
                             <td class="text-end">{{ number_format($rowOutstanding, 0, ',', '.') }}</td>
-                            <td>
-                                <div class="d-flex flex-wrap gap-2">
-                                    @if ($row['can_edit'] ?? false)
-                                        <button type="button" class="btn btn-sm btn-outline-primary" disabled>
-                                            Edit
-                                        </button>
-                                    @endif
-
-                                    @if ($row['can_pay'] ?? false)
-                                        <button type="button" class="btn btn-sm btn-outline-success" disabled>
-                                            Bayar
-                                        </button>
-                                    @endif
-
-                                    @if ($row['can_refund'] ?? false)
-                                        <button type="button" class="btn btn-sm btn-outline-warning" disabled>
-                                            Refund
-                                        </button>
-                                    @endif
-
-                                    @if ($row['can_view_detail'] ?? false)
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
-                                            Detail
-                                        </button>
-                                    @endif
-                                </div>
-                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
+                            <td colspan="7" class="text-center text-muted py-4">
                                 Belum ada line pada nota ini.
                             </td>
                         </tr>
@@ -122,7 +94,7 @@
         </div>
 
         <div class="small text-muted mt-3">
-            Centang line Open untuk pembayaran atau line Close untuk refund. Wiring final ke request dan controller sekarang sudah line-centric.
+            Kolom aksi placeholder sudah dihapus. Proses line sekarang fokus ke pilihan line dan panel samping agar alurnya tidak membingungkan.
         </div>
     </div>
 </div>
