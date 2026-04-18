@@ -31,7 +31,7 @@
                                 <div>
                                     <h4 class="card-title mb-1">Rincian Nota</h4>
                                     <p class="mb-0 text-muted">
-                                        Revisi setelah barang diterima akan diproses sebagai delta faktur.
+                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Revisi setelah barang diterima akan diproses sebagai delta faktur.
                                     </p>
                                 </div>
 
@@ -46,9 +46,8 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px; gap: 16px;"
                             >
-                                <div>Baris</div>
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
                                 <div>Total Rincian</div>
@@ -74,15 +73,8 @@
 
                                         <div
                                             class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                            style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                            style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
                                         >
-                                            <div class="w-100">
-                                                <label class="form-label d-xl-none">Baris</label>
-                                                <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
-                                                    <span data-line-label>{{ $lineView['line_no'] }}</span>
-                                                </div>
-                                            </div>
-
                                             <div class="w-100 position-relative">
                                                 <label class="form-label d-xl-none">Produk</label>
 
@@ -123,6 +115,7 @@
                                                     class="form-control @error('lines.' . $lineView['index'] . '.qty_pcs') is-invalid @enderror"
                                                     placeholder="Contoh: 2"
                                                     data-qty-input
+                                                    style="text-align: center;"
                                                     required
                                                 >
                                                 @error('lines.' . $lineView['index'] . '.qty_pcs')
@@ -147,6 +140,7 @@
                                                     class="form-control @error('lines.' . $lineView['index'] . '.line_total_rupiah') is-invalid @enderror"
                                                     placeholder="Contoh: 150.000"
                                                     data-money-display
+                                                    style="text-align: right;"
                                                     required
                                                 >
 
@@ -159,10 +153,12 @@
                                                 <label class="form-label d-xl-none">Aksi</label>
                                                 <button
                                                     type="button"
-                                                    class="btn btn-light-danger w-100"
+                                                    class="btn icon btn-danger"
                                                     data-remove-line
+                                                    aria-label="Hapus rincian"
+                                                    title="Hapus rincian"
                                                 >
-                                                    Hapus
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -188,15 +184,8 @@
 
                                     <div
                                         class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: 72px minmax(0, 1.8fr) 160px 220px 96px;"
+                                        style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
                                     >
-                                        <div class="w-100">
-                                            <label class="form-label d-xl-none">Baris</label>
-                                            <div class="border rounded px-3 py-2 bg-light fw-semibold text-center">
-                                                <span data-line-label>__LINE_NO__</span>
-                                            </div>
-                                        </div>
-
                                         <div class="w-100 position-relative">
                                             <label class="form-label d-xl-none">Produk</label>
 
@@ -233,6 +222,7 @@
                                                 class="form-control"
                                                 placeholder="Contoh: 2"
                                                 data-qty-input
+                                                style="text-align: center;"
                                                 required
                                             >
                                         </div>
@@ -254,6 +244,7 @@
                                                 class="form-control"
                                                 placeholder="Contoh: 150.000"
                                                 data-money-display
+                                                style="text-align: right;"
                                                 required
                                             >
                                         </div>
@@ -262,10 +253,12 @@
                                             <label class="form-label d-xl-none">Aksi</label>
                                             <button
                                                 type="button"
-                                                class="btn btn-light-danger w-100"
+                                                class="btn icon btn-danger"
                                                 data-remove-line
+                                                aria-label="Hapus rincian"
+                                                title="Hapus rincian"
                                             >
-                                                Hapus
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -394,7 +387,12 @@
     <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}"></script>
     <script>
         window.procurementCreateConfig = {
-            lookupEndpoint: @json(route('admin.procurement.products.lookup'))
+            lookupEndpoint: @json(route('admin.procurement.products.lookup')),
+            createProductUrl: @json(
+                route('admin.products.create')
+                    . '?return_to=' . urlencode(route('admin.procurement.supplier-invoices.edit', ['supplierInvoiceId' => $summary['supplier_invoice_id']]))
+                    . '&return_label=' . urlencode('Kembali ke Edit Nota Supplier')
+            )
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-edit.js') }}"></script>

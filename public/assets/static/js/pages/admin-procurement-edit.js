@@ -65,15 +65,10 @@
     lineItems().forEach((item, index) => {
       const lineNo = String(index + 1);
       const lineNoInput = item.querySelector("[data-line-no]");
-      const lineLabels = item.querySelectorAll("[data-line-label]");
 
       if (lineNoInput) {
         lineNoInput.value = lineNo;
       }
-
-      lineLabels.forEach((label) => {
-        label.textContent = lineNo;
-      });
     });
   };
 
@@ -174,12 +169,17 @@
       .replaceAll("__LINE_NO__", String(lineNo));
 
   const populateLineItem = (item, line) => {
+    const previousLineIdInput = item.querySelector("[data-previous-line-id]");
     const lineNoInput = item.querySelector("[data-line-no]");
     const productIdInput = item.querySelector("[data-product-id]");
     const productSearchInput = item.querySelector("[data-product-search]");
     const qtyInput = item.querySelector("[data-qty-input]");
     const moneyRawInput = item.querySelector("[data-money-raw]");
     const moneyDisplayInput = item.querySelector("[data-money-display]");
+
+    if (previousLineIdInput) {
+      previousLineIdInput.value = String(line.previous_line_id ?? "");
+    }
 
     if (lineNoInput) {
       lineNoInput.value = String(line.line_no ?? "");
@@ -190,7 +190,7 @@
     }
 
     if (productSearchInput) {
-      productSearchInput.value = String(line.product_label ?? "");
+      productSearchInput.value = String(line.product_label ?? line.selected_label ?? "");
     }
 
     if (qtyInput) {
@@ -204,7 +204,7 @@
     if (moneyDisplayInput) {
       moneyDisplayInput.value = formatMoneyDisplay(
         line.line_total_rupiah ?? "",
-        line.line_total_display ?? ""
+        line.line_total_display ?? line.line_total_display_formatted ?? ""
       );
     }
   };
@@ -382,6 +382,7 @@
       lines: lineItems()
         .filter((item) => !isLineCompletelyEmpty(item))
         .map((item) => ({
+          previous_line_id: String(item.querySelector("[data-previous-line-id]")?.value ?? ""),
           line_no: String(item.querySelector("[data-line-no]")?.value ?? ""),
           product_id: String(item.querySelector("[data-product-id]")?.value ?? ""),
           product_label: String(item.querySelector("[data-product-search]")?.value ?? ""),
@@ -506,7 +507,6 @@
     const hiddenInput = item.querySelector("[data-product-id]");
     const resultsBox = item.querySelector("[data-product-results]");
     const qtyInput = item.querySelector("[data-qty-input]");
-    const createProductLink = item.querySelector("a[href*='/admin/products/create']");
 
     if (!searchInput || !hiddenInput || !resultsBox) return;
 
@@ -518,8 +518,8 @@
     const createProductButton = () => resultsBox.querySelector("[data-create-product-action]");
 
     const openCreateProduct = () => {
-      const href = createProductLink?.getAttribute("href");
-      if (!href) return;
+      const href = String(config.createProductUrl ?? "").trim();
+      if (href === "") return;
 
       window.location.assign(href);
     };
@@ -546,9 +546,9 @@
 
     const renderResults = (rows) => {
       if (!rows.length) {
-        const createHref = createProductLink?.getAttribute("href");
+        const createHref = String(config.createProductUrl ?? "").trim();
 
-        resultsBox.innerHTML = createHref
+        resultsBox.innerHTML = createHref !== ""
           ? '<button type="button" class="list-group-item list-group-item-action" data-create-product-action><div class="fw-semibold">Produk tidak ditemukan</div><small class="text-muted">Tekan Enter untuk buat product baru.</small></button>'
           : '<div class="list-group-item text-muted">Produk tidak ditemukan.</div>';
 
@@ -632,6 +632,12 @@
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
         form.requestSubmit();
+        return;
+      }
+
+      if (event.ctrlKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        openCreateProduct();
         return;
       }
 
