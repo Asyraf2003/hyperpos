@@ -30,12 +30,17 @@ trait SupplierInvoiceWritePayloads
         ];
     }
 
-    private function toLineRecords(SupplierInvoice $supplierInvoice): array
+    private function toLineRecords(SupplierInvoice $supplierInvoice, int $revisionNo): array
     {
         return array_map(
             static fn (SupplierInvoiceLine $line): array => [
                 'id' => $line->id(),
                 'supplier_invoice_id' => $supplierInvoice->id(),
+                'revision_no' => $revisionNo,
+                'is_current' => true,
+                'source_line_id' => null,
+                'superseded_by_line_id' => null,
+                'superseded_at' => null,
                 'line_no' => $line->lineNo(),
                 'product_id' => $line->productId(),
                 'product_kode_barang_snapshot' => $line->productKodeBarangSnapshot(),

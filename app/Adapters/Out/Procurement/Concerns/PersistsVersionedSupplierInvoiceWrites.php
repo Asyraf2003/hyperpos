@@ -18,7 +18,7 @@ trait PersistsVersionedSupplierInvoiceWrites
         $eventName = 'supplier_invoice_created';
 
         DB::table('supplier_invoices')->insert($this->toInvoiceRecord($supplierInvoice, $revisionNo));
-        DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice));
+        DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice, $revisionNo));
         DB::table('supplier_invoice_versions')->insert($this->toVersionRecord($supplierInvoice, $revisionNo, $eventName, $occurredAt, $context, $snapshot));
 
         $auditEventId = $this->uuid->generate();
@@ -43,9 +43,13 @@ trait PersistsVersionedSupplierInvoiceWrites
 
         DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_id', $supplierInvoice->id())
-            ->delete();
+            ->where('is_current', true)
+            ->update([
+                'is_current' => false,
+                'superseded_at' => $occurredAt,
+            ]);
 
-        DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice));
+        DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice, $revisionNo));
         DB::table('supplier_invoice_versions')->insert($this->toVersionRecord($supplierInvoice, $revisionNo, $eventName, $occurredAt, $context, $afterSnapshot));
 
         $auditEventId = $this->uuid->generate();
