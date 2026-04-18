@@ -20,19 +20,20 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'invoice-1',
-            ]), [
+            ]), $this->updatePayload([
                 'nomor_faktur' => 'INV-SUP-001-REV',
                 'nama_pt_pengirim' => 'PT Sumber Makmur',
                 'tanggal_pengiriman' => '2026-03-20',
                 'lines' => [
                     [
+                        'previous_line_id' => 'invoice-line-1',
                         'line_no' => 1,
                         'product_id' => 'product-1',
                         'qty_pcs' => 3,
                         'line_total_rupiah' => 30000,
                     ],
                 ],
-            ]);
+            ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-1',
@@ -50,6 +51,8 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('supplier_invoice_lines', [
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 2,
+            'is_current' => 1,
             'line_no' => 1,
             'product_id' => 'product-1',
             'qty_pcs' => 3,
@@ -70,7 +73,6 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         ]);
     }
 
-
     public function test_admin_can_add_new_line_when_updating_editable_supplier_invoice(): void
     {
         $this->seedEditableInvoice();
@@ -79,25 +81,27 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'invoice-1',
-            ]), [
+            ]), $this->updatePayload([
                 'nomor_faktur' => 'INV-SUP-001-REV',
                 'nama_pt_pengirim' => 'PT Sumber Makmur',
                 'tanggal_pengiriman' => '2026-03-20',
                 'lines' => [
                     [
+                        'previous_line_id' => 'invoice-line-1',
                         'line_no' => 1,
                         'product_id' => 'product-1',
                         'qty_pcs' => 2,
                         'line_total_rupiah' => 20000,
                     ],
                     [
+                        'previous_line_id' => null,
                         'line_no' => 2,
                         'product_id' => 'product-2',
                         'qty_pcs' => 1,
                         'line_total_rupiah' => 15000,
                     ],
                 ],
-            ]);
+            ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-1',
@@ -112,6 +116,8 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('supplier_invoice_lines', [
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 2,
+            'is_current' => 1,
             'line_no' => 1,
             'product_id' => 'product-1',
             'qty_pcs' => 2,
@@ -121,6 +127,8 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('supplier_invoice_lines', [
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 2,
+            'is_current' => 1,
             'line_no' => 2,
             'product_id' => 'product-2',
             'qty_pcs' => 1,
@@ -137,6 +145,11 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         DB::table('supplier_invoice_lines')->insert([
             'id' => 'invoice-line-2',
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 1,
+            'is_current' => 1,
+            'source_line_id' => null,
+            'superseded_by_line_id' => null,
+            'superseded_at' => null,
             'line_no' => 2,
             'product_id' => 'product-2',
             'product_kode_barang_snapshot' => 'KB-002',
@@ -157,19 +170,20 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'invoice-1',
-            ]), [
+            ]), $this->updatePayload([
                 'nomor_faktur' => 'INV-SUP-001',
                 'nama_pt_pengirim' => 'PT Sumber Makmur',
                 'tanggal_pengiriman' => '2026-03-15',
                 'lines' => [
                     [
+                        'previous_line_id' => 'invoice-line-1',
                         'line_no' => 1,
                         'product_id' => 'product-1',
                         'qty_pcs' => 2,
                         'line_total_rupiah' => 20000,
                     ],
                 ],
-            ]);
+            ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-1',
@@ -182,9 +196,11 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'last_revision_no' => 2,
         ]);
 
-        $this->assertDatabaseMissing('supplier_invoice_lines', [
+        $this->assertDatabaseHas('supplier_invoice_lines', [
             'id' => 'invoice-line-2',
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 1,
+            'is_current' => 0,
         ]);
     }
 
@@ -193,19 +209,20 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response = $this->actingAs($this->user('admin'))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'missing-invoice',
-            ]), [
+            ]), $this->updatePayload([
                 'nomor_faktur' => 'INV-404',
                 'nama_pt_pengirim' => 'PT Tidak Ada',
                 'tanggal_pengiriman' => '2026-03-20',
                 'lines' => [
                     [
+                        'previous_line_id' => null,
                         'line_no' => 1,
                         'product_id' => 'product-1',
                         'qty_pcs' => 1,
                         'line_total_rupiah' => 1000,
                     ],
                 ],
-            ]);
+            ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.index'));
         $response->assertSessionHas('error', 'Nota supplier tidak ditemukan.');
@@ -230,19 +247,20 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             ]))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'invoice-1',
-            ]), [
+            ]), $this->updatePayload([
                 'nomor_faktur' => 'INV-SUP-LOCKED',
                 'nama_pt_pengirim' => 'PT Sumber Makmur',
                 'tanggal_pengiriman' => '2026-03-20',
                 'lines' => [
                     [
+                        'previous_line_id' => 'invoice-line-1',
                         'line_no' => 1,
                         'product_id' => 'product-1',
                         'qty_pcs' => 2,
                         'line_total_rupiah' => 20000,
                     ],
                 ],
-            ]);
+            ]));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-1',
@@ -254,6 +272,26 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'nomor_faktur' => 'INV-SUP-001',
             'last_revision_no' => 1,
         ]);
+    }
+
+    private function updatePayload(array $overrides): array
+    {
+        return array_replace_recursive([
+            'expected_revision_no' => 1,
+            'change_reason' => 'Perbaikan data faktur supplier.',
+            'nomor_faktur' => 'INV-SUP-001',
+            'nama_pt_pengirim' => 'PT Sumber Makmur',
+            'tanggal_pengiriman' => '2026-03-15',
+            'lines' => [
+                [
+                    'previous_line_id' => 'invoice-line-1',
+                    'line_no' => 1,
+                    'product_id' => 'product-1',
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 20000,
+                ],
+            ],
+        ], $overrides);
     }
 
     private function seedEditableInvoice(): void
@@ -294,6 +332,11 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         DB::table('supplier_invoice_lines')->insert([
             'id' => 'invoice-line-1',
             'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 1,
+            'is_current' => 1,
+            'source_line_id' => null,
+            'superseded_by_line_id' => null,
+            'superseded_at' => null,
             'line_no' => 1,
             'product_id' => 'product-1',
             'product_kode_barang_snapshot' => 'KB-001',
@@ -305,7 +348,6 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'unit_cost_rupiah' => 10000,
         ]);
     }
-
 
     private function seedSecondProduct(): void
     {
