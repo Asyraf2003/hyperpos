@@ -9,8 +9,6 @@ use Illuminate\Validation\Validator;
 
 final class CreateSupplierInvoiceLinesPostValidation
 {
-    private const MAX_INVOICE_GRAND_TOTAL_RUPIAH = 2147483647;
-
     public function validate(FormRequest $request, Validator $validator): void
     {
         $lines = $request->input('lines');
@@ -21,7 +19,7 @@ final class CreateSupplierInvoiceLinesPostValidation
 
         $this->validateDuplicateLineNo($lines, $validator);
         $this->validateLineTotalDivisibleByQty($lines, $validator);
-        $this->validateGrandTotalWithinStorageLimit($lines, $validator);
+        (new CreateSupplierInvoiceGrandTotalStorageLimitValidation())->validate($lines, $validator);
     }
 
     /**
@@ -76,46 +74,6 @@ final class CreateSupplierInvoiceLinesPostValidation
                 'lines.' . $index . '.line_total_rupiah',
                 'Baris ' . $lineNo . ': total rincian harus habis dibagi qty.'
             );
-        }
-    }
-
-    /**
-     * @param array<int, mixed> $lines
-     */
-    private function validateGrandTotalWithinStorageLimit(array $lines, Validator $validator): void
-    {
-        $grandTotal = 0;
-
-        foreach ($lines as $index => $line) {
-            if (! is_array($line)) {
-                continue;
-            }
-
-            $lineTotal = isset($line['line_total_rupiah']) ? (int) $line['line_total_rupiah'] : 0;
-
-            if ($lineTotal < 1) {
-                continue;
-            }
-
-            if ($lineTotal > self::MAX_INVOICE_GRAND_TOTAL_RUPIAH) {
-                $validator->errors()->add(
-                    'lines.' . $index . '.line_total_rupiah',
-                    'Total rincian melebihi batas penyimpanan sistem.'
-                );
-
-                return;
-            }
-
-            $grandTotal += $lineTotal;
-
-            if ($grandTotal > self::MAX_INVOICE_GRAND_TOTAL_RUPIAH) {
-                $validator->errors()->add(
-                    'supplier_invoice',
-                    'Total keseluruhan nota melebihi batas penyimpanan sistem. Kurangi total rincian lalu simpan lagi.'
-                );
-
-                return;
-            }
         }
     }
 }
