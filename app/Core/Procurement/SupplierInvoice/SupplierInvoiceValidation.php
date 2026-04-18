@@ -25,9 +25,30 @@ trait SupplierInvoiceValidation
         if ($lines === []) throw new DomainException('Minimal 1 line.');
 
         foreach ($lines as $line) {
-            if (!$line instanceof SupplierInvoiceLine) {
+            if (! $line instanceof SupplierInvoiceLine) {
                 throw new DomainException('Line tidak valid.');
             }
+        }
+
+        self::assertNoDuplicateProducts($lines);
+    }
+
+    /** @param list<SupplierInvoiceLine> $lines */
+    private static function assertNoDuplicateProducts(array $lines): void
+    {
+        $seen = [];
+
+        foreach ($lines as $line) {
+            $productId = trim($line->productId());
+            $lineNo = $line->lineNo();
+
+            if (array_key_exists($productId, $seen)) {
+                throw new DomainException(
+                    'Baris ' . $lineNo . ': produk yang sama sudah dipakai di baris ' . $seen[$productId] . '.'
+                );
+            }
+
+            $seen[$productId] = $lineNo;
         }
     }
 

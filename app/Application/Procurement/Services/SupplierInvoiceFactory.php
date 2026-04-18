@@ -24,6 +24,8 @@ final class SupplierInvoiceFactory
             throw new DomainException('Invoice minimal 1 line.');
         }
 
+        $this->assertNoDuplicateProducts($lines);
+
         return array_map(function ($line, int $index) {
             $productId = trim((string) ($line['product_id'] ?? ''));
             $product = $productId !== '' ? $this->products->getById($productId) : null;
@@ -46,5 +48,31 @@ final class SupplierInvoiceFactory
                 Money::fromInt((int) ($line['line_total_rupiah'] ?? 0))
             );
         }, $lines, array_keys($lines));
+    }
+
+    private function assertNoDuplicateProducts(array $lines): void
+    {
+        $seen = [];
+
+        foreach ($lines as $index => $line) {
+            if (! is_array($line)) {
+                continue;
+            }
+
+            $productId = trim((string) ($line['product_id'] ?? ''));
+            if ($productId === '') {
+                continue;
+            }
+
+            $lineNo = isset($line['line_no']) ? (int) $line['line_no'] : ($index + 1);
+
+            if (array_key_exists($productId, $seen)) {
+                throw new DomainException(
+                    'Baris ' . $lineNo . ': produk yang sama sudah dipakai di baris ' . $seen[$productId] . '.'
+                );
+            }
+
+            $seen[$productId] = $lineNo;
+        }
     }
 }
