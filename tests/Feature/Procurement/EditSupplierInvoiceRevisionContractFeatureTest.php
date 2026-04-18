@@ -19,7 +19,7 @@ final class EditSupplierInvoiceRevisionContractFeatureTest extends TestCase
         $this->seedPayment();
 
         $response = $this->actingAs($this->user('admin'))
-            ->get(route('admin.procurement.supplier-invoices.edit', [
+            ->get(route('admin.procurement.supplier-invoices.revise', [
                 'supplierInvoiceId' => 'invoice-1',
             ]));
 
@@ -34,7 +34,7 @@ final class EditSupplierInvoiceRevisionContractFeatureTest extends TestCase
         $this->seedInvoice();
 
         $response = $this->actingAs($this->user('admin'))
-            ->from(route('admin.procurement.supplier-invoices.edit', [
+            ->from(route('admin.procurement.supplier-invoices.revise', [
                 'supplierInvoiceId' => 'invoice-1',
             ]))
             ->put(route('admin.procurement.supplier-invoices.update', [
@@ -55,7 +55,7 @@ final class EditSupplierInvoiceRevisionContractFeatureTest extends TestCase
             ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.revise', [
             'supplierInvoiceId' => 'invoice-1',
         ]));
         $response->assertSessionHasErrors([

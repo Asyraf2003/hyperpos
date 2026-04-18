@@ -42,7 +42,7 @@ final class ReviseReceivedSupplierInvoiceNegativeStockGuardFeatureTest extends T
         ]);
 
         $response = $this->actingAs($this->user('admin'))
-            ->from(route('admin.procurement.supplier-invoices.edit', [
+            ->from(route('admin.procurement.supplier-invoices.revise', [
                 'supplierInvoiceId' => 'invoice-1',
             ]))
             ->put(route('admin.procurement.supplier-invoices.update', [
@@ -64,7 +64,7 @@ final class ReviseReceivedSupplierInvoiceNegativeStockGuardFeatureTest extends T
                 ],
             ]);
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.revise', [
             'supplierInvoiceId' => 'invoice-1',
         ]));
         $response->assertSessionHasErrors([
