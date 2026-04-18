@@ -47,7 +47,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         $this->assertDatabaseHas('inventory_movements', [
             'product_id' => 'product-1',
             'movement_type' => 'stock_in',
-            'source_type' => 'work_item_store_stock_line',
+            'source_type' => 'work_item_store_stock_line_reversal',
             'source_id' => 'ssl-1',
             'qty_delta' => 2,
             'unit_cost_rupiah' => 15000,
@@ -147,7 +147,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
             'customer_payment_id' => 'payment-1',
             'note_id' => 'note-1',
             'work_item_id' => 'wi-1',
-            'component_type' => 'store_stock_part',
+            'component_type' => 'service_store_stock_part',
             'component_ref_id' => 'ssl-1',
             'component_amount_rupiah_snapshot' => 30000,
             'allocated_amount_rupiah' => 30000,
