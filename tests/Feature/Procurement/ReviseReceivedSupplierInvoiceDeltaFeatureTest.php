@@ -232,6 +232,17 @@ final class ReviseReceivedSupplierInvoiceDeltaFeatureTest extends TestCase
             'unit_cost_rupiah' => 10000,
             'total_cost_rupiah' => 20000,
         ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-1',
+            'qty_on_hand' => 2,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 20000,
+        ]);
     }
 
     private function seedReplacementProduct(): void
