@@ -20,11 +20,15 @@ trait BuildsProcurementInvoiceDetailLinesView
             }
 
             $lineViews[] = [
+                'supplier_invoice_line_id' => isset($line['id']) ? (string) $line['id'] : null,
+                'product_id' => isset($line['product_id']) ? (string) $line['product_id'] : null,
                 'kode_barang' => isset($line['kode_barang']) ? (string) $line['kode_barang'] : null,
                 'nama_barang' => (string) ($line['nama_barang'] ?? ''),
                 'merek' => (string) ($line['merek'] ?? ''),
                 'ukuran' => isset($line['ukuran']) ? (int) $line['ukuran'] : null,
                 'qty_pcs' => (int) ($line['qty_pcs'] ?? 0),
+                'unit_cost_rupiah' => (int) ($line['unit_cost_rupiah'] ?? 0),
+                'line_total_rupiah' => (int) ($line['line_total_rupiah'] ?? 0),
                 'unit_cost_label' => $this->formatRupiah((int) ($line['unit_cost_rupiah'] ?? 0)),
                 'line_total_label' => $this->formatRupiah((int) ($line['line_total_rupiah'] ?? 0)),
             ];
