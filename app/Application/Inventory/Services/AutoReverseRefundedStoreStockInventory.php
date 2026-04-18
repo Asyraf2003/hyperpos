@@ -6,21 +6,50 @@ namespace App\Application\Inventory\Services;
 
 use App\Core\Payment\CustomerRefund\CustomerRefund;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
+use App\Ports\Out\Inventory\InventoryMovementReaderPort;
+use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
 use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 
 final class AutoReverseRefundedStoreStockInventory
 {
     public function __construct(
         private readonly RefundComponentAllocationReaderPort $refundAllocations,
+        private readonly PaymentComponentAllocationReaderPort $paymentAllocations,
+        private readonly InventoryMovementReaderPort $movements,
         private readonly ReverseIssuedInventoryOperation $reverseIssuedInventory,
     ) {
     }
 
     public function execute(CustomerRefund $refund): void
     {
-        $reversedLineIds = [];
+        $noteId = $refund->noteId();
+        $paymentAllocations = $this->paymentAllocations->listByNoteId($noteId);
+        $refundAllocations = $this->refundAllocations->listByNoteId($noteId);
 
-        foreach ($this->refundAllocations->listByNoteId($refund->noteId()) as $allocation) {
+        $allocatedTotals = [];
+        foreach ($paymentAllocations as $allocation) {
+            if ($allocation->componentType() !== PaymentComponentType::SERVICE_STORE_STOCK_PART) {
+                continue;
+            }
+
+            $componentRefId = $allocation->componentRefId();
+            $allocatedTotals[$componentRefId] = ($allocatedTotals[$componentRefId] ?? 0)
+                + $allocation->allocatedAmountRupiah()->amount();
+        }
+
+        $refundedTotals = [];
+        foreach ($refundAllocations as $allocation) {
+            if ($allocation->componentType() !== PaymentComponentType::SERVICE_STORE_STOCK_PART) {
+                continue;
+            }
+
+            $componentRefId = $allocation->componentRefId();
+            $refundedTotals[$componentRefId] = ($refundedTotals[$componentRefId] ?? 0)
+                + $allocation->refundedAmountRupiah()->amount();
+        }
+
+        $candidateLineIds = [];
+        foreach ($refundAllocations as $allocation) {
             if ($allocation->customerRefundId() !== $refund->id()) {
                 continue;
             }
@@ -29,9 +58,18 @@ final class AutoReverseRefundedStoreStockInventory
                 continue;
             }
 
-            $lineId = $allocation->componentRefId();
+            $candidateLineIds[$allocation->componentRefId()] = true;
+        }
 
-            if (isset($reversedLineIds[$lineId])) {
+        foreach (array_keys($candidateLineIds) as $lineId) {
+            $allocated = (int) ($allocatedTotals[$lineId] ?? 0);
+            $refunded = (int) ($refundedTotals[$lineId] ?? 0);
+
+            if ($allocated < 1 || $refunded < $allocated) {
+                continue;
+            }
+
+            if ($this->movements->getBySource('work_item_store_stock_line_reversal', $lineId) !== []) {
                 continue;
             }
 
@@ -41,8 +79,6 @@ final class AutoReverseRefundedStoreStockInventory
                 $refund->refundedAt(),
                 'work_item_store_stock_line_reversal',
             );
-
-            $reversedLineIds[$lineId] = true;
         }
     }
 }
