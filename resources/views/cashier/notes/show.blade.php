@@ -27,14 +27,16 @@
             <div class="d-flex flex-column gap-4">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Panel Aksi Workspace</h4>
+                        <h4 class="card-title mb-1">Panel Tindakan Nota</h4>
                         <p class="mb-0 text-muted">
-                            Area samping dipakai untuk tindakan lanjutan workspace dan form transisi sebelum flow line final selesai.
+                            Area samping dipakai untuk tindakan lanjutan nota dan form transisi sesuai status line yang aktif.
                         </p>
                     </div>
                 </div>
 
-                @include('cashier.notes.partials.add-rows-form')
+                @if ($note['can_show_workspace_panel'] ?? false)
+                    @include('cashier.notes.partials.add-rows-form')
+                @endif
 
                 @if ($note['can_show_payment_form'])
                     @include('cashier.notes.partials.payment-form')

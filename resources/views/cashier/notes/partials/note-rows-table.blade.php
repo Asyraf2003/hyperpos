@@ -35,41 +35,31 @@
                 </thead>
                 <tbody>
                     @forelse ($note['rows'] as $row)
-                        @php
-                            $rowId = (string) ($row['id'] ?? '');
-                            $canPay = (bool) ($row['can_pay'] ?? false);
-                            $canRefund = (bool) ($row['can_refund'] ?? false);
-                            $lineStatus = (string) ($row['line_status'] ?? '');
-                            $rowOutstanding = (int) ($row['outstanding_rupiah'] ?? 0);
-                            $rowRefundable = (int) ($row['net_paid_rupiah'] ?? 0);
-                            $paymentSelectorId = 'payment-row-' . $rowId;
-                            $refundSelectorId = 'refund-row-' . $rowId;
-                        @endphp
                         <tr>
                             <td>
-                                @if ($canPay && $rowId !== '')
+                                @if (($row['can_pay'] ?? false) && (string) ($row['id'] ?? '') !== '')
                                     <div class="form-check d-flex justify-content-center mb-0">
                                         <input
                                             type="checkbox"
-                                            id="{{ $paymentSelectorId }}"
+                                            id="{{ 'payment-row-' . $row['id'] }}"
                                             class="form-check-input js-payment-row-selector"
-                                            value="{{ $rowId }}"
-                                            data-row-id="{{ $rowId }}"
-                                            data-outstanding-rupiah="{{ $rowOutstanding }}"
-                                            data-line-status="{{ $lineStatus }}"
+                                            value="{{ $row['id'] }}"
+                                            data-row-id="{{ $row['id'] }}"
+                                            data-outstanding-rupiah="{{ (int) ($row['outstanding_rupiah'] ?? 0) }}"
+                                            data-line-status="{{ (string) ($row['line_status'] ?? '') }}"
                                             aria-label="Pilih line {{ $row['line_no'] }} untuk pembayaran"
                                         >
                                     </div>
-                                @elseif ($canRefund && $rowId !== '')
+                                @elseif (($row['can_refund'] ?? false) && (string) ($row['id'] ?? '') !== '')
                                     <div class="form-check d-flex justify-content-center mb-0">
                                         <input
                                             type="checkbox"
-                                            id="{{ $refundSelectorId }}"
+                                            id="{{ 'refund-row-' . $row['id'] }}"
                                             class="form-check-input js-refund-row-selector"
-                                            value="{{ $rowId }}"
-                                            data-row-id="{{ $rowId }}"
-                                            data-refundable-rupiah="{{ $rowRefundable }}"
-                                            data-line-status="{{ $lineStatus }}"
+                                            value="{{ $row['id'] }}"
+                                            data-row-id="{{ $row['id'] }}"
+                                            data-refundable-rupiah="{{ (int) ($row['net_paid_rupiah'] ?? 0) }}"
+                                            data-line-status="{{ (string) ($row['line_status'] ?? '') }}"
                                             aria-label="Pilih line {{ $row['line_no'] }} untuk refund"
                                         >
                                     </div>
@@ -81,41 +71,41 @@
                             <td>{{ $row['type_label'] }}</td>
                             <td>
                                 <span class="badge bg-light text-dark border text-uppercase">
-                                    {{ $lineStatus !== '' ? $lineStatus : '-' }}
+                                    {{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}
                                 </span>
                             </td>
                             <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
                             <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                            <td class="text-end">{{ number_format($rowOutstanding, 0, ',', '.') }}</td>
+                            <td class="text-end">{{ number_format((int) ($row['outstanding_rupiah'] ?? 0), 0, ',', '.') }}</td>
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
-                                    @if ($canPay && $rowId !== '')
+                                    @if (($row['can_pay'] ?? false) && (string) ($row['id'] ?? '') !== '')
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-primary js-line-action"
-                                            data-selector-id="{{ $paymentSelectorId }}"
+                                            data-selector-id="{{ 'payment-row-' . $row['id'] }}"
                                             data-target-panel="#note-payment-form"
                                         >
                                             Bayar
                                         </button>
                                     @endif
 
-                                    @if ($canRefund && $rowId !== '')
+                                    @if (($row['can_refund'] ?? false) && (string) ($row['id'] ?? '') !== '')
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-warning js-line-action"
-                                            data-selector-id="{{ $refundSelectorId }}"
+                                            data-selector-id="{{ 'refund-row-' . $row['id'] }}"
                                             data-target-panel="#note-refund-form"
                                         >
                                             Refund
                                         </button>
                                     @endif
 
-                                    @if ($lineStatus === 'refund')
+                                    @if (($row['line_status'] ?? '') === 'refund' && (string) ($row['id'] ?? '') !== '')
                                         <button
                                             type="button"
                                             class="btn btn-sm btn-outline-secondary js-line-detail-focus"
-                                            data-target-row-id="{{ $rowId }}"
+                                            data-target-row-id="{{ $row['id'] }}"
                                         >
                                             Detail
                                         </button>
