@@ -96,9 +96,14 @@ final class ExtremeEditableProcurementHeaderPolicyMatrixFeatureTest extends Test
 
         $response = $this->actingAs($this->admin())
             ->from(route('admin.procurement.supplier-invoices.edit', ['supplierInvoiceId' => 'invoice-1']))
-            ->put(route('admin.procurement.supplier-invoices.update', ['supplierInvoiceId' => 'invoice-1']), $this->payload([
+            ->put(route('admin.procurement.supplier-invoices.update', ['supplierInvoiceId' => 'invoice-1']), [
+                'expected_revision_no' => 1,
+                'change_reason' => 'Koreksi header matrix editable invoice.',
+                'nomor_faktur' => 'INV-SUP-001',
+                'nama_pt_pengirim' => 'PT Sumber Makmur',
+                'tanggal_pengiriman' => '2026-03-15',
                 'lines' => [],
-            ]));
+            ]);
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', ['supplierInvoiceId' => 'invoice-1']))
             ->assertSessionHasErrors(['lines']);
