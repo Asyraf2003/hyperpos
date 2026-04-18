@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 trait ProcurementInvoiceDetailSummaryQuery
 {
+    use ProcurementInvoicePolicySqlFragments;
+
     private function getSummaryRow(string $supplierInvoiceId): ?object
     {
         $paymentTotalsSubquery = DB::table('supplier_payments')
@@ -20,9 +22,7 @@ trait ProcurementInvoiceDetailSummaryQuery
 
         $receivedQtySubquery = DB::table('supplier_receipts')
             ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
-            ->selectRaw(
-                'supplier_receipts.supplier_invoice_id, COALESCE(SUM(supplier_receipt_lines.qty_diterima), 0) as total_received_qty'
-            )
+            ->selectRaw('supplier_receipts.supplier_invoice_id, COALESCE(SUM(supplier_receipt_lines.qty_diterima), 0) as total_received_qty')
             ->groupBy('supplier_receipts.supplier_invoice_id');
 
         return DB::table('supplier_invoices')
@@ -54,50 +54,9 @@ trait ProcurementInvoiceDetailSummaryQuery
                 DB::raw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count'),
                 DB::raw('receipt_counts.latest_receipt_date as latest_receipt_date'),
                 DB::raw('COALESCE(received_qty_totals.total_received_qty, 0) as total_received_qty'),
-                DB::raw("
-                    CASE
-                        WHEN supplier_invoices.voided_at IS NOT NULL
-                        THEN 'voided'
-                        WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                          OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                        THEN 'locked'
-                        ELSE 'editable'
-                    END as policy_state
-                "),
-                DB::raw("
-                    CASE
-                        WHEN supplier_invoices.voided_at IS NOT NULL
-                        THEN ''
-                        WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                          OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                        THEN 'correction'
-                        ELSE 'edit,void'
-                    END as allowed_actions_csv
-                "),
-                DB::raw("
-                    CASE
-                        WHEN supplier_invoices.voided_at IS NOT NULL
-                        THEN 'voided'
-                        ELSE TRIM(BOTH ',' FROM CONCAT(
-                            CASE
-                                WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                                THEN 'receipt_recorded'
-                                ELSE ''
-                            END,
-                            CASE
-                                WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                                 AND COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                                THEN ','
-                                ELSE ''
-                            END,
-                            CASE
-                                WHEN COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                                THEN 'payment_effective_recorded'
-                                ELSE ''
-                            END
-                        ))
-                    END as lock_reasons_csv
-                "),
+                $this->policyStateSelect(),
+                $this->allowedActionsSelect(),
+                $this->lockReasonsSelect(),
             ]);
     }
 }
