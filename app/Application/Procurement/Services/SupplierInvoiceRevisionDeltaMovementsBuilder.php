@@ -6,7 +6,6 @@ namespace App\Application\Procurement\Services;
 
 use App\Core\Inventory\Movement\InventoryMovement;
 use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoiceLine;
 use DateTimeImmutable;
 
 final class SupplierInvoiceRevisionDeltaMovementsBuilder
@@ -14,6 +13,7 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
     public function __construct(
         private readonly SupplierInvoiceRevisionMovementFactory $movements,
         private readonly SupplierInvoiceRevisionLineMapFactory $lineMaps,
+        private readonly SupplierInvoiceRevisionPairedLineDeltaResolver $pairedDeltaResolver,
     ) {
     }
 
@@ -48,7 +48,11 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
 
                 array_push(
                     $deltaMovements,
-                    ...$this->pairedLineDeltaMovements($oldLinesById[$previousLineId], $newLine, $movementDate)
+                    ...$this->pairedDeltaResolver->resolve(
+                        $oldLinesById[$previousLineId],
+                        $newLine,
+                        $movementDate,
+                    )
                 );
 
                 continue;
@@ -64,30 +68,6 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
         }
 
         return $deltaMovements;
-    }
-
-    /**
-     * @return list<InventoryMovement>
-     */
-    private function pairedLineDeltaMovements(
-        SupplierInvoiceLine $oldLine,
-        SupplierInvoiceLine $newLine,
-        DateTimeImmutable $movementDate,
-    ): array {
-        if ($oldLine->productId() !== $newLine->productId()) {
-            return [
-                $this->movements->stockOut($oldLine, $movementDate, $oldLine->qtyPcs()),
-                $this->movements->stockIn($newLine, $movementDate, $newLine->qtyPcs()),
-            ];
-        }
-
-        $deltaQty = $newLine->qtyPcs() - $oldLine->qtyPcs();
-
-        return match (true) {
-            $deltaQty > 0 => [$this->movements->stockIn($newLine, $movementDate, $deltaQty)],
-            $deltaQty < 0 => [$this->movements->stockOut($oldLine, $movementDate, abs($deltaQty))],
-            default => [],
-        };
     }
 
     /**
