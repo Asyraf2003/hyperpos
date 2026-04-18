@@ -31,7 +31,7 @@
                                 <div>
                                     <h4 class="card-title mb-1">Rincian Nota</h4>
                                     <p class="mb-0 text-muted">
-                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Revisi setelah barang diterima akan diproses sebagai delta faktur.
+                                        Revisi setelah barang diterima akan diproses sebagai delta faktur.
                                     </p>
                                 </div>
 
