@@ -13,6 +13,7 @@ trait BuildsProcurementInvoiceDetailPolicyView
     private function buildPolicyView(array $summary): array
     {
         $policyState = (string) ($summary['policy_state'] ?? 'editable');
+        $supplierInvoiceId = (string) ($summary['supplier_invoice_id'] ?? '');
 
         $allowedActions = array_values(array_map(
             'strval',
@@ -24,18 +25,42 @@ trait BuildsProcurementInvoiceDetailPolicyView
             is_array($summary['lock_reasons'] ?? null) ? $summary['lock_reasons'] : [],
         ));
 
+        $allowedActionLabels = array_map(
+            fn (string $action): string => match ($action) {
+                'edit' => 'Edit nota',
+                'void' => 'Hapus nota',
+                'correction' => 'Correction / reversal',
+                default => $action,
+            },
+            $allowedActions,
+        );
+
+        $primaryAction = null;
+
+        if ($supplierInvoiceId !== '') {
+            if (in_array('correction', $allowedActions, true)) {
+                $primaryAction = [
+                    'label' => 'Correction / reversal',
+                    'url' => route('admin.procurement.supplier-invoices.revise', [
+                        'supplierInvoiceId' => $supplierInvoiceId,
+                    ]),
+                    'button_class' => 'btn btn-warning',
+                ];
+            } elseif (in_array('edit', $allowedActions, true)) {
+                $primaryAction = [
+                    'label' => 'Edit nota',
+                    'url' => route('admin.procurement.supplier-invoices.edit', [
+                        'supplierInvoiceId' => $supplierInvoiceId,
+                    ]),
+                    'button_class' => 'btn btn-primary',
+                ];
+            }
+        }
+
         return [
             'badge_class' => $policyState === 'locked' ? 'bg-danger' : 'bg-success',
             'label' => $policyState === 'locked' ? 'Locked' : 'Editable',
-            'allowed_actions' => array_map(
-                fn (string $action): string => match ($action) {
-                    'edit' => 'Edit nota',
-                    'void' => 'Hapus nota',
-                    'correction' => 'Correction / reversal',
-                    default => $action,
-                },
-                $allowedActions,
-            ),
+            'allowed_actions' => $allowedActionLabels,
             'lock_reasons' => array_map(
                 fn (string $reason): string => match ($reason) {
                     'receipt_recorded' => 'Receipt sudah tercatat',
@@ -44,6 +69,7 @@ trait BuildsProcurementInvoiceDetailPolicyView
                 },
                 $lockReasons,
             ),
+            'primary_action' => $primaryAction,
         ];
     }
 }

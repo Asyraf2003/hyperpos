@@ -90,6 +90,17 @@
                                     @endforeach
                                 </ul>
                             @endif
+
+                            @if (($policyView['primary_action'] ?? null) !== null)
+                                <div class="d-grid mt-3">
+                                    <a
+                                        href="{{ $policyView['primary_action']['url'] }}"
+                                        class="{{ $policyView['primary_action']['button_class'] }}"
+                                    >
+                                        {{ $policyView['primary_action']['label'] }}
+                                    </a>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="mb-3">
