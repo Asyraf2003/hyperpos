@@ -186,6 +186,12 @@
     }
   };
 
+  const invalidateManualProductEntry = (item, searchInput, hiddenInput) => {
+    clearProductDuplicateFeedback(item, searchInput);
+    hiddenInput.value = "";
+    searchInput.dataset.selectedProductId = "";
+  };
+
   const lineNoOfItem = (item, fallbackIndex = 0) => {
     const value = String(item.querySelector("[data-line-no]")?.value ?? "").trim();
     const parsed = Number.parseInt(value, 10);
@@ -228,17 +234,30 @@
     });
 
     lineItems().forEach((item, index) => {
+      const searchInput = item.querySelector("[data-product-search]");
       const productId = String(item.querySelector("[data-product-id]")?.value ?? "").trim();
+      const typedLabel = String(searchInput?.value ?? "").trim();
+      const currentLineNo = lineNoOfItem(item, index);
+
+      if (typedLabel !== "" && productId === "") {
+        isValid = false;
+
+        if (searchInput) {
+          searchInput.classList.add("is-invalid");
+        }
+
+        const feedback = ensureProductDuplicateFeedback(item);
+        feedback.textContent = `Baris ${currentLineNo}: pilih produk dari daftar hasil pencarian, jangan hanya tempel atau ketik teks.`;
+        return;
+      }
+
       if (productId === "") {
         return;
       }
 
-      const currentLineNo = lineNoOfItem(item, index);
-
       if (seen.has(productId)) {
         isValid = false;
 
-        const searchInput = item.querySelector("[data-product-search]");
         if (searchInput) {
           searchInput.classList.add("is-invalid");
         }
@@ -756,9 +775,43 @@
     };
 
     searchInput.addEventListener("input", () => {
-      clearProductDuplicateFeedback(item, searchInput);
+      const selectedLabel = String(searchInput.dataset.selectedLabel ?? "").trim();
+      const currentValue = String(searchInput.value ?? "").trim();
+
+      if (currentValue !== selectedLabel) {
+        invalidateManualProductEntry(item, searchInput, hiddenInput);
+      } else {
+        clearProductDuplicateFeedback(item, searchInput);
+      }
+
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(fetchResults, 250);
+    });
+
+    searchInput.addEventListener("paste", () => {
+      window.requestAnimationFrame(() => {
+        const selectedLabel = String(searchInput.dataset.selectedLabel ?? "").trim();
+        const currentValue = String(searchInput.value ?? "").trim();
+
+        if (currentValue !== selectedLabel) {
+          invalidateManualProductEntry(item, searchInput, hiddenInput);
+        }
+      });
+    });
+
+    searchInput.addEventListener("blur", () => {
+      const selectedLabel = String(searchInput.dataset.selectedLabel ?? "").trim();
+      const currentValue = String(searchInput.value ?? "").trim();
+
+      if (currentValue === "") {
+        invalidateManualProductEntry(item, searchInput, hiddenInput);
+        searchInput.dataset.selectedLabel = "";
+        return;
+      }
+
+      if (currentValue !== selectedLabel) {
+        invalidateManualProductEntry(item, searchInput, hiddenInput);
+      }
     });
 
     searchInput.addEventListener("focus", () => {
