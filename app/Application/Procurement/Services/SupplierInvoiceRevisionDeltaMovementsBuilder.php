@@ -13,6 +13,7 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
 {
     public function __construct(
         private readonly SupplierInvoiceRevisionMovementFactory $movements,
+        private readonly SupplierInvoiceRevisionLineMapFactory $lineMaps,
     ) {
     }
 
@@ -26,8 +27,8 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
         array $requestLines,
         DateTimeImmutable $movementDate,
     ): array {
-        $oldLinesById = $this->oldLinesById($current);
-        $newLinesByLineNo = $this->newLinesByLineNo($updated);
+        $oldLinesById = $this->lineMaps->oldLinesById($current);
+        $newLinesByLineNo = $this->lineMaps->newLinesByLineNo($updated);
         $referencedOldIds = [];
         $deltaMovements = [];
 
@@ -36,17 +37,20 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
                 continue;
             }
 
-            $previousLineId = $this->previousLineId($requestLine);
-            $lineNo = isset($requestLine['line_no']) ? (int) $requestLine['line_no'] : 0;
-            $newLine = $newLinesByLineNo[$lineNo] ?? null;
-
+            $newLine = $newLinesByLineNo[(int) ($requestLine['line_no'] ?? 0)] ?? null;
             if ($newLine === null) {
                 continue;
             }
 
+            $previousLineId = $this->previousLineId($requestLine);
             if ($previousLineId !== '' && isset($oldLinesById[$previousLineId])) {
                 $referencedOldIds[$previousLineId] = true;
-                array_push($deltaMovements, ...$this->pairedLineDeltaMovements($oldLinesById[$previousLineId], $newLine, $movementDate));
+
+                array_push(
+                    $deltaMovements,
+                    ...$this->pairedLineDeltaMovements($oldLinesById[$previousLineId], $newLine, $movementDate)
+                );
+
                 continue;
             }
 
@@ -84,34 +88,6 @@ final class SupplierInvoiceRevisionDeltaMovementsBuilder
             $deltaQty < 0 => [$this->movements->stockOut($oldLine, $movementDate, abs($deltaQty))],
             default => [],
         };
-    }
-
-    /**
-     * @return array<string, SupplierInvoiceLine>
-     */
-    private function oldLinesById(SupplierInvoice $invoice): array
-    {
-        $lines = [];
-
-        foreach ($invoice->lines() as $line) {
-            $lines[$line->id()] = $line;
-        }
-
-        return $lines;
-    }
-
-    /**
-     * @return array<int, SupplierInvoiceLine>
-     */
-    private function newLinesByLineNo(SupplierInvoice $invoice): array
-    {
-        $lines = [];
-
-        foreach ($invoice->lines() as $line) {
-            $lines[$line->lineNo()] = $line;
-        }
-
-        return $lines;
     }
 
     /**
