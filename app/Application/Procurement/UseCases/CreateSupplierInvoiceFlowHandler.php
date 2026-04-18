@@ -5,30 +5,19 @@ declare(strict_types=1);
 namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
-use App\Application\Procurement\Services\SupplierInvoiceAutoReceiveProcessor;
-use App\Application\Procurement\Services\SupplierInvoiceFactory;
-use App\Application\Procurement\Services\SupplierInvoiceFlowDateResolver;
-use App\Application\Procurement\Services\SupplierService;
 use App\Application\Shared\DTO\Result;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
-use App\Ports\Out\UuidPort;
 use Illuminate\Database\QueryException;
 use Throwable;
 
 final class CreateSupplierInvoiceFlowHandler
 {
     public function __construct(
-        private SupplierInvoiceWriterPort $invoiceWriter,
-        private TransactionManagerPort $transactions,
-        private UuidPort $uuid,
-        private SupplierService $supplierService,
-        private SupplierInvoiceFactory $invoiceFactory,
-        private SupplierInvoiceFlowDateResolver $dateResolver,
-        private SupplierInvoiceAutoReceiveProcessor $autoReceiveProcessor,
-        private SupplierInvoiceChangeContext $changeContext,
+        private readonly TransactionManagerPort $transactions,
+        private readonly CreateSupplierInvoiceFlowOperation $operation,
+        private readonly CreateSupplierInvoiceFlowQueryExceptionClassifier $queryErrors,
+        private readonly SupplierInvoiceChangeContext $changeContext,
     ) {
     }
 
@@ -46,12 +35,8 @@ final class CreateSupplierInvoiceFlowHandler
         $started = false;
 
         try {
-            [$dateKirim, $dateTerima] = $this->dateResolver->resolve($tglKirim, $autoRec, $tglTerima);
-
             $this->transactions->begin();
             $started = true;
-
-            $supplier = $this->supplierService->resolve($pt);
 
             $this->changeContext->set(
                 $performedByActorId,
@@ -60,20 +45,14 @@ final class CreateSupplierInvoiceFlowHandler
                 'supplier_invoice_flow_completed',
             );
 
-            $invoice = SupplierInvoice::create(
-                $this->uuid->generate(),
-                $supplier->id(),
-                $supplier->namaPtPengirim(),
-                trim($nomorFaktur),
-                $dateKirim,
-                $this->invoiceFactory->makeLines($lines)
+            $invoice = $this->operation->execute(
+                $nomorFaktur,
+                $pt,
+                $tglKirim,
+                $lines,
+                $autoRec,
+                $tglTerima,
             );
-
-            $this->invoiceWriter->create($invoice);
-
-            if ($autoRec && $dateTerima !== null) {
-                $this->autoReceiveProcessor->process($invoice, $dateTerima);
-            }
 
             $this->transactions->commit();
 
@@ -89,11 +68,10 @@ final class CreateSupplierInvoiceFlowHandler
                 $this->transactions->rollBack();
             }
 
-            if ($this->isGrandTotalOutOfRange($e)) {
-                return Result::failure(
-                    'Total keseluruhan nota melebihi batas penyimpanan sistem. Kurangi total rincian lalu simpan lagi.',
-                    ['supplier_invoice' => ['SUPPLIER_INVOICE_GRAND_TOTAL_OUT_OF_RANGE']]
-                );
+            $failure = $this->queryErrors->classify($e);
+
+            if ($failure !== null) {
+                return $failure;
             }
 
             throw $e;
@@ -106,18 +84,5 @@ final class CreateSupplierInvoiceFlowHandler
         } finally {
             $this->changeContext->clear();
         }
-    }
-
-    private function isGrandTotalOutOfRange(QueryException $e): bool
-    {
-        $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
-        $message = mb_strtolower($e->getMessage());
-
-        if ($sqlState !== '22003' && ! str_contains($message, 'out of range')) {
-            return false;
-        }
-
-        return str_contains($message, 'grand_total_rupiah')
-            || str_contains($message, 'supplier_invoices');
     }
 }
