@@ -126,7 +126,7 @@ final class ExtremeProductMasterValidationMatrixFeatureTest extends TestCase
 
         $response = $this->actingAs($this->admin())->put(
             route('admin.products.update', ['productId' => 'missing-product']),
-            $this->payload()
+            $this->payload(['kode_barang' => 'KB-999'])
         );
 
         $response->assertRedirect(route('admin.products.index'))
