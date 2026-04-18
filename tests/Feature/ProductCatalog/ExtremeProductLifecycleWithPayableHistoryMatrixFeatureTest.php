@@ -17,8 +17,9 @@ final class ExtremeProductLifecycleWithPayableHistoryMatrixFeatureTest extends T
     public function test_admin_can_soft_delete_existing_product(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar');
+        $admin = $this->admin();
 
-        $response = $this->actingAs($this->admin())
+        $response = $this->actingAs($admin)
             ->delete(route('admin.products.delete', ['productId' => 'product-1']));
 
         $response->assertRedirect(route('admin.products.index'))
@@ -26,7 +27,7 @@ final class ExtremeProductLifecycleWithPayableHistoryMatrixFeatureTest extends T
 
         $this->assertDatabaseHas('products', [
             'id' => 'product-1',
-            'deleted_by_actor_id' => 'admin-product-lifecycle',
+            'deleted_by_actor_id' => (string) $admin->getAuthIdentifier(),
         ]);
 
         $this->assertNotNull(DB::table('products')->where('id', 'product-1')->value('deleted_at'));
