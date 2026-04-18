@@ -37,11 +37,13 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         $this->assertSame('Belum Dibayar', $items->get('note-open')['payment_status_label']);
         $this->assertSame('Editable Normal', $items->get('note-open')['editability_label']);
         $this->assertSame('Open: 1 • Selesai: 0 • Batal: 0', $items->get('note-open')['work_status_label']);
+        $this->assertSame('1 Open', $items->get('note-open')['line_summary_label']);
         $this->assertStringContainsString('/admin/notes/note-open', (string) $items->get('note-open')['action_url']);
 
         $this->assertSame('Lunas', $items->get('note-closed')['payment_status_label']);
         $this->assertSame('Admin Ketat', $items->get('note-closed')['editability_label']);
         $this->assertSame('Open: 0 • Selesai: 1 • Batal: 0', $items->get('note-closed')['work_status_label']);
+        $this->assertSame('1 Close', $items->get('note-closed')['line_summary_label']);
         $this->assertStringContainsString('/admin/notes/note-closed', (string) $items->get('note-closed')['action_url']);
     }
 
