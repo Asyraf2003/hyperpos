@@ -41,6 +41,12 @@ Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
         Route::get('/', AdminNoteHistoryPageController::class)->name('index');
         Route::get('/table', AdminNoteHistoryTableDataController::class)->name('table');
         Route::get('/{noteId}', AdminNoteDetailPageController::class)->name('show');
+
+        Route::post('/{noteId}/refunds', RecordClosedNoteRefundController::class)->name('refunds.store');
+        Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
+        Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
+        Route::patch('/{noteId}/workspace', UpdateTransactionWorkspaceController::class)->name('workspace.update');
+
         Route::post('/{noteId}/reopen', AdminReopenClosedNoteController::class)->name('reopen');
     });
 
