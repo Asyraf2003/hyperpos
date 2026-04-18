@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Procurement;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
@@ -37,21 +36,35 @@ final class ExtremeReceiveRequestValidationMatrixFeatureTest extends TestCase
     public function test_receive_rejects_zero_qty_diterima(): void
     {
         $this->seedBase();
-        $this->postReceive(['lines' => [['supplier_invoice_line_id' => 'invoice-line-1', 'qty_diterima' => 0]]])->assertStatus(422);
+        $this->postReceive([
+            'lines' => [[
+                'supplier_invoice_line_id' => 'invoice-line-1',
+                'qty_diterima' => 0,
+            ]],
+        ])->assertStatus(422);
         $this->assertNoReceiptSideEffect();
     }
 
     public function test_receive_rejects_negative_qty_diterima(): void
     {
         $this->seedBase();
-        $this->postReceive(['lines' => [['supplier_invoice_line_id' => 'invoice-line-1', 'qty_diterima' => -1]]])->assertStatus(422);
+        $this->postReceive([
+            'lines' => [[
+                'supplier_invoice_line_id' => 'invoice-line-1',
+                'qty_diterima' => -1,
+            ]],
+        ])->assertStatus(422);
         $this->assertNoReceiptSideEffect();
     }
 
     public function test_receive_rejects_missing_supplier_invoice_line_id(): void
     {
         $this->seedBase();
-        $this->postReceive(['lines' => [['qty_diterima' => 1]]])->assertStatus(422);
+        $this->postReceive([
+            'lines' => [[
+                'qty_diterima' => 1,
+            ]],
+        ])->assertStatus(422);
         $this->assertNoReceiptSideEffect();
     }
 
@@ -66,10 +79,25 @@ final class ExtremeReceiveRequestValidationMatrixFeatureTest extends TestCase
 
     private function postReceive(array $overrides = [])
     {
-        $payload = array_replace_recursive([
+        $payload = [
             'tanggal_terima' => '2026-03-13',
-            'lines' => [['supplier_invoice_line_id' => 'invoice-line-1', 'qty_diterima' => 1]],
-        ], $overrides);
+            'lines' => [[
+                'supplier_invoice_line_id' => 'invoice-line-1',
+                'qty_diterima' => 1,
+            ]],
+        ];
+
+        if (array_key_exists('tanggal_terima', $overrides)) {
+            $payload['tanggal_terima'] = $overrides['tanggal_terima'];
+            unset($overrides['tanggal_terima']);
+        }
+
+        if (array_key_exists('lines', $overrides)) {
+            $payload['lines'] = $overrides['lines'];
+            unset($overrides['lines']);
+        }
+
+        $payload = array_replace($payload, $overrides);
 
         return $this->postJson('/procurement/supplier-invoices/invoice-1/receive', $payload);
     }
