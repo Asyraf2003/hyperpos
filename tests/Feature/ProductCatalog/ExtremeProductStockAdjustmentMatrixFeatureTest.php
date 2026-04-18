@@ -90,7 +90,7 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
-            ->assertSessionHasErrors(['reason']);
+            ->assertSessionHasErrors(['stock_adjustment']);
 
         $this->assertDatabaseMissing('inventory_movements', [
             'product_id' => 'product-1',
@@ -116,7 +116,7 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
-            ->assertSessionHasErrors(['stock_adjustment']);
+            ->assertSessionHasErrors(['reason']);
 
         $this->assertDatabaseMissing('inventory_movements', [
             'product_id' => 'product-1',
