@@ -67,11 +67,7 @@ final class VoidSupplierInvoiceHandler
 
             if (DB::getSchemaBuilder()->hasTable('audit_logs')) {
                 DB::table('audit_logs')->insert([
-                    'id' => (string) \Illuminate\Support\Str::uuid(),
                     'event' => 'supplier_invoice_voided',
-                    'aggregate_type' => 'supplier_invoice',
-                    'aggregate_id' => trim($supplierInvoiceId),
-                    'actor_id' => $performedByActorId !== null && $performedByActorId !== '' ? $performedByActorId : 'system',
                     'context' => json_encode([
                         'supplier_invoice_id' => trim($supplierInvoiceId),
                         'void_reason' => trim($voidReason),
