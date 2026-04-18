@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
-use App\Application\Inventory\UseCases\RebuildInventoryCostingProjectionHandler;
-use App\Application\Inventory\UseCases\RebuildInventoryProjectionHandler;
-use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
+use App\Application\Procurement\Services\SupplierInvoiceRevisionContextResolver;
+use App\Application\Procurement\Services\SupplierInvoiceRevisionDeltaMovementsBuilder;
+use App\Application\Procurement\Services\SupplierInvoiceRevisionDeltaStockGuard;
+use App\Application\Procurement\Services\SupplierInvoiceRevisionInventoryEffectsApplier;
 use App\Application\Procurement\Services\UpdatedSupplierInvoiceBuilder;
 use App\Application\Shared\DTO\Result;
-use App\Core\Inventory\Movement\InventoryMovement;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoiceLine;
+use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\Inventory\InventoryMovementWriterPort;
-use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
-use App\Ports\Out\UuidPort;
-use DateTimeImmutable;
 use Throwable;
 
 final class UpdateSupplierInvoiceHandler
@@ -32,12 +27,10 @@ final class UpdateSupplierInvoiceHandler
         private readonly SupplierInvoiceEditabilityGuard $guard,
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierInvoiceChangeContext $changeContext,
-        private readonly GetProcurementInvoiceDetailHandler $details,
-        private readonly InventoryMovementWriterPort $inventoryMovements,
-        private readonly ProductInventoryReaderPort $productInventories,
-        private readonly UuidPort $uuid,
-        private readonly RebuildInventoryProjectionHandler $rebuildInventoryProjection,
-        private readonly RebuildInventoryCostingProjectionHandler $rebuildInventoryCostingProjection,
+        private readonly SupplierInvoiceRevisionContextResolver $contextResolver,
+        private readonly SupplierInvoiceRevisionDeltaMovementsBuilder $deltaMovements,
+        private readonly SupplierInvoiceRevisionDeltaStockGuard $deltaStockGuard,
+        private readonly SupplierInvoiceRevisionInventoryEffectsApplier $inventoryEffects,
     ) {
     }
 
@@ -54,15 +47,12 @@ final class UpdateSupplierInvoiceHandler
         $current = $this->reader->getById($supplierInvoiceId);
 
         if ($current === null) {
-            return Result::failure(
-                'Nota supplier tidak ditemukan.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_NOT_FOUND']]
-            );
+            return Result::failure('Nota supplier tidak ditemukan.', ['supplier_invoice' => ['SUPPLIER_INVOICE_NOT_FOUND']]);
         }
 
-        $guard = $this->guard->ensureEditable($supplierInvoiceId);
-        if ($guard->isFailure()) {
-            return $guard;
+        $editable = $this->guard->ensureEditable($supplierInvoiceId);
+        if ($editable->isFailure()) {
+            return $editable;
         }
 
         $started = false;
@@ -70,29 +60,13 @@ final class UpdateSupplierInvoiceHandler
         try {
             $this->transactions->begin();
             $started = true;
+            $this->changeContext->set($performedByActorId, $performedByActorRole, $sourceChannel, 'supplier_invoice_updated');
 
-            $this->changeContext->set(
-                $performedByActorId,
-                $performedByActorRole,
-                $sourceChannel,
-                'supplier_invoice_updated',
-            );
+            $updated = $this->builder->build($current, $nomorFaktur, $namaPtPengirim, $tanggalPengiriman, $lines);
+            $context = $this->contextResolver->resolve($supplierInvoiceId, $updated);
 
-            $updated = $this->builder->build(
-                $current,
-                $nomorFaktur,
-                $namaPtPengirim,
-                $tanggalPengiriman,
-                $lines,
-            );
-
-            $summary = $this->resolveSummary($supplierInvoiceId);
-            $totalPaidRupiah = (int) ($summary['total_paid_rupiah'] ?? 0);
-            $totalReceivedQty = (int) ($summary['total_received_qty'] ?? 0);
-
-            if ($updated->grandTotalRupiah()->amount() < $totalPaidRupiah) {
+            if ($updated->grandTotalRupiah()->amount() < $context->totalPaidRupiah()) {
                 $this->transactions->rollBack();
-                $started = false;
 
                 return Result::failure(
                     'Total revisi tidak boleh lebih kecil dari total pembayaran yang sudah tercatat.',
@@ -100,65 +74,36 @@ final class UpdateSupplierInvoiceHandler
                 );
             }
 
-            $deltaMovements = [];
-            if ($totalReceivedQty > 0) {
-                $movementDate = $this->resolveRevisionMovementDate($updated, $summary);
-                $deltaMovements = $this->buildRevisionDeltaMovements($current, $updated, $lines, $movementDate);
+            $deltaMovements = $context->totalReceivedQty() > 0
+                ? $this->deltaMovements->build($current, $updated, $lines, $context->movementDate())
+                : [];
 
-                if (! $this->canApplyDeltaMovementsWithoutNegativeStock($deltaMovements)) {
-                    $this->transactions->rollBack();
-                    $started = false;
+            if (! $this->deltaStockGuard->canApplyWithoutNegativeStock($deltaMovements)) {
+                $this->transactions->rollBack();
 
-                    return Result::failure(
-                        'Revisi faktur akan membuat stok product lama menjadi negatif.',
-                        ['supplier_invoice' => ['SUPPLIER_INVOICE_REVISION_NEGATIVE_STOCK']]
-                    );
-                }
+                return Result::failure(
+                    'Revisi faktur akan membuat stok product lama menjadi negatif.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_REVISION_NEGATIVE_STOCK']]
+                );
             }
 
             $this->writer->update($updated);
 
-            if ($deltaMovements !== []) {
-                $this->inventoryMovements->createMany($deltaMovements);
-
-                $inventoryProjectionResult = $this->rebuildInventoryProjection->handle();
-                if ($inventoryProjectionResult->isFailure()) {
-                    $this->transactions->rollBack();
-                    $started = false;
-
-                    return Result::failure(
-                        'Proyeksi stok gagal diperbarui setelah revisi nota supplier.',
-                        ['supplier_invoice' => ['SUPPLIER_INVENTORY_PROJECTION_REBUILD_FAILED']]
-                    );
-                }
-
-                $inventoryCostingResult = $this->rebuildInventoryCostingProjection->handle();
-                if ($inventoryCostingResult->isFailure()) {
-                    $this->transactions->rollBack();
-                    $started = false;
-
-                    return Result::failure(
-                        'Proyeksi costing gagal diperbarui setelah revisi nota supplier.',
-                        ['supplier_invoice' => ['SUPPLIER_INVENTORY_COSTING_REBUILD_FAILED']]
-                    );
-                }
+            $inventoryEffects = $this->inventoryEffects->apply($deltaMovements);
+            if ($inventoryEffects->isFailure()) {
+                $this->transactions->rollBack();
+                return $inventoryEffects;
             }
 
             $this->transactions->commit();
 
-            return Result::success(
-                ['id' => $updated->id()],
-                'Nota supplier berhasil diperbarui.'
-            );
+            return Result::success(['id' => $updated->id()], 'Nota supplier berhasil diperbarui.');
         } catch (DomainException $e) {
             if ($started) {
                 $this->transactions->rollBack();
             }
 
-            return Result::failure(
-                $e->getMessage(),
-                ['supplier_invoice' => ['INVALID_SUPPLIER_INVOICE']]
-            );
+            return Result::failure($e->getMessage(), ['supplier_invoice' => ['INVALID_SUPPLIER_INVOICE']]);
         } catch (Throwable $e) {
             if ($started) {
                 $this->transactions->rollBack();
@@ -168,209 +113,5 @@ final class UpdateSupplierInvoiceHandler
         } finally {
             $this->changeContext->clear();
         }
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function resolveSummary(string $supplierInvoiceId): array
-    {
-        $detail = $this->details->handle($supplierInvoiceId);
-        $payload = $detail->data();
-
-        if (! is_array($payload)) {
-            return [];
-        }
-
-        return is_array($payload['summary'] ?? null)
-            ? $payload['summary']
-            : [];
-    }
-
-    /**
-     * @param array<string, mixed> $summary
-     */
-    private function resolveRevisionMovementDate(
-        SupplierInvoice $updated,
-        array $summary,
-    ): DateTimeImmutable {
-        $latestReceiptDate = $summary['latest_receipt_date'] ?? null;
-
-        if (is_string($latestReceiptDate) && trim($latestReceiptDate) !== '') {
-            $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', trim($latestReceiptDate));
-
-            if ($parsed !== false) {
-                return $parsed->modify('+1 day');
-            }
-        }
-
-        return $updated->tanggalPengiriman();
-    }
-
-    /**
-     * @param list<array<string, mixed>> $requestLines
-     * @return list<InventoryMovement>
-     */
-    private function buildRevisionDeltaMovements(
-        SupplierInvoice $current,
-        SupplierInvoice $updated,
-        array $requestLines,
-        DateTimeImmutable $movementDate,
-    ): array {
-        $oldLinesById = [];
-        foreach ($current->lines() as $line) {
-            $oldLinesById[$line->id()] = $line;
-        }
-
-        $newLinesByLineNo = [];
-        foreach ($updated->lines() as $line) {
-            $newLinesByLineNo[$line->lineNo()] = $line;
-        }
-
-        $referencedOldIds = [];
-        $movements = [];
-
-        foreach ($requestLines as $requestLine) {
-            if (! is_array($requestLine)) {
-                continue;
-            }
-
-            $previousLineId = isset($requestLine['previous_line_id']) && is_string($requestLine['previous_line_id'])
-                ? trim($requestLine['previous_line_id'])
-                : '';
-
-            $lineNo = isset($requestLine['line_no']) ? (int) $requestLine['line_no'] : 0;
-            $newLine = $newLinesByLineNo[$lineNo] ?? null;
-
-            if ($newLine === null) {
-                continue;
-            }
-
-            if ($previousLineId !== '' && isset($oldLinesById[$previousLineId])) {
-                $referencedOldIds[$previousLineId] = true;
-                $oldLine = $oldLinesById[$previousLineId];
-
-                array_push(
-                    $movements,
-                    ...$this->buildPairedLineDeltaMovements($oldLine, $newLine, $movementDate)
-                );
-
-                continue;
-            }
-
-            $movements[] = $this->makeStockInMovement(
-                $newLine,
-                $movementDate,
-                $newLine->qtyPcs()
-            );
-        }
-
-        foreach ($oldLinesById as $oldLineId => $oldLine) {
-            if (isset($referencedOldIds[$oldLineId])) {
-                continue;
-            }
-
-            $movements[] = $this->makeStockOutMovement(
-                $oldLine,
-                $movementDate,
-                $oldLine->qtyPcs()
-            );
-        }
-
-        return $movements;
-    }
-
-    /**
-     * @return list<InventoryMovement>
-     */
-    private function buildPairedLineDeltaMovements(
-        SupplierInvoiceLine $oldLine,
-        SupplierInvoiceLine $newLine,
-        DateTimeImmutable $movementDate,
-    ): array {
-        if ($oldLine->productId() !== $newLine->productId()) {
-            return [
-                $this->makeStockOutMovement($oldLine, $movementDate, $oldLine->qtyPcs()),
-                $this->makeStockInMovement($newLine, $movementDate, $newLine->qtyPcs()),
-            ];
-        }
-
-        $deltaQty = $newLine->qtyPcs() - $oldLine->qtyPcs();
-
-        if ($deltaQty > 0) {
-            return [
-                $this->makeStockInMovement($newLine, $movementDate, $deltaQty),
-            ];
-        }
-
-        if ($deltaQty < 0) {
-            return [
-                $this->makeStockOutMovement($oldLine, $movementDate, abs($deltaQty)),
-            ];
-        }
-
-        return [];
-    }
-
-    /**
-     * @param list<InventoryMovement> $deltaMovements
-     */
-    private function canApplyDeltaMovementsWithoutNegativeStock(array $deltaMovements): bool
-    {
-        $minusByProduct = [];
-
-        foreach ($deltaMovements as $movement) {
-            if ($movement->movementType() !== 'stock_out') {
-                continue;
-            }
-
-            $productId = $movement->productId();
-            $minusByProduct[$productId] = ($minusByProduct[$productId] ?? 0) + abs($movement->qtyDelta());
-        }
-
-        foreach ($minusByProduct as $productId => $qtyToSubtract) {
-            $currentInventory = $this->productInventories->getByProductId($productId);
-            $qtyOnHand = $currentInventory?->qtyOnHand() ?? 0;
-
-            if ($qtyToSubtract > $qtyOnHand) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function makeStockInMovement(
-        SupplierInvoiceLine $line,
-        DateTimeImmutable $movementDate,
-        int $qty,
-    ): InventoryMovement {
-        return InventoryMovement::create(
-            $this->uuid->generate(),
-            $line->productId(),
-            'stock_in',
-            'supplier_invoice_revision_delta_line',
-            $line->id(),
-            $movementDate,
-            $qty,
-            $line->unitCostRupiah(),
-        );
-    }
-
-    private function makeStockOutMovement(
-        SupplierInvoiceLine $line,
-        DateTimeImmutable $movementDate,
-        int $qty,
-    ): InventoryMovement {
-        return InventoryMovement::create(
-            $this->uuid->generate(),
-            $line->productId(),
-            'stock_out',
-            'supplier_invoice_revision_delta_line',
-            $line->id(),
-            $movementDate,
-            -$qty,
-            $line->unitCostRupiah(),
-        );
     }
 }
