@@ -65,7 +65,7 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
         $response->assertSee(route('cashier.notes.workspace.edit', ['noteId' => 'note-entry-1']), false);
     }
 
-    public function test_note_detail_hides_edit_nota_entry_when_payment_allocation_exists(): void
+    public function test_open_note_detail_keeps_edit_nota_entry_visible_even_when_payment_allocation_exists(): void
     {
         $this->loginAsKasir();
 
@@ -124,7 +124,7 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-entry-2']));
 
         $response->assertOk();
-        $response->assertDontSee('Edit Nota');
-        $response->assertDontSee(route('cashier.notes.workspace.edit', ['noteId' => 'note-entry-2']), false);
+        $response->assertSee('Edit Nota');
+        $response->assertSee(route('cashier.notes.workspace.edit', ['noteId' => 'note-entry-2']), false);
     }
 }

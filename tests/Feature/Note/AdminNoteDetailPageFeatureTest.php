@@ -30,10 +30,11 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response = $this->get(route('admin.notes.show', ['noteId' => 'note-closed']));
 
         $response->assertOk();
-        $response->assertSee('Identitas Nota Admin');
-        $response->assertSee('Status Operasional');
+        $response->assertSee('Detail Nota Admin');
+        $response->assertSee('Header Nota');
+        $response->assertSee('Status Operasional Admin');
         $response->assertSee('Alasan Reopen');
-        $response->assertSee('Buka Ulang Note');
+        $response->assertSee('Buka Ulang Nota');
     }
 
     public function test_authorized_admin_sees_open_note_detail_without_reopen_form(): void
@@ -52,9 +53,10 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response = $this->get(route('admin.notes.show', ['noteId' => 'note-open']));
 
         $response->assertOk();
-        $response->assertSee('Identitas Nota Admin');
-        $response->assertSee('Status Operasional');
+        $response->assertSee('Detail Nota Admin');
+        $response->assertSee('Header Nota');
+        $response->assertSee('Status Operasional Admin');
         $response->assertSee('Reopen tidak diperlukan');
-        $response->assertDontSee('Buka Ulang Note');
+        $response->assertDontSee('Buka Ulang Nota');
     }
 }

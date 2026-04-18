@@ -17,6 +17,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
     public function test_get_supplier_payable_summary_handler_returns_invoice_level_rows_and_passes_reconciliation(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 50000);
+        $this->seedProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 50000);
 
         $this->seedSupplier('supplier-1', 'PT Sumber Makmur');
         $this->seedSupplier('supplier-2', 'PT Sentosa Jaya');
@@ -26,7 +27,7 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         $this->seedSupplierInvoice('invoice-3', 'supplier-1', '2026-03-18', '2026-04-18', 30000);
 
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 100000, 50000);
-        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-1', 1, 50000, 50000);
+        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 50000, 50000);
         $this->seedSupplierInvoiceLine('invoice-line-3', 'invoice-2', 'product-1', 5, 50000, 10000);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 60000, '2026-03-15', 'pending');

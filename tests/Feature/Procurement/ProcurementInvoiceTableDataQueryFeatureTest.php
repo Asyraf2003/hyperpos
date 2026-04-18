@@ -135,8 +135,8 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         $this->seedProductFixture();
         $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Makmur');
 
-        $this->seedInvoiceLine('line-1', 'invoice-1', 5, 50000, 10000);
-        $this->seedInvoiceLine('line-2', 'invoice-1', 10, 50000, 5000);
+        $this->seedInvoiceLine('line-1', 'invoice-1', 5, 50000, 10000, 'product-1');
+        $this->seedInvoiceLine('line-2', 'invoice-1', 10, 50000, 5000, 'product-2');
 
         $this->seedReceipt('receipt-1', 'invoice-1', '2026-03-16');
         $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'line-1', 5);
@@ -176,6 +176,7 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
     private function seedProductFixture(): void
     {
         $this->seedMinimalProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 75000);
+        $this->seedMinimalProduct('product-2', 'KB-002', 'Kampas Rem', 'Federal', 90, 50000);
     }
 
     private function seedInvoice(
@@ -201,19 +202,27 @@ final class ProcurementInvoiceTableDataQueryFeatureTest extends TestCase
         string $invoiceId,
         int $qtyPcs,
         int $lineTotalRupiah,
-        int $unitCostRupiah
+        int $unitCostRupiah,
+        string $productId = 'product-1'
     ): void {
+        $snapshots = [
+            'product-1' => ['KB-001', 'Ban Luar', 'Federal', 100],
+            'product-2' => ['KB-002', 'Kampas Rem', 'Federal', 90],
+        ];
+
+        [$kode, $nama, $merek, $ukuran] = $snapshots[$productId];
+
         $this->seedMinimalSupplierInvoiceLine(
             $id,
             $invoiceId,
-            'product-1',
+            $productId,
             $qtyPcs,
             $lineTotalRupiah,
             $unitCostRupiah,
-            'KB-001',
-            'Ban Luar',
-            'Federal',
-            100
+            $kode,
+            $nama,
+            $merek,
+            $ukuran
         );
     }
 
