@@ -26,7 +26,8 @@ trait ProcurementInvoiceDetailLinesQuery
     {
         return DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_lines.supplier_invoice_id', $supplierInvoiceId)
-            ->orderBy('supplier_invoice_lines.id')
+            ->where('supplier_invoice_lines.is_current', true)
+            ->orderBy('supplier_invoice_lines.line_no')
             ->get([
                 'supplier_invoice_lines.id',
                 'supplier_invoice_lines.supplier_invoice_id',

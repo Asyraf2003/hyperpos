@@ -48,6 +48,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
                 'line_total_rupiah',
             ])
             ->where('supplier_invoice_id', (string) $invoiceRow->id)
+            ->where('is_current', true)
             ->orderBy('line_no')
             ->get();
 

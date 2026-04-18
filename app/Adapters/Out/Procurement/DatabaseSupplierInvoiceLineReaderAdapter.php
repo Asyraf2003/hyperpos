@@ -31,7 +31,8 @@ final class DatabaseSupplierInvoiceLineReaderAdapter implements SupplierInvoiceL
                 'unit_cost_rupiah',
             ])
             ->where('supplier_invoice_id', $supplierInvoiceId)
-            ->orderBy('id')
+            ->where('is_current', true)
+            ->orderBy('line_no')
             ->get();
 
         $lines = [];
