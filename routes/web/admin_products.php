@@ -9,6 +9,7 @@ use App\Adapters\In\Http\Controllers\Admin\Product\EditProductStockPageControlle
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Product\RecordProductStockAdjustmentController;
+use App\Adapters\In\Http\Controllers\Admin\Product\RestoreProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ShowProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\UpdateProductController as WebUpdateProductController;
@@ -44,6 +45,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::put('/admin/products/{productId}', WebUpdateProductController::class)
         ->name('admin.products.update');
+
+    Route::patch('/admin/products/{productId}/restore', RestoreProductController::class)
+        ->name('admin.products.restore');
 
     Route::delete('/admin/products/{productId}', DeleteProductController::class)
         ->name('admin.products.delete');

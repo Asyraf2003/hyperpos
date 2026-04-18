@@ -8,6 +8,7 @@ use App\Adapters\Out\ProductCatalog\Concerns\PersistsVersionedProductWrites;
 use App\Adapters\Out\ProductCatalog\Concerns\ProductVersionRevisionLookup;
 use App\Adapters\Out\ProductCatalog\Concerns\ProductWritePayloads;
 use App\Adapters\Out\ProductCatalog\Concerns\RecordsProductHistory;
+use App\Adapters\Out\ProductCatalog\Concerns\RestoresProducts;
 use App\Adapters\Out\ProductCatalog\Concerns\SoftDeletesProducts;
 use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Core\ProductCatalog\Product\Product;
@@ -23,6 +24,7 @@ final class DatabaseVersionedProductWriterAdapter implements ProductWriterPort, 
     use ProductWritePayloads;
     use RecordsProductHistory;
     use SoftDeletesProducts;
+    use RestoresProducts;
 
     public function __construct(
         private readonly TransactionManagerPort $transactions,
