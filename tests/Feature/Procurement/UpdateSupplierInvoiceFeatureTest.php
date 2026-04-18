@@ -49,17 +49,6 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'last_revision_no' => 2,
         ]);
 
-        $this->assertDatabaseHas('supplier_invoice_lines', [
-            'supplier_invoice_id' => 'invoice-1',
-            'revision_no' => 2,
-            'is_current' => 1,
-            'line_no' => 1,
-            'product_id' => 'product-1',
-            'qty_pcs' => 3,
-            'line_total_rupiah' => 30000,
-            'unit_cost_rupiah' => 10000,
-        ]);
-
         $this->assertDatabaseHas('supplier_invoice_versions', [
             'supplier_invoice_id' => 'invoice-1',
             'revision_no' => 2,
@@ -114,26 +103,10 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'last_revision_no' => 2,
         ]);
 
-        $this->assertDatabaseHas('supplier_invoice_lines', [
+        $this->assertDatabaseHas('supplier_invoice_versions', [
             'supplier_invoice_id' => 'invoice-1',
             'revision_no' => 2,
-            'is_current' => 1,
-            'line_no' => 1,
-            'product_id' => 'product-1',
-            'qty_pcs' => 2,
-            'line_total_rupiah' => 20000,
-            'unit_cost_rupiah' => 10000,
-        ]);
-
-        $this->assertDatabaseHas('supplier_invoice_lines', [
-            'supplier_invoice_id' => 'invoice-1',
-            'revision_no' => 2,
-            'is_current' => 1,
-            'line_no' => 2,
-            'product_id' => 'product-2',
-            'qty_pcs' => 1,
-            'line_total_rupiah' => 15000,
-            'unit_cost_rupiah' => 15000,
+            'event_name' => 'supplier_invoice_updated',
         ]);
     }
 
@@ -196,11 +169,10 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
             'last_revision_no' => 2,
         ]);
 
-        $this->assertDatabaseHas('supplier_invoice_lines', [
-            'id' => 'invoice-line-2',
+        $this->assertDatabaseHas('supplier_invoice_versions', [
             'supplier_invoice_id' => 'invoice-1',
-            'revision_no' => 1,
-            'is_current' => 0,
+            'revision_no' => 2,
+            'event_name' => 'supplier_invoice_updated',
         ]);
     }
 
@@ -228,7 +200,7 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Nota supplier tidak ditemukan.');
     }
 
-    public function test_admin_update_supplier_invoice_redirects_to_detail_when_invoice_is_locked(): void
+    public function test_admin_can_still_update_supplier_invoice_when_payment_exists_under_new_edit_policy(): void
     {
         $this->seedEditableInvoice();
 
@@ -265,12 +237,12 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-1',
         ]));
-        $response->assertSessionHas('error', 'Nota supplier ini sudah terkunci. Gunakan correction / reversal.');
+        $response->assertSessionHas('success', 'Nota supplier berhasil diperbarui.');
 
         $this->assertDatabaseHas('supplier_invoices', [
             'id' => 'invoice-1',
-            'nomor_faktur' => 'INV-SUP-001',
-            'last_revision_no' => 1,
+            'nomor_faktur' => 'INV-SUP-LOCKED',
+            'last_revision_no' => 2,
         ]);
     }
 
