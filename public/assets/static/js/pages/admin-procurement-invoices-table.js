@@ -105,6 +105,7 @@
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
   const editUrl = (id) => `${detailUrl(id)}/edit`;
+  const reviseUrl = (id) => `${detailUrl(id)}/revise`;
   const paymentStoreUrl = (id) => c.paymentStoreBaseUrl.replace("__ID__", encodeURIComponent(id));
   const paymentSectionUrl = (id) => `${detailUrl(id)}#payment-form-section`;
   const proofSectionUrl = (id) => `${detailUrl(id)}#payment-proof-section`;
@@ -315,6 +316,15 @@
       || "-";
     const nomorFaktur = trimValue(row.nomor_faktur) || "-";
 
+    const editActionKind = trimValue(row.edit_action_kind)
+      || ((Number(row.payment_count || 0) > 0 || Number(row.receipt_count || 0) > 0) ? "revise" : "edit");
+    const editActionLabel = trimValue(row.edit_action_label)
+      || (editActionKind === "revise" ? "Correction / Reversal" : "Edit Nota");
+    const editActionUrl = trimValue(row.edit_action_url)
+      || (editActionKind === "revise"
+        ? reviseUrl(row.supplier_invoice_id)
+        : editUrl(row.supplier_invoice_id));
+
     actionModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
     actionDetailLink.href = detailUrl(row.supplier_invoice_id);
 
@@ -345,9 +355,11 @@
       setLinkDisabledState(actionProofLink, false);
     }
 
-    actionEditLink.href = editUrl(row.supplier_invoice_id);
-    actionEditTitle.textContent = "Edit Nota";
-    actionEditDescription.textContent = "Buka form revisi nota. Tetap tersedia walau sudah ada receipt atau payment, validasi akhir dicek saat simpan.";
+    actionEditLink.href = editActionUrl;
+    actionEditTitle.textContent = editActionLabel;
+    actionEditDescription.textContent = editActionKind === "revise"
+      ? "Nota ini sudah locked. Buka correction / reversal untuk membuat perubahan terkontrol."
+      : "Buka form edit untuk nota yang masih editable.";
     setLinkDisabledState(actionEditLink, false);
   };
 

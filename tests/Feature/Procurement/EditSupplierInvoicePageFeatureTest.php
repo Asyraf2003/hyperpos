@@ -67,7 +67,7 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
         $response->assertSee('Simpan Perubahan Nota');
     }
 
-    public function test_admin_is_redirected_to_detail_when_supplier_invoice_is_locked_for_edit(): void
+    public function test_admin_is_redirected_to_revise_when_supplier_invoice_is_locked_for_edit(): void
     {
         $this->seedEditableInvoice();
 
@@ -85,10 +85,9 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
                 'supplierInvoiceId' => 'invoice-1',
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.revise', [
             'supplierInvoiceId' => 'invoice-1',
         ]));
-        $response->assertSessionHas('error', 'Nota supplier ini sudah terkunci. Gunakan correction / reversal.');
     }
 
     private function seedEditableInvoice(): void

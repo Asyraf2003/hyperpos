@@ -18,12 +18,21 @@ trait ProcurementInvoiceTablePayload
     private function toTablePayload(LengthAwarePaginator $paginator, ProcurementInvoiceTableQuery $query): array
     {
         $rows = array_map(static function (object $row): array {
+            $supplierInvoiceId = (string) $row->supplier_invoice_id;
             $outstandingRupiah = (int) $row->outstanding_rupiah;
             $paymentCount = (int) $row->payment_count;
+            $receiptCount = (int) $row->receipt_count;
             $proofAttachmentCount = (int) $row->proof_attachment_count;
 
+            $isLocked = $paymentCount > 0 || $receiptCount > 0;
+            $editActionKind = $isLocked ? 'revise' : 'edit';
+            $editActionLabel = $isLocked ? 'Correction / Reversal' : 'Edit Nota';
+            $editActionRoute = $isLocked
+                ? 'admin.procurement.supplier-invoices.revise'
+                : 'admin.procurement.supplier-invoices.edit';
+
             return [
-                'supplier_invoice_id' => (string) $row->supplier_invoice_id,
+                'supplier_invoice_id' => $supplierInvoiceId,
                 'nomor_faktur' => $row->nomor_faktur !== null ? (string) $row->nomor_faktur : '',
                 'supplier_nama_pt_pengirim_current' => $row->supplier_nama_pt_pengirim_current !== null
                     ? (string) $row->supplier_nama_pt_pengirim_current
@@ -35,11 +44,17 @@ trait ProcurementInvoiceTablePayload
                 'total_paid_rupiah' => (int) $row->total_paid_rupiah,
                 'outstanding_rupiah' => $outstandingRupiah,
                 'payment_count' => $paymentCount,
-                'receipt_count' => (int) $row->receipt_count,
+                'receipt_count' => $receiptCount,
                 'total_received_qty' => (int) $row->total_received_qty,
                 'proof_attachment_count' => $proofAttachmentCount,
                 'can_record_payment' => $outstandingRupiah > 0,
                 'has_uploaded_proof' => $proofAttachmentCount > 0,
+                'policy_state' => $isLocked ? 'locked' : 'editable',
+                'edit_action_kind' => $editActionKind,
+                'edit_action_label' => $editActionLabel,
+                'edit_action_url' => route($editActionRoute, [
+                    'supplierInvoiceId' => $supplierInvoiceId,
+                ]),
             ];
         }, $paginator->items());
 
