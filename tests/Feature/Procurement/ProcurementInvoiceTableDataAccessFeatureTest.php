@@ -52,6 +52,13 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
         $response->assertJsonPath('data.rows.0.outstanding_rupiah', 60000);
         $response->assertJsonPath('data.rows.0.receipt_count', 1);
         $response->assertJsonPath('data.rows.0.total_received_qty', 3);
+        $response->assertJsonPath('data.rows.0.policy_state', 'locked');
+        $response->assertJsonPath('data.rows.0.edit_action_kind', 'revise');
+        $response->assertJsonPath('data.rows.0.edit_action_label', 'Koreksi');
+        $response->assertJsonPath(
+            'data.rows.0.edit_action_url',
+            route('admin.procurement.supplier-invoices.revise', ['supplierInvoiceId' => 'invoice-1'])
+        );
     }
 
     private function user(string $role): User

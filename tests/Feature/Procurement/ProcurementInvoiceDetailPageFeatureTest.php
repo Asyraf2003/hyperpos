@@ -80,7 +80,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Bukti Pembayaran');
         $response->assertSee('Unggah Bukti');
         $response->assertSee('Aksi yang Diizinkan');
-        $response->assertSee('Correction / reversal');
+        $response->assertSee('Koreksi');
         $response->assertSee('Alasan Penguncian');
         $response->assertSee('Receipt sudah tercatat');
         $response->assertSee('Payment efektif sudah tercatat');
@@ -212,7 +212,6 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             'grand_total_rupiah' => $grandTotalRupiah,
         ]);
     }
-
 
     private function seedSupplierInvoiceLine(
         string $id,

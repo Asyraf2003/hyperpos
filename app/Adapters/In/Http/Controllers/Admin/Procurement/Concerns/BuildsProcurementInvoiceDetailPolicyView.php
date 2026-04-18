@@ -29,7 +29,7 @@ trait BuildsProcurementInvoiceDetailPolicyView
             fn (string $action): string => match ($action) {
                 'edit' => 'Edit nota',
                 'void' => 'Hapus nota',
-                'correction' => 'Correction / reversal',
+                'correction' => 'Koreksi',
                 default => $action,
             },
             $allowedActions,
@@ -40,7 +40,7 @@ trait BuildsProcurementInvoiceDetailPolicyView
         if ($supplierInvoiceId !== '') {
             if (in_array('correction', $allowedActions, true)) {
                 $primaryAction = [
-                    'label' => 'Correction / reversal',
+                    'label' => 'Koreksi',
                     'url' => route('admin.procurement.supplier-invoices.revise', [
                         'supplierInvoiceId' => $supplierInvoiceId,
                     ]),

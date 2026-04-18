@@ -319,7 +319,7 @@
     const editActionKind = trimValue(row.edit_action_kind)
       || ((Number(row.payment_count || 0) > 0 || Number(row.receipt_count || 0) > 0) ? "revise" : "edit");
     const editActionLabel = trimValue(row.edit_action_label)
-      || (editActionKind === "revise" ? "Correction / Reversal" : "Edit Nota");
+      || (editActionKind === "revise" ? "Koreksi" : "Edit Nota");
     const editActionUrl = trimValue(row.edit_action_url)
       || (editActionKind === "revise"
         ? reviseUrl(row.supplier_invoice_id)
@@ -358,7 +358,7 @@
     actionEditLink.href = editActionUrl;
     actionEditTitle.textContent = editActionLabel;
     actionEditDescription.textContent = editActionKind === "revise"
-      ? "Nota ini sudah locked. Buka correction / reversal untuk membuat perubahan terkontrol."
+      ? "Nota ini sudah locked. Buka koreksi untuk membuat perubahan terkontrol."
       : "Buka form edit untuk nota yang masih editable.";
     setLinkDisabledState(actionEditLink, false);
   };
