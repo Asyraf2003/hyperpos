@@ -26,6 +26,8 @@ final class UpdateSupplierInvoiceHandler
         string $namaPtPengirim,
         string $tanggalPengiriman,
         array $lines,
+        ?int $expectedRevisionNo = null,
+        ?string $changeReason = null,
         ?string $performedByActorId = null,
         ?string $performedByActorRole = null,
         string $sourceChannel = 'web_admin',
@@ -39,9 +41,14 @@ final class UpdateSupplierInvoiceHandler
             );
         }
 
-        $editable = $this->guard->ensureEditable($supplierInvoiceId);
-        if ($editable->isFailure()) {
-            return $editable;
+        $isRevisionMode = $expectedRevisionNo !== null && $changeReason !== null && trim($changeReason) !== '';
+
+        if (! $isRevisionMode) {
+            $editable = $this->guard->ensureEditable($supplierInvoiceId);
+
+            if ($editable->isFailure()) {
+                return $editable;
+            }
         }
 
         return $this->transactionalRunner->run(

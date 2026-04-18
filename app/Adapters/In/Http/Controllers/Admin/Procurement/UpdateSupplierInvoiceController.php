@@ -27,6 +27,8 @@ final class UpdateSupplierInvoiceController extends Controller
             (string) $data['nama_pt_pengirim'],
             (string) $data['tanggal_pengiriman'],
             $data['lines'],
+            isset($data['expected_revision_no']) ? (int) $data['expected_revision_no'] : null,
+            isset($data['change_reason']) ? (string) $data['change_reason'] : null,
             $actorId !== null ? (string) $actorId : null,
             null,
             'web_admin',

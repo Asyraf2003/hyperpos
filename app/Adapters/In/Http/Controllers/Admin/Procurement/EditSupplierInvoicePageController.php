@@ -38,7 +38,10 @@ final class EditSupplierInvoicePageController extends Controller
         $summary = is_array($payload['summary'] ?? null) ? $payload['summary'] : [];
         $lines = is_array($payload['lines'] ?? null) ? $payload['lines'] : [];
 
-        if ((string) ($summary['policy_state'] ?? 'editable') === 'locked') {
+        $isLocked = (string) ($summary['policy_state'] ?? 'editable') === 'locked';
+        $hasRevisionCapableLines = $lines !== [];
+
+        if ($isLocked && ! $hasRevisionCapableLines) {
             return redirect()
                 ->route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $supplierInvoiceId])
                 ->with('error', 'Nota supplier ini sudah terkunci. Gunakan correction / reversal.');
