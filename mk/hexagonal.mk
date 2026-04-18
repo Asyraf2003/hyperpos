@@ -10,7 +10,7 @@ fmt:
 	./vendor/bin/pint
 
 test:
-	php -d memory_limit=-1 artisan test
+	php -d memory_limit=-1 vendor/bin/pest
 
 test-unit:
 	php artisan test tests/Unit
