@@ -39,7 +39,7 @@ trait ProcurementInvoiceDetailPayload
             $lockReasons[] = 'payment_effective_recorded';
         }
 
-        $policyState = $lockReasons === [] ? 'editable' : 'locked';
+        $policyState = 'editable';
 
         return [
             'summary' => [
@@ -55,15 +55,14 @@ trait ProcurementInvoiceDetailPayload
                 'shipment_date' => (string) $summary->shipment_date,
                 'due_date' => (string) $summary->due_date,
                 'grand_total_rupiah' => (int) $summary->grand_total_rupiah,
+                'last_revision_no' => (int) $summary->last_revision_no,
                 'total_paid_rupiah' => $totalPaidRupiah,
                 'outstanding_rupiah' => (int) $summary->outstanding_rupiah,
                 'receipt_count' => $receiptCount,
                 'total_received_qty' => (int) $summary->total_received_qty,
                 'policy_state' => $policyState,
                 'lock_reasons' => $lockReasons,
-                'allowed_actions' => $policyState === 'editable'
-                    ? ['edit', 'void']
-                    : ['correction'],
+                'allowed_actions' => ['edit'],
             ],
             'lines' => $lines,
         ];

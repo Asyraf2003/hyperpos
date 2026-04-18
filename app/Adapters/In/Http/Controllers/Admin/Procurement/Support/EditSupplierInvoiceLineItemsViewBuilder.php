@@ -31,6 +31,7 @@ final class EditSupplierInvoiceLineItemsViewBuilder
         if (! is_array($oldLines) || $oldLines === []) {
             $oldLines = array_map(
                 static fn (array $line): array => [
+                    'previous_line_id' => (string) ($line['id'] ?? ''),
                     'line_no' => (string) ($line['line_no'] ?? ''),
                     'product_id' => (string) ($line['product_id'] ?? ''),
                     'qty_pcs' => (string) ($line['qty_pcs'] ?? '1'),
@@ -42,6 +43,7 @@ final class EditSupplierInvoiceLineItemsViewBuilder
 
         if ($oldLines === []) {
             $oldLines = [[
+                'previous_line_id' => '',
                 'line_no' => '1',
                 'product_id' => '',
                 'qty_pcs' => '1',
@@ -62,6 +64,7 @@ final class EditSupplierInvoiceLineItemsViewBuilder
 
             $lineItems[] = [
                 'index' => (int) $index,
+                'previous_line_id' => (string) ($line['previous_line_id'] ?? ''),
                 'line_no' => $lineNo,
                 'selected_product_id' => $selectedProductId,
                 'selected_label' => $selectedProductId !== ''

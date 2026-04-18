@@ -17,6 +17,12 @@
             @csrf
             @method('PUT')
 
+            <input
+                type="hidden"
+                name="expected_revision_no"
+                value="{{ $formDefaults['expected_revision_no'] }}"
+            >
+
             <div class="row g-4">
                 <div class="col-12 col-xl-8 order-2 order-xl-1">
                     <div class="card">
@@ -25,7 +31,7 @@
                                 <div>
                                     <h4 class="card-title mb-1">Rincian Nota</h4>
                                     <p class="mb-0 text-muted">
-                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Jika produk belum ada.
+                                        Cari produk berdasarkan nama, merek, ukuran, atau kode. Revisi setelah barang diterima akan diproses sebagai delta faktur.
                                     </p>
                                 </div>
 
@@ -52,6 +58,13 @@
                             <div id="procurement-line-items" data-next-index="{{ count($lineItemsView) }}" class="d-flex flex-column gap-3">
                                 @foreach ($lineItemsView as $lineView)
                                     <div class="border rounded p-3" data-line-item>
+                                        <input
+                                            type="hidden"
+                                            name="lines[{{ $lineView['index'] }}][previous_line_id]"
+                                            value="{{ $lineView['previous_line_id'] }}"
+                                            data-previous-line-id
+                                        >
+
                                         <input
                                             type="hidden"
                                             name="lines[{{ $lineView['index'] }}][line_no]"
@@ -161,6 +174,13 @@
                                 <div class="border rounded p-3" data-line-item>
                                     <input
                                         type="hidden"
+                                        name="lines[__INDEX__][previous_line_id]"
+                                        value=""
+                                        data-previous-line-id
+                                    >
+
+                                    <input
+                                        type="hidden"
                                         name="lines[__INDEX__][line_no]"
                                         value="__LINE_NO__"
                                         data-line-no
@@ -261,7 +281,7 @@
                             <div>
                                 <h4 class="card-title mb-1">Informasi Nota</h4>
                                 <p class="mb-0 text-muted">
-                                    Edit pre-effect hanya boleh dilakukan sebelum ada receipt atau payment efektif.
+                                    Revisi faktur disiapkan dengan nomor revision aktif agar perubahan berikutnya bisa dihitung sebagai delta.
                                 </p>
                             </div>
                         </div>
@@ -274,6 +294,21 @@
                             @enderror
 
                             <div class="d-flex flex-column gap-3">
+                                <div class="form-group">
+                                    <label for="change_reason" class="form-label">Alasan Perubahan</label>
+                                    <textarea
+                                        id="change_reason"
+                                        name="change_reason"
+                                        rows="3"
+                                        class="form-control @error('change_reason') is-invalid @enderror"
+                                        placeholder="Contoh: Salah input qty dan kode product di faktur supplier."
+                                        required
+                                    >{{ $formDefaults['change_reason'] }}</textarea>
+                                    @error('change_reason')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="form-group">
                                     <label for="nomor_faktur" class="form-label">Nomor Faktur</label>
                                     <input

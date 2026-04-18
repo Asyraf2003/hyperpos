@@ -46,6 +46,7 @@ trait ProcurementInvoiceDetailSummaryQuery
                 'supplier_invoices.tanggal_pengiriman as shipment_date',
                 'supplier_invoices.jatuh_tempo as due_date',
                 'supplier_invoices.grand_total_rupiah',
+                'supplier_invoices.last_revision_no',
                 DB::raw('COALESCE(payment_totals.total_paid_rupiah, 0) as total_paid_rupiah'),
                 DB::raw('supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) as outstanding_rupiah'),
                 DB::raw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count'),
