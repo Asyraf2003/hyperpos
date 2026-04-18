@@ -7,10 +7,10 @@
 @section('content')
 <div class="page-content">
     <div class="mb-4">
-        <div class="small text-muted text-uppercase fw-semibold">Admin Nota Overview</div>
+        <div class="small text-muted text-uppercase fw-semibold">Admin Nota Workspace</div>
         <h3 class="mb-1">Detail Nota Admin</h3>
         <div class="text-muted">
-            Admin membaca nota dari ringkasan line dan status pembayaran aktual, tanpa memakai aksi kerja kasir.
+            Admin membaca dan menangani nota dari status line aktual. Perbedaan admin dengan kasir hanya pada cakupan data, bukan pada kejelasan aksi.
         </div>
     </div>
 
@@ -21,7 +21,7 @@
                     <div class="card-header">
                         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Identitas Nota Admin</h4>
+                                <h4 class="card-title mb-1">Header Nota</h4>
                                 <p class="mb-0 text-muted">
                                     Ringkasan identitas nota dan komposisi line untuk pembacaan admin.
                                 </p>
@@ -88,56 +88,7 @@
                     </div>
                 </div>
 
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h4 class="card-title mb-1">Daftar Line Nota</h4>
-                        <p class="mb-0 text-muted">
-                            Tampilan read-only untuk melihat posisi line Open, Close, dan Refund tanpa aksi kasir.
-                        </p>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Line</th>
-                                        <th>Tipe</th>
-                                        <th>Status Line</th>
-                                        <th class="text-end">Subtotal</th>
-                                        <th class="text-end">Sudah Dibayar</th>
-                                        <th class="text-end">Refund</th>
-                                        <th class="text-end">Sisa</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($note['rows'] as $row)
-                                        <tr>
-                                            <td>{{ $row['line_no'] }}</td>
-                                            <td>{{ $row['type_label'] }}</td>
-                                            <td>
-                                                <span class="badge bg-light text-dark border text-uppercase">
-                                                    {{ $row['line_status'] ?? '-' }}
-                                                </span>
-                                            </td>
-                                            <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                                            <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                                            <td class="text-end">{{ number_format((int) ($row['refunded_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                                            <td class="text-end">{{ number_format((int) ($row['outstanding_rupiah'] ?? 0), 0, ',', '.') }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
-                                                Belum ada line pada nota ini.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
+                @include('cashier.notes.partials.note-rows-table')
                 @include('cashier.notes.partials.correction-history')
             </div>
         </div>
@@ -173,9 +124,19 @@
                     </div>
                 </div>
 
+                @include('cashier.notes.partials.add-rows-form')
+
+                @if ($note['can_show_payment_form'])
+                    @include('cashier.notes.partials.payment-form')
+                @endif
+
+                @if ($note['can_show_refund_form'] ?? false)
+                    @include('cashier.notes.partials.refund-form')
+                @endif
+
                 <div class="card">
                     <div class="card-body">
-                        <div class="fw-bold mb-1">Status Operasional</div>
+                        <div class="fw-bold mb-1">Status Operasional Admin</div>
 
                         @if ($note['note_state'] === 'closed')
                             <div class="text-muted small mb-3">
@@ -198,7 +159,7 @@
 
                                 <div class="d-grid d-sm-flex">
                                     <button type="submit" class="btn btn-warning">
-                                        Buka Ulang Note
+                                        Buka Ulang Nota
                                     </button>
                                 </div>
                             </form>
@@ -214,3 +175,9 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('assets/static/js/pages/cashier-note-payment.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-payment.js')) }}"></script>
+<script src="{{ asset('assets/static/js/pages/cashier-note-refund.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-refund.js')) }}"></script>
+<script src="{{ asset('assets/static/js/pages/note-line-actions.js') }}?v={{ filemtime(public_path('assets/static/js/pages/note-line-actions.js')) }}"></script>
+@endpush
