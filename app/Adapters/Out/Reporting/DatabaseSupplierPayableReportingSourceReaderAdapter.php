@@ -36,6 +36,7 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
             ->leftJoinSub($receivedQtySubquery, 'received_qty_totals', function ($join): void {
                 $join->on('received_qty_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
             })
+            ->whereNull('supplier_invoices.voided_at')
             ->whereBetween('supplier_invoices.tanggal_pengiriman', [$fromShipmentDate, $toShipmentDate])
             ->orderBy('supplier_invoices.tanggal_pengiriman')
             ->orderBy('supplier_invoices.id')
@@ -68,6 +69,7 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
     ): array {
         $filteredInvoicesSubquery = DB::table('supplier_invoices')
             ->select('id', 'grand_total_rupiah')
+            ->whereNull('voided_at')
             ->whereBetween('tanggal_pengiriman', [$fromShipmentDate, $toShipmentDate]);
 
         $invoiceTotals = DB::query()

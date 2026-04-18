@@ -16,6 +16,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProof
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\SupplierLookupController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\UpdateSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\VoidSupplierInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
@@ -33,6 +34,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/payments', RecordSupplierPaymentController::class)
         ->name('admin.procurement.supplier-invoices.payments.store');
+
+    Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/void', VoidSupplierInvoiceController::class)
+        ->name('admin.procurement.supplier-invoices.void');
 
     Route::post('/admin/procurement/supplier-payments/{supplierPaymentId}/proof', AttachSupplierPaymentProofController::class)
         ->name('admin.procurement.supplier-payments.proof.store');
