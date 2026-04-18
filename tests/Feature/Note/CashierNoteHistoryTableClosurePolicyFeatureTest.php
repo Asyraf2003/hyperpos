@@ -13,7 +13,7 @@ final class CashierNoteHistoryTableClosurePolicyFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_only_returns_open_notes_for_today_and_yesterday(): void
+    public function test_it_returns_today_and_yesterday_notes_without_forcing_open_only(): void
     {
         $today = date('Y-m-d');
         $yesterday = date('Y-m-d', strtotime('-1 day'));
@@ -37,7 +37,7 @@ final class CashierNoteHistoryTableClosurePolicyFeatureTest extends TestCase
 
         $this->assertContains('note-today-open', $noteIds);
         $this->assertContains('note-yesterday-open', $noteIds);
-        $this->assertNotContains('note-today-closed', $noteIds);
+        $this->assertContains('note-today-closed', $noteIds);
         $this->assertNotContains('note-older-open', $noteIds);
     }
 

@@ -8,6 +8,7 @@ use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\TransactionManagerPort;
+use Illuminate\Database\QueryException;
 use Throwable;
 
 final class UpdateSupplierInvoiceTransactionalRunner
@@ -15,6 +16,7 @@ final class UpdateSupplierInvoiceTransactionalRunner
     public function __construct(
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierInvoiceChangeContext $changeContext,
+        private readonly SupplierInvoiceQueryExceptionClassifier $queryErrors,
     ) {
     }
 
@@ -57,6 +59,18 @@ final class UpdateSupplierInvoiceTransactionalRunner
                 $e->getMessage(),
                 ['supplier_invoice' => ['INVALID_SUPPLIER_INVOICE']]
             );
+        } catch (QueryException $e) {
+            if ($started) {
+                $this->transactions->rollBack();
+            }
+
+            $failure = $this->queryErrors->classify($e);
+
+            if ($failure !== null) {
+                return $failure;
+            }
+
+            throw $e;
         } catch (Throwable $e) {
             if ($started) {
                 $this->transactions->rollBack();

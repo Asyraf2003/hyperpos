@@ -20,7 +20,7 @@ final class CashierNoteHistoryBaseQuery
             $criteria->previousDateText,
             $criteria->anchorDateText,
             $criteria->search,
-            true,
+            false,
         );
     }
 }
