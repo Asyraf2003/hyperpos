@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
+use App\Application\Payment\Services\PaymentDateParser;
 use App\Application\Payment\Services\ResolveNotePayableComponents;
 use App\Core\Note\Note\Note;
 use App\Core\Payment\CustomerPayment\CustomerPayment;
 use App\Core\Payment\Policies\PaymentAllocationPolicy;
-use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Payment\CustomerPaymentWriterPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
 use App\Ports\Out\UuidPort;
-use DateTimeImmutable;
 
 final class CreateTransactionWorkspaceInlinePaymentRecorder
 {
@@ -25,7 +24,7 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         private readonly PaymentAllocationPolicy $policy,
         private readonly UuidPort $uuid,
         private readonly AuditLogPort $audit,
-        private readonly CreateTransactionWorkspaceInlinePaymentAmountResolver $amounts,
+        private readonly CreateTransactionWorkspaceInlinePaymentContextResolver $context,
         private readonly ResolveNotePayableComponents $components,
         private readonly AllocatePaymentAcrossComponents $allocator,
         private readonly AutoCloseNoteWhenFullyPaid $autoClose,
@@ -38,30 +37,21 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
      */
     public function record(Note $note, mixed $payload): array
     {
-        $payment = is_array($payload) ? $payload : [];
-        $decision = (string) ($payment['decision'] ?? 'skip');
+        $payment = $this->context->resolve($note, $payload);
 
-        if ($decision === 'skip') {
-            return ['decision' => 'skip', 'amount_paid_rupiah' => 0, 'change_rupiah' => 0];
+        if ($payment['decision'] === 'skip') {
+            return [
+                'decision' => 'skip',
+                'amount_paid_rupiah' => 0,
+                'change_rupiah' => 0,
+            ];
         }
 
-        $method = (string) ($payment['payment_method'] ?? '');
-        if (! in_array($method, ['cash', 'transfer'], true)) {
-            throw new DomainException('Metode pembayaran workspace tidak valid.');
-        }
-
-        $amount = $this->amounts->resolve($note, $payment);
-        $received = (int) ($payment['amount_received_rupiah'] ?? 0);
-
-        if ($method === 'cash' && $received < $amount) {
-            throw new DomainException('Uang masuk cash tidak boleh kurang dari total yang dibayar.');
-        }
-
-        $money = Money::fromInt($amount);
+        $money = Money::fromInt($payment['amount_paid_rupiah']);
         $customerPayment = CustomerPayment::create(
             $this->uuid->generate(),
             $money,
-            $this->parsePaidAt($payment['paid_at'] ?? null)
+            PaymentDateParser::parseYmd($payment['paid_at'], 'Tanggal bayar wajib valid dengan format Y-m-d.'),
         );
 
         $this->policy->assertAllocatable(
@@ -86,32 +76,16 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         $this->audit->record('payment_allocated', [
             'payment_id' => $customerPayment->id(),
             'note_id' => $note->id(),
-            'amount' => $amount,
+            'amount' => $payment['amount_paid_rupiah'],
             'allocation_count' => count($allocations),
             'source' => 'transaction_workspace',
-            'decision' => $decision,
+            'decision' => $payment['decision'],
         ]);
 
         return [
-            'decision' => $decision,
-            'amount_paid_rupiah' => $amount,
-            'change_rupiah' => $method === 'cash' ? max($received - $amount, 0) : 0,
+            'decision' => $payment['decision'],
+            'amount_paid_rupiah' => $payment['amount_paid_rupiah'],
+            'change_rupiah' => $payment['change_rupiah'],
         ];
-    }
-
-    private function parsePaidAt(mixed $value): DateTimeImmutable
-    {
-        if (! is_string($value)) {
-            throw new DomainException('Tanggal bayar wajib diisi.');
-        }
-
-        $normalized = trim($value);
-        $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $normalized);
-
-        if ($parsed === false || $parsed->format('Y-m-d') !== $normalized) {
-            throw new DomainException('Tanggal bayar wajib valid dengan format Y-m-d.');
-        }
-
-        return $parsed;
     }
 }
