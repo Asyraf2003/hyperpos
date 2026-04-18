@@ -16,9 +16,11 @@ trait BuildsProcurementInvoiceDetailSummaryView
 
         $supplierNamaCurrent = trim((string) ($summary['supplier_nama_pt_pengirim_current'] ?? ''));
         $supplierNamaSnapshot = trim((string) ($summary['supplier_nama_pt_pengirim_snapshot'] ?? ''));
+        $nomorFaktur = trim((string) ($summary['nomor_faktur'] ?? ''));
 
         return [
             'supplier_invoice_id' => (string) ($summary['supplier_invoice_id'] ?? ''),
+            'nomor_faktur' => $nomorFaktur,
             'supplier_nama_pt_pengirim_current' => $supplierNamaCurrent,
             'supplier_nama_pt_pengirim_snapshot' => $supplierNamaSnapshot,
             'shipment_date' => (string) ($summary['shipment_date'] ?? ''),

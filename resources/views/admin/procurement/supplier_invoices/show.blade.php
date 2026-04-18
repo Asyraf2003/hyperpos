@@ -109,7 +109,12 @@
                         <hr>
 
                         <div class="mb-3">
-                            <small class="text-muted d-block">Nomor Nota</small>
+                            <small class="text-muted d-block">Nomor Faktur</small>
+                            <strong>{{ $summaryView['nomor_faktur'] !== '' ? $summaryView['nomor_faktur'] : '-' }}</strong>
+                        </div>
+
+                        <div class="mb-3">
+                            <small class="text-muted d-block">ID Nota Internal</small>
                             <strong>{{ $summaryView['supplier_invoice_id'] }}</strong>
                         </div>
 
