@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Application\Note\Services;
 
+use App\Application\Note\Services\NoteOperationalComponentAllocationTotalsGrouper;
+use App\Application\Note\Services\NoteOperationalComponentSettlementSummaryBuilder;
+use App\Application\Note\Services\NoteOperationalLegacySettlementSummaryBuilder;
 use App\Application\Note\Services\NoteOperationalRowSettlementProjector;
+use App\Application\Note\Services\NoteOperationalSettlementLabelResolver;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
@@ -52,7 +56,7 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
 
         $componentRefunds->method('listByNoteId')->with('note-1')->willReturn([]);
 
-        $projector = new NoteOperationalRowSettlementProjector(
+        $projector = $this->makeProjector(
             $componentPayments,
             $componentRefunds,
             $legacyPayments,
@@ -129,7 +133,7 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
             ),
         ]);
 
-        $projector = new NoteOperationalRowSettlementProjector(
+        $projector = $this->makeProjector(
             $componentPayments,
             $componentRefunds,
             $legacyPayments,
@@ -181,7 +185,7 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
             ->with('note-legacy')
             ->willReturn(Money::fromInt(0));
 
-        $projector = new NoteOperationalRowSettlementProjector(
+        $projector = $this->makeProjector(
             $componentPayments,
             $componentRefunds,
             $legacyPayments,
@@ -207,6 +211,25 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
         $this->assertSame(0, $result['row-3']['allocated_rupiah']);
         $this->assertSame(5000, $result['row-3']['outstanding_rupiah']);
         $this->assertSame('hutang', $result['row-3']['settlement_label']);
+    }
+
+    private function makeProjector(
+        PaymentComponentAllocationReaderPort $componentPayments,
+        RefundComponentAllocationReaderPort $componentRefunds,
+        PaymentAllocationReaderPort $legacyPayments,
+        CustomerRefundReaderPort $legacyRefunds,
+    ): NoteOperationalRowSettlementProjector {
+        $labels = new NoteOperationalSettlementLabelResolver();
+
+        return new NoteOperationalRowSettlementProjector(
+            $componentPayments,
+            $componentRefunds,
+            $legacyPayments,
+            $legacyRefunds,
+            new NoteOperationalComponentAllocationTotalsGrouper(),
+            new NoteOperationalComponentSettlementSummaryBuilder($labels),
+            new NoteOperationalLegacySettlementSummaryBuilder($labels),
+        );
     }
 
     private function makeServiceRow(string $id, string $noteId, int $lineNo, int $price): WorkItem
