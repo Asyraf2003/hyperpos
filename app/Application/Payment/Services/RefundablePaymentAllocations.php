@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\Services;
 
+use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
 use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
 
 final class RefundablePaymentAllocations
 {
     /**
      * @param list<string> $selectedRowIds
-     * @return array<int, mixed>
+     * @return list<PaymentComponentAllocation>
      */
     public static function forPayment(
         PaymentComponentAllocationReaderPort $reader,
@@ -22,7 +23,7 @@ final class RefundablePaymentAllocations
 
         $allocations = array_filter(
             $reader->listByNoteId($noteId),
-            static function ($allocation) use ($customerPaymentId, $selectedIds): bool {
+            static function (PaymentComponentAllocation $allocation) use ($customerPaymentId, $selectedIds): bool {
                 if ($allocation->customerPaymentId() !== $customerPaymentId) {
                     return false;
                 }
@@ -35,11 +36,14 @@ final class RefundablePaymentAllocations
             },
         );
 
-        usort($allocations, static function ($left, $right): int {
-            return $right->allocationPriority() <=> $left->allocationPriority();
-        });
+        usort(
+            $allocations,
+            static function (PaymentComponentAllocation $left, PaymentComponentAllocation $right): int {
+                return $right->allocationPriority() <=> $left->allocationPriority();
+            },
+        );
 
-        return array_values($allocations);
+        return $allocations;
     }
 
     /**

@@ -11,8 +11,18 @@ use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\Operation
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\PayrollDisbursementPerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\RefundPerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\StoreStockCogsPerDayQuery;
+use App\Ports\Out\Reporting\DashboardOperationalPerformanceReaderPort;
 use Carbon\CarbonImmutable;
 
+/**
+ * @phpstan-import-type DashboardOperationalPerformancePeriodRow from DashboardOperationalPerformanceReaderPort
+ * @phpstan-type DashboardOperationalPerformancePeriodRowsByKey array<string, DashboardOperationalPerformancePeriodRow>
+ * @phpstan-type DashboardOperationalPerformanceAmountRow array{
+ *   period_key:string,
+ *   period_label:string,
+ *   amount_rupiah:int
+ * }
+ */
 final class DashboardOperationalPerformancePeriodQuery
 {
     public function __construct(
@@ -27,18 +37,7 @@ final class DashboardOperationalPerformancePeriodQuery
     }
 
     /**
-     * @return list<array{
-     *   period_key:string,
-     *   period_label:string,
-     *   cash_in_rupiah:int,
-     *   refund_rupiah:int,
-     *   external_purchase_cost_rupiah:int,
-     *   store_stock_cogs_rupiah:int,
-     *   operational_expense_rupiah:int,
-     *   payroll_disbursement_rupiah:int,
-     *   employee_debt_cash_out_rupiah:int,
-     *   operational_profit_rupiah:int
-     * }>
+     * @return list<DashboardOperationalPerformancePeriodRow>
      */
     public function rows(string $fromDate, string $toDate): array
     {
@@ -101,18 +100,7 @@ final class DashboardOperationalPerformancePeriodQuery
     }
 
     /**
-     * @return array<string, array{
-     *   period_key:string,
-     *   period_label:string,
-     *   cash_in_rupiah:int,
-     *   refund_rupiah:int,
-     *   external_purchase_cost_rupiah:int,
-     *   store_stock_cogs_rupiah:int,
-     *   operational_expense_rupiah:int,
-     *   payroll_disbursement_rupiah:int,
-     *   employee_debt_cash_out_rupiah:int,
-     *   operational_profit_rupiah:int
-     * }>
+     * @return DashboardOperationalPerformancePeriodRowsByKey
      */
     private function emptyPeriods(string $fromDate, string $toDate): array
     {
@@ -143,23 +131,20 @@ final class DashboardOperationalPerformancePeriodQuery
     }
 
     /**
-     * @param array<string, array<string, int|string>> $rows
-     * @param list<array{
-     *   period_key:string,
-     *   period_label:string,
-     *   amount_rupiah:int
-     * }> $amountRows
+     * @param DashboardOperationalPerformancePeriodRowsByKey $rows
+     * @param list<DashboardOperationalPerformanceAmountRow> $amountRows
+     * @param 'cash_in_rupiah'|'refund_rupiah'|'external_purchase_cost_rupiah'|'store_stock_cogs_rupiah'|'operational_expense_rupiah'|'payroll_disbursement_rupiah'|'employee_debt_cash_out_rupiah' $field
      */
     private function mergeAmount(array &$rows, array $amountRows, string $field): void
     {
         foreach ($amountRows as $amountRow) {
-            $periodKey = (string) ($amountRow['period_key'] ?? '');
+            $periodKey = $amountRow['period_key'];
 
-            if ($periodKey === '' || ! isset($rows[$periodKey])) {
+            if (! isset($rows[$periodKey])) {
                 continue;
             }
 
-            $rows[$periodKey][$field] = (int) ($amountRow['amount_rupiah'] ?? 0);
+            $rows[$periodKey][$field] = $amountRow['amount_rupiah'];
         }
     }
 }
