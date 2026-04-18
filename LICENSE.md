@@ -1,13 +1,6 @@
 # App Kasir Hexagonal Non-Commercial Source-Available License v1.0
 
-**Template License**  
-Silakan ganti placeholder seperti `[YEAR]` dan `[COPYRIGHT HOLDER]` sebelum dipublikasikan.
-
----
-
-## Copyright
-
-Copyright (c) [YEAR] [COPYRIGHT HOLDER]
+Copyright (c) 14 04 2026 AsyrafCloud
 
 All rights reserved.
 
