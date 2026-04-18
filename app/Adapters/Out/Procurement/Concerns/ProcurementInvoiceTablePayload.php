@@ -26,7 +26,7 @@ trait ProcurementInvoiceTablePayload
 
             $isLocked = $paymentCount > 0 || $receiptCount > 0;
             $editActionKind = $isLocked ? 'revise' : 'edit';
-            $editActionLabel = $isLocked ? 'Correction / Reversal' : 'Edit Nota';
+            $editActionLabel = $isLocked ? 'Koreksi' : 'Edit Nota';
             $editActionRoute = $isLocked
                 ? 'admin.procurement.supplier-invoices.revise'
                 : 'admin.procurement.supplier-invoices.edit';
