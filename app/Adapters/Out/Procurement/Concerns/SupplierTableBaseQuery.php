@@ -16,6 +16,7 @@ trait SupplierTableBaseQuery
             ->groupBy('supplier_invoice_id');
 
         $supplierInvoiceSummarySubquery = DB::table('supplier_invoices')
+            ->whereNull('supplier_invoices.voided_at')
             ->leftJoinSub($paymentTotalsSubquery, 'payment_totals', function ($join): void {
                 $join->on('payment_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
             })

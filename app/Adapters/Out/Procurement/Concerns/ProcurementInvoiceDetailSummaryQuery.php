@@ -47,6 +47,8 @@ trait ProcurementInvoiceDetailSummaryQuery
                 'supplier_invoices.jatuh_tempo as due_date',
                 'supplier_invoices.grand_total_rupiah',
                 'supplier_invoices.last_revision_no',
+                'supplier_invoices.voided_at',
+                'supplier_invoices.void_reason',
                 DB::raw('COALESCE(payment_totals.total_paid_rupiah, 0) as total_paid_rupiah'),
                 DB::raw('supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) as outstanding_rupiah'),
                 DB::raw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count'),
@@ -54,6 +56,8 @@ trait ProcurementInvoiceDetailSummaryQuery
                 DB::raw('COALESCE(received_qty_totals.total_received_qty, 0) as total_received_qty'),
                 DB::raw("
                     CASE
+                        WHEN supplier_invoices.voided_at IS NOT NULL
+                        THEN 'voided'
                         WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
                           OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
                         THEN 'locked'
@@ -62,6 +66,8 @@ trait ProcurementInvoiceDetailSummaryQuery
                 "),
                 DB::raw("
                     CASE
+                        WHEN supplier_invoices.voided_at IS NOT NULL
+                        THEN ''
                         WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
                           OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
                         THEN 'correction'
@@ -69,24 +75,28 @@ trait ProcurementInvoiceDetailSummaryQuery
                     END as allowed_actions_csv
                 "),
                 DB::raw("
-                    TRIM(BOTH ',' FROM CONCAT(
-                        CASE
-                            WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                            THEN 'receipt_recorded'
-                            ELSE ''
-                        END,
-                        CASE
-                            WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
-                             AND COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                            THEN ','
-                            ELSE ''
-                        END,
-                        CASE
-                            WHEN COALESCE(payment_totals.total_paid_rupiah, 0) > 0
-                            THEN 'payment_effective_recorded'
-                            ELSE ''
-                        END
-                    )) as lock_reasons_csv
+                    CASE
+                        WHEN supplier_invoices.voided_at IS NOT NULL
+                        THEN 'voided'
+                        ELSE TRIM(BOTH ',' FROM CONCAT(
+                            CASE
+                                WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                                THEN 'receipt_recorded'
+                                ELSE ''
+                            END,
+                            CASE
+                                WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                                 AND COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                                THEN ','
+                                ELSE ''
+                            END,
+                            CASE
+                                WHEN COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                                THEN 'payment_effective_recorded'
+                                ELSE ''
+                            END
+                        ))
+                    END as lock_reasons_csv
                 "),
             ]);
     }
