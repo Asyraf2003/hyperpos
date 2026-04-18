@@ -16,6 +16,7 @@ final class CashierNoteTableQueryRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
+            'date' => $this->trimOrNull('date'),
             'search' => $this->trimOrNull('search'),
             'line_status' => $this->trimOrNull('line_status'),
         ]);
@@ -24,6 +25,7 @@ final class CashierNoteTableQueryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'date' => ['nullable', 'date_format:Y-m-d'],
             'search' => ['nullable', 'string'],
             'line_status' => ['nullable', 'in:open,close,refund'],
             'page' => ['nullable', 'integer', 'min:1'],

@@ -23,7 +23,7 @@ final class CashierNoteHistoryCriteria
      */
     public static function fromFilters(array $filters): self
     {
-        $anchorDate = new DateTimeImmutable(date('Y-m-d'));
+        $anchorDate = self::resolveAnchorDate($filters['date'] ?? null);
 
         return new self(
             anchorDateText: $anchorDate->format('Y-m-d'),
@@ -33,6 +33,19 @@ final class CashierNoteHistoryCriteria
             page: max((int) ($filters['page'] ?? 1), 1),
             perPage: 10,
         );
+    }
+
+    private static function resolveAnchorDate(mixed $value): DateTimeImmutable
+    {
+        if (is_string($value)) {
+            $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', trim($value));
+
+            if ($parsed !== false) {
+                return $parsed;
+            }
+        }
+
+        return new DateTimeImmutable(date('Y-m-d'));
     }
 
     private static function normalizeString(mixed $value): string

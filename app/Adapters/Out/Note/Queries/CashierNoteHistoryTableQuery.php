@@ -35,6 +35,7 @@ final class CashierNoteHistoryTableQuery
 
         return [
             'filters' => [
+                'date' => $criteria->anchorDateText,
                 'search' => $criteria->search,
                 'line_status' => $criteria->lineStatus,
             ],
