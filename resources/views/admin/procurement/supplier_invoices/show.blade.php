@@ -64,7 +64,7 @@
                                 <p class="mb-0 text-muted">Data utama dan status keuangan nota pemasok.</p>
                             </div>
 
-                            @if ($linesView !== [])
+                            @if ($linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
                                 <a href="#receipt-form-section" class="btn btn-sm btn-primary">
                                     Terima Barang
                                 </a>
@@ -162,22 +162,20 @@
                     </div>
                 </div>
 
-                <div class="card" id="receipt-form-section">
-                    <div class="card-header">
-                        <h4 class="card-title mb-1">Terima Barang</h4>
-                        <p class="mb-0 text-muted">
-                            Gunakan checklist ini jika seluruh barang pada nota sudah datang sesuai jumlah invoice.
-                        </p>
-                    </div>
+                @if ($linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
+                    <div class="card" id="receipt-form-section">
+                        <div class="card-header">
+                            <h4 class="card-title mb-1">Terima Barang</h4>
+                            <p class="mb-0 text-muted">
+                                Gunakan checklist ini jika seluruh barang pada nota sudah datang sesuai jumlah invoice.
+                            </p>
+                        </div>
 
-                    <div class="card-body">
-                        @error('supplier_receipt')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
+                        <div class="card-body">
+                            @error('supplier_receipt')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
 
-                        @if ($linesView === [])
-                            <div class="text-muted">Belum ada rincian nota yang bisa diterima.</div>
-                        @else
                             <form
                                 action="{{ route('admin.procurement.supplier-invoices.receive', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}"
                                 method="post"
@@ -241,9 +239,24 @@
                                     </button>
                                 </div>
                             </form>
-                        @endif
+                        </div>
                     </div>
-                </div>
+                @elseif ((int) ($summaryView['receipt_count'] ?? 0) > 0)
+                    <div class="card" id="receipt-form-section">
+                        <div class="card-header">
+                            <h4 class="card-title mb-1">Status Penerimaan Barang</h4>
+                            <p class="mb-0 text-muted">
+                                Barang pada nota ini sudah diterima dan dicatat ke stok.
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="alert alert-success mb-0">
+                                Penerimaan barang sudah tercatat. Form terima barang disembunyikan untuk mencegah double receive.
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="card" id="payment-form-section">
                     <div class="card-header">
