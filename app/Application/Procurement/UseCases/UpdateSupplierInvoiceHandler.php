@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Inventory\UseCases\RebuildInventoryCostingProjectionHandler;
+use App\Application\Inventory\UseCases\RebuildInventoryProjectionHandler;
 use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
 use App\Application\Procurement\Services\UpdatedSupplierInvoiceBuilder;
@@ -17,6 +19,7 @@ use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
+use DateTimeImmutable;
 use Throwable;
 
 final class UpdateSupplierInvoiceHandler
@@ -31,6 +34,8 @@ final class UpdateSupplierInvoiceHandler
         private readonly GetProcurementInvoiceDetailHandler $details,
         private readonly InventoryMovementWriterPort $inventoryMovements,
         private readonly UuidPort $uuid,
+        private readonly RebuildInventoryProjectionHandler $rebuildInventoryProjection,
+        private readonly RebuildInventoryCostingProjectionHandler $rebuildInventoryCostingProjection,
     ) {
     }
 
@@ -96,10 +101,33 @@ final class UpdateSupplierInvoiceHandler
             $this->writer->update($updated);
 
             if ($totalReceivedQty > 0) {
-                $deltaMovements = $this->buildRevisionDeltaMovements($current, $updated, $lines);
+                $movementDate = $this->resolveRevisionMovementDate($updated, $summary);
+                $deltaMovements = $this->buildRevisionDeltaMovements($current, $updated, $lines, $movementDate);
 
                 if ($deltaMovements !== []) {
                     $this->inventoryMovements->createMany($deltaMovements);
+
+                    $inventoryProjectionResult = $this->rebuildInventoryProjection->handle();
+                    if ($inventoryProjectionResult->isFailure()) {
+                        $this->transactions->rollBack();
+                        $started = false;
+
+                        return Result::failure(
+                            'Proyeksi stok gagal diperbarui setelah revisi nota supplier.',
+                            ['supplier_invoice' => ['SUPPLIER_INVENTORY_PROJECTION_REBUILD_FAILED']]
+                        );
+                    }
+
+                    $inventoryCostingResult = $this->rebuildInventoryCostingProjection->handle();
+                    if ($inventoryCostingResult->isFailure()) {
+                        $this->transactions->rollBack();
+                        $started = false;
+
+                        return Result::failure(
+                            'Proyeksi costing gagal diperbarui setelah revisi nota supplier.',
+                            ['supplier_invoice' => ['SUPPLIER_INVENTORY_COSTING_REBUILD_FAILED']]
+                        );
+                    }
                 }
             }
 
@@ -147,6 +175,26 @@ final class UpdateSupplierInvoiceHandler
     }
 
     /**
+     * @param array<string, mixed> $summary
+     */
+    private function resolveRevisionMovementDate(
+        SupplierInvoice $updated,
+        array $summary,
+    ): DateTimeImmutable {
+        $latestReceiptDate = $summary['latest_receipt_date'] ?? null;
+
+        if (is_string($latestReceiptDate) && trim($latestReceiptDate) !== '') {
+            $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', trim($latestReceiptDate));
+
+            if ($parsed !== false) {
+                return $parsed;
+            }
+        }
+
+        return $updated->tanggalPengiriman();
+    }
+
+    /**
      * @param list<array<string, mixed>> $requestLines
      * @return list<InventoryMovement>
      */
@@ -154,6 +202,7 @@ final class UpdateSupplierInvoiceHandler
         SupplierInvoice $current,
         SupplierInvoice $updated,
         array $requestLines,
+        DateTimeImmutable $movementDate,
     ): array {
         $oldLinesById = [];
         foreach ($current->lines() as $line) {
@@ -190,7 +239,7 @@ final class UpdateSupplierInvoiceHandler
 
                 array_push(
                     $movements,
-                    ...$this->buildPairedLineDeltaMovements($oldLine, $newLine, $updated->tanggalPengiriman())
+                    ...$this->buildPairedLineDeltaMovements($oldLine, $newLine, $movementDate)
                 );
 
                 continue;
@@ -198,7 +247,7 @@ final class UpdateSupplierInvoiceHandler
 
             $movements[] = $this->makeStockInMovement(
                 $newLine,
-                $updated->tanggalPengiriman(),
+                $movementDate,
                 $newLine->qtyPcs()
             );
         }
@@ -210,7 +259,7 @@ final class UpdateSupplierInvoiceHandler
 
             $movements[] = $this->makeStockOutMovement(
                 $oldLine,
-                $updated->tanggalPengiriman(),
+                $movementDate,
                 $oldLine->qtyPcs()
             );
         }
@@ -224,7 +273,7 @@ final class UpdateSupplierInvoiceHandler
     private function buildPairedLineDeltaMovements(
         SupplierInvoiceLine $oldLine,
         SupplierInvoiceLine $newLine,
-        \DateTimeImmutable $movementDate,
+        DateTimeImmutable $movementDate,
     ): array {
         if ($oldLine->productId() !== $newLine->productId()) {
             return [
@@ -252,7 +301,7 @@ final class UpdateSupplierInvoiceHandler
 
     private function makeStockInMovement(
         SupplierInvoiceLine $line,
-        \DateTimeImmutable $movementDate,
+        DateTimeImmutable $movementDate,
         int $qty,
     ): InventoryMovement {
         return InventoryMovement::create(
@@ -269,7 +318,7 @@ final class UpdateSupplierInvoiceHandler
 
     private function makeStockOutMovement(
         SupplierInvoiceLine $line,
-        \DateTimeImmutable $movementDate,
+        DateTimeImmutable $movementDate,
         int $qty,
     ): InventoryMovement {
         return InventoryMovement::create(

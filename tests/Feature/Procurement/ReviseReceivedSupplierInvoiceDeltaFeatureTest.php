@@ -84,6 +84,26 @@ final class ReviseReceivedSupplierInvoiceDeltaFeatureTest extends TestCase
             'unit_cost_rupiah' => 12000,
             'total_cost_rupiah' => 24000,
         ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-1',
+            'qty_on_hand' => 0,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-2',
+            'qty_on_hand' => 2,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-2',
+            'avg_cost_rupiah' => 12000,
+            'inventory_value_rupiah' => 24000,
+        ]);
+
+        $this->assertDatabaseMissing('product_inventory_costing', [
+            'product_id' => 'product-1',
+        ]);
     }
 
     public function test_admin_cannot_revise_received_invoice_when_revised_total_is_below_total_paid(): void

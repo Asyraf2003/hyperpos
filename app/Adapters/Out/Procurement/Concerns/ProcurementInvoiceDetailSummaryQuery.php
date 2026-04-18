@@ -15,7 +15,7 @@ trait ProcurementInvoiceDetailSummaryQuery
             ->groupBy('supplier_invoice_id');
 
         $receiptCountSubquery = DB::table('supplier_receipts')
-            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
+            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count, MAX(tanggal_terima) as latest_receipt_date')
             ->groupBy('supplier_invoice_id');
 
         $receivedQtySubquery = DB::table('supplier_receipts')
@@ -50,6 +50,7 @@ trait ProcurementInvoiceDetailSummaryQuery
                 DB::raw('COALESCE(payment_totals.total_paid_rupiah, 0) as total_paid_rupiah'),
                 DB::raw('supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) as outstanding_rupiah'),
                 DB::raw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count'),
+                DB::raw('receipt_counts.latest_receipt_date as latest_receipt_date'),
                 DB::raw('COALESCE(received_qty_totals.total_received_qty, 0) as total_received_qty'),
             ]);
     }

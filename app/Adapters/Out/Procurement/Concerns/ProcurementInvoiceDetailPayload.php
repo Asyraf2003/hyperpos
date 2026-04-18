@@ -59,6 +59,9 @@ trait ProcurementInvoiceDetailPayload
                 'total_paid_rupiah' => $totalPaidRupiah,
                 'outstanding_rupiah' => (int) $summary->outstanding_rupiah,
                 'receipt_count' => $receiptCount,
+                'latest_receipt_date' => $summary->latest_receipt_date !== null
+                    ? (string) $summary->latest_receipt_date
+                    : null,
                 'total_received_qty' => (int) $summary->total_received_qty,
                 'policy_state' => $policyState,
                 'lock_reasons' => $lockReasons,
