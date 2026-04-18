@@ -166,7 +166,7 @@
                     <div class="card-header">
                         <h4 class="card-title mb-1">Terima Barang</h4>
                         <p class="mb-0 text-muted">
-                            Gunakan bagian ini untuk mencatat barang yang benar-benar sudah diterima. Kosongkan qty pada line yang belum datang.
+                            Gunakan checklist ini jika seluruh barang pada nota sudah datang sesuai jumlah invoice.
                         </p>
                     </div>
 
@@ -201,58 +201,39 @@
                                     @enderror
                                 </div>
 
-                                <div class="alert alert-danger d-none" data-receipt-form-error>
-                                    Isi minimal satu qty diterima sebelum menyimpan penerimaan.
+                                <div class="border rounded p-3 bg-light-subtle">
+                                    <div class="form-check">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            value="1"
+                                            id="confirm_full_receive"
+                                            data-confirm-full-receive
+                                        >
+                                        <label class="form-check-label" for="confirm_full_receive">
+                                            Saya konfirmasi seluruh barang pada nota ini sudah diterima lengkap sesuai jumlah invoice.
+                                        </label>
+                                    </div>
                                 </div>
 
-                                <div class="d-flex flex-column gap-3">
-                                    @foreach ($linesView as $index => $line)
-                                        <div class="border rounded p-3" data-receipt-line-item>
-                                            <input
-                                                type="hidden"
-                                                name="lines[{{ $index }}][supplier_invoice_line_id]"
-                                                value="{{ old('lines.' . $index . '.supplier_invoice_line_id', $line['supplier_invoice_line_id'] ?? '') }}"
-                                                data-receipt-line-id
-                                            >
-
-                                            <div class="mb-2">
-                                                <small class="text-muted d-block">Produk</small>
-                                                <strong>{{ $line['nama_barang'] }}</strong>
-                                                <div class="small text-muted">
-                                                    {{ $line['merek'] }}
-                                                    @if (($line['ukuran'] ?? null) !== null)
-                                                        - {{ $line['ukuran'] }}
-                                                    @endif
-                                                    @if (($line['kode_barang'] ?? null) !== null && $line['kode_barang'] !== '')
-                                                        ({{ $line['kode_barang'] }})
-                                                    @endif
-                                                </div>
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <small class="text-muted d-block">Qty Invoice</small>
-                                                <strong>{{ $line['qty_pcs'] }}</strong>
-                                            </div>
-
-                                            <div>
-                                                <label class="form-label" for="qty_diterima_{{ $index }}">Qty Diterima Sekarang</label>
-                                                <input
-                                                    type="text"
-                                                    inputmode="numeric"
-                                                    id="qty_diterima_{{ $index }}"
-                                                    name="lines[{{ $index }}][qty_diterima]"
-                                                    value="{{ old('lines.' . $index . '.qty_diterima', '') }}"
-                                                    class="form-control @error('lines.' . $index . '.qty_diterima') is-invalid @enderror"
-                                                    placeholder="Kosongkan jika line ini belum diterima"
-                                                    data-receipt-qty-input
-                                                >
-                                                @error('lines.' . $index . '.qty_diterima')
-                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    @endforeach
+                                <div class="alert alert-danger d-none mt-3 mb-0" data-receipt-form-error>
+                                    Centang konfirmasi penerimaan penuh sebelum menyimpan penerimaan barang.
                                 </div>
+
+                                @foreach ($linesView as $index => $line)
+                                    <input
+                                        type="hidden"
+                                        name="lines[{{ $index }}][supplier_invoice_line_id]"
+                                        value="{{ $line['supplier_invoice_line_id'] ?? '' }}"
+                                        data-receipt-line-id
+                                    >
+                                    <input
+                                        type="hidden"
+                                        name="lines[{{ $index }}][qty_diterima]"
+                                        value="{{ $line['qty_pcs'] }}"
+                                        data-receipt-line-qty
+                                    >
+                                @endforeach
 
                                 <div class="d-grid mt-4">
                                     <button type="submit" class="btn btn-primary">
@@ -501,43 +482,21 @@
             const form = document.getElementById('supplier-receipt-form');
             if (!form) return;
 
+            const confirmInput = form.querySelector('[data-confirm-full-receive]');
             const errorBox = form.querySelector('[data-receipt-form-error]');
-            const qtyInputs = Array.from(form.querySelectorAll('[data-receipt-qty-input]'));
-
-            qtyInputs.forEach((input) => {
-                const syncDigits = () => {
-                    input.value = String(input.value ?? '').replace(/\D+/g, '');
-                };
-
-                input.addEventListener('input', syncDigits);
-                input.addEventListener('blur', syncDigits);
-            });
 
             form.addEventListener('submit', (event) => {
-                let activeCount = 0;
+                const confirmed = Boolean(confirmInput?.checked);
 
-                form.querySelectorAll('[data-receipt-line-item]').forEach((row) => {
-                    const qtyInput = row.querySelector('[data-receipt-qty-input]');
-                    const fields = row.querySelectorAll('[name]');
-                    const qty = Number.parseInt(String(qtyInput?.value ?? '').trim(), 10);
-
-                    const shouldKeep = Number.isInteger(qty) && qty > 0;
-
-                    fields.forEach((field) => {
-                        field.disabled = !shouldKeep;
-                    });
-
-                    if (shouldKeep) {
-                        activeCount += 1;
-                    }
-                });
-
-                if (activeCount < 1) {
+                if (!confirmed) {
                     event.preventDefault();
                     if (errorBox) {
                         errorBox.classList.remove('d-none');
                     }
-                } else if (errorBox) {
+                    return;
+                }
+
+                if (errorBox) {
                     errorBox.classList.add('d-none');
                 }
             });
