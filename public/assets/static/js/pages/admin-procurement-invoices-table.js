@@ -345,19 +345,10 @@
       setLinkDisabledState(actionProofLink, false);
     }
 
-    const isEditable = Number(row.payment_count || 0) < 1 && Number(row.receipt_count || 0) < 1;
-
-    if (isEditable) {
-      actionEditLink.href = editUrl(row.supplier_invoice_id);
-      actionEditTitle.textContent = "Edit Nota";
-      actionEditDescription.textContent = "Ubah header, qty, dan total rincian untuk nota pre-effect.";
-      setLinkDisabledState(actionEditLink, false);
-    } else {
-      actionEditLink.href = "#";
-      actionEditTitle.textContent = "Edit Nota";
-      actionEditDescription.textContent = "Tidak tersedia setelah ada receipt atau payment.";
-      setLinkDisabledState(actionEditLink, true);
-    }
+    actionEditLink.href = editUrl(row.supplier_invoice_id);
+    actionEditTitle.textContent = "Edit Nota";
+    actionEditDescription.textContent = "Buka form revisi nota. Tetap tersedia walau sudah ada receipt atau payment, validasi akhir dicek saat simpan.";
+    setLinkDisabledState(actionEditLink, false);
   };
 
   const rowHtml = (row, index, meta) => `
