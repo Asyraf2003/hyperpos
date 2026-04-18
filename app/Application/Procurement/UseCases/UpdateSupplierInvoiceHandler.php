@@ -15,6 +15,7 @@ use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
 use App\Core\Procurement\SupplierInvoice\SupplierInvoiceLine;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Inventory\InventoryMovementWriterPort;
+use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\TransactionManagerPort;
@@ -33,6 +34,7 @@ final class UpdateSupplierInvoiceHandler
         private readonly SupplierInvoiceChangeContext $changeContext,
         private readonly GetProcurementInvoiceDetailHandler $details,
         private readonly InventoryMovementWriterPort $inventoryMovements,
+        private readonly ProductInventoryReaderPort $productInventories,
         private readonly UuidPort $uuid,
         private readonly RebuildInventoryProjectionHandler $rebuildInventoryProjection,
         private readonly RebuildInventoryCostingProjectionHandler $rebuildInventoryCostingProjection,
@@ -98,36 +100,47 @@ final class UpdateSupplierInvoiceHandler
                 );
             }
 
-            $this->writer->update($updated);
-
+            $deltaMovements = [];
             if ($totalReceivedQty > 0) {
                 $movementDate = $this->resolveRevisionMovementDate($updated, $summary);
                 $deltaMovements = $this->buildRevisionDeltaMovements($current, $updated, $lines, $movementDate);
 
-                if ($deltaMovements !== []) {
-                    $this->inventoryMovements->createMany($deltaMovements);
+                if (! $this->canApplyDeltaMovementsWithoutNegativeStock($deltaMovements)) {
+                    $this->transactions->rollBack();
+                    $started = false;
 
-                    $inventoryProjectionResult = $this->rebuildInventoryProjection->handle();
-                    if ($inventoryProjectionResult->isFailure()) {
-                        $this->transactions->rollBack();
-                        $started = false;
+                    return Result::failure(
+                        'Revisi faktur akan membuat stok product lama menjadi negatif.',
+                        ['supplier_invoice' => ['SUPPLIER_INVOICE_REVISION_NEGATIVE_STOCK']]
+                    );
+                }
+            }
 
-                        return Result::failure(
-                            'Proyeksi stok gagal diperbarui setelah revisi nota supplier.',
-                            ['supplier_invoice' => ['SUPPLIER_INVENTORY_PROJECTION_REBUILD_FAILED']]
-                        );
-                    }
+            $this->writer->update($updated);
 
-                    $inventoryCostingResult = $this->rebuildInventoryCostingProjection->handle();
-                    if ($inventoryCostingResult->isFailure()) {
-                        $this->transactions->rollBack();
-                        $started = false;
+            if ($deltaMovements !== []) {
+                $this->inventoryMovements->createMany($deltaMovements);
 
-                        return Result::failure(
-                            'Proyeksi costing gagal diperbarui setelah revisi nota supplier.',
-                            ['supplier_invoice' => ['SUPPLIER_INVENTORY_COSTING_REBUILD_FAILED']]
-                        );
-                    }
+                $inventoryProjectionResult = $this->rebuildInventoryProjection->handle();
+                if ($inventoryProjectionResult->isFailure()) {
+                    $this->transactions->rollBack();
+                    $started = false;
+
+                    return Result::failure(
+                        'Proyeksi stok gagal diperbarui setelah revisi nota supplier.',
+                        ['supplier_invoice' => ['SUPPLIER_INVENTORY_PROJECTION_REBUILD_FAILED']]
+                    );
+                }
+
+                $inventoryCostingResult = $this->rebuildInventoryCostingProjection->handle();
+                if ($inventoryCostingResult->isFailure()) {
+                    $this->transactions->rollBack();
+                    $started = false;
+
+                    return Result::failure(
+                        'Proyeksi costing gagal diperbarui setelah revisi nota supplier.',
+                        ['supplier_invoice' => ['SUPPLIER_INVENTORY_COSTING_REBUILD_FAILED']]
+                    );
                 }
             }
 
@@ -297,6 +310,34 @@ final class UpdateSupplierInvoiceHandler
         }
 
         return [];
+    }
+
+    /**
+     * @param list<InventoryMovement> $deltaMovements
+     */
+    private function canApplyDeltaMovementsWithoutNegativeStock(array $deltaMovements): bool
+    {
+        $minusByProduct = [];
+
+        foreach ($deltaMovements as $movement) {
+            if ($movement->movementType() !== 'stock_out') {
+                continue;
+            }
+
+            $productId = $movement->productId();
+            $minusByProduct[$productId] = ($minusByProduct[$productId] ?? 0) + abs($movement->qtyDelta());
+        }
+
+        foreach ($minusByProduct as $productId => $qtyToSubtract) {
+            $currentInventory = $this->productInventories->getByProductId($productId);
+            $qtyOnHand = $currentInventory?->qtyOnHand() ?? 0;
+
+            if ($qtyToSubtract > $qtyOnHand) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function makeStockInMovement(
