@@ -39,7 +39,9 @@ trait ProcurementInvoiceDetailPayload
             $lockReasons[] = 'payment_effective_recorded';
         }
 
-        $policyState = 'editable';
+        $isLocked = $lockReasons !== [];
+        $policyState = $isLocked ? 'locked' : 'editable';
+        $allowedActions = $isLocked ? ['correction'] : ['edit', 'void'];
 
         return [
             'summary' => [
@@ -65,7 +67,7 @@ trait ProcurementInvoiceDetailPayload
                 'total_received_qty' => (int) $summary->total_received_qty,
                 'policy_state' => $policyState,
                 'lock_reasons' => $lockReasons,
-                'allowed_actions' => ['edit'],
+                'allowed_actions' => $allowedActions,
             ],
             'lines' => $lines,
         ];

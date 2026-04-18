@@ -52,6 +52,42 @@ trait ProcurementInvoiceDetailSummaryQuery
                 DB::raw('COALESCE(receipt_counts.receipt_count, 0) as receipt_count'),
                 DB::raw('receipt_counts.latest_receipt_date as latest_receipt_date'),
                 DB::raw('COALESCE(received_qty_totals.total_received_qty, 0) as total_received_qty'),
+                DB::raw("
+                    CASE
+                        WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                          OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                        THEN 'locked'
+                        ELSE 'editable'
+                    END as policy_state
+                "),
+                DB::raw("
+                    CASE
+                        WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                          OR COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                        THEN 'correction'
+                        ELSE 'edit,void'
+                    END as allowed_actions_csv
+                "),
+                DB::raw("
+                    TRIM(BOTH ',' FROM CONCAT(
+                        CASE
+                            WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                            THEN 'receipt_recorded'
+                            ELSE ''
+                        END,
+                        CASE
+                            WHEN COALESCE(receipt_counts.receipt_count, 0) > 0
+                             AND COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                            THEN ','
+                            ELSE ''
+                        END,
+                        CASE
+                            WHEN COALESCE(payment_totals.total_paid_rupiah, 0) > 0
+                            THEN 'payment_effective_recorded'
+                            ELSE ''
+                        END
+                    )) as lock_reasons_csv
+                "),
             ]);
     }
 }
