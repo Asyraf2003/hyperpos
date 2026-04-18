@@ -34,20 +34,24 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         /** @var Collection<string, array<string, mixed>> $items */
         $items = collect($response->json('data.items'))->keyBy('note_id');
 
-        $this->assertSame('Belum Dibayar', $items->get('note-open')['payment_status_label']);
-        $this->assertSame('Editable Normal', $items->get('note-open')['editability_label']);
-        $this->assertSame('Open: 1 • Selesai: 0 • Batal: 0', $items->get('note-open')['work_status_label']);
         $this->assertSame('1 Open', $items->get('note-open')['line_summary_label']);
+        $this->assertSame([
+            'open' => 1,
+            'close' => 0,
+            'refund' => 0,
+        ], $items->get('note-open')['line_summary_counts']);
         $this->assertStringContainsString('/admin/notes/note-open', (string) $items->get('note-open')['action_url']);
 
-        $this->assertSame('Lunas', $items->get('note-closed')['payment_status_label']);
-        $this->assertSame('Admin Ketat', $items->get('note-closed')['editability_label']);
-        $this->assertSame('Open: 0 • Selesai: 1 • Batal: 0', $items->get('note-closed')['work_status_label']);
         $this->assertSame('1 Close', $items->get('note-closed')['line_summary_label']);
+        $this->assertSame([
+            'open' => 0,
+            'close' => 1,
+            'refund' => 0,
+        ], $items->get('note-closed')['line_summary_counts']);
         $this->assertStringContainsString('/admin/notes/note-closed', (string) $items->get('note-closed')['action_url']);
     }
 
-    public function test_authorized_admin_can_filter_note_history_by_editability(): void
+    public function test_authorized_admin_can_filter_note_history_by_line_status(): void
     {
         $this->loginAsAuthorizedAdmin();
         $today = now()->toDateString();
@@ -58,14 +62,14 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         $response = $this->getJson(route('admin.notes.table', [
             'date_from' => $today,
             'date_to' => $today,
-            'editability' => 'admin_strict',
+            'line_status' => 'close',
         ]));
 
         $response->assertOk();
         $response->assertJsonPath('success', true);
         $response->assertJsonPath('data.pagination.total', 1);
         $response->assertJsonPath('data.items.0.note_id', 'note-closed');
-        $response->assertJsonPath('data.items.0.editability_label', 'Admin Ketat');
+        $response->assertJsonPath('data.items.0.line_summary_label', '1 Close');
     }
 
     private function seedOpenUnpaidNote(string $noteId, string $date, string $customerName, string $phone): void
