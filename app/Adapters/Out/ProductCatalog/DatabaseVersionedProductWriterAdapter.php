@@ -6,6 +6,7 @@ namespace App\Adapters\Out\ProductCatalog;
 
 use App\Adapters\Out\ProductCatalog\Concerns\PersistsVersionedProductWrites;
 use App\Adapters\Out\ProductCatalog\Concerns\ProductVersionRevisionLookup;
+use App\Adapters\Out\ProductCatalog\Concerns\ProductLifecycleSnapshots;
 use App\Adapters\Out\ProductCatalog\Concerns\ProductWritePayloads;
 use App\Adapters\Out\ProductCatalog\Concerns\RecordsProductHistory;
 use App\Adapters\Out\ProductCatalog\Concerns\RestoresProducts;
@@ -21,6 +22,7 @@ final class DatabaseVersionedProductWriterAdapter implements ProductWriterPort, 
 {
     use PersistsVersionedProductWrites;
     use ProductVersionRevisionLookup;
+    use ProductLifecycleSnapshots;
     use ProductWritePayloads;
     use RecordsProductHistory;
     use SoftDeletesProducts;
