@@ -21,7 +21,7 @@
                     <div class="card-header">
                         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                             <div>
-                                <h4 class="card-title mb-1">Header Nota</h4>
+                                <h4 class="card-title mb-1">Identitas Nota Admin</h4>
                                 <p class="mb-0 text-muted">
                                     Ringkasan identitas nota dan komposisi line untuk pembacaan admin.
                                 </p>
@@ -175,7 +175,7 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <div class="fw-bold mb-1">Status Operasional Admin</div>
+                        <div class="fw-bold mb-1">Status Operasional</div>
 
                         @if ($note['note_state'] === 'closed')
                             <div class="text-muted small mb-3">
@@ -198,7 +198,7 @@
 
                                 <div class="d-grid d-sm-flex">
                                     <button type="submit" class="btn btn-warning">
-                                        Buka Ulang Nota
+                                        Buka Ulang Note
                                     </button>
                                 </div>
                             </form>
