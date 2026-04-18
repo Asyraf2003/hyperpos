@@ -11,6 +11,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPa
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReceiveSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ReviseSupplierInvoicePageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProofAttachmentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\SupplierLookupController;
@@ -52,6 +53,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}/edit', EditSupplierInvoicePageController::class)
         ->name('admin.procurement.supplier-invoices.edit');
+
+    Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}/revise', ReviseSupplierInvoicePageController::class)
+        ->name('admin.procurement.supplier-invoices.revise');
 
     Route::put('/admin/procurement/supplier-invoices/{supplierInvoiceId}', UpdateSupplierInvoiceController::class)
         ->name('admin.procurement.supplier-invoices.update');

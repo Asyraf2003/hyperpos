@@ -390,7 +390,7 @@
             lookupEndpoint: @json(route('admin.procurement.products.lookup')),
             createProductUrl: @json(
                 route('admin.products.create')
-                    . '?return_to=' . urlencode(route('admin.procurement.supplier-invoices.edit', ['supplierInvoiceId' => $summary['supplier_invoice_id']]))
+                    . '?return_to=' . urlencode(route($returnRouteName, ['supplierInvoiceId' => $summary['supplier_invoice_id']]))
                     . '&return_label=' . urlencode('Kembali ke Edit Nota Supplier')
             )
         };

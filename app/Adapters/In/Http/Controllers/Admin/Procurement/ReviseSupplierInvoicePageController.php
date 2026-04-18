@@ -10,7 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
-final class EditSupplierInvoicePageController extends Controller
+final class ReviseSupplierInvoicePageController extends Controller
 {
     public function __construct(
         private readonly GetProcurementInvoiceDetailHandler $details,
@@ -38,12 +38,6 @@ final class EditSupplierInvoicePageController extends Controller
         $summary = is_array($payload['summary'] ?? null) ? $payload['summary'] : [];
         $lines = is_array($payload['lines'] ?? null) ? $payload['lines'] : [];
 
-        if ((string) ($summary['policy_state'] ?? 'editable') === 'locked') {
-            return redirect()
-                ->route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $supplierInvoiceId])
-                ->with('error', 'Nota supplier ini sudah terkunci. Gunakan correction / reversal.');
-        }
-
         return view('admin.procurement.supplier_invoices.edit', [
             'summary' => $summary,
             'lines' => $lines,
@@ -55,7 +49,7 @@ final class EditSupplierInvoicePageController extends Controller
                 'tanggal_pengiriman' => old('tanggal_pengiriman', (string) ($summary['shipment_date'] ?? '')),
             ],
             'lineItemsView' => $this->lineItems->build($lines),
-            'returnRouteName' => 'admin.procurement.supplier-invoices.edit',
+            'returnRouteName' => 'admin.procurement.supplier-invoices.revise',
         ]);
     }
 }
