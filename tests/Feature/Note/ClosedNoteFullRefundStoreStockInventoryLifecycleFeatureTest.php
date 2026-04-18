@@ -89,25 +89,31 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         $today = date('Y-m-d');
 
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'closed');
-        $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, WorkItem::STATUS_OPEN, 50000);
-        $this->seedServiceDetailBase('wi-1', 'Servis + Part', 20000, ServiceDetail::PART_SOURCE_STORE_STOCK);
-
-        DB::table('store_stock_lines')->insert([
-            'id' => 'ssl-1',
-            'work_item_id' => 'wi-1',
-            'product_id' => 'product-1',
-            'qty' => 2,
-            'unit_price_rupiah' => 15000,
-            'line_total_rupiah' => 30000,
-        ]);
+        $this->seedWorkItemBase(
+            'wi-1',
+            'note-1',
+            1,
+            WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART,
+            WorkItem::STATUS_OPEN,
+            50000
+        );
+        $this->seedServiceDetailBase('wi-1', 'Servis + Part', 20000, ServiceDetail::PART_SOURCE_NONE);
 
         DB::table('products')->insert([
             'id' => 'product-1',
             'kode_barang' => 'PRD-1',
             'nama_barang' => 'Produk A',
             'merek' => 'Merek A',
-            'ukuran' => 'Std',
+            'ukuran' => null,
             'harga_jual' => 25000,
+        ]);
+
+        DB::table('work_item_store_stock_lines')->insert([
+            'id' => 'ssl-1',
+            'work_item_id' => 'wi-1',
+            'product_id' => 'product-1',
+            'qty' => 2,
+            'line_total_rupiah' => 30000,
         ]);
 
         DB::table('product_inventory')->insert([
