@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\ProductCatalog\UseCases;
 
+use App\Application\ProductCatalog\UseCases\Concerns\HandlesProductWriteExceptions;
 use App\Application\ProductCatalog\UseCases\Concerns\NormalizesProductMasterInput;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
@@ -11,9 +12,11 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
+use Illuminate\Database\QueryException;
 
 final class UpdateProductHandler
 {
+    use HandlesProductWriteExceptions;
     use NormalizesProductMasterInput;
 
     public function __construct(
@@ -76,7 +79,17 @@ final class UpdateProductHandler
             );
         }
 
-        $this->writer->update($product);
+        try {
+            $this->writer->update($product);
+        } catch (QueryException $e) {
+            $failure = $this->toProductWriteFailure($e);
+
+            if ($failure !== null) {
+                return $failure;
+            }
+
+            throw $e;
+        }
 
         return Result::success(
             [

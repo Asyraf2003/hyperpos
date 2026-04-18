@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\ProductCatalog\UseCases;
 
+use App\Application\ProductCatalog\UseCases\Concerns\HandlesProductWriteExceptions;
+use App\Application\ProductCatalog\UseCases\Concerns\NormalizesProductMasterInput;
 use App\Application\Shared\DTO\Result;
 use App\Core\ProductCatalog\Product\Product;
 use App\Core\Shared\Exceptions\DomainException;
@@ -11,9 +13,13 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
 use App\Ports\Out\UuidPort;
+use Illuminate\Database\QueryException;
 
 final class CreateProductHandler
 {
+    use HandlesProductWriteExceptions;
+    use NormalizesProductMasterInput;
+
     public function __construct(
         private readonly ProductWriterPort $products,
         private readonly ProductDuplicateCheckerPort $duplicates,
@@ -64,7 +70,17 @@ final class CreateProductHandler
             );
         }
 
-        $this->products->create($product);
+        try {
+            $this->products->create($product);
+        } catch (QueryException $e) {
+            $failure = $this->toProductWriteFailure($e);
+
+            if ($failure !== null) {
+                return $failure;
+            }
+
+            throw $e;
+        }
 
         return Result::success(
             [
@@ -79,16 +95,5 @@ final class CreateProductHandler
             ],
             'Product master berhasil dibuat.'
         );
-    }
-
-    private function normalizeKodeBarang(?string $kodeBarang): ?string
-    {
-        if ($kodeBarang === null) {
-            return null;
-        }
-
-        $normalized = trim($kodeBarang);
-
-        return $normalized === '' ? null : $normalized;
     }
 }

@@ -48,6 +48,14 @@ final class UpdateProductController extends Controller
                     ->with('error', $result->message() ?? 'Product tidak ditemukan.');
             }
 
+            if (($result->errors()['product'] ?? []) === ['PRODUCT_CODE_ALREADY_EXISTS']) {
+                return back()
+                    ->withErrors([
+                        'kode_barang' => $result->message() ?? 'Kode barang sudah dipakai product lain.',
+                    ])
+                    ->withInput();
+            }
+
             return back()
                 ->withErrors([
                     'product' => $result->message() ?? 'Product master gagal diperbarui.',

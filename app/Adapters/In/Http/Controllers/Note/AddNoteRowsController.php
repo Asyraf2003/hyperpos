@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\AddNoteRowsRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -14,6 +15,7 @@ final class AddNoteRowsController extends Controller
         string $noteId,
         AddNoteRowsRequest $request,
         CreateNoteRowsAction $action,
+        NoteRouteAreaResolver $routes,
     ): RedirectResponse {
         $result = $action->handle($noteId, $request->validated()['rows'] ?? []);
 
@@ -22,7 +24,7 @@ final class AddNoteRowsController extends Controller
         }
 
         return redirect()
-            ->route('cashier.notes.show', ['noteId' => $noteId])
+            ->route($routes->showRoute($request), ['noteId' => $noteId])
             ->with('success', 'Baris nota berhasil ditambahkan.');
     }
 }

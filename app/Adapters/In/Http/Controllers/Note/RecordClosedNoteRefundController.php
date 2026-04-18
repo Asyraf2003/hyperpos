@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\RecordClosedNoteRefundRequest;
 use App\Application\Note\Services\SelectedNoteRowsRefundAmountResolver;
 use App\Application\Payment\UseCases\RecordCustomerRefundHandler;
@@ -19,6 +20,7 @@ final class RecordClosedNoteRefundController extends Controller
         NoteReaderPort $notes,
         SelectedNoteRowsRefundAmountResolver $selectedRowsResolver,
         RecordCustomerRefundHandler $handler,
+        NoteRouteAreaResolver $routes,
     ): RedirectResponse {
         $note = $notes->getById(trim($noteId));
 
@@ -61,7 +63,7 @@ final class RecordClosedNoteRefundController extends Controller
         }
 
         return redirect()
-            ->route('cashier.notes.index')
+            ->route($routes->indexRoute($request))
             ->with('success', $result->message() ?? 'Refund berhasil dicatat.');
     }
 }

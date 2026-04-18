@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\UpdateTransactionWorkspaceRequest;
 use App\Application\Note\UseCases\UpdateTransactionWorkspaceHandler;
 use App\Ports\Out\Note\TransactionWorkspaceDraftDeleterPort;
@@ -17,6 +18,7 @@ final class UpdateTransactionWorkspaceController extends Controller
         UpdateTransactionWorkspaceRequest $request,
         UpdateTransactionWorkspaceHandler $handler,
         TransactionWorkspaceDraftDeleterPort $drafts,
+        NoteRouteAreaResolver $routes,
     ): RedirectResponse {
         $result = $handler->handle($noteId, $request->validated());
 
@@ -35,7 +37,7 @@ final class UpdateTransactionWorkspaceController extends Controller
         }
 
         return redirect()
-            ->route('cashier.notes.show', ['noteId' => $noteId])
+            ->route($routes->showRoute($request), ['noteId' => $noteId])
             ->with('success', $result->message() ?? 'Perubahan workspace nota berhasil disimpan.');
     }
 }

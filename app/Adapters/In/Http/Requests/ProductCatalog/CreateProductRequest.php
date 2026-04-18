@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Requests\ProductCatalog;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 final class CreateProductRequest extends FormRequest
 {
@@ -13,13 +14,25 @@ final class CreateProductRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'kode_barang' => $this->normalizeNullableString($this->input('kode_barang')),
+        ]);
+    }
+
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
-            'kode_barang' => ['nullable', 'string'],
+            'kode_barang' => [
+                'nullable',
+                'string',
+                Rule::unique('products', 'kode_barang')
+                    ->where(fn ($query) => $query->whereNull('deleted_at')),
+            ],
             'nama_barang' => ['required', 'string'],
             'merek' => ['required', 'string'],
             'ukuran' => ['nullable', 'integer'],
@@ -27,5 +40,26 @@ final class CreateProductRequest extends FormRequest
             'reorder_point_qty' => ['nullable', 'integer', 'min:0'],
             'critical_threshold_qty' => ['nullable', 'integer', 'min:0'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'kode_barang.unique' => 'Kode barang sudah dipakai product lain.',
+        ];
+    }
+
+    private function normalizeNullableString(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalized = trim($value);
+
+        return $normalized === '' ? null : $normalized;
     }
 }

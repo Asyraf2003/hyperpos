@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
 use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
@@ -17,6 +18,7 @@ final class RecordNotePaymentController extends Controller
         RecordNotePaymentRequest $request,
         SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
         RecordAndAllocateNotePaymentHandler $flow,
+        NoteRouteAreaResolver $routes,
     ): RedirectResponse {
         $data = $request->validated();
 
@@ -52,7 +54,7 @@ final class RecordNotePaymentController extends Controller
         }
 
         return redirect()
-            ->route('cashier.notes.show', ['noteId' => $noteId])
+            ->route($routes->showRoute($request), ['noteId' => $noteId])
             ->with('success', $this->successMessage($data, $amount));
     }
 
