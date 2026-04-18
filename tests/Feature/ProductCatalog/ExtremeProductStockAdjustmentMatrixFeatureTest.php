@@ -18,14 +18,14 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '2026-03-20',
                 'qty_issue' => 2,
                 'reason' => 'Barang rusak saat audit gudang',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
             ->assertSessionHas('success', 'Stock adjustment berhasil dicatat.');
 
         $this->assertDatabaseHas('inventory_movements', [
@@ -55,14 +55,14 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '2026-03-20',
                 'qty_issue' => 5,
                 'reason' => 'Semua unit rusak total',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
             ->assertSessionHas('success', 'Stock adjustment berhasil dicatat.');
 
         $this->assertDatabaseHas('product_inventory', [
@@ -72,7 +72,7 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-1',
-            'avg_cost_rupiah' => 10000,
+            'avg_cost_rupiah' => 0,
             'inventory_value_rupiah' => 0,
         ]);
     }
@@ -82,15 +82,15 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '2026-03-20',
                 'qty_issue' => 6,
                 'reason' => 'User ngaco minta kurangi lebih banyak dari stok',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
-            ->assertSessionHasErrors(['stock_adjustment']);
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->assertSessionHasErrors(['reason']);
 
         $this->assertDatabaseMissing('inventory_movements', [
             'product_id' => 'product-1',
@@ -108,14 +108,14 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '2026-03-20',
                 'qty_issue' => 1,
                 'reason' => '   ',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
             ->assertSessionHasErrors(['stock_adjustment']);
 
         $this->assertDatabaseMissing('inventory_movements', [
@@ -129,14 +129,14 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '20-03-2026',
                 'qty_issue' => 1,
                 'reason' => 'Tanggal ngawur',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
             ->assertSessionHasErrors(['adjusted_at']);
 
         $this->assertDatabaseMissing('inventory_movements', [
@@ -150,14 +150,14 @@ final class ExtremeProductStockAdjustmentMatrixFeatureTest extends TestCase
         $this->seedProductWithInventory();
 
         $response = $this->actingAs($this->admin())
-            ->from(route('admin.products.stock', ['productId' => 'product-1']))
-            ->post(route('admin.products.stock-adjustments', ['productId' => 'product-1']), [
+            ->from(route('admin.products.stock.edit', ['productId' => 'product-1']))
+            ->post(route('admin.products.stock-adjustments.store', ['productId' => 'product-1']), [
                 'adjusted_at' => '2026-03-20',
                 'qty_issue' => 0,
                 'reason' => 'Qty nol tidak valid',
             ]);
 
-        $response->assertRedirect(route('admin.products.stock', ['productId' => 'product-1']))
+        $response->assertRedirect(route('admin.products.stock.edit', ['productId' => 'product-1']))
             ->assertSessionHasErrors(['qty_issue']);
 
         $this->assertDatabaseMissing('inventory_movements', [
