@@ -23,6 +23,7 @@ final class UpdateSupplierInvoiceHandler
         private readonly SupplierInvoiceEditabilityGuard $guard,
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierInvoiceChangeContext $changeContext,
+        private readonly GetProcurementInvoiceDetailHandler $details,
     ) {
     }
 
@@ -71,6 +72,18 @@ final class UpdateSupplierInvoiceHandler
                 $lines,
             );
 
+            $totalPaidRupiah = $this->resolveTotalPaidRupiah($supplierInvoiceId);
+
+            if ($updated->grandTotalRupiah()->amount() < $totalPaidRupiah) {
+                $this->transactions->rollBack();
+                $started = false;
+
+                return Result::failure(
+                    'Total revisi tidak boleh lebih kecil dari total pembayaran yang sudah tercatat.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_REVISED_TOTAL_BELOW_TOTAL_PAID']]
+                );
+            }
+
             $this->writer->update($updated);
             $this->transactions->commit();
 
@@ -96,5 +109,19 @@ final class UpdateSupplierInvoiceHandler
         } finally {
             $this->changeContext->clear();
         }
+    }
+
+    private function resolveTotalPaidRupiah(string $supplierInvoiceId): int
+    {
+        $detail = $this->details->handle($supplierInvoiceId);
+        $payload = $detail->data();
+
+        if (! is_array($payload)) {
+            return 0;
+        }
+
+        $summary = is_array($payload['summary'] ?? null) ? $payload['summary'] : [];
+
+        return (int) ($summary['total_paid_rupiah'] ?? 0);
     }
 }
