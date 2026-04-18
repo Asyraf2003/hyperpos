@@ -66,6 +66,63 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         ]);
     }
 
+
+    public function test_partial_refund_that_touches_store_stock_component_does_not_reverse_inventory_yet(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedClosedPaidStoreStockNote();
+
+        $this->actingAs($user)
+            ->from(route('cashier.notes.index'))
+            ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'customer_payment_id' => 'payment-1',
+                'amount_rupiah' => 30000,
+                'refunded_at' => date('Y-m-d'),
+                'reason' => 'Refund sebagian, service fee penuh dan part sebagian',
+            ])
+            ->assertRedirect(route('cashier.notes.index'))
+            ->assertSessionHas('success');
+
+        $refundId = (string) DB::table('customer_refunds')->value('id');
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-1',
+            'refunded_amount_rupiah' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'component_type' => 'service_store_stock_part',
+            'component_ref_id' => 'ssl-1',
+            'refunded_amount_rupiah' => 10000,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'note_state' => 'closed',
+        ]);
+
+        $this->assertDatabaseMissing('inventory_movements', [
+            'product_id' => 'product-1',
+            'movement_type' => 'stock_in',
+            'source_type' => 'work_item_store_stock_line_reversal',
+            'source_id' => 'ssl-1',
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-1',
+            'qty_on_hand' => 3,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 15000,
+            'inventory_value_rupiah' => 45000,
+        ]);
+    }
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();

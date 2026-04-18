@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\UseCases;
 
+use App\Application\Inventory\Services\AutoReverseRefundedStoreStockInventory;
 use App\Application\Note\Services\AutoRefundNoteWhenFullyRefunded;
 use App\Application\Payment\Services\RecordCustomerRefundOperation;
 use App\Application\Shared\DTO\Result;
@@ -21,6 +22,7 @@ final class RecordCustomerRefundHandler
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
         private readonly AutoRefundNoteWhenFullyRefunded $refundLifecycle,
+        private readonly AutoReverseRefundedStoreStockInventory $reverseRefundedInventory,
     ) {
     }
 
@@ -58,6 +60,8 @@ final class RecordCustomerRefundHandler
             );
 
             $refund = $recorded->refund();
+
+            $this->reverseRefundedInventory->execute($refund);
 
             $this->refundLifecycle->refundIfEligible(
                 $noteId,
