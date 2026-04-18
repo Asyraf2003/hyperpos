@@ -42,4 +42,5 @@ trait NoteState
     public function reopenedByActorId(): ?string { return $this->reopenedByActorId; }
     public function isOpen(): bool { return $this->noteState === Note::STATE_OPEN; }
     public function isClosed(): bool { return $this->noteState === Note::STATE_CLOSED; }
+    public function isRefunded(): bool { return $this->noteState === Note::STATE_REFUNDED; }
 }

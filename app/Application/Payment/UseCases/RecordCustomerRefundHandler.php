@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\UseCases;
 
+use App\Application\Note\Services\AutoRefundNoteWhenFullyRefunded;
 use App\Application\Payment\Services\RecordCustomerRefundOperation;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
@@ -19,12 +20,11 @@ final class RecordCustomerRefundHandler
         private readonly RecordCustomerRefundOperation $operation,
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
+        private readonly AutoRefundNoteWhenFullyRefunded $refundLifecycle,
     ) {
     }
 
-    /**
-     * @param list<string> $selectedRowIds
-     */
+    /** @param list<string> $selectedRowIds */
     public function handle(
         string $customerPaymentId,
         string $noteId,
@@ -59,21 +59,24 @@ final class RecordCustomerRefundHandler
 
             $refund = $recorded->refund();
 
+            $this->refundLifecycle->refundIfEligible(
+                $noteId,
+                $performedByActorId,
+                'kasir',
+                $reason,
+                $customerPaymentId,
+                $refund->id(),
+            );
+
             $this->audit->record('customer_refund_recorded', array_merge(
                 $this->formatAuditPayload($refund, $performedByActorId),
-                [
-                    'refund_allocation_count' => $recorded->allocationCount(),
-                    'selected_row_ids' => $selectedRowIds,
-                ],
+                ['refund_allocation_count' => $recorded->allocationCount(), 'selected_row_ids' => $selectedRowIds],
             ));
 
             $this->transactions->commit();
 
             return Result::success(
-                array_merge(
-                    $this->formatSuccessPayload($refund),
-                    ['refund_allocation_count' => $recorded->allocationCount()],
-                ),
+                array_merge($this->formatSuccessPayload($refund), ['refund_allocation_count' => $recorded->allocationCount()]),
                 'Customer refund berhasil dicatat.'
             );
         } catch (DomainException $e) {

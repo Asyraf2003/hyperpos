@@ -13,6 +13,7 @@ final class Note
 {
     public const STATE_OPEN = 'open';
     public const STATE_CLOSED = 'closed';
+    public const STATE_REFUNDED = 'refunded';
 
     use NoteState;
     use NoteValidation;

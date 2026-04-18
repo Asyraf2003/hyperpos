@@ -26,6 +26,33 @@ trait NoteOperationalStateMutations
         $this->closedByActorId = $actor;
     }
 
+    public function refund(string $actorId, DateTimeImmutable $occurredAt): void
+    {
+        $actor = trim($actorId);
+
+        if ($actor === '') {
+            throw new DomainException('Actor refund note wajib ada.');
+        }
+
+        if ($this->noteState === Note::STATE_REFUNDED) {
+            return;
+        }
+
+        if ($this->noteState !== Note::STATE_CLOSED) {
+            throw new DomainException('Hanya note closed yang boleh di-refund.');
+        }
+
+        $this->noteState = Note::STATE_REFUNDED;
+
+        if ($this->closedAt === null) {
+            $this->closedAt = $occurredAt;
+        }
+
+        if ($this->closedByActorId === null) {
+            $this->closedByActorId = $actor;
+        }
+    }
+
     public function reopen(string $actorId, DateTimeImmutable $occurredAt): void
     {
         $actor = trim($actorId);

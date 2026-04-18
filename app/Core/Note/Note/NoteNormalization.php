@@ -10,7 +10,7 @@ trait NoteNormalization
 {
     private static function assertValidOperationalState(string $noteState): void
     {
-        if (!in_array(trim($noteState), [Note::STATE_OPEN, Note::STATE_CLOSED], true)) {
+        if (!in_array(trim($noteState), [Note::STATE_OPEN, Note::STATE_CLOSED, Note::STATE_REFUNDED], true)) {
             throw new DomainException('State operasional note tidak valid.');
         }
     }
