@@ -187,7 +187,7 @@ final class UpdateSupplierInvoiceHandler
             $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', trim($latestReceiptDate));
 
             if ($parsed !== false) {
-                return $parsed;
+                return $parsed->modify('+1 day');
             }
         }
 
