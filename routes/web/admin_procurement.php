@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceDetailP
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ReceiveSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProofAttachmentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\SupplierLookupController;
@@ -25,6 +26,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::get('/admin/procurement/suppliers/lookup', SupplierLookupController::class)
         ->name('admin.procurement.suppliers.lookup');
+
+    Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/receive', ReceiveSupplierInvoiceController::class)
+        ->name('admin.procurement.supplier-invoices.receive');
 
     Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/payments', RecordSupplierPaymentController::class)
         ->name('admin.procurement.supplier-invoices.payments.store');
