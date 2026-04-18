@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Admin\Product\ProductIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ProductTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Product\RecordProductStockAdjustmentController;
 use App\Adapters\In\Http\Controllers\Admin\Product\RestoreProductController;
+use App\Adapters\In\Http\Controllers\Admin\Product\ReverseProductStockAdjustmentController;
 use App\Adapters\In\Http\Controllers\Admin\Product\ShowProductPageController;
 use App\Adapters\In\Http\Controllers\Admin\Product\StoreProductController;
 use App\Adapters\In\Http\Controllers\Admin\Product\UpdateProductController as WebUpdateProductController;
@@ -21,6 +22,10 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/products/{productId}/stock-adjustments', RecordProductStockAdjustmentController::class)
         ->name('admin.products.stock-adjustments.store');
+
+    Route::patch('/admin/products/{productId}/stock-adjustments/{adjustmentId}/reverse', ReverseProductStockAdjustmentController::class)
+        ->name('admin.products.stock-adjustments.reverse');
+
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
