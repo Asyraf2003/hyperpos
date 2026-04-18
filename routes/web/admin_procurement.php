@@ -11,6 +11,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPa
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReceiveSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ReverseSupplierReceiptController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReviseSupplierInvoicePageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ServeSupplierPaymentProofAttachmentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\StoreSupplierInvoiceController;
@@ -34,6 +35,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/payments', RecordSupplierPaymentController::class)
         ->name('admin.procurement.supplier-invoices.payments.store');
+
+    Route::post('/admin/procurement/supplier-receipts/{supplierReceiptId}/reverse', ReverseSupplierReceiptController::class)
+        ->name('admin.procurement.supplier-receipts.reverse.store');
 
     Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/void', VoidSupplierInvoiceController::class)
         ->name('admin.procurement.supplier-invoices.void');
