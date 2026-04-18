@@ -48,10 +48,8 @@ final class ReverseSupplierReceiptFeatureTest extends TestCase
             'qty_on_hand' => 0,
         ]);
 
-        $this->assertDatabaseHas('product_inventory_costing', [
+        $this->assertDatabaseMissing('product_inventory_costing', [
             'product_id' => 'product-1',
-            'avg_cost_rupiah' => 0,
-            'inventory_value_rupiah' => 0,
         ]);
     }
 
