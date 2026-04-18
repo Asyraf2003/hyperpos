@@ -252,7 +252,7 @@
 
                         <div class="card-body">
                             <div class="alert alert-success mb-0">
-                                Penerimaan barang sudah tercatat. Form terima barang disembunyikan untuk mencegah double receive.
+                                Penerimaan barang sudah tercatat.
                             </div>
                         </div>
                     </div>

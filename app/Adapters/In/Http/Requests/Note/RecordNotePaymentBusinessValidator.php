@@ -13,6 +13,14 @@ final class RecordNotePaymentBusinessValidator
      */
     public static function validate(array $payload, Validator $validator): void
     {
+        if (array_key_exists('selected_row_ids', $payload)) {
+            $selectedRowIds = $payload['selected_row_ids'];
+
+            if (! is_array($selectedRowIds) || $selectedRowIds === []) {
+                $validator->errors()->add('selected_row_ids', 'Minimal satu line open harus dipilih.');
+            }
+        }
+
         if (($payload['payment_method'] ?? null) === 'cash' && ($payload['amount_received'] ?? null) === null) {
             $validator->errors()->add('amount_received', 'Uang masuk wajib diisi untuk pembayaran cash.');
         }
