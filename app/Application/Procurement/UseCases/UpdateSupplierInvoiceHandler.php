@@ -6,6 +6,7 @@ namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
 use App\Application\Procurement\Services\UpdateSupplierInvoiceOperation;
+use App\Application\Procurement\Services\VoidedSupplierInvoiceGuard;
 use App\Application\Procurement\Services\UpdateSupplierInvoiceTransactionalRunner;
 use App\Application\Shared\DTO\Result;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
@@ -17,6 +18,7 @@ final class UpdateSupplierInvoiceHandler
         private readonly SupplierInvoiceEditabilityGuard $guard,
         private readonly UpdateSupplierInvoiceTransactionalRunner $transactionalRunner,
         private readonly UpdateSupplierInvoiceOperation $operation,
+        private readonly VoidedSupplierInvoiceGuard $voidedGuard,
     ) {
     }
 
@@ -39,6 +41,12 @@ final class UpdateSupplierInvoiceHandler
                 'Nota supplier tidak ditemukan.',
                 ['supplier_invoice' => ['SUPPLIER_INVOICE_NOT_FOUND']]
             );
+        }
+
+        $voided = $this->voidedGuard->ensureNotVoided($supplierInvoiceId);
+
+        if ($voided->isFailure()) {
+            return $voided;
         }
 
         $isRevisionMode = $expectedRevisionNo !== null && $changeReason !== null && trim($changeReason) !== '';

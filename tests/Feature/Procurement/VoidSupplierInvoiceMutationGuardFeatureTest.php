@@ -20,6 +20,8 @@ final class VoidSupplierInvoiceMutationGuardFeatureTest extends TestCase
         $response = $this->actingAs($this->admin())
             ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
             ->put(route('admin.procurement.supplier-invoices.update', ['supplierInvoiceId' => 'invoice-1']), [
+                'expected_revision_no' => 1,
+                'change_reason' => 'Coba revise invoice voided.',
                 'nomor_faktur' => 'INV-SUP-001-EDIT',
                 'nama_pt_pengirim' => 'PT Supplier Test',
                 'tanggal_pengiriman' => '2026-03-15',
@@ -33,7 +35,7 @@ final class VoidSupplierInvoiceMutationGuardFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
-            ->assertSessionHas('error');
+            ->assertSessionHasErrors(['supplier_invoice']);
     }
 
     public function test_admin_cannot_receive_voided_supplier_invoice(): void
@@ -51,7 +53,7 @@ final class VoidSupplierInvoiceMutationGuardFeatureTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
-            ->assertSessionHasErrors(['supplier_invoice']);
+            ->assertSessionHasErrors(['supplier_receipt']);
     }
 
     public function test_admin_cannot_record_payment_for_voided_supplier_invoice(): void
