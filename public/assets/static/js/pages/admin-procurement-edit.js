@@ -147,6 +147,113 @@
     return !hasSelectedProduct && !hasMeaningfulQty && !hasMeaningfulTotal;
   };
 
+  const ensureProductDuplicateFeedback = (item) => {
+    let feedback = item.querySelector("[data-product-duplicate-feedback]");
+
+    if (feedback) {
+      return feedback;
+    }
+
+    feedback = document.createElement("div");
+    feedback.className = "invalid-feedback d-block";
+    feedback.setAttribute("data-product-duplicate-feedback", "1");
+
+    const resultsBox = item.querySelector("[data-product-results]");
+    if (resultsBox) {
+      resultsBox.insertAdjacentElement("afterend", feedback);
+      return feedback;
+    }
+
+    const searchInput = item.querySelector("[data-product-search]");
+    if (searchInput) {
+      searchInput.insertAdjacentElement("afterend", feedback);
+      return feedback;
+    }
+
+    item.appendChild(feedback);
+    return feedback;
+  };
+
+  const clearProductDuplicateFeedback = (item, searchInput = null) => {
+    const field = searchInput || item.querySelector("[data-product-search]");
+    if (field) {
+      field.classList.remove("is-invalid");
+    }
+
+    const feedback = item.querySelector("[data-product-duplicate-feedback]");
+    if (feedback) {
+      feedback.remove();
+    }
+  };
+
+  const lineNoOfItem = (item, fallbackIndex = 0) => {
+    const value = String(item.querySelector("[data-line-no]")?.value ?? "").trim();
+    const parsed = Number.parseInt(value, 10);
+
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackIndex + 1;
+  };
+
+  const duplicateProductMessage = (firstLineNo, currentLineNo) =>
+    `Baris ${currentLineNo}: produk ini sudah dipakai di baris ${firstLineNo}. Satu produk hanya boleh satu kali per faktur.`;
+
+  const findDuplicateProductLineNo = (currentItem, productId) => {
+    const normalized = String(productId ?? "").trim();
+    if (normalized === "") {
+      return null;
+    }
+
+    const items = lineItems();
+
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index];
+      if (item === currentItem) {
+        continue;
+      }
+
+      const otherProductId = String(item.querySelector("[data-product-id]")?.value ?? "").trim();
+      if (otherProductId === normalized) {
+        return lineNoOfItem(item, index);
+      }
+    }
+
+    return null;
+  };
+
+  const validateDuplicateProductsBeforeSubmit = () => {
+    let isValid = true;
+    const seen = new Map();
+
+    lineItems().forEach((item) => {
+      clearProductDuplicateFeedback(item);
+    });
+
+    lineItems().forEach((item, index) => {
+      const productId = String(item.querySelector("[data-product-id]")?.value ?? "").trim();
+      if (productId === "") {
+        return;
+      }
+
+      const currentLineNo = lineNoOfItem(item, index);
+
+      if (seen.has(productId)) {
+        isValid = false;
+
+        const searchInput = item.querySelector("[data-product-search]");
+        if (searchInput) {
+          searchInput.classList.add("is-invalid");
+        }
+
+        const feedback = ensureProductDuplicateFeedback(item);
+        feedback.textContent = duplicateProductMessage(seen.get(productId), currentLineNo);
+        return;
+      }
+
+      seen.set(productId, currentLineNo);
+    });
+
+    return isValid;
+  };
+
   const pruneEmptyLinesBeforeSubmit = () => {
     const items = lineItems();
     const removable = items.filter((item) => isLineCompletelyEmpty(item));
@@ -191,6 +298,8 @@
 
     if (productSearchInput) {
       productSearchInput.value = String(line.product_label ?? line.selected_label ?? "");
+      productSearchInput.dataset.selectedProductId = String(line.product_id ?? "");
+      productSearchInput.dataset.selectedLabel = productSearchInput.value;
     }
 
     if (qtyInput) {
@@ -544,8 +653,32 @@
     };
 
     const selectProduct = (row) => {
+      const productId = String(row.id ?? "").trim();
+      const currentLineNo = lineNoOfItem(item);
+      const duplicateLineNo = findDuplicateProductLineNo(item, productId);
+      const previousSelectedProductId = String(searchInput.dataset.selectedProductId ?? "").trim();
+      const previousSelectedLabel = String(searchInput.dataset.selectedLabel ?? "").trim();
+
+      if (duplicateLineNo !== null) {
+        hideResults();
+        searchInput.classList.add("is-invalid");
+
+        const feedback = ensureProductDuplicateFeedback(item);
+        feedback.textContent = duplicateProductMessage(duplicateLineNo, currentLineNo);
+
+        hiddenInput.value = previousSelectedProductId;
+        searchInput.value = previousSelectedLabel;
+
+        scheduleDraftSave();
+        focusField(searchInput, false);
+        return;
+      }
+
+      clearProductDuplicateFeedback(item, searchInput);
       hiddenInput.value = row.id || "";
       searchInput.value = row.label || "";
+      searchInput.dataset.selectedProductId = hiddenInput.value;
+      searchInput.dataset.selectedLabel = searchInput.value;
       hideResults();
       scheduleDraftSave();
       focusField(qtyInput);
@@ -623,6 +756,7 @@
     };
 
     searchInput.addEventListener("input", () => {
+      clearProductDuplicateFeedback(item, searchInput);
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(fetchResults, 250);
     });
@@ -788,8 +922,25 @@
   form.addEventListener("input", scheduleDraftSave);
   form.addEventListener("change", scheduleDraftSave);
 
-  form.addEventListener("submit", () => {
+  form.addEventListener("submit", (event) => {
     pruneEmptyLinesBeforeSubmit();
+
+    if (!validateDuplicateProductsBeforeSubmit()) {
+      event.preventDefault();
+      persistDraftNow();
+
+      const invalidItem = lineItems().find((item) =>
+        item.querySelector("[data-product-search].is-invalid")
+      );
+
+      if (invalidItem) {
+        setActiveLine(invalidItem);
+        focusField(invalidItem.querySelector("[data-product-search]"), false);
+      }
+
+      return;
+    }
+
     persistDraftNow();
   });
 
