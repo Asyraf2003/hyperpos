@@ -2,6 +2,7 @@
 
 @section('title', 'Edit Produk')
 @section('heading', 'Edit Produk')
+@section('back_url', route('admin.products.show', ['productId' => $product->id()]))
 
 @section('content')
     <section class="section">
@@ -11,14 +12,14 @@
                     <div class="card-header">
                         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                             <div>
-                                <h4 class="card-title mb-1">Edit Produk</h4>
+                                <h4 class="card-title mb-1">Form Edit Produk</h4>
                                 <p class="mb-0 text-muted">
-                                    Ubah data identitas produk.
+                                    Ubah identitas produk dengan pola form yang sama seperti halaman tambah produk.
                                 </p>
                             </div>
 
-                            <div class="d-flex flex-column flex-sm-row gap-2">
-                                <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-primary">
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ route('admin.products.stock.edit', ['productId' => $product->id()]) }}" class="btn btn-light-primary">
                                     Ubah Stok
                                 </a>
                             </div>
@@ -146,7 +147,9 @@
                                     <div class="border rounded p-3 bg-light-subtle mb-4">
                                         <div class="fw-semibold mb-1">Aturan Batas Stok</div>
                                         <small class="text-muted d-block">
-                                            Isi dua angka ini secara berpasangan. Reorder Point adalah batas saat stok mulai perlu dibeli lagi. Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok. Produk tanpa dua angka ini akan dianggap belum dikonfigurasi.
+                                            Isi dua angka ini secara berpasangan. Reorder Point adalah batas saat stok mulai perlu dibeli lagi.
+                                            Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok.
+                                            Produk tanpa dua angka ini akan dianggap belum dikonfigurasi.
                                         </small>
                                     </div>
                                 </div>
@@ -194,12 +197,12 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-start gap-2">
+                            <div class="ui-form-actions">
                                 <button type="submit" class="btn btn-primary">
                                     Simpan Perubahan
                                 </button>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-light-secondary">
-                                    Batal
+                                <a href="{{ route('admin.products.show', ['productId' => $product->id()]) }}" class="btn btn-light-secondary">
+                                    Kembali ke Detail
                                 </a>
                             </div>
                         </form>

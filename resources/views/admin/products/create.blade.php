@@ -1,34 +1,35 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Product')
-@section('heading', 'Tambah Product')
+@section('title', 'Tambah Produk')
+@section('heading', 'Tambah Produk')
+@section('back_url', route('admin.products.index'))
 
 @section('content')
     <section class="section">
-        <div class="row">
-            <div class="col-12 col-lg-6">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-8">
                 <div class="card">
                     <div class="card-header">
-                        <div class="d-flex flex-row justify-content-between align-items-center gap-2">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                             <div>
-                                <h4 class="card-title mb-1">Tambah Product</h4>
+                                <h4 class="card-title mb-1">Form Produk Baru</h4>
                                 <p class="mb-0 text-muted">
-                                    Isi data produk.
+                                    Isi identitas produk dan aturan batas stok dengan format yang rapi dan mudah dibaca.
                                 </p>
                             </div>
+
+                            @if (! empty($returnTo))
+                                <div class="alert alert-light-primary border mb-0 py-2 px-3">
+                                    <div class="fw-semibold mb-1">Mode kembali ke nota aktif</div>
+                                    <small class="text-muted d-block">
+                                        Setelah produk berhasil dibuat, Anda akan diarahkan kembali ke halaman nota supplier.
+                                    </small>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
                     <div class="card-body">
-                        @if (! empty($returnTo))
-                            <div class="alert alert-light-primary border">
-                                <div class="fw-semibold mb-1">Mode kembali ke nota aktif</div>
-                                <small class="text-muted d-block">
-                                    Setelah product berhasil dibuat, Anda akan diarahkan kembali ke halaman nota supplier agar bisa lanjut mencatat.
-                                </small>
-                            </div>
-                        @endif
-
                         <form action="{{ route('admin.products.store') }}" method="post" id="product-master-form" data-product-master-form="1">
                             @csrf
 
@@ -160,7 +161,9 @@
                                     <div class="border rounded p-3 bg-light-subtle mb-4">
                                         <div class="fw-semibold mb-1">Aturan Batas Stok</div>
                                         <small class="text-muted d-block">
-                                            Isi dua angka ini bila produk ingin dipantau stoknya. Reorder Point adalah batas saat stok mulai perlu dibeli lagi. Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok. Kosongkan keduanya bila belum ingin dipakai.
+                                            Isi dua angka ini bila produk ingin dipantau stoknya. Reorder Point adalah batas saat stok mulai perlu dibeli lagi.
+                                            Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok.
+                                            Kosongkan keduanya bila belum ingin dipakai.
                                         </small>
                                     </div>
                                 </div>
@@ -208,9 +211,9 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-start gap-2">
+                            <div class="ui-form-actions">
                                 <button type="submit" class="btn btn-primary">
-                                    Simpan Product
+                                    Simpan Produk
                                 </button>
 
                                 @if (! empty($returnTo))

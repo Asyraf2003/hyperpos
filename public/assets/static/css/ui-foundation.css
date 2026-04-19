@@ -1,0 +1,182 @@
+:root {
+    --ui-action-min-height: 46px;
+    --ui-control-min-height: 46px;
+    --ui-card-radius: 1rem;
+    --ui-control-radius: 0.875rem;
+    --ui-soft-radius: 0.875rem;
+}
+
+.page-content {
+    padding-top: 1.25rem;
+}
+
+.page-heading {
+    margin-bottom: 1.5rem;
+}
+
+.page-heading h3 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.card {
+    border-radius: var(--ui-card-radius);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.1rem 1.25rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-footer {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.card-title {
+    font-weight: 700;
+}
+
+.alert {
+    border-radius: var(--ui-soft-radius);
+}
+
+.badge {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+}
+
+.border.rounded,
+.rounded,
+.rounded-3 {
+    border-radius: var(--ui-soft-radius) !important;
+}
+
+.btn:not(.btn-sm):not(.btn-lg):not(.icon) {
+    min-height: var(--ui-action-min-height);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn.icon {
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    min-height: var(--ui-control-min-height);
+    border-radius: var(--ui-control-radius);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    border-radius: var(--ui-control-radius);
+}
+
+.invalid-feedback {
+    font-size: 0.875rem;
+}
+
+.table.table-lg th,
+.table.table-lg td {
+    vertical-align: middle;
+}
+
+.btn-link[data-sort-by] {
+    color: inherit;
+    font-weight: 600;
+}
+
+.modal-content {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.modal-body .btn.text-start,
+.modal-body a.btn.text-start {
+    white-space: normal;
+}
+
+.d-grid > .btn,
+.d-grid > a.btn {
+    width: 100%;
+}
+
+.ui-page-intro {
+    margin-bottom: 1.5rem;
+}
+
+.ui-page-intro-title {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.ui-page-intro-subtitle {
+    color: var(--bs-secondary-color);
+    margin-bottom: 0;
+}
+
+.ui-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.ui-card-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.ui-key-value > small {
+    display: block;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.25rem;
+}
+
+.ui-key-value > div,
+.ui-key-value > strong {
+    font-weight: 600;
+}
+
+@media (max-width: 575.98px) {
+    .page-heading {
+        align-items: stretch !important;
+    }
+
+    .page-heading .btn,
+    .page-heading a.btn,
+    .card-header .btn,
+    .card-header a.btn,
+    .ui-form-actions .btn,
+    .ui-form-actions a.btn {
+        width: 100%;
+    }
+
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
