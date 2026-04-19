@@ -3,6 +3,7 @@
 
 @section('title', 'Buat Nota Pemasok')
 @section('heading', 'Buat Nota Pemasok')
+@section('back_url', route('admin.procurement.supplier-invoices.index'))
 
 @section('content')
     <section class="section">
@@ -375,10 +376,14 @@
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
+                            <div class="ui-form-actions mt-4">
                                 <button type="submit" class="btn btn-primary">
                                     Simpan Nota Pemasok
                                 </button>
+
+                                <a href="{{ route('admin.procurement.supplier-invoices.index') }}" class="btn btn-light-secondary">
+                                    Kembali ke Daftar
+                                </a>
 
                                 <button
                                     type="button"

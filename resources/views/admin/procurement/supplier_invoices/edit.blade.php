@@ -1,8 +1,9 @@
 @extends('layouts.app')
 @include('layouts.partials.date-picker-assets')
 
-@section('title', 'Edit Nota Supplier')
-@section('heading', 'Edit Nota Supplier')
+@section('title', 'Edit Nota Pemasok')
+@section('heading', 'Edit Nota Pemasok')
+@section('back_url', route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $summary['supplier_invoice_id']]))
 
 @section('content')
     <section class="section">
@@ -354,7 +355,7 @@
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2 mt-4">
+                            <div class="ui-form-actions mt-4">
                                 <button type="submit" class="btn btn-primary">
                                     Simpan Perubahan Nota
                                 </button>
@@ -363,7 +364,7 @@
                                     href="{{ route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $summary['supplier_invoice_id']]) }}"
                                     class="btn btn-light-secondary"
                                 >
-                                    Batal
+                                    Kembali ke Detail
                                 </a>
 
                                 <button
@@ -391,7 +392,7 @@
             createProductUrl: @json(
                 route('admin.products.create')
                     . '?return_to=' . urlencode(route($returnRouteName, ['supplierInvoiceId' => $summary['supplier_invoice_id']]))
-                    . '&return_label=' . urlencode('Kembali ke Edit Nota Supplier')
+                    . '&return_label=' . urlencode('Kembali ke Edit Nota Pemasok')
             )
         };
     </script>
