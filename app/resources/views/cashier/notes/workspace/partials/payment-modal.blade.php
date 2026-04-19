@@ -1,0 +1,61 @@
+<div class="modal fade" id="workspace-payment-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" id="workspace-payment-modal-dialog">
+        <div class="modal-content">
+            <input
+                type="hidden"
+                id="inline_payment_decision_hidden"
+                name="inline_payment[decision]"
+                value="{{ $oldInlinePayment['decision'] ?? 'skip' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_method_hidden"
+                name="inline_payment[payment_method]"
+                value="{{ $oldInlinePayment['payment_method'] ?? '' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_paid_at_hidden"
+                name="inline_payment[paid_at]"
+                value="{{ $oldInlinePayment['paid_at'] ?? $oldNote['transaction_date'] }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_amount_paid_rupiah"
+                name="inline_payment[amount_paid_rupiah]"
+                value="{{ $oldInlinePayment['amount_paid_rupiah'] ?? '' }}"
+            >
+            <input
+                type="hidden"
+                id="inline_payment_amount_received_rupiah"
+                name="inline_payment[amount_received_rupiah]"
+                value="{{ $oldInlinePayment['amount_received_rupiah'] ?? '' }}"
+            >
+
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title mb-1" id="workspace-payment-modal-title">Proses Nota</h5>
+                    <p class="mb-0 text-muted small" id="workspace-payment-modal-subtitle">
+                        Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.
+                    </p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="workspace-payment-standard-view">
+                    <div class="row g-4">
+                        @include('cashier.notes.workspace.partials.payment-modal-left')
+                        @include('cashier.notes.workspace.partials.payment-modal-right')
+                    </div>
+                </div>
+
+                <div id="workspace-payment-cash-view" class="d-none">
+                    @include('cashier.notes.workspace.partials.payment-modal-cash')
+                </div>
+            </div>
+
+            @include('cashier.notes.workspace.partials.payment-modal-footer')
+        </div>
+    </div>
+</div>

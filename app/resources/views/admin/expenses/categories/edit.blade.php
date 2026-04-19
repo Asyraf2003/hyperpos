@@ -1,0 +1,74 @@
+@extends('layouts.app')
+
+@section('title', 'Edit Kategori Pengeluaran')
+@section('heading', 'Edit Kategori Pengeluaran')
+
+@section('content')
+    <section class="section">
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Edit Kategori Pengeluaran</h4>
+                        <p class="mb-0 text-muted">Perbarui master kategori biaya operasional.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="{{ route('admin.expenses.categories.update', ['categoryId' => $category->id()]) }}" method="post">
+                            @csrf
+                            @method('put')
+
+                            <div class="form-group mb-4">
+                                <label for="code" class="form-label">Kode</label>
+                                <input
+                                    type="text"
+                                    id="code"
+                                    name="code"
+                                    value="{{ old('code', $category->code()) }}"
+                                    class="form-control @error('code') is-invalid @enderror"
+                                    required
+                                >
+                                @error('code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="name" class="form-label">Nama</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value="{{ old('name', $category->name()) }}"
+                                    class="form-control @error('name') is-invalid @enderror"
+                                    required
+                                >
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="description" class="form-label">Deskripsi</label>
+                                <textarea
+                                    id="description"
+                                    name="description"
+                                    rows="4"
+                                    class="form-control @error('description') is-invalid @enderror"
+                                >{{ old('description', $category->description()) }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex justify-content-start gap-2">
+                                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-light-secondary">Batal</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection

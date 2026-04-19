@@ -1,0 +1,280 @@
+(() => {
+  const NS = (window.CashierNoteWorkspace = window.CashierNoteWorkspace || {});
+  const timers = new WeakMap();
+  const requestTokens = new WeakMap();
+  const activeChoiceIndexes = new WeakMap();
+
+  const parseDigits = (value) =>
+    Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
+
+  const focusElement = (element, select = true) => {
+    if (typeof NS.focusElement === "function") {
+      NS.focusElement(element, select);
+      return;
+    }
+
+    if (!(element instanceof HTMLElement)) return;
+
+    window.requestAnimationFrame(() => {
+      element.focus();
+
+      if (select && typeof element.select === "function") {
+        element.select();
+      }
+    });
+  };
+
+  NS.syncFloorPriceGuard = (row) => {
+    const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
+    const display = row.querySelector("[data-price-input]");
+    const warning = row.querySelector("[data-min-price-warning]");
+    const text = row.querySelector("[data-min-price-text]");
+
+    const floor = parseDigits(row.dataset.minimumUnitPriceRupiah || "0");
+    const current = parseDigits(raw?.value || display?.value || "0");
+    const invalid = floor > 0 && current > 0 && current < floor;
+
+    if (text) {
+      text.textContent =
+        floor > 0 ? `Harga minimum: ${floor.toLocaleString("id-ID")}` : "Harga minimum: -";
+    }
+
+    if (display) {
+      display.classList.toggle("is-invalid", invalid);
+    }
+
+    if (warning) {
+      warning.classList.toggle("d-none", !invalid);
+    }
+  };
+
+  const resultButtons = (row) =>
+    Array.from(row.querySelectorAll("[data-product-choice]"));
+
+  const setActiveChoice = (row, index) => {
+    const buttons = resultButtons(row);
+
+    if (!buttons.length) {
+      activeChoiceIndexes.set(row, -1);
+      return;
+    }
+
+    const nextIndex = Math.max(0, Math.min(index, buttons.length - 1));
+    activeChoiceIndexes.set(row, nextIndex);
+
+    buttons.forEach((button, buttonIndex) => {
+      button.classList.toggle("active", buttonIndex === nextIndex);
+    });
+  };
+
+  const clearResults = (row) => {
+    const results = row.querySelector("[data-product-results]");
+    if (!results) return;
+
+    results.innerHTML = "";
+    results.classList.add("d-none");
+    activeChoiceIndexes.set(row, -1);
+  };
+
+  const renderResults = (row, rows) => {
+    const results = row.querySelector("[data-product-results]");
+    if (!results) return;
+
+    results.innerHTML = "";
+
+    if (!rows.length) {
+      results.classList.add("d-none");
+      activeChoiceIndexes.set(row, -1);
+      return;
+    }
+
+    rows.forEach((item) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "list-group-item list-group-item-action";
+      button.dataset.productChoice = "1";
+      button.textContent = `${item.label} · stok ${item.available_stock}`;
+      button.addEventListener("click", () => NS.selectProduct(row, item));
+      results.appendChild(button);
+    });
+
+    results.classList.remove("d-none");
+    setActiveChoice(row, 0);
+  };
+
+  NS.selectProduct = (row, item) => {
+    const search = row.querySelector("[data-product-search]");
+    const hidden = row.querySelector("[data-product-id]");
+    const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
+    const display = row.querySelector("[data-price-input]");
+    const qty = row.querySelector("[data-qty-input]");
+
+    if (!search || !hidden) return;
+
+    search.value = item.label;
+    hidden.value = item.id;
+    row.dataset.minimumUnitPriceRupiah = String(
+      item.minimum_unit_price_rupiah || item.default_unit_price_rupiah || 0
+    );
+
+    NS.updateStockText?.(row, item.available_stock);
+
+    if (raw && !parseDigits(raw.value)) {
+      raw.value = String(item.default_unit_price_rupiah || 0);
+    }
+
+    if (display && !parseDigits(display.value)) {
+      display.value = String(item.default_unit_price_rupiah || 0);
+    }
+
+    window.AdminMoneyInput?.bindBySelector?.(row);
+    NS.syncFloorPriceGuard?.(row);
+    clearResults(row);
+    NS.syncQtyGuard?.(row);
+    NS.updateSummary?.();
+    focusElement(qty);
+  };
+
+  NS.bindProductSearch = (row) => {
+    const input = row.querySelector("[data-product-search]");
+    const hidden = row.querySelector("[data-product-id]");
+    const priceInput = row.querySelector("[data-price-input]");
+
+    if (!input) return;
+    if (input.dataset.searchBound === "1") return;
+    input.dataset.searchBound = "1";
+
+    const fetchResults = async () => {
+      const query = input.value.trim();
+      const endpoint = NS.config?.productLookupEndpoint;
+
+      if (!hidden) {
+        clearResults(row);
+        return;
+      }
+
+      hidden.value = "";
+
+      if (query.length < 2 || !endpoint) {
+        clearResults(row);
+        NS.updateSummary?.();
+        return;
+      }
+
+      const token = Symbol("product-search");
+      requestTokens.set(input, token);
+
+      try {
+        const url = `${endpoint}?q=${encodeURIComponent(query)}`;
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
+
+        if (!response.ok) {
+          throw new Error(`Product lookup failed with status ${response.status}`);
+        }
+
+        const payload = await response.json();
+
+        if (requestTokens.get(input) !== token) {
+          return;
+        }
+
+        renderResults(row, payload?.data?.rows || []);
+      } catch (_error) {
+        if (requestTokens.get(input) !== token) {
+          return;
+        }
+
+        clearResults(row);
+      }
+    };
+
+    input.addEventListener("input", () => {
+      if (hidden) {
+        hidden.value = "";
+      }
+
+      clearTimeout(timers.get(input));
+
+      timers.set(
+        input,
+        setTimeout(() => {
+          void fetchResults();
+        }, 250)
+      );
+    });
+
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 2) {
+        void fetchResults();
+      }
+    });
+
+    input.addEventListener("keydown", (event) => {
+      const buttons = resultButtons(row);
+      const activeIndex = activeChoiceIndexes.get(row) ?? -1;
+
+      if (event.key === "ArrowDown" && buttons.length) {
+        event.preventDefault();
+        setActiveChoice(row, activeIndex + 1);
+        return;
+      }
+
+      if (event.key === "ArrowUp" && buttons.length) {
+        event.preventDefault();
+        setActiveChoice(row, activeIndex - 1);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        clearResults(row);
+        return;
+      }
+
+      if (event.key !== "Enter") {
+        return;
+      }
+
+      if (event.ctrlKey || event.altKey || event.metaKey) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (buttons.length && activeIndex >= 0 && buttons[activeIndex]) {
+        buttons[activeIndex].click();
+        return;
+      }
+
+      if (hidden?.value.trim()) {
+        focusElement(row.querySelector("[data-qty-input]"));
+        return;
+      }
+
+      if (input.value.trim().length >= 2) {
+        void fetchResults();
+      }
+    });
+
+    if (priceInput) {
+      priceInput.addEventListener("input", () => {
+        NS.syncFloorPriceGuard?.(row);
+        NS.updateSummary?.();
+      });
+
+      priceInput.addEventListener("blur", () => {
+        NS.syncFloorPriceGuard?.(row);
+      });
+    }
+
+    if (row.dataset.searchOutsideBound !== "1") {
+      row.dataset.searchOutsideBound = "1";
+
+      document.addEventListener("click", (event) => {
+        if (!row.contains(event.target)) {
+          clearResults(row);
+        }
+      });
+    }
+  };
+})();

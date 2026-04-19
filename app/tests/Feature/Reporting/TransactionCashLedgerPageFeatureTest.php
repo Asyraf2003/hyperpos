@@ -1,0 +1,247 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Reporting;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
+
+final class TransactionCashLedgerPageFeatureTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_guest_is_redirected_to_login_when_accessing_transaction_cash_ledger_page(): void
+    {
+        $this->get(route('admin.reports.transaction_cash_ledger.index'))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_transaction_cash_ledger_page(): void
+    {
+        $response = $this->actingAs($this->user('kasir'))
+            ->get(route('admin.reports.transaction_cash_ledger.index'));
+
+        $response->assertRedirect(route('cashier.dashboard'));
+        $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
+    }
+
+    public function test_admin_can_access_transaction_cash_ledger_page_and_see_report_data(): void
+    {
+        $this->seedCashInEvent('note-1', 'wi-1', 'pay-1', '2026-04-02', 8000, 'Budi');
+        $this->seedCashInEvent('note-2', 'wi-2', 'pay-2', '2026-04-03', 4000, 'Sari');
+        $this->seedCashOutEvent('note-1', 'wi-1', 'pay-1', 'ref-1', '2026-04-04', 1000, 'Refund');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2026-04-01',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('Arus Kas Transaksi');
+        $response->assertSee('transaction-cash-ledger-filter-form', false);
+        $response->assertSee('2026-04-02');
+        $response->assertSee('2026-04-03');
+        $response->assertSee('2026-04-04');
+        $response->assertSee('note-1');
+        $response->assertSee('note-2');
+        $response->assertSee('payment_allocation');
+        $response->assertSee('refund');
+        $response->assertSee('Rp 12.000');
+        $response->assertSee('Rp 1.000');
+        $response->assertSee('Rp 11.000');
+    }
+
+    public function test_daily_mode_uses_reference_date_only(): void
+    {
+        $this->seedCashInEvent('note-daily-1', 'wi-daily-1', 'pay-daily-1', '2026-04-02', 7000, 'Daily A');
+        $this->seedCashInEvent('note-daily-2', 'wi-daily-2', 'pay-daily-2', '2026-04-03', 9000, 'Daily B');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'daily',
+                'reference_date' => '2026-04-02',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-02 s/d 2026-04-02');
+        $response->assertSee('note-daily-1');
+        $response->assertDontSee('note-daily-2');
+        $response->assertSee('Rp 7.000');
+        $response->assertDontSee('Rp 9.000');
+    }
+
+    public function test_weekly_mode_uses_monday_to_sunday_range(): void
+    {
+        $this->seedCashInEvent('note-week-1', 'wi-week-1', 'pay-week-1', '2026-04-06', 5000, 'Week Mon');
+        $this->seedCashInEvent('note-week-2', 'wi-week-2', 'pay-week-2', '2026-04-09', 6000, 'Week Thu');
+        $this->seedCashInEvent('note-week-3', 'wi-week-3', 'pay-week-3', '2026-04-13', 11000, 'Next Week');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'weekly',
+                'reference_date' => '2026-04-09',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-06 s/d 2026-04-12');
+        $response->assertSee('note-week-1');
+        $response->assertSee('note-week-2');
+        $response->assertDontSee('note-week-3');
+        $response->assertSee('Rp 11.000');
+    }
+
+    public function test_monthly_mode_uses_first_to_last_day_of_month(): void
+    {
+        $this->seedCashInEvent('note-month-1', 'wi-month-1', 'pay-month-1', '2026-04-01', 3000, 'Month Start');
+        $this->seedCashInEvent('note-month-2', 'wi-month-2', 'pay-month-2', '2026-04-29', 4000, 'Month End');
+        $this->seedCashInEvent('note-month-3', 'wi-month-3', 'pay-month-3', '2026-05-01', 9000, 'Next Month');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2026-04-11',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('2026-04-01 s/d 2026-04-30');
+        $response->assertSee('note-month-1');
+        $response->assertSee('note-month-2');
+        $response->assertDontSee('note-month-3');
+        $response->assertSee('Rp 7.000');
+    }
+
+    public function test_custom_mode_is_rejected(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.transaction_cash_ledger.index'))
+            ->get(route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'custom',
+                'reference_date' => '2026-04-01',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
+        $response->assertSessionHasErrors(['period_mode']);
+    }
+
+
+    public function test_unknown_period_mode_is_rejected(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.transaction_cash_ledger.index'))
+            ->get(route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'quarterly',
+                'reference_date' => '2026-04-01',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
+        $response->assertSessionHasErrors(['period_mode']);
+    }
+
+
+    private function user(string $role): User
+    {
+        $user = User::query()->create([
+            'name' => 'Test',
+            'email' => $role . '-reporting-page@example.test',
+            'password' => 'password123',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => $role,
+        ]);
+
+        return $user;
+    }
+
+    private function seedCashInEvent(
+        string $noteId,
+        string $workItemId,
+        string $paymentId,
+        string $paidAt,
+        int $amountRupiah,
+        string $customerName
+    ): void {
+        $this->seedNote($noteId, $customerName, $paidAt, $amountRupiah);
+        $this->seedWorkItem($workItemId, $noteId, 1, $amountRupiah);
+
+        DB::table('customer_payments')->insert([
+            'id' => $paymentId,
+            'amount_rupiah' => $amountRupiah,
+            'paid_at' => $paidAt,
+        ]);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'alloc-' . $paymentId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'work_item_id' => $workItemId,
+            'component_type' => 'service_fee',
+            'component_ref_id' => $workItemId,
+            'component_amount_rupiah_snapshot' => $amountRupiah,
+            'allocated_amount_rupiah' => $amountRupiah,
+            'allocation_priority' => 1,
+        ]);
+    }
+
+    private function seedCashOutEvent(
+        string $noteId,
+        string $workItemId,
+        string $paymentId,
+        string $refundId,
+        string $refundedAt,
+        int $amountRupiah,
+        string $reason
+    ): void {
+        DB::table('customer_refunds')->insert([
+            'id' => $refundId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'amount_rupiah' => $amountRupiah,
+            'refunded_at' => $refundedAt,
+            'reason' => $reason,
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            'id' => 'refund-alloc-' . $refundId,
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'work_item_id' => $workItemId,
+            'component_type' => 'service_fee',
+            'component_ref_id' => $workItemId,
+            'refunded_amount_rupiah' => $amountRupiah,
+            'refund_priority' => 1,
+        ]);
+    }
+
+    private function seedNote(string $id, string $customerName, string $transactionDate, int $totalRupiah): void
+    {
+        DB::table('notes')->insert([
+            'id' => $id,
+            'customer_name' => $customerName,
+            'transaction_date' => $transactionDate,
+            'total_rupiah' => $totalRupiah,
+        ]);
+    }
+
+    private function seedWorkItem(string $id, string $noteId, int $lineNo, int $subtotalRupiah): void
+    {
+        DB::table('work_items')->insert([
+            'id' => $id,
+            'note_id' => $noteId,
+            'line_no' => $lineNo,
+            'transaction_type' => 'service_only',
+            'status' => 'open',
+            'subtotal_rupiah' => $subtotalRupiah,
+        ]);
+    }
+}
