@@ -6,6 +6,7 @@ namespace Tests\Feature\Procurement;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
@@ -30,35 +31,99 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_can_get_procurement_invoice_table_json(): void
+    public function test_admin_can_get_procurement_invoice_table_json_with_action_contracts_for_locked_and_editable_rows(): void
     {
         $this->seedSupplier('supplier-1', 'PT Supplier Baru');
         $this->seedProductFixture();
-        $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Federal Abadi');
-        $this->seedInvoiceLine('invoice-line-1', 'invoice-1');
-        $this->seedPayment('payment-1', 'invoice-1', 40000, '2026-03-16', 'pending');
-        $this->seedReceipt('receipt-1', 'invoice-1', '2026-03-17');
-        $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-1', 3);
+
+        $this->seedInvoice('invoice-locked', 'supplier-1', '2026-03-15', '2026-04-15', 100000, 'PT Federal Abadi');
+        $this->seedInvoiceLine('invoice-line-locked', 'invoice-locked');
+        $this->seedPayment('payment-1', 'invoice-locked', 40000, '2026-03-16', 'pending');
+        $this->seedReceipt('receipt-1', 'invoice-locked', '2026-03-17');
+        $this->seedReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-locked', 3);
+
+        $this->seedInvoice('invoice-editable', 'supplier-1', '2026-03-18', '2026-04-18', 120000, 'PT Federal Abadi');
+        $this->seedInvoiceLine('invoice-line-editable', 'invoice-editable');
 
         $response = $this->actingAs($this->user('admin'))
             ->get(route('admin.procurement.supplier-invoices.table'));
 
         $response->assertOk();
         $response->assertJsonPath('success', true);
-        $response->assertJsonPath('data.rows.0.supplier_invoice_id', 'invoice-1');
-        $response->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_current', 'PT Supplier Baru');
-        $response->assertJsonPath('data.rows.0.supplier_nama_pt_pengirim_snapshot', 'PT Federal Abadi');
-        $response->assertJsonPath('data.rows.0.total_paid_rupiah', 40000);
-        $response->assertJsonPath('data.rows.0.outstanding_rupiah', 60000);
-        $response->assertJsonPath('data.rows.0.receipt_count', 1);
-        $response->assertJsonPath('data.rows.0.total_received_qty', 3);
-        $response->assertJsonPath('data.rows.0.policy_state', 'locked');
-        $response->assertJsonPath('data.rows.0.edit_action_kind', 'revise');
-        $response->assertJsonPath('data.rows.0.edit_action_label', 'Koreksi');
-        $response->assertJsonPath(
-            'data.rows.0.edit_action_url',
-            route('admin.procurement.supplier-invoices.revise', ['supplierInvoiceId' => 'invoice-1'])
+
+        /** @var list<array<string, mixed>> $rows */
+        $rows = $response->json('data.rows');
+        $rowCollection = collect($rows);
+
+        $lockedRow = $this->findRow($rowCollection, 'invoice-locked');
+        $editableRow = $this->findRow($rowCollection, 'invoice-editable');
+
+        self::assertNotNull($lockedRow);
+        self::assertNotNull($editableRow);
+
+        self::assertSame('PT Supplier Baru', $lockedRow['supplier_nama_pt_pengirim_current']);
+        self::assertSame('PT Federal Abadi', $lockedRow['supplier_nama_pt_pengirim_snapshot']);
+        self::assertSame(40000, $lockedRow['total_paid_rupiah']);
+        self::assertSame(60000, $lockedRow['outstanding_rupiah']);
+        self::assertSame(1, $lockedRow['receipt_count']);
+        self::assertSame(3, $lockedRow['total_received_qty']);
+        self::assertSame('locked', $lockedRow['policy_state']);
+
+        self::assertSame('proof', $lockedRow['payment_action_kind']);
+        self::assertSame('Bukti Bayar', $lockedRow['payment_action_label']);
+        self::assertSame('link', $lockedRow['payment_action_mode']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-locked']),
+            $lockedRow['payment_action_url']
         );
+
+        self::assertSame('revise', $lockedRow['edit_action_kind']);
+        self::assertSame('Koreksi', $lockedRow['edit_action_label']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.revise', ['supplierInvoiceId' => 'invoice-locked']),
+            $lockedRow['edit_action_url']
+        );
+
+        self::assertFalse($lockedRow['void_action_enabled']);
+        self::assertSame('Hapus Nota', $lockedRow['void_action_label']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.void', ['supplierInvoiceId' => 'invoice-locked']),
+            $lockedRow['void_action_url']
+        );
+
+        self::assertSame('editable', $editableRow['policy_state']);
+
+        self::assertSame('pay', $editableRow['payment_action_kind']);
+        self::assertSame('Bayar', $editableRow['payment_action_label']);
+        self::assertSame('modal', $editableRow['payment_action_mode']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-editable']),
+            $editableRow['payment_action_url']
+        );
+
+        self::assertSame('edit', $editableRow['edit_action_kind']);
+        self::assertSame('Edit Nota', $editableRow['edit_action_label']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.edit', ['supplierInvoiceId' => 'invoice-editable']),
+            $editableRow['edit_action_url']
+        );
+
+        self::assertTrue($editableRow['void_action_enabled']);
+        self::assertSame('Hapus Nota', $editableRow['void_action_label']);
+        self::assertSame(
+            route('admin.procurement.supplier-invoices.void', ['supplierInvoiceId' => 'invoice-editable']),
+            $editableRow['void_action_url']
+        );
+    }
+
+    private function findRow(Collection $rows, string $invoiceId): ?array
+    {
+        /** @var array<string, mixed>|null $row */
+        $row = $rows->first(
+            fn (array $candidate): bool => ($candidate['supplier_invoice_id'] ?? null) === $invoiceId
+        );
+
+        return $row;
     }
 
     private function user(string $role): User

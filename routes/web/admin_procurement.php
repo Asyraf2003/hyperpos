@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Adapters\In\Http\Controllers\Admin\Procurement\AttachSupplierPaymentProofController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\CreateSupplierInvoicePageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\EditSupplierInvoicePageController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoicePaymentProofPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProductLookupController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
@@ -59,6 +60,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/procurement/supplier-invoices/create', CreateSupplierInvoicePageController::class)
         ->name('admin.procurement.supplier-invoices.create');
+
+    Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}/payment-proofs', ProcurementInvoicePaymentProofPageController::class)
+        ->name('admin.procurement.supplier-invoices.payment-proofs.show');
 
     Route::get('/admin/procurement/supplier-invoices/{supplierInvoiceId}', ProcurementInvoiceDetailPageController::class)
         ->name('admin.procurement.supplier-invoices.show');

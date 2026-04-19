@@ -9,44 +9,41 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
+final class ProcurementInvoicePaymentProofPageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_is_redirected_to_login_when_accessing_procurement_invoice_detail_page(): void
+    public function test_guest_is_redirected_to_login_when_accessing_procurement_invoice_payment_proof_page(): void
     {
-        $this->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
+        $this->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-1']))
             ->assertRedirect(route('login'));
     }
 
-    public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_procurement_invoice_detail_page(): void
+    public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_procurement_invoice_payment_proof_page(): void
     {
         $response = $this->actingAs($this->user('kasir'))
-            ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']));
+            ->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-1']));
 
         $response->assertRedirect(route('cashier.dashboard'));
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
-    public function test_admin_is_redirected_back_to_procurement_index_when_invoice_detail_is_not_found(): void
+    public function test_admin_is_redirected_back_to_procurement_index_when_payment_proof_page_invoice_is_not_found(): void
     {
         $response = $this->actingAs($this->user('admin'))
-            ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'missing-invoice']));
+            ->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'missing-invoice']));
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.index'));
         $response->assertSessionHas('error', 'Nota supplier tidak ditemukan.');
     }
 
-    public function test_admin_can_access_procurement_invoice_detail_page_as_locked_when_receipt_and_payment_exist(): void
+    public function test_admin_can_access_payment_proof_page_with_payment_status_and_attachments(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
-        $this->seedProduct('product-2', null, 'Aki Kering', 'GS Astra', null, 120000);
         $this->seedSupplier('supplier-1', 'PT Supplier Baru', 'pt supplier baru');
 
         $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 150000, 'PT Sumber Makmur');
-
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
-        $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 130000, 130000, null, 'Aki Kering', 'GS Astra', null);
 
         $this->seedSupplierPayment('payment-1', 'invoice-1', 50000, '2026-03-16', 'pending');
         $this->seedSupplierPayment('payment-2', 'invoice-1', 25000, '2026-03-17', 'uploaded', null);
@@ -62,30 +59,19 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             'actor-admin',
         );
 
-        $this->seedSupplierReceipt('receipt-1', 'invoice-1', '2026-03-16');
-        $this->seedSupplierReceipt('receipt-2', 'invoice-1', '2026-03-17');
-
-        $this->seedSupplierReceiptLine('receipt-line-1', 'receipt-1', 'invoice-line-1', 2);
-        $this->seedSupplierReceiptLine('receipt-line-2', 'receipt-2', 'invoice-line-2', 1);
-
         $response = $this->actingAs($this->user('admin'))
-            ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']));
+            ->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-1']));
 
         $response->assertOk();
 
-        $response->assertSee('Status Kebijakan');
-        $response->assertSee('Locked');
-        $response->assertSee('Aksi yang Diizinkan');
-        $response->assertSee('Koreksi');
-        $response->assertSee('Alasan Penguncian');
-        $response->assertSee('Receipt sudah tercatat');
-        $response->assertSee('Payment efektif sudah tercatat');
+        $response->assertSee('Header Faktur');
+        $response->assertSee('Status Pembayaran');
+        $response->assertSee('Sebagian Dibayar');
+        $response->assertSee('Jumlah Pembayaran');
+        $response->assertSee('2');
 
-        $response->assertSee('Ringkasan Nota');
-        $response->assertSee('Rincian Nota');
-        $response->assertSee('Pembayaran');
-
-        $response->assertSee('invoice-1');
+        $response->assertSee('Nomor Faktur');
+        $response->assertSee('ID Nota Internal');
         $response->assertSee('Nama Pemasok Saat Ini');
         $response->assertSee('PT Supplier Baru');
         $response->assertSee('Nama Saat Nota Dibuat');
@@ -95,28 +81,22 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
 
         $response->assertSee('Rp 150.000');
         $response->assertSee('Rp 75.000');
-        $response->assertSee('Jumlah Penerimaan');
-        $response->assertSee('2');
-        $response->assertSee('Total Kuantitas Diterima');
-        $response->assertSee('3');
 
-        $response->assertSee('KB-001');
-        $response->assertSee('Ban Luar');
-        $response->assertSee('Federal');
-        $response->assertSee('90');
-        $response->assertSee('Rp 10.000');
-        $response->assertSee('Rp 20.000');
+        $response->assertSee('Catat Pembayaran');
+        $response->assertSee('Simpan Pembayaran');
+        $response->assertSee('Bukti Pembayaran');
+        $response->assertSee('Unggah Bukti');
 
-        $response->assertSee('Aki Kering');
-        $response->assertSee('GS Astra');
-        $response->assertSee('Rp 130.000');
-
-        $response->assertDontSee('Bukti Pembayaran');
-        $response->assertDontSee('Unggah Bukti');
-        $response->assertDontSee('Simpan Pembayaran');
+        $response->assertSee('Sudah Ada Bukti');
+        $response->assertSee('Belum Ada Bukti');
+        $response->assertSee('Jumlah Lampiran');
+        $response->assertSee('Riwayat Lampiran');
+        $response->assertSee('proof.pdf');
+        $response->assertSee('Lihat PDF');
+        $response->assertSee('Unduh');
     }
 
-    public function test_admin_can_access_procurement_invoice_detail_page_as_editable_when_no_receipt_and_no_payment_exist(): void
+    public function test_admin_can_access_payment_proof_page_when_no_payment_exists(): void
     {
         $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
         $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
@@ -125,28 +105,25 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
 
         $response = $this->actingAs($this->user('admin'))
-            ->get(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']));
+            ->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-1']));
 
         $response->assertOk();
 
-        $response->assertSee('Status Kebijakan');
-        $response->assertSee('Editable');
-        $response->assertSee('Aksi yang Diizinkan');
-        $response->assertSee('Edit nota');
-        $response->assertSee('Hapus nota');
-        $response->assertSee('Alasan Penguncian');
-        $response->assertSee('Belum ada efek turunan primer.');
-        $response->assertSee('Pembayaran');
-
-        $response->assertDontSee('Bukti Pembayaran');
-        $response->assertDontSee('Belum ada pembayaran pemasok.');
+        $response->assertSee('Status Pembayaran');
+        $response->assertSee('Belum Dibayar');
+        $response->assertSee('Jumlah Pembayaran');
+        $response->assertSee('0');
+        $response->assertSee('Catat Pembayaran');
+        $response->assertSee('Simpan Pembayaran');
+        $response->assertSee('Bukti Pembayaran');
+        $response->assertSee('Belum ada pembayaran pemasok.');
     }
 
     private function user(string $role): User
     {
         $user = User::query()->create([
             'name' => 'Test',
-            'email' => $role . '@example.test',
+            'email' => $role . '-payment-proof@example.test',
             'password' => 'password123',
         ]);
 
@@ -276,32 +253,6 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
             'file_size_bytes' => $fileSizeBytes,
             'uploaded_at' => $uploadedAt,
             'uploaded_by_actor_id' => $uploadedByActorId,
-        ]);
-    }
-
-    private function seedSupplierReceipt(
-        string $id,
-        string $supplierInvoiceId,
-        string $tanggalTerima
-    ): void {
-        DB::table('supplier_receipts')->insert([
-            'id' => $id,
-            'supplier_invoice_id' => $supplierInvoiceId,
-            'tanggal_terima' => $tanggalTerima,
-        ]);
-    }
-
-    private function seedSupplierReceiptLine(
-        string $id,
-        string $supplierReceiptId,
-        string $supplierInvoiceLineId,
-        int $qtyDiterima
-    ): void {
-        DB::table('supplier_receipt_lines')->insert([
-            'id' => $id,
-            'supplier_receipt_id' => $supplierReceiptId,
-            'supplier_invoice_line_id' => $supplierInvoiceLineId,
-            'qty_diterima' => $qtyDiterima,
         ]);
     }
 }

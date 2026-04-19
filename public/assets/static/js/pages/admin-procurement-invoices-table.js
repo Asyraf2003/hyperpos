@@ -42,35 +42,12 @@
   const actionModalElement = $("procurement-action-modal");
   const actionModalSubtitle = $("procurement-action-modal-subtitle");
   const actionDetailLink = $("procurement-action-detail-link");
-  const actionPaymentButton = $("procurement-action-payment-link");
+  const actionPaymentLink = $("procurement-action-payment-link");
   const actionPaymentTitle = $("procurement-action-payment-title");
-  const actionPaymentDescription = $("procurement-action-payment-description");
-  const actionProofCol = $("procurement-action-proof-col");
-  const actionProofLink = $("procurement-action-proof-link");
-  const actionProofTitle = $("procurement-action-proof-title");
-  const actionProofDescription = $("procurement-action-proof-description");
   const actionEditLink = $("procurement-action-edit-link");
   const actionEditTitle = $("procurement-action-edit-title");
-  const actionEditDescription = $("procurement-action-edit-description");
-
-  const setLinkDisabledState = (node, disabled) => {
-    if (!node) return;
-
-    node.classList.toggle("disabled", disabled);
-    node.classList.toggle("btn-outline-secondary", disabled);
-    node.classList.toggle("text-muted", disabled);
-    node.classList.toggle("border-secondary", disabled);
-
-    if (!disabled) {
-      node.classList.remove("btn-outline-secondary", "text-muted", "border-secondary");
-      if (!node.classList.contains("btn-outline-primary")) {
-        node.classList.add("btn-outline-primary");
-      }
-    }
-
-    node.setAttribute("aria-disabled", disabled ? "true" : "false");
-    node.tabIndex = disabled ? -1 : 0;
-  };
+  const actionVoidButton = $("procurement-action-void-button");
+  const actionVoidTitle = $("procurement-action-void-title");
 
   const paymentModalElement = $("procurement-payment-modal");
   const paymentModalSubtitle = $("procurement-payment-modal-subtitle");
@@ -81,6 +58,14 @@
   const paymentAmountDisplay = $("procurement-payment-amount-display");
   const paymentAmountHelp = $("procurement-payment-amount-help");
 
+  const voidModalElement = $("procurement-void-modal");
+  const voidModalSubtitle = $("procurement-void-modal-subtitle");
+  const voidForm = $("procurement-void-form");
+  const voidInvoiceIdInput = $("procurement-void-invoice-id");
+  const voidReasonInput = $("procurement-void-reason");
+  const voidConfirmInput = $("procurement-void-confirm");
+  const voidSubmitButton = $("procurement-void-submit");
+
   const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
     ? new window.bootstrap.Modal(actionModalElement)
     : null;
@@ -89,9 +74,14 @@
     ? new window.bootstrap.Modal(paymentModalElement)
     : null;
 
+  const voidModal = voidModalElement && window.bootstrap && window.bootstrap.Modal
+    ? new window.bootstrap.Modal(voidModalElement)
+    : null;
+
   let searchDebounceTimer = null;
   let requestCounter = 0;
   let pendingPaymentAction = null;
+  let pendingVoidAction = null;
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
     "&": "&amp;",
@@ -104,11 +94,8 @@
   const trimValue = (v) => String(v ?? "").trim();
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const detailUrl = (id) => c.detailBaseUrl.replace("__ID__", encodeURIComponent(id));
-  const editUrl = (id) => `${detailUrl(id)}/edit`;
-  const reviseUrl = (id) => `${detailUrl(id)}/revise`;
   const paymentStoreUrl = (id) => c.paymentStoreBaseUrl.replace("__ID__", encodeURIComponent(id));
   const paymentSectionUrl = (id) => `${detailUrl(id)}#payment-form-section`;
-  const proofSectionUrl = (id) => `${detailUrl(id)}#payment-proof-section`;
 
   const intOrDefault = (v, fallback) => {
     const n = Number.parseInt(String(v ?? ""), 10);
@@ -116,6 +103,20 @@
   };
 
   const todayYmd = () => new Date().toISOString().slice(0, 10);
+
+  const setActionLinkDisabledState = (node, disabled) => {
+    if (!node) return;
+    node.classList.toggle("disabled", disabled);
+    node.setAttribute("aria-disabled", disabled ? "true" : "false");
+    node.tabIndex = disabled ? -1 : 0;
+  };
+
+  const setActionButtonDisabledState = (node, disabled) => {
+    if (!node) return;
+    node.disabled = disabled;
+    node.classList.toggle("disabled", disabled);
+    node.setAttribute("aria-disabled", disabled ? "true" : "false");
+  };
 
   const supplierCellHtml = (row) => {
     const currentName = trimValue(row.supplier_nama_pt_pengirim_current);
@@ -294,19 +295,62 @@
     paymentModal.show();
   };
 
+  const syncVoidSubmitState = () => {
+    const hasReason = trimValue(voidReasonInput?.value) !== "";
+    const confirmed = Boolean(voidConfirmInput?.checked);
+    setActionButtonDisabledState(voidSubmitButton, !(hasReason && confirmed));
+  };
+
+  const openVoidModal = (row, preserveOldInput = false) => {
+    if (!voidForm || !voidModal) {
+      window.location.assign(detailUrl(row.supplier_invoice_id));
+      return;
+    }
+
+    const supplierName = trimValue(row.supplier_nama_pt_pengirim_current)
+      || trimValue(row.supplier_nama_pt_pengirim_snapshot)
+      || "-";
+    const nomorFaktur = trimValue(row.nomor_faktur) || "-";
+    const actionUrl = trimValue(row.void_action_url);
+
+    if (actionUrl === "") {
+      return;
+    }
+
+    voidForm.action = actionUrl;
+
+    if (voidInvoiceIdInput) {
+      voidInvoiceIdInput.value = row.supplier_invoice_id;
+    }
+
+    if (voidModalSubtitle) {
+      voidModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
+    }
+
+    if (!preserveOldInput) {
+      if (voidReasonInput) {
+        voidReasonInput.value = "";
+      }
+
+      if (voidConfirmInput) {
+        voidConfirmInput.checked = false;
+      }
+    }
+
+    syncVoidSubmitState();
+    voidModal.show();
+  };
+
   const configureActionModal = (row) => {
     if (
       !actionModalSubtitle ||
       !actionDetailLink ||
-      !actionPaymentButton ||
+      !actionPaymentLink ||
       !actionPaymentTitle ||
-      !actionPaymentDescription ||
-      !actionProofLink ||
-      !actionProofTitle ||
-      !actionProofDescription ||
       !actionEditLink ||
       !actionEditTitle ||
-      !actionEditDescription
+      !actionVoidButton ||
+      !actionVoidTitle
     ) {
       return;
     }
@@ -316,51 +360,35 @@
       || "-";
     const nomorFaktur = trimValue(row.nomor_faktur) || "-";
 
-    const editActionKind = trimValue(row.edit_action_kind)
-      || ((Number(row.payment_count || 0) > 0 || Number(row.receipt_count || 0) > 0) ? "revise" : "edit");
-    const editActionLabel = trimValue(row.edit_action_label)
-      || (editActionKind === "revise" ? "Koreksi" : "Edit Nota");
-    const editActionUrl = trimValue(row.edit_action_url)
-      || (editActionKind === "revise"
-        ? reviseUrl(row.supplier_invoice_id)
-        : editUrl(row.supplier_invoice_id));
-
     actionModalSubtitle.textContent = `${nomorFaktur} • ${supplierName}`;
     actionDetailLink.href = detailUrl(row.supplier_invoice_id);
 
-    if (row.can_record_payment) {
-      pendingPaymentAction = { mode: "modal", row };
-      actionPaymentTitle.textContent = "Bayar";
-      actionPaymentDescription.textContent = "Catat pembayaran langsung dari daftar nota.";
-    } else {
-      pendingPaymentAction = { mode: "detail", row };
-      actionPaymentTitle.textContent = "Riwayat Pembayaran";
-      actionPaymentDescription.textContent = "Nota ini sudah lunas. Buka detail untuk melihat riwayat pembayaran.";
-    }
+    const paymentActionMode = trimValue(row.payment_action_mode) || "link";
+    const paymentActionLabel = trimValue(row.payment_action_label) || "Bayar";
+    const paymentActionUrl = trimValue(row.payment_action_url) || paymentSectionUrl(row.supplier_invoice_id);
 
-    if (Number(row.payment_count || 0) < 1) {
-      actionProofLink.href = "#";
-      actionProofTitle.textContent = "Bukti Bayar";
-      actionProofDescription.textContent = "Tersedia setelah ada pembayaran pertama.";
-      setLinkDisabledState(actionProofLink, true);
-    } else if (row.has_uploaded_proof) {
-      actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Bukti Bayar";
-      actionProofDescription.textContent = "Lihat atau unduh lampiran bukti pembayaran.";
-      setLinkDisabledState(actionProofLink, false);
-    } else {
-      actionProofLink.href = proofSectionUrl(row.supplier_invoice_id);
-      actionProofTitle.textContent = "Unggah Bukti Bayar";
-      actionProofDescription.textContent = "Buka bagian unggah bukti pembayaran.";
-      setLinkDisabledState(actionProofLink, false);
-    }
+    pendingPaymentAction = {
+      mode: paymentActionMode,
+      row,
+      url: paymentActionUrl
+    };
 
-    actionEditLink.href = editActionUrl;
+    actionPaymentLink.href = paymentActionUrl;
+    actionPaymentLink.dataset.actionMode = paymentActionMode;
+    actionPaymentTitle.textContent = paymentActionLabel;
+    setActionLinkDisabledState(actionPaymentLink, false);
+
+    const editActionLabel = trimValue(row.edit_action_label) || "Edit Nota";
+    const editActionUrl = trimValue(row.edit_action_url);
+
     actionEditTitle.textContent = editActionLabel;
-    actionEditDescription.textContent = editActionKind === "revise"
-      ? "Nota ini sudah locked. Buka koreksi untuk membuat perubahan terkontrol."
-      : "Buka form edit untuk nota yang masih editable.";
-    setLinkDisabledState(actionEditLink, false);
+    actionEditLink.href = editActionUrl || "#";
+    setActionLinkDisabledState(actionEditLink, editActionUrl === "");
+
+    const voidEnabled = Boolean(row.void_action_enabled);
+    actionVoidTitle.textContent = trimValue(row.void_action_label) || "Hapus Nota";
+    pendingVoidAction = voidEnabled ? row : null;
+    setActionButtonDisabledState(actionVoidButton, !voidEnabled);
   };
 
   const rowHtml = (row, index, meta) => `
@@ -440,35 +468,54 @@
 
     body.innerHTML = `<tr><td colspan="11" class="text-center text-muted py-4">Memuat data...</td></tr>`;
 
-    const res = await fetch(`${c.endpoint}?${paramsString()}`, {
-      headers: { Accept: "application/json" }
-    });
+    try {
+      const res = await fetch(`${c.endpoint}?${paramsString()}`, {
+        headers: { Accept: "application/json" }
+      });
 
-    const json = await res.json();
+      const json = await res.json();
 
-    if (currentRequest !== requestCounter) {
-      return;
-    }
-
-    if (!res.ok || !json.success) {
-      body.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
-      return;
-    }
-
-    renderRows(json.data.rows || [], json.data.meta || {});
-    renderSummary(json.data.meta || {});
-    renderPager(json.data.meta || {});
-    renderSortIndicators();
-    syncInputsFromState();
-    renderActiveFilters();
-    updateUrl(replaceUrl);
-
-    if (c.oldPaymentInvoiceId) {
-      const failedRow = (json.data.rows || []).find((row) => row.supplier_invoice_id === c.oldPaymentInvoiceId);
-      if (failedRow) {
-        openPaymentModal(failedRow, true);
-        c.oldPaymentInvoiceId = "";
+      if (currentRequest !== requestCounter) {
+        return;
       }
+
+      if (!res.ok || !json.success) {
+        body.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
+        return;
+      }
+
+      const rows = json.data.rows || [];
+      const meta = json.data.meta || {};
+
+      renderRows(rows, meta);
+      renderSummary(meta);
+      renderPager(meta);
+      renderSortIndicators();
+      syncInputsFromState();
+      renderActiveFilters();
+      updateUrl(replaceUrl);
+
+      if (c.oldPaymentInvoiceId) {
+        const failedPaymentRow = rows.find((row) => row.supplier_invoice_id === c.oldPaymentInvoiceId);
+        if (failedPaymentRow) {
+          openPaymentModal(failedPaymentRow, true);
+          c.oldPaymentInvoiceId = "";
+        }
+      }
+
+      if (c.oldVoidInvoiceId) {
+        const failedVoidRow = rows.find((row) => row.supplier_invoice_id === c.oldVoidInvoiceId);
+        if (failedVoidRow) {
+          openVoidModal(failedVoidRow, true);
+          c.oldVoidInvoiceId = "";
+        }
+      }
+    } catch (_error) {
+      if (currentRequest !== requestCounter) {
+        return;
+      }
+
+      body.innerHTML = `<tr><td colspan="11" class="text-center text-danger py-4">Gagal memuat data.</td></tr>`;
     }
   };
 
@@ -476,9 +523,21 @@
   $("close-procurement-filter")?.addEventListener("click", () => drawOpen(false));
   backdrop?.addEventListener("click", () => drawOpen(false));
 
-  actionProofLink?.addEventListener("click", (event) => {
-    if (actionProofLink.getAttribute("aria-disabled") === "true") {
+  actionPaymentLink?.addEventListener("click", (event) => {
+    if (actionPaymentLink.getAttribute("aria-disabled") === "true") {
       event.preventDefault();
+      return;
+    }
+
+    if (!pendingPaymentAction) {
+      event.preventDefault();
+      return;
+    }
+
+    if (pendingPaymentAction.mode === "modal") {
+      event.preventDefault();
+      actionModal?.hide();
+      openPaymentModal(pendingPaymentAction.row);
     }
   });
 
@@ -488,16 +547,32 @@
     }
   });
 
-  actionPaymentButton?.addEventListener("click", () => {
-    if (!pendingPaymentAction) return;
-
-    if (pendingPaymentAction.mode === "detail") {
-      window.location.assign(paymentSectionUrl(pendingPaymentAction.row.supplier_invoice_id));
+  actionVoidButton?.addEventListener("click", () => {
+    if (!pendingVoidAction) {
       return;
     }
 
     actionModal?.hide();
-    openPaymentModal(pendingPaymentAction.row);
+    openVoidModal(pendingVoidAction);
+  });
+
+  voidReasonInput?.addEventListener("input", syncVoidSubmitState);
+  voidConfirmInput?.addEventListener("change", syncVoidSubmitState);
+
+  voidForm?.addEventListener("submit", (event) => {
+    const hasReason = trimValue(voidReasonInput?.value) !== "";
+    const confirmed = Boolean(voidConfirmInput?.checked);
+
+    if (!hasReason || !confirmed) {
+      event.preventDefault();
+      syncVoidSubmitState();
+      return;
+    }
+
+    const approved = window.confirm("Yakin mau membatalkan nota pemasok ini?");
+    if (!approved) {
+      event.preventDefault();
+    }
   });
 
   searchForm?.addEventListener("submit", (e) => {
@@ -640,5 +715,6 @@
   syncInputsFromState();
   renderSortIndicators();
   renderActiveFilters();
+  syncVoidSubmitState();
   load(true);
 })();

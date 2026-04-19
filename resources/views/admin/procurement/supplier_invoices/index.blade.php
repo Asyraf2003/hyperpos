@@ -10,11 +10,12 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Tabel nota pemasok interaktif untuk admin</h4>
+                        <h4 class="card-title mb-1">Daftar Nota Pemasok</h4>
+                        <p class="mb-0 text-muted">Tabel nota pemasok interaktif untuk admin.</p>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
-                        <form id="procurement-search-form" class="m-0 d-flex flex-grow-1">
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <form id="procurement-search-form" class="d-flex flex-column gap-1">
                             <input
                                 type="text"
                                 id="procurement-search-input"
@@ -24,11 +25,8 @@
                             >
                         </form>
 
-                        <button type="button" id="open-procurement-filter" class="btn btn-primary py-2">
-                            Filter
-                        </button>
-                        
-                        <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary d-flex align-items-center">
+                        <button type="button" id="open-procurement-filter" class="btn btn-light-secondary">Filter</button>
+                        <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
                             Buat Nota Pemasok
                         </a>
                     </div>
@@ -143,46 +141,48 @@
 
                     <div class="modal-body px-4 pb-4 pt-3">
                         <div class="row g-3">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-6 col-xl-3">
                                 <a
                                     href="#"
                                     id="procurement-action-detail-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-primary w-100 text-start py-3 px-4 h-100"
                                 >
-                                    <div class="fw-bold fs-5 mb-1">Detail Nota</div>
+                                    <div class="fw-bold fs-5 mb-1">Detail</div>
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-6">
-                                <button
-                                    type="button"
-                                    id="procurement-action-payment-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
-                                >
-                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
-                                </button>
-                            </div>
-
-                            <div class="col-12 col-md-6" id="procurement-action-proof-col">
+                            <div class="col-12 col-md-6 col-xl-3">
                                 <a
                                     href="#"
-                                    id="procurement-action-proof-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
+                                    id="procurement-action-payment-link"
+                                    class="btn btn-light-primary w-100 text-start py-3 px-4 h-100"
                                 >
-                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Bukti Bayar</div>
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-6 col-xl-3">
                                 <a
                                     href="#"
                                     id="procurement-action-edit-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100 disabled"
+                                    class="btn btn-light-secondary w-100 text-start py-3 px-4 h-100 disabled"
                                     aria-disabled="true"
                                     tabindex="-1"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-edit-title">Edit Nota</div>
                                 </a>
+                            </div>
+
+                            <div class="col-12 col-md-6 col-xl-3">
+                                <button
+                                    type="button"
+                                    id="procurement-action-void-button"
+                                    class="btn btn-outline-danger w-100 text-start py-3 px-4 h-100"
+                                    disabled
+                                    aria-disabled="true"
+                                >
+                                    <div class="fw-bold fs-5 mb-1" id="procurement-action-void-title">Hapus Nota</div>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -271,6 +271,76 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="procurement-void-modal"
+            tabindex="-1"
+            aria-labelledby="procurement-void-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="procurement-void-modal-title">Hapus Nota</h3>
+                            <p class="mb-0 text-muted fs-6" id="procurement-void-modal-subtitle">
+                                Isi alasan pembatalan nota pemasok.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        @error('supplier_invoice')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
+                        <form method="post" id="procurement-void-form">
+                            @csrf
+
+                            <input type="hidden" name="void_invoice_id" id="procurement-void-invoice-id" value="{{ old('void_invoice_id') }}">
+
+                            <div class="form-group mb-4">
+                                <label for="procurement-void-reason" class="form-label">Alasan Pembatalan</label>
+                                <textarea
+                                    id="procurement-void-reason"
+                                    name="void_reason"
+                                    class="form-control @error('void_reason') is-invalid @enderror"
+                                    rows="4"
+                                    placeholder="Contoh: Salah input sebelum ada pembayaran atau receipt."
+                                    required
+                                >{{ old('void_reason') }}</textarea>
+                                @error('void_reason')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="border rounded p-3 bg-light-subtle mb-4">
+                                <div class="form-check">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        value="1"
+                                        id="procurement-void-confirm"
+                                    >
+                                    <label class="form-check-label" for="procurement-void-confirm">
+                                        Saya yakin ingin membatalkan nota ini. Tindakan ini hanya untuk salah input sebelum ada efek domain lanjutan.
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-danger" id="procurement-void-submit" disabled>
+                                    Hapus Nota
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
 
@@ -293,7 +363,9 @@
             paymentStoreBaseUrl: @json(route('admin.procurement.supplier-invoices.payments.store', ['supplierInvoiceId' => '__ID__'])),
             oldPaymentInvoiceId: @json(old('payment_invoice_id')),
             oldPaymentDate: @json(old('payment_date', now()->format('Y-m-d'))),
-            oldPaymentAmount: @json(old('amount'))
+            oldPaymentAmount: @json(old('amount')),
+            oldVoidInvoiceId: @json(old('void_invoice_id')),
+            oldVoidReason: @json(old('void_reason'))
         };
     </script>
     <script src="{{ asset('assets/static/js/pages/admin-procurement-invoices-table.js') }}"></script>

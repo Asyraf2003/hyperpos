@@ -31,6 +31,13 @@ trait ProcurementInvoiceTablePayload
                 ? 'admin.procurement.supplier-invoices.revise'
                 : 'admin.procurement.supplier-invoices.edit';
 
+            $paymentActionKind = $paymentCount > 0 ? 'proof' : 'pay';
+            $paymentActionLabel = $paymentCount > 0 ? 'Bukti Bayar' : 'Bayar';
+            $paymentActionMode = $paymentCount > 0 ? 'link' : 'modal';
+            $paymentActionUrl = route('admin.procurement.supplier-invoices.payment-proofs.show', [
+                'supplierInvoiceId' => $supplierInvoiceId,
+            ]);
+
             return [
                 'supplier_invoice_id' => $supplierInvoiceId,
                 'nomor_faktur' => $row->nomor_faktur !== null ? (string) $row->nomor_faktur : '',
@@ -50,9 +57,21 @@ trait ProcurementInvoiceTablePayload
                 'can_record_payment' => $outstandingRupiah > 0,
                 'has_uploaded_proof' => $proofAttachmentCount > 0,
                 'policy_state' => $isLocked ? 'locked' : 'editable',
+
+                'payment_action_kind' => $paymentActionKind,
+                'payment_action_label' => $paymentActionLabel,
+                'payment_action_mode' => $paymentActionMode,
+                'payment_action_url' => $paymentActionUrl,
+
                 'edit_action_kind' => $editActionKind,
                 'edit_action_label' => $editActionLabel,
                 'edit_action_url' => route($editActionRoute, [
+                    'supplierInvoiceId' => $supplierInvoiceId,
+                ]),
+
+                'void_action_enabled' => ! $isLocked,
+                'void_action_label' => 'Hapus Nota',
+                'void_action_url' => route('admin.procurement.supplier-invoices.void', [
                     'supplierInvoiceId' => $supplierInvoiceId,
                 ]),
             ];
