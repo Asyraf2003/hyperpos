@@ -15,7 +15,7 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_open_edit_workspace_page_for_unpaid_note_without_payment_allocation(): void
+    public function test_cashier_can_open_edit_workspace_page_for_unpaid_note_without_refund_action(): void
     {
         $this->loginAsKasir();
 
@@ -61,9 +61,10 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
         $response->assertSee('Edit Nota');
         $response->assertSee('Budi Santoso');
         $response->assertSee('08123456789');
-        $response->assertSee('Simpan Perubahan');
+        $response->assertSee('Proses Nota');
+        $response->assertSee('id="workspace-payment-modal"', false);
+        $response->assertDontSee('Refund');
         $response->assertDontSee('Bayar Penuh');
         $response->assertDontSee('Bayar Sebagian');
-        $response->assertDontSee('id="workspace-payment-modal"', false);
     }
 }
