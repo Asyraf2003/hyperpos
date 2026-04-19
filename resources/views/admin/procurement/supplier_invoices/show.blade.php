@@ -12,7 +12,6 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Rincian Nota</h4>
-                        <p class="mb-0 text-muted">Daftar item pembelian yang tercatat pada nota pemasok ini.</p>
                     </div>
 
                     <div class="card-body">
@@ -62,7 +61,6 @@
                         <div class="d-flex justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Ringkasan Nota</h4>
-                                <p class="mb-0 text-muted">Data utama dan status keuangan nota pemasok.</p>
                             </div>
 
                             <div class="d-flex gap-2">

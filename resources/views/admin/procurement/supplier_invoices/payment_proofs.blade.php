@@ -88,9 +88,6 @@
                 <div class="card" id="payment-proof-section">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Bukti Pembayaran</h4>
-                        <p class="mb-0 text-muted">
-                            Unggah bukti ke baris pembayaran yang sudah tercatat. Maksimal 3 file per unggahan dan bisa unggah lagi untuk pembayaran yang sama.
-                        </p>
                     </div>
 
                     <div class="card-body">
@@ -251,9 +248,6 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Header Faktur</h4>
-                        <p class="mb-0 text-muted">
-                            Ringkasan utama nota pemasok dan status pembayarannya.
-                        </p>
                     </div>
 
                     <div class="card-body">
