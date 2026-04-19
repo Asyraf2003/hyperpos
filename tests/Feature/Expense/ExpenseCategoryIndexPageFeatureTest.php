@@ -34,7 +34,7 @@ final class ExpenseCategoryIndexPageFeatureTest extends TestCase
             ->get(route('admin.expenses.categories.index'));
 
         $response->assertOk();
-        $response->assertSee('Master Kategori Pengeluaran');
+        $response->assertSee('Kategori biaya operasional yang dipakai saat pencatatan operasional');
         $response->assertSee('expense-category-search-form', false);
         $response->assertSee('expense-category-table-body', false);
         $response->assertSee('admin-expense-categories-table.js');

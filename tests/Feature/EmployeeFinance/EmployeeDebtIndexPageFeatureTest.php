@@ -29,7 +29,7 @@ final class EmployeeDebtIndexPageFeatureTest extends TestCase
     {
         $response = $this->actingAs($this->user('admin'))->get(route('admin.employee-debts.index'));
         $response->assertOk();
-        $response->assertSee('Ringkasan Hutang Karyawan');
+        $response->assertSee('Tabel ringkasan hutang interaktif yang mengarah ke detail karyawan');
         $response->assertSee('employee-debt-search-form', false);
         $response->assertSee('employee-debt-table-body', false);
         $response->assertSee('admin-employee-debts-table.js');
