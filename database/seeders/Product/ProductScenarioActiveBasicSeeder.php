@@ -14,15 +14,17 @@ final class ProductScenarioActiveBasicSeeder extends Seeder
     {
         $items = ProductSeedCatalog::all()['active_basic'];
 
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
+            $thresholds = ProductSeedThresholds::forIndex($index + 1);
+
             $result = $handler->handle(
                 kodeBarang: $item['code'],
                 namaBarang: $item['name'],
                 merek: $item['brand'],
                 ukuran: $item['size'],
                 hargaJual: $item['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($result->isFailure()) {

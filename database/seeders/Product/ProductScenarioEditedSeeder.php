@@ -18,7 +18,9 @@ final class ProductScenarioEditedSeeder extends Seeder
     ): void {
         $items = ProductSeedCatalog::all()['active_edited'];
 
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
+            $thresholds = ProductSeedThresholds::forIndex($index + 1);
+
             $productId = $this->resolveExistingProductId(
                 createCode: $item['create']['code'],
                 updateCode: $item['update']['code'],
@@ -31,8 +33,8 @@ final class ProductScenarioEditedSeeder extends Seeder
                     merek: $item['create']['brand'],
                     ukuran: $item['create']['size'],
                     hargaJual: $item['create']['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                    reorderPointQty: $thresholds['reorderPointQty'],
+                    criticalThresholdQty: $thresholds['criticalThresholdQty'],
                 );
 
                 if ($created->isFailure()) {
@@ -61,8 +63,8 @@ final class ProductScenarioEditedSeeder extends Seeder
                 merek: $item['update']['brand'],
                 ukuran: $item['update']['size'],
                 hargaJual: $item['update']['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($updated->isFailure()) {

@@ -17,15 +17,17 @@ final class ProductScenarioSoftDeletedSeeder extends Seeder
     ): void {
         $items = ProductSeedCatalog::all()['soft_deleted'];
 
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
+            $thresholds = ProductSeedThresholds::forIndex($index + 1);
+
             $created = $createHandler->handle(
                 kodeBarang: $item['create']['code'],
                 namaBarang: $item['create']['name'],
                 merek: $item['create']['brand'],
                 ukuran: $item['create']['size'],
                 hargaJual: $item['create']['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($created->isFailure()) {

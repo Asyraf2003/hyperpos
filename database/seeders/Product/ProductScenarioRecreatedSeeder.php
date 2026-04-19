@@ -17,15 +17,17 @@ final class ProductScenarioRecreatedSeeder extends Seeder
     ): void {
         $items = ProductSeedCatalog::all()['recreated_after_delete'];
 
-        foreach ($items as $item) {
+        foreach ($items as $index => $item) {
+            $thresholds = ProductSeedThresholds::forIndex($index + 1);
+
             $original = $createHandler->handle(
                 kodeBarang: $item['original']['code'],
                 namaBarang: $item['original']['name'],
                 merek: $item['original']['brand'],
                 ukuran: $item['original']['size'],
                 hargaJual: $item['original']['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($original->isFailure()) {
@@ -63,8 +65,8 @@ final class ProductScenarioRecreatedSeeder extends Seeder
                 merek: $item['replacement']['brand'],
                 ukuran: $item['replacement']['size'],
                 hargaJual: $item['replacement']['price'],
-                reorderPointQty: null,
-                criticalThresholdQty: null,
+                reorderPointQty: $thresholds['reorderPointQty'],
+                criticalThresholdQty: $thresholds['criticalThresholdQty'],
             );
 
             if ($replacement->isFailure()) {
