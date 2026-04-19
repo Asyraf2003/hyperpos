@@ -113,7 +113,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail</div>
-                                    <div class="small opacity-75">Lihat ringkasan dan riwayat versi produk.</div>
                                 </a>
                             </div>
 
@@ -124,7 +123,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Edit identitas barang</div>
-                                    <div class="small opacity-75">Ubah kode, nama, merek, ukuran, dan harga jual.</div>
                                 </a>
                             </div>
 
@@ -135,7 +133,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Ubah stok</div>
-                                    <div class="small opacity-75">Masuk ke form penyesuaian stok keluar.</div>
                                 </a>
                             </div>
 
@@ -150,7 +147,6 @@
                                         class="btn btn-outline-danger w-100 text-start py-3 px-4 h-100"
                                     >
                                         <div class="fw-bold fs-5 mb-1">Hapus Produk</div>
-                                        <div class="small opacity-75">Sembunyikan dari daftar tanpa menghapus histori.</div>
                                     </button>
                                 </form>
                             </div>

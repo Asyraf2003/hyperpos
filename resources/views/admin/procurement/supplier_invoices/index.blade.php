@@ -148,7 +148,6 @@
                                     class="btn btn-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Nota</div>
-                                    <div class="small opacity-75">Lihat ringkasan nota, pembayaran, dan bukti bayar.</div>
                                 </a>
                             </div>
 
@@ -159,9 +158,6 @@
                                     class="btn btn-light-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
-                                    <div class="small opacity-75" id="procurement-action-payment-description">
-                                        Buka form pembayaran nota.
-                                    </div>
                                 </button>
                             </div>
 
@@ -173,9 +169,6 @@
                                     aria-disabled="false"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Bukti Bayar</div>
-                                    <div class="small opacity-75" id="procurement-action-proof-description">
-                                        Buka bagian bukti pembayaran pada detail nota.
-                                    </div>
                                 </a>
                             </div>
 
@@ -188,9 +181,6 @@
                                     tabindex="-1"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-edit-title">Edit Nota</div>
-                                    <div class="small opacity-75" id="procurement-action-edit-description">
-                                        Tersedia hanya untuk nota pre-effect yang belum punya receipt atau payment.
-                                    </div>
                                 </a>
                             </div>
                         </div>
