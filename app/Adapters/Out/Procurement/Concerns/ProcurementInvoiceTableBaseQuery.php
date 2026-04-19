@@ -12,10 +12,24 @@ trait ProcurementInvoiceTableBaseQuery
     private function baseTableQuery(): Builder
     {
         $paymentTotalsSubquery = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
             ->groupBy('supplier_invoice_id');
 
         $paymentCountSubquery = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->selectRaw('supplier_invoice_id, COUNT(*) as payment_count')
             ->groupBy('supplier_invoice_id');
 
@@ -31,6 +45,13 @@ trait ProcurementInvoiceTableBaseQuery
             ->groupBy('supplier_receipts.supplier_invoice_id');
 
         $proofAttachmentCountSubquery = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->leftJoin(
                 'supplier_payment_proof_attachments',
                 'supplier_payment_proof_attachments.supplier_payment_id',

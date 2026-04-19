@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceDetailP
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\RecordSupplierPaymentController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\ReverseSupplierPaymentController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReceiveSupplierInvoiceController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReverseSupplierReceiptController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ReviseSupplierInvoicePageController;
@@ -41,6 +42,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 
     Route::post('/admin/procurement/supplier-invoices/{supplierInvoiceId}/void', VoidSupplierInvoiceController::class)
         ->name('admin.procurement.supplier-invoices.void');
+
+    Route::post('/admin/procurement/supplier-payments/{supplierPaymentId}/reverse', ReverseSupplierPaymentController::class)
+        ->name('admin.procurement.supplier-payments.reverse.store');
 
     Route::post('/admin/procurement/supplier-payments/{supplierPaymentId}/proof', AttachSupplierPaymentProofController::class)
         ->name('admin.procurement.supplier-payments.proof.store');

@@ -14,6 +14,13 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
         string $toShipmentDate,
     ): array {
         $paymentTotalsSubquery = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
             ->groupBy('supplier_invoice_id');
 
@@ -80,6 +87,13 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
             ->first();
 
         $paymentTotals = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->joinSub($filteredInvoicesSubquery, 'filtered_invoices', function ($join): void {
                 $join->on('filtered_invoices.id', '=', 'supplier_payments.supplier_invoice_id');
             })

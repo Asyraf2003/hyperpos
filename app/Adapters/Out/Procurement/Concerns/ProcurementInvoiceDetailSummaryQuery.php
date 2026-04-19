@@ -13,6 +13,13 @@ trait ProcurementInvoiceDetailSummaryQuery
     private function getSummaryRow(string $supplierInvoiceId): ?object
     {
         $paymentTotalsSubquery = DB::table('supplier_payments')
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->whereNull('supplier_payment_reversals.id')
             ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
             ->groupBy('supplier_invoice_id');
 

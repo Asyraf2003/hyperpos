@@ -15,8 +15,15 @@ final class DatabaseSupplierPaymentReaderAdapter implements SupplierPaymentReade
     public function getTotalPaidBySupplierInvoiceId(string $supplierInvoiceId): Money
     {
         $totalPaid = (int) DB::table('supplier_payments')
-            ->where('supplier_invoice_id', $supplierInvoiceId)
-            ->sum('amount_rupiah');
+            ->leftJoin(
+                'supplier_payment_reversals',
+                'supplier_payment_reversals.supplier_payment_id',
+                '=',
+                'supplier_payments.id'
+            )
+            ->where('supplier_payments.supplier_invoice_id', $supplierInvoiceId)
+            ->whereNull('supplier_payment_reversals.id')
+            ->sum('supplier_payments.amount_rupiah');
 
         return Money::fromInt($totalPaid);
     }
