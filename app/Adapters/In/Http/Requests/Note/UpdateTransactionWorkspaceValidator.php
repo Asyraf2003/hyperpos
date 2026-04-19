@@ -27,5 +27,7 @@ final class UpdateTransactionWorkspaceValidator
 
             StoreTransactionWorkspaceItemValidator::validate($item, (int) $index, $validator);
         }
+
+        StoreTransactionWorkspacePaymentValidator::validate($payload, $validator);
     }
 }

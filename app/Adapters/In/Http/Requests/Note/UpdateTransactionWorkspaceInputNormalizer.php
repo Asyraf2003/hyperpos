@@ -15,6 +15,7 @@ final class UpdateTransactionWorkspaceInputNormalizer
         return [
             'note' => StoreTransactionWorkspaceNoteNormalizer::normalize($input['note'] ?? []),
             'items' => StoreTransactionWorkspaceItemNormalizer::normalizeMany($input['items'] ?? []),
+            'inline_payment' => StoreTransactionWorkspacePaymentNormalizer::normalize($input['inline_payment'] ?? []),
         ];
     }
 }
