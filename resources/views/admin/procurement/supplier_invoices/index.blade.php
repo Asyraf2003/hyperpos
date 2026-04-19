@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @include('layouts.partials.date-picker-assets')
 
-@section('title', 'Nota Pengadaan')
-@section('heading', 'Nota Pengadaan')
+@section('title', 'Nota Pemasok')
+@section('heading', 'Nota Pemasok')
 
 @section('content')
     <section class="section">
@@ -10,8 +10,8 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Daftar nota pengadaan</h4>
-                        <p class="mb-0 text-muted">Tabel pengadaan interaktif untuk admin.</p>
+                        <h4 class="card-title mb-1">Daftar Nota Pemasok</h4>
+                        <p class="mb-0 text-muted">Tabel nota pemasok interaktif untuk admin.</p>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
@@ -25,9 +25,9 @@
                             >
                         </form>
 
-                        <button type="button" id="open-procurement-filter" class="btn btn-primary">Filter</button>
+                        <button type="button" id="open-procurement-filter" class="btn btn-light-secondary">Filter</button>
                         <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
-                            Buat Nota Supplier
+                            Buat Nota Pemasok
                         </a>
                     </div>
                 </div>
@@ -131,9 +131,9 @@
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header border-0 pb-0 px-4 pt-4">
                         <div class="w-100">
-                            <h3 class="modal-title fw-bold mb-1" id="procurement-action-modal-title">Aksi Nota Supplier</h3>
+                            <h3 class="modal-title fw-bold mb-1" id="procurement-action-modal-title">Aksi Nota Pemasok</h3>
                             <p class="mb-0 text-muted fs-6" id="procurement-action-modal-subtitle">
-                                Pilih tindakan untuk nota supplier.
+                                Pilih tindakan untuk nota pemasok.
                             </p>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
@@ -145,7 +145,7 @@
                                 <a
                                     href="#"
                                     id="procurement-action-detail-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Nota</div>
                                     <div class="small opacity-75">Lihat ringkasan nota, pembayaran, dan bukti bayar.</div>
@@ -156,7 +156,7 @@
                                 <button
                                     type="button"
                                     id="procurement-action-payment-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-light-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
                                     <div class="small opacity-75" id="procurement-action-payment-description">
@@ -169,7 +169,7 @@
                                 <a
                                     href="#"
                                     id="procurement-action-proof-link"
-                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4 h-100"
                                     aria-disabled="false"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-proof-title">Bukti Bayar</div>
@@ -183,7 +183,7 @@
                                 <a
                                     href="#"
                                     id="procurement-action-edit-link"
-                                    class="btn btn-outline-secondary w-100 text-start py-3 px-4 h-100 disabled"
+                                    class="btn btn-light-secondary w-100 text-start py-3 px-4 h-100 disabled"
                                     aria-disabled="true"
                                     tabindex="-1"
                                 >
@@ -210,9 +210,9 @@
                 <div class="modal-content border-0 shadow-lg">
                     <div class="modal-header border-0 pb-0 px-4 pt-4">
                         <div class="w-100">
-                            <h3 class="modal-title fw-bold mb-1" id="procurement-payment-modal-title">Bayar Nota Supplier</h3>
+                            <h3 class="modal-title fw-bold mb-1" id="procurement-payment-modal-title">Catat Pembayaran Nota</h3>
                             <p class="mb-0 text-muted fs-6" id="procurement-payment-modal-subtitle">
-                                Catat pembayaran langsung dari daftar nota.
+                                Catat pembayaran langsung dari daftar nota pemasok.
                             </p>
                         </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>

@@ -3,10 +3,11 @@
 
 @section('title', 'Detail Nota Pemasok')
 @section('heading', 'Detail Nota Pemasok')
+@section('back_url', route('admin.procurement.supplier-invoices.index'))
 
 @section('content')
     <section class="section">
-        <div class="row">
+        <div class="row g-4">
             <div class="col-12 col-xl-8">
                 <div class="card">
                     <div class="card-header">
@@ -276,8 +277,8 @@
 
                 <div class="card" id="payment-form-section">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Catat Pembayaran</h4>
-                        <p class="mb-0 text-muted">Pembayaran pemasok dicatat secara eksplisit per nota.</p>
+                        <h4 class="card-title mb-1">Pembayaran Nota Pemasok</h4>
+                        <p class="mb-0 text-muted">Pembayaran pemasok dicatat secara eksplisit per nota dan tetap mudah ditelusuri.</p>
                     </div>
 
                     <div class="card-body">
@@ -332,9 +333,11 @@
                                     @enderror
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">
-                                    Simpan Pembayaran
-                                </button>
+                                <div class="ui-form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        Simpan Pembayaran
+                                    </button>
+                                </div>
                             </form>
                         @else
                             <div class="text-muted">Nota pemasok ini sudah lunas. Tidak ada pembayaran tambahan yang bisa dicatat.</div>
@@ -367,28 +370,28 @@
                             <div class="d-flex flex-column gap-3">
                                 @foreach ($paymentsView as $payment)
                                     <div class="border rounded p-3">
-                                        <div class="mb-2">
-                                            <small class="text-muted d-block">ID Pembayaran</small>
+                                        <div class="ui-key-value mb-2">
+                                            <small>ID Pembayaran</small>
                                             <strong>{{ $payment['id'] }}</strong>
                                         </div>
 
-                                        <div class="mb-2">
-                                            <small class="text-muted d-block">Tanggal Pembayaran</small>
+                                        <div class="ui-key-value mb-2">
+                                            <small>Tanggal Pembayaran</small>
                                             <strong>{{ $payment['paid_at'] }}</strong>
                                         </div>
 
-                                        <div class="mb-2">
-                                            <small class="text-muted d-block">Nominal</small>
+                                        <div class="ui-key-value mb-2">
+                                            <small>Nominal</small>
                                             <strong>{{ $payment['amount_label'] }}</strong>
                                         </div>
 
-                                        <div class="mb-2">
-                                            <small class="text-muted d-block">Status Bukti</small>
+                                        <div class="ui-key-value mb-2">
+                                            <small>Status Bukti</small>
                                             <strong>{{ $payment['proof_status_label'] }}</strong>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <small class="text-muted d-block">Jumlah Lampiran</small>
+                                        <div class="ui-key-value mb-3">
+                                            <small>Jumlah Lampiran</small>
                                             <strong>{{ $payment['attachment_count'] }}</strong>
                                         </div>
 
@@ -415,9 +418,11 @@
                                                 </small>
                                             </div>
 
-                                            <button type="submit" class="btn btn-outline-primary">
-                                                Unggah Bukti
-                                            </button>
+                                            <div class="ui-form-actions">
+                                                <button type="submit" class="btn btn-light-primary">
+                                                    Unggah Bukti
+                                                </button>
+                                            </div>
                                         </form>
 
                                         <hr>
