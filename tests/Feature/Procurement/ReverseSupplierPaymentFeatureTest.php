@@ -38,7 +38,7 @@ final class ReverseSupplierPaymentFeatureTest extends TestCase
 
         $this->assertCount(1, $rows);
         $this->assertSame(50000, $rows[0]['outstanding_rupiah']);
-        $this->assertSame(0, $rows[0]['paid_rupiah']);
+        $this->assertSame(0, $rows[0]['total_paid_rupiah']);
     }
 
     public function test_admin_cannot_reverse_same_supplier_payment_twice(): void
