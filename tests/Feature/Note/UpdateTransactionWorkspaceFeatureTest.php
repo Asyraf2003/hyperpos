@@ -131,6 +131,8 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
     {
         $this->loginAsKasir();
 
+        $today = date('Y-m-d');
+
         $user = User::query()->create([
             'name' => 'Kasir Update Workspace Bayar',
             'email' => 'update-workspace-payment@example.test',
@@ -146,7 +148,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'id' => 'note-update-payment-1',
             'customer_name' => 'Budi Lama',
             'customer_phone' => '0811111111',
-            'transaction_date' => '2026-03-15',
+            'transaction_date' => $today,
             'total_rupiah' => 50000,
         ]);
 
@@ -172,7 +174,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 'note' => [
                     'customer_name' => 'Budi Bayar',
                     'customer_phone' => '0822222222',
-                    'transaction_date' => '2026-03-15',
+                    'transaction_date' => $today,
                 ],
                 'items' => [
                     [
@@ -191,7 +193,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 'inline_payment' => [
                     'decision' => 'pay_partial',
                     'payment_method' => 'transfer',
-                    'paid_at' => '2026-03-15',
+                    'paid_at' => $today,
                     'amount_paid_rupiah' => 30000,
                     'amount_received_rupiah' => null,
                 ],
@@ -205,13 +207,13 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'id' => 'note-update-payment-1',
             'customer_name' => 'Budi Bayar',
             'customer_phone' => '0822222222',
-            'transaction_date' => '2026-03-15',
+            'transaction_date' => $today,
             'total_rupiah' => 70000,
         ]);
 
         $this->assertDatabaseHas('customer_payments', [
             'amount_rupiah' => 30000,
-            'paid_at' => '2026-03-15',
+            'paid_at' => $today,
         ]);
 
         $paymentId = (string) DB::table('customer_payments')
