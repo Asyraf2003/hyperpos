@@ -4,7 +4,7 @@
 
   const defaults = {
     q: "",
-    payment_status: "all",
+    payment_status: "active",
     page: 1,
     sort_by: "shipment_date",
     sort_dir: "desc",
@@ -23,7 +23,7 @@
     "total_received_qty"
   ]);
   const allowedSortDir = new Set(["asc", "desc"]);
-  const allowedPaymentStatus = new Set(["all", "outstanding", "paid", "voided"]);
+  const allowedPaymentStatus = new Set(["active", "all", "outstanding", "paid", "voided"]);
 
   const $ = (id) => document.getElementById(id);
   const body = $("procurement-invoice-table-body");
@@ -132,7 +132,12 @@
 
   const invoiceCellHtml = (row) => {
     const nomorFaktur = trimValue(row.nomor_faktur);
-    return `<div class="fw-semibold">${esc(nomorFaktur || "-")}</div>`;
+    const isVoided = row.policy_state === "voided";
+
+    return `
+      <div class="fw-semibold">${esc(nomorFaktur || "-")}</div>
+      ${isVoided ? '<div class="mt-1"><span class="badge bg-secondary">Dibatalkan</span></div>' : ""}
+    `;
   };
 
   const activeFilterEntries = () => {
@@ -152,6 +157,10 @@
 
     if (s.payment_status === "voided") {
       entries.push({ label: "Status", value: "Sudah Dibatalkan" });
+    }
+
+    if (s.payment_status === "all") {
+      entries.push({ label: "Status", value: "Semua" });
     }
 
     if (trimValue(s.shipment_date_from) !== "" || trimValue(s.shipment_date_to) !== "") {
@@ -393,8 +402,12 @@
     setActionButtonDisabledState(actionVoidButton, !voidEnabled);
   };
 
-  const rowHtml = (row, index, meta) => `
-    <tr>
+  const rowHtml = (row, index, meta) => {
+    const isVoided = row.policy_state === "voided";
+    const rowClass = isVoided ? "table-secondary text-muted" : "";
+
+    return `
+    <tr class="${rowClass}">
       <td>${(meta.page - 1) * meta.per_page + index + 1}</td>
       <td>${invoiceCellHtml(row)}</td>
       <td>${supplierCellHtml(row)}</td>
@@ -408,7 +421,7 @@
       <td class="text-center">
         <button
           type="button"
-          class="btn btn-sm btn-outline-primary"
+          class="btn btn-sm ${isVoided ? "btn-outline-secondary" : "btn-outline-primary"}"
           data-procurement-action="open"
           data-row='${JSON.stringify(row).replace(/'/g, "&apos;")}'
         >
@@ -417,6 +430,7 @@
       </td>
     </tr>
   `;
+  };
 
   const renderRows = (rows, meta) => {
     if (!rows.length) {

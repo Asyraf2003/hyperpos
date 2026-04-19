@@ -11,10 +11,11 @@
             <div class="form-group mb-4">
                 <label class="form-label" for="filter-payment-status">Status Nota</label>
                 <select id="filter-payment-status" name="payment_status" class="form-select">
-                    <option value="all">Semua</option>
+                    <option value="active">Aktif</option>
                     <option value="outstanding">Masih Punya Tagihan</option>
                     <option value="paid">Sudah Lunas</option>
                     <option value="voided">Sudah Dibatalkan</option>
+                    <option value="all">Semua</option>
                 </select>
             </div>
 

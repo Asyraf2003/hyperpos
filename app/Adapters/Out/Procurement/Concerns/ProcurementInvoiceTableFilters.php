@@ -23,6 +23,10 @@ trait ProcurementInvoiceTableFilters
             });
         }
 
+        if ($filters->paymentStatus() === 'active') {
+            $query->whereNull('supplier_invoices.voided_at');
+        }
+
         if ($filters->paymentStatus() === 'outstanding') {
             $query->whereNull('supplier_invoices.voided_at')
                 ->whereRaw(
