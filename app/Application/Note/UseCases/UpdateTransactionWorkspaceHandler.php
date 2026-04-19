@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\UseCases;
 
+use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorder;
 use App\Application\Note\Services\EditableWorkspaceNoteGuard;
 use App\Application\Note\Services\UpdateTransactionWorkspaceResultBuilder;
 use App\Application\Note\Services\UpdateTransactionWorkspaceWorkItemPersister;
@@ -23,6 +24,7 @@ final class UpdateTransactionWorkspaceHandler
         private readonly NoteReaderPort $notes,
         private readonly NoteWriterPort $noteWriter,
         private readonly UpdateTransactionWorkspaceWorkItemPersister $items,
+        private readonly CreateTransactionWorkspaceInlinePaymentRecorder $payments,
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
         private readonly UpdateTransactionWorkspaceResultBuilder $results,
@@ -32,7 +34,8 @@ final class UpdateTransactionWorkspaceHandler
     /**
      * @param array{
      * note: array<string, mixed>,
-     * items: list<array<string, mixed>>
+     * items: list<array<string, mixed>>,
+     * inline_payment: array<string, mixed>
      * } $payload
      */
     public function handle(string $noteId, array $payload): Result
@@ -61,14 +64,16 @@ final class UpdateTransactionWorkspaceHandler
             $itemsCount = $this->items->persist($note, $payload['items'] ?? [], $note->transactionDate());
             $this->noteWriter->updateTotal($note);
 
+            $paymentSummary = $this->payments->record($note, $payload['inline_payment'] ?? []);
+
             $this->audit->record(
                 'transaction_workspace_updated',
-                $this->results->auditPayload($note, $itemsCount),
+                $this->results->auditPayload($note, $itemsCount, $paymentSummary),
             );
 
             $this->transactions->commit();
 
-            return $this->results->success($note);
+            return $this->results->success($note, $paymentSummary);
         } catch (DomainException $e) {
             if ($started) {
                 $this->transactions->rollBack();
