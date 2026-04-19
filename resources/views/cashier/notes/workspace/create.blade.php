@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @include('layouts.partials.date-picker-assets')
+@include('cashier.notes.workspace.partials.dropdown-layer-fix')
 
 @section('title', $pageTitle)
 @section('heading', $pageTitle)
