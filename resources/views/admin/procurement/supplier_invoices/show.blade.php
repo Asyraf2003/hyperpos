@@ -66,14 +66,16 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <a
-                                    href="{{ route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}"
-                                    class="btn btn-sm btn-light-primary"
-                                >
-                                    Pembayaran
-                                </a>
+                                @if (! $policyView['is_voided'])
+                                    <a
+                                        href="{{ route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}"
+                                        class="btn btn-sm btn-light-primary"
+                                    >
+                                        Pembayaran
+                                    </a>
+                                @endif
 
-                                @if ($linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
+                                @if (! $policyView['is_voided'] && $linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
                                     <a href="#receipt-form-section" class="btn btn-sm btn-primary">
                                         Terima Barang
                                     </a>
@@ -188,7 +190,7 @@
                     </div>
                 </div>
 
-                @if ($linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
+                @if (! $policyView['is_voided'] && $linesView !== [] && (int) ($summaryView['receipt_count'] ?? 0) < 1)
                     <div class="card" id="receipt-form-section">
                         <div class="card-header">
                             <h4 class="card-title mb-1">Terima Barang</h4>
@@ -267,7 +269,7 @@
                             </form>
                         </div>
                     </div>
-                @elseif ((int) ($summaryView['receipt_count'] ?? 0) > 0)
+                @elseif (! $policyView['is_voided'] && (int) ($summaryView['receipt_count'] ?? 0) > 0)
                     <div class="card" id="receipt-form-section">
                         <div class="card-header">
                             <h4 class="card-title mb-1">Status Penerimaan Barang</h4>

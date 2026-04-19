@@ -9,7 +9,13 @@
     <section class="section">
         <div class="row g-4">
             <div class="col-12 col-xl-8">
-                @if ($summaryView['can_record_payment'])
+                @if ($policyView['is_voided'])
+                    <div class="alert alert-secondary">
+                        Nota ini sudah dibatalkan. Halaman pembayaran bersifat baca-saja.
+                    </div>
+                @endif
+
+                @if ($summaryView['can_record_payment'] && ! $policyView['is_voided'])
                     <div class="card" id="payment-form-section">
                         <div class="card-header">
                             <h4 class="card-title mb-1">Catat Pembayaran</h4>
@@ -131,37 +137,39 @@
                                             <strong>{{ $payment['attachment_count'] }}</strong>
                                         </div>
 
-                                        <form
-                                            action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
-                                            method="post"
-                                            enctype="multipart/form-data"
-                                        >
-                                            @csrf
+                                        @if (! $policyView['is_voided'])
+                                            <form
+                                                action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
+                                                method="post"
+                                                enctype="multipart/form-data"
+                                            >
+                                                @csrf
 
-                                            <div class="form-group mb-3">
-                                                <label class="form-label" for="proof_files_{{ $payment['id'] }}">File Bukti</label>
-                                                <input
-                                                    type="file"
-                                                    id="proof_files_{{ $payment['id'] }}"
-                                                    name="proof_files[]"
-                                                    class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
-                                                    accept=".jpg,.jpeg,.png,.pdf"
-                                                    multiple
-                                                    required
-                                                >
-                                                <small class="text-muted d-block mt-1">
-                                                    Maksimal 3 file per unggahan. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
-                                                </small>
-                                            </div>
+                                                <div class="form-group mb-3">
+                                                    <label class="form-label" for="proof_files_{{ $payment['id'] }}">File Bukti</label>
+                                                    <input
+                                                        type="file"
+                                                        id="proof_files_{{ $payment['id'] }}"
+                                                        name="proof_files[]"
+                                                        class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
+                                                        accept=".jpg,.jpeg,.png,.pdf"
+                                                        multiple
+                                                        required
+                                                    >
+                                                    <small class="text-muted d-block mt-1">
+                                                        Maksimal 3 file per unggahan. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
+                                                    </small>
+                                                </div>
 
-                                            <div class="ui-form-actions">
-                                                <button type="submit" class="btn btn-light-primary">
-                                                    Unggah Bukti
-                                                </button>
-                                            </div>
-                                        </form>
+                                                <div class="ui-form-actions">
+                                                    <button type="submit" class="btn btn-light-primary">
+                                                        Unggah Bukti
+                                                    </button>
+                                                </div>
+                                            </form>
 
-                                        <hr>
+                                            <hr>
+                                        @endif
 
                                         <div>
                                             <small class="text-muted d-block mb-2">Riwayat Lampiran</small>

@@ -23,7 +23,7 @@
     "total_received_qty"
   ]);
   const allowedSortDir = new Set(["asc", "desc"]);
-  const allowedPaymentStatus = new Set(["all", "outstanding", "paid"]);
+  const allowedPaymentStatus = new Set(["all", "outstanding", "paid", "voided"]);
 
   const $ = (id) => document.getElementById(id);
   const body = $("procurement-invoice-table-body");
@@ -149,6 +149,10 @@
 
     if (s.payment_status === "paid") {
       entries.push({ label: "Status", value: "Sudah Lunas" });
+    }
+
+    if (s.payment_status === "voided") {
+      entries.push({ label: "Status", value: "Sudah Dibatalkan" });
     }
 
     if (trimValue(s.shipment_date_from) !== "" || trimValue(s.shipment_date_to) !== "") {
@@ -366,17 +370,20 @@
     const paymentActionMode = trimValue(row.payment_action_mode) || "link";
     const paymentActionLabel = trimValue(row.payment_action_label) || "Bayar";
     const paymentActionUrl = trimValue(row.payment_action_url) || paymentSectionUrl(row.supplier_invoice_id);
+    const paymentActionEnabled = row.payment_action_enabled !== false;
 
-    pendingPaymentAction = {
-      mode: paymentActionMode,
-      row,
-      url: paymentActionUrl
-    };
+    pendingPaymentAction = paymentActionEnabled
+      ? {
+          mode: paymentActionMode,
+          row,
+          url: paymentActionUrl
+        }
+      : null;
 
-    actionPaymentLink.href = paymentActionUrl;
+    actionPaymentLink.href = paymentActionEnabled ? paymentActionUrl : "#";
     actionPaymentLink.dataset.actionMode = paymentActionMode;
     actionPaymentTitle.textContent = paymentActionLabel;
-    setActionLinkDisabledState(actionPaymentLink, false);
+    setActionLinkDisabledState(actionPaymentLink, !paymentActionEnabled);
 
     const editActionLabel = trimValue(row.edit_action_label) || "Edit Nota";
     const editActionUrl = trimValue(row.edit_action_url);

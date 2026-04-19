@@ -24,15 +24,21 @@ trait ProcurementInvoiceTableFilters
         }
 
         if ($filters->paymentStatus() === 'outstanding') {
-            $query->whereRaw(
-                'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) > 0'
-            );
+            $query->whereNull('supplier_invoices.voided_at')
+                ->whereRaw(
+                    'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) > 0'
+                );
         }
 
         if ($filters->paymentStatus() === 'paid') {
-            $query->whereRaw(
-                'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) <= 0'
-            );
+            $query->whereNull('supplier_invoices.voided_at')
+                ->whereRaw(
+                    'supplier_invoices.grand_total_rupiah - COALESCE(payment_totals.total_paid_rupiah, 0) <= 0'
+                );
+        }
+
+        if ($filters->paymentStatus() === 'voided') {
+            $query->whereNotNull('supplier_invoices.voided_at');
         }
 
         if ($filters->shipmentDateFrom() !== null) {

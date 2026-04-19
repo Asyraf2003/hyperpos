@@ -37,7 +37,7 @@ trait BuildsProcurementInvoiceDetailPolicyView
 
         $primaryAction = null;
 
-        if ($supplierInvoiceId !== '') {
+        if ($supplierInvoiceId !== '' && $policyState !== 'voided') {
             if (in_array('correction', $allowedActions, true)) {
                 $primaryAction = [
                     'label' => 'Koreksi',
@@ -58,13 +58,24 @@ trait BuildsProcurementInvoiceDetailPolicyView
         }
 
         return [
-            'badge_class' => $policyState === 'locked' ? 'bg-danger' : 'bg-success',
-            'label' => $policyState === 'locked' ? 'Locked' : 'Editable',
+            'state' => $policyState,
+            'is_voided' => $policyState === 'voided',
+            'badge_class' => match ($policyState) {
+                'voided' => 'bg-secondary',
+                'locked' => 'bg-danger',
+                default => 'bg-success',
+            },
+            'label' => match ($policyState) {
+                'voided' => 'Dibatalkan',
+                'locked' => 'Locked',
+                default => 'Editable',
+            },
             'allowed_actions' => $allowedActionLabels,
             'lock_reasons' => array_map(
                 fn (string $reason): string => match ($reason) {
                     'receipt_recorded' => 'Receipt sudah tercatat',
                     'payment_effective_recorded' => 'Payment efektif sudah tercatat',
+                    'voided' => 'Nota sudah dibatalkan',
                     default => $reason,
                 },
                 $lockReasons,

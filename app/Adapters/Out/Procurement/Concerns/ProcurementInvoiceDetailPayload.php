@@ -29,19 +29,23 @@ trait ProcurementInvoiceDetailPayload
         $totalPaidRupiah = (int) $summary->total_paid_rupiah;
         $receiptCount = (int) $summary->receipt_count;
 
-        $lockReasons = [];
+        $policyState = trim((string) ($summary->policy_state ?? 'editable'));
 
-        if ($receiptCount > 0) {
-            $lockReasons[] = 'receipt_recorded';
-        }
+        $allowedActionsCsv = trim((string) ($summary->allowed_actions_csv ?? ''));
+        $allowedActions = $allowedActionsCsv === ''
+            ? []
+            : array_values(array_filter(array_map(
+                static fn (string $value): string => trim($value),
+                explode(',', $allowedActionsCsv),
+            ), static fn (string $value): bool => $value !== ''));
 
-        if ($totalPaidRupiah > 0) {
-            $lockReasons[] = 'payment_effective_recorded';
-        }
-
-        $isLocked = $lockReasons !== [];
-        $policyState = $isLocked ? 'locked' : 'editable';
-        $allowedActions = $isLocked ? ['correction'] : ['edit', 'void'];
+        $lockReasonsCsv = trim((string) ($summary->lock_reasons_csv ?? ''));
+        $lockReasons = $lockReasonsCsv === ''
+            ? []
+            : array_values(array_filter(array_map(
+                static fn (string $value): string => trim($value),
+                explode(',', $lockReasonsCsv),
+            ), static fn (string $value): bool => $value !== ''));
 
         return [
             'summary' => [
@@ -65,6 +69,8 @@ trait ProcurementInvoiceDetailPayload
                     ? (string) $summary->latest_receipt_date
                     : null,
                 'total_received_qty' => (int) $summary->total_received_qty,
+                'voided_at' => $summary->voided_at !== null ? (string) $summary->voided_at : null,
+                'void_reason' => $summary->void_reason !== null ? (string) $summary->void_reason : null,
                 'policy_state' => $policyState,
                 'lock_reasons' => $lockReasons,
                 'allowed_actions' => $allowedActions,

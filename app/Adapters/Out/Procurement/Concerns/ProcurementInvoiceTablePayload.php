@@ -23,13 +23,18 @@ trait ProcurementInvoiceTablePayload
             $paymentCount = (int) $row->payment_count;
             $receiptCount = (int) $row->receipt_count;
             $proofAttachmentCount = (int) $row->proof_attachment_count;
+            $isVoided = $row->voided_at !== null;
+            $isLocked = ! $isVoided && ($paymentCount > 0 || $receiptCount > 0);
 
-            $isLocked = $paymentCount > 0 || $receiptCount > 0;
             $editActionKind = $isLocked ? 'revise' : 'edit';
             $editActionLabel = $isLocked ? 'Koreksi' : 'Edit Nota';
-            $editActionRoute = $isLocked
-                ? 'admin.procurement.supplier-invoices.revise'
-                : 'admin.procurement.supplier-invoices.edit';
+            $editActionUrl = $isVoided
+                ? ''
+                : route($isLocked
+                    ? 'admin.procurement.supplier-invoices.revise'
+                    : 'admin.procurement.supplier-invoices.edit', [
+                    'supplierInvoiceId' => $supplierInvoiceId,
+                ]);
 
             $paymentActionKind = $paymentCount > 0 ? 'proof' : 'pay';
             $paymentActionLabel = $paymentCount > 0 ? 'Bukti Bayar' : 'Bayar';
@@ -54,10 +59,11 @@ trait ProcurementInvoiceTablePayload
                 'receipt_count' => $receiptCount,
                 'total_received_qty' => (int) $row->total_received_qty,
                 'proof_attachment_count' => $proofAttachmentCount,
-                'can_record_payment' => $outstandingRupiah > 0,
+                'can_record_payment' => ! $isVoided && $outstandingRupiah > 0,
                 'has_uploaded_proof' => $proofAttachmentCount > 0,
-                'policy_state' => $isLocked ? 'locked' : 'editable',
+                'policy_state' => $isVoided ? 'voided' : ($isLocked ? 'locked' : 'editable'),
 
+                'payment_action_enabled' => ! $isVoided,
                 'payment_action_kind' => $paymentActionKind,
                 'payment_action_label' => $paymentActionLabel,
                 'payment_action_mode' => $paymentActionMode,
@@ -65,11 +71,9 @@ trait ProcurementInvoiceTablePayload
 
                 'edit_action_kind' => $editActionKind,
                 'edit_action_label' => $editActionLabel,
-                'edit_action_url' => route($editActionRoute, [
-                    'supplierInvoiceId' => $supplierInvoiceId,
-                ]),
+                'edit_action_url' => $editActionUrl,
 
-                'void_action_enabled' => ! $isLocked,
+                'void_action_enabled' => ! $isVoided && ! $isLocked,
                 'void_action_label' => 'Hapus Nota',
                 'void_action_url' => route('admin.procurement.supplier-invoices.void', [
                     'supplierInvoiceId' => $supplierInvoiceId,

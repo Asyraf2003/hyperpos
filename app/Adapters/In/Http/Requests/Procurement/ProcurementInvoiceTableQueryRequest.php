@@ -33,7 +33,7 @@ final class ProcurementInvoiceTableQueryRequest extends FormRequest
     {
         return [
             'q' => ['nullable', 'string'],
-            'payment_status' => ['nullable', 'in:outstanding,paid,all'],
+            'payment_status' => ['nullable', 'in:outstanding,paid,all,voided'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'in:10'],
             'sort_by' => ['nullable', 'in:shipment_date,due_date,nama_pt_pengirim,grand_total_rupiah,total_paid_rupiah,outstanding_rupiah,receipt_count,total_received_qty'],
