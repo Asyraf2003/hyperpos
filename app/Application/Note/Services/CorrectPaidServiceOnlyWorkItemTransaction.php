@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Note\Policies\NotePaidStatusPolicy;
+use App\Application\Note\UseCases\CorrectPaidServiceOnlySupportTrait;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
@@ -65,7 +66,18 @@ final class CorrectPaidServiceOnlyWorkItemTransaction
 
             $before = $this->snapshots->build($note);
             $detail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
-            $corrected = WorkItem::rehydrate($target->id(), $target->noteId(), $target->lineNo(), $target->transactionType(), $target->status(), $detail->servicePriceRupiah(), $detail, [], []);
+            $corrected = WorkItem::rehydrate(
+                $target->id(),
+                $target->noteId(),
+                $target->lineNo(),
+                $target->transactionType(),
+                $target->status(),
+                $detail->servicePriceRupiah(),
+                $detail,
+                [],
+                []
+            );
+
             $newTotal = $note->totalRupiah()->subtract($target->subtotalRupiah())->add($corrected->subtotalRupiah());
             $newTotal->ensureNotNegative('Total note hasil correction tidak boleh negatif.');
 
@@ -77,8 +89,24 @@ final class CorrectPaidServiceOnlyWorkItemTransaction
             $after = $this->snapshots->build($afterNote);
             $refundReq = $this->calculateRefundRequired($this->allocations, $this->refunds, $note->id(), $afterNote->totalRupiah());
 
-            $this->timeline->record($note->id(), 'paid_service_only_work_item_corrected', $performedByActorId, 'admin', $reason, $this->clock->now(), $before, $after, null, null, ['refund_required_rupiah' => $refundReq]);
-            $this->audit->record('paid_service_only_work_item_corrected', $this->formatAuditPayload($performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after));
+            $this->timeline->record(
+                $note->id(),
+                'paid_service_only_work_item_corrected',
+                $performedByActorId,
+                'admin',
+                $reason,
+                $this->clock->now(),
+                $before,
+                $after,
+                null,
+                null,
+                ['refund_required_rupiah' => $refundReq]
+            );
+
+            $this->audit->record(
+                'paid_service_only_work_item_corrected',
+                $this->formatAuditPayload($performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after)
+            );
 
             $this->projection->syncNote($afterNote->id());
             $this->transactions->commit();
