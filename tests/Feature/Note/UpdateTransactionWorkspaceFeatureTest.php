@@ -76,6 +76,13 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                         'external_purchase_lines' => [],
                     ],
                 ],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => date('Y-m-d'),
+                    'amount_paid_rupiah' => null,
+                    'amount_received_rupiah' => null,
+                ],
             ],
         );
 
@@ -113,6 +120,110 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'service_name' => 'Servis Baru',
             'service_price_rupiah' => 70000,
             'part_source' => ServiceDetail::PART_SOURCE_NONE,
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'transaction_workspace_updated',
+        ]);
+    }
+
+    public function test_cashier_can_update_workspace_with_partial_transfer_inline_payment(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Update Workspace Bayar',
+            'email' => 'update-workspace-payment@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('notes')->insert([
+            'id' => 'note-update-payment-1',
+            'customer_name' => 'Budi Lama',
+            'customer_phone' => '0811111111',
+            'transaction_date' => '2026-03-15',
+            'total_rupiah' => 50000,
+        ]);
+
+        DB::table('work_items')->insert([
+            'id' => 'work-item-update-payment-old-1',
+            'note_id' => 'note-update-payment-1',
+            'line_no' => 1,
+            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
+            'status' => WorkItem::STATUS_OPEN,
+            'subtotal_rupiah' => 50000,
+        ]);
+
+        DB::table('work_item_service_details')->insert([
+            'work_item_id' => 'work-item-update-payment-old-1',
+            'service_name' => 'Servis Lama',
+            'service_price_rupiah' => 50000,
+            'part_source' => ServiceDetail::PART_SOURCE_NONE,
+        ]);
+
+        $response = $this->actingAs($user)->patch(
+            route('cashier.notes.workspace.update', ['noteId' => 'note-update-payment-1']),
+            [
+                'note' => [
+                    'customer_name' => 'Budi Bayar',
+                    'customer_phone' => '0822222222',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [
+                    [
+                        'entry_mode' => 'service',
+                        'description' => '',
+                        'part_source' => 'none',
+                        'service' => [
+                            'name' => 'Servis Baru',
+                            'price_rupiah' => '70000',
+                            'notes' => '',
+                        ],
+                        'product_lines' => [],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+                'inline_payment' => [
+                    'decision' => 'pay_partial',
+                    'payment_method' => 'transfer',
+                    'paid_at' => '2026-03-15',
+                    'amount_paid_rupiah' => 30000,
+                    'amount_received_rupiah' => null,
+                ],
+            ],
+        );
+
+        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-update-payment-1']));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-update-payment-1',
+            'customer_name' => 'Budi Bayar',
+            'customer_phone' => '0822222222',
+            'transaction_date' => '2026-03-15',
+            'total_rupiah' => 70000,
+        ]);
+
+        $this->assertDatabaseHas('customer_payments', [
+            'amount_rupiah' => 30000,
+            'paid_at' => '2026-03-15',
+        ]);
+
+        $paymentId = (string) DB::table('customer_payments')
+            ->where('amount_rupiah', 30000)
+            ->value('id');
+
+        $this->assertNotSame('', $paymentId);
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'customer_payment_id' => $paymentId,
+            'note_id' => 'note-update-payment-1',
+            'allocated_amount_rupiah' => 30000,
         ]);
 
         $this->assertDatabaseHas('audit_logs', [
