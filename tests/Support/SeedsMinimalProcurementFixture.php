@@ -50,7 +50,6 @@ trait SeedsMinimalProcurementFixture
         );
     }
 
-
     private function seedMinimalSupplierInvoice(
         string $id,
         string $supplierId,
@@ -81,6 +80,8 @@ trait SeedsMinimalProcurementFixture
                 'last_revision_no' => 0,
             ]
         );
+
+        $this->syncSupplierInvoiceProjectionForTest($id);
     }
 
     private function seedMinimalSupplierInvoiceLine(
@@ -122,6 +123,8 @@ trait SeedsMinimalProcurementFixture
                 'unit_cost_rupiah' => $unitCostRupiah,
             ]
         );
+
+        $this->syncSupplierInvoiceProjectionForTest($supplierInvoiceId);
     }
 
     private function seedMinimalSupplierPayment(
@@ -142,6 +145,8 @@ trait SeedsMinimalProcurementFixture
                 'proof_storage_path' => $proofStoragePath,
             ]
         );
+
+        $this->syncSupplierInvoiceProjectionForTest($supplierInvoiceId);
     }
 
     private function seedMinimalSupplierReceipt(
@@ -156,6 +161,8 @@ trait SeedsMinimalProcurementFixture
                 'tanggal_terima' => $tanggalTerima,
             ]
         );
+
+        $this->syncSupplierInvoiceProjectionForTest($supplierInvoiceId);
     }
 
     private function seedMinimalSupplierReceiptLine(
@@ -172,5 +179,13 @@ trait SeedsMinimalProcurementFixture
                 'qty_diterima' => $qtyDiterima,
             ]
         );
+
+        $supplierInvoiceId = (string) DB::table('supplier_receipts')
+            ->where('id', $supplierReceiptId)
+            ->value('supplier_invoice_id');
+
+        if ($supplierInvoiceId !== '') {
+            $this->syncSupplierInvoiceProjectionForTest($supplierInvoiceId);
+        }
     }
 }

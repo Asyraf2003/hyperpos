@@ -91,6 +91,8 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
             'status' => WorkItem::STATUS_OPEN,
             'subtotal_rupiah' => 40000,
         ]);
+
+        $this->syncNoteProjectionForTest($noteId);
     }
 
     private function seedClosedPaidNote(string $noteId, string $date, string $customerName, string $phone): void
@@ -125,5 +127,7 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
             'note_id' => $noteId,
             'amount_rupiah' => 50000,
         ]);
+
+        $this->syncNoteProjectionForTest($noteId);
     }
 }
