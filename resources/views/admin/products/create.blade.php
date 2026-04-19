@@ -18,9 +18,6 @@
                             @if (! empty($returnTo))
                                 <div class="alert alert-light-primary border mb-0 py-2 px-3">
                                     <div class="fw-semibold mb-1">Mode kembali ke nota aktif</div>
-                                    <small class="text-muted d-block">
-                                        Setelah produk berhasil dibuat, Anda akan diarahkan kembali ke halaman nota supplier.
-                                    </small>
                                 </div>
                             @endif
                         </div>

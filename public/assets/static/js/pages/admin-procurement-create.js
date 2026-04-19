@@ -307,6 +307,97 @@
       .replaceAll("__INDEX__", String(index))
       .replaceAll("__LINE_NO__", String(lineNo));
 
+  const buildProductCanonicalLabel = (row) => {
+    if (!row || typeof row !== "object") {
+      return "";
+    }
+
+    const explicitLabel = String(row.label ?? "").trim();
+    if (explicitLabel !== "") {
+      return explicitLabel;
+    }
+
+    const namaBarang = String(row.nama_barang ?? row.namaBarang ?? "").trim();
+    const merek = String(row.merek ?? "").trim();
+    const ukuranRaw = row.ukuran;
+    const ukuran =
+      ukuranRaw === null || ukuranRaw === undefined || String(ukuranRaw).trim() === ""
+        ? ""
+        : String(ukuranRaw).trim();
+    const kodeBarang = String(row.kode_barang ?? row.kodeBarang ?? "").trim();
+
+    const parts = [namaBarang, merek].filter((value) => value !== "");
+    if (ukuran !== "") {
+      parts.push(ukuran);
+    }
+
+    let label = parts.join(" — ");
+    if (kodeBarang !== "") {
+      label = label !== "" ? `${label} (${kodeBarang})` : `(${kodeBarang})`;
+    }
+
+    return label;
+  };
+
+  const buildProductMetaLabel = (row) => {
+    if (!row || typeof row !== "object") {
+      return "";
+    }
+
+    const merek = String(row.merek ?? "").trim();
+    const ukuranRaw = row.ukuran;
+    const ukuran =
+      ukuranRaw === null || ukuranRaw === undefined || String(ukuranRaw).trim() === ""
+        ? ""
+        : String(ukuranRaw).trim();
+    const kodeBarang = String(row.kode_barang ?? row.kodeBarang ?? "").trim();
+
+    const parts = [merek].filter((value) => value !== "");
+    if (ukuran !== "") {
+      parts.push(ukuran);
+    }
+
+    let meta = parts.join(" - ");
+    if (kodeBarang !== "") {
+      meta = meta !== "" ? `${meta} (${kodeBarang})` : `(${kodeBarang})`;
+    }
+
+    return meta;
+  };
+
+  const applySelectedProductState = (item, row) => {
+    const hiddenInput = item.querySelector("[data-product-id]");
+    const searchInput = item.querySelector("[data-product-search]");
+
+    if (!(hiddenInput instanceof HTMLInputElement) || !(searchInput instanceof HTMLInputElement)) {
+      return;
+    }
+
+    if (!row || typeof row !== "object") {
+      hiddenInput.value = "";
+      searchInput.value = "";
+      searchInput.dataset.selectedProductId = "";
+      searchInput.dataset.selectedLabel = "";
+      return;
+    }
+
+    const selectedId = String(row.id ?? "").trim();
+    const selectedLabel = buildProductCanonicalLabel(row);
+
+    if (selectedId === "" || selectedLabel === "") {
+      hiddenInput.value = "";
+      searchInput.value = "";
+      searchInput.dataset.selectedProductId = "";
+      searchInput.dataset.selectedLabel = "";
+      return;
+    }
+
+    hiddenInput.value = selectedId;
+    searchInput.value = selectedLabel;
+    searchInput.dataset.selectedProductId = selectedId;
+    searchInput.dataset.selectedLabel = selectedLabel;
+  };
+
   const populateLineItem = (item, line) => {
     const lineNoInput = item.querySelector("[data-line-no]");
     const productIdInput = item.querySelector("[data-product-id]");
@@ -319,15 +410,15 @@
       lineNoInput.value = String(line.line_no ?? "");
     }
 
-    if (productIdInput) {
-      productIdInput.value = String(line.product_id ?? "");
-    }
+    const restoredProductId = String(line.product_id ?? "").trim();
+    const restoredProductLabel = String(line.product_label ?? "").trim();
 
-    if (productSearchInput) {
-      productSearchInput.value = String(line.product_label ?? "");
-      productSearchInput.dataset.selectedProductId = String(line.product_id ?? "");
-      productSearchInput.dataset.selectedLabel = productSearchInput.value;
-    }
+    applySelectedProductState(
+      item,
+      restoredProductId !== ""
+        ? { id: restoredProductId, label: restoredProductLabel }
+        : null
+    );
 
     if (qtyInput) {
       qtyInput.value = String(line.qty_pcs ?? "1");
@@ -520,7 +611,9 @@
         .map((item) => ({
           line_no: String(item.querySelector("[data-line-no]")?.value ?? ""),
           product_id: String(item.querySelector("[data-product-id]")?.value ?? ""),
-          product_label: String(item.querySelector("[data-product-search]")?.value ?? ""),
+          product_label: String(item.querySelector("[data-product-id]")?.value ?? "").trim() !== ""
+            ? String(item.querySelector("[data-product-search]")?.dataset.selectedLabel ?? "")
+            : "",
           qty_pcs: String(item.querySelector("[data-qty-input]")?.value ?? ""),
           line_total_rupiah: String(item.querySelector("[data-money-raw]")?.value ?? ""),
           line_total_display: String(item.querySelector("[data-money-display]")?.value ?? "")
@@ -846,8 +939,12 @@
         const feedback = ensureProductDuplicateFeedback(item);
         feedback.textContent = duplicateProductMessage(duplicateLineNo, currentLineNo);
 
-        hiddenInput.value = previousSelectedProductId;
-        searchInput.value = previousSelectedLabel;
+        applySelectedProductState(
+          item,
+          previousSelectedProductId !== "" && previousSelectedLabel !== ""
+            ? { id: previousSelectedProductId, label: previousSelectedLabel }
+            : null
+        );
 
         scheduleDraftSave();
         focusField(searchInput, false);
@@ -855,10 +952,7 @@
       }
 
       clearProductDuplicateFeedback(item, searchInput);
-      hiddenInput.value = row.id || "";
-      searchInput.value = row.label || "";
-      searchInput.dataset.selectedProductId = hiddenInput.value;
-      searchInput.dataset.selectedLabel = searchInput.value;
+      applySelectedProductState(item, row);
       hideResults();
       scheduleDraftSave();
       focusField(qtyInput);
@@ -884,7 +978,7 @@
       resultsBox.innerHTML = rows.map((row) => `
         <button type="button" class="list-group-item list-group-item-action" data-product-choice='${JSON.stringify(row).replace(/'/g, "&apos;")}'>
           <div class="fw-semibold">${esc(row.nama_barang)}</div>
-          <small class="text-muted">${esc(row.merek)}${row.ukuran !== null ? " - " + esc(row.ukuran) : ""}${row.kode_barang ? " (" + esc(row.kode_barang) + ")" : ""}</small>
+          <small class="text-muted">${esc(buildProductMetaLabel(row))}</small>
         </button>
       `).join("");
 

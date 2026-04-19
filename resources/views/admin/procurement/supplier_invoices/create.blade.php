@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @include('layouts.partials.date-picker-assets')
+@include('admin.procurement.supplier_invoices.partials.create-dropdown-overflow-fix')
 
 @section('title', 'Buat Nota Pemasok')
 @section('heading', 'Buat Nota Pemasok')

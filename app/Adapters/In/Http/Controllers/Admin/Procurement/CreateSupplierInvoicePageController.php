@@ -78,7 +78,7 @@ final class CreateSupplierInvoicePageController extends Controller
             $parts[] = (string) $product->ukuran();
         }
 
-        $label = implode(' - ', $parts);
+        $label = implode(' — ', $parts);
 
         if ($product->kodeBarang() !== null) {
             $label .= ' (' . $product->kodeBarang() . ')';

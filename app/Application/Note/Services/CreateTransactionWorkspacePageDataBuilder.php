@@ -13,10 +13,10 @@ final class CreateTransactionWorkspacePageDataBuilder
     {
         return [
             'itemTypeOptions' => [
-                ['type' => 'product', 'label' => 'Produk', 'help' => 'Penjualan barang dari stok toko.'],
-                ['type' => 'service', 'label' => 'Servis', 'help' => 'Servis biasa tanpa sparepart toko.'],
-                ['type' => 'service_store_stock', 'label' => 'Servis + Sparepart Toko', 'help' => 'Servis dengan sparepart dari stok toko.'],
-                ['type' => 'service_external', 'label' => 'Servis + Pembelian Luar', 'help' => 'Servis dengan sparepart yang dibeli dari luar.'],
+                ['type' => 'product', 'label' => 'Produk'],
+                ['type' => 'service', 'label' => 'Servis'],
+                ['type' => 'service_store_stock', 'label' => 'Servis + Sparepart Toko'],
+                ['type' => 'service_external', 'label' => 'Servis + Pembelian Luar'],
             ],
             'paymentDecisionOptions' => [
                 ['value' => 'skip', 'label' => 'Skip'],

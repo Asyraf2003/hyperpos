@@ -11,7 +11,6 @@
                 data-add-item-type="{{ $option['type'] }}"
             >
                 <span class="fw-semibold d-block text-dark">{{ $option['label'] }}</span>
-                <small class="text-black-50">{{ $option['help'] }}</small>
             </button>
         @endforeach
     </div>
