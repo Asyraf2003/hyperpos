@@ -319,20 +319,6 @@
                                 @enderror
                             </div>
 
-                            <div class="border rounded p-3 bg-light-subtle mb-4">
-                                <div class="form-check">
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        value="1"
-                                        id="procurement-void-confirm"
-                                    >
-                                    <label class="form-check-label" for="procurement-void-confirm">
-                                        Saya yakin ingin membatalkan nota ini. Tindakan ini hanya untuk salah input sebelum ada efek domain lanjutan.
-                                    </label>
-                                </div>
-                            </div>
-
                             <div class="d-flex justify-content-end gap-2">
                                 <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
                                 <button type="submit" class="btn btn-danger" id="procurement-void-submit" disabled>

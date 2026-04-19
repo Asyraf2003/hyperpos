@@ -63,7 +63,6 @@
   const voidForm = $("procurement-void-form");
   const voidInvoiceIdInput = $("procurement-void-invoice-id");
   const voidReasonInput = $("procurement-void-reason");
-  const voidConfirmInput = $("procurement-void-confirm");
   const voidSubmitButton = $("procurement-void-submit");
 
   const actionModal = actionModalElement && window.bootstrap && window.bootstrap.Modal
@@ -301,8 +300,7 @@
 
   const syncVoidSubmitState = () => {
     const hasReason = trimValue(voidReasonInput?.value) !== "";
-    const confirmed = Boolean(voidConfirmInput?.checked);
-    setActionButtonDisabledState(voidSubmitButton, !(hasReason && confirmed));
+    setActionButtonDisabledState(voidSubmitButton, !hasReason);
   };
 
   const openVoidModal = (row, preserveOldInput = false) => {
@@ -336,9 +334,6 @@
         voidReasonInput.value = "";
       }
 
-      if (voidConfirmInput) {
-        voidConfirmInput.checked = false;
-      }
     }
 
     syncVoidSubmitState();
@@ -564,21 +559,13 @@
   });
 
   voidReasonInput?.addEventListener("input", syncVoidSubmitState);
-  voidConfirmInput?.addEventListener("change", syncVoidSubmitState);
 
   voidForm?.addEventListener("submit", (event) => {
     const hasReason = trimValue(voidReasonInput?.value) !== "";
-    const confirmed = Boolean(voidConfirmInput?.checked);
 
-    if (!hasReason || !confirmed) {
+    if (!hasReason) {
       event.preventDefault();
       syncVoidSubmitState();
-      return;
-    }
-
-    const approved = window.confirm("Yakin mau membatalkan nota pemasok ini?");
-    if (!approved) {
-      event.preventDefault();
     }
   });
 
