@@ -14,6 +14,8 @@ final class EditTransactionWorkspacePageDataBuilder
         private readonly NoteReaderPort $notes,
         private readonly CreateTransactionWorkspacePageDataBuilder $options,
         private readonly TransactionWorkspaceExistingItemMapper $existingItems,
+        private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
+        private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
     ) {
     }
 
@@ -32,6 +34,12 @@ final class EditTransactionWorkspacePageDataBuilder
             throw new DomainException('Nota tidak ditemukan.');
         }
 
+        $workspacePanel = $this->workspacePanel->build($normalized);
+
+        if ($workspacePanel === null) {
+            throw new DomainException('Panel workspace nota tidak ditemukan.');
+        }
+
         $oldNote = [
             'customer_name' => $note->customerName(),
             'customer_phone' => $note->customerPhone() ?? '',
@@ -39,12 +47,21 @@ final class EditTransactionWorkspacePageDataBuilder
         ];
 
         $oldItems = $this->existingItems->mapMany($note);
+        $refundRows = array_values(array_filter(
+            $workspacePanel['rows'] ?? [],
+            static fn (array $row): bool => (bool) ($row['can_refund'] ?? false)
+        ));
 
         return [
             'pageTitle' => 'Edit Nota',
             'workspaceMode' => 'edit',
             'formAction' => route('cashier.notes.workspace.update', ['noteId' => $normalized]),
             'cancelAction' => route('cashier.notes.show', ['noteId' => $normalized]),
+            'refundAction' => route('cashier.notes.refunds.store', ['noteId' => $normalized]),
+            'refundDateDefault' => date('Y-m-d'),
+            'refundPaymentOptions' => $this->refundPaymentOptions->build($note->id()),
+            'workspaceRefundRows' => $refundRows,
+            'canShowRefundModal' => count($refundRows) > 0,
             'oldNote' => $oldNote,
             'oldItems' => $oldItems,
             'defaultCustomerName' => $oldNote['customer_name'],

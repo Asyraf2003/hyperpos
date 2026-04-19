@@ -67,8 +67,15 @@
 
             <div class="ui-form-actions">
                 <button type="button" class="btn btn-primary" id="workspace-open-payment-dialog">
-                    {{ ($workspaceMode ?? 'create') === 'edit' ? 'Proses Nota' : 'Proses Nota' }}
+                    Proses Nota
                 </button>
+
+                @if (($workspaceMode ?? 'create') === 'edit' && ($canShowRefundModal ?? false))
+                    <button type="button" class="btn btn-light-primary" data-bs-toggle="modal" data-bs-target="#workspace-refund-modal">
+                        Refund
+                    </button>
+                @endif
+
                 <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light-secondary">
                     Batal
                 </a>

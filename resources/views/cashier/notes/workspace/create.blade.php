@@ -33,6 +33,7 @@
         </div>
 
         @include('cashier.notes.workspace.partials.payment-modal')
+        @include('cashier.notes.workspace.partials.refund-modal')
     </form>
 
     <script id="cashier-note-workspace-config" type="application/json">{!! json_encode([
