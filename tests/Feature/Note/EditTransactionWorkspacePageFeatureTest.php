@@ -15,7 +15,7 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_open_edit_workspace_page_for_unpaid_note_without_refund_action(): void
+    public function test_cashier_can_open_edit_workspace_page_for_unpaid_note_with_payment_modal_but_without_refund_action(): void
     {
         $this->loginAsKasir();
 
@@ -63,8 +63,8 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
         $response->assertSee('08123456789');
         $response->assertSee('Proses Nota');
         $response->assertSee('id="workspace-payment-modal"', false);
+        $response->assertSee('Bayar Penuh');
+        $response->assertSee('Bayar Sebagian');
         $response->assertDontSee('Refund');
-        $response->assertDontSee('Bayar Penuh');
-        $response->assertDontSee('Bayar Sebagian');
     }
 }
