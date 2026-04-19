@@ -3,6 +3,7 @@
 
 @section('title', $pageTitle)
 @section('heading', $pageTitle)
+@section('back_url', $cancelAction ?? route('cashier.notes.index'))
 
 @section('content')
 <section class="section">
@@ -10,20 +11,28 @@
         <div class="alert alert-danger">{{ $errors->first('workspace') }}</div>
     @endif
 
+    <div class="ui-page-intro">
+        <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
+        <h4 class="ui-page-intro-title">
+            {{ ($workspaceMode ?? 'create') === 'edit' ? 'Edit Nota dari Workspace' : 'Buat Nota dari Workspace' }}
+        </h4>
+        <p class="ui-page-intro-subtitle">
+            Header nota tetap di kanan dan rincian tetap di kiri supaya create dan edit memakai pola kerja yang sama.
+        </p>
+    </div>
+
     <form action="{{ $formAction ?? route('notes.workspace.store') }}" method="POST" novalidate id="cashier-note-workspace-form">
         @csrf
         @if (($workspaceMode ?? 'create') === 'edit')
             @method('PATCH')
         @endif
 
-        <div class="row">
+        <div class="row g-4">
             @include('cashier.notes.workspace.partials.rincian-card')
             @include('cashier.notes.workspace.partials.info-card')
         </div>
 
-        @if (($workspaceMode ?? 'create') === 'create')
-            @include('cashier.notes.workspace.partials.payment-modal')
-        @endif
+        @include('cashier.notes.workspace.partials.payment-modal')
     </form>
 
     <script id="cashier-note-workspace-config" type="application/json">{!! json_encode([
@@ -47,9 +56,7 @@
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/rows.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/rows.js')) }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/search.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/search.js')) }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/summary.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/summary.js')) }}"></script>
-    @if (($workspaceMode ?? 'create') === 'create')
-        <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/payment-flow.js')) }}"></script>
-    @endif
+    <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/payment-flow.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/payment-flow.js')) }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/draft.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/draft.js')) }}"></script>
     <script src="{{ asset('assets/static/js/pages/cashier-note-workspace/boot.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-workspace/boot.js')) }}"></script>
 @endpush

@@ -17,8 +17,8 @@
             <p class="mt-2 mb-0 text-muted small">
                 {{
                     ($workspaceMode ?? 'create') === 'edit'
-                        ? 'Perubahan pembayaran tidak dilakukan dari workspace edit.'
-                        : 'Tombol Bayar membuka pilihan bayar penuh, bayar sebagian, atau simpan tanpa pembayaran.'
+                        ? 'Edit tetap memakai workspace yang sama agar struktur kerja tidak berubah saat revisi nota.'
+                        : 'Tombol proses nota membuka pilihan bayar penuh, bayar sebagian, atau simpan tanpa pembayaran.'
                 }}
             </p>
         </div>
@@ -65,17 +65,20 @@
                 <div class="fs-4 fw-bold" id="workspace-note-total-text">0</div>
             </div>
 
-            <div class="d-grid gap-2">
-                @if (($workspaceMode ?? 'create') === 'edit')
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                    <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
-                @else
-                    <button type="button" class="btn btn-primary" id="workspace-open-payment-dialog">
-                        Bayar
-                    </button>
-                    <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light">Batal</a>
-                @endif
+            <div class="ui-form-actions">
+                <button type="button" class="btn btn-primary" id="workspace-open-payment-dialog">
+                    {{ ($workspaceMode ?? 'create') === 'edit' ? 'Proses Nota' : 'Proses Nota' }}
+                </button>
+                <a href="{{ $cancelAction ?? route('cashier.notes.index') }}" class="btn btn-light-secondary">
+                    Batal
+                </a>
             </div>
+
+            @if (($workspaceMode ?? 'create') === 'edit')
+                <div class="small text-muted mt-2">
+                    Pembayaran, simpan perubahan, dan langkah lanjut akan disatukan dari dialog proses nota.
+                </div>
+            @endif
         </div>
     </div>
 </div>
