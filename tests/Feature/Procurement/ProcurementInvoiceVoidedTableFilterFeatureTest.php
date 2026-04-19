@@ -26,6 +26,10 @@ final class ProcurementInvoiceVoidedTableFilterFeatureTest extends TestCase
                 'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
                 'nomor_faktur' => 'INV-ACTIVE-001',
                 'nomor_faktur_normalized' => 'inv-active-001',
+                'document_kind' => 'invoice',
+                'lifecycle_status' => 'active',
+                'origin_supplier_invoice_id' => null,
+                'superseded_by_supplier_invoice_id' => null,
                 'tanggal_pengiriman' => '2026-03-15',
                 'jatuh_tempo' => '2026-04-15',
                 'grand_total_rupiah' => 100000,
@@ -39,6 +43,10 @@ final class ProcurementInvoiceVoidedTableFilterFeatureTest extends TestCase
                 'supplier_nama_pt_pengirim_snapshot' => 'PT Sumber Makmur',
                 'nomor_faktur' => 'INV-VOID-001',
                 'nomor_faktur_normalized' => 'inv-void-001',
+                'document_kind' => 'invoice',
+                'lifecycle_status' => 'active',
+                'origin_supplier_invoice_id' => null,
+                'superseded_by_supplier_invoice_id' => null,
                 'tanggal_pengiriman' => '2026-03-16',
                 'jatuh_tempo' => '2026-04-16',
                 'grand_total_rupiah' => 120000,
@@ -47,6 +55,9 @@ final class ProcurementInvoiceVoidedTableFilterFeatureTest extends TestCase
                 'last_revision_no' => 1,
             ],
         ]);
+
+        $this->syncSupplierInvoiceProjectionForTest('invoice-active');
+        $this->syncSupplierInvoiceProjectionForTest('invoice-voided');
 
         $response = $this->actingAs($this->user('admin'))
             ->get(route('admin.procurement.supplier-invoices.table', ['payment_status' => 'voided']));

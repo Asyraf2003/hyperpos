@@ -51,6 +51,8 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
             DB::table('supplier_invoices')->where('id', 'invoice-1')->value('voided_at')
         );
 
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
+
         self::assertSame($beforeInventoryMovementCount, DB::table('inventory_movements')->count());
         self::assertSame($beforeReceiptCount, DB::table('supplier_receipts')->count());
         self::assertSame($beforePaymentCount, DB::table('supplier_payments')->count());
@@ -79,6 +81,8 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
             'proof_status' => 'pending',
             'proof_storage_path' => null,
         ]);
+
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
 
         $response = $this->actingAs($this->admin())
             ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
@@ -128,6 +132,8 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
             'supplier_invoice_line_id' => 'invoice-line-1',
             'qty_diterima' => 1,
         ]);
+
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
 
         DB::table('inventory_movements')->insert([
             'id' => 'movement-1',
@@ -238,6 +244,9 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
             'unit_cost_rupiah' => 50000,
         ]);
 
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
+        $this->syncSupplierInvoiceProjectionForTest('invoice-2');
+
         $response = $this->actingAs($this->admin())
             ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
             ->post(route('admin.procurement.supplier-invoices.void', ['supplierInvoiceId' => 'invoice-1']), [
@@ -246,6 +255,9 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
 
         $response->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
             ->assertSessionHas('success', 'Nota supplier berhasil dibatalkan.');
+
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
+        $this->syncSupplierInvoiceProjectionForTest('invoice-2');
 
         $tableResponse = $this->actingAs($this->admin())
             ->get(route('admin.procurement.supplier-invoices.table', ['payment_status' => 'outstanding']));
@@ -315,6 +327,8 @@ final class VoidSupplierInvoiceIntegrityFeatureTest extends TestCase
             'line_total_rupiah' => 100000,
             'unit_cost_rupiah' => 50000,
         ]);
+
+        $this->syncSupplierInvoiceProjectionForTest('invoice-1');
     }
 
     private function admin(): User
