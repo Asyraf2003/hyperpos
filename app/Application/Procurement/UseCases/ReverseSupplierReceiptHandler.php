@@ -8,10 +8,10 @@ use App\Application\Procurement\Services\SupplierInvoiceRevisionDeltaStockGuard;
 use App\Application\Procurement\Services\SupplierInvoiceRevisionInventoryEffectsApplier;
 use App\Application\Procurement\Services\SupplierReceiptReversalDeltaMovementsBuilder;
 use App\Application\Procurement\Services\SupplierReceiptReversalPreflight;
+use App\Application\Procurement\Services\SupplierReceiptReversalRecorder;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\{AuditLogPort, TransactionManagerPort, UuidPort};
-use Illuminate\Support\Facades\DB;
+use App\Ports\Out\TransactionManagerPort;
 use Throwable;
 
 final class ReverseSupplierReceiptHandler
@@ -22,8 +22,7 @@ final class ReverseSupplierReceiptHandler
         private readonly SupplierInvoiceRevisionDeltaStockGuard $deltaStockGuard,
         private readonly SupplierInvoiceRevisionInventoryEffectsApplier $inventoryEffects,
         private readonly TransactionManagerPort $transactions,
-        private readonly AuditLogPort $audit,
-        private readonly UuidPort $uuid,
+        private readonly SupplierReceiptReversalRecorder $recorder,
     ) {
     }
 
@@ -53,17 +52,6 @@ final class ReverseSupplierReceiptHandler
             $this->transactions->begin();
             $started = true;
 
-            $reversalId = $this->uuid->generate();
-
-            DB::table('supplier_receipt_reversals')->insert([
-                'id' => $reversalId,
-                'supplier_receipt_id' => (string) $data['supplier_receipt_id'],
-                'reason' => trim($reason),
-                'performed_by_actor_id' => (string) $data['actor_id'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
             $effects = $this->inventoryEffects->apply($deltaMovements);
 
             if ($effects->isFailure()) {
@@ -73,15 +61,14 @@ final class ReverseSupplierReceiptHandler
                 );
             }
 
-            $this->audit->record('supplier_receipt_reversed', [
-                'reversal_id' => $reversalId,
-                'supplier_receipt_id' => (string) $data['supplier_receipt_id'],
-                'supplier_invoice_id' => (string) $data['supplier_invoice_id'],
-                'reason' => trim($reason),
-                'reversed_at' => $date->format('Y-m-d'),
-                'performed_by_actor_id' => (string) $data['actor_id'],
-                'delta_movement_count' => count($deltaMovements),
-            ]);
+            $reversalId = $this->recorder->record(
+                (string) $data['supplier_receipt_id'],
+                (string) $data['supplier_invoice_id'],
+                $reason,
+                (string) $data['actor_id'],
+                $date,
+                count($deltaMovements),
+            );
 
             $this->transactions->commit();
 
