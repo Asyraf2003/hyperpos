@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Procurement\UseCases;
 
 use App\Application\Inventory\Services\InventoryProjectionService;
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierReceiptFactory;
 use App\Application\Procurement\Services\VoidedSupplierInvoiceGuard;
 use App\Application\Shared\DTO\Result;
@@ -30,6 +31,7 @@ final class ReceiveSupplierInvoiceHandler
         private InventoryProjectionService $projection,
         private AuditLogPort $audit,
         private VoidedSupplierInvoiceGuard $voidedGuard,
+        private SupplierInvoiceListProjectionService $invoiceProjection,
     ) {}
 
     public function handle(string $invoiceId, string $tanggal, array $lines): Result
@@ -64,6 +66,8 @@ final class ReceiveSupplierInvoiceHandler
                 'invoice_id' => $inv->id(),
                 'line_count' => count($receipt->lines()),
             ]);
+
+            $this->invoiceProjection->syncInvoice($inv->id());
 
             $this->transactions->commit();
 

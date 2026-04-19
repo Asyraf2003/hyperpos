@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierPaymentReversalPreflight;
 use App\Application\Procurement\Services\SupplierPaymentReversalRecorder;
 use App\Application\Shared\DTO\Result;
@@ -16,6 +17,7 @@ final class ReverseSupplierPaymentHandler
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierPaymentReversalPreflight $preflight,
         private readonly SupplierPaymentReversalRecorder $recorder,
+        private readonly SupplierInvoiceListProjectionService $projection,
     ) {
     }
 
@@ -44,6 +46,8 @@ final class ReverseSupplierPaymentHandler
                 (string) $data['reason'],
                 (string) $data['actor_id'],
             );
+
+            $this->projection->syncInvoice((string) $data['supplier_invoice_id']);
 
             $this->transactions->commit();
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierPaymentPreflight;
 use App\Application\Shared\DTO\Result;
 use App\Core\Procurement\SupplierPayment\SupplierPayment;
-use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Procurement\SupplierPaymentWriterPort;
 use App\Ports\Out\TransactionManagerPort;
@@ -22,6 +22,7 @@ final class RecordSupplierPaymentHandler
         private readonly UuidPort $uuid,
         private readonly AuditLogPort $audit,
         private readonly SupplierPaymentPreflight $preflight,
+        private readonly SupplierInvoiceListProjectionService $projection,
     ) {
     }
 
@@ -68,6 +69,8 @@ final class RecordSupplierPaymentHandler
                 'performed_by_actor_id' => $actorId,
                 'proof_status' => SupplierPayment::PROOF_STATUS_PENDING,
             ]);
+
+            $this->projection->syncInvoice($invoice->id());
 
             $this->transactions->commit();
 

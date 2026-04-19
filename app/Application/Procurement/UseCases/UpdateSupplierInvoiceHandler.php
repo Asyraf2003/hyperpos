@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Services\SupplierInvoiceEditabilityGuard;
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\UpdateSupplierInvoiceOperation;
-use App\Application\Procurement\Services\VoidedSupplierInvoiceGuard;
 use App\Application\Procurement\Services\UpdateSupplierInvoiceTransactionalRunner;
+use App\Application\Procurement\Services\VoidedSupplierInvoiceGuard;
 use App\Application\Shared\DTO\Result;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 
@@ -19,6 +20,7 @@ final class UpdateSupplierInvoiceHandler
         private readonly UpdateSupplierInvoiceTransactionalRunner $transactionalRunner,
         private readonly UpdateSupplierInvoiceOperation $operation,
         private readonly VoidedSupplierInvoiceGuard $voidedGuard,
+        private readonly SupplierInvoiceListProjectionService $projection,
     ) {
     }
 
@@ -60,14 +62,29 @@ final class UpdateSupplierInvoiceHandler
         }
 
         return $this->transactionalRunner->run(
-            fn (): Result => $this->operation->execute(
+            function () use (
                 $current,
                 $supplierInvoiceId,
                 $nomorFaktur,
                 $namaPtPengirim,
                 $tanggalPengiriman,
-                $lines,
-            ),
+                $lines
+            ): Result {
+                $result = $this->operation->execute(
+                    $current,
+                    $supplierInvoiceId,
+                    $nomorFaktur,
+                    $namaPtPengirim,
+                    $tanggalPengiriman,
+                    $lines,
+                );
+
+                if (! $result->isFailure()) {
+                    $this->projection->syncInvoice($supplierInvoiceId);
+                }
+
+                return $result;
+            },
             $performedByActorId,
             $performedByActorRole,
             $sourceChannel,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\TransactionManagerPort;
@@ -18,6 +19,7 @@ final class CreateSupplierInvoiceFlowHandler
         private readonly CreateSupplierInvoiceFlowOperation $operation,
         private readonly CreateSupplierInvoiceFlowQueryExceptionClassifier $queryErrors,
         private readonly SupplierInvoiceChangeContext $changeContext,
+        private readonly SupplierInvoiceListProjectionService $projection,
     ) {
     }
 
@@ -53,6 +55,8 @@ final class CreateSupplierInvoiceFlowHandler
                 $autoRec,
                 $tglTerima,
             );
+
+            $this->projection->syncInvoice($invoice->id());
 
             $this->transactions->commit();
 

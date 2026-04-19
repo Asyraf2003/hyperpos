@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierInvoiceRevisionDeltaStockGuard;
 use App\Application\Procurement\Services\SupplierInvoiceRevisionInventoryEffectsApplier;
 use App\Application\Procurement\Services\SupplierReceiptReversalDeltaMovementsBuilder;
@@ -23,6 +24,7 @@ final class ReverseSupplierReceiptHandler
         private readonly SupplierInvoiceRevisionInventoryEffectsApplier $inventoryEffects,
         private readonly TransactionManagerPort $transactions,
         private readonly SupplierReceiptReversalRecorder $recorder,
+        private readonly SupplierInvoiceListProjectionService $projection,
     ) {
     }
 
@@ -69,6 +71,8 @@ final class ReverseSupplierReceiptHandler
                 $date,
                 count($deltaMovements),
             );
+
+            $this->projection->syncInvoice((string) $data['supplier_invoice_id']);
 
             $this->transactions->commit();
 
