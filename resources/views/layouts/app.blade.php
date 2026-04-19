@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app.css') }}?v={{ filemtime(public_path('assets/compiled/css/app.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app-dark.css') }}?v={{ filemtime(public_path('assets/compiled/css/app-dark.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/iconly.css') }}?v={{ filemtime(public_path('assets/compiled/css/iconly.css')) }}">
+    <link rel="stylesheet" href="{{ asset('assets/static/css/ui-foundation.css') }}?v={{ filemtime(public_path('assets/static/css/ui-foundation.css')) }}">
     @stack('styles')
 </head>
 
@@ -34,7 +35,7 @@
                             <i class="bi bi-justify fs-3"></i>
                         </a>
                         <h3 class="mb-0">@yield('heading')</h3>
-                        
+
                         @if (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))
                             <a
                                 href="@yield('back_url', url()->previous())"
