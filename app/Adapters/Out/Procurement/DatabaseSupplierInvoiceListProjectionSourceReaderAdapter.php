@@ -9,83 +9,27 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierInvoiceListProjectionSourceReaderAdapter implements SupplierInvoiceListProjectionSourceReaderPort
 {
+    public function __construct(
+        private readonly SupplierInvoiceListProjectionActivePaymentSubqueries $payments,
+        private readonly SupplierInvoiceListProjectionReceiptSubqueries $receipts,
+    ) {
+    }
+
     public function findBySupplierInvoiceId(string $supplierInvoiceId): ?array
     {
-        $normalizedInvoiceId = trim($supplierInvoiceId);
+        $invoiceId = trim($supplierInvoiceId);
 
-        if ($normalizedInvoiceId === '') {
+        if ($invoiceId === '') {
             return null;
         }
 
-        $paymentTotalsSubquery = DB::table('supplier_payments')
-            ->leftJoin(
-                'supplier_payment_reversals',
-                'supplier_payment_reversals.supplier_payment_id',
-                '=',
-                'supplier_payments.id'
-            )
-            ->whereNull('supplier_payment_reversals.id')
-            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
-            ->groupBy('supplier_invoice_id');
-
-        $paymentCountSubquery = DB::table('supplier_payments')
-            ->leftJoin(
-                'supplier_payment_reversals',
-                'supplier_payment_reversals.supplier_payment_id',
-                '=',
-                'supplier_payments.id'
-            )
-            ->whereNull('supplier_payment_reversals.id')
-            ->selectRaw('supplier_invoice_id, COUNT(*) as payment_count')
-            ->groupBy('supplier_invoice_id');
-
-        $receiptCountSubquery = DB::table('supplier_receipts')
-            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
-            ->groupBy('supplier_invoice_id');
-
-        $receivedQtySubquery = DB::table('supplier_receipts')
-            ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
-            ->selectRaw(
-                'supplier_receipts.supplier_invoice_id, COALESCE(SUM(supplier_receipt_lines.qty_diterima), 0) as total_received_qty'
-            )
-            ->groupBy('supplier_receipts.supplier_invoice_id');
-
-        $proofAttachmentCountSubquery = DB::table('supplier_payments')
-            ->leftJoin(
-                'supplier_payment_reversals',
-                'supplier_payment_reversals.supplier_payment_id',
-                '=',
-                'supplier_payments.id'
-            )
-            ->whereNull('supplier_payment_reversals.id')
-            ->leftJoin(
-                'supplier_payment_proof_attachments',
-                'supplier_payment_proof_attachments.supplier_payment_id',
-                '=',
-                'supplier_payments.id'
-            )
-            ->selectRaw(
-                'supplier_payments.supplier_invoice_id, COUNT(supplier_payment_proof_attachments.id) as proof_attachment_count'
-            )
-            ->groupBy('supplier_payments.supplier_invoice_id');
-
         $row = DB::table('supplier_invoices')
-            ->leftJoinSub($paymentTotalsSubquery, 'payment_totals', function ($join): void {
-                $join->on('payment_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
-            })
-            ->leftJoinSub($paymentCountSubquery, 'payment_counts', function ($join): void {
-                $join->on('payment_counts.supplier_invoice_id', '=', 'supplier_invoices.id');
-            })
-            ->leftJoinSub($receiptCountSubquery, 'receipt_counts', function ($join): void {
-                $join->on('receipt_counts.supplier_invoice_id', '=', 'supplier_invoices.id');
-            })
-            ->leftJoinSub($receivedQtySubquery, 'received_qty_totals', function ($join): void {
-                $join->on('received_qty_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
-            })
-            ->leftJoinSub($proofAttachmentCountSubquery, 'proof_attachment_counts', function ($join): void {
-                $join->on('proof_attachment_counts.supplier_invoice_id', '=', 'supplier_invoices.id');
-            })
-            ->where('supplier_invoices.id', $normalizedInvoiceId)
+            ->leftJoinSub($this->payments->totals(), 'payment_totals', fn ($join) => $join->on('payment_totals.supplier_invoice_id', '=', 'supplier_invoices.id'))
+            ->leftJoinSub($this->payments->counts(), 'payment_counts', fn ($join) => $join->on('payment_counts.supplier_invoice_id', '=', 'supplier_invoices.id'))
+            ->leftJoinSub($this->receipts->counts(), 'receipt_counts', fn ($join) => $join->on('receipt_counts.supplier_invoice_id', '=', 'supplier_invoices.id'))
+            ->leftJoinSub($this->receipts->receivedQtyTotals(), 'received_qty_totals', fn ($join) => $join->on('received_qty_totals.supplier_invoice_id', '=', 'supplier_invoices.id'))
+            ->leftJoinSub($this->payments->proofAttachmentCounts(), 'proof_attachment_counts', fn ($join) => $join->on('proof_attachment_counts.supplier_invoice_id', '=', 'supplier_invoices.id'))
+            ->where('supplier_invoices.id', $invoiceId)
             ->first([
                 'supplier_invoices.id as supplier_invoice_id',
                 'supplier_invoices.supplier_id',
@@ -133,11 +77,7 @@ final class DatabaseSupplierInvoiceListProjectionSourceReaderAdapter implements 
 
     private function nullableString(mixed $value): ?string
     {
-        if ($value === null) {
-            return null;
-        }
-
-        $string = trim((string) $value);
+        $string = $value === null ? '' : trim((string) $value);
 
         return $string === '' ? null : $string;
     }
