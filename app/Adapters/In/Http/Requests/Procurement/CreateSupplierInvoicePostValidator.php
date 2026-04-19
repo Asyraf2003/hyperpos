@@ -11,9 +11,15 @@ final class CreateSupplierInvoicePostValidator
 {
     public function validate(FormRequest $request, Validator $validator): void
     {
+        $routeSupplierInvoiceId = $request->route('supplierInvoiceId');
+        $excludeSupplierInvoiceId = is_string($routeSupplierInvoiceId)
+            ? trim($routeSupplierInvoiceId)
+            : null;
+
         (new CreateSupplierInvoiceDuplicateNumberPostValidation())->validate(
             (string) $request->input('nomor_faktur', ''),
             $validator,
+            $excludeSupplierInvoiceId !== '' ? $excludeSupplierInvoiceId : null,
         );
 
         (new CreateSupplierInvoiceDatePostValidation())->validate($request, $validator);

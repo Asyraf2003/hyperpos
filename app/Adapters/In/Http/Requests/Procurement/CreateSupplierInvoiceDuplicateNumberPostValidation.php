@@ -9,18 +9,26 @@ use Illuminate\Validation\Validator;
 
 final class CreateSupplierInvoiceDuplicateNumberPostValidation
 {
-    public function validate(string $nomorFaktur, Validator $validator): void
-    {
+    public function validate(
+        string $nomorFaktur,
+        Validator $validator,
+        ?string $excludeSupplierInvoiceId = null,
+    ): void {
         $normalized = mb_strtolower(trim($nomorFaktur), 'UTF-8');
 
         if ($normalized === '') {
             return;
         }
 
-        $exists = DB::table('supplier_invoices')
+        $query = DB::table('supplier_invoices')
             ->where('nomor_faktur_normalized', $normalized)
-            ->whereNull('voided_at')
-            ->exists();
+            ->whereNull('voided_at');
+
+        if ($excludeSupplierInvoiceId !== null && trim($excludeSupplierInvoiceId) !== '') {
+            $query->where('id', '!=', trim($excludeSupplierInvoiceId));
+        }
+
+        $exists = $query->exists();
 
         if (! $exists) {
             return;
