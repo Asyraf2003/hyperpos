@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\UseCases;
 
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\Note\Note;
 use App\Core\Shared\Exceptions\DomainException;
@@ -16,6 +17,7 @@ final class CreateNoteHandler
     public function __construct(
         private readonly NoteWriterPort $notes,
         private readonly UuidPort $uuid,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -39,6 +41,7 @@ final class CreateNoteHandler
         }
 
         $this->notes->create($note);
+        $this->projection->syncNote($note->id());
 
         return Result::success(
             [

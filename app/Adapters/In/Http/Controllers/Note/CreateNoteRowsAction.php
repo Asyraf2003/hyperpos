@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Ports\Out\Note\NoteReaderPort;
 
@@ -13,6 +14,7 @@ final class CreateNoteRowsAction
         private readonly NoteReaderPort $notes,
         private readonly CreateNoteProductRowAction $addProductRow,
         private readonly CreateNoteServiceRowAction $addServiceRow,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -36,6 +38,8 @@ final class CreateNoteRowsAction
 
             $lineNo++;
         }
+
+        $this->projection->syncNote($noteId);
 
         return null;
     }

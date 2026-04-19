@@ -6,6 +6,7 @@ namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorder;
 use App\Application\Note\Services\EditableWorkspaceNoteGuard;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\UpdateTransactionWorkspaceResultBuilder;
 use App\Application\Note\Services\UpdateTransactionWorkspaceWorkItemPersister;
 use App\Application\Shared\DTO\Result;
@@ -28,6 +29,7 @@ final class UpdateTransactionWorkspaceHandler
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
         private readonly UpdateTransactionWorkspaceResultBuilder $results,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -70,6 +72,8 @@ final class UpdateTransactionWorkspaceHandler
                 'transaction_workspace_updated',
                 $this->results->auditPayload($note, $itemsCount, $paymentSummary),
             );
+
+            $this->projection->syncNote($note->id());
 
             $this->transactions->commit();
 

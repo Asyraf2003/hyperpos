@@ -9,6 +9,7 @@ use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorde
 use App\Application\Note\Services\CreateTransactionWorkspaceNoteFactory;
 use App\Application\Note\Services\CreateTransactionWorkspaceSuccessMessageBuilder;
 use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPersister;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\AuditLogPort;
@@ -27,6 +28,7 @@ final class CreateTransactionWorkspaceHandler
         private readonly CreateTransactionWorkspaceAuditPayloadBuilder $auditPayloads,
         private readonly CreateTransactionWorkspaceSuccessMessageBuilder $messages,
         private readonly AuditLogPort $audit,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -56,6 +58,8 @@ final class CreateTransactionWorkspaceHandler
                 'transaction_workspace_created',
                 $this->auditPayloads->build($note, $itemsCount, $paymentSummary)
             );
+
+            $this->projection->syncNote($note->id());
 
             $this->transactions->commit();
 

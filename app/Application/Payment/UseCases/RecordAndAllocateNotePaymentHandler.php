@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Payment\UseCases;
 
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
 use App\Application\Payment\Services\RecordAndAllocateNotePaymentOperation;
 use App\Application\Shared\DTO\Result;
@@ -19,6 +20,7 @@ final class RecordAndAllocateNotePaymentHandler
         private readonly TransactionManagerPort $transactions,
         private readonly AllocatePaymentErrorClassifier $errors,
         private readonly AuditLogPort $audit,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -42,6 +44,8 @@ final class RecordAndAllocateNotePaymentHandler
                 'allocation_count' => $recorded->allocationCount(),
                 'selected_row_ids' => $selectedRowIds,
             ]);
+
+            $this->projection->syncNote(trim($noteId));
 
             $this->transactions->commit();
 

@@ -6,6 +6,7 @@ namespace App\Application\Payment\UseCases;
 
 use App\Application\Inventory\Services\AutoReverseRefundedStoreStockInventory;
 use App\Application\Note\Services\AutoRefundNoteWhenFullyRefunded;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Payment\Services\RecordCustomerRefundOperation;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
@@ -23,6 +24,7 @@ final class RecordCustomerRefundHandler
         private readonly AuditLogPort $audit,
         private readonly AutoRefundNoteWhenFullyRefunded $refundLifecycle,
         private readonly AutoReverseRefundedStoreStockInventory $reverseRefundedInventory,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -76,6 +78,8 @@ final class RecordCustomerRefundHandler
                 $this->formatAuditPayload($refund, $performedByActorId),
                 ['refund_allocation_count' => $recorded->allocationCount(), 'selected_row_ids' => $selectedRowIds],
             ));
+
+            $this->projection->syncNote($noteId);
 
             $this->transactions->commit();
 

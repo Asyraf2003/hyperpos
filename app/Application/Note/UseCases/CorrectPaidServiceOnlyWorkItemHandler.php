@@ -6,6 +6,7 @@ namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Policies\NotePaidStatusPolicy;
 use App\Application\Note\Services\NoteCorrectionSnapshotBuilder;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\PersistNoteMutationTimeline;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\ServiceDetail;
@@ -38,6 +39,7 @@ final class CorrectPaidServiceOnlyWorkItemHandler
         private readonly CustomerRefundReaderPort $refunds,
         private readonly ClockPort $clock,
         private readonly AuditLogPort $audit,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -46,9 +48,15 @@ final class CorrectPaidServiceOnlyWorkItemHandler
         $started = false;
 
         try {
-            if ($lineNo <= 0) throw new DomainException('Line number harus > 0.');
-            if (trim($reason) === '') return Result::failure('Alasan correction wajib diisi.', ['correction' => ['AUDIT_REASON_REQUIRED']]);
-            if (trim($performedByActorId) === '') throw new DomainException('Actor correction wajib ada.');
+            if ($lineNo <= 0) {
+                throw new DomainException('Line number harus > 0.');
+            }
+            if (trim($reason) === '') {
+                return Result::failure('Alasan correction wajib diisi.', ['correction' => ['AUDIT_REASON_REQUIRED']]);
+            }
+            if (trim($performedByActorId) === '') {
+                throw new DomainException('Actor correction wajib ada.');
+            }
 
             $this->transactions->begin();
             $started = true;
@@ -57,7 +65,9 @@ final class CorrectPaidServiceOnlyWorkItemHandler
             $this->paidStatus->assertPaidForCorrection($note);
 
             $target = $this->findWorkItem($note, $lineNo);
-            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_ONLY) throw new DomainException('Correction nominal slice ini hanya mendukung work item service_only.');
+            if ($target->transactionType() !== WorkItem::TYPE_SERVICE_ONLY) {
+                throw new DomainException('Correction nominal slice ini hanya mendukung work item service_only.');
+            }
 
             $before = $this->snapshots->build($note);
             $detail = ServiceDetail::create($serviceName, Money::fromInt($servicePriceRupiah), $partSource);
@@ -76,13 +86,19 @@ final class CorrectPaidServiceOnlyWorkItemHandler
             $this->timeline->record($note->id(), 'paid_service_only_work_item_corrected', $performedByActorId, 'admin', $reason, $this->clock->now(), $before, $after, null, null, ['refund_required_rupiah' => $refundReq]);
             $this->audit->record('paid_service_only_work_item_corrected', $this->formatAuditPayload($performedByActorId, $note->id(), $lineNo, $reason, $refundReq, $before, $after));
 
+            $this->projection->syncNote($afterNote->id());
+
             $this->transactions->commit();
             return Result::success($this->formatSuccessPayload($afterNote, $corrected, $refundReq), 'Correction nominal service_only berhasil disimpan.');
         } catch (DomainException $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
             return Result::failure($e->getMessage(), ['work_item' => ['INVALID_WORK_ITEM_STATE']]);
         } catch (Throwable $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
             throw $e;
         }
     }

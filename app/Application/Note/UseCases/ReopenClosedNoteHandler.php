@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\NoteCorrectionSnapshotBuilder;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\PersistNoteMutationTimeline;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
@@ -25,6 +26,7 @@ final class ReopenClosedNoteHandler
         private readonly PersistNoteMutationTimeline $timeline,
         private readonly ClockPort $clock,
         private readonly AuditLogPort $audit,
+        private readonly NoteHistoryProjectionService $projection,
     ) {
     }
 
@@ -49,7 +51,7 @@ final class ReopenClosedNoteHandler
             $note = $this->notes->getById(trim($noteId))
                 ?? throw new DomainException('Note tidak ditemukan.');
 
-            if (!$note->isClosed()) {
+            if (! $note->isClosed()) {
                 throw new DomainException('Hanya note closed yang boleh dibuka kembali.');
             }
 
@@ -76,6 +78,8 @@ final class ReopenClosedNoteHandler
                 'reason' => trim($reason),
             ]);
 
+            $this->projection->syncNote($note->id());
+
             $this->transactions->commit();
 
             return Result::success([
@@ -85,10 +89,14 @@ final class ReopenClosedNoteHandler
                 'reopened_at' => $note->reopenedAt()?->format('Y-m-d H:i:s'),
             ], 'Note berhasil dibuka kembali.');
         } catch (DomainException $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
             return Result::failure($e->getMessage(), ['note' => ['INVALID_NOTE_STATE']]);
         } catch (Throwable $e) {
-            if ($started) $this->transactions->rollBack();
+            if ($started) {
+                $this->transactions->rollBack();
+            }
             throw $e;
         }
     }
