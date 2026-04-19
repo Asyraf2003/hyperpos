@@ -9,38 +9,21 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierPayableReportingSourceReaderAdapter implements SupplierPayableReportingSourceReaderPort
 {
-    public function getSupplierPayableSummaryRows(
-        string $fromShipmentDate,
-        string $toShipmentDate,
-    ): array {
-        $paymentTotalsSubquery = DB::table('supplier_payments')
-            ->leftJoin(
-                'supplier_payment_reversals',
-                'supplier_payment_reversals.supplier_payment_id',
-                '=',
-                'supplier_payments.id'
-            )
-            ->whereNull('supplier_payment_reversals.id')
-            ->selectRaw('supplier_invoice_id, COALESCE(SUM(amount_rupiah), 0) as total_paid_rupiah')
-            ->groupBy('supplier_invoice_id');
+    public function __construct(
+        private readonly SupplierPayableReportingQueryFactory $queries,
+    ) {
+    }
 
-        $receiptCountSubquery = DB::table('supplier_receipts')
-            ->selectRaw('supplier_invoice_id, COUNT(*) as receipt_count')
-            ->groupBy('supplier_invoice_id');
-
-        $receivedQtySubquery = DB::table('supplier_receipts')
-            ->join('supplier_receipt_lines', 'supplier_receipt_lines.supplier_receipt_id', '=', 'supplier_receipts.id')
-            ->selectRaw('supplier_receipts.supplier_invoice_id, COALESCE(SUM(supplier_receipt_lines.qty_diterima), 0) as total_received_qty')
-            ->groupBy('supplier_receipts.supplier_invoice_id');
-
+    public function getSupplierPayableSummaryRows(string $fromShipmentDate, string $toShipmentDate): array
+    {
         return DB::table('supplier_invoices')
-            ->leftJoinSub($paymentTotalsSubquery, 'payment_totals', function ($join): void {
+            ->leftJoinSub($this->queries->paymentTotalsSubquery(), 'payment_totals', function ($join): void {
                 $join->on('payment_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
             })
-            ->leftJoinSub($receiptCountSubquery, 'receipt_counts', function ($join): void {
+            ->leftJoinSub($this->queries->receiptCountSubquery(), 'receipt_counts', function ($join): void {
                 $join->on('receipt_counts.supplier_invoice_id', '=', 'supplier_invoices.id');
             })
-            ->leftJoinSub($receivedQtySubquery, 'received_qty_totals', function ($join): void {
+            ->leftJoinSub($this->queries->receivedQtySubquery(), 'received_qty_totals', function ($join): void {
                 $join->on('received_qty_totals.supplier_invoice_id', '=', 'supplier_invoices.id');
             })
             ->whereNull('supplier_invoices.voided_at')
@@ -70,20 +53,13 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
             ->all();
     }
 
-    public function getSupplierPayableSummaryReconciliation(
-        string $fromShipmentDate,
-        string $toShipmentDate,
-    ): array {
-        $filteredInvoicesSubquery = DB::table('supplier_invoices')
-            ->select('id', 'grand_total_rupiah')
-            ->whereNull('voided_at')
-            ->whereBetween('tanggal_pengiriman', [$fromShipmentDate, $toShipmentDate]);
+    public function getSupplierPayableSummaryReconciliation(string $fromShipmentDate, string $toShipmentDate): array
+    {
+        $filteredInvoicesSubquery = $this->queries->filteredInvoicesSubquery($fromShipmentDate, $toShipmentDate);
 
         $invoiceTotals = DB::query()
             ->fromSub($filteredInvoicesSubquery, 'filtered_invoices')
-            ->selectRaw(
-                'COUNT(*) as total_rows, COALESCE(SUM(grand_total_rupiah), 0) as grand_total_rupiah'
-            )
+            ->selectRaw('COUNT(*) as total_rows, COALESCE(SUM(grand_total_rupiah), 0) as grand_total_rupiah')
             ->first();
 
         $paymentTotals = DB::table('supplier_payments')
