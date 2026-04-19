@@ -12,9 +12,6 @@
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Tambah Kategori Pengeluaran</h4>
-                                <p class="mb-0 text-muted">
-                                    Isi master kategori biaya operasional.
-                                </p>
                             </div>
                         </div>
                     </div>

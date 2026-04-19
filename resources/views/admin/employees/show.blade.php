@@ -8,7 +8,6 @@
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
             <div>
                 <h4 class="mb-1">{{ $page['heading'] }}</h4>
-                <p class="text-muted mb-0">{{ $page['subtitle'] }}</p>
             </div>
 
             <div class="d-flex flex-column flex-sm-row gap-2">

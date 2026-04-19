@@ -31,9 +31,6 @@
                             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                                 <div>
                                     <h4 class="card-title mb-1">Rincian Nota</h4>
-                                    <p class="mb-0 text-muted">
-                                        Revisi setelah barang diterima akan diproses sebagai delta faktur.
-                                    </p>
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-2">
@@ -274,9 +271,6 @@
                         <div class="card-header">
                             <div>
                                 <h4 class="card-title mb-1">Informasi Nota</h4>
-                                <p class="mb-0 text-muted">
-                                    Revisi faktur disiapkan dengan nomor revision aktif agar perubahan berikutnya bisa dihitung sebagai delta.
-                                </p>
                             </div>
                         </div>
 

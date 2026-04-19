@@ -1,9 +1,6 @@
 <div class="card">
     <div class="card-body">
-        <div class="fw-bold mb-1">Aksi Workspace</div>
-        <div class="text-muted small mb-3">
-            Workspace dipakai untuk perubahan besar pada nota. Operasi harian utama tetap dibaca dari status masing-masing line.
-        </div>
+        <h5 class="card-title mb-1">Aksi Workspace</h5>
 
         @if (($note['can_edit_workspace'] ?? false) && $note['can_add_rows'])
             <div class="ui-form-actions">
@@ -13,10 +10,6 @@
                 >
                     Edit Workspace
                 </a>
-            </div>
-
-            <div class="small text-muted mt-2">
-                Tambah servis, produk, dan ubah rincian besar tetap dilakukan dari halaman workspace.
             </div>
         @else
             <div class="border rounded p-3 bg-light">

@@ -6,13 +6,6 @@
 
 @section('content')
 <div class="page-content">
-    <div class="mb-4">
-        <div class="small text-muted text-uppercase fw-semibold">Admin Nota Workspace</div>
-        <h3 class="mb-1">Detail Nota Admin</h3>
-        <div class="text-muted">
-            Admin membaca dan menangani nota dari status line aktual. Perbedaan admin dengan kasir hanya pada cakupan data, bukan pada kejelasan aksi.
-        </div>
-    </div>
 
     <div class="row g-4 align-items-start">
         <div class="col-12 col-xl-8">
@@ -22,9 +15,6 @@
                         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Header Nota</h4>
-                                <p class="mb-0 text-muted">
-                                    Ringkasan identitas nota dan komposisi line untuk pembacaan admin.
-                                </p>
                             </div>
 
                             <span class="badge bg-light text-dark border">
@@ -98,7 +88,6 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Ringkasan Pembayaran</h4>
-                        <p class="mb-0 text-muted">Ringkasan angka nota untuk pembacaan admin.</p>
                     </div>
 
                     <div class="card-body">

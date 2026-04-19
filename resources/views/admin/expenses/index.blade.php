@@ -12,7 +12,6 @@
                     <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                         <div>
                             <h4 class="card-title mb-1">Daftar Pengeluaran Operasional</h4>
-                            <p class="mb-0 text-muted">Daftar pengeluaran operasional bengkel.</p>
                         </div>
 
                         <div class="d-flex flex-column flex-md-row gap-2">

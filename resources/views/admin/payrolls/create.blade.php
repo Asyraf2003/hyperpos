@@ -12,10 +12,6 @@
                     <div class="card-header">
                         <div>
                             <h4 class="card-title mb-1">Form Pencairan Gaji</h4>
-                            <p class="mb-0 text-muted">
-                                Pencairan gaji manual dicatat satu per satu. Ketik minimal 2 huruf untuk mencari karyawan.
-                                Koreksi dilakukan lewat reversal lalu catat ulang.
-                            </p>
                         </div>
                     </div>
 

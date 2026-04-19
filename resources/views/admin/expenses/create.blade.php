@@ -13,9 +13,6 @@
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Catat Pengeluaran Operasional</h4>
-                                <p class="mb-0 text-muted">
-                                    Isi data pengeluaran operasional bengkel.
-                                </p>
                             </div>
                         </div>
                     </div>

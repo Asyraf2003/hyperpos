@@ -9,8 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Riwayat Gaji</h4>
-                        <p class="mb-0 text-muted">Tabel riwayat pencairan gaji manual.</p>
+                        <h4 class="card-title mb-1">Tabel riwayat pencairan gaji manual</h4>
                     </div>
                     <div class="d-flex flex-column flex-md-row gap-2">
                         <form id="payroll-search-form" class="d-flex flex-column gap-1">

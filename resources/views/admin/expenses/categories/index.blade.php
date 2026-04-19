@@ -9,8 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Master Kategori Pengeluaran</h4>
-                        <p class="mb-0 text-muted">Kategori biaya operasional yang dipakai saat pencatatan expense.</p>
+                        <h4 class="card-title mb-1">Kategori biaya operasional yang dipakai saat pencatatan operasional</h4>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">

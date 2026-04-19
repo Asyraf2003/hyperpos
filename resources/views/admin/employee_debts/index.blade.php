@@ -9,8 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Ringkasan Hutang Karyawan</h4>
-                        <p class="mb-0 text-muted">Tabel ringkasan hutang interaktif yang mengarah ke detail karyawan.</p>
+                        <h4 class="card-title mb-1">Tabel ringkasan hutang interaktif yang mengarah ke detail karyawan</h4>
                     </div>
                     <div class="d-flex flex-column flex-md-row gap-2">
                         <form id="employee-debt-search-form" class="d-flex flex-column gap-1">

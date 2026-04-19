@@ -9,8 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Master Karyawan</h4>
-                        <p class="mb-0 text-muted">Tabel karyawan interaktif untuk admin.</p>
+                        <h4 class="card-title mb-1">Tabel karyawan interaktif untuk admin</h4>
                     </div>
 
                     <div class="d-flex flex-column flex-md-row gap-2">
@@ -105,7 +104,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Karyawan</div>
-                                    <div class="small opacity-75">Lihat identitas dan ringkasan umum karyawan.</div>
                                 </a>
                             </div>
 
@@ -116,7 +114,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Edit Karyawan</div>
-                                    <div class="small opacity-75">Perbarui karyawan dengan catatan perubahan.</div>
                                 </a>
                             </div>
 
@@ -127,7 +124,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
-                                    <div class="small opacity-75">Buka riwayat gaji khusus karyawan ini.</div>
                                 </a>
                             </div>
 
@@ -138,7 +134,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
-                                    <div class="small opacity-75">Buka detail hutang atau buat data hutang.</div>
                                 </a>
                             </div>
                         </div>

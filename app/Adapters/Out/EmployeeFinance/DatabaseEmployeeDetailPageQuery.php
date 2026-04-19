@@ -51,8 +51,7 @@ final class DatabaseEmployeeDetailPageQuery
         return [
             'summary' => $currentIdentity,
             'page' => [
-                'heading' => 'Ringkasan Karyawan',
-                'subtitle' => 'Profil saat ini dan riwayat versi karyawan.',
+                'heading' => 'Profil saat ini dan riwayat versi karyawan',
                 'current_identity' => $currentIdentity,
                 'initial_identity' => $initialIdentity,
                 'initial_identity_source' => $initialIdentitySource,

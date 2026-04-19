@@ -13,9 +13,6 @@
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Edit Karyawan</h4>
-                                <p class="mb-0 text-muted">
-                                    Perubahan master karyawan wajib menyertakan catatan perubahan.
-                                </p>
                             </div>
                         </div>
                     </div>

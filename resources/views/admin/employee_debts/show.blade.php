@@ -12,7 +12,6 @@
                         <div class="d-flex flex-row justify-content-between align-items-center gap-2">
                             <div>
                                 <h4 class="card-title mb-1">Ringkasan Hutang</h4>
-                                <p class="mb-0 text-muted">Status dan saldo hutang karyawan.</p>
                             </div>
                         </div>
                     </div>
@@ -48,7 +47,6 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Riwayat Pembayaran</h4>
-                        <p class="mb-0 text-muted">Riwayat cicilan atau pelunasan hutang karyawan.</p>
                     </div>
 
                     <div class="card-body">
@@ -84,7 +82,6 @@
                 <div class="card mb-4">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Riwayat Reversal Pembayaran</h4>
-                        <p class="mb-0 text-muted">Daftar pembayaran hutang yang sudah dibatalkan secara resmi.</p>
                     </div>
 
                     <div class="card-body">
@@ -124,7 +121,6 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Riwayat Koreksi Hutang</h4>
-                        <p class="mb-0 text-muted">Daftar koreksi principal hutang yang pernah dicatat.</p>
                     </div>
 
                     <div class="card-body">

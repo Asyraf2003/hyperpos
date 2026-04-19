@@ -3,17 +3,10 @@
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
                 <h4 class="card-title mb-1">Refund Line Close Terpilih</h4>
-                <p class="mb-0 text-muted">
-                    Form ini membaca line Close yang dipilih dari tabel line. Refund dicatat untuk line yang dicentang, sambil tetap menjaga histori sumber pembayaran.
-                </p>
             </div>
 
             <span class="badge bg-light text-dark border">Panel Refund</span>
         </div>
-
-        <p class="mt-2 mb-0 text-muted small">
-            Sumber pembayaran lama tetap dipakai sebagai jejak histori, tetapi pilihan line Close sekarang menjadi input utama refund.
-        </p>
     </div>
 
     <div class="card-body">
@@ -61,13 +54,6 @@
                 <div class="d-flex justify-content-between align-items-center pt-2">
                     <span class="fw-semibold">Nominal Refund Sekarang</span>
                     <strong id="selected-refund-total">0</strong>
-                </div>
-            </div>
-
-            <div class="border rounded p-3 mb-4 bg-light">
-                <div class="fw-semibold mb-1">Catatan Transisi Selesai</div>
-                <div class="small text-muted">
-                    Refund sekarang mengikuti line Close yang dipilih. Sumber pembayaran tetap dipakai untuk memastikan histori refund tetap konsisten dengan alokasi payment sebelumnya.
                 </div>
             </div>
 

@@ -11,9 +11,6 @@
             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                 <div>
                     <h4 class="card-title mb-1">Daftar Nota Admin</h4>
-                    <p class="mb-0 text-muted">
-                        Area kerja admin untuk membuka daftar nota penuh, memfilter berdasarkan rentang tanggal, dan lanjut ke panel kerja per line.
-                    </p>
                 </div>
 
                 <div class="d-flex flex-column flex-md-row gap-2">

@@ -3,9 +3,6 @@
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>
                 <h4 class="card-title mb-1">Daftar Line Nota</h4>
-                <p class="mb-0 text-muted">
-                    Setiap line menjadi unit kerja utama. Gunakan tombol aksi yang sesuai, lalu lanjutkan dari panel samping.
-                </p>
             </div>
 
             <span class="badge bg-light text-dark border">
@@ -13,9 +10,6 @@
             </span>
         </div>
 
-        <p class="mt-2 mb-0 text-muted small">
-            Open dapat dibayar. Close dapat direfund. Refund hanya berlaku untuk line yang memang sudah berada di status close.
-        </p>
     </div>
 
     <div class="card-body">
