@@ -129,7 +129,7 @@
                     >{{ old('reason') }}</textarea>
                 </div>
 
-                <div class="d-grid">
+                <div class="ui-form-actions">
                     <button type="submit" class="btn btn-primary" id="note-refund-submit">Catat Refund Line</button>
                 </div>
             @else

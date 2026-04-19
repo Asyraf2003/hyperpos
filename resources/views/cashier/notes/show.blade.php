@@ -5,18 +5,18 @@
 @section('back_url', route('cashier.notes.index'))
 
 @section('content')
-<div class="page-content">
-    <div class="mb-4">
+<section class="section">
+    <div class="ui-page-intro">
         <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
-        <h3 class="mb-1">Panel Kerja Nota</h3>
-        <div class="text-muted">
+        <h4 class="ui-page-intro-title">Panel Kerja Nota</h4>
+        <p class="ui-page-intro-subtitle">
             Pilih tindakan berdasarkan status masing-masing line. Nota dibaca sebagai wadah, sedangkan operasi harian mengikuti line.
-        </div>
+        </p>
     </div>
 
     <div class="row g-4 align-items-start">
         <div class="col-12 col-xl-8">
-            <div class="d-flex flex-column gap-4">
+            <div class="ui-card-stack">
                 @include('cashier.notes.partials.note-overview')
                 @include('cashier.notes.partials.note-rows-table')
                 @include('cashier.notes.partials.correction-history')
@@ -24,7 +24,7 @@
         </div>
 
         <div class="col-12 col-xl-4">
-            <div class="d-flex flex-column gap-4">
+            <div class="ui-card-stack">
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Panel Tindakan Nota</h4>
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 @endsection
 
 @push('scripts')

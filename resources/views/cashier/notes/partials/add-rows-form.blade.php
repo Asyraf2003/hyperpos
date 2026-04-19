@@ -6,17 +6,17 @@
         </div>
 
         @if (($note['can_edit_workspace'] ?? false) && $note['can_add_rows'])
-            <div class="d-grid gap-2">
+            <div class="ui-form-actions">
                 <a
                     href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
-                    class="btn btn-primary"
+                    class="btn btn-light-primary"
                 >
                     Edit Workspace
                 </a>
+            </div>
 
-                <div class="small text-muted">
-                    Tambah servis, produk, dan ubah rincian besar tetap dilakukan dari halaman workspace.
-                </div>
+            <div class="small text-muted mt-2">
+                Tambah servis, produk, dan ubah rincian besar tetap dilakukan dari halaman workspace.
             </div>
         @else
             <div class="border rounded p-3 bg-light">

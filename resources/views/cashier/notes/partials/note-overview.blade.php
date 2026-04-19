@@ -21,31 +21,31 @@
             </div>
 
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <div class="text-muted">No. Nota</div>
-                    <div class="text-end fw-semibold">{{ $note['id'] }}</div>
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <small>No. Nota</small>
+                    <div class="text-end">{{ $note['id'] }}</div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <div class="text-muted">Customer</div>
-                    <div class="text-end fw-semibold">{{ $note['customer_name'] }}</div>
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <small>Customer</small>
+                    <div class="text-end">{{ $note['customer_name'] }}</div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <div class="text-muted">No. Telp</div>
-                    <div class="text-end fw-semibold">
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <small>No. Telp</small>
+                    <div class="text-end">
                         {{ !empty($note['customer_phone']) ? $note['customer_phone'] : '-' }}
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <div class="text-muted">Tanggal Nota</div>
-                    <div class="text-end fw-semibold">{{ $note['transaction_date'] }}</div>
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <small>Tanggal Nota</small>
+                    <div class="text-end">{{ $note['transaction_date'] }}</div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-start py-2">
-                    <div class="text-muted">Ringkasan Line</div>
-                    <div class="text-end fw-semibold">
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2">
+                    <small>Ringkasan Line</small>
+                    <div class="text-end">
                         {{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <div class="d-grid gap-2 mt-3">
+                <div class="ui-form-actions mt-3">
                     @if ($note['can_edit_workspace'] ?? false)
                         <a
                             href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
@@ -75,14 +75,14 @@
                             Edit Nota
                         </a>
                     @else
-                        <button type="button" class="btn btn-light" disabled>
+                        <button type="button" class="btn btn-light-secondary" disabled>
                             Workspace Nonaktif
                         </button>
                     @endif
+                </div>
 
-                    <div class="small text-muted">
-                        Edit besar tetap lewat workspace. Operasi harian utama akan mengikuti status per line.
-                    </div>
+                <div class="small text-muted mt-2">
+                    Edit besar tetap lewat workspace. Operasi harian utama akan mengikuti status per line.
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@
                 <div>
                     <h4 class="card-title mb-1">Pembayaran Line Open Terpilih</h4>
                     <p class="mb-0 text-muted">
-                        Form ini sekarang membaca line Open yang dipilih dari tabel line. Pembayaran dilakukan untuk baris yang dicentang, bukan untuk nota secara umum.
+                        Form ini membaca line Open yang dipilih dari tabel line. Pembayaran dilakukan untuk baris yang dicentang, bukan untuk nota secara umum.
                     </p>
                 </div>
 
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="d-grid mt-3">
+                <div class="ui-form-actions mt-3">
                     <button type="submit" class="btn btn-primary" id="note-payment-submit">
                         Catat Pembayaran Line
                     </button>
