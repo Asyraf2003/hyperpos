@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 final class ProcurementLoadSeeder extends Seeder
 {
     private const INT_MAX = 2147483647;
+
     public function run(): void
     {
         $suppliers = DB::table('suppliers')
@@ -104,6 +105,12 @@ final class ProcurementLoadSeeder extends Seeder
                             'id' => $receiptLineId,
                             'supplier_receipt_id' => $receiptId,
                             'supplier_invoice_line_id' => $line['id'],
+                            'product_id_snapshot' => (string) $line['product_id'],
+                            'product_kode_barang_snapshot' => $line['product_kode_barang_snapshot'],
+                            'product_nama_barang_snapshot' => $line['product_nama_barang_snapshot'],
+                            'product_merek_snapshot' => $line['product_merek_snapshot'],
+                            'product_ukuran_snapshot' => $line['product_ukuran_snapshot'],
+                            'unit_cost_rupiah_snapshot' => $unitCost,
                             'qty_diterima' => $qty,
                         ];
 
@@ -185,7 +192,7 @@ final class ProcurementLoadSeeder extends Seeder
 
     private function resolveInvoiceCount(object $day, array $density): int
     {
-        $spikeDays = [2, 4, 6]; // Selasa, Kamis, Sabtu
+        $spikeDays = [2, 4, 6];
         $weekday = (int) $day->dayOfWeekIso;
 
         $count = in_array($weekday, $spikeDays, true)
@@ -223,6 +230,11 @@ final class ProcurementLoadSeeder extends Seeder
             $lines[] = [
                 'id' => sprintf('%s-line-%02d', $invoiceId, $lineNo),
                 'supplier_invoice_id' => $invoiceId,
+                'revision_no' => 1,
+                'is_current' => 1,
+                'source_line_id' => null,
+                'superseded_by_line_id' => null,
+                'superseded_at' => null,
                 'line_no' => $lineNo,
                 'product_id' => (string) $product->id,
                 'product_kode_barang_snapshot' => $product->kode_barang,

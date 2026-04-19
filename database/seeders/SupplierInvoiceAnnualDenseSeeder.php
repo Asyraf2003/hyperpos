@@ -131,6 +131,11 @@ final class SupplierInvoiceAnnualDenseSeeder extends Seeder
             $lines[] = [
                 'id' => sprintf('%s-line-%02d', $invoiceId, $lineNo),
                 'supplier_invoice_id' => $invoiceId,
+                'revision_no' => 1,
+                'is_current' => 1,
+                'source_line_id' => null,
+                'superseded_by_line_id' => null,
+                'superseded_at' => null,
                 'line_no' => $lineNo,
                 'product_id' => (string) $product->id,
                 'product_kode_barang_snapshot' => $product->kode_barang,

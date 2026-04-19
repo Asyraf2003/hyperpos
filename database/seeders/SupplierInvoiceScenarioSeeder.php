@@ -95,6 +95,11 @@ final class SupplierInvoiceScenarioSeeder extends Seeder
             $lines[] = [
                 'id' => $lineId,
                 'supplier_invoice_id' => $invoiceId,
+                'revision_no' => 1,
+                'is_current' => 1,
+                'source_line_id' => null,
+                'superseded_by_line_id' => null,
+                'superseded_at' => null,
                 'line_no' => $index + 1,
                 'product_id' => (string) $def['product']->id,
                 'product_kode_barang_snapshot' => $def['product']->kode_barang,
@@ -111,6 +116,12 @@ final class SupplierInvoiceScenarioSeeder extends Seeder
                     'id' => $receiptId . '-line-' . ($index + 1),
                     'supplier_receipt_id' => $receiptId,
                     'supplier_invoice_line_id' => $lineId,
+                    'product_id_snapshot' => (string) $def['product']->id,
+                    'product_kode_barang_snapshot' => $def['product']->kode_barang,
+                    'product_nama_barang_snapshot' => $def['product']->nama_barang,
+                    'product_merek_snapshot' => $def['product']->merek,
+                    'product_ukuran_snapshot' => $def['product']->ukuran,
+                    'unit_cost_rupiah_snapshot' => (int) $def['unit_cost'],
                     'qty_diterima' => (int) $def['qty'],
                 ];
             }
