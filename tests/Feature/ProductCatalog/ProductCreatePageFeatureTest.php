@@ -41,10 +41,10 @@ final class ProductCreatePageFeatureTest extends TestCase
             ->get(route('admin.products.create'));
 
         $response->assertOk();
-        $response->assertSee('Tambah Product');
+        $response->assertSee('Tambah Produk');
         $response->assertSee('Nama Barang');
         $response->assertSee('Harga Jual');
-        $response->assertSee('Simpan Product');
+        $response->assertSee('Simpan Produk');
     }
 
     public function test_admin_can_store_product_from_create_page(): void

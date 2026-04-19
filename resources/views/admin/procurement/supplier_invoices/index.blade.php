@@ -10,23 +10,26 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Daftar Nota Pemasok</h4>
-                        <p class="mb-0 text-muted">Tabel nota pemasok interaktif untuk admin.</p>
+                        <h4 class="card-title mb-1">Tabel nota pemasok interaktif untuk admin</h4>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="procurement-search-form" class="d-flex flex-column gap-1">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                        <form id="procurement-search-form" class="m-0 d-flex flex-grow-1">
                             <input
                                 type="text"
                                 id="procurement-search-input"
                                 class="form-control"
                                 placeholder="Cari nomor faktur atau nama PT"
                                 autocomplete="off"
+                                style="min-height: 48px;"
                             >
                         </form>
 
-                        <button type="button" id="open-procurement-filter" class="btn btn-light-secondary">Filter</button>
-                        <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary">
+                        <button type="button" id="open-procurement-filter" class="btn btn-primary px-4" style="min-height: 48px;">
+                            Filter
+                        </button>
+
+                        <a href="{{ route('admin.procurement.supplier-invoices.create') }}" class="btn btn-primary px-4 d-flex align-items-center justify-content-center" style="min-height: 48px;">
                             Buat Nota Pemasok
                         </a>
                     </div>
@@ -141,31 +144,31 @@
 
                     <div class="modal-body px-4 pb-4 pt-3">
                         <div class="row g-3">
-                            <div class="col-12 col-md-6 col-xl-3">
+                            <div class="col-12 col-md-6">
                                 <a
                                     href="#"
                                     id="procurement-action-detail-link"
-                                    class="btn btn-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail</div>
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-6 col-xl-3">
+                            <div class="col-12 col-md-6">
                                 <a
                                     href="#"
                                     id="procurement-action-payment-link"
-                                    class="btn btn-light-primary w-100 text-start py-3 px-4 h-100"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1" id="procurement-action-payment-title">Bayar</div>
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-6 col-xl-3">
+                            <div class="col-12 col-md-6">
                                 <a
                                     href="#"
                                     id="procurement-action-edit-link"
-                                    class="btn btn-light-secondary w-100 text-start py-3 px-4 h-100 disabled"
+                                    class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100 disabled"
                                     aria-disabled="true"
                                     tabindex="-1"
                                 >
@@ -173,7 +176,7 @@
                                 </a>
                             </div>
 
-                            <div class="col-12 col-md-6 col-xl-3">
+                            <div class="col-12 col-md-6">
                                 <button
                                     type="button"
                                     id="procurement-action-void-button"

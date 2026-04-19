@@ -56,7 +56,7 @@ final class EditSupplierInvoicePageFeatureTest extends TestCase
             ]));
 
         $response->assertOk();
-        $response->assertSee('Edit Nota Supplier');
+        $response->assertSee('Edit Nota Pemasok');
         $response->assertSee('INV-SUP-001');
         $response->assertSee('PT Sumber Makmur');
         $response->assertSee('Rincian Nota');
