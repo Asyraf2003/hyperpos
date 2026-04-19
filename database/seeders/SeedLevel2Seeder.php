@@ -21,6 +21,7 @@ final class SeedLevel2Seeder extends Seeder
             SupplierSeeder::class,
             EmployeeFinanceBaselineSeeder::class,
             SupplierInvoiceScenarioSeeder::class,
+            SupplierInvoiceVoidedScenarioSeeder::class,
             SupplierInvoiceBaselineSeeder::class,
             ExpenseBaselineSeeder::class,
             CustomerTransactionBaselineSeeder::class,
