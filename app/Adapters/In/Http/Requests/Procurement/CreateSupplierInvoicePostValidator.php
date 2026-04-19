@@ -11,6 +11,11 @@ final class CreateSupplierInvoicePostValidator
 {
     public function validate(FormRequest $request, Validator $validator): void
     {
+        (new CreateSupplierInvoiceDuplicateNumberPostValidation())->validate(
+            (string) $request->input('nomor_faktur', ''),
+            $validator,
+        );
+
         (new CreateSupplierInvoiceDatePostValidation())->validate($request, $validator);
         (new CreateSupplierInvoiceLinesPostValidation())->validate($request, $validator);
     }

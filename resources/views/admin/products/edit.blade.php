@@ -13,9 +13,6 @@
                         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                             <div>
                                 <h4 class="card-title mb-1">Form Edit Produk</h4>
-                                <p class="mb-0 text-muted">
-                                    Ubah identitas produk dengan pola form yang sama seperti halaman tambah produk.
-                                </p>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
@@ -140,17 +137,6 @@
                                                 {{ $message }}
                                             </div>
                                         @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="border rounded p-3 bg-light-subtle mb-4">
-                                        <div class="fw-semibold mb-1">Aturan Batas Stok</div>
-                                        <small class="text-muted d-block">
-                                            Isi dua angka ini secara berpasangan. Reorder Point adalah batas saat stok mulai perlu dibeli lagi.
-                                            Batas Stok Kritis adalah batas saat stok sudah terlalu rendah dan harus segera direstok.
-                                            Produk tanpa dua angka ini akan dianggap belum dikonfigurasi.
-                                        </small>
                                     </div>
                                 </div>
 

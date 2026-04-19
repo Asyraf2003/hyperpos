@@ -9,23 +9,28 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Master Barang Bengkel</h4>
-                        <p class="mb-0 text-muted">Tabel produk interaktif untuk admin.</p>
+                        <h4 class="card-title mb-1">Tabel produk interaktif untuk admin</h4>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="product-search-form" class="d-flex flex-column gap-1">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                        <form id="product-search-form" class="m-0 d-flex">
                             <input
                                 type="text"
                                 id="product-search-input"
-                                class="form-control"
+                                class="form-control py-2" 
                                 placeholder="Cari kode, nama, atau merek"
                                 autocomplete="off"
+                                style="min-height: 40px;"
                             >
                         </form>
 
-                        <button type="button" id="open-product-filter" class="btn btn-primary">Filter</button>
-                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Produk</a>
+                        <button type="button" id="open-product-filter" class="btn btn-primary py-2">
+                            Filter
+                        </button>
+
+                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                            Tambah Produk
+                        </a>
                     </div>
                 </div>
             </div>

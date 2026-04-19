@@ -13,7 +13,6 @@
                     <div class="card-header">
                         <div>
                             <h4 class="card-title mb-1">Informasi Produk</h4>
-                            <p class="mb-0 text-muted">Penyesuaian stok keluar untuk produk terpilih.</p>
                         </div>
                     </div>
 
@@ -59,9 +58,6 @@
                     <div class="card-header">
                         <div>
                             <h4 class="card-title mb-1">Form Penyesuaian Stok</h4>
-                            <p class="mb-0 text-muted">
-                                Bagian ini khusus untuk pencatatan pengurangan stok operasional melalui mutasi.
-                            </p>
                         </div>
                     </div>
 

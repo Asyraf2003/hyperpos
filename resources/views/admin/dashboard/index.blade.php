@@ -824,10 +824,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="helper-note mt-4">
-                        Dashboard v1 ini sudah memakai report backend aktif yang paling aman untuk dibaca cepat.
-                    </div>
                 </div>
             </div>
         </div>

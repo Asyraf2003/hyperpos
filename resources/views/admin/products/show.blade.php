@@ -9,8 +9,7 @@
         <div class="ui-page-intro">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                 <div>
-                    <h4 class="ui-page-intro-title">{{ $page['heading'] }}</h4>
-                    <p class="ui-page-intro-subtitle">{{ $page['subtitle'] }}</p>
+                    <h4 class="ui-page-intro-title">{{ $page['heading'] }} {{ $page['subtitle'] }}</h4>
                 </div>
 
                 <div class="d-flex flex-wrap gap-2">
