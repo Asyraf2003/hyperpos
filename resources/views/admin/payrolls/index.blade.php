@@ -11,11 +11,21 @@
                     <div>
                         <h4 class="card-title mb-1">Tabel riwayat pencairan gaji manual</h4>
                     </div>
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="payroll-search-form" class="d-flex flex-column gap-1">
-                            <input type="text" id="payroll-search-input" class="form-control" placeholder="Cari nama, catatan, mode, atau tanggal" autocomplete="off">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                        <form id="payroll-search-form" class="m-0 d-flex">
+                            <input 
+                                type="text" 
+                                id="payroll-search-input" 
+                                class="form-control py-2" 
+                                placeholder="Cari nama, catatan, mode, atau tanggal" 
+                                autocomplete="off"
+                                style="min-height: 40px;"
+                            >
                         </form>
-                        <a href="{{ route('admin.payrolls.create') }}" class="btn btn-primary">Catat Gaji</a>
+
+                        <a href="{{ route('admin.payrolls.create') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                            Catat Gaji
+                        </a>
                     </div>
                 </div>
             </div>

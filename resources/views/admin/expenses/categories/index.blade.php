@@ -12,19 +12,25 @@
                         <h4 class="card-title mb-1">Kategori biaya operasional yang dipakai saat pencatatan operasional</h4>
                     </div>
 
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="expense-category-search-form" class="d-flex flex-column gap-1">
+                   <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                        <form id="expense-category-search-form" class="m-0 d-flex">
                             <input
                                 type="text"
                                 id="expense-category-search-input"
-                                class="form-control"
+                                class="form-control py-2"
                                 placeholder="Cari kode, nama, atau deskripsi kategori"
                                 autocomplete="off"
+                                style="min-height: 40px;"
                             >
                         </form>
 
-                        <button type="button" id="open-expense-category-filter" class="btn btn-primary">Filter</button>
-                        <a href="{{ route('admin.expenses.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
+                        <button type="button" id="open-expense-category-filter" class="btn btn-primary py-2">
+                            Filter
+                        </button>
+
+                        <a href="{{ route('admin.expenses.categories.create') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                            Tambah Kategori
+                        </a>
                     </div>
                 </div>
             </div>

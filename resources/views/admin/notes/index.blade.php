@@ -13,19 +13,20 @@
                     <h4 class="card-title mb-1">Daftar Nota Admin</h4>
                 </div>
 
-                <div class="d-flex flex-column flex-md-row gap-2">
-                    <form class="d-flex flex-column gap-1" id="admin-note-search-form">
+                <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                    <form id="admin-note-search-form" class="m-0 d-flex">
                         <input
                             type="text"
                             id="admin-note-search-input"
-                            class="form-control"
+                            class="form-control py-2"
                             placeholder="Cari no nota, customer, no telp"
                             autocomplete="off"
                             value="{{ $filters['search'] }}"
+                            style="min-height: 40px;"
                         >
                     </form>
 
-                    <button type="button" id="open-admin-note-filter" class="btn btn-primary">
+                    <button type="button" id="open-admin-note-filter" class="btn btn-primary py-2">
                         Filter
                     </button>
                 </div>

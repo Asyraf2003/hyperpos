@@ -14,20 +14,29 @@
                             <h4 class="card-title mb-1">Daftar Pengeluaran Operasional</h4>
                         </div>
 
-                        <div class="d-flex flex-column flex-md-row gap-2">
-                            <form id="expense-search-form" class="d-flex flex-column gap-1">
+                        <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                            <form id="expense-search-form" class="m-0 d-flex">
                                 <input
                                     type="text"
                                     id="expense-search-input"
-                                    class="form-control"
+                                    class="form-control py-2"
                                     placeholder="Cari kategori, kode kategori, deskripsi, metode bayar"
                                     autocomplete="off"
+                                    style="min-height: 40px;"
                                 >
                             </form>
 
-                            <button type="button" id="open-expense-filter" class="btn btn-primary">Filter</button>
-                            <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-primary">Kelola Kategori</a>
-                            <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary">Catat Pengeluaran</a>
+                            <button type="button" id="open-expense-filter" class="btn btn-primary py-2">
+                                Filter
+                            </button>
+
+                            <a href="{{ route('admin.expenses.categories.index') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                                Kelola Kategori
+                            </a>
+
+                            <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                                Catat Pengeluaran
+                            </a>
                         </div>
                     </div>
 

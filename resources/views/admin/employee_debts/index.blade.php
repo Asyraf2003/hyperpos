@@ -11,17 +11,21 @@
                     <div>
                         <h4 class="card-title mb-1">Tabel ringkasan hutang interaktif yang mengarah ke detail karyawan</h4>
                     </div>
-                    <div class="d-flex flex-column flex-md-row gap-2">
-                        <form id="employee-debt-search-form" class="d-flex flex-column gap-1">
+                    <div class="d-flex flex-column flex-md-row gap-2 align-items-stretch">
+                        <form id="employee-debt-search-form" class="m-0 d-flex">
                             <input
                                 type="text"
                                 id="employee-debt-search-input"
-                                class="form-control"
+                                class="form-control py-2"
                                 placeholder="Cari nama karyawan"
                                 autocomplete="off"
+                                style="min-height: 40px;"
                             >
                         </form>
-                        <a href="{{ route('admin.employee-debts.create') }}" class="btn btn-primary">Catat Hutang Karyawan</a>
+
+                        <a href="{{ route('admin.employee-debts.create') }}" class="btn btn-primary py-2 d-inline-flex align-items-center">
+                            Catat Hutang Karyawan
+                        </a>
                     </div>
                 </div>
             </div>
