@@ -3,48 +3,53 @@
 
 @section('title', 'Ubah Stok Produk')
 @section('heading', 'Ubah Stok Produk')
+@section('back_url', route('admin.products.show', ['productId' => $product->id()]))
 
 @section('content')
     <section class="section">
-        <div class="row">
+        <div class="row g-4">
             <div class="col-12 col-xl-5">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Informasi Produk</h4>
-                        <p class="mb-0 text-muted">Penyesuaian stok keluar untuk produk terpilih.</p>
+                        <div>
+                            <h4 class="card-title mb-1">Informasi Produk</h4>
+                            <p class="mb-0 text-muted">Penyesuaian stok keluar untuk produk terpilih.</p>
+                        </div>
                     </div>
 
                     <div class="card-body">
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Kode Barang</small>
-                            <div class="fw-semibold">{{ $product->kodeBarang() ?: '-' }}</div>
+                        <div class="ui-key-value mb-3">
+                            <small>Kode Barang</small>
+                            <div>{{ $product->kodeBarang() ?: '-' }}</div>
                         </div>
 
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Nama Barang</small>
-                            <div class="fw-semibold">{{ $product->namaBarang() }}</div>
+                        <div class="ui-key-value mb-3">
+                            <small>Nama Barang</small>
+                            <div>{{ $product->namaBarang() }}</div>
                         </div>
 
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Merek</small>
-                            <div class="fw-semibold">{{ $product->merek() }}</div>
+                        <div class="ui-key-value mb-3">
+                            <small>Merek</small>
+                            <div>{{ $product->merek() }}</div>
                         </div>
 
-                        <div class="mb-3">
-                            <small class="text-muted d-block">Ukuran</small>
-                            <div class="fw-semibold">{{ $product->ukuran() ?? '-' }}</div>
+                        <div class="ui-key-value mb-3">
+                            <small>Ukuran</small>
+                            <div>{{ $product->ukuran() ?? '-' }}</div>
                         </div>
 
-                        <div>
-                            <small class="text-muted d-block">Stok Saat Ini</small>
-                            <div class="fw-semibold">{{ $currentStock }}</div>
+                        <div class="ui-key-value">
+                            <small>Stok Saat Ini</small>
+                            <div>{{ $currentStock }}</div>
                         </div>
                     </div>
 
-                    <div class="card-footer d-flex gap-2">
-                        <a href="{{ route('admin.products.edit', ['productId' => $product->id()]) }}" class="btn btn-primary">
-                            Edit Identitas
-                        </a>
+                    <div class="card-footer">
+                        <div class="ui-form-actions">
+                            <a href="{{ route('admin.products.edit', ['productId' => $product->id()]) }}" class="btn btn-light-primary">
+                                Edit Identitas
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,10 +57,12 @@
             <div class="col-12 col-xl-7">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Stok Penyesuaian</h4>
-                        <p class="mb-0 text-muted">
-                            Bagian ini khusus untuk pencatatan pengurangan stok operasional melalui Mutasi.
-                        </p>
+                        <div>
+                            <h4 class="card-title mb-1">Form Penyesuaian Stok</h4>
+                            <p class="mb-0 text-muted">
+                                Bagian ini khusus untuk pencatatan pengurangan stok operasional melalui mutasi.
+                            </p>
+                        </div>
                     </div>
 
                     <div class="card-body">
@@ -120,9 +127,14 @@
                                 @enderror
                             </div>
 
-                            <button type="submit" class="btn btn-primary">
-                                Catat Stok Penyesuaian
-                            </button>
+                            <div class="ui-form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    Catat Penyesuaian Stok
+                                </button>
+                                <a href="{{ route('admin.products.show', ['productId' => $product->id()]) }}" class="btn btn-light-secondary">
+                                    Kembali ke Detail
+                                </a>
+                            </div>
                         </form>
                     </div>
                 </div>
