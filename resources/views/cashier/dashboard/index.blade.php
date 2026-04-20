@@ -466,10 +466,6 @@
                             <h3 class="cashier-section-title fw-bold mb-2">
                                 Pusat kerja cepat kasir
                             </h3>
-                            <p class="cashier-section-desc mb-0">
-                                Dashboard ini dipakai untuk mulai transaksi, membuka nota aktif,
-                                dan mengecek harga jual serta stok produk yang siap dipakai.
-                            </p>
                         </div>
 
                         <div class="row g-3">

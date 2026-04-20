@@ -8,10 +8,7 @@
         <div class="card-header">
             <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                 <div>
-                    <h4 class="card-title mb-1">Daftar Nota Kasir</h4>
-                    <p class="mb-0 text-muted">
-                        Area kerja kasir untuk memilih nota hari ini dan kemarin, lalu lanjut ke panel kerja per line.
-                    </p>
+                    <h4 class="card-title mb-1">Area kerja kasir untuk memilih nota hari ini dan kemarin, lalu lanjut ke panel kerja per line</h4>
                 </div>
 
                 <div class="d-flex flex-column flex-md-row gap-2">
