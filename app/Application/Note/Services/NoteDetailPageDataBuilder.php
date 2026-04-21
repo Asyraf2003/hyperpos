@@ -42,9 +42,17 @@ final class NoteDetailPageDataBuilder
             return null;
         }
 
+        $rows = $workspacePanel['rows'];
         $openLineCount = (int) ($workspacePanel['line_summary']['open_count'] ?? 0);
         $closeLineCount = (int) ($workspacePanel['line_summary']['close_count'] ?? 0);
-        $isOpen = $note->isOpen();
+        $paymentRows = $this->filterRows($rows, 'can_pay');
+        $refundRows = $this->filterRows($rows, 'can_refund');
+        $refundPaymentOptions = $this->refundPaymentOptions->build($note->id());
+        $canShowPaymentAction = $isOpen = $note->isOpen()
+            && $openLineCount > 0
+            && $operational['outstanding_rupiah'] > 0
+            && $paymentRows !== [];
+        $canShowRefundAction = $refundRows !== [] && $refundPaymentOptions !== [];
         $isClosed = $note->isClosed();
         $isRefunded = $note->isRefunded();
 
@@ -72,18 +80,39 @@ final class NoteDetailPageDataBuilder
                 'can_show_edit_actions' => $isOpen,
                 'can_edit_workspace' => $isOpen,
                 'can_show_workspace_panel' => $isOpen || $isClosed,
-                'can_show_payment_form' => $isOpen && $openLineCount > 0 && $operational['outstanding_rupiah'] > 0,
+                'can_show_payment_form' => $canShowPaymentAction,
                 'can_show_refund_form' => $closeLineCount > 0,
-                'refund_payment_options' => $this->refundPaymentOptions->build($note->id()),
+                'can_show_payment_action' => $canShowPaymentAction,
+                'can_show_refund_action' => $canShowRefundAction,
+                'payment_rows' => $paymentRows,
+                'refund_rows' => $refundRows,
+                'refund_payment_options' => $refundPaymentOptions,
+                'detail_action_contract' => [
+                    'selection_mode' => 'modal_only',
+                    'payment_flow' => 'launcher_then_modal_selection',
+                    'refund_flow' => 'launcher_then_modal_selection',
+                ],
                 'can_show_correction_actions' => false,
                 'correction_notice' => $isClosed
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
                     : ($isRefunded ? 'Nota sudah refunded. Workspace tidak dipakai lagi.' : null),
                 'line_summary' => $workspacePanel['line_summary'],
-                'rows' => $workspacePanel['rows'],
+                'rows' => $rows,
                 'correction_history' => $this->history->build($note->id()),
             ],
             'productOptions' => $this->products->build(),
         ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows
+     * @return list<array<string, mixed>>
+     */
+    private function filterRows(array $rows, string $eligibilityKey): array
+    {
+        return array_values(array_filter(
+            $rows,
+            static fn (array $row): bool => (bool) ($row[$eligibilityKey] ?? false)
+        ));
     }
 }
