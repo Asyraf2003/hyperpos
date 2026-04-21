@@ -25,9 +25,9 @@ final class CashierRefundedNoteDetailViewFeatureTest extends TestCase
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Note Hybrid')
             ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
+            ->assertSee('Billing Projection')
             ->assertDontSee('Lunasi Pembayaran')->assertDontSee('Pembayaran Nota')
-            ->assertDontSee('Edit Workspace Aktif')
-            ->assertDontSee('Billing Projection');
+            ->assertDontSee('Edit Workspace Aktif');
     }
 
     private function seedKasir(): User
