@@ -6,7 +6,7 @@
                     <div>
                         <h4 class="card-title mb-1">Header Nota</h4>
                         <p class="mb-0 text-muted">
-                            Ringkasan identitas nota dan komposisi line untuk area kerja kasir.
+                            Ringkasan identitas note dan komposisi line untuk membaca konteks transaksi saat ini.
                         </p>
                     </div>
 
@@ -16,7 +16,7 @@
                 </div>
 
                 <p class="mt-2 mb-0 text-muted small">
-                    Nota dibaca sebagai wadah transaksi. Operasi harian mengikuti status masing-masing line.
+                    Fase ini memisahkan pembacaan line domain, billing projection, dan pseudo-versioning agar kerja kasir tetap jelas.
                 </p>
             </div>
 
@@ -41,6 +41,11 @@
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
                     <small>Tanggal Nota</small>
                     <div class="text-end">{{ $note['transaction_date'] }}</div>
+                </div>
+
+                <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
+                    <small>Status Note</small>
+                    <div class="text-end text-uppercase">{{ $note['note_state'] }}</div>
                 </div>
 
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2">
@@ -72,7 +77,7 @@
                             href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
                             class="btn btn-primary"
                         >
-                            Edit Nota
+                            Edit Workspace Aktif
                         </a>
                     @else
                         <button type="button" class="btn btn-light-secondary" disabled>
@@ -82,7 +87,7 @@
                 </div>
 
                 <div class="small text-muted mt-2">
-                    Edit besar tetap lewat workspace. Operasi harian utama akan mengikuti status per line.
+                    True note revision flow belum dibuka di fase ini. Tombol edit masih menuju workspace aktif existing.
                 </div>
             </div>
         </div>
@@ -93,7 +98,7 @@
             <div class="card-header">
                 <h4 class="card-title mb-1">Ringkasan Angka</h4>
                 <p class="mb-0 text-muted">
-                    Angka utama nota untuk membaca posisi pembayaran, refund, dan sisa tagihan saat ini.
+                    Angka utama note untuk membaca posisi pembayaran, refund, dan sisa tagihan saat ini.
                 </p>
             </div>
 
