@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
+use App\Core\Note\Note\Note;
 use App\Ports\Out\Note\NoteReaderPort;
 
 final class NoteDetailPageDataBuilder
@@ -31,8 +32,8 @@ final class NoteDetailPageDataBuilder
 
         $operational = $this->operationalStatuses->resolve($note);
         $paymentStatus = $this->paymentStatuses->resolve(
-            $operational['grand_total_rupiah'],
-            $operational['net_paid_rupiah'],
+            (int) $operational['grand_total_rupiah'],
+            (int) $operational['net_paid_rupiah'],
         );
 
         $this->rowSettlements->build($note->id(), $note->workItems());
@@ -45,7 +46,12 @@ final class NoteDetailPageDataBuilder
         return [
             'pageTitle' => 'Detail Nota',
             'workspace_panel' => $workspacePanel,
-            'note' => $this->buildNotePayload($note, $operational, $paymentStatus, $workspacePanel),
+            'note' => $this->buildNotePayload(
+                $note,
+                $operational,
+                $paymentStatus,
+                $workspacePanel,
+            ),
             'productOptions' => $this->products->build(),
         ];
     }
@@ -56,16 +62,21 @@ final class NoteDetailPageDataBuilder
      * @param array<string, mixed> $workspacePanel
      * @return array<string, mixed>
      */
-    private function buildNotePayload(object $note, array $operational, array $paymentStatus, array $workspacePanel): array
-    {
+    private function buildNotePayload(
+        Note $note,
+        array $operational,
+        array $paymentStatus,
+        array $workspacePanel,
+    ): array {
         $isOpen = $note->isOpen();
         $isClosed = $note->isClosed();
         $isRefunded = $note->isRefunded();
+
         $actionPayloads = $this->actionPayloads->build(
             $isOpen,
-            $workspacePanel['rows'],
+            (array) $workspacePanel['rows'],
             $operational,
-            $workspacePanel['line_summary'],
+            (array) $workspacePanel['line_summary'],
             $this->refundPaymentOptions->build($note->id()),
         );
 
@@ -79,12 +90,15 @@ final class NoteDetailPageDataBuilder
             'is_open' => $isOpen,
             'is_closed' => $isClosed,
             'is_refunded' => $isRefunded,
-            'grand_total_rupiah' => $operational['grand_total_rupiah'],
-            'total_allocated_rupiah' => $operational['total_allocated_rupiah'],
-            'total_refunded_rupiah' => $operational['total_refunded_rupiah'],
-            'net_paid_rupiah' => $operational['net_paid_rupiah'],
-            'outstanding_rupiah' => $operational['outstanding_rupiah'],
-            'refund_required_rupiah' => max($operational['net_paid_rupiah'] - $operational['grand_total_rupiah'], 0),
+            'grand_total_rupiah' => (int) $operational['grand_total_rupiah'],
+            'total_allocated_rupiah' => (int) $operational['total_allocated_rupiah'],
+            'total_refunded_rupiah' => (int) $operational['total_refunded_rupiah'],
+            'net_paid_rupiah' => (int) $operational['net_paid_rupiah'],
+            'outstanding_rupiah' => (int) $operational['outstanding_rupiah'],
+            'refund_required_rupiah' => max(
+                (int) $operational['net_paid_rupiah'] - (int) $operational['grand_total_rupiah'],
+                0
+            ),
             'payment_status' => $paymentStatus,
             'can_add_rows' => $isOpen,
             'can_show_edit_actions' => $isOpen,
