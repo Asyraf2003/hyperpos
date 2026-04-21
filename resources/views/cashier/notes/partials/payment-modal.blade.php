@@ -29,7 +29,6 @@
 
                 <div class="d-flex flex-column gap-2">
                   @foreach (($note['billing_rows'] ?? []) as $row)
-                    @php($isDisabled = !($row['can_select_manually'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0)
                     <label class="border rounded px-3 py-2 d-flex align-items-start gap-2 {{ ($row['is_paid'] ?? false) ? 'bg-light' : '' }}">
                       <input type="checkbox"
                         class="form-check-input mt-1"
@@ -40,14 +39,14 @@
                         data-eligible-dp="{{ ($row['eligible_for_dp_preset'] ?? false) ? '1' : '0' }}"
                         data-outstanding-rupiah="{{ (int) ($row['outstanding_rupiah'] ?? 0) }}"
                         {{ ($row['is_paid'] ?? false) ? 'disabled' : '' }}
-                        {{ $isDisabled ? 'disabled' : '' }}>
+                        {{ (!($row['can_select_manually'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0) ? 'disabled' : '' }}>
                       <span class="w-100 d-flex justify-content-between align-items-start gap-3">
                         <span>
                           <span class="d-block fw-semibold">Line {{ $row['line_no'] }} · {{ $row['component_label'] }}</span>
                           <small class="text-muted d-block">{{ $row['domain_type_label'] }} · Status: {{ $row['status_label'] }}</small>
                           @if (($row['is_paid'] ?? false))
                             <small class="text-muted d-block">Komponen sudah lunas.</small>
-                          @elseif ($isDisabled)
+                          @elseif (!($row['can_select_manually'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0)
                             <small class="text-muted d-block">{{ $row['selection_blocked_reason'] ?? 'Ikuti urutan komponen existing.' }}</small>
                           @elseif ($row['eligible_for_dp_preset'] ?? false)
                             <small class="text-muted d-block">Masuk prioritas preset DP.</small>
