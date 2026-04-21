@@ -26,8 +26,8 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Note Hybrid')
             ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
             ->assertSee('Refund')->assertSee('Refund Nota')
-            ->assertDontSee('Bayar')
-            ->assertDontSee('Lunasi Pembayaran');
+            ->assertDontSee('Lunasi Pembayaran')
+            ->assertDontSee('Edit Workspace Aktif');
     }
 
     public function test_open_note_detail_shows_workspace_edit_and_payment_actions(): void
