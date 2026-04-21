@@ -10,7 +10,7 @@
         <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
         <h4 class="ui-page-intro-title">Panel Kerja Nota</h4>
         <p class="ui-page-intro-subtitle">
-            Pilih tindakan berdasarkan status masing-masing line. Nota dibaca sebagai wadah, sedangkan operasi harian mengikuti line.
+            Detail nota dibaca sebagai ringkasan kerja. Aksi bayar dan refund dibuka lewat modal agar tabel line tetap bersih dan fokus.
         </p>
     </div>
 
@@ -29,29 +29,69 @@
                     <div class="card-header">
                         <h4 class="card-title mb-1">Panel Tindakan Nota</h4>
                         <p class="mb-0 text-muted">
-                            Area samping dipakai untuk tindakan lanjutan nota dan form transisi sesuai status line yang aktif.
+                            Aksi utama dibuka lewat launcher. Pilihan line dilakukan di dalam modal sesuai konteks aksi, bukan di tabel.
                         </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            @if ($note['can_edit_workspace'] ?? false)
+                                <a
+                                    href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
+                                    class="btn btn-primary"
+                                >
+                                    Edit Workspace
+                                </a>
+                            @endif
+
+                            @if ($note['can_show_payment_action'] ?? false)
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#note-payment-modal"
+                                >
+                                    Buka Modal Bayar
+                                </button>
+                            @endif
+
+                            @if ($note['can_show_refund_action'] ?? false)
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-warning"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#note-refund-modal"
+                                >
+                                    Buka Modal Refund
+                                </button>
+                            @endif
+                        </div>
+
+                        <div class="border rounded p-3 mt-3 bg-light">
+                            <div class="fw-semibold mb-1">Kontrak Aksi</div>
+                            <div class="small text-muted">
+                                Checklist line hanya muncul di modal aksi. Tabel line dipakai untuk membaca data dan memilih launcher yang sesuai.
+                            </div>
+                        </div>
+
+                        @if ($note['correction_notice'] ?? null)
+                            <div class="border rounded p-3 mt-3">
+                                <div class="fw-semibold mb-1">Catatan Status Nota</div>
+                                <div class="small text-muted">
+                                    {{ $note['correction_notice'] }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 @if ($note['can_show_workspace_panel'] ?? false)
                     @include('cashier.notes.partials.add-rows-form')
                 @endif
-
-                @if ($note['can_show_payment_form'])
-                    @include('cashier.notes.partials.payment-form')
-                @endif
-
-                @if ($note['can_show_refund_form'] ?? false)
-                    @include('cashier.notes.partials.refund-form')
-                @endif
             </div>
         </div>
     </div>
+
+    @include('cashier.notes.partials.payment-modal')
+    @include('cashier.notes.partials.refund-modal')
 </section>
 @endsection
-
-@push('scripts')
-<script src="{{ asset('assets/static/js/pages/cashier-note-payment.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-payment.js')) }}"></script>
-<script src="{{ asset('assets/static/js/pages/cashier-note-refund.js') }}?v={{ filemtime(public_path('assets/static/js/pages/cashier-note-refund.js')) }}"></script>
-@endpush
