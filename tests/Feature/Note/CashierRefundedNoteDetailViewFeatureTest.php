@@ -17,17 +17,17 @@ final class CashierRefundedNoteDetailViewFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_refunded_note_detail_hides_payment_launcher_and_workspace_edit(): void
+    public function test_refunded_note_detail_hides_payment_actions_and_workspace_edit(): void
     {
         $user = $this->seedKasir();
         $this->seedRefundedPaidServiceOnlyNote();
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Panel Kerja Nota')
+            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Note Hybrid')
             ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
-            ->assertDontSee('Buka Modal Bayar')->assertDontSee('Pembayaran Nota')
-            ->assertDontSee('Aksi Workspace')->assertDontSee('Edit Nota')
-            ->assertDontSee('Pembayaran Line Open Terpilih')->assertDontSee('Panel Bayar');
+            ->assertDontSee('Lunasi Pembayaran')->assertDontSee('Pembayaran Nota')
+            ->assertDontSee('Edit Workspace Aktif')
+            ->assertDontSee('Billing Projection');
     }
 
     private function seedKasir(): User
