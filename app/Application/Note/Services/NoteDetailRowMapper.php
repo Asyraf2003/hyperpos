@@ -34,10 +34,14 @@ final class NoteDetailRowMapper
                 $outstandingRupiah = (int) ($settlement['outstanding_rupiah'] ?? $item->subtotalRupiah()->amount());
                 $lineStatus = $this->statuses->resolve($outstandingRupiah, $refundedRupiah);
 
+                $hasServiceComponent = $item->serviceDetail() !== null;
+                $storeStockCount = count($item->storeStockLines());
+                $externalPurchaseCount = count($item->externalPurchaseLines());
+
                 return [
                     'id' => $item->id(),
                     'line_no' => $item->lineNo(),
-                    'type_label' => $item->transactionType() === WorkItem::TYPE_STORE_STOCK_SALE_ONLY ? 'Produk' : 'Servis',
+                    'type_label' => $this->typeLabel($item),
                     'transaction_type' => $item->transactionType(),
                     'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
 
@@ -52,6 +56,15 @@ final class NoteDetailRowMapper
                     'net_paid_rupiah' => (int) ($settlement['net_paid_rupiah'] ?? 0),
                     'outstanding_rupiah' => $outstandingRupiah,
 
+                    // hybrid read helpers
+                    'has_service_component' => $hasServiceComponent,
+                    'store_stock_count' => $storeStockCount,
+                    'external_purchase_count' => $externalPurchaseCount,
+                    'refund_stock_return_count' => $storeStockCount,
+                    'refund_external_count' => $externalPurchaseCount,
+                    'refund_money_possible' => (int) ($settlement['net_paid_rupiah'] ?? 0) > 0,
+                    'refund_preview_label' => $this->refundPreviewLabel($storeStockCount, $externalPurchaseCount),
+
                     // new line-centric operational fields
                     'line_status' => $lineStatus,
                     'can_edit' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
@@ -62,5 +75,33 @@ final class NoteDetailRowMapper
             },
             $rows
         );
+    }
+
+    private function typeLabel(WorkItem $item): string
+    {
+        return match ($item->transactionType()) {
+            WorkItem::TYPE_STORE_STOCK_SALE_ONLY => 'Produk Toko',
+            WorkItem::TYPE_SERVICE_ONLY => 'Service Only',
+            WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART => 'Service + Part Toko',
+            WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE => 'Service + Part External',
+            default => 'Line Nota',
+        };
+    }
+
+    private function refundPreviewLabel(int $storeStockCount, int $externalPurchaseCount): string
+    {
+        if ($storeStockCount > 0 && $externalPurchaseCount > 0) {
+            return 'Uang balik mungkin, stok toko kembali, external disederhanakan.';
+        }
+
+        if ($storeStockCount > 0) {
+            return 'Uang balik mungkin dan stok toko kembali.';
+        }
+
+        if ($externalPurchaseCount > 0) {
+            return 'Uang balik mungkin, external tidak memicu stok toko.';
+        }
+
+        return 'Refund sederhana mengikuti uang yang memang sudah masuk.';
     }
 }
