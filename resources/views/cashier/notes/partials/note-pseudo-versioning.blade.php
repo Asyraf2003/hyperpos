@@ -2,7 +2,7 @@
   <div class="card-header">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
-        <h4 class="card-title mb-1">Pseudo Versioning Note</h4>
+        <h4 class="card-title mb-1">Riwayat Mutasi Nota</h4>
         <p class="mb-0 text-muted">Fase ini hanya membaca current state, baseline yang memang tersedia, dan timeline mutasi native. True revision persistence belum dibuka.</p>
       </div>
       <span class="badge bg-light-info text-info border">Phase Read Model</span>
@@ -92,12 +92,7 @@
               <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
                 <div>
                   <h6 class="mb-1">{{ $entry['event_label'] }}</h6>
-                  <small class="text-muted">
-                    {{ $entry['created_at'] }}
-                    @if (!empty($entry['performed_by_actor_id']))
-                      · {{ $entry['performed_by_actor_id'] }}
-                    @endif
-                  </small>
+                  <small class="text-muted">{{ $entry['created_at'] }}</small>
                 </div>
                 @if (!empty($entry['target_status']))
                   <span class="badge bg-light-secondary text-secondary align-self-start text-uppercase">{{ $entry['target_status'] }}</span>
@@ -106,6 +101,12 @@
 
               @if (!empty($entry['reason']))
                 <div class="small text-muted mb-2">{{ $entry['reason'] }}</div>
+              @endif
+
+              @if (!empty($entry['performed_by_actor_id']))
+                <div class="small mb-2">
+                  <span class="text-muted">Diproses oleh:</span> {{ $entry['performed_by_actor_id'] }}
+                </div>
               @endif
 
               <div class="border rounded p-3 bg-light-subtle">

@@ -6,12 +6,38 @@
   <div class="card-body">
     <div class="d-grid gap-2">
       @if ($note['can_show_payment_form'] ?? false)
-        <button type="button" class="btn btn-primary js-open-payment-intent" data-bs-toggle="modal" data-bs-target="#note-payment-modal" data-payment-intent="pay" data-payment-preset="manual">Bayar</button>
-        <button type="button" class="btn btn-outline-primary js-open-payment-intent" data-bs-toggle="modal" data-bs-target="#note-payment-modal" data-payment-intent="settle" data-payment-preset="manual">Lunasi Pembayaran</button>
+        <button
+          type="button"
+          class="btn btn-primary js-open-payment-intent"
+          data-bs-toggle="modal"
+          data-bs-target="#note-payment-modal"
+          data-payment-intent="pay"
+          data-payment-preset="manual"
+        >
+          Buka Modal Bayar
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline-primary js-open-payment-intent"
+          data-bs-toggle="modal"
+          data-bs-target="#note-payment-modal"
+          data-payment-intent="settle"
+          data-payment-preset="manual"
+        >
+          Lunasi Pembayaran
+        </button>
       @endif
 
       @if ($note['can_show_refund_form'] ?? false)
-        <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#note-refund-modal">Refund</button>
+        <button
+          type="button"
+          class="btn btn-outline-warning"
+          data-bs-toggle="modal"
+          data-bs-target="#note-refund-modal"
+        >
+          Buka Modal Refund
+        </button>
       @endif
     </div>
 

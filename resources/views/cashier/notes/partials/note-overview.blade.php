@@ -77,7 +77,7 @@
                             href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id']]) }}"
                             class="btn btn-primary"
                         >
-                            Edit Workspace Aktif
+                            Edit Nota
                         </a>
                     @else
                         <button type="button" class="btn btn-light-secondary" disabled>
