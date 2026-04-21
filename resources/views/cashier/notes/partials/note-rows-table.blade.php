@@ -3,7 +3,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
         <h4 class="card-title mb-1">Daftar Line Nota</h4>
-        <p class="mb-0 text-muted">Tabel line dipakai untuk membaca posisi kerja dan membuka aksi yang sesuai.</p>
+        <p class="mb-0 text-muted">Tabel ini tetap menjadi layer baca domain line dan basis selection refund. Payment tidak lagi memilih langsung dari tabel ini.</p>
       </div>
       <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
     </div>
@@ -13,9 +13,14 @@
       <table class="table table-striped align-middle mb-0">
         <thead>
           <tr>
-            <th>Line</th><th>Tipe</th><th>Status Line</th>
-            <th class="text-end">Subtotal</th><th class="text-end">Sudah Dibayar</th>
-            <th class="text-end">Refund</th><th class="text-end">Sisa</th><th style="width:180px;">Aksi</th>
+            <th>Line</th>
+            <th>Tipe Domain</th>
+            <th>Status Line</th>
+            <th class="text-end">Subtotal</th>
+            <th class="text-end">Sudah Dibayar</th>
+            <th class="text-end">Refund</th>
+            <th class="text-end">Sisa</th>
+            <th>Preview Refund</th>
           </tr>
         </thead>
         <tbody>
@@ -29,17 +34,13 @@
               <td class="text-end">{{ number_format((int) ($row['refunded_rupiah'] ?? 0), 0, ',', '.') }}</td>
               <td class="text-end">{{ number_format((int) ($row['outstanding_rupiah'] ?? 0), 0, ',', '.') }}</td>
               <td>
-                <div class="d-flex flex-wrap gap-2">
-                  @if (($row['can_pay'] ?? false) && ($note['can_show_payment_form'] ?? false))
-                    <button type="button" class="btn btn-sm btn-primary js-open-payment-modal" data-bs-toggle="modal" data-bs-target="#note-payment-modal" data-default-row-id="{{ $row['id'] }}">Bayar</button>
-                  @endif
-                  @if (($row['can_refund'] ?? false) && ($note['can_show_refund_form'] ?? false))
-                    <button type="button" class="btn btn-sm btn-warning js-open-refund-modal" data-bs-toggle="modal" data-bs-target="#note-refund-modal" data-default-row-id="{{ $row['id'] }}">Refund</button>
-                  @endif
-                  @if (($row['line_status'] ?? '') === 'refund' && (string) ($row['id'] ?? '') !== '')
-                    <button type="button" class="btn btn-sm btn-outline-secondary js-line-detail-focus" data-target-row-id="{{ $row['id'] }}">Detail</button>
-                  @endif
-                </div>
+                <div class="small text-muted">{{ $row['refund_preview_label'] ?? '-' }}</div>
+                @if ((int) ($row['refund_stock_return_count'] ?? 0) > 0)
+                  <div class="small">Stok toko kembali: {{ (int) ($row['refund_stock_return_count'] ?? 0) }}</div>
+                @endif
+                @if ((int) ($row['refund_external_count'] ?? 0) > 0)
+                  <div class="small">External disederhanakan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
+                @endif
               </td>
             </tr>
           @empty
@@ -48,6 +49,6 @@
         </tbody>
       </table>
     </div>
-    <div class="small text-muted mt-3">Klik aksi yang sesuai pada row. Pemilihan line dilakukan di dalam modal agar konteks kerja tetap jelas.</div>
+    <div class="small text-muted mt-3">Refund tetap memilih line domain di modal. Payment memakai billing projection agar komponen tagihan tidak bercampur dengan layer baca line.</div>
   </div>
 </div>
