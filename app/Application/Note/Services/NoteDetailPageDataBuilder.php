@@ -17,7 +17,8 @@ final class NoteDetailPageDataBuilder
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
-        private readonly NoteDetailActionModalPayloadBuilder $actionPayloads,
+        private readonly NoteBillingProjectionBuilder $billingProjection,
+        private readonly NotePseudoVersioningBuilder $pseudoVersioning,
     ) {
     }
 
@@ -43,19 +44,33 @@ final class NoteDetailPageDataBuilder
             return null;
         }
 
+        $billingRows = $this->billingProjection->build($note->id()) ?? [];
+        $history = $this->history->build($note->id());
+
         $openLineCount = (int) ($workspacePanel['line_summary']['open_count'] ?? 0);
         $closeLineCount = (int) ($workspacePanel['line_summary']['close_count'] ?? 0);
         $isOpen = $note->isOpen();
         $isClosed = $note->isClosed();
         $isRefunded = $note->isRefunded();
         $refundPaymentOptions = $this->refundPaymentOptions->build($note->id());
-        $actionPayloads = $this->actionPayloads->build(
-            $isOpen,
+        $refundRows = array_values(array_filter(
             $workspacePanel['rows'],
-            $operational,
-            $workspacePanel['line_summary'],
-            $refundPaymentOptions,
-        );
+            static fn (array $row): bool => (bool) ($row['can_refund'] ?? false)
+        ));
+
+        $hasOutstandingBillingRow = count(array_filter(
+            $billingRows,
+            static fn (array $row): bool => (int) ($row['outstanding_rupiah'] ?? 0) > 0
+        )) > 0;
+
+        $pseudoVersioning = $this->pseudoVersioning->build([
+            'note_state' => $note->noteState(),
+            'grand_total_rupiah' => $operational['grand_total_rupiah'],
+            'net_paid_rupiah' => $operational['net_paid_rupiah'],
+            'total_refunded_rupiah' => $operational['total_refunded_rupiah'],
+            'outstanding_rupiah' => $operational['outstanding_rupiah'],
+            'refund_required_rupiah' => max($operational['net_paid_rupiah'] - $operational['grand_total_rupiah'], 0),
+        ], $workspacePanel['line_summary'], $history);
 
         return [
             'pageTitle' => 'Detail Nota',
@@ -81,8 +96,8 @@ final class NoteDetailPageDataBuilder
                 'can_show_edit_actions' => $isOpen,
                 'can_edit_workspace' => $isOpen,
                 'can_show_workspace_panel' => $isOpen || $isClosed,
-                'can_show_payment_form' => $isOpen && $openLineCount > 0 && $operational['outstanding_rupiah'] > 0,
-                'can_show_refund_form' => $closeLineCount > 0,
+                'can_show_payment_form' => $isOpen && $openLineCount > 0 && $hasOutstandingBillingRow,
+                'can_show_refund_form' => $closeLineCount > 0 && $refundPaymentOptions !== [] && $refundRows !== [],
                 'refund_payment_options' => $refundPaymentOptions,
                 'can_show_correction_actions' => false,
                 'correction_notice' => $isClosed
@@ -90,8 +105,10 @@ final class NoteDetailPageDataBuilder
                     : ($isRefunded ? 'Nota sudah refunded. Workspace tidak dipakai lagi.' : null),
                 'line_summary' => $workspacePanel['line_summary'],
                 'rows' => $workspacePanel['rows'],
-                'correction_history' => $this->history->build($note->id()),
-                ...$actionPayloads,
+                'refund_rows' => $refundRows,
+                'billing_rows' => $billingRows,
+                'pseudo_versioning' => $pseudoVersioning,
+                'correction_history' => $history,
             ],
             'productOptions' => $this->products->build(),
         ];
