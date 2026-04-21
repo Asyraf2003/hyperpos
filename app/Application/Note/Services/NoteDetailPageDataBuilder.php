@@ -17,6 +17,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteProductOptionsBuilder $products,
         private readonly NoteCorrectionHistoryBuilder $history,
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
+        private readonly NoteDetailActionModalPayloadBuilder $actionPayloads,
     ) {
     }
 
@@ -47,6 +48,14 @@ final class NoteDetailPageDataBuilder
         $isOpen = $note->isOpen();
         $isClosed = $note->isClosed();
         $isRefunded = $note->isRefunded();
+        $refundPaymentOptions = $this->refundPaymentOptions->build($note->id());
+        $actionPayloads = $this->actionPayloads->build(
+            $isOpen,
+            $workspacePanel['rows'],
+            $operational,
+            $workspacePanel['line_summary'],
+            $refundPaymentOptions,
+        );
 
         return [
             'pageTitle' => 'Detail Nota',
@@ -74,7 +83,7 @@ final class NoteDetailPageDataBuilder
                 'can_show_workspace_panel' => $isOpen || $isClosed,
                 'can_show_payment_form' => $isOpen && $openLineCount > 0 && $operational['outstanding_rupiah'] > 0,
                 'can_show_refund_form' => $closeLineCount > 0,
-                'refund_payment_options' => $this->refundPaymentOptions->build($note->id()),
+                'refund_payment_options' => $refundPaymentOptions,
                 'can_show_correction_actions' => false,
                 'correction_notice' => $isClosed
                     ? 'Nota sudah close. Pembalikan dilakukan lewat refund flow.'
@@ -82,6 +91,7 @@ final class NoteDetailPageDataBuilder
                 'line_summary' => $workspacePanel['line_summary'],
                 'rows' => $workspacePanel['rows'],
                 'correction_history' => $this->history->build($note->id()),
+                ...$actionPayloads,
             ],
             'productOptions' => $this->products->build(),
         ];

@@ -1,129 +1,50 @@
 (() => {
-    const form = document.getElementById('note-payment-form');
-
-    if (!form) {
-        return;
-    }
-
-    const rowSelectors = Array.from(document.querySelectorAll('.js-payment-row-selector'));
-    const hiddenInputsContainer = document.getElementById('selected-payment-row-inputs');
-    const amountPaidInput = document.getElementById('amount-paid');
-    const amountReceivedInput = document.getElementById('amount-received');
-    const paymentMethod = document.getElementById('payment-method');
-    const selectedRowCount = document.getElementById('selected-payment-row-count');
-    const selectedOutstandingTotal = document.getElementById('selected-payment-outstanding-total');
-    const selectedPaymentTotal = document.getElementById('selected-payment-total');
-    const paymentRemainingText = document.getElementById('payment-remaining-text');
-    const paymentChangeText = document.getElementById('payment-change-text');
-    const submitButton = document.getElementById('note-payment-submit');
-
-    if (
-        rowSelectors.length === 0
-        || !hiddenInputsContainer
-        || !selectedRowCount
-        || !selectedOutstandingTotal
-        || !selectedPaymentTotal
-        || !paymentRemainingText
-        || !paymentChangeText
-        || !submitButton
-    ) {
-        return;
-    }
-
-    function parseNumber(value) {
-        if (typeof value !== 'string') {
-            return 0;
-        }
-
-        const cleaned = value.replace(/[^0-9]/g, '');
-        return cleaned === '' ? 0 : Number.parseInt(cleaned, 10);
-    }
-
-    function formatNumber(value) {
-        return new Intl.NumberFormat('id-ID').format(Number.isFinite(value) ? value : 0);
-    }
-
-    function selectedRows() {
-        return rowSelectors.filter((input) => input.checked);
-    }
-
-    function selectedOutstandingAmount() {
-        return selectedRows().reduce((total, input) => {
-            const raw = input.getAttribute('data-outstanding-rupiah') || '0';
-            return total + parseNumber(raw);
-        }, 0);
-    }
-
-    function amountToPay() {
-        const selectedOutstanding = selectedOutstandingAmount();
-        const typedAmount = parseNumber(amountPaidInput ? amountPaidInput.value : '');
-        return Math.min(typedAmount, selectedOutstanding);
-    }
-
-    function syncHiddenSelectedRows() {
-        hiddenInputsContainer.innerHTML = '';
-
-        selectedRows().forEach((input) => {
-            const rowId = (input.getAttribute('data-row-id') || '').trim();
-
-            if (rowId === '') {
-                return;
-            }
-
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = 'selected_row_ids[]';
-            hidden.value = rowId;
-            hiddenInputsContainer.appendChild(hidden);
-        });
-    }
-
-    function updateSubmitState(selectedCount, paidNow, isCash, received) {
-        let disabled = false;
-
-        if (selectedCount <= 0) {
-            disabled = true;
-        }
-
-        if (paidNow <= 0) {
-            disabled = true;
-        }
-
-        if (isCash && received > 0 && received < paidNow) {
-            disabled = true;
-        }
-
-        submitButton.disabled = disabled;
-    }
-
-    function update() {
-        const selectedCount = selectedRows().length;
-        const outstanding = selectedOutstandingAmount();
-        const paidNow = amountToPay();
-        const received = parseNumber(amountReceivedInput ? amountReceivedInput.value : '');
-        const isCash = paymentMethod && paymentMethod.value === 'cash';
-
-        syncHiddenSelectedRows();
-
-        selectedRowCount.textContent = formatNumber(selectedCount);
-        selectedOutstandingTotal.textContent = formatNumber(outstanding);
-        selectedPaymentTotal.textContent = formatNumber(paidNow);
-        paymentRemainingText.textContent = formatNumber(Math.max(outstanding - paidNow, 0));
-        paymentChangeText.textContent = formatNumber(isCash ? Math.max(received - paidNow, 0) : 0);
-
-        if (amountReceivedInput) {
-            amountReceivedInput.disabled = !isCash;
-        }
-
-        updateSubmitState(selectedCount, paidNow, isCash, received);
-    }
-
-    rowSelectors.forEach((input) => {
-        input.addEventListener('change', update);
-    });
-
-    form.addEventListener('input', update);
-    form.addEventListener('change', update);
-
-    update();
+  const modal = document.getElementById('note-payment-modal');
+  const form = document.getElementById('note-payment-form');
+  if (!modal || !form) return;
+  const q = (s) => Array.from(modal.querySelectorAll(s));
+  const byId = (id) => document.getElementById(id);
+  let pendingRowId = null;
+  const parseNumber = (v) => Number.parseInt(String(v || '').replace(/[^0-9]/g, '') || '0', 10);
+  const format = (v) => new Intl.NumberFormat('id-ID').format(Number.isFinite(v) ? v : 0);
+  const boxes = () => q('[data-payment-row-checkbox]');
+  const selected = () => boxes().filter((el) => el.checked);
+  const outstanding = () => selected().reduce((s, el) => s + parseNumber(el.dataset.outstandingRupiah), 0);
+  const amountInput = () => byId('amount-paid');
+  const receivedInput = () => byId('amount-received');
+  const methodInput = () => byId('payment-method');
+  const payNow = () => {
+    const typed = parseNumber(amountInput()?.value || '');
+    const total = outstanding();
+    return typed > 0 ? Math.min(typed, total) : total;
+  };
+  const setDefaultSelection = () => {
+    if (!pendingRowId) return;
+    boxes().forEach((el) => { el.checked = el.dataset.rowId === pendingRowId; });
+    pendingRowId = null;
+  };
+  const update = () => {
+    const count = selected().length;
+    const total = outstanding();
+    const paid = payNow();
+    const received = parseNumber(receivedInput()?.value || '');
+    const isCash = methodInput()?.value === 'cash';
+    byId('payment-modal-selected-count').textContent = format(count);
+    byId('payment-modal-selected-total').textContent = format(total);
+    byId('payment-modal-pay-now').textContent = format(paid);
+    byId('payment-remaining-text').textContent = format(Math.max(total - paid, 0));
+    byId('payment-change-text').textContent = format(isCash ? Math.max(received - paid, 0) : 0);
+    if (receivedInput()) receivedInput().disabled = !isCash;
+    const submit = byId('note-payment-submit');
+    if (submit) submit.disabled = count <= 0 || paid <= 0 || (isCash && received > 0 && received < paid);
+  };
+  document.addEventListener('click', (e) => {
+    const button = e.target.closest('.js-open-payment-modal');
+    if (button) pendingRowId = button.dataset.defaultRowId || null;
+  });
+  modal.addEventListener('shown.bs.modal', () => { setDefaultSelection(); update(); });
+  boxes().forEach((el) => el.addEventListener('change', update));
+  form.addEventListener('input', update);
+  form.addEventListener('change', update);
+  update();
 })();
