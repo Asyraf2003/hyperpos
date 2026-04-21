@@ -35,28 +35,13 @@ final class NoteDetailPageController extends Controller
         $data = $builder->build($noteId);
         abort_if($data === null, 404);
 
-        $paymentDateDefault = date('Y-m-d');
-        $refundDateDefault = date('Y-m-d');
-        $paymentAction = route('cashier.notes.payments.store', ['noteId' => $noteId]);
-        $refundAction = route('cashier.notes.refunds.store', ['noteId' => $noteId]);
-
         return view('cashier.notes.show', $data + [
             'addRowsAction' => route('cashier.notes.rows.store', ['noteId' => $noteId]),
             'oldRows' => array_values(old('rows', [['line_type' => 'service']])),
-            'paymentAction' => $paymentAction,
-            'paymentDateDefault' => $paymentDateDefault,
-            'paymentModalConfig' => [
-                'action' => $paymentAction,
-                'date_default' => $paymentDateDefault,
-                'selection_mode' => 'modal_only',
-            ],
-            'refundAction' => $refundAction,
-            'refundDateDefault' => $refundDateDefault,
-            'refundModalConfig' => [
-                'action' => $refundAction,
-                'date_default' => $refundDateDefault,
-                'selection_mode' => 'modal_only',
-            ],
+            'paymentAction' => route('cashier.notes.payments.store', ['noteId' => $noteId]),
+            'paymentDateDefault' => date('Y-m-d'),
+            'refundAction' => route('cashier.notes.refunds.store', ['noteId' => $noteId]),
+            'refundDateDefault' => date('Y-m-d'),
             'statusCorrectionAction' => route('cashier.notes.corrections.status.store', ['noteId' => $noteId]),
             'serviceOnlyCorrectionAction' => route('cashier.notes.corrections.service-only.store', ['noteId' => $noteId]),
         ] + $options->build());
