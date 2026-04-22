@@ -1,10 +1,17 @@
 <div class="card">
   <div class="card-header">
     <h4 class="card-title mb-1">Panel Tindakan Nota</h4>
-    <p class="mb-0 text-muted">Aksi keuangan utama hidup di level note. Bayar memakai billing projection, refund tetap memilih line domain yang dibatalkan.</p>
+    <p class="mb-0 text-muted">Aksi utama hidup di level note. Refund dipilih dari line detail yang diklik.</p>
   </div>
   <div class="card-body">
     <div class="d-grid gap-2">
+      <a
+        href="{{ route('cashier.notes.workspace.edit', ['noteId' => $note['id'] ?? ($note['note_header']['id'] ?? null)]) }}"
+        class="btn btn-outline-secondary"
+      >
+        Edit Nota
+      </a>
+
       @if ($note['can_show_payment_form'] ?? false)
         <button
           type="button"
@@ -33,10 +40,12 @@
         <button
           type="button"
           class="btn btn-outline-warning"
+          id="note-refund-open-button"
           data-bs-toggle="modal"
           data-bs-target="#note-refund-modal"
+          disabled
         >
-          Buka Modal Refund
+          Refund Line Terpilih
         </button>
       @endif
     </div>
@@ -51,7 +60,8 @@
     @if ($note['can_show_refund_form'] ?? false)
       <div class="border rounded p-3 mt-3 bg-light">
         <div class="fw-semibold mb-1">Kontrak Refund</div>
-        <div class="small text-muted">Refund tetap selection-first berbasis line domain. Preview hanya membantu membaca dampak uang kembali dan stok kembali.</div>
+        <div class="small text-muted">Klik line pada tabel untuk memilih refund. Tombol refund aktif jika sudah ada line yang dipilih.</div>
+        <div class="small text-muted mt-2">Row yang lebih gelap dianggap sedang dipilih.</div>
       </div>
     @endif
   </div>

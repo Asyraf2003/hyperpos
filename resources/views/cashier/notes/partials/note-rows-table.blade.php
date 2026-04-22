@@ -3,7 +3,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
         <h4 class="card-title mb-1">Daftar Line Nota</h4>
-        <p class="mb-0 text-muted">Tabel ini tetap menjadi layer baca domain line dan basis selection refund. Payment tidak lagi memilih langsung dari tabel ini.</p>
+        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Row yang lebih gelap dianggap terpilih.</p>
       </div>
       <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
     </div>
@@ -26,10 +26,32 @@
         </thead>
         <tbody>
           @forelse ($note['rows'] as $row)
-            <tr>
+            @php
+              $isRefundable = (bool) ($row['can_refund'] ?? false);
+            @endphp
+            <tr
+              @if ($isRefundable)
+                role="button"
+                tabindex="0"
+                class="js-refund-selectable-row"
+                data-refund-row
+                data-row-id="{{ $row['id'] }}"
+                data-line-no="{{ $row['line_no'] }}"
+                data-line-label="{{ $row['line_label'] ?? '-' }}"
+                data-type-label="{{ $row['type_label'] }}"
+                data-refundable-rupiah="{{ (int) ($row['net_paid_rupiah'] ?? 0) }}"
+                data-store-return-count="{{ (int) ($row['refund_stock_return_count'] ?? 0) }}"
+                data-external-count="{{ (int) ($row['refund_external_count'] ?? 0) }}"
+                data-preview-label="{{ $row['refund_preview_label'] ?? '-' }}"
+                data-selected="0"
+              @endif
+            >
               <td>{{ $row['line_no'] }}</td>
               <td>
                 <div class="fw-semibold">{{ $row['line_label'] ?? '-' }}</div>
+                @if ($isRefundable)
+                  <div class="small text-muted">Klik untuk pilih refund</div>
+                @endif
               </td>
               <td>{{ $row['type_label'] }}</td>
               <td><span class="badge bg-light text-dark border text-uppercase">{{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}</span></td>
@@ -53,6 +75,6 @@
         </tbody>
       </table>
     </div>
-    <div class="small text-muted mt-3">Refund tetap memilih line domain di modal. Payment memakai billing projection agar komponen tagihan tidak bercampur dengan layer baca line.</div>
+    <div class="small text-muted mt-3">Refund dipilih dari tabel line. Payment tetap memakai billing projection agar layer baca line tidak bercampur dengan komponen tagihan.</div>
   </div>
 </div>
