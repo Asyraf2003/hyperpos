@@ -39,11 +39,10 @@
       @if ($note['can_show_refund_form'] ?? false)
         <button
           type="button"
-          class="btn btn-outline-warning"
+          class="btn btn-outline-warning disabled"
           id="note-refund-open-button"
-          data-bs-toggle="modal"
-          data-bs-target="#note-refund-modal"
           disabled
+          aria-disabled="true"
         >
           Refund Line Terpilih
         </button>
@@ -60,8 +59,8 @@
     @if ($note['can_show_refund_form'] ?? false)
       <div class="border rounded p-3 mt-3 bg-light">
         <div class="fw-semibold mb-1">Kontrak Refund</div>
-        <div class="small text-muted">Klik line pada tabel untuk memilih refund. Tombol refund aktif jika sudah ada line yang dipilih.</div>
-        <div class="small text-muted mt-2">Row yang lebih gelap dianggap sedang dipilih.</div>
+        <div class="small text-muted">Klik line pada tabel untuk memilih refund. Tombol refund baru aktif jika ada line yang dipilih.</div>
+        <div class="small text-muted mt-2">Row hover menandakan bisa dipilih. Row gelap menandakan sudah dipilih.</div>
       </div>
     @endif
   </div>

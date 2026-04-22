@@ -9,6 +9,22 @@
     </div>
   </div>
   <div class="card-body">
+    <style>
+      .refund-row-hoverable {
+        cursor: pointer;
+        transition: background-color .15s ease, box-shadow .15s ease;
+      }
+
+      .refund-row-hoverable:hover > td {
+        background-color: rgba(148, 163, 184, 0.14) !important;
+      }
+
+      .refund-row-selected > td {
+        background-color: rgba(30, 64, 175, 0.16) !important;
+        box-shadow: inset 0 0 0 9999px rgba(30, 64, 175, 0.08);
+      }
+    </style>
+
     <div class="table-responsive">
       <table class="table table-striped align-middle mb-0">
         <thead>
@@ -34,6 +50,7 @@
               @if ($isRefundable)
                 role="button"
                 tabindex="0"
+                class="refund-row-hoverable {{ $isSelected ? 'refund-row-selected' : '' }}"
                 data-refund-row="1"
                 data-row-id="{{ $row['id'] }}"
                 data-line-no="{{ $row['line_no'] }}"
@@ -43,9 +60,8 @@
                 data-store-return-count="{{ (int) ($row['refund_stock_return_count'] ?? 0) }}"
                 data-external-count="{{ (int) ($row['refund_external_count'] ?? 0) }}"
                 data-preview-label="{{ $row['refund_preview_label'] ?? '-' }}"
-                data-selected="{{ $isSelected ? '1' : '0' }}"
+                data-initial-selected="{{ $isSelected ? '1' : '0' }}"
                 aria-pressed="{{ $isSelected ? 'true' : 'false' }}"
-                style="cursor:pointer;"
               @endif
             >
               <td>{{ $row['line_no'] }}</td>

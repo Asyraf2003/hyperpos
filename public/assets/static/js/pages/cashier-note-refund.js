@@ -1,16 +1,20 @@
 (() => {
   const init = () => {
-    const modal = document.getElementById('note-refund-modal');
+    const modalEl = document.getElementById('note-refund-modal');
     const form = document.getElementById('note-refund-form');
     const openButton = document.getElementById('note-refund-open-button');
     const selectedContainer = document.getElementById('note-refund-selected-lines');
     const hiddenInputsContainer = document.getElementById('note-refund-hidden-selected-rows');
-    const submitButton = document.getElementById('note-refund-submit');
     const refundInput = document.getElementById('refund_amount_rupiah');
+    const submitButton = document.getElementById('note-refund-submit');
 
-    if (!modal || !form || !openButton || !selectedContainer || !hiddenInputsContainer) {
+    if (!modalEl || !form || !openButton || !selectedContainer || !hiddenInputsContainer) {
       return;
     }
+
+    const modal = window.bootstrap?.Modal
+      ? window.bootstrap.Modal.getOrCreateInstance(modalEl)
+      : null;
 
     const parseNumber = (value) =>
       Number.parseInt(String(value || '').replace(/[^0-9]/g, '') || '0', 10);
@@ -19,18 +23,25 @@
       new Intl.NumberFormat('id-ID').format(Number.isFinite(value) ? value : 0);
 
     const rows = () => Array.from(document.querySelectorAll('[data-refund-row="1"]'));
-    const selectedRows = () => rows().filter((row) => String(row.dataset.selected || '0') === '1');
+    const selectedIds = new Set();
 
-    const paintRow = (row) => {
-      const selected = String(row.dataset.selected || '0') === '1';
-      row.setAttribute('aria-pressed', selected ? 'true' : 'false');
-
-      Array.from(row.children).forEach((cell) => {
-        if (!(cell instanceof HTMLElement)) return;
-        cell.style.backgroundColor = selected ? '#dbeafe' : '';
-        cell.style.boxShadow = selected ? 'inset 0 0 0 9999px rgba(30,64,175,0.10)' : '';
+    const hydrateInitialSelection = () => {
+      rows().forEach((row) => {
+        if (String(row.dataset.initialSelected || '0') === '1') {
+          selectedIds.add(String(row.dataset.rowId || ''));
+        }
       });
     };
+
+    const isSelected = (row) => selectedIds.has(String(row.dataset.rowId || ''));
+
+    const syncRowVisual = (row) => {
+      const selected = isSelected(row);
+      row.classList.toggle('refund-row-selected', selected);
+      row.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    };
+
+    const selectedRows = () => rows().filter((row) => isSelected(row));
 
     const refundableTotal = () =>
       selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.refundableRupiah), 0);
@@ -83,7 +94,9 @@
       }).join('');
     };
 
-    const updateSummary = () => {
+    const updateUi = () => {
+      rows().forEach(syncRowVisual);
+
       const count = selectedRows().length;
       const total = refundableTotal();
       const amount = refundNow();
@@ -113,25 +126,40 @@
     };
 
     const toggleRow = (row) => {
-      row.dataset.selected = String(row.dataset.selected || '0') === '1' ? '0' : '1';
-      paintRow(row);
-      updateSummary();
+      const rowId = String(row.dataset.rowId || '');
+      if (rowId === '') return;
+
+      if (selectedIds.has(rowId)) {
+        selectedIds.delete(rowId);
+      } else {
+        selectedIds.add(rowId);
+      }
+
+      updateUi();
     };
 
-    rows().forEach((row) => paintRow(row));
+    hydrateInitialSelection();
+    updateUi();
 
     document.addEventListener('click', (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
 
       const row = target.closest('[data-refund-row="1"]');
-      if (!row) return;
-
-      if (target.closest('a, button, input, textarea, select, label')) {
+      if (row && !target.closest('a, button, input, textarea, select, label')) {
+        toggleRow(row);
         return;
       }
 
-      toggleRow(row);
+      if (target === openButton) {
+        event.preventDefault();
+        if (selectedRows().length <= 0) {
+          return;
+        }
+
+        updateUi();
+        modal?.show();
+      }
     });
 
     document.addEventListener('keydown', (event) => {
@@ -146,21 +174,8 @@
       toggleRow(row);
     });
 
-    openButton.addEventListener('click', (event) => {
-      if (selectedRows().length > 0) return;
-      event.preventDefault();
-      event.stopPropagation();
-      return false;
-    });
-
-    form.addEventListener('input', updateSummary);
-    form.addEventListener('change', updateSummary);
-
-    if (submitButton) {
-      submitButton.disabled = true;
-    }
-
-    updateSummary();
+    form.addEventListener('input', updateUi);
+    form.addEventListener('change', updateUi);
   };
 
   if (document.readyState === 'loading') {
