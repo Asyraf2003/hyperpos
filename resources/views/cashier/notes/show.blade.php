@@ -16,7 +16,12 @@
     <div class="col-12 col-xl-8">
       <div class="ui-card-stack">
         @include('cashier.notes.partials.note-overview')
-        @include('cashier.notes.partials.note-revision-timeline')
+        @include('cashier.notes.partials.note-revision-timeline', [
+          'revision' => $note['revision_timeline'] ?? ['current' => [], 'baseline' => [], 'timeline' => []],
+          'currentRevision' => ($note['revision_timeline']['current'] ?? []),
+          'baselineRevision' => ($note['revision_timeline']['baseline'] ?? []),
+          'timelineRevisions' => ($note['revision_timeline']['timeline'] ?? []),
+        ])
         @include('cashier.notes.partials.note-rows-table')
         @include('cashier.notes.partials.billing-table')
       </div>
