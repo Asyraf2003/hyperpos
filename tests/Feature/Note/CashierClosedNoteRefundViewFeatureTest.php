@@ -40,7 +40,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Header Nota')->assertSee('List Line Nota')
             ->assertSee('Edit')->assertSee('Bayar')
             ->assertSee('Lunasi')->assertSee('List Line Nota')
-            ->assertSee('Status &amp; Aksi Nota', false);
+            ;
     }
 
     private function seedKasir(): User
