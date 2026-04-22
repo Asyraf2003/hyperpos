@@ -15,7 +15,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_update_unpaid_service_only_note_via_workspace(): void
+    public function test_cashier_can_submit_workspace_update_as_new_revision(): void
     {
         $this->loginAsKasir();
 
@@ -36,6 +36,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'customer_phone' => '0811111111',
             'transaction_date' => date('Y-m-d'),
             'total_rupiah' => 50000,
+            'note_state' => 'open',
         ]);
 
         DB::table('work_items')->insert([
@@ -54,6 +55,8 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'part_source' => ServiceDetail::PART_SOURCE_NONE,
         ]);
 
+        $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-update-1']))->assertOk();
+
         $response = $this->actingAs($user)->patch(
             route('cashier.notes.workspace.update', ['noteId' => 'note-update-1']),
             [
@@ -64,25 +67,12 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 ],
                 'items' => [
                     [
-                        'entry_mode' => 'service',
-                        'description' => '',
-                        'part_source' => 'none',
-                        'service' => [
-                            'name' => 'Servis Baru',
-                            'price_rupiah' => '70000',
-                            'notes' => '',
-                        ],
-                        'product_lines' => [],
-                        'external_purchase_lines' => [],
+                        'line_type' => 'service',
+                        'service_name' => 'Servis Baru',
+                        'service_price' => '70000',
                     ],
                 ],
-                'inline_payment' => [
-                    'decision' => 'skip',
-                    'payment_method' => null,
-                    'paid_at' => date('Y-m-d'),
-                    'amount_paid_rupiah' => null,
-                    'amount_received_rupiah' => null,
-                ],
+                'reason' => 'Revisi workspace service only',
             ],
         );
 
@@ -91,43 +81,34 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-update-1',
+            'current_revision_id' => 'note-update-1-r002',
+            'latest_revision_number' => 2,
+        ]);
+
+        $this->assertDatabaseHas('note_revisions', [
+            'id' => 'note-update-1-r002',
+            'note_root_id' => 'note-update-1',
+            'revision_number' => 2,
             'customer_name' => 'Budi Baru',
             'customer_phone' => '0822222222',
-            'transaction_date' => date('Y-m-d'),
-            'total_rupiah' => 70000,
+            'grand_total_rupiah' => 70000,
         ]);
 
-        $this->assertDatabaseMissing('work_items', [
-            'id' => 'work-item-old-1',
-        ]);
-
-        $this->assertDatabaseHas('work_items', [
-            'note_id' => 'note-update-1',
+        $this->assertDatabaseHas('note_revision_lines', [
+            'note_revision_id' => 'note-update-1-r002',
             'line_no' => 1,
             'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
-            'status' => WorkItem::STATUS_OPEN,
             'subtotal_rupiah' => 70000,
-        ]);
-
-        $newWorkItemId = (string) DB::table('work_items')
-            ->where('note_id', 'note-update-1')
-            ->value('id');
-
-        $this->assertNotSame('', $newWorkItemId);
-
-        $this->assertDatabaseHas('work_item_service_details', [
-            'work_item_id' => $newWorkItemId,
-            'service_name' => 'Servis Baru',
+            'service_label' => 'Servis Baru',
             'service_price_rupiah' => 70000,
-            'part_source' => ServiceDetail::PART_SOURCE_NONE,
         ]);
 
         $this->assertDatabaseHas('audit_logs', [
-            'event' => 'transaction_workspace_updated',
+            'event' => 'note_revision_created',
         ]);
     }
 
-    public function test_cashier_can_update_workspace_with_partial_transfer_inline_payment(): void
+    public function test_cashier_can_submit_workspace_update_and_keep_payment_outside_revision_creation(): void
     {
         $this->loginAsKasir();
 
@@ -150,6 +131,7 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'customer_phone' => '0811111111',
             'transaction_date' => $today,
             'total_rupiah' => 50000,
+            'note_state' => 'open',
         ]);
 
         DB::table('work_items')->insert([
@@ -168,6 +150,8 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
             'part_source' => ServiceDetail::PART_SOURCE_NONE,
         ]);
 
+        $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-update-payment-1']))->assertOk();
+
         $response = $this->actingAs($user)->patch(
             route('cashier.notes.workspace.update', ['noteId' => 'note-update-payment-1']),
             [
@@ -178,25 +162,12 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 ],
                 'items' => [
                     [
-                        'entry_mode' => 'service',
-                        'description' => '',
-                        'part_source' => 'none',
-                        'service' => [
-                            'name' => 'Servis Baru',
-                            'price_rupiah' => '70000',
-                            'notes' => '',
-                        ],
-                        'product_lines' => [],
-                        'external_purchase_lines' => [],
+                        'line_type' => 'service',
+                        'service_name' => 'Servis Baru',
+                        'service_price' => '70000',
                     ],
                 ],
-                'inline_payment' => [
-                    'decision' => 'pay_partial',
-                    'payment_method' => 'transfer',
-                    'paid_at' => $today,
-                    'amount_paid_rupiah' => 30000,
-                    'amount_received_rupiah' => null,
-                ],
+                'reason' => 'Revisi workspace tanpa inline payment',
             ],
         );
 
@@ -205,31 +176,26 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-update-payment-1',
+            'current_revision_id' => 'note-update-payment-1-r002',
+            'latest_revision_number' => 2,
+        ]);
+
+        $this->assertDatabaseHas('note_revisions', [
+            'id' => 'note-update-payment-1-r002',
+            'note_root_id' => 'note-update-payment-1',
+            'revision_number' => 2,
             'customer_name' => 'Budi Bayar',
             'customer_phone' => '0822222222',
-            'transaction_date' => $today,
-            'total_rupiah' => 70000,
+            'grand_total_rupiah' => 70000,
         ]);
 
-        $this->assertDatabaseHas('customer_payments', [
-            'amount_rupiah' => 30000,
+        $this->assertDatabaseMissing('customer_payments', [
             'paid_at' => $today,
-        ]);
-
-        $paymentId = (string) DB::table('customer_payments')
-            ->where('amount_rupiah', 30000)
-            ->value('id');
-
-        $this->assertNotSame('', $paymentId);
-
-        $this->assertDatabaseHas('payment_component_allocations', [
-            'customer_payment_id' => $paymentId,
-            'note_id' => 'note-update-payment-1',
-            'allocated_amount_rupiah' => 30000,
+            'amount_rupiah' => 30000,
         ]);
 
         $this->assertDatabaseHas('audit_logs', [
-            'event' => 'transaction_workspace_updated',
+            'event' => 'note_revision_created',
         ]);
     }
 }
