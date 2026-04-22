@@ -33,7 +33,7 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response->assertSee('Workspace Nota Admin');
         $response->assertSee('Detail Nota');
         $response->assertSee('Header Nota');
-        $response->assertSee('Status & Aksi Nota');
+        $response->assertSee('Status &amp; Aksi Nota', false);
         $response->assertSee('List Line Nota');
         $response->assertSee('Versioning Nota');
         $response->assertDontSee('Status Operasional Admin');
@@ -59,7 +59,7 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response->assertSee('Workspace Nota Admin');
         $response->assertSee('Detail Nota');
         $response->assertSee('Header Nota');
-        $response->assertSee('Status & Aksi Nota');
+        $response->assertSee('Status &amp; Aksi Nota', false);
         $response->assertSee('List Line Nota');
         $response->assertSee('Versioning Nota');
         $response->assertDontSee('Status Operasional Admin');
