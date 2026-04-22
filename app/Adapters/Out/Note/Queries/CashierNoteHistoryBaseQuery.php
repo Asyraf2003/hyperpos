@@ -30,8 +30,8 @@ final class CashierNoteHistoryBaseQuery
                 'line_open_count',
                 'line_close_count',
                 'line_refund_count',
-                DB::raw('0 as open_count'),
-                DB::raw('0 as done_count'),
+                DB::raw('line_open_count as open_count'),
+                DB::raw('line_close_count as done_count'),
                 DB::raw('0 as canceled_count'),
             ])
             ->whereBetween('transaction_date', [

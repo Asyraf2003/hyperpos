@@ -24,6 +24,11 @@ final class CashierNoteHistoryTableClosurePolicyFeatureTest extends TestCase
         $this->seedNote('note-today-closed', $today, 'closed', 12000);
         $this->seedNote('note-older-open', $older, 'open', 13000);
 
+        $this->syncNoteProjectionForTest('note-today-open');
+        $this->syncNoteProjectionForTest('note-yesterday-open');
+        $this->syncNoteProjectionForTest('note-today-closed');
+        $this->syncNoteProjectionForTest('note-older-open');
+
         $result = app(CashierNoteHistoryTableQuery::class)->get([
             'date' => $today,
             'search' => '',

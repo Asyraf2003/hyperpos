@@ -63,6 +63,8 @@ final class CashierNoteHistoryLegacyLineSummaryFeatureTest extends TestCase
             'amount_rupiah' => 50000,
         ]);
 
+        $this->syncNoteProjectionForTest('note-legacy');
+
         $response = $this->actingAs($user)->getJson(route('cashier.notes.table'));
 
         $response->assertOk();

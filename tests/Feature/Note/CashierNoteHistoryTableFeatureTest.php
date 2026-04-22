@@ -62,6 +62,9 @@ final class CashierNoteHistoryTableFeatureTest extends TestCase
             ],
         ]);
 
+        $this->syncNoteProjectionForTest('NOTE-TODAY-1');
+        $this->syncNoteProjectionForTest('NOTE-YESTERDAY-OPEN');
+
         $response = $this->actingAs($user)->getJson(route('cashier.notes.table', [
             'date' => '2026-03-15',
         ]));
