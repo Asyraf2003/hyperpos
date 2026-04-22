@@ -36,34 +36,48 @@ final class ResolveNotePayableComponents
         $selectedIds = $this->normalizeSelectedRowIds($selectedRowIds);
 
         if ($selectedIds === []) {
-            throw new DomainException('Pilih minimal satu line open untuk pembayaran.');
+            throw new DomainException('Pilih minimal satu billing row outstanding untuk pembayaran.');
         }
 
         $components = [];
         $nextOrder = 1;
-        $matchedIds = [];
 
         foreach ($note->workItems() as $item) {
-            if (! in_array($item->id(), $selectedIds, true)) {
-                continue;
+            $resolved = PayableComponentsFromWorkItem::resolve($item, $nextOrder);
+
+            foreach ($resolved as $component) {
+                if (in_array($this->componentSelectionId($component), $selectedIds, true)) {
+                    $components[] = $component;
+                }
             }
 
-            $matchedIds[] = $item->id();
-
-            $resolved = PayableComponentsFromWorkItem::resolve($item, $nextOrder);
-            $components = [...$components, ...$resolved];
             $nextOrder += count($resolved);
         }
 
+        $matchedIds = array_map(
+            fn (PayableNoteComponent $component): string => $this->componentSelectionId($component),
+            $components,
+        );
+
         if (array_values(array_diff($selectedIds, $matchedIds)) !== []) {
-            throw new DomainException('Line pembayaran yang dipilih tidak valid untuk nota ini.');
+            throw new DomainException('Billing row pembayaran yang dipilih tidak valid untuk nota ini.');
         }
 
         if ($components === []) {
-            throw new DomainException('Line pembayaran yang dipilih tidak memiliki komponen yang bisa dibayar.');
+            throw new DomainException('Billing row pembayaran yang dipilih tidak memiliki komponen yang bisa dibayar.');
         }
 
         return $components;
+    }
+
+    private function componentSelectionId(PayableNoteComponent $component): string
+    {
+        return sprintf(
+            '%s::%s::%s',
+            $component->workItemId(),
+            $component->componentType(),
+            $component->componentRefId(),
+        );
     }
 
     /**
