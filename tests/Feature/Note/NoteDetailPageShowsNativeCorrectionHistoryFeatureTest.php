@@ -13,13 +13,13 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
 {
     use RefreshDatabase;
 
-    public function test_cashier_can_see_native_correction_history_on_note_detail_page(): void
+    public function test_note_detail_uses_compact_versioning_instead_of_large_native_correction_block(): void
     {
         $this->loginAsKasir();
 
         $user = User::query()->create([
-            'name' => 'Kasir History',
-            'email' => 'cashier-history@example.test',
+            'name' => 'Kasir',
+            'email' => 'cashier@example.test',
             'password' => 'password',
         ]);
 
@@ -28,15 +28,15 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
             'role' => 'kasir',
         ]);
 
-        $today = now()->toDateString();
-        $eventAt = now()->format('Y-m-d H:i:s');
+        $today = date('Y-m-d');
+        $now = $today . ' 10:00:00';
 
         DB::table('notes')->insert([
             'id' => 'note-1',
             'customer_name' => 'Budi',
             'transaction_date' => $today,
-            'total_rupiah' => 45000,
             'note_state' => 'open',
+            'total_rupiah' => 45000,
         ]);
 
         DB::table('note_mutation_events')->insert([
@@ -46,7 +46,7 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
             'actor_id' => 'actor-1',
             'actor_role' => 'admin',
             'reason' => 'Koreksi nominal',
-            'occurred_at' => $eventAt,
+            'occurred_at' => $now,
             'related_customer_payment_id' => null,
             'related_customer_refund_id' => null,
         ]);
@@ -56,15 +56,15 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
                 'id' => 'snap-1',
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'before',
-                'payload_json' => '{"note":{"total_rupiah":50000},"meta":{"refund_required_rupiah":5000}}',
-                'created_at' => $eventAt,
+                'payload_json' => '{"note":{"total_rupiah":50000}}',
+                'created_at' => $now,
             ],
             [
                 'id' => 'snap-2',
                 'note_mutation_event_id' => 'evt-1',
                 'snapshot_kind' => 'after',
-                'payload_json' => '{"note":{"total_rupiah":45000},"meta":{"refund_required_rupiah":5000}}',
-                'created_at' => $eventAt,
+                'payload_json' => '{"note":{"total_rupiah":45000}}',
+                'created_at' => $now,
             ],
         ]);
 
@@ -72,11 +72,7 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
 
         $response->assertOk();
         $response->assertSee('Versioning Nota');
-        $response->assertSee('Correction Nominal Service');
-        $response->assertSee('Koreksi nominal');
-        $response->assertSee('actor-1');
-        $response->assertSee('50.000', false);
-        $response->assertSee('45.000', false);
-        $response->assertSee('5.000', false);
+        $response->assertSee('Current Revision');
+        $response->assertDontSee('Correction Nominal Service');
     }
 }
