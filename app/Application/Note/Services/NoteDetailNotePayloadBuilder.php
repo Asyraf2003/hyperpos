@@ -51,7 +51,6 @@ final class NoteDetailNotePayloadBuilder
             'refund_rows' => $refundRows,
             'billing_rows' => $billingRows,
             'revision_timeline' => $revisionTimeline,
-            'pseudo_versioning' => $revisionTimeline,
             'correction_history' => $history,
         ];
     }
