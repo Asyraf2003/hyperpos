@@ -6,7 +6,7 @@
             <div class="border rounded p-3 bg-light mb-3">
                 <div class="fw-semibold mb-1">Mode edit yang tersedia saat ini</div>
                 <div class="text-muted small">
-                    Phase ini belum membuka true note revision flow. Perubahan isi nota masih memakai workspace existing, sedangkan pembacaan histori memakai pseudo-versioning read model.
+                    Workspace edit tetap dipakai sebagai form kerja kasir, tetapi hasil simpan sekarang dibukukan sebagai revision baru pada root note yang sama.
                 </div>
             </div>
 
@@ -30,7 +30,7 @@
                     <div class="text-muted small">{{ $note['correction_notice'] }}</div>
                 @else
                     <div class="text-muted small">
-                        Fokuskan tindakan dari layer hybrid yang tersedia pada detail note ini. True revision note tetap di luar scope phase sekarang.
+                        Fokuskan tindakan dari layer hybrid yang tersedia pada detail note ini. Revision chain sudah menjadi sumber histori note.
                     </div>
                 @endif
             </div>
