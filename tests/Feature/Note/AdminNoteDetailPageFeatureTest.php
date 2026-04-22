@@ -12,7 +12,7 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_authorized_admin_can_see_reopen_form_on_closed_note_detail_page(): void
+    public function test_authorized_admin_can_see_final_note_detail_layout_on_closed_note(): void
     {
         $this->loginAsAuthorizedAdmin();
 
@@ -30,13 +30,17 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response = $this->get(route('admin.notes.show', ['noteId' => 'note-closed']));
 
         $response->assertOk();
+        $response->assertSee('Workspace Nota Admin');
+        $response->assertSee('Detail Nota');
         $response->assertSee('Header Nota');
-        $response->assertSee('Status Operasional Admin');
-        $response->assertSee('Alasan Reopen');
-        $response->assertSee('Buka Ulang Nota');
+        $response->assertSee('Status & Aksi Nota');
+        $response->assertSee('List Line Nota');
+        $response->assertSee('Versioning Nota');
+        $response->assertDontSee('Status Operasional Admin');
+        $response->assertDontSee('Buka Ulang Nota');
     }
 
-    public function test_authorized_admin_sees_open_note_detail_without_reopen_form(): void
+    public function test_authorized_admin_sees_same_final_detail_layout_on_open_note(): void
     {
         $this->loginAsAuthorizedAdmin();
 
@@ -52,9 +56,13 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
         $response = $this->get(route('admin.notes.show', ['noteId' => 'note-open']));
 
         $response->assertOk();
+        $response->assertSee('Workspace Nota Admin');
+        $response->assertSee('Detail Nota');
         $response->assertSee('Header Nota');
-        $response->assertSee('Status Operasional Admin');
-        $response->assertSee('Reopen tidak diperlukan');
+        $response->assertSee('Status & Aksi Nota');
+        $response->assertSee('List Line Nota');
+        $response->assertSee('Versioning Nota');
+        $response->assertDontSee('Status Operasional Admin');
         $response->assertDontSee('Buka Ulang Nota');
     }
 }
