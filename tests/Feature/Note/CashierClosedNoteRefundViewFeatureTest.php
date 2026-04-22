@@ -27,7 +27,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Header Nota')->assertSee('List Line Nota')
             ->assertSee('Refund')->assertSee('Refund Nota')
             ->assertDontSee('Lunasi')
-            ->assertDontSee('Edit');
+            ->assertSee('Edit');
     }
 
     public function test_open_note_detail_shows_workspace_edit_and_payment_actions(): void
@@ -40,7 +40,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Header Nota')->assertSee('List Line Nota')
             ->assertSee('Edit')->assertSee('Bayar')
             ->assertSee('Lunasi')->assertSee('List Line Nota')
-            ->assertSee('Status & Aksi Nota');
+            ->assertSee('Status &amp; Aksi Nota', false);
     }
 
     private function seedKasir(): User

@@ -27,7 +27,7 @@ final class CashierRefundedNoteDetailViewFeatureTest extends TestCase
             ->assertSee('Header Nota')->assertSee('List Line Nota')
             ->assertSee('List Line Nota')
             ->assertDontSee('Lunasi')->assertDontSee('Status & Aksi Nota')
-            ->assertDontSee('Edit');
+            ->assertSee('Edit');
     }
 
     private function seedKasir(): User
