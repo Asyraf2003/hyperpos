@@ -23,7 +23,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->seedClosedPaidServiceOnlyNote();
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Note Hybrid')
+            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota Root + Revision')
             ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
             ->assertSee('Refund')->assertSee('Refund Nota')
             ->assertDontSee('Lunasi Pembayaran')
@@ -36,7 +36,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->seedOpenPartialPaidServiceOnlyNote();
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Note Hybrid')
+            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota Root + Revision')
             ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
             ->assertSee('Edit Nota')->assertSee('Buka Modal Bayar')
             ->assertSee('Lunasi Pembayaran')->assertSee('Billing Projection')

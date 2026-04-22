@@ -71,7 +71,7 @@ final class NoteDetailPageShowsNativeCorrectionHistoryFeatureTest extends TestCa
         $response = $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk();
-        $response->assertSee('Riwayat Mutasi Nota');
+        $response->assertSee('Riwayat Revisi Nota');
         $response->assertSee('Correction Nominal Service');
         $response->assertSee('Koreksi nominal');
         $response->assertSee('actor-1');
