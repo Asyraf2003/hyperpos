@@ -71,24 +71,17 @@ final class CashierHybridPaymentComponentSelectionFeatureTest extends TestCase
     {
         $today = date('Y-m-d');
 
+        $this->seedProduct('prod-1', 'Sparepart A', 20000, 10);
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'open');
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, WorkItem::STATUS_OPEN, 50000);
         $this->seedServiceDetailBase('wi-1', 'Servis Campuran', 30000, ServiceDetail::PART_SOURCE_NONE);
 
-        DB::table('store_stock_lines')->insert([
+        DB::table('work_item_store_stock_lines')->insert([
             'id' => 'ssl-1',
             'work_item_id' => 'wi-1',
             'product_id' => 'prod-1',
             'qty' => 1,
             'line_total_rupiah' => 20000,
-        ]);
-
-        DB::table('products')->insert([
-            'id' => 'prod-1',
-            'name' => 'Sparepart A',
-            'selling_price_rupiah' => 20000,
-            'stock_quantity' => 10,
-            'is_active' => 1,
         ]);
     }
 }
