@@ -6,11 +6,7 @@ namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\NoteCurrentRevisionResolver;
 use App\Application\Note\Services\NoteRevisionBootstrapFactory;
-use App\Core\Note\Note\Note;
-use App\Core\Note\WorkItem\ServiceDetail;
-use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
@@ -25,6 +21,8 @@ final class CreateNoteRevisionHandler
         private readonly NoteCurrentRevisionResolver $currentRevision,
         private readonly NoteRevisionWriterPort $revisionWriter,
         private readonly NoteRevisionBootstrapFactory $factory,
+        private readonly CreateNoteRevisionPayloadNoteBuilder $notesFromPayload,
+        private readonly CreateNoteRevisionAuditPayloadBuilder $auditPayloads,
         private readonly ClockPort $clock,
         private readonly TransactionManagerPort $transactions,
         private readonly AuditLogPort $audit,
@@ -55,8 +53,9 @@ final class CreateNoteRevisionHandler
             $current = $this->currentRevision->resolveOrFail($root->id());
             $nextRevisionNumber = $this->currentRevision->nextRevisionNumber($root->id());
             $revisionId = sprintf('%s-r%03d', $root->id(), $nextRevisionNumber);
+            $reason = (string) ($payload['reason'] ?? '');
 
-            $revisedNote = $this->buildRevisionNoteFromPayload($root->id(), $payload);
+            $revisedNote = $this->notesFromPayload->build($root->id(), $payload);
 
             $revision = $this->factory->createNextRevision(
                 $revisionId,
@@ -65,7 +64,7 @@ final class CreateNoteRevisionHandler
                 $revisedNote,
                 $actorId,
                 $this->clock->now(),
-                (string) ($payload['reason'] ?? ''),
+                $reason,
             );
 
             $this->revisionWriter->create($revision);
@@ -75,16 +74,10 @@ final class CreateNoteRevisionHandler
                 $revision->revisionNumber(),
             );
 
-            $this->audit->record('note_revision_created', [
-                'note_root_id' => $root->id(),
-                'revision_id' => $revision->id(),
-                'revision_number' => $revision->revisionNumber(),
-                'parent_revision_id' => $current->id(),
-                'reason' => (string) ($payload['reason'] ?? ''),
-                'actor_id' => $actorId,
-                'line_count' => $revision->lineCount(),
-                'grand_total_rupiah' => $revision->grandTotalRupiah(),
-            ]);
+            $this->audit->record(
+                'note_revision_created',
+                $this->auditPayloads->build($root->id(), $current->id(), $actorId, $reason, $revision),
+            );
 
             $this->transactions->commit();
 
@@ -106,95 +99,5 @@ final class CreateNoteRevisionHandler
 
             throw $e;
         }
-    }
-
-    /**
-     * @param array{
-     *   note: array<string, mixed>,
-     *   items: list<array<string, mixed>>,
-     *   reason: string
-     * } $payload
-     */
-    private function buildRevisionNoteFromPayload(string $noteRootId, array $payload): Note
-    {
-        $noteData = (array) ($payload['note'] ?? []);
-        $itemsData = array_values((array) ($payload['items'] ?? []));
-
-        $workItems = [];
-        $lineNo = 1;
-
-        foreach ($itemsData as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            $lineType = (string) ($item['line_type'] ?? '');
-
-            if ($lineType === 'service') {
-                $serviceName = trim((string) ($item['service_name'] ?? ''));
-                $servicePrice = (int) preg_replace('/\D+/', '', (string) ($item['service_price'] ?? '0'));
-
-                $service = ServiceDetail::create(
-                    $serviceName === '' ? 'Service Revision' : $serviceName,
-                    Money::fromInt($servicePrice),
-                    ServiceDetail::PART_SOURCE_NONE,
-                );
-
-                $workItems[] = WorkItem::createServiceOnly(
-                    sprintf('%s-wi-r%03d', $noteRootId, $lineNo),
-                    $noteRootId,
-                    $lineNo,
-                    $service,
-                    WorkItem::STATUS_OPEN,
-                );
-
-                $lineNo++;
-                continue;
-            }
-
-            if ($lineType === 'product') {
-                $qty = max((int) preg_replace('/\D+/', '', (string) ($item['qty'] ?? '1')), 1);
-                $price = (int) preg_replace('/\D+/', '', (string) ($item['price'] ?? '0'));
-
-                $storeStockLines = [[
-                    'product_id' => (string) ($item['product_id'] ?? ''),
-                    'qty' => $qty,
-                    'selling_price_rupiah' => $price,
-                    'subtotal_rupiah' => $qty * $price,
-                    'note' => (string) ($item['note'] ?? ''),
-                ]];
-
-                $workItems[] = WorkItem::createStoreStockSaleOnly(
-                    sprintf('%s-wi-r%03d', $noteRootId, $lineNo),
-                    $noteRootId,
-                    $lineNo,
-                    $storeStockLines,
-                    WorkItem::STATUS_OPEN,
-                );
-
-                $lineNo++;
-                continue;
-            }
-        }
-
-        if ($workItems === []) {
-            throw new DomainException('Minimal satu item valid wajib ada untuk membuat revisi.');
-        }
-
-        $total = array_reduce(
-            $workItems,
-            fn (int $carry, WorkItem $item): int => $carry + $item->subtotalRupiah()->amount(),
-            0,
-        );
-
-        return Note::rehydrate(
-            $noteRootId,
-            (string) ($noteData['customer_name'] ?? ''),
-            isset($noteData['customer_phone']) ? (string) $noteData['customer_phone'] : null,
-            new \DateTimeImmutable((string) ($noteData['transaction_date'] ?? '')),
-            Money::fromInt($total),
-            $workItems,
-            Note::STATE_OPEN,
-        );
     }
 }
