@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 final class CashierNoteHistoryBaseQuery
 {
     public function __construct(
+        private readonly NoteHistoryAggregationSubqueries $aggregations,
         private readonly NoteHistoryRowsQuery $rowsQuery,
     ) {
     }
@@ -19,22 +20,27 @@ final class CashierNoteHistoryBaseQuery
     public function paginate(CashierNoteHistoryCriteria $criteria): LengthAwarePaginator
     {
         $query = DB::table('note_history_projection')
+            ->leftJoinSub(
+                $this->aggregations->workSummary(),
+                'work_summary',
+                fn ($join) => $join->on('work_summary.note_id', '=', 'note_history_projection.note_id')
+            )
             ->select([
-                'note_id as id',
-                'transaction_date',
-                'customer_name',
-                'customer_phone',
-                'total_rupiah',
-                DB::raw('net_paid_rupiah as allocated_rupiah'),
+                'note_history_projection.note_id as id',
+                'note_history_projection.transaction_date',
+                'note_history_projection.customer_name',
+                'note_history_projection.customer_phone',
+                'note_history_projection.total_rupiah',
+                DB::raw('note_history_projection.net_paid_rupiah as allocated_rupiah'),
                 DB::raw('0 as refunded_rupiah'),
-                'line_open_count',
-                'line_close_count',
-                'line_refund_count',
-                DB::raw('line_open_count as open_count'),
-                DB::raw('line_close_count as done_count'),
-                DB::raw('0 as canceled_count'),
+                'note_history_projection.line_open_count',
+                'note_history_projection.line_close_count',
+                'note_history_projection.line_refund_count',
+                DB::raw('COALESCE(work_summary.open_count, 0) as open_count'),
+                DB::raw('COALESCE(work_summary.done_count, 0) as done_count'),
+                DB::raw('COALESCE(work_summary.canceled_count, 0) as canceled_count'),
             ])
-            ->whereBetween('transaction_date', [
+            ->whereBetween('note_history_projection.transaction_date', [
                 $criteria->previousDateText,
                 $criteria->anchorDateText,
             ]);
@@ -43,8 +49,8 @@ final class CashierNoteHistoryBaseQuery
         $query = $this->applyLineStatus($query, $criteria->lineStatus);
 
         return $query
-            ->orderByDesc('transaction_date')
-            ->orderByDesc('note_id')
+            ->orderByDesc('note_history_projection.transaction_date')
+            ->orderByDesc('note_history_projection.note_id')
             ->paginate($criteria->perPage, ['*'], 'page', $criteria->page);
     }
 
@@ -66,19 +72,19 @@ final class CashierNoteHistoryBaseQuery
 
         return $query->where(function (Builder $builder) use ($search, $normalizedSearch): void {
             $builder
-                ->where('note_id', 'like', '%' . $search . '%')
-                ->orWhere('customer_name', 'like', '%' . $search . '%')
-                ->orWhere('customer_name_normalized', 'like', '%' . $normalizedSearch . '%')
-                ->orWhere('customer_phone', 'like', '%' . $search . '%');
+                ->where('note_history_projection.note_id', 'like', '%' . $search . '%')
+                ->orWhere('note_history_projection.customer_name', 'like', '%' . $search . '%')
+                ->orWhere('note_history_projection.customer_name_normalized', 'like', '%' . $normalizedSearch . '%')
+                ->orWhere('note_history_projection.customer_phone', 'like', '%' . $search . '%');
         });
     }
 
     private function applyLineStatus(Builder $query, string $lineStatus): Builder
     {
         return match ($lineStatus) {
-            WorkItemOperationalStatusResolver::STATUS_OPEN => $query->where('has_open_lines', true),
-            WorkItemOperationalStatusResolver::STATUS_CLOSE => $query->where('has_close_lines', true),
-            WorkItemOperationalStatusResolver::STATUS_REFUND => $query->where('has_refund_lines', true),
+            WorkItemOperationalStatusResolver::STATUS_OPEN => $query->where('note_history_projection.has_open_lines', true),
+            WorkItemOperationalStatusResolver::STATUS_CLOSE => $query->where('note_history_projection.has_close_lines', true),
+            WorkItemOperationalStatusResolver::STATUS_REFUND => $query->where('note_history_projection.has_refund_lines', true),
             default => $query,
         };
     }
