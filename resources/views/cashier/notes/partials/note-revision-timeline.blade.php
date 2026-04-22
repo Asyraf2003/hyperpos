@@ -9,40 +9,33 @@
     </div>
   </div>
   <div class="card-body">
-    @php
-      $revision = $note['revision_timeline'] ?? ['current' => [], 'baseline' => [], 'timeline' => []];
-      $current = $revision['current'] ?? [];
-      $baseline = $revision['baseline'] ?? [];
-      $timeline = $revision['timeline'] ?? [];
-    @endphp
-
     <div class="row g-4">
       <div class="col-12 col-xl-5">
         <div class="border rounded p-3 h-100">
           <h5 class="mb-3">Current Revision</h5>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Revision</small>
-            <div class="text-end">R{{ (int) ($current['revision_number'] ?? 0) }}</div>
+            <div class="text-end">R{{ (int) ($currentRevision['revision_number'] ?? 0) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Customer</small>
-            <div class="text-end">{{ $current['customer_name'] ?? '-' }}</div>
+            <div class="text-end">{{ $currentRevision['customer_name'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Tanggal Nota</small>
-            <div class="text-end">{{ $current['transaction_date'] ?? '-' }}</div>
+            <div class="text-end">{{ $currentRevision['transaction_date'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Jumlah Line</small>
-            <div class="text-end">{{ (int) ($current['line_count'] ?? 0) }}</div>
+            <div class="text-end">{{ (int) ($currentRevision['line_count'] ?? 0) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Grand Total</small>
-            <div class="text-end">{{ number_format((int) ($current['grand_total_rupiah'] ?? 0), 0, ',', '.') }}</div>
+            <div class="text-end">{{ number_format((int) ($currentRevision['grand_total_rupiah'] ?? 0), 0, ',', '.') }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2">
             <small>Dibuat Pada</small>
-            <div class="text-end">{{ $current['created_at'] ?? '-' }}</div>
+            <div class="text-end">{{ $currentRevision['created_at'] ?? '-' }}</div>
           </div>
         </div>
       </div>
@@ -52,29 +45,29 @@
           <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
             <h5 class="mb-0">Baseline Revision</h5>
             <span class="badge bg-light text-dark border">
-              R{{ (int) ($baseline['revision_number'] ?? 0) }}
+              R{{ (int) ($baselineRevision['revision_number'] ?? 0) }}
             </span>
           </div>
 
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Customer</small>
-            <div class="text-end">{{ $baseline['customer_name'] ?? '-' }}</div>
+            <div class="text-end">{{ $baselineRevision['customer_name'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Tanggal Nota</small>
-            <div class="text-end">{{ $baseline['transaction_date'] ?? '-' }}</div>
+            <div class="text-end">{{ $baselineRevision['transaction_date'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Jumlah Line</small>
-            <div class="text-end">{{ (int) ($baseline['line_count'] ?? 0) }}</div>
+            <div class="text-end">{{ (int) ($baselineRevision['line_count'] ?? 0) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Grand Total</small>
-            <div class="text-end">{{ number_format((int) ($baseline['grand_total_rupiah'] ?? 0), 0, ',', '.') }}</div>
+            <div class="text-end">{{ number_format((int) ($baselineRevision['grand_total_rupiah'] ?? 0), 0, ',', '.') }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2">
             <small>Dibuat Pada</small>
-            <div class="text-end">{{ $baseline['created_at'] ?? '-' }}</div>
+            <div class="text-end">{{ $baselineRevision['created_at'] ?? '-' }}</div>
           </div>
         </div>
       </div>
@@ -86,14 +79,14 @@
           <h5 class="mb-1">Timeline Revision</h5>
           <p class="text-muted mb-0 small">Timeline ini menunjukkan chain revision pada root note yang sama.</p>
         </div>
-        <span class="badge bg-light text-dark border">{{ count($timeline) }} Revision</span>
+        <span class="badge bg-light text-dark border">{{ count($timelineRevisions) }} Revision</span>
       </div>
 
-      @if ($timeline === [])
+      @if ($timelineRevisions === [])
         <div class="text-muted">Belum ada revision yang tercatat.</div>
       @else
         <div class="timeline">
-          @foreach ($timeline as $entry)
+          @foreach ($timelineRevisions as $entry)
             <div class="timeline-item pb-4">
               <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
                 <div>
