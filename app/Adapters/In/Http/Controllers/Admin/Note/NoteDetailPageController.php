@@ -25,11 +25,7 @@ final class NoteDetailPageController extends Controller
         $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
 
         try {
-            $ensureInitialRevision->handle(
-                $noteId,
-                trim($noteId) . '-r001',
-                $actorId,
-            );
+            $ensureInitialRevision->handle($noteId, trim($noteId) . '-r001', $actorId);
         } catch (DomainException $e) {
             abort(500, $e->getMessage());
         }
@@ -37,13 +33,31 @@ final class NoteDetailPageController extends Controller
         $data = $builder->build($noteId);
         abort_if($data === null, 404);
 
-        return view('admin.notes.show', $data + [
+        $paymentAction = route('admin.notes.payments.store', ['noteId' => $noteId]);
+        $refundAction = route('admin.notes.refunds.store', ['noteId' => $noteId]);
+
+        return view('shared.notes.show', $data + [
+            'backUrl' => route('admin.notes.index'),
+            'pageIntroEyebrow' => 'Workspace Nota Admin',
+            'pageIntroTitle' => 'Detail Nota',
+            'pageIntroSubtitle' => 'Detail operasional nota aktif untuk admin dengan akses histori lebih luas.',
+            'detailConfig' => [
+                'workspace_edit_route' => 'admin.notes.workspace.update',
+            ],
             'addRowsAction' => route('admin.notes.rows.store', ['noteId' => $noteId]),
             'oldRows' => array_values(old('rows', [['line_type' => 'service']])),
-            'paymentAction' => route('admin.notes.payments.store', ['noteId' => $noteId]),
+            'paymentAction' => $paymentAction,
             'paymentDateDefault' => date('Y-m-d'),
-            'refundAction' => route('admin.notes.refunds.store', ['noteId' => $noteId]),
+            'paymentModalConfig' => [
+                'action' => $paymentAction,
+                'date_default' => date('Y-m-d'),
+            ],
+            'refundAction' => $refundAction,
             'refundDateDefault' => date('Y-m-d'),
+            'refundModalConfig' => [
+                'action' => $refundAction,
+                'date_default' => date('Y-m-d'),
+            ],
         ] + $options->build());
     }
 }
