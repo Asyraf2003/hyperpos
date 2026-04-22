@@ -38,14 +38,9 @@ final class NoteDetailPageController extends Controller
 
         $user = $request->user();
         $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
-        $bootstrapRevisionId = trim($noteId) . '-r001';
 
         try {
-            $ensureInitialRevision->handle(
-                $noteId,
-                $bootstrapRevisionId,
-                $actorId,
-            );
+            $ensureInitialRevision->handle($noteId, trim($noteId) . '-r001', $actorId);
         } catch (DomainException $e) {
             abort(500, $e->getMessage());
         }
@@ -55,23 +50,28 @@ final class NoteDetailPageController extends Controller
 
         $paymentAction = route('cashier.notes.payments.store', ['noteId' => $noteId]);
         $refundAction = route('cashier.notes.refunds.store', ['noteId' => $noteId]);
-        $paymentDateDefault = date('Y-m-d');
-        $refundDateDefault = date('Y-m-d');
 
-        return view('cashier.notes.show', $data + [
+        return view('shared.notes.show', $data + [
+            'backUrl' => route('cashier.notes.index'),
+            'pageIntroEyebrow' => 'Workspace Nota Kasir',
+            'pageIntroTitle' => 'Detail Nota',
+            'pageIntroSubtitle' => 'Detail operasional nota aktif untuk kerja kasir pada scope 2 hari terakhir.',
+            'detailConfig' => [
+                'workspace_edit_route' => 'cashier.notes.workspace.edit',
+            ],
             'addRowsAction' => route('cashier.notes.rows.store', ['noteId' => $noteId]),
             'oldRows' => array_values(old('rows', [['line_type' => 'service']])),
             'paymentAction' => $paymentAction,
-            'paymentDateDefault' => $paymentDateDefault,
+            'paymentDateDefault' => date('Y-m-d'),
             'paymentModalConfig' => [
                 'action' => $paymentAction,
-                'date_default' => $paymentDateDefault,
+                'date_default' => date('Y-m-d'),
             ],
             'refundAction' => $refundAction,
-            'refundDateDefault' => $refundDateDefault,
+            'refundDateDefault' => date('Y-m-d'),
             'refundModalConfig' => [
                 'action' => $refundAction,
-                'date_default' => $refundDateDefault,
+                'date_default' => date('Y-m-d'),
             ],
             'statusCorrectionAction' => route('cashier.notes.corrections.status.store', ['noteId' => $noteId]),
             'serviceOnlyCorrectionAction' => route('cashier.notes.corrections.service-only.store', ['noteId' => $noteId]),
