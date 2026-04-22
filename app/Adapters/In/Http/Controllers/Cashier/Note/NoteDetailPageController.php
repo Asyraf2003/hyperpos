@@ -12,12 +12,14 @@ use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 final class NoteDetailPageController extends Controller
 {
     public function __invoke(
         string $noteId,
+        Request $request,
         NoteReaderPort $notes,
         NoteDetailPageDataBuilder $builder,
         NoteCorrectionUiOptionsBuilder $options,
@@ -34,14 +36,15 @@ final class NoteDetailPageController extends Controller
             abort(403, $e->getMessage());
         }
 
-        $actorId = auth()->user()?->getAuthIdentifier();
+        $user = $request->user();
+        $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
         $bootstrapRevisionId = trim($noteId) . '-r001';
 
         try {
             $ensureInitialRevision->handle(
                 $noteId,
                 $bootstrapRevisionId,
-                $actorId !== null ? (string) $actorId : null,
+                $actorId,
             );
         } catch (DomainException $e) {
             abort(500, $e->getMessage());
