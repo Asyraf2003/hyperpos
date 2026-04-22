@@ -24,14 +24,8 @@ final class CashierNoteHistoryTableQuery
     public function get(array $filters): array
     {
         $criteria = CashierNoteHistoryCriteria::fromFilters($filters);
-        $rows = $this->baseQuery->fetch($criteria);
-        $items = $this->rowMapper->map($rows, $criteria);
-
-        $total = count($items);
-        $lastPage = max((int) ceil($total / $criteria->perPage), 1);
-        $page = min($criteria->page, $lastPage);
-        $offset = ($page - 1) * $criteria->perPage;
-        $pagedItems = array_values(array_slice($items, $offset, $criteria->perPage));
+        $paginator = $this->baseQuery->paginate($criteria);
+        $items = $this->rowMapper->map($paginator->items(), $criteria);
 
         return [
             'filters' => [
@@ -39,12 +33,12 @@ final class CashierNoteHistoryTableQuery
                 'search' => $criteria->search,
                 'line_status' => $criteria->lineStatus,
             ],
-            'items' => $pagedItems,
+            'items' => $items,
             'pagination' => [
-                'page' => $page,
-                'per_page' => $criteria->perPage,
-                'total' => $total,
-                'last_page' => $lastPage,
+                'page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
             ],
             'summary' => [
                 'label' => sprintf(
