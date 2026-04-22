@@ -73,13 +73,16 @@ final class CashierHybridPaymentComponentSelectionFeatureTest extends TestCase
 
         DB::table('products')->insert([
             'id' => 'prod-1',
-            'name' => 'Sparepart A',
-            'sku' => 'SKU-PROD-1',
-            'selling_price_rupiah' => 20000,
-            'stock_quantity' => 10,
-            'is_active' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'kode_barang' => 'PRD-TEST-001',
+            'nama_barang' => 'Sparepart A',
+            'nama_barang_normalized' => 'sparepart a',
+            'merek' => 'TEST',
+            'merek_normalized' => 'test',
+            'ukuran' => 1,
+            'harga_jual' => 20000,
+            'reorder_point_qty' => 1,
+            'critical_threshold_qty' => 1,
+            'active_unique_marker' => 1,
         ]);
 
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'open');
