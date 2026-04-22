@@ -23,9 +23,43 @@ final class AutoReverseRefundedStoreStockInventory
     public function execute(CustomerRefund $refund): void
     {
         $noteId = $refund->noteId();
-        $allocatedTotals = $this->sumSupportedTotals($this->paymentAllocations->listByNoteId($noteId), false);
-        $refundedTotals = $this->sumSupportedTotals($this->refundAllocations->listByNoteId($noteId), true);
-        $candidateLineIds = $this->candidateLineIdsForRefund($refund->id());
+        $paymentAllocations = $this->paymentAllocations->listByNoteId($noteId);
+        $refundAllocations = $this->refundAllocations->listByNoteId($noteId);
+
+        $allocatedTotals = [];
+        foreach ($paymentAllocations as $allocation) {
+            if (! $this->supportsStockReversal($allocation->componentType())) {
+                continue;
+            }
+
+            $componentRefId = $allocation->componentRefId();
+            $allocatedTotals[$componentRefId] = ($allocatedTotals[$componentRefId] ?? 0)
+                + $allocation->allocatedAmountRupiah()->amount();
+        }
+
+        $refundedTotals = [];
+        foreach ($refundAllocations as $allocation) {
+            if (! $this->supportsStockReversal($allocation->componentType())) {
+                continue;
+            }
+
+            $componentRefId = $allocation->componentRefId();
+            $refundedTotals[$componentRefId] = ($refundedTotals[$componentRefId] ?? 0)
+                + $allocation->refundedAmountRupiah()->amount();
+        }
+
+        $candidateLineIds = [];
+        foreach ($refundAllocations as $allocation) {
+            if ($allocation->customerRefundId() !== $refund->id()) {
+                continue;
+            }
+
+            if (! $this->supportsStockReversal($allocation->componentType())) {
+                continue;
+            }
+
+            $candidateLineIds[$allocation->componentRefId()] = true;
+        }
 
         foreach (array_keys($candidateLineIds) as $lineId) {
             $allocated = (int) ($allocatedTotals[$lineId] ?? 0);
@@ -48,59 +82,11 @@ final class AutoReverseRefundedStoreStockInventory
         }
     }
 
-    private function sumSupportedTotals(array $allocations, bool $isRefund): array
-    {
-        $totals = [];
-
-        foreach ($allocations as $allocation) {
-            if (! $this->supportsStockReversal($allocation->componentType())) {
-                continue;
-            }
-
-            $amount = $isRefund
-                ? $allocation->refundedAmountRupiah()->amount()
-                : $allocation->allocatedAmountRupiah()->amount();
-
-            $componentRefId = $allocation->componentRefId();
-            $totals[$componentRefId] = ($totals[$componentRefId] ?? 0) + $amount;
-        }
-
-        return $totals;
-    }
-
-    private function candidateLineIdsForRefund(string $refundId): array
-    {
-        $candidateLineIds = [];
-
-        foreach ($this->refundAllocations->listByNoteId('') as $allocation) {
-            // unreachable fallback guard, never used
-        }
-
-        foreach ($this->refundAllocations->listByNoteId($this->noteIdFromRefundAllocations()) as $allocation) {
-            // unreachable fallback guard, never used
-        }
-
-        foreach ($this->refundAllocations->listByNoteIdForRefund($refundId) as $allocation) {
-            if (! $this->supportsStockReversal($allocation->componentType())) {
-                continue;
-            }
-
-            $candidateLineIds[$allocation->componentRefId()] = true;
-        }
-
-        return $candidateLineIds;
-    }
-
     private function supportsStockReversal(string $componentType): bool
     {
         return in_array($componentType, [
             PaymentComponentType::SERVICE_STORE_STOCK_PART,
             PaymentComponentType::PRODUCT_ONLY_WORK_ITEM,
         ], true);
-    }
-
-    private function noteIdFromRefundAllocations(): string
-    {
-        return '';
     }
 }
