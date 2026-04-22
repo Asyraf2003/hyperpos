@@ -26,7 +26,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
             ServiceDetail::create('Servis Mesin', Money::fromInt(50000), ServiceDetail::PART_SOURCE_NONE),
         );
 
-        $component = PayableNoteComponent::create(
+        $component = new PayableNoteComponent(
             'wi-1',
             'service_fee',
             'wi-1',
@@ -58,7 +58,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
             [ExternalPurchaseLine::create('ext-1', 'IC Board', Money::fromInt(70000), 1)],
         );
 
-        $productComponent = PayableNoteComponent::create(
+        $productComponent = new PayableNoteComponent(
             'wi-2',
             'service_external_purchase_part',
             'ext-1',
@@ -66,7 +66,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
             1,
         );
 
-        $serviceComponent = PayableNoteComponent::create(
+        $serviceComponent = new PayableNoteComponent(
             'wi-2',
             'service_fee',
             'wi-2',
@@ -99,7 +99,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
             ServiceDetail::create('Servis Rem', Money::fromInt(40000), ServiceDetail::PART_SOURCE_NONE),
         );
 
-        $component = PayableNoteComponent::create(
+        $component = new PayableNoteComponent(
             'wi-3',
             'service_fee',
             'wi-3',
