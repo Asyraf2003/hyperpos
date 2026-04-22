@@ -13,7 +13,7 @@ final class NoteDetailNotePayloadBuilder
         array $refundPaymentOptions,
         array $refundRows,
         array $billingRows,
-        array $pseudoVersioning,
+        array $revisionTimeline,
         array $history,
         bool $isOpen,
         bool $isClosed,
@@ -50,7 +50,8 @@ final class NoteDetailNotePayloadBuilder
             'rows' => $workspacePanel['rows'],
             'refund_rows' => $refundRows,
             'billing_rows' => $billingRows,
-            'pseudo_versioning' => $pseudoVersioning,
+            'revision_timeline' => $revisionTimeline,
+            'pseudo_versioning' => $revisionTimeline,
             'correction_history' => $history,
         ];
     }
