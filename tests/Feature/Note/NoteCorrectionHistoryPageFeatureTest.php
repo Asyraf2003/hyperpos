@@ -13,7 +13,7 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_paid_note_detail_page_shows_correction_history_from_native_mutation_timeline(): void
+    public function test_paid_note_detail_page_shows_compact_versioning_in_final_ui(): void
     {
         $this->loginAsKasir();
 
@@ -72,11 +72,7 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Versioning Nota');
-        $response->assertSee('Correction Nominal Service');
-        $response->assertSee('Harga salah input');
-        $response->assertSee('actor-1');
-        $response->assertSee('50.000', false);
-        $response->assertSee('40.000', false);
-        $response->assertSee('10.000', false);
+        $response->assertSee('Current Revision');
+        $response->assertDontSee('Correction Nominal Service');
     }
 }
