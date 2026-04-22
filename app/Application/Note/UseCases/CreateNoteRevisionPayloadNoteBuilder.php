@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Core\Note\Note\Note;
-use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
@@ -13,7 +12,8 @@ use App\Core\Shared\ValueObjects\Money;
 final class CreateNoteRevisionPayloadNoteBuilder
 {
     public function __construct(
-        private readonly CreateNoteRevisionItemNormalizer $values,
+        private readonly CreateNoteRevisionServiceItemBuilder $services,
+        private readonly CreateNoteRevisionProductItemBuilder $products,
     ) {
     }
 
@@ -27,23 +27,7 @@ final class CreateNoteRevisionPayloadNoteBuilder
     public function build(string $noteRootId, array $payload): Note
     {
         $noteData = (array) ($payload['note'] ?? []);
-        $itemsData = array_values((array) ($payload['items'] ?? []));
-
-        $workItems = [];
-        $lineNo = 1;
-
-        foreach ($itemsData as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            $mapped = $this->mapWorkItem($noteRootId, $lineNo, $item);
-
-            if ($mapped !== null) {
-                $workItems[] = $mapped;
-                $lineNo++;
-            }
-        }
+        $workItems = $this->buildWorkItems($noteRootId, array_values((array) ($payload['items'] ?? [])));
 
         if ($workItems === []) {
             throw new DomainException('Minimal satu item valid wajib ada untuk membuat revisi.');
@@ -67,50 +51,35 @@ final class CreateNoteRevisionPayloadNoteBuilder
     }
 
     /**
+     * @param list<array<string, mixed>> $itemsData
+     * @return list<WorkItem>
+     */
+    private function buildWorkItems(string $noteRootId, array $itemsData): array
+    {
+        $workItems = [];
+        $lineNo = 1;
+
+        foreach ($itemsData as $item) {
+            $mapped = $this->mapWorkItem($noteRootId, $lineNo, $item);
+
+            if ($mapped !== null) {
+                $workItems[] = $mapped;
+                $lineNo++;
+            }
+        }
+
+        return $workItems;
+    }
+
+    /**
      * @param array<string, mixed> $item
      */
     private function mapWorkItem(string $noteRootId, int $lineNo, array $item): ?WorkItem
     {
-        $lineType = (string) ($item['line_type'] ?? '');
-
-        if ($lineType === 'service') {
-            $serviceName = $this->values->string($item['service_name'] ?? '', 'Service Revision');
-            $servicePrice = $this->values->integer($item['service_price'] ?? '0');
-
-            $service = ServiceDetail::create(
-                $serviceName === '' ? 'Service Revision' : $serviceName,
-                Money::fromInt($servicePrice),
-                ServiceDetail::PART_SOURCE_NONE,
-            );
-
-            return WorkItem::createServiceOnly(
-                sprintf('%s-wi-r%03d', $noteRootId, $lineNo),
-                $noteRootId,
-                $lineNo,
-                $service,
-                WorkItem::STATUS_OPEN,
-            );
-        }
-
-        if ($lineType === 'product') {
-            $qty = $this->values->positiveInteger($item['qty'] ?? '1');
-            $price = $this->values->integer($item['price'] ?? '0');
-
-            return WorkItem::createStoreStockSaleOnly(
-                sprintf('%s-wi-r%03d', $noteRootId, $lineNo),
-                $noteRootId,
-                $lineNo,
-                [[
-                    'product_id' => (string) ($item['product_id'] ?? ''),
-                    'qty' => $qty,
-                    'selling_price_rupiah' => $price,
-                    'subtotal_rupiah' => $qty * $price,
-                    'note' => (string) ($item['note'] ?? ''),
-                ]],
-                WorkItem::STATUS_OPEN,
-            );
-        }
-
-        return null;
+        return match ((string) ($item['line_type'] ?? '')) {
+            'service' => $this->services->build($noteRootId, $lineNo, $item),
+            'product' => $this->products->build($noteRootId, $lineNo, $item),
+            default => null,
+        };
     }
 }

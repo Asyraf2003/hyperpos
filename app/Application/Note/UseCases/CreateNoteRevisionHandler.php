@@ -55,13 +55,11 @@ final class CreateNoteRevisionHandler
             $revisionId = sprintf('%s-r%03d', $root->id(), $nextRevisionNumber);
             $reason = (string) ($payload['reason'] ?? '');
 
-            $revisedNote = $this->notesFromPayload->build($root->id(), $payload);
-
             $revision = $this->factory->createNextRevision(
                 $revisionId,
                 $current->id(),
                 $nextRevisionNumber,
-                $revisedNote,
+                $this->notesFromPayload->build($root->id(), $payload),
                 $actorId,
                 $this->clock->now(),
                 $reason,
