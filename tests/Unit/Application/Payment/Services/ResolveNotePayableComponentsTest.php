@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Application\Payment\Services;
 
 use App\Application\Payment\Services\ResolveNotePayableComponents;
+use App\Application\Payment\Services\ResolveNotePayableComponentsSelectedRows;
+use App\Application\Payment\Services\ResolveNotePayableComponentsSelectionId;
 use App\Core\Note\Note\Note;
 use App\Core\Note\WorkItem\ExternalPurchaseLine;
 use App\Core\Note\WorkItem\ServiceDetail;
@@ -29,18 +31,24 @@ final class ResolveNotePayableComponentsTest extends TestCase
                 WorkItem::createStoreStockSaleOnly('wi-1', 'note-1', 1, [
                     StoreStockLine::create('sto-1', 'product-1', 1, Money::fromInt(5000)),
                 ]),
-                WorkItem::createServiceWithStoreStockPart('wi-2', 'note-1', 2,
+                WorkItem::createServiceWithStoreStockPart(
+                    'wi-2',
+                    'note-1',
+                    2,
                     ServiceDetail::create('Servis A', Money::fromInt(5000), ServiceDetail::PART_SOURCE_NONE),
                     [StoreStockLine::create('sto-2', 'product-2', 1, Money::fromInt(3000))]
                 ),
-                WorkItem::createServiceWithExternalPurchase('wi-3', 'note-1', 3,
+                WorkItem::createServiceWithExternalPurchase(
+                    'wi-3',
+                    'note-1',
+                    3,
                     ServiceDetail::create('Servis B', Money::fromInt(9000), ServiceDetail::PART_SOURCE_NONE),
                     [ExternalPurchaseLine::create('ext-1', 'Beli luar', Money::fromInt(2000), 1)]
                 ),
             ],
         );
 
-        $components = (new ResolveNotePayableComponents())->fromNote($note);
+        $components = $this->makeService()->fromNote($note);
 
         $this->assertCount(5, $components);
         $this->assertSame(PaymentComponentType::PRODUCT_ONLY_WORK_ITEM, $components[0]->componentType());
@@ -48,5 +56,14 @@ final class ResolveNotePayableComponentsTest extends TestCase
         $this->assertSame(PaymentComponentType::SERVICE_FEE, $components[2]->componentType());
         $this->assertSame(PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART, $components[3]->componentType());
         $this->assertSame(PaymentComponentType::SERVICE_FEE, $components[4]->componentType());
+    }
+
+    private function makeService(): ResolveNotePayableComponents
+    {
+        return new ResolveNotePayableComponents(
+            new ResolveNotePayableComponentsSelectedRows(
+                new ResolveNotePayableComponentsSelectionId(),
+            ),
+        );
     }
 }
