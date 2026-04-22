@@ -31,7 +31,7 @@ final class RecordSelectedRowsNotePaymentFeatureTest extends TestCase
         $this->seedServiceDetailBase('wi-2', 'Servis B', 50000, ServiceDetail::PART_SOURCE_NONE);
 
         $response = $this->actingAs($user)->post(route('cashier.notes.payments.store', ['noteId' => 'note-1']), [
-            'selected_row_ids' => ['wi-2'],
+            'selected_row_ids' => ['wi-2::service_fee::wi-2'],
             'payment_scope' => 'partial',
             'payment_method' => 'cash',
             'paid_at' => $today,

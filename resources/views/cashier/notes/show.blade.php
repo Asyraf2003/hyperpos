@@ -22,6 +22,7 @@
           'baselineRevision' => ($note['revision_timeline']['baseline'] ?? []),
           'timelineRevisions' => ($note['revision_timeline']['timeline'] ?? []),
         ])
+        @include('cashier.notes.partials.correction-history')
         @include('cashier.notes.partials.note-rows-table')
         @include('cashier.notes.partials.billing-table')
       </div>
