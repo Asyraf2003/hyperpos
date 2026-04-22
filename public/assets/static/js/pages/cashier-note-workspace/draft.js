@@ -3,6 +3,8 @@
   const configEl = document.getElementById("cashier-note-workspace-config");
   if (!configEl) return;
 
+  let isSubmitting = false;
+
   const parseConfig = () => {
     try {
       return JSON.parse(configEl.textContent || "{}");
@@ -60,11 +62,16 @@
 
       const merged = {
         ...config,
-        oldNote: typeof draftPayload.note === "object" && draftPayload.note !== null ? draftPayload.note : {},
+        oldNote:
+          typeof draftPayload.note === "object" && draftPayload.note !== null
+            ? draftPayload.note
+            : {},
         oldItems: Array.isArray(draftPayload.items) ? draftPayload.items : [],
-        oldInlinePayment: typeof draftPayload.inline_payment === "object" && draftPayload.inline_payment !== null
-          ? draftPayload.inline_payment
-          : {},
+        oldInlinePayment:
+          typeof draftPayload.inline_payment === "object" &&
+          draftPayload.inline_payment !== null
+            ? draftPayload.inline_payment
+            : {},
         draftMeta: {
           restored_at: new Date().toISOString(),
           updated_at: draft.updated_at || null,
@@ -80,7 +87,8 @@
   };
 
   const numberText = (value) => String(value ?? "").replace(/\D+/g, "");
-  const valueOf = (selector, root = document) => root.querySelector(selector)?.value || "";
+  const valueOf = (selector, root = document) =>
+    root.querySelector(selector)?.value || "";
 
   const normalizeItem = (row) => {
     const itemType = row.dataset.itemType || "service";
@@ -98,8 +106,12 @@
         product_lines: [
           {
             product_id: valueOf("[data-product-id]", row),
-            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
-            unit_price_rupiah: numberText(valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row)),
+            qty:
+              numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) ||
+              "1",
+            unit_price_rupiah: numberText(
+              valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
+            ),
           },
         ],
       };
@@ -113,14 +125,20 @@
         service: {
           name: valueOf('input[name$="[service][name]"]', row),
           notes: valueOf('textarea[name$="[service][notes]"]', row),
-          price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
+          price_rupiah: numberText(
+            valueOf('input[name$="[service][price_rupiah]"]', row),
+          ),
         },
         selected_label: valueOf("[data-product-search]", row),
         product_lines: [
           {
             product_id: valueOf("[data-product-id]", row),
-            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
-            unit_price_rupiah: numberText(valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row)),
+            qty:
+              numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) ||
+              "1",
+            unit_price_rupiah: numberText(
+              valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
+            ),
           },
         ],
       };
@@ -134,13 +152,26 @@
         service: {
           name: valueOf('input[name$="[service][name]"]', row),
           notes: valueOf('textarea[name$="[service][notes]"]', row),
-          price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
+          price_rupiah: numberText(
+            valueOf('input[name$="[service][price_rupiah]"]', row),
+          ),
         },
         external_purchase_lines: [
           {
-            label: valueOf('input[name$="[external_purchase_lines][0][label]"]', row),
-            qty: numberText(valueOf('input[name$="[external_purchase_lines][0][qty]"]', row)) || "1",
-            unit_cost_rupiah: numberText(valueOf('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]', row)),
+            label: valueOf(
+              'input[name$="[external_purchase_lines][0][label]"]',
+              row,
+            ),
+            qty:
+              numberText(
+                valueOf('input[name$="[external_purchase_lines][0][qty]"]', row),
+              ) || "1",
+            unit_cost_rupiah: numberText(
+              valueOf(
+                'input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]',
+                row,
+              ),
+            ),
           },
         ],
       };
@@ -169,18 +200,26 @@
         customer_phone: valueOf("#note_customer_phone"),
         transaction_date: valueOf("#note_transaction_date"),
       },
-      items: Array.from(document.querySelectorAll("[data-line-item]")).map((row) => normalizeItem(row)),
+      items: Array.from(document.querySelectorAll("[data-line-item]")).map((row) =>
+        normalizeItem(row),
+      ),
       inline_payment: {
         decision: valueOf("#inline_payment_decision_hidden") || "skip",
         payment_method: valueOf("#inline_payment_method_hidden"),
         paid_at: valueOf("#inline_payment_paid_at_hidden"),
         amount_paid_rupiah: numberText(valueOf("#inline_payment_amount_paid_rupiah")),
-        amount_received_rupiah: numberText(valueOf("#inline_payment_amount_received_rupiah")),
+        amount_received_rupiah: numberText(
+          valueOf("#inline_payment_amount_received_rupiah"),
+        ),
       },
     };
   };
 
   const saveDraftToServer = async (keepalive = false) => {
+    if (isSubmitting) {
+      return;
+    }
+
     const config = parseConfig();
     const endpoint = String(config.draftSaveEndpoint || "").trim();
     if (!endpoint) {
@@ -217,6 +256,10 @@
     let hasInteracted = false;
 
     const queueSave = () => {
+      if (isSubmitting) {
+        return;
+      }
+
       hasInteracted = true;
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
@@ -224,23 +267,28 @@
       }, 1200);
     };
 
+    form.addEventListener("submit", () => {
+      isSubmitting = true;
+      window.clearTimeout(timer);
+    });
+
     form.addEventListener("input", queueSave);
     form.addEventListener("change", queueSave);
 
     document.addEventListener("click", (event) => {
       if (
-        event.target.closest("[data-add-item-type]")
-        || event.target.closest("[data-remove-line]")
-        || event.target.closest("[data-payment-choice]")
-        || event.target.closest("#workspace-payment-open-cash")
-        || event.target.closest("#workspace-payment-back-cash")
+        event.target.closest("[data-add-item-type]") ||
+        event.target.closest("[data-remove-line]") ||
+        event.target.closest("[data-payment-choice]") ||
+        event.target.closest("#workspace-payment-open-cash") ||
+        event.target.closest("#workspace-payment-back-cash")
       ) {
         window.setTimeout(queueSave, 0);
       }
     });
 
     window.addEventListener("beforeunload", () => {
-      if (!hasInteracted) {
+      if (!hasInteracted || isSubmitting) {
         return;
       }
 
