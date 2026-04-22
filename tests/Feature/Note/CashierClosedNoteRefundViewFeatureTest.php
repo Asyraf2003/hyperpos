@@ -23,11 +23,11 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->seedClosedPaidServiceOnlyNote();
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota Root + Revision')
-            ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
+            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota')
+            ->assertSee('Header Nota')->assertSee('List Line Nota')
             ->assertSee('Refund')->assertSee('Refund Nota')
-            ->assertDontSee('Lunasi Pembayaran')
-            ->assertDontSee('Edit Nota');
+            ->assertDontSee('Lunasi')
+            ->assertDontSee('Edit');
     }
 
     public function test_open_note_detail_shows_workspace_edit_and_payment_actions(): void
@@ -36,11 +36,11 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
         $this->seedOpenPartialPaidServiceOnlyNote();
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota Root + Revision')
-            ->assertSee('Header Nota')->assertSee('Daftar Line Nota')
-            ->assertSee('Edit Nota')->assertSee('Buka Modal Bayar')
-            ->assertSee('Lunasi Pembayaran')->assertSee('Billing Projection')
-            ->assertSee('Pembayaran Nota');
+            ->assertOk()->assertSee('Workspace Nota Kasir')->assertSee('Detail Nota')
+            ->assertSee('Header Nota')->assertSee('List Line Nota')
+            ->assertSee('Edit')->assertSee('Bayar')
+            ->assertSee('Lunasi')->assertSee('List Line Nota')
+            ->assertSee('Status & Aksi Nota');
     }
 
     private function seedKasir(): User

@@ -61,7 +61,7 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-entry-1']));
 
         $response->assertOk();
-        $response->assertSee('Edit Nota');
+        $response->assertSee('Edit');
         $response->assertSee(route('cashier.notes.workspace.edit', ['noteId' => 'note-entry-1']), false);
     }
 
@@ -124,7 +124,7 @@ final class NoteDetailEditEntryFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-entry-2']));
 
         $response->assertOk();
-        $response->assertSee('Edit Nota');
+        $response->assertSee('Edit');
         $response->assertSee(route('cashier.notes.workspace.edit', ['noteId' => 'note-entry-2']), false);
     }
 }

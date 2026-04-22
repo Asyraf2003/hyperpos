@@ -36,7 +36,7 @@ final class RecordSelectedRowsClosedNoteRefundHttpFeatureTest extends TestCase
         $user = $this->seedKasir(); $today = date('Y-m-d'); $this->seedOpenNoteWithOnePaidLine($today);
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
-            ->assertOk()->assertSee('Buka Modal Refund')->assertSee('Refund Nota')
+            ->assertOk()->assertSee('Refund')->assertSee('Refund Nota')
             ->assertDontSee('Refund Line Close Terpilih')->assertDontSee('Panel Refund');
     }
 

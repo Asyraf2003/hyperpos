@@ -71,7 +71,7 @@ final class NoteCorrectionHistoryPageFeatureTest extends TestCase
         $response = $this->actingAs($user)->get('/cashier/notes/note-1');
 
         $response->assertOk();
-        $response->assertSee('Riwayat Revisi Nota');
+        $response->assertSee('Versioning Nota');
         $response->assertSee('Correction Nominal Service');
         $response->assertSee('Harga salah input');
         $response->assertSee('actor-1');

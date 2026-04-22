@@ -25,7 +25,7 @@ final class CashierNoteRevisionSmokeTest extends TestCase
         $response = $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk()
-            ->assertSee('Riwayat Revisi Nota')
+            ->assertSee('Versioning Nota')
             ->assertSee('Current Revision')
             ->assertSee('Timeline Revision');
 

@@ -25,8 +25,8 @@ final class CashierNoteRevisionCleanupFeatureTest extends TestCase
         $response = $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk()
-            ->assertSee('Detail Nota Root + Revision')
-            ->assertSee('Riwayat Revisi Nota')
+            ->assertSee('Detail Nota')
+            ->assertSee('Versioning Nota')
             ->assertDontSee('pseudo-versioning')
             ->assertDontSee('Pseudo Versioning');
     }
