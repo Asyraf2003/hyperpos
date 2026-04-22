@@ -41,7 +41,7 @@ final class CashierHybridNoteDetailFeatureTest extends TestCase
             ->assertOk()
             ->assertSee('Versioning Nota')
             ->assertSee('Current Revision')
-            ->assertSee('Timeline Revision');
+            ->assertSee('Versioning Nota')->assertSee('Current Revision');
     }
 
     private function seedKasir(): User

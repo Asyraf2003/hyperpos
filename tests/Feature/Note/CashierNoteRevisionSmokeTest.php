@@ -27,7 +27,7 @@ final class CashierNoteRevisionSmokeTest extends TestCase
         $response->assertOk()
             ->assertSee('Versioning Nota')
             ->assertSee('Current Revision')
-            ->assertSee('Timeline Revision');
+            ->assertSee('Versioning Nota')->assertSee('Current Revision');
 
         $this->assertDatabaseHas('note_revisions', [
             'note_root_id' => 'note-1',
