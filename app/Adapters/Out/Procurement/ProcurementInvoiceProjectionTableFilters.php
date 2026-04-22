@@ -17,7 +17,9 @@ final class ProcurementInvoiceProjectionTableFilters
 
             $query->where(function (Builder $builder) use ($keyword, $normalizedKeyword): void {
                 $builder
-                    ->where('supplier_invoice_list_projection.nomor_faktur', 'like', '%' . $keyword . '%')
+                    ->where('supplier_invoice_list_projection.nomor_faktur_normalized', '=', $normalizedKeyword)
+                    ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', $normalizedKeyword . '%')
+                    ->orWhere('supplier_invoice_list_projection.nomor_faktur', 'like', '%' . $keyword . '%')
                     ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', '%' . $normalizedKeyword . '%')
                     ->orWhere('supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%');
             });
