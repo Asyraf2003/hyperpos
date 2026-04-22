@@ -13,25 +13,14 @@ final class NoteWorkspacePanelDataBuilder
     public function __construct(
         private readonly NoteReaderPort $notes,
         private readonly NoteCurrentRevisionResolver $revisions,
-        private readonly CurrentRevisionRowSettlementProjector $settlements,
-        private readonly CurrentRevisionDetailRowMapper $rows,
+        private readonly CurrentRevisionRowSettlementProjector $revisionSettlements,
+        private readonly CurrentRevisionDetailRowMapper $revisionRows,
+        private readonly NoteOperationalRowSettlementProjector $rootSettlements,
+        private readonly NoteDetailRowMapper $rootRows,
         private readonly NoteLineSummaryBuilder $lineSummary,
     ) {
     }
 
-    /**
-     * @return array{
-     *   note_header: array<string, mixed>,
-     *   note_totals: array<string, int>,
-     *   line_summary: array{
-     *     open_count: int,
-     *     close_count: int,
-     *     refund_count: int,
-     *     summary_label: string
-     *   },
-     *   rows: list<array<string, mixed>>
-     * }|null
-     */
     public function build(string $noteId): ?array
     {
         $note = $this->notes->getById(trim($noteId));
@@ -40,39 +29,75 @@ final class NoteWorkspacePanelDataBuilder
             return null;
         }
 
-        $revision = $this->revisions->resolveOrFail($note->id());
-        $lines = $revision->lines();
-        $settlements = $this->settlements->build($note->id(), $lines);
-        $rows = $this->rows->map($lines, $settlements);
-        $lineSummary = $this->lineSummary->build($rows);
+        if ($this->revisions->hasRevision($note->id())) {
+            $revision = $this->revisions->resolveOrFail($note->id());
+            $rows = $this->revisionRows->map(
+                $revision->lines(),
+                $this->revisionSettlements->build($note->id(), $revision->lines()),
+            );
 
-        $totalAllocated = 0;
-        $totalRefunded = 0;
-        $totalNetPaid = 0;
-        $totalOutstanding = 0;
+            return $this->payload(
+                $note->id(),
+                (string) $revision->customerName(),
+                $revision->customerPhone(),
+                $revision->transactionDate()->format('Y-m-d'),
+                $revision->grandTotalRupiah(),
+                $rows,
+            );
+        }
+
+        $rows = $this->rootRows->map(
+            $note->workItems(),
+            $this->rootSettlements->build($note->id(), $note->workItems()),
+        );
+
+        return $this->payload(
+            $note->id(),
+            $note->customerName(),
+            $note->customerPhone(),
+            $note->transactionDate()->format('Y-m-d'),
+            $note->totalRupiah()->amount(),
+            $rows,
+        );
+    }
+
+    private function payload(
+        string $noteId,
+        string $customerName,
+        ?string $customerPhone,
+        string $transactionDate,
+        int $grandTotal,
+        array $rows,
+    ): array {
+        $summary = $this->lineSummary->build($rows);
+
+        $allocated = 0;
+        $refunded = 0;
+        $netPaid = 0;
+        $outstanding = 0;
 
         foreach ($rows as $row) {
-            $totalAllocated += (int) ($row['allocated_rupiah'] ?? 0);
-            $totalRefunded += (int) ($row['refunded_rupiah'] ?? 0);
-            $totalNetPaid += (int) ($row['net_paid_rupiah'] ?? 0);
-            $totalOutstanding += (int) ($row['outstanding_rupiah'] ?? 0);
+            $allocated += (int) ($row['allocated_rupiah'] ?? 0);
+            $refunded += (int) ($row['refunded_rupiah'] ?? 0);
+            $netPaid += (int) ($row['net_paid_rupiah'] ?? 0);
+            $outstanding += (int) ($row['outstanding_rupiah'] ?? 0);
         }
 
         return [
             'note_header' => [
-                'id' => $note->id(),
-                'customer_name' => $revision->customerName(),
-                'customer_phone' => $revision->customerPhone(),
-                'transaction_date' => $revision->transactionDate()->format('Y-m-d'),
+                'id' => $noteId,
+                'customer_name' => $customerName,
+                'customer_phone' => $customerPhone,
+                'transaction_date' => $transactionDate,
             ],
             'note_totals' => [
-                'grand_total_rupiah' => $revision->grandTotalRupiah(),
-                'total_allocated_rupiah' => $totalAllocated,
-                'total_refunded_rupiah' => $totalRefunded,
-                'net_paid_rupiah' => $totalNetPaid,
-                'outstanding_rupiah' => $totalOutstanding,
+                'grand_total_rupiah' => $grandTotal,
+                'total_allocated_rupiah' => $allocated,
+                'total_refunded_rupiah' => $refunded,
+                'net_paid_rupiah' => $netPaid,
+                'outstanding_rupiah' => $outstanding,
             ],
-            'line_summary' => $lineSummary,
+            'line_summary' => $summary,
             'rows' => $rows,
         ];
     }
