@@ -23,7 +23,7 @@ final class CashierHybridPaymentComponentSelectionFeatureTest extends TestCase
         $this->seedMixedNote();
 
         $response = $this->actingAs($user)->post(route('cashier.notes.payments.store', ['noteId' => 'note-1']), [
-            'selected_row_ids' => ['wi-1::store_stock_line::ssl-1'],
+            'selected_row_ids' => ['wi-1::service_store_stock_part::ssl-1'],
             'payment_method' => 'cash',
             'paid_at' => date('Y-m-d'),
             'amount_paid' => '20000',
@@ -35,7 +35,7 @@ final class CashierHybridPaymentComponentSelectionFeatureTest extends TestCase
         $this->assertDatabaseHas('payment_component_allocations', [
             'note_id' => 'note-1',
             'work_item_id' => 'wi-1',
-            'component_type' => 'store_stock_line',
+            'component_type' => 'service_store_stock_part',
             'component_ref_id' => 'ssl-1',
             'allocated_amount_rupiah' => 20000,
         ]);
