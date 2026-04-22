@@ -82,7 +82,6 @@ final class CashierHybridPaymentComponentSelectionFeatureTest extends TestCase
             'harga_jual' => 20000,
             'reorder_point_qty' => 1,
             'critical_threshold_qty' => 1,
-            'active_unique_marker' => 1,
         ]);
 
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'open');
