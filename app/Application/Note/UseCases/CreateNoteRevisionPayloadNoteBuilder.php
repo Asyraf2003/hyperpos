@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Note\UseCases;
 
+use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPayloadMapper;
+use App\Application\Note\Services\WorkItemFactory;
 use App\Core\Note\Note\Note;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Shared\Exceptions\DomainException;
@@ -12,8 +14,8 @@ use App\Core\Shared\ValueObjects\Money;
 final class CreateNoteRevisionPayloadNoteBuilder
 {
     public function __construct(
-        private readonly CreateNoteRevisionServiceItemBuilder $services,
-        private readonly CreateNoteRevisionProductItemBuilder $products,
+        private readonly CreateTransactionWorkspaceWorkItemPayloadMapper $mapper,
+        private readonly WorkItemFactory $factory,
     ) {
     }
 
@@ -21,13 +23,17 @@ final class CreateNoteRevisionPayloadNoteBuilder
      * @param array{
      *   note: array<string, mixed>,
      *   items: list<array<string, mixed>>,
-     *   reason: string
+     *   reason?: string,
+     *   inline_payment?: array<string, mixed>
      * } $payload
      */
     public function build(string $noteRootId, array $payload): Note
     {
         $noteData = (array) ($payload['note'] ?? []);
-        $workItems = $this->buildWorkItems($noteRootId, array_values((array) ($payload['items'] ?? [])));
+        $workItems = $this->buildWorkItems(
+            $noteRootId,
+            array_values((array) ($payload['items'] ?? [])),
+        );
 
         if ($workItems === []) {
             throw new DomainException('Minimal satu item valid wajib ada untuk membuat revisi.');
@@ -60,26 +66,24 @@ final class CreateNoteRevisionPayloadNoteBuilder
         $lineNo = 1;
 
         foreach ($itemsData as $item) {
-            $mapped = $this->mapWorkItem($noteRootId, $lineNo, $item);
-
-            if ($mapped !== null) {
-                $workItems[] = $mapped;
-                $lineNo++;
+            if (! is_array($item)) {
+                continue;
             }
+
+            [$type, $service, $external, $store] = $this->mapper->map($item);
+
+            $workItems[] = $this->factory->build(
+                $noteRootId,
+                $lineNo,
+                $type,
+                $service,
+                $external,
+                $store,
+            );
+
+            $lineNo++;
         }
 
         return $workItems;
-    }
-
-    /**
-     * @param array<string, mixed> $item
-     */
-    private function mapWorkItem(string $noteRootId, int $lineNo, array $item): ?WorkItem
-    {
-        return match ((string) ($item['line_type'] ?? '')) {
-            'service' => $this->services->build($noteRootId, $lineNo, $item),
-            'product' => $this->products->build($noteRootId, $lineNo, $item),
-            default => null,
-        };
     }
 }

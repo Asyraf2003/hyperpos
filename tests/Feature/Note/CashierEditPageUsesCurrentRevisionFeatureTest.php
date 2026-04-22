@@ -32,12 +32,21 @@ final class CashierEditPageUsesCurrentRevisionFeatureTest extends TestCase
             ],
             'items' => [
                 [
-                    'line_type' => 'service',
-                    'service_name' => 'Servis Revision Aktif',
-                    'service_price' => '75000',
+                    'entry_mode' => 'service',
+                    'description' => null,
+                    'part_source' => 'none',
+                    'service' => [
+                        'name' => 'Servis Revision Aktif',
+                        'price_rupiah' => '75000',
+                        'notes' => null,
+                    ],
+                    'product_lines' => [],
+                    'external_purchase_lines' => [],
                 ],
             ],
-            'reason' => 'Revisi agar edit page baca revision aktif',
+            'inline_payment' => [
+                'decision' => 'skip',
+            ],
         ])->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response = $this->actingAs($user)->get(route('cashier.notes.workspace.edit', ['noteId' => 'note-1']));

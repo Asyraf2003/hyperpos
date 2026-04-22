@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Adapters\In\Http\Controllers\Admin\Note\NoteDetailPageController as AdminNoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Admin\Note\ReopenClosedNoteController as AdminReopenClosedNoteController;
-use App\Adapters\In\Http\Controllers\Admin\Note\NoteDetailPageController as AdminNoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\CreateTransactionWorkspacePageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\EditTransactionWorkspacePageController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\GetTransactionWorkspaceDraftController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as CashierNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController as CashierNoteHistoryTableDataController;
-use App\Adapters\In\Http\Controllers\Cashier\Note\GetTransactionWorkspaceDraftController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\ProductLookupController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\SaveTransactionWorkspaceDraftController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
@@ -20,6 +20,7 @@ use App\Adapters\In\Http\Controllers\Note\CorrectPaidWorkItemStatusController;
 use App\Adapters\In\Http\Controllers\Note\CreateNoteController;
 use App\Adapters\In\Http\Controllers\Note\RecordClosedNoteRefundController;
 use App\Adapters\In\Http\Controllers\Note\RecordNotePaymentController;
+use App\Adapters\In\Http\Controllers\Note\StoreNoteRevisionController;
 use App\Adapters\In\Http\Controllers\Note\StoreTransactionWorkspaceController;
 use App\Adapters\In\Http\Controllers\Note\UpdateTransactionWorkspaceController;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureAdminPageAccess;
@@ -72,7 +73,7 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
             )->name('prototype.show');
 
             Route::get('/{noteId}', NoteDetailPageController::class)->name('show');
-            Route::patch('/{noteId}/workspace', UpdateTransactionWorkspaceController::class)->name('workspace.update');
+            Route::patch('/{noteId}/workspace', StoreNoteRevisionController::class)->name('workspace.update');
             Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
             Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
             Route::post('/{noteId}/corrections/status', CorrectPaidWorkItemStatusController::class)->name('corrections.status.store');

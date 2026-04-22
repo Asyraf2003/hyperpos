@@ -32,12 +32,21 @@ final class CashierNoteRevisionSubmitFeatureTest extends TestCase
             ],
             'items' => [
                 [
-                    'line_type' => 'service',
-                    'service_name' => 'Servis Revised',
-                    'service_price' => '75000',
+                    'entry_mode' => 'service',
+                    'description' => null,
+                    'part_source' => 'none',
+                    'service' => [
+                        'name' => 'Servis Revised',
+                        'price_rupiah' => '75000',
+                        'notes' => null,
+                    ],
+                    'product_lines' => [],
+                    'external_purchase_lines' => [],
                 ],
             ],
-            'reason' => 'Revisi nota test',
+            'inline_payment' => [
+                'decision' => 'skip',
+            ],
         ]);
 
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
