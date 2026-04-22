@@ -8,10 +8,11 @@
   const parseNumber = (value) => Number.parseInt(String(value || '').replace(/[^0-9]/g, '') || '0', 10);
   const format = (value) => new Intl.NumberFormat('id-ID').format(Number.isFinite(value) ? value : 0);
   const rows = () => Array.from(document.querySelectorAll('[data-refund-row]'));
-  const selectedRows = () => rows().filter((row) => row.dataset.selected === '1');
+  const selectedRows = () => rows().filter((row) => String(row.dataset.selected || '0') === '1');
   const refundInput = () => byId('refund_amount_rupiah');
   const selectedContainer = byId('note-refund-selected-lines');
   const hiddenInputsContainer = byId('note-refund-hidden-selected-rows');
+  const submitButton = byId('note-refund-submit');
 
   const refundableTotal = () =>
     selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.refundableRupiah), 0);
@@ -29,10 +30,8 @@
   };
 
   const syncRowVisual = (row) => {
-    const selected = row.dataset.selected === '1';
-    row.classList.toggle('table-active', selected);
-    row.classList.toggle('border-dark', selected);
-    row.classList.toggle('shadow-sm', selected);
+    const selected = String(row.dataset.selected || '0') === '1';
+    row.classList.toggle('refund-row-selected', selected);
     row.setAttribute('aria-pressed', selected ? 'true' : 'false');
   };
 
@@ -52,28 +51,26 @@
       return;
     }
 
-    selectedContainer.innerHTML = items
-      .map((row) => {
-        const lineNo = row.dataset.lineNo || '-';
-        const label = row.dataset.lineLabel || '-';
-        const typeLabel = row.dataset.typeLabel || '-';
-        const preview = row.dataset.previewLabel || '-';
-        const refundable = format(parseNumber(row.dataset.refundableRupiah));
+    selectedContainer.innerHTML = items.map((row) => {
+      const lineNo = row.dataset.lineNo || '-';
+      const label = row.dataset.lineLabel || '-';
+      const typeLabel = row.dataset.typeLabel || '-';
+      const preview = row.dataset.previewLabel || '-';
+      const refundable = format(parseNumber(row.dataset.refundableRupiah));
 
-        return `
-          <div class="border rounded px-3 py-2">
-            <div class="d-flex justify-content-between align-items-start gap-3">
-              <div>
-                <div class="fw-semibold">Line ${lineNo} · ${label}</div>
-                <div class="small text-muted">${typeLabel}</div>
-                <div class="small text-muted">${preview}</div>
-              </div>
-              <strong>${refundable}</strong>
+      return `
+        <div class="border rounded px-3 py-2">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <div class="fw-semibold">Line ${lineNo} · ${label}</div>
+              <div class="small text-muted">${typeLabel}</div>
+              <div class="small text-muted">${preview}</div>
             </div>
+            <strong>${refundable}</strong>
           </div>
-        `;
-      })
-      .join('');
+        </div>
+      `;
+    }).join('');
   };
 
   const updateSummary = () => {
@@ -97,16 +94,19 @@
     if (refundNowNode) refundNowNode.textContent = format(amount);
 
     openButton.disabled = count <= 0;
+    openButton.classList.toggle('disabled', count <= 0);
+    openButton.setAttribute('aria-disabled', count <= 0 ? 'true' : 'false');
 
-    const submit = byId('note-refund-submit');
-    if (submit) submit.disabled = count <= 0 || amount <= 0;
+    if (submitButton) {
+      submitButton.disabled = count <= 0 || amount <= 0;
+    }
 
     buildHiddenInputs();
     buildSelectedLinesSummary();
   };
 
   const toggleRow = (row) => {
-    row.dataset.selected = row.dataset.selected === '1' ? '0' : '1';
+    row.dataset.selected = String(row.dataset.selected || '0') === '1' ? '0' : '1';
     syncRowVisual(row);
     updateSummary();
   };
@@ -119,7 +119,6 @@
       if (target instanceof HTMLElement && target.closest('a, button, input, textarea, select, label')) {
         return;
       }
-
       toggleRow(row);
     });
 
@@ -130,7 +129,18 @@
     });
   });
 
+  openButton.addEventListener('click', (event) => {
+    if (selectedRows().length > 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
   form.addEventListener('input', updateSummary);
   form.addEventListener('change', updateSummary);
+
+  if (submitButton) {
+    submitButton.disabled = true;
+  }
+
   updateSummary();
 })();

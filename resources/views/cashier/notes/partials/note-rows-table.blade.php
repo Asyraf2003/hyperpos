@@ -3,12 +3,20 @@
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
         <h4 class="card-title mb-1">Daftar Line Nota</h4>
-        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Row yang lebih gelap dianggap terpilih.</p>
+        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Row gelap berarti sedang dipilih.</p>
       </div>
       <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
     </div>
   </div>
   <div class="card-body">
+    <style>
+      .refund-row-selectable { cursor: pointer; transition: background-color .15s ease, box-shadow .15s ease; }
+      .refund-row-selectable.refund-row-selected > td {
+        background-color: #dbeafe !important;
+        box-shadow: inset 0 0 0 9999px rgba(30, 64, 175, 0.12);
+      }
+    </style>
+
     <div class="table-responsive">
       <table class="table table-striped align-middle mb-0">
         <thead>
@@ -28,12 +36,13 @@
           @forelse ($note['rows'] as $row)
             @php
               $isRefundable = (bool) ($row['can_refund'] ?? false);
+              $isSelected = in_array($row['id'], old('selected_row_ids', []), true);
             @endphp
             <tr
               @if ($isRefundable)
                 role="button"
                 tabindex="0"
-                class="js-refund-selectable-row"
+                class="refund-row-selectable {{ $isSelected ? 'refund-row-selected' : '' }}"
                 data-refund-row
                 data-row-id="{{ $row['id'] }}"
                 data-line-no="{{ $row['line_no'] }}"
@@ -43,7 +52,7 @@
                 data-store-return-count="{{ (int) ($row['refund_stock_return_count'] ?? 0) }}"
                 data-external-count="{{ (int) ($row['refund_external_count'] ?? 0) }}"
                 data-preview-label="{{ $row['refund_preview_label'] ?? '-' }}"
-                data-selected="0"
+                data-selected="{{ $isSelected ? '1' : '0' }}"
               @endif
             >
               <td>{{ $row['line_no'] }}</td>
