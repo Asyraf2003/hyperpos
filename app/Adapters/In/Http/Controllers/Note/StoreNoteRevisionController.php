@@ -18,12 +18,13 @@ final class StoreNoteRevisionController extends Controller
         CreateNoteRevisionHandler $handler,
         NoteRouteAreaResolver $routes,
     ): RedirectResponse {
+        $user = $request->user();
+        $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
+
         $result = $handler->handle(
             $noteId,
             $request->validated(),
-            $request->user()?->getAuthIdentifier() !== null
-                ? (string) $request->user()?->getAuthIdentifier()
-                : null,
+            $actorId,
         );
 
         if ($result->isFailure()) {
