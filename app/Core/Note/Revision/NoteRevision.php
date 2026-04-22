@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Core\Note\Revision;
 
-use App\Core\Shared\Exceptions\DomainException;
+use App\Core\Note\Revision\Concerns\NoteRevisionAccessors;
+use App\Core\Note\Revision\Concerns\NoteRevisionValidation;
 use DateTimeImmutable;
 
 final class NoteRevision
 {
+    use NoteRevisionAccessors;
+    use NoteRevisionValidation;
+
     /**
      * @param list<NoteRevisionLineSnapshot> $lines
      */
@@ -49,35 +53,14 @@ final class NoteRevision
         $noteRootId = trim($noteRootId);
         $customerName = trim($customerName);
 
-        if ($id === '') {
-            throw new DomainException('Note revision id wajib diisi.');
-        }
-
-        if ($noteRootId === '') {
-            throw new DomainException('Note root id wajib diisi.');
-        }
-
-        if ($revisionNumber <= 0) {
-            throw new DomainException('Revision number wajib lebih dari nol.');
-        }
-
-        if ($customerName === '') {
-            throw new DomainException('Customer name revision wajib diisi.');
-        }
-
-        if ($grandTotalRupiah < 0) {
-            throw new DomainException('Grand total revision tidak boleh negatif.');
-        }
-
-        foreach ($lines as $line) {
-            if (! $line instanceof NoteRevisionLineSnapshot) {
-                throw new DomainException('Semua line revision wajib berupa NoteRevisionLineSnapshot.');
-            }
-
-            if ($line->noteRevisionId() !== $id) {
-                throw new DomainException('Semua line revision wajib belong ke note revision yang sama.');
-            }
-        }
+        self::assertValidState(
+            $id,
+            $noteRootId,
+            $revisionNumber,
+            $customerName,
+            $grandTotalRupiah,
+            $lines,
+        );
 
         return new self(
             $id,
@@ -93,73 +76,5 @@ final class NoteRevision
             array_values($lines),
             $createdAt,
         );
-    }
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function noteRootId(): string
-    {
-        return $this->noteRootId;
-    }
-
-    public function revisionNumber(): int
-    {
-        return $this->revisionNumber;
-    }
-
-    public function parentRevisionId(): ?string
-    {
-        return $this->parentRevisionId;
-    }
-
-    public function createdByActorId(): ?string
-    {
-        return $this->createdByActorId;
-    }
-
-    public function reason(): ?string
-    {
-        return $this->reason;
-    }
-
-    public function customerName(): string
-    {
-        return $this->customerName;
-    }
-
-    public function customerPhone(): ?string
-    {
-        return $this->customerPhone;
-    }
-
-    public function transactionDate(): DateTimeImmutable
-    {
-        return $this->transactionDate;
-    }
-
-    public function grandTotalRupiah(): int
-    {
-        return $this->grandTotalRupiah;
-    }
-
-    /**
-     * @return list<NoteRevisionLineSnapshot>
-     */
-    public function lines(): array
-    {
-        return $this->lines;
-    }
-
-    public function createdAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function lineCount(): int
-    {
-        return count($this->lines);
     }
 }
