@@ -12,8 +12,9 @@ final class EditTransactionWorkspacePageDataBuilder
     public function __construct(
         private readonly EditableWorkspaceNoteGuard $guard,
         private readonly NoteReaderPort $notes,
+        private readonly NoteCurrentRevisionResolver $revisionResolver,
+        private readonly NoteRevisionWorkspaceExistingItemMapper $revisionItems,
         private readonly CreateTransactionWorkspacePageDataBuilder $options,
-        private readonly TransactionWorkspaceExistingItemMapper $existingItems,
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
         private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
     ) {
@@ -34,6 +35,8 @@ final class EditTransactionWorkspacePageDataBuilder
             throw new DomainException('Nota tidak ditemukan.');
         }
 
+        $currentRevision = $this->revisionResolver->resolveOrFail($normalized);
+
         $workspacePanel = $this->workspacePanel->build($normalized);
 
         if ($workspacePanel === null) {
@@ -41,12 +44,13 @@ final class EditTransactionWorkspacePageDataBuilder
         }
 
         $oldNote = [
-            'customer_name' => $note->customerName(),
-            'customer_phone' => $note->customerPhone() ?? '',
-            'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+            'customer_name' => $currentRevision->customerName(),
+            'customer_phone' => $currentRevision->customerPhone() ?? '',
+            'transaction_date' => $currentRevision->transactionDate()->format('Y-m-d'),
         ];
 
-        $oldItems = $this->existingItems->mapMany($note);
+        $oldItems = $this->revisionItems->mapMany($currentRevision);
+
         $refundRows = array_values(array_filter(
             $workspacePanel['rows'] ?? [],
             static fn (array $row): bool => (bool) ($row['can_refund'] ?? false)
