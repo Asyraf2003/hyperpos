@@ -112,7 +112,7 @@ final class ClosedNoteFullRefundProductOnlyInventoryLifecycleFeatureTest extends
             'note_id' => 'note-1',
             'work_item_id' => 'wi-1',
             'component_type' => 'product_only_work_item',
-            'component_ref_id' => 'ssl-1',
+            'component_ref_id' => 'wi-1',
             'component_amount_rupiah_snapshot' => 50000,
             'allocated_amount_rupiah' => 50000,
             'allocation_priority' => 1,
