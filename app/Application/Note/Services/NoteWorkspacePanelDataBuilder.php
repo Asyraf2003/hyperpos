@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
+use App\Application\Note\Services\CurrentRevision\CurrentRevisionDetailRowMapper;
+use App\Application\Note\Services\CurrentRevision\CurrentRevisionRowSettlementProjector;
 use App\Ports\Out\Note\NoteReaderPort;
 
 final class NoteWorkspacePanelDataBuilder
 {
     public function __construct(
         private readonly NoteReaderPort $notes,
-        private readonly NoteOperationalRowSettlementProjector $rowSettlements,
-        private readonly NoteDetailRowMapper $rowMapper,
+        private readonly NoteCurrentRevisionResolver $revisions,
+        private readonly CurrentRevisionRowSettlementProjector $settlements,
+        private readonly CurrentRevisionDetailRowMapper $rows,
         private readonly NoteLineSummaryBuilder $lineSummary,
     ) {
     }
@@ -37,8 +40,10 @@ final class NoteWorkspacePanelDataBuilder
             return null;
         }
 
-        $settlements = $this->rowSettlements->build($note->id(), $note->workItems());
-        $rows = $this->rowMapper->map($note->workItems(), $settlements);
+        $revision = $this->revisions->resolveOrFail($note->id());
+        $lines = $revision->lines();
+        $settlements = $this->settlements->build($note->id(), $lines);
+        $rows = $this->rows->map($lines, $settlements);
         $lineSummary = $this->lineSummary->build($rows);
 
         $totalAllocated = 0;
@@ -56,12 +61,12 @@ final class NoteWorkspacePanelDataBuilder
         return [
             'note_header' => [
                 'id' => $note->id(),
-                'customer_name' => $note->customerName(),
-                'customer_phone' => $note->customerPhone(),
-                'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+                'customer_name' => $revision->customerName(),
+                'customer_phone' => $revision->customerPhone(),
+                'transaction_date' => $revision->transactionDate()->format('Y-m-d'),
             ],
             'note_totals' => [
-                'grand_total_rupiah' => $note->totalRupiah()->amount(),
+                'grand_total_rupiah' => $revision->grandTotalRupiah(),
                 'total_allocated_rupiah' => $totalAllocated,
                 'total_refunded_rupiah' => $totalRefunded,
                 'net_paid_rupiah' => $totalNetPaid,
