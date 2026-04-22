@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
 use App\Application\Note\Services\EditTransactionWorkspacePageDataBuilder;
+use App\Application\Note\Services\EnsureInitialNoteRevisionExists;
+use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Note\TransactionWorkspaceDraftReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -17,7 +19,21 @@ final class EditTransactionWorkspacePageController extends Controller
         Request $request,
         EditTransactionWorkspacePageDataBuilder $builder,
         TransactionWorkspaceDraftReaderPort $drafts,
+        EnsureInitialNoteRevisionExists $ensureInitialRevision,
     ): View {
+        $actorId = $request->user()?->getAuthIdentifier();
+        $bootstrapRevisionId = trim($noteId) . '-r001';
+
+        try {
+            $ensureInitialRevision->handle(
+                $noteId,
+                $bootstrapRevisionId,
+                $actorId !== null ? (string) $actorId : null,
+            );
+        } catch (DomainException $e) {
+            abort(500, $e->getMessage());
+        }
+
         $page = $builder->build($noteId);
         $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];
         $draftPayload = $this->loadDraftPayload($request, $drafts, $noteId, $sessionHasOldInput);
