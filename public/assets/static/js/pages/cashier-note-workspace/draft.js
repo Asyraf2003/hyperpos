@@ -20,6 +20,80 @@
 
   const hasBlockingServerOldInput = (config) => config?.hasOldInput === true;
 
+  const mergeProductLine = (draftLine, baseLine) => ({
+    product_id: draftLine?.product_id || baseLine?.product_id || "",
+    qty: draftLine?.qty || baseLine?.qty || "1",
+    unit_price_rupiah:
+      draftLine?.unit_price_rupiah || baseLine?.unit_price_rupiah || "",
+  });
+
+  const mergeExternalLine = (draftLine, baseLine) => ({
+    label: draftLine?.label || baseLine?.label || "",
+    qty: draftLine?.qty || baseLine?.qty || "1",
+    unit_cost_rupiah:
+      draftLine?.unit_cost_rupiah || baseLine?.unit_cost_rupiah || "",
+  });
+
+  const mergeService = (draftService, baseService) => ({
+    name: draftService?.name || baseService?.name || "",
+    price_rupiah: draftService?.price_rupiah || baseService?.price_rupiah || "",
+    notes: draftService?.notes || baseService?.notes || "",
+  });
+
+  const mergeItemWithPreload = (draftItem, preloadItem) => ({
+    ...preloadItem,
+    ...draftItem,
+    entry_mode: draftItem?.entry_mode || preloadItem?.entry_mode || "",
+    description: draftItem?.description || preloadItem?.description || "",
+    part_source: draftItem?.part_source || preloadItem?.part_source || "",
+    selected_label: draftItem?.selected_label || preloadItem?.selected_label || "",
+    service: mergeService(draftItem?.service, preloadItem?.service),
+    product_lines: [
+      mergeProductLine(
+        Array.isArray(draftItem?.product_lines) ? draftItem.product_lines[0] : null,
+        Array.isArray(preloadItem?.product_lines) ? preloadItem.product_lines[0] : null,
+      ),
+    ],
+    external_purchase_lines: [
+      mergeExternalLine(
+        Array.isArray(draftItem?.external_purchase_lines)
+          ? draftItem.external_purchase_lines[0]
+          : null,
+        Array.isArray(preloadItem?.external_purchase_lines)
+          ? preloadItem.external_purchase_lines[0]
+          : null,
+      ),
+    ],
+  });
+
+  const mergeDraftItemsWithPreload = (draftItems, preloadItems) => {
+    const draftList = Array.isArray(draftItems) ? draftItems : [];
+    const preloadList = Array.isArray(preloadItems) ? preloadItems : [];
+    const maxLength = Math.max(draftList.length, preloadList.length);
+    const merged = [];
+
+    for (let index = 0; index < maxLength; index += 1) {
+      const draftItem = draftList[index];
+      const preloadItem = preloadList[index];
+
+      if (draftItem && preloadItem) {
+        merged.push(mergeItemWithPreload(draftItem, preloadItem));
+        continue;
+      }
+
+      if (draftItem) {
+        merged.push(draftItem);
+        continue;
+      }
+
+      if (preloadItem) {
+        merged.push(preloadItem);
+      }
+    }
+
+    return merged;
+  };
+
   const restoreFromServer = async () => {
     const config = parseConfig();
     writeConfig(config);
@@ -64,14 +138,17 @@
         ...config,
         oldNote:
           typeof draftPayload.note === "object" && draftPayload.note !== null
-            ? draftPayload.note
-            : {},
-        oldItems: Array.isArray(draftPayload.items) ? draftPayload.items : [],
+            ? { ...(config.oldNote || {}), ...draftPayload.note }
+            : config.oldNote || {},
+        oldItems: mergeDraftItemsWithPreload(
+          draftPayload.items,
+          config.oldItems,
+        ),
         oldInlinePayment:
           typeof draftPayload.inline_payment === "object" &&
           draftPayload.inline_payment !== null
-            ? draftPayload.inline_payment
-            : {},
+            ? { ...(config.oldInlinePayment || {}), ...draftPayload.inline_payment }
+            : config.oldInlinePayment || {},
         draftMeta: {
           restored_at: new Date().toISOString(),
           updated_at: draft.updated_at || null,
@@ -87,8 +164,7 @@
   };
 
   const numberText = (value) => String(value ?? "").replace(/\D+/g, "");
-  const valueOf = (selector, root = document) =>
-    root.querySelector(selector)?.value || "";
+  const valueOf = (selector, root = document) => root.querySelector(selector)?.value || "";
 
   const normalizeItem = (row) => {
     const itemType = row.dataset.itemType || "service";
@@ -106,9 +182,7 @@
         product_lines: [
           {
             product_id: valueOf("[data-product-id]", row),
-            qty:
-              numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) ||
-              "1",
+            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
             unit_price_rupiah: numberText(
               valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
             ),
@@ -125,17 +199,13 @@
         service: {
           name: valueOf('input[name$="[service][name]"]', row),
           notes: valueOf('textarea[name$="[service][notes]"]', row),
-          price_rupiah: numberText(
-            valueOf('input[name$="[service][price_rupiah]"]', row),
-          ),
+          price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
         },
         selected_label: valueOf("[data-product-search]", row),
         product_lines: [
           {
             product_id: valueOf("[data-product-id]", row),
-            qty:
-              numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) ||
-              "1",
+            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
             unit_price_rupiah: numberText(
               valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
             ),
@@ -152,25 +222,16 @@
         service: {
           name: valueOf('input[name$="[service][name]"]', row),
           notes: valueOf('textarea[name$="[service][notes]"]', row),
-          price_rupiah: numberText(
-            valueOf('input[name$="[service][price_rupiah]"]', row),
-          ),
+          price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
         },
         external_purchase_lines: [
           {
-            label: valueOf(
-              'input[name$="[external_purchase_lines][0][label]"]',
-              row,
-            ),
+            label: valueOf('input[name$="[external_purchase_lines][0][label]"]', row),
             qty:
-              numberText(
-                valueOf('input[name$="[external_purchase_lines][0][qty]"]', row),
-              ) || "1",
+              numberText(valueOf('input[name$="[external_purchase_lines][0][qty]"]', row)) ||
+              "1",
             unit_cost_rupiah: numberText(
-              valueOf(
-                'input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]',
-                row,
-              ),
+              valueOf('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]', row),
             ),
           },
         ],
