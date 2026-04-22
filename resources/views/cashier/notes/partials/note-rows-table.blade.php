@@ -14,6 +14,7 @@
         <thead>
           <tr>
             <th>Line</th>
+            <th>Label</th>
             <th>Tipe Domain</th>
             <th>Status Line</th>
             <th class="text-end">Subtotal</th>
@@ -27,6 +28,9 @@
           @forelse ($note['rows'] as $row)
             <tr>
               <td>{{ $row['line_no'] }}</td>
+              <td>
+                <div class="fw-semibold">{{ $row['line_label'] ?? '-' }}</div>
+              </td>
               <td>{{ $row['type_label'] }}</td>
               <td><span class="badge bg-light text-dark border text-uppercase">{{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}</span></td>
               <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
@@ -44,7 +48,7 @@
               </td>
             </tr>
           @empty
-            <tr><td colspan="8" class="text-center text-muted py-4">Belum ada line pada nota ini.</td></tr>
+            <tr><td colspan="9" class="text-center text-muted py-4">Belum ada line pada nota ini.</td></tr>
           @endforelse
         </tbody>
       </table>

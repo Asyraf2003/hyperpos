@@ -47,9 +47,15 @@ final class CurrentRevisionDetailRowMapper
         $outstanding = (int) ($settlement['outstanding_rupiah'] ?? $line->subtotalRupiah());
         $lineStatus = $this->statuses->resolve($outstanding, $refunded);
 
+        $lineLabel = $line->serviceLabel();
+        if ($lineLabel === null || trim($lineLabel) == '') {
+            $lineLabel = $storeCount > 0 ? ('Produk x' . $storeCount) : 'Line Nota';
+        }
+
         return [
             'id' => $key,
             'line_no' => $line->lineNo(),
+            'line_label' => $lineLabel,
             'type_label' => $this->presentation->typeLabel($line->transactionType()),
             'transaction_type' => $line->transactionType(),
             'can_correct_service_only' => $line->transactionType() === 'service_only',

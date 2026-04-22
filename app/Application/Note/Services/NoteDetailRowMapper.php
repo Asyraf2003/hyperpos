@@ -38,6 +38,7 @@ final class NoteDetailRowMapper
         return [
             'id' => $item->id(),
             'line_no' => $item->lineNo(),
+            'line_label' => $item->serviceDetail()?->serviceName() ?: ('Produk x' . max($storeCount, 1)),
             'type_label' => $this->presentation->typeLabel($item),
             'transaction_type' => $item->transactionType(),
             'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
