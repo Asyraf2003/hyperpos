@@ -67,12 +67,21 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 ],
                 'items' => [
                     [
-                        'line_type' => 'service',
-                        'service_name' => 'Servis Baru',
-                        'service_price' => '70000',
+                        'entry_mode' => 'service',
+                        'description' => null,
+                        'part_source' => 'none',
+                        'service' => [
+                            'name' => 'Servis Baru',
+                            'price_rupiah' => '70000',
+                            'notes' => null,
+                        ],
+                        'product_lines' => [],
+                        'external_purchase_lines' => [],
                     ],
                 ],
-                'reason' => 'Revisi workspace service only',
+                'inline_payment' => [
+                    'decision' => 'skip',
+                ],
             ],
         );
 
@@ -162,12 +171,21 @@ final class UpdateTransactionWorkspaceFeatureTest extends TestCase
                 ],
                 'items' => [
                     [
-                        'line_type' => 'service',
-                        'service_name' => 'Servis Baru',
-                        'service_price' => '70000',
+                        'entry_mode' => 'service',
+                        'description' => null,
+                        'part_source' => 'none',
+                        'service' => [
+                            'name' => 'Servis Baru',
+                            'price_rupiah' => '70000',
+                            'notes' => null,
+                        ],
+                        'product_lines' => [],
+                        'external_purchase_lines' => [],
                     ],
                 ],
-                'reason' => 'Revisi workspace tanpa inline payment',
+                'inline_payment' => [
+                    'decision' => 'skip',
+                ],
             ],
         );
 
