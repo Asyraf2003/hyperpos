@@ -15,11 +15,7 @@ final class ProcurementInvoiceProjectionTableSorting
 
         return match ($filters->sortBy()) {
             'due_date' => $this->sort($query, 'supplier_invoice_list_projection.due_date', $sortDir),
-            'nama_pt_pengirim' => $query
-                ->orderByRaw(
-                    'COALESCE(suppliers.nama_pt_pengirim, supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot) ' . $sortDir
-                )
-                ->orderBy('supplier_invoice_list_projection.supplier_invoice_id'),
+            'nama_pt_pengirim' => $this->sort($query, 'supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', $sortDir),
             'grand_total_rupiah' => $this->sort($query, 'supplier_invoice_list_projection.grand_total_rupiah', $sortDir),
             'total_paid_rupiah' => $this->sort($query, 'supplier_invoice_list_projection.total_paid_rupiah', $sortDir),
             'outstanding_rupiah' => $this->sort($query, 'supplier_invoice_list_projection.outstanding_rupiah', $sortDir),

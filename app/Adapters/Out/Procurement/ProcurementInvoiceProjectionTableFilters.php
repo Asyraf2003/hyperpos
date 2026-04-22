@@ -19,7 +19,6 @@ final class ProcurementInvoiceProjectionTableFilters
                 $builder
                     ->where('supplier_invoice_list_projection.nomor_faktur', 'like', '%' . $keyword . '%')
                     ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', '%' . $normalizedKeyword . '%')
-                    ->orWhere('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%')
                     ->orWhere('supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%');
             });
         }
