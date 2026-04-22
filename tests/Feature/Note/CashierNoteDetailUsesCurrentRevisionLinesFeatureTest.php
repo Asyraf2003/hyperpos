@@ -22,6 +22,8 @@ final class CashierNoteDetailUsesCurrentRevisionLinesFeatureTest extends TestCas
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
 
+        $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))->assertOk();
+
         $this->actingAs($user)->patch(route('cashier.notes.workspace.update', ['noteId' => 'note-1']), [
             'note' => [
                 'customer_name' => 'Budi Revisi Detail',
