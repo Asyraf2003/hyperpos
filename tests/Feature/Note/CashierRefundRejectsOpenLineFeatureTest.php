@@ -17,10 +17,10 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_refund_rejects_open_line_selection(): void
+    public function test_refund_rejects_operationally_open_line_selection(): void
     {
         $user = $this->seedKasir();
-        $this->seedOpenPaidNote();
+        $this->seedOpenPartialPaidNote();
 
         $response = $this->from(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->actingAs($user)
@@ -28,8 +28,8 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
                 'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'refunded_at' => date('Y-m-d'),
-                'amount_rupiah' => 20000,
-                'reason' => 'Coba refund line open',
+                'amount_rupiah' => 10000,
+                'reason' => 'Coba refund line open operasional',
             ]);
 
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
@@ -56,7 +56,7 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
         return $user;
     }
 
-    private function seedOpenPaidNote(): void
+    private function seedOpenPartialPaidNote(): void
     {
         $today = date('Y-m-d');
 
@@ -64,8 +64,8 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 20000);
         $this->seedServiceDetailBase('wi-1', 'Servis Open', 20000, ServiceDetail::PART_SOURCE_NONE);
 
-        $this->seedCustomerPaymentBase('payment-1', 20000, $today);
-        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 20000);
+        $this->seedCustomerPaymentBase('payment-1', 10000, $today);
+        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 10000);
 
         DB::table('payment_component_allocations')->insert([
             'id' => 'pca-1',
@@ -75,7 +75,7 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
             'component_type' => 'service_fee',
             'component_ref_id' => 'wi-1',
             'component_amount_rupiah_snapshot' => 20000,
-            'allocated_amount_rupiah' => 20000,
+            'allocated_amount_rupiah' => 10000,
             'allocation_priority' => 1,
         ]);
     }
