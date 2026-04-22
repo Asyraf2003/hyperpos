@@ -503,6 +503,11 @@
   };
 
   const reopenModalIfNeeded = () => {
+    const workspaceMode = String(NS.config?.workspaceMode || "create");
+    if (workspaceMode === "edit") {
+      return;
+    }
+
     const decision = hiddenValue("inline_payment_decision_hidden");
     const method = hiddenValue("inline_payment_method_hidden");
 
