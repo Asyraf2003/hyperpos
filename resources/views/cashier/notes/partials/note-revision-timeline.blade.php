@@ -10,7 +10,7 @@
   </div>
   <div class="card-body">
     @php
-      $revision = $note['revision_timeline'] ?? $note['pseudo_versioning'] ?? ['current' => [], 'baseline' => [], 'timeline' => []];
+      $revision = $note['revision_timeline'] ?? ['current' => [], 'baseline' => [], 'timeline' => []];
       $current = $revision['current'] ?? [];
       $baseline = $revision['baseline'] ?? [];
       $timeline = $revision['timeline'] ?? [];
