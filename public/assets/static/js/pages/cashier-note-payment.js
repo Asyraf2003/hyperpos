@@ -27,11 +27,12 @@
 
   const selectedOutstanding = () => selectedBoxes().reduce((sum, el) => sum + parseNumber(el.dataset.outstandingRupiah), 0);
   const selectedWorkItemIds = () => Array.from(new Set(selectedBoxes().map((el) => el.dataset.workItemId).filter(Boolean)));
+  const selectedBillingRowIds = () => selectedBoxes().map((el) => el.dataset.billingRowId).filter(Boolean);
 
   const syncHiddenSelectedRows = () => {
     const container = hiddenRowsContainer();
     if (!container) return;
-    container.innerHTML = selectedWorkItemIds()
+    container.innerHTML = selectedBillingRowIds()
       .map((id) => `<input type="hidden" name="selected_row_ids[]" value="${id}">`)
       .join('');
   };
@@ -120,7 +121,7 @@
 
     const submit = byId('note-payment-submit');
     if (submit) {
-      submit.disabled = lineCount <= 0 || paid <= 0 || (isCash && received > 0 && received < paid);
+      submit.disabled = count <= 0 || paid <= 0 || (isCash && received > 0 && received < paid);
     }
   };
 
