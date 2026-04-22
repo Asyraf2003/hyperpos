@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Core\Note\Revision;
 
-use App\Core\Shared\Exceptions\DomainException;
+use App\Core\Note\Revision\Concerns\NoteRevisionLineSnapshotAccessors;
+use App\Core\Note\Revision\Concerns\NoteRevisionLineSnapshotValidation;
 
 final class NoteRevisionLineSnapshot
 {
+    use NoteRevisionLineSnapshotAccessors;
+    use NoteRevisionLineSnapshotValidation;
+
     /**
      * @param array<string, mixed> $payload
      */
@@ -45,33 +49,15 @@ final class NoteRevisionLineSnapshot
         $transactionType = trim($transactionType);
         $status = trim($status);
 
-        if ($id === '') {
-            throw new DomainException('Id snapshot line revision wajib diisi.');
-        }
-
-        if ($noteRevisionId === '') {
-            throw new DomainException('Note revision id pada snapshot line wajib diisi.');
-        }
-
-        if ($lineNo <= 0) {
-            throw new DomainException('Line number snapshot revision wajib lebih dari nol.');
-        }
-
-        if ($transactionType === '') {
-            throw new DomainException('Transaction type snapshot revision wajib diisi.');
-        }
-
-        if ($status === '') {
-            throw new DomainException('Status snapshot revision wajib diisi.');
-        }
-
-        if ($subtotalRupiah < 0) {
-            throw new DomainException('Subtotal snapshot revision tidak boleh negatif.');
-        }
-
-        if ($servicePriceRupiah !== null && $servicePriceRupiah < 0) {
-            throw new DomainException('Harga service snapshot revision tidak boleh negatif.');
-        }
+        self::assertValidState(
+            $id,
+            $noteRevisionId,
+            $lineNo,
+            $transactionType,
+            $status,
+            $subtotalRupiah,
+            $servicePriceRupiah,
+        );
 
         return new self(
             $id,
@@ -85,58 +71,5 @@ final class NoteRevisionLineSnapshot
             $servicePriceRupiah,
             $payload,
         );
-    }
-
-    public function id(): string
-    {
-        return $this->id;
-    }
-
-    public function noteRevisionId(): string
-    {
-        return $this->noteRevisionId;
-    }
-
-    public function workItemRootId(): ?string
-    {
-        return $this->workItemRootId;
-    }
-
-    public function lineNo(): int
-    {
-        return $this->lineNo;
-    }
-
-    public function transactionType(): string
-    {
-        return $this->transactionType;
-    }
-
-    public function status(): string
-    {
-        return $this->status;
-    }
-
-    public function subtotalRupiah(): int
-    {
-        return $this->subtotalRupiah;
-    }
-
-    public function serviceLabel(): ?string
-    {
-        return $this->serviceLabel;
-    }
-
-    public function servicePriceRupiah(): ?int
-    {
-        return $this->servicePriceRupiah;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function payload(): array
-    {
-        return $this->payload;
     }
 }
