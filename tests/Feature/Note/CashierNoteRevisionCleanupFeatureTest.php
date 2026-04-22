@@ -17,7 +17,7 @@ final class CashierNoteRevisionCleanupFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_note_detail_shows_revision_copy_and_no_longer_mentions_pseudo_versioning(): void
+    public function test_note_detail_shows_revision_copy_and_no_longer_mentions_legacy_transition_terms(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
