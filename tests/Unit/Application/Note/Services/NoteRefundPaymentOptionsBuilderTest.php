@@ -17,88 +17,38 @@ use PHPUnit\Framework\TestCase;
 
 final class NoteRefundPaymentOptionsBuilderTest extends TestCase
 {
-    public function test_it_builds_unique_refundable_payment_options_for_note(): void
+    public function test_it_builds_refund_options_only_from_component_allocations(): void
     {
-        $paymentComponents = $this->createMock(PaymentComponentAllocationReaderPort::class);
+        $components = $this->createMock(PaymentComponentAllocationReaderPort::class);
         $payments = $this->createMock(CustomerPaymentReaderPort::class);
         $allocations = $this->createMock(PaymentAllocationReaderPort::class);
         $refunds = $this->createMock(CustomerRefundReaderPort::class);
 
-        $paymentComponents->method('listByNoteId')->with('note-1')->willReturn([
-            PaymentComponentAllocation::rehydrate(
-                'alloc-1',
-                'payment-1',
-                'note-1',
-                'wi-1',
-                'service_fee',
-                'wi-1',
-                Money::fromInt(30000),
-                Money::fromInt(30000),
-                1,
-            ),
-            PaymentComponentAllocation::rehydrate(
-                'alloc-2',
-                'payment-1',
-                'note-1',
-                'wi-2',
-                'service_fee',
-                'wi-2',
-                Money::fromInt(20000),
-                Money::fromInt(20000),
-                2,
-            ),
-            PaymentComponentAllocation::rehydrate(
-                'alloc-3',
-                'payment-2',
-                'note-1',
-                'wi-3',
-                'service_fee',
-                'wi-3',
-                Money::fromInt(10000),
-                Money::fromInt(10000),
-                3,
-            ),
+        $components->method('listByNoteId')->with('note-1')->willReturn([
+            PaymentComponentAllocation::rehydrate('a1', 'payment-1', 'note-1', 'wi-1', 'service_fee', 'wi-1', Money::fromInt(50000), Money::fromInt(30000), 1),
         ]);
+        $payments->method('getById')->with('payment-1')->willReturn(CustomerPayment::rehydrate('payment-1', Money::fromInt(30000), new DateTimeImmutable('2026-04-22')));
+        $allocations->method('getTotalAllocatedAmountByCustomerPaymentIdAndNoteId')->with('payment-1', 'note-1')->willReturn(Money::fromInt(30000));
+        $refunds->method('getTotalRefundedAmountByCustomerPaymentIdAndNoteId')->with('payment-1', 'note-1')->willReturn(Money::fromInt(5000));
 
-        $payments->method('getById')->willReturnCallback(
-            static fn (string $paymentId): ?CustomerPayment => match ($paymentId) {
-                'payment-1' => CustomerPayment::rehydrate('payment-1', Money::fromInt(50000), new DateTimeImmutable('2026-04-15')),
-                'payment-2' => CustomerPayment::rehydrate('payment-2', Money::fromInt(10000), new DateTimeImmutable('2026-04-16')),
-                default => null,
-            }
-        );
+        $result = (new NoteRefundPaymentOptionsBuilder($components, $payments, $allocations, $refunds))->build('note-1');
 
-        $allocations->method('getTotalAllocatedAmountByCustomerPaymentIdAndNoteId')->willReturnCallback(
-            static fn (string $paymentId, string $noteId): Money => match ($paymentId . ':' . $noteId) {
-                'payment-1:note-1' => Money::fromInt(50000),
-                'payment-2:note-1' => Money::fromInt(10000),
-                default => Money::zero(),
-            }
-        );
+        self::assertCount(1, $result);
+        self::assertSame('payment-1', $result[0]['payment_id']);
+        self::assertSame(25000, $result[0]['refundable_rupiah']);
+    }
 
-        $refunds->method('getTotalRefundedAmountByCustomerPaymentIdAndNoteId')->willReturnCallback(
-            static fn (string $paymentId, string $noteId): Money => match ($paymentId . ':' . $noteId) {
-                'payment-1:note-1' => Money::fromInt(10000),
-                'payment-2:note-1' => Money::fromInt(10000),
-                default => Money::zero(),
-            }
-        );
+    public function test_it_returns_empty_when_only_legacy_allocations_exist_without_component_allocations(): void
+    {
+        $components = $this->createMock(PaymentComponentAllocationReaderPort::class);
+        $payments = $this->createMock(CustomerPaymentReaderPort::class);
+        $allocations = $this->createMock(PaymentAllocationReaderPort::class);
+        $refunds = $this->createMock(CustomerRefundReaderPort::class);
 
-        $service = new NoteRefundPaymentOptionsBuilder(
-            $paymentComponents,
-            $payments,
-            $allocations,
-            $refunds,
-        );
+        $components->method('listByNoteId')->with('note-legacy')->willReturn([]);
 
-        $result = $service->build('note-1');
+        $result = (new NoteRefundPaymentOptionsBuilder($components, $payments, $allocations, $refunds))->build('note-legacy');
 
-        $this->assertCount(1, $result);
-        $this->assertSame('payment-1', $result[0]['value']);
-        $this->assertSame('payment-1', $result[0]['payment_id']);
-        $this->assertSame('2026-04-15', $result[0]['paid_at']);
-        $this->assertSame(50000, $result[0]['allocated_rupiah']);
-        $this->assertSame(10000, $result[0]['refunded_rupiah']);
-        $this->assertSame(40000, $result[0]['refundable_rupiah']);
+        self::assertSame([], $result);
     }
 }

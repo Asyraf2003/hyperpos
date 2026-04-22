@@ -22,10 +22,26 @@ final class NoteRefundPaymentOptionsBuilder
     public function build(string $noteId): array
     {
         $options = [];
+        $paymentIds = [];
+        $seen = [];
 
-        foreach ($this->collectPaymentIds($noteId) as $paymentId) {
+        foreach ($this->paymentComponents->listByNoteId($noteId) as $allocation) {
+            $paymentId = $allocation->customerPaymentId();
+
+            if (isset($seen[$paymentId])) {
+                continue;
+            }
+
+            $seen[$paymentId] = true;
+            $paymentIds[] = $paymentId;
+        }
+
+        foreach ($paymentIds as $paymentId) {
             $payment = $this->payments->getById($paymentId);
-            if ($payment === null) continue;
+
+            if ($payment === null) {
+                continue;
+            }
 
             $allocated = $this->allocations->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId($paymentId, $noteId);
             $allocated->ensureNotNegative('Total alokasi refund option tidak boleh negatif.');
@@ -34,7 +50,10 @@ final class NoteRefundPaymentOptionsBuilder
             $refunded->ensureNotNegative('Total refund refund option tidak boleh negatif.');
 
             $refundable = max($allocated->amount() - $refunded->amount(), 0);
-            if ($refundable <= 0) continue;
+
+            if ($refundable <= 0) {
+                continue;
+            }
 
             $options[] = [
                 'value' => $paymentId,
@@ -52,27 +71,5 @@ final class NoteRefundPaymentOptionsBuilder
         }
 
         return $options;
-    }
-
-    private function collectPaymentIds(string $noteId): array
-    {
-        $ids = [];
-        $seen = [];
-
-        foreach ($this->paymentComponents->listByNoteId($noteId) as $allocation) {
-            $paymentId = $allocation->customerPaymentId();
-            if (isset($seen[$paymentId])) continue;
-            $seen[$paymentId] = true;
-            $ids[] = $paymentId;
-        }
-
-        foreach ($this->allocations->listByNoteId($noteId) as $allocation) {
-            $paymentId = $allocation->customerPaymentId();
-            if (isset($seen[$paymentId])) continue;
-            $seen[$paymentId] = true;
-            $ids[] = $paymentId;
-        }
-
-        return $ids;
     }
 }

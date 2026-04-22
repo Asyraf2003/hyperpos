@@ -17,7 +17,7 @@ final class LegacyAllocatedNoteDetailFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_legacy_paid_note_is_rendered_as_close_in_workspace_detail(): void
+    public function test_legacy_paid_note_is_rendered_as_close_in_workspace_detail_without_hybrid_refund_launcher(): void
     {
         $this->loginAsKasir();
 
@@ -45,9 +45,8 @@ final class LegacyAllocatedNoteDetailFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-legacy']))
             ->assertOk()
             ->assertSee('1 Close')
-            ->assertSee('Buka Modal Refund')
-            ->assertSee('Refund Nota')
-            ->assertDontSee('Refund Line Close Terpilih')
-            ->assertDontSee('Pembayaran Line Open Terpilih');
+            ->assertSee('Daftar Line Nota')
+            ->assertDontSee('Buka Modal Refund')
+            ->assertDontSee('Refund Nota');
     }
 }
