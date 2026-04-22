@@ -6,7 +6,7 @@
                     <div>
                         <h4 class="card-title mb-1">Header Nota</h4>
                         <p class="mb-0 text-muted">
-                            Ringkasan identitas note dan komposisi line untuk membaca konteks transaksi saat ini.
+                            Ringkasan identitas note root dan komposisi line dari current revision untuk membaca konteks transaksi saat ini.
                         </p>
                     </div>
 
@@ -16,7 +16,7 @@
                 </div>
 
                 <p class="mt-2 mb-0 text-muted small">
-                    Fase ini memisahkan pembacaan line domain, billing projection, dan pseudo-versioning agar kerja kasir tetap jelas.
+                    Detail note sekarang memisahkan pembacaan line domain, billing projection, dan revision timeline agar kerja kasir tetap jelas.
                 </p>
             </div>
 
@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="small text-muted mt-2">
-                    True note revision flow belum dibuka di fase ini. Tombol edit masih menuju workspace aktif existing.
+                    Edit nota sekarang disimpan sebagai revision baru pada root note yang sama.
                 </div>
             </div>
         </div>
