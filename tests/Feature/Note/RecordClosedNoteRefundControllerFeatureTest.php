@@ -93,6 +93,59 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $this->assertDatabaseCount('customer_refunds', 0);
     }
 
+    public function test_refund_allocates_only_selected_rows(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedClosedPaidTwoLineNote();
+
+        $this->actingAs($user)
+            ->from(route('cashier.notes.index'))
+            ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-2']), [
+                'selected_row_ids' => ['wi-2'],
+                'customer_payment_id' => 'payment-2',
+                'amount_rupiah' => 30000,
+                'refunded_at' => date('Y-m-d'),
+                'reason' => 'Refund line kedua saja',
+            ])
+            ->assertRedirect(route('cashier.notes.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('customer_refunds', [
+            'customer_payment_id' => 'payment-2',
+            'note_id' => 'note-2',
+            'amount_rupiah' => 30000,
+            'reason' => 'Refund line kedua saja',
+        ]);
+
+        $refundId = (string) DB::table('customer_refunds')
+            ->where('customer_payment_id', 'payment-2')
+            ->where('note_id', 'note-2')
+            ->value('id');
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => 'payment-2',
+            'note_id' => 'note-2',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-2',
+            'refunded_amount_rupiah' => 30000,
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => 'payment-2',
+            'note_id' => 'note-2',
+            'component_ref_id' => 'wi-1',
+        ]);
+
+        $this->assertSame(
+            1,
+            DB::table('refund_component_allocations')
+                ->where('customer_refund_id', $refundId)
+                ->count()
+        );
+    }
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();
@@ -156,6 +209,47 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
             'component_amount_rupiah_snapshot' => 50000,
             'allocated_amount_rupiah' => 20000,
             'allocation_priority' => 1,
+        ]);
+    }
+
+    private function seedClosedPaidTwoLineNote(): void
+    {
+        $today = date('Y-m-d');
+
+        $this->seedNoteBase('note-2', 'Joko', $today, 80000, 'closed');
+
+        $this->seedWorkItemBase('wi-1', 'note-2', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('wi-1', 'Servis A', 50000, ServiceDetail::PART_SOURCE_NONE);
+
+        $this->seedWorkItemBase('wi-2', 'note-2', 2, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 30000);
+        $this->seedServiceDetailBase('wi-2', 'Servis B', 30000, ServiceDetail::PART_SOURCE_NONE);
+
+        $this->seedCustomerPaymentBase('payment-2', 80000, $today);
+        $this->seedPaymentAllocationBase('allocation-2', 'payment-2', 'note-2', 80000);
+
+        DB::table('payment_component_allocations')->insert([
+            [
+                'id' => 'pca-2a',
+                'customer_payment_id' => 'payment-2',
+                'note_id' => 'note-2',
+                'work_item_id' => 'wi-1',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-1',
+                'component_amount_rupiah_snapshot' => 50000,
+                'allocated_amount_rupiah' => 50000,
+                'allocation_priority' => 1,
+            ],
+            [
+                'id' => 'pca-2b',
+                'customer_payment_id' => 'payment-2',
+                'note_id' => 'note-2',
+                'work_item_id' => 'wi-2',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-2',
+                'component_amount_rupiah_snapshot' => 30000,
+                'allocated_amount_rupiah' => 30000,
+                'allocation_priority' => 2,
+            ],
         ]);
     }
 }
