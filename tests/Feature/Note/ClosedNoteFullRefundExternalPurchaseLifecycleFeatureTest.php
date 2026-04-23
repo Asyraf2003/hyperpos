@@ -56,6 +56,8 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
             'id' => 'note-1',
             'note_state' => 'closed',
         ]);
+
+        $this->assertDatabaseCount('inventory_movements', 0);
     }
 
     public function test_full_refund_for_closed_external_purchase_note_marks_note_as_refunded(): void
@@ -85,6 +87,8 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
             'id' => 'note-1',
             'note_state' => 'refunded',
         ]);
+
+        $this->assertDatabaseCount('inventory_movements', 0);
     }
 
     private function seedKasir(): User
