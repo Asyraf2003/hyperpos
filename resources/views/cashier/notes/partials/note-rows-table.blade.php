@@ -61,6 +61,7 @@
                 data-store-return-count="{{ (int) ($row['refund_stock_return_count'] ?? 0) }}"
                 data-external-count="{{ (int) ($row['refund_external_count'] ?? 0) }}"
                 data-preview-label="{{ $row['refund_preview_label'] ?? '-' }}"
+                data-refund-impact='@json($row["refund_impact"] ?? [])'
                 aria-pressed="false"
               @endif
             >
