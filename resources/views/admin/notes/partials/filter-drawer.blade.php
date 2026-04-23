@@ -8,28 +8,6 @@
         </div>
 
         <form id="admin-note-filter-form">
-            <div class="form-group mb-3">
-                <label for="admin-note-date-from" class="form-label">Tanggal Mulai</label>
-                <input
-                    type="date"
-                    id="admin-note-date-from"
-                    class="form-control"
-                    value="{{ $filters['date_from'] }}"
-                    data-ui-date="single"
-                >
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="admin-note-date-to" class="form-label">Tanggal Akhir</label>
-                <input
-                    type="date"
-                    id="admin-note-date-to"
-                    class="form-control"
-                    value="{{ $filters['date_to'] }}"
-                    data-ui-date="single"
-                >
-            </div>
-
             <div class="form-group mb-4">
                 <label for="admin-note-line-status" class="form-label">Status Line</label>
                 <select id="admin-note-line-status" class="form-select">
@@ -38,6 +16,22 @@
                     <option value="close" @selected($filters['line_status'] === 'close')>Close</option>
                     <option value="refund" @selected($filters['line_status'] === 'refund')>Refund</option>
                 </select>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label" for="admin-note-date-range">Rentang Tanggal Nota</label>
+                <input
+                    type="text"
+                    id="admin-note-date-range"
+                    class="form-control"
+                    data-ui-date="range-single"
+                    data-ui-date-placeholder="Pilih rentang tanggal nota"
+                    data-range-start-name="date_from"
+                    data-range-end-name="date_to"
+                    autocomplete="off"
+                >
+                <input type="hidden" id="admin-note-date-from" name="date_from" value="{{ $filters['date_from'] }}">
+                <input type="hidden" id="admin-note-date-to" name="date_to" value="{{ $filters['date_to'] }}">
             </div>
 
             <div class="d-grid gap-2">

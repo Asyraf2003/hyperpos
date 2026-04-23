@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const configNode = document.getElementById('admin-note-index-config');
     const searchForm = document.getElementById('admin-note-search-form');
     const searchInput = document.getElementById('admin-note-search-input');
+    const dateRangeInput = document.getElementById('admin-note-date-range');
     const dateFromInput = document.getElementById('admin-note-date-from');
     const dateToInput = document.getElementById('admin-note-date-to');
     const lineStatusInput = document.getElementById('admin-note-line-status');
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         !configNode
         || !searchForm
         || !searchInput
+        || !dateRangeInput
         || !dateFromInput
         || !dateToInput
         || !lineStatusInput
@@ -54,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return Number.isNaN(parsed) || parsed < 1 ? fallback : parsed;
     };
 
+    const refreshDatePicker = () => {
+        window.AdminDateInput?.refreshWithin(filterForm);
+    };
+
     const stateFromUrl = () => {
         const params = new URLSearchParams(window.location.search);
 
@@ -77,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dateFromInput.value = state.date_from;
         dateToInput.value = state.date_to;
         lineStatusInput.value = state.line_status;
+        refreshDatePicker();
     };
 
     const syncFilterState = () => {
@@ -301,7 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
-    openFilterButton.addEventListener('click', () => drawOpen(true));
+    openFilterButton.addEventListener('click', () => {
+        fillControlsFromState();
+        drawOpen(true);
+    });
+
     closeFilterButton.addEventListener('click', () => drawOpen(false));
     filterBackdrop.addEventListener('click', () => drawOpen(false));
 
@@ -317,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dateFromInput.value = normalize(filters.date_from);
         dateToInput.value = normalize(filters.date_to);
         lineStatusInput.value = '';
+        refreshDatePicker();
         syncFilterState();
         drawOpen(false);
         loadTable();

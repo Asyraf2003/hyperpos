@@ -21,6 +21,9 @@ final class AdminNoteHistoryPageFeatureTest extends TestCase
         $response->assertSee('Daftar Nota Admin');
         $response->assertSee('admin-note-search-input', false);
         $response->assertSee('admin-note-table-body', false);
+        $response->assertSee('admin-note-date-range', false);
+        $response->assertSee('admin-note-date-from', false);
+        $response->assertSee('admin-note-date-to', false);
         $response->assertSee('admin-note-index.js');
         $response->assertSee(json_encode(route('admin.notes.table')), false);
     }
