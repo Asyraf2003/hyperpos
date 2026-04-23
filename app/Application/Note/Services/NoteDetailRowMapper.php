@@ -11,6 +11,7 @@ final class NoteDetailRowMapper
     public function __construct(
         private readonly WorkItemOperationalStatusResolver $statuses,
         private readonly NoteDetailRowPresentationSupport $presentation,
+        private readonly RefundImpactPayloadBuilder $refundImpact,
     ) {
     }
 
@@ -30,15 +31,21 @@ final class NoteDetailRowMapper
         ];
 
         $refunded = (int) ($settlement['refunded_rupiah'] ?? 0);
+        $netPaid = (int) ($settlement['net_paid_rupiah'] ?? 0);
         $outstanding = (int) ($settlement['outstanding_rupiah'] ?? $item->subtotalRupiah()->amount());
         $lineStatus = $this->statuses->resolve($outstanding, $refunded);
-        $storeCount = count($item->storeStockLines());
-        $externalCount = count($item->externalPurchaseLines());
+        $storeLineCount = count($item->storeStockLines());
+        $externalLineCount = count($item->externalPurchaseLines());
+        $refundImpact = $this->refundImpact->fromWorkItem($item, $netPaid);
+        $summary = is_array($refundImpact['effect_summary'] ?? null) ? $refundImpact['effect_summary'] : [];
+
+        $refundStockReturnCount = (int) ($summary['stock_store_return_count'] ?? 0);
+        $refundExternalCount = (int) ($summary['external_item_count'] ?? 0);
 
         return [
             'id' => $item->id(),
             'line_no' => $item->lineNo(),
-            'line_label' => $item->serviceDetail()?->serviceName() ?: ('Produk x' . max($storeCount, 1)),
+            'line_label' => $item->serviceDetail()?->serviceName() ?: ('Produk x' . max($storeLineCount, 1)),
             'type_label' => $this->presentation->typeLabel($item),
             'transaction_type' => $item->transactionType(),
             'can_correct_service_only' => $item->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
@@ -47,15 +54,16 @@ final class NoteDetailRowMapper
             'subtotal_rupiah' => $item->subtotalRupiah()->amount(),
             'allocated_rupiah' => (int) ($settlement['allocated_rupiah'] ?? 0),
             'refunded_rupiah' => $refunded,
-            'net_paid_rupiah' => (int) ($settlement['net_paid_rupiah'] ?? 0),
+            'net_paid_rupiah' => $netPaid,
             'outstanding_rupiah' => $outstanding,
             'has_service_component' => $item->serviceDetail() !== null,
-            'store_stock_count' => $storeCount,
-            'external_purchase_count' => $externalCount,
-            'refund_stock_return_count' => $storeCount,
-            'refund_external_count' => $externalCount,
-            'refund_money_possible' => (int) ($settlement['net_paid_rupiah'] ?? 0) > 0,
-            'refund_preview_label' => $this->presentation->refundPreviewLabel($storeCount, $externalCount),
+            'store_stock_count' => $storeLineCount,
+            'external_purchase_count' => $externalLineCount,
+            'refund_stock_return_count' => $refundStockReturnCount,
+            'refund_external_count' => $refundExternalCount,
+            'refund_money_possible' => $netPaid > 0,
+            'refund_preview_label' => $this->presentation->refundPreviewLabel($refundStockReturnCount, $refundExternalCount),
+            'refund_impact' => $refundImpact,
             'line_status' => $lineStatus,
             'can_edit' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
             'can_pay' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
