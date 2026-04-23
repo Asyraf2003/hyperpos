@@ -38,11 +38,25 @@
               <strong id="refund-modal-stock-return-count">0</strong>
             </div>
             <div class="d-flex justify-content-between py-2 border-bottom">
-              <span class="text-muted">External Disederhanakan</span>
+              <span class="text-muted">Komponen External Dinetralkan</span>
               <strong id="refund-modal-external-count">0</strong>
             </div>
             <div class="pt-2 small text-muted" id="refund-modal-impact-note">
               Refund akan dicatat untuk line yang dipilih sesuai total refundable saat ini.
+            </div>
+          </div>
+
+          <div class="border rounded p-3 mb-4">
+            <div class="fw-semibold mb-2">Barang / Stok Toko Kembali</div>
+            <div id="refund-modal-store-returns" class="d-flex flex-column gap-2">
+              <div class="small text-muted">Tidak ada stok toko yang kembali.</div>
+            </div>
+          </div>
+
+          <div class="border rounded p-3 mb-4">
+            <div class="fw-semibold mb-2">Komponen External yang Dinetralkan</div>
+            <div id="refund-modal-external-returns" class="d-flex flex-column gap-2">
+              <div class="small text-muted">Tidak ada komponen external yang dinetralkan.</div>
             </div>
           </div>
 
