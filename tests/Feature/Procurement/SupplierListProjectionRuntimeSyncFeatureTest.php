@@ -110,11 +110,6 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             'harga_jual' => $hargaJual,
         ]);
 
-        DB::table('product_inventories')->insert([
-            'product_id' => $id,
-            'stok_saat_ini' => 0,
-            'avg_cost' => 0,
-        ]);
     }
 
     protected function setUp(): void
