@@ -24,6 +24,7 @@ final class ClosedNoteFullRefundProductOnlyInventoryLifecycleFeatureTest extends
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 50000,
                 'refunded_at' => date('Y-m-d'),
