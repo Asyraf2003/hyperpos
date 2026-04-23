@@ -13,7 +13,6 @@ final class CashierNoteHistoryBaseQuery
 {
     public function __construct(
         private readonly NoteHistoryAggregationSubqueries $aggregations,
-        private readonly NoteHistoryRowsQuery $rowsQuery,
     ) {
     }
 
