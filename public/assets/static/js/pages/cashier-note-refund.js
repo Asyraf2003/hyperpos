@@ -5,10 +5,11 @@
     const openButton = document.getElementById('note-refund-open-button');
     const selectedContainer = document.getElementById('note-refund-selected-lines');
     const hiddenInputsContainer = document.getElementById('note-refund-hidden-selected-rows');
-    const refundInput = document.getElementById('refund_amount_rupiah');
+    const amountInput = document.getElementById('refund_amount_rupiah');
+    const reasonInput = document.getElementById('note-refund-reason');
     const submitButton = document.getElementById('note-refund-submit');
 
-    if (!modalEl || !form || !openButton || !selectedContainer || !hiddenInputsContainer) {
+    if (!modalEl || !form || !openButton || !selectedContainer || !hiddenInputsContainer || !amountInput || !reasonInput) {
       return;
     }
 
@@ -37,67 +38,7 @@
     const externalCount = () =>
       selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.externalCount), 0);
 
-    const hasTypedRefundAmount = () => {
-      if (!refundInput) return false;
-      return String(refundInput.value || '').replace(/[^0-9]/g, '').trim() !== '';
-    };
-
-    const typedRefundAmount = () => parseNumber(refundInput?.value || '');
-
-    const effectiveRefundAmount = () => {
-      const total = refundableTotal();
-      const typed = typedRefundAmount();
-
-      if (total <= 0) {
-        return 0;
-      }
-
-      if (!hasTypedRefundAmount()) {
-        return 0;
-      }
-
-      if (typed <= 0 || typed > total) {
-        return 0;
-      }
-
-      return typed;
-    };
-
-    const syncRefundInput = ({ normalize = false } = {}) => {
-      if (!refundInput) {
-        return;
-      }
-
-      const total = refundableTotal();
-      const typed = typedRefundAmount();
-      const hasValue = hasTypedRefundAmount();
-
-      refundInput.max = total > 0 ? String(total) : '';
-
-      if (total <= 0) {
-        refundInput.value = '';
-        refundInput.setCustomValidity('');
-        return;
-      }
-
-      if (normalize && (!hasValue || typed <= 0 || typed > total)) {
-        refundInput.value = String(total);
-        refundInput.setCustomValidity('');
-        return;
-      }
-
-      if (!hasValue || typed <= 0) {
-        refundInput.setCustomValidity('Nominal refund wajib diisi.');
-        return;
-      }
-
-      if (typed > total) {
-        refundInput.setCustomValidity('Nominal refund tidak boleh melebihi total refundable line yang dipilih.');
-        return;
-      }
-
-      refundInput.setCustomValidity('');
-    };
+    const hasReason = () => String(reasonInput.value || '').trim() !== '';
 
     const buildHiddenInputs = () => {
       hiddenInputsContainer.innerHTML = selectedRows()
@@ -119,6 +60,8 @@
         const typeLabel = row.dataset.typeLabel || '-';
         const preview = row.dataset.previewLabel || '-';
         const refundable = format(parseNumber(row.dataset.refundableRupiah));
+        const stockCount = parseNumber(row.dataset.storeReturnCount);
+        const externalCount = parseNumber(row.dataset.externalCount);
 
         return `
           <div class="border rounded px-3 py-2">
@@ -127,6 +70,7 @@
                 <div class="fw-semibold">Line ${lineNo} · ${label}</div>
                 <div class="small text-muted">${typeLabel}</div>
                 <div class="small text-muted">${preview}</div>
+                <div class="small text-muted">Stok toko kembali: ${format(stockCount)} · External disederhanakan: ${format(externalCount)}</div>
               </div>
               <strong>${refundable}</strong>
             </div>
@@ -143,6 +87,10 @@
       });
     };
 
+    const syncAmount = () => {
+      amountInput.value = String(refundableTotal());
+    };
+
     const syncButton = () => {
       const hasSelection = selectedRows().length > 0;
       openButton.disabled = !hasSelection;
@@ -152,7 +100,7 @@
       openButton.setAttribute('aria-disabled', hasSelection ? 'false' : 'true');
 
       if (submitButton) {
-        submitButton.disabled = !hasSelection || effectiveRefundAmount() <= 0;
+        submitButton.disabled = !hasSelection || refundableTotal() <= 0 || !hasReason();
       }
     };
 
@@ -161,21 +109,26 @@
       const totalNode = document.getElementById('refund-modal-selected-total');
       const stockNode = document.getElementById('refund-modal-stock-return-count');
       const externalNode = document.getElementById('refund-modal-external-count');
-      const refundNowNode = document.getElementById('refund-modal-refund-now');
+      const impactNode = document.getElementById('refund-modal-impact-note');
 
       if (countNode) countNode.textContent = format(selectedRows().length);
       if (totalNode) totalNode.textContent = format(refundableTotal());
       if (stockNode) stockNode.textContent = format(stockReturnCount());
       if (externalNode) externalNode.textContent = format(externalCount());
-      if (refundNowNode) refundNowNode.textContent = format(effectiveRefundAmount());
+
+      if (impactNode) {
+        impactNode.textContent = selectedRows().length > 0
+          ? `Refund akan dicatat otomatis sebesar ${format(refundableTotal())} untuk line yang dipilih.`
+          : 'Refund akan dicatat untuk line yang dipilih sesuai total refundable saat ini.';
+      }
 
       buildHiddenInputs();
       buildSelectedLinesSummary();
     };
 
-    const syncAll = ({ normalizeInput = false } = {}) => {
+    const syncAll = () => {
       syncVisual();
-      syncRefundInput({ normalize: normalizeInput });
+      syncAmount();
       syncButton();
       syncSummary();
     };
@@ -190,7 +143,7 @@
         selectedIds.add(rowId);
       }
 
-      syncAll({ normalizeInput: true });
+      syncAll();
     };
 
     document.addEventListener('click', (event) => {
@@ -208,7 +161,8 @@
         if (selectedRows().length <= 0) {
           return;
         }
-        syncAll({ normalizeInput: true });
+
+        syncAll();
         modal?.show();
       }
     });
@@ -225,11 +179,30 @@
       toggleRow(row);
     });
 
-    form.addEventListener('input', () => syncAll());
-    form.addEventListener('change', () => syncAll());
+    modalEl.addEventListener('shown.bs.modal', () => {
+      reasonInput.focus();
+      reasonInput.select();
+    });
+
+    reasonInput.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (submitButton.disabled) {
+        return;
+      }
+
+      form.requestSubmit();
+    });
+
+    form.addEventListener('input', syncAll);
+    form.addEventListener('change', syncAll);
 
     selectedIds.clear();
-    syncAll({ normalizeInput: true });
+    syncAll();
   };
 
   if (document.readyState === 'loading') {
