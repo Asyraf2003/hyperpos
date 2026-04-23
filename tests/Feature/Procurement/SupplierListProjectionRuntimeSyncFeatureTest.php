@@ -34,8 +34,8 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             lines: [
                 [
                     'product_id' => 'product-1',
-                    'qty' => 2,
-                    'harga_beli_rupiah' => 50000,
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 100000,
                 ],
             ],
             autoRec: false,
