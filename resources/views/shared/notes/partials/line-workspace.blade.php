@@ -19,10 +19,12 @@
         @if ($note['can_show_refund_form'] ?? false)
           <button
             type="button"
-            class="btn btn-outline-warning"
+            class="btn btn-outline-warning opacity-50 disabled"
             data-bs-toggle="modal"
             data-bs-target="#note-refund-modal"
-            id="note-refund-toolbar-button"
+            id="note-refund-open-button"
+            disabled
+            aria-disabled="true"
           >
             Refund
           </button>
