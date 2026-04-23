@@ -47,11 +47,8 @@
         </thead>
         <tbody>
           @forelse ($note['rows'] as $row)
-            @php
-              $isRefundable = (bool) ($row['can_refund'] ?? false);
-            @endphp
             <tr
-              @if ($isRefundable)
+              @if ((bool) ($row['can_refund'] ?? false))
                 role="button"
                 tabindex="0"
                 class="refund-row-hoverable"
@@ -70,7 +67,7 @@
               <td>{{ $row['line_no'] }}</td>
               <td>
                 <div class="fw-semibold">{{ $row['line_label'] ?? '-' }}</div>
-                @if ($isRefundable)
+                @if ((bool) ($row['can_refund'] ?? false))
                   <div class="small text-muted refund-row-hint">Klik untuk pilih refund</div>
                 @endif
               </td>
