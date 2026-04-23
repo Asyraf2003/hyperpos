@@ -14,7 +14,7 @@ trait SupplierTableFilters
         if ($filters->q() !== null) {
             $keyword = $filters->q();
 
-            $query->where('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%');
+            $query->where('supplier_list_projection.nama_pt_pengirim', 'like', '%' . $keyword . '%');
         }
 
         return $query;
