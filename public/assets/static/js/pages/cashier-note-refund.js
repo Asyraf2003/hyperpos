@@ -23,26 +23,77 @@
     const format = (value) =>
       new Intl.NumberFormat('id-ID').format(Number.isFinite(value) ? value : 0);
 
+    const escapeHtml = (value) =>
+      String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
     const rows = () => Array.from(document.querySelectorAll('[data-refund-row="1"]'));
     const selectedIds = new Set();
 
     const isSelected = (row) => selectedIds.has(String(row.dataset.rowId || ''));
     const selectedRows = () => rows().filter((row) => isSelected(row));
 
+    const parseRefundImpact = (row) => {
+      try {
+        const parsed = JSON.parse(row.dataset.refundImpact || '{}');
+        return parsed && typeof parsed === 'object' ? parsed : {};
+      } catch {
+        return {};
+      }
+    };
+
     const refundableTotal = () =>
       selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.refundableRupiah), 0);
 
     const stockReturnCount = () =>
-      selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.storeReturnCount), 0);
+      selectedRows().reduce((sum, row) => {
+        const impact = parseRefundImpact(row);
+        return sum + parseNumber(impact.effect_summary?.stock_store_return_count);
+      }, 0);
 
     const externalCount = () =>
-      selectedRows().reduce((sum, row) => sum + parseNumber(row.dataset.externalCount), 0);
+      selectedRows().reduce((sum, row) => {
+        const impact = parseRefundImpact(row);
+        return sum + parseNumber(impact.effect_summary?.external_item_count);
+      }, 0);
 
     const hasReason = () => String(reasonInput.value || '').trim() !== '';
 
+    const selectedStoreReturns = () =>
+      selectedRows().flatMap((row) => {
+        const impact = parseRefundImpact(row);
+        const items = Array.isArray(impact.store_returns) ? impact.store_returns : [];
+        return items.map((item) => ({
+          lineNo: row.dataset.lineNo || '-',
+          lineLabel: row.dataset.lineLabel || '-',
+          sourceLineId: String(item.source_line_id || ''),
+          productId: String(item.product_id || ''),
+          productLabel: String(item.product_label || item.product_id || '-'),
+          qty: parseNumber(item.qty),
+        }));
+      });
+
+    const selectedExternalReturns = () =>
+      selectedRows().flatMap((row) => {
+        const impact = parseRefundImpact(row);
+        const items = Array.isArray(impact.external_returns) ? impact.external_returns : [];
+        return items.map((item) => ({
+          lineNo: row.dataset.lineNo || '-',
+          lineLabel: row.dataset.lineLabel || '-',
+          sourceLineId: String(item.source_line_id || ''),
+          description: String(item.description || '-'),
+          qty: parseNumber(item.qty),
+          amountRupiah: parseNumber(item.amount_rupiah),
+        }));
+      });
+
     const buildHiddenInputs = () => {
       hiddenInputsContainer.innerHTML = selectedRows()
-        .map((row) => `<input type="hidden" name="selected_row_ids[]" value="${row.dataset.rowId}">`)
+        .map((row) => `<input type="hidden" name="selected_row_ids[]" value="${escapeHtml(row.dataset.rowId)}">`)
         .join('');
     };
 
@@ -55,28 +106,80 @@
       }
 
       selectedContainer.innerHTML = items.map((row) => {
+        const impact = parseRefundImpact(row);
         const lineNo = row.dataset.lineNo || '-';
         const label = row.dataset.lineLabel || '-';
         const typeLabel = row.dataset.typeLabel || '-';
         const preview = row.dataset.previewLabel || '-';
-        const refundable = format(parseNumber(row.dataset.refundableRupiah));
-        const stockCount = parseNumber(row.dataset.storeReturnCount);
-        const externalCount = parseNumber(row.dataset.externalCount);
+        const refundable = format(parseNumber(impact.refund_amount_rupiah ?? row.dataset.refundableRupiah));
+        const stockCount = parseNumber(impact.effect_summary?.stock_store_return_count);
+        const externalCount = parseNumber(impact.effect_summary?.external_item_count);
 
         return `
           <div class="border rounded px-3 py-2">
             <div class="d-flex justify-content-between align-items-start gap-3">
               <div>
-                <div class="fw-semibold">Line ${lineNo} · ${label}</div>
-                <div class="small text-muted">${typeLabel}</div>
-                <div class="small text-muted">${preview}</div>
-                <div class="small text-muted">Stok toko kembali: ${format(stockCount)} · External disederhanakan: ${format(externalCount)}</div>
+                <div class="fw-semibold">Line ${escapeHtml(lineNo)} · ${escapeHtml(label)}</div>
+                <div class="small text-muted">${escapeHtml(typeLabel)}</div>
+                <div class="small text-muted">${escapeHtml(preview)}</div>
+                <div class="small text-muted">Stok toko kembali: ${format(stockCount)} · External dinetralkan: ${format(externalCount)}</div>
               </div>
               <strong>${refundable}</strong>
             </div>
           </div>
         `;
       }).join('');
+    };
+
+    const renderStoreReturns = () => {
+      const container = document.getElementById('refund-modal-store-returns');
+      if (!container) return;
+
+      const items = selectedStoreReturns();
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="small text-muted">Tidak ada stok toko yang kembali.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map((item) => `
+        <div class="border rounded px-3 py-2">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <div class="fw-semibold">${escapeHtml(item.productLabel)}</div>
+              <div class="small text-muted">Line ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
+            </div>
+            <strong>+${format(item.qty)}</strong>
+          </div>
+        </div>
+      `).join('');
+    };
+
+    const renderExternalReturns = () => {
+      const container = document.getElementById('refund-modal-external-returns');
+      if (!container) return;
+
+      const items = selectedExternalReturns();
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="small text-muted">Tidak ada komponen external yang dinetralkan.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map((item) => `
+        <div class="border rounded px-3 py-2">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <div class="fw-semibold">${escapeHtml(item.description)}</div>
+              <div class="small text-muted">Line ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
+            </div>
+            <div class="text-end">
+              <strong>${format(item.amountRupiah)}</strong>
+              <div class="small text-muted">Qty ${format(item.qty)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
     };
 
     const syncVisual = () => {
@@ -118,12 +221,14 @@
 
       if (impactNode) {
         impactNode.textContent = selectedRows().length > 0
-          ? `Refund akan dicatat otomatis sebesar ${format(refundableTotal())} untuk line yang dipilih.`
+          ? `Refund akan dicatat otomatis sebesar ${format(refundableTotal())}. Line terpilih menjadi netral setelah refund.`
           : 'Refund akan dicatat untuk line yang dipilih sesuai total refundable saat ini.';
       }
 
       buildHiddenInputs();
       buildSelectedLinesSummary();
+      renderStoreReturns();
+      renderExternalReturns();
     };
 
     const syncAll = () => {
