@@ -33,6 +33,7 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             tglKirim: '2026-03-15',
             lines: [
                 [
+                    'line_no' => 1,
                     'product_id' => 'product-1',
                     'qty_pcs' => 2,
                     'line_total_rupiah' => 100000,
