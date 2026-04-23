@@ -8,53 +8,6 @@
 @section('content')
     <section class="section">
         <div class="row g-4">
-            <div class="col-12 col-xl-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title mb-1">Rincian Nota</h4>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-lg">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Kode</th>
-                                        <th>Nama Barang</th>
-                                        <th>Merek</th>
-                                        <th>Ukuran</th>
-                                        <th>Jumlah</th>
-                                        <th>Harga Satuan</th>
-                                        <th>Total Rincian</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($linesView as $index => $line)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $line['kode_barang'] ?? '-' }}</td>
-                                            <td>{{ $line['nama_barang'] }}</td>
-                                            <td>{{ $line['merek'] }}</td>
-                                            <td>{{ $line['ukuran'] ?? '-' }}</td>
-                                            <td>{{ $line['qty_pcs'] }}</td>
-                                            <td>{{ $line['unit_cost_label'] }}</td>
-                                            <td>{{ $line['line_total_label'] }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
-                                                Belum ada rincian nota.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="col-12 col-xl-4">
                 <div class="card">
                     <div class="card-header">
@@ -283,6 +236,53 @@
                         </div>
                     </div>
                 @endif
+            </div>
+
+            <div class="col-12 col-xl-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Rincian Nota</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-lg">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode</th>
+                                        <th>Nama Barang</th>
+                                        <th>Merek</th>
+                                        <th>Ukuran</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Total Rincian</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($linesView as $index => $line)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $line['kode_barang'] ?? '-' }}</td>
+                                            <td>{{ $line['nama_barang'] }}</td>
+                                            <td>{{ $line['merek'] }}</td>
+                                            <td>{{ $line['ukuran'] ?? '-' }}</td>
+                                            <td>{{ $line['qty_pcs'] }}</td>
+                                            <td>{{ $line['unit_cost_label'] }}</td>
+                                            <td>{{ $line['line_total_label'] }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                Belum ada rincian nota.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
