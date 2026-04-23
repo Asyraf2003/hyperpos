@@ -54,6 +54,17 @@
           Lunasi
         </button>
       @endif
+
+      @if ($note['can_show_refund_form'] ?? false)
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#note-refund-modal"
+        >
+          Refund
+        </button>
+      @endif
     </div>
   </div>
 </div>

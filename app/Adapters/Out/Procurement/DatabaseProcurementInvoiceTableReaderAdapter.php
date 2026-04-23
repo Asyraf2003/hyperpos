@@ -36,7 +36,7 @@ final class DatabaseProcurementInvoiceTableReaderAdapter implements ProcurementI
                 'total_received_qty',
                 'proof_attachment_count',
                 'voided_at',
-                DB::raw('supplier_nama_pt_pengirim_snapshot as supplier_nama_pt_pengirim_current'),
+                DB::raw("(SELECT suppliers.nama_pt_pengirim FROM suppliers WHERE suppliers.id = supplier_invoice_list_projection.supplier_id LIMIT 1) as supplier_nama_pt_pengirim_current"),
             ]);
 
         $builder = $this->filters->apply($builder, $query);

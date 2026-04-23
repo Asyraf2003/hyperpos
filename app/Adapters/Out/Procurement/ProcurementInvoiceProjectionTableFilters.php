@@ -16,17 +16,33 @@ final class ProcurementInvoiceProjectionTableFilters
             $normalizedKeyword = mb_strtolower($keyword, 'UTF-8');
 
             if ($this->looksLikeInvoiceKeyword($normalizedKeyword)) {
-                $query->where(function (Builder $builder) use ($normalizedKeyword): void {
+                $query->where(function (Builder $builder) use ($normalizedKeyword, $keyword): void {
                     $builder
                         ->where('supplier_invoice_list_projection.nomor_faktur_normalized', '=', $normalizedKeyword)
-                        ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', $normalizedKeyword . '%');
+                        ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', $normalizedKeyword . '%')
+                        ->orWhere('supplier_invoice_list_projection.nomor_faktur', 'like', '%' . $keyword . '%')
+                        ->orWhere('supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%')
+                        ->orWhereExists(function (Builder $supplierQuery) use ($keyword): void {
+                            $supplierQuery
+                                ->selectRaw('1')
+                                ->from('suppliers')
+                                ->whereColumn('suppliers.id', 'supplier_invoice_list_projection.supplier_id')
+                                ->where('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%');
+                        });
                 });
             } else {
                 $query->where(function (Builder $builder) use ($keyword, $normalizedKeyword): void {
                     $builder
                         ->where('supplier_invoice_list_projection.nomor_faktur', 'like', '%' . $keyword . '%')
                         ->orWhere('supplier_invoice_list_projection.nomor_faktur_normalized', 'like', '%' . $normalizedKeyword . '%')
-                        ->orWhere('supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%');
+                        ->orWhere('supplier_invoice_list_projection.supplier_nama_pt_pengirim_snapshot', 'like', '%' . $keyword . '%')
+                        ->orWhereExists(function (Builder $supplierQuery) use ($keyword): void {
+                            $supplierQuery
+                                ->selectRaw('1')
+                                ->from('suppliers')
+                                ->whereColumn('suppliers.id', 'supplier_invoice_list_projection.supplier_id')
+                                ->where('suppliers.nama_pt_pengirim', 'like', '%' . $keyword . '%');
+                        });
                 });
             }
         }
@@ -60,6 +76,6 @@ final class ProcurementInvoiceProjectionTableFilters
             return false;
         }
 
-        return preg_match('/^[a-z0-9][a-z0-9\\-\\/_\\.]*$/', $keyword) === 1;
+        return preg_match('/^[a-z0-9][a-z0-9\-\/_\.]*$/', $keyword) === 1;
     }
 }
