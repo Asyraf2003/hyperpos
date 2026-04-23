@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services\CurrentRevision;
 
+use App\Application\Note\Services\RefundImpactPayloadBuilder;
 use App\Application\Note\Services\WorkItemOperationalStatusResolver;
 use App\Core\Note\Revision\NoteRevisionLineSnapshot;
 
@@ -12,6 +13,7 @@ final class CurrentRevisionDetailRowMapper
     public function __construct(
         private readonly WorkItemOperationalStatusResolver $statuses,
         private readonly CurrentRevisionLinePresentationSupport $presentation,
+        private readonly RefundImpactPayloadBuilder $refundImpact,
     ) {
     }
 
@@ -41,15 +43,21 @@ final class CurrentRevisionDetailRowMapper
         ];
 
         $payload = $line->payload();
-        $storeCount = count(is_array($payload['store_stock_lines'] ?? null) ? $payload['store_stock_lines'] : []);
-        $externalCount = count(is_array($payload['external_purchase_lines'] ?? null) ? $payload['external_purchase_lines'] : []);
+        $storeLineCount = count(is_array($payload['store_stock_lines'] ?? null) ? $payload['store_stock_lines'] : []);
+        $externalLineCount = count(is_array($payload['external_purchase_lines'] ?? null) ? $payload['external_purchase_lines'] : []);
         $refunded = (int) ($settlement['refunded_rupiah'] ?? 0);
+        $netPaid = (int) ($settlement['net_paid_rupiah'] ?? 0);
         $outstanding = (int) ($settlement['outstanding_rupiah'] ?? $line->subtotalRupiah());
         $lineStatus = $this->statuses->resolve($outstanding, $refunded);
+        $refundImpact = $this->refundImpact->fromRevisionPayload($payload, $netPaid);
+        $summary = is_array($refundImpact['effect_summary'] ?? null) ? $refundImpact['effect_summary'] : [];
+
+        $refundStockReturnCount = (int) ($summary['stock_store_return_count'] ?? 0);
+        $refundExternalCount = (int) ($summary['external_item_count'] ?? 0);
 
         $lineLabel = $line->serviceLabel();
-        if ($lineLabel === null || trim($lineLabel) == '') {
-            $lineLabel = $storeCount > 0 ? ('Produk x' . $storeCount) : 'Line Nota';
+        if ($lineLabel === null || trim($lineLabel) === '') {
+            $lineLabel = $storeLineCount > 0 ? ('Produk x' . $storeLineCount) : 'Line Nota';
         }
 
         return [
@@ -64,15 +72,16 @@ final class CurrentRevisionDetailRowMapper
             'subtotal_rupiah' => $line->subtotalRupiah(),
             'allocated_rupiah' => (int) ($settlement['allocated_rupiah'] ?? 0),
             'refunded_rupiah' => $refunded,
-            'net_paid_rupiah' => (int) ($settlement['net_paid_rupiah'] ?? 0),
+            'net_paid_rupiah' => $netPaid,
             'outstanding_rupiah' => $outstanding,
             'has_service_component' => $line->serviceLabel() !== null,
-            'store_stock_count' => $storeCount,
-            'external_purchase_count' => $externalCount,
-            'refund_stock_return_count' => $storeCount,
-            'refund_external_count' => $externalCount,
-            'refund_money_possible' => (int) ($settlement['net_paid_rupiah'] ?? 0) > 0,
-            'refund_preview_label' => $this->presentation->refundPreviewLabel($storeCount, $externalCount),
+            'store_stock_count' => $storeLineCount,
+            'external_purchase_count' => $externalLineCount,
+            'refund_stock_return_count' => $refundStockReturnCount,
+            'refund_external_count' => $refundExternalCount,
+            'refund_money_possible' => $netPaid > 0,
+            'refund_preview_label' => $this->presentation->refundPreviewLabel($refundStockReturnCount, $refundExternalCount),
+            'refund_impact' => $refundImpact,
             'line_status' => $lineStatus,
             'can_edit' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
             'can_pay' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
