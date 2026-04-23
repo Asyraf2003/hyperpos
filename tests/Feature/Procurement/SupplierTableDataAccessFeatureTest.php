@@ -31,6 +31,7 @@ final class SupplierTableDataAccessFeatureTest extends TestCase
         $this->seedSupplier('supplier-1', 'PT Federal Abadi');
         $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
         $this->seedPayment('payment-1', 'invoice-1', 40000, '2026-03-16', 'pending');
+        $this->syncSupplierListProjectionForTest('supplier-1');
 
         $response = $this->actingAs($this->user('admin'))->get(route('admin.suppliers.table'));
 

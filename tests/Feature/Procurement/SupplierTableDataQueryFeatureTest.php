@@ -19,6 +19,10 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $this->seedSupplier('supplier-2', 'PT Astra Otoparts');
         $this->seedSupplier('supplier-3', 'CV Toko Lokal');
 
+        $this->syncSupplierListProjectionForTest('supplier-1');
+        $this->syncSupplierListProjectionForTest('supplier-2');
+        $this->syncSupplierListProjectionForTest('supplier-3');
+
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', ['q' => 'PT']));
 
         $response->assertOk();
@@ -36,6 +40,9 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
 
         $this->seedPayment('payment-1', 'invoice-1', 70000, '2026-03-16', 'pending');
         $this->seedPayment('payment-2', 'invoice-2', 10000, '2026-03-17', 'pending');
+
+        $this->syncSupplierListProjectionForTest('supplier-1');
+        $this->syncSupplierListProjectionForTest('supplier-2');
 
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
             'sort_by' => 'outstanding_rupiah',
@@ -59,6 +66,8 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $this->seedPayment('payment-1', 'invoice-1', 25000, '2026-03-16', 'pending');
         $this->seedPayment('payment-2', 'invoice-2', 50000, '2026-03-18', 'uploaded');
 
+        $this->syncSupplierListProjectionForTest('supplier-1');
+
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
             'q' => 'Sumber',
         ]));
@@ -81,6 +90,10 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
         $this->seedInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
         $this->seedInvoice('invoice-2', 'supplier-2', '2026-03-18', '2026-04-18', 50000);
 
+        $this->syncSupplierListProjectionForTest('supplier-1');
+        $this->syncSupplierListProjectionForTest('supplier-2');
+        $this->syncSupplierListProjectionForTest('supplier-3');
+
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', [
             'sort_by' => 'last_shipment_date',
             'sort_dir' => 'desc',
@@ -98,10 +111,14 @@ final class SupplierTableDataQueryFeatureTest extends TestCase
     public function test_admin_can_access_second_page_of_supplier_table(): void
     {
         for ($i = 1; $i <= 11; $i++) {
+            $supplierId = 'supplier-' . $i;
+
             $this->seedSupplier(
-                'supplier-' . $i,
+                $supplierId,
                 'Supplier ' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
             );
+
+            $this->syncSupplierListProjectionForTest($supplierId);
         }
 
         $response = $this->actingAs($this->admin())->get(route('admin.suppliers.table', ['page' => 2]));

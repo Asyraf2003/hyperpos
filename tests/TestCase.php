@@ -4,6 +4,7 @@ namespace Tests;
 
 use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
+use App\Application\Procurement\Services\SupplierListProjectionService;
 use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,12 @@ abstract class TestCase extends BaseTestCase
     {
         app(SupplierInvoiceListProjectionService::class)
             ->syncInvoice(trim($supplierInvoiceId));
+    }
+
+    protected function syncSupplierListProjectionForTest(string $supplierId): void
+    {
+        app(SupplierListProjectionService::class)
+            ->syncSupplier(trim($supplierId));
     }
 
     protected function syncNoteProjectionForTest(string $noteId): void
