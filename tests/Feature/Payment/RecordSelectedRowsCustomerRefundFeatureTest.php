@@ -57,6 +57,63 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
         ]);
     }
 
+    public function test_it_records_external_purchase_refund_only_for_selected_external_row(): void
+    {
+        $this->seedNote();
+        $this->seedPaymentAndAllocations();
+
+        $result = app(RecordCustomerRefundHandler::class)->handle(
+            'payment-1',
+            'note-1',
+            2000,
+            '2026-04-03',
+            'Refund komponen external line terpilih',
+            'actor-1',
+            ['wi-3'],
+        );
+
+        $this->assertTrue($result->isSuccess());
+
+        $refundId = (string) DB::table('customer_refunds')->value('id');
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-3',
+            'component_type' => 'service_external_purchase_part',
+            'component_ref_id' => 'ext-1',
+            'refunded_amount_rupiah' => 2000,
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'work_item_id' => 'wi-1',
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'work_item_id' => 'wi-2',
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'component_type' => 'product_only_work_item',
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'component_type' => 'service_store_stock_part',
+        ]);
+
+        $this->assertSame(
+            1,
+            DB::table('refund_component_allocations')
+                ->where('customer_refund_id', $refundId)
+                ->count()
+        );
+    }
+
     private function seedNote(): void
     {
         $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 5000);
