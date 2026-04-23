@@ -14,6 +14,7 @@ final class SupplierInvoiceListProjectionService
     public function __construct(
         private readonly SupplierInvoiceListProjectionSourceReaderPort $source,
         private readonly SupplierInvoiceListProjectionWriterPort $writer,
+        private readonly SupplierListProjectionService $supplierProjection,
         private readonly ClockPort $clock,
     ) {
     }
@@ -40,6 +41,8 @@ final class SupplierInvoiceListProjectionService
             ),
             'projected_at' => $this->clock->now()->format('Y-m-d H:i:s'),
         ]);
+
+        $this->supplierProjection->syncSupplier((string) $sourceRow['supplier_id']);
     }
 
     private function resolvePaymentStatus(?string $voidedAt, int $outstandingRupiah): string

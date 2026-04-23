@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\UseCases;
 
+use App\Application\Procurement\Services\SupplierListProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Procurement\SupplierReaderPort;
@@ -14,6 +15,7 @@ final class UpdateSupplierHandler
     public function __construct(
         private SupplierReaderPort $readers,
         private SupplierWriterPort $writers,
+        private SupplierListProjectionService $projection,
     ) {
     }
 
@@ -48,6 +50,7 @@ final class UpdateSupplierHandler
         }
 
         $this->writers->update($supplier);
+        $this->projection->syncSupplier($supplier->id());
 
         return Result::success(
             [
@@ -67,7 +70,7 @@ final class UpdateSupplierHandler
             throw new DomainException('Nama PT pengirim wajib ada.');
         }
 
-        $val = preg_replace('/\s+/', ' ', $val) ?? $val;
+        $val = preg_replace('/\\s+/', ' ', $val) ?? $val;
 
         return mb_strtolower($val);
     }
