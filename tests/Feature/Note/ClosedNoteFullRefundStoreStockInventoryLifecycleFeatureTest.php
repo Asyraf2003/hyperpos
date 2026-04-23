@@ -25,6 +25,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 50000,
                 'refunded_at' => date('Y-m-d'),
@@ -66,7 +67,6 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         ]);
     }
 
-
     public function test_partial_refund_that_touches_store_stock_component_does_not_reverse_inventory_yet(): void
     {
         $user = $this->seedKasir();
@@ -75,6 +75,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 30000,
                 'refunded_at' => date('Y-m-d'),
