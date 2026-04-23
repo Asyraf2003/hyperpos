@@ -5,13 +5,16 @@
       <div class="modal-header">
         <div>
           <h5 class="modal-title mb-1">Refund Nota</h5>
-          <p class="mb-0 text-muted small">Modal ini hanya untuk konfirmasi line yang sudah dipilih dari tabel detail.</p>
+          <p class="mb-0 text-muted small">Refund hanya berlaku untuk line yang sudah dipilih dari tabel detail.</p>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
       </div>
+
       <form method="POST" action="{{ $refundModalConfig['action'] ?? $refundAction }}" id="note-refund-form">
         @csrf
         <div id="note-refund-hidden-selected-rows"></div>
+        <input type="hidden" id="refund_amount_rupiah" name="amount_rupiah" value="">
+
         <div class="modal-body">
           <div class="border rounded p-3 mb-4">
             <div class="fw-semibold mb-2">Line Terpilih</div>
@@ -21,12 +24,26 @@
           </div>
 
           <div class="border rounded p-3 mb-4">
-            <div class="small text-muted mb-2">Ringkasan Pilihan</div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Jumlah Line Dipilih</span><strong id="refund-modal-selected-count">0</strong></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Refundable Terpilih</span><strong id="refund-modal-selected-total">0</strong></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">Stok Toko Kembali</span><strong id="refund-modal-stock-return-count">0</strong></div>
-            <div class="d-flex justify-content-between py-2 border-bottom"><span class="text-muted">External Disederhanakan</span><strong id="refund-modal-external-count">0</strong></div>
-            <div class="d-flex justify-content-between pt-2"><span class="fw-semibold">Nominal Refund Sekarang</span><strong id="refund-modal-refund-now">0</strong></div>
+            <div class="small text-muted mb-2">Akibat Refund</div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Jumlah Line Dipilih</span>
+              <strong id="refund-modal-selected-count">0</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Nominal Refund Otomatis</span>
+              <strong id="refund-modal-selected-total">0</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">Stok Toko Kembali</span>
+              <strong id="refund-modal-stock-return-count">0</strong>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted">External Disederhanakan</span>
+              <strong id="refund-modal-external-count">0</strong>
+            </div>
+            <div class="pt-2 small text-muted" id="refund-modal-impact-note">
+              Refund akan dicatat untuk line yang dipilih sesuai total refundable saat ini.
+            </div>
           </div>
 
           <div class="mb-3">
@@ -43,16 +60,21 @@
             <input type="date" name="refunded_at" value="{{ old('refunded_at', $refundModalConfig['date_default'] ?? $refundDateDefault) }}" class="form-control" required>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Nominal Refund</label>
-            <input type="number" min="1" id="refund_amount_rupiah" name="amount_rupiah" value="{{ old('amount_rupiah') }}" class="form-control" required>
-          </div>
-
           <div class="mb-0">
             <label class="form-label">Alasan Refund</label>
-            <textarea name="reason" rows="3" class="form-control" required>{{ old('reason') }}</textarea>
+            <input
+              type="text"
+              id="note-refund-reason"
+              name="reason"
+              value="{{ old('reason') }}"
+              class="form-control"
+              required
+              autocomplete="off"
+              placeholder="Tulis alasan refund lalu tekan Enter"
+            >
           </div>
         </div>
+
         <div class="modal-footer">
           <div class="ui-form-actions w-100 justify-content-between">
             <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
