@@ -25,6 +25,7 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 10000,
                 'refunded_at' => date('Y-m-d'),
@@ -60,6 +61,7 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 5000,
                 'refunded_at' => date('Y-m-d'),
@@ -79,6 +81,7 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $this->actingAs($user)
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+                'selected_row_ids' => ['wi-1'],
                 'customer_payment_id' => 'payment-1',
                 'amount_rupiah' => 5000,
                 'refunded_at' => date('Y-m-d'),
