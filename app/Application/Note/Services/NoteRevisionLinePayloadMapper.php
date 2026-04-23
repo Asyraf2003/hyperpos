@@ -18,15 +18,22 @@ final class NoteRevisionLinePayloadMapper
             'transaction_type' => $item->transactionType(),
             'status' => $item->status(),
             'external_purchase_lines' => array_map(
-                static fn (mixed $line): mixed => is_object($line) && method_exists($line, 'toArray')
-                    ? $line->toArray()
-                    : $line,
+                static fn ($line): array => [
+                    'id' => $line->id(),
+                    'cost_description' => $line->costDescription(),
+                    'unit_cost_rupiah' => $line->unitCostRupiah()->amount(),
+                    'qty' => $line->qty(),
+                    'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
+                ],
                 $item->externalPurchaseLines(),
             ),
             'store_stock_lines' => array_map(
-                static fn (mixed $line): mixed => is_object($line) && method_exists($line, 'toArray')
-                    ? $line->toArray()
-                    : $line,
+                static fn ($line): array => [
+                    'id' => $line->id(),
+                    'product_id' => $line->productId(),
+                    'qty' => $line->qty(),
+                    'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
+                ],
                 $item->storeStockLines(),
             ),
         ];
