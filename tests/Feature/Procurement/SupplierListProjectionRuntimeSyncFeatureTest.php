@@ -106,7 +106,7 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             'kode_barang' => strtoupper(str_replace('-', '_', $id)),
             'nama_barang' => $namaBarang,
             'merek' => 'Runtime',
-            'ukuran' => 'std',
+            'ukuran' => 90,
             'harga_jual' => $hargaJual,
         ]);
 
