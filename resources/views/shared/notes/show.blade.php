@@ -13,13 +13,6 @@
   </div>
 
   <div class="row g-4 align-items-start">
-    <div class="col-12 col-xl-4">
-      <div class="ui-card-stack">
-        @include('shared.notes.partials.header-summary')
-        @include('shared.notes.partials.payment-summary-actions')
-      </div>
-    </div>
-
     <div class="col-12 col-xl-8">
       <div class="ui-card-stack">
         @include('shared.notes.partials.line-workspace')
@@ -28,6 +21,13 @@
           'timelineRevisions' => array_slice(($note['revision_timeline']['timeline'] ?? []), 0, 3),
           'revisionCount' => count($note['revision_timeline']['timeline'] ?? []),
         ])
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-4">
+      <div class="ui-card-stack">
+        @include('shared.notes.partials.header-summary')
+        @include('shared.notes.partials.payment-summary-actions')
       </div>
     </div>
   </div>
