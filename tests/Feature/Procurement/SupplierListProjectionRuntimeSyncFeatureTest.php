@@ -99,19 +99,20 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
         ]);
     }
 
-    private function seedProduct(string $id, string $name, int $stock = 0): void
+    private function seedProduct(string $id, string $namaBarang, int $hargaJual = 100000): void
     {
         DB::table('products')->insert([
             'id' => $id,
-            'name' => $name,
-            'sku' => strtoupper($id),
-            'selling_price' => 100000,
-            'is_active' => 1,
+            'kode_barang' => strtoupper(str_replace('-', '_', $id)),
+            'nama_barang' => $namaBarang,
+            'merek' => 'Runtime',
+            'ukuran' => 'std',
+            'harga_jual' => $hargaJual,
         ]);
 
         DB::table('product_inventories')->insert([
             'product_id' => $id,
-            'stock' => $stock,
+            'stok_saat_ini' => 0,
             'avg_cost' => 0,
         ]);
     }
