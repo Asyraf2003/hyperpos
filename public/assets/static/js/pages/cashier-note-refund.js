@@ -25,21 +25,7 @@
     const rows = () => Array.from(document.querySelectorAll('[data-refund-row="1"]'));
     const selectedIds = new Set();
 
-    const hydrateInitialSelection = () => {
-      rows().forEach((row) => {
-        if (String(row.dataset.initialSelected || '0') === '1') {
-          selectedIds.add(String(row.dataset.rowId || ''));
-        }
-      });
-    };
-
     const isSelected = (row) => selectedIds.has(String(row.dataset.rowId || ''));
-
-    const syncRowVisual = (row) => {
-      const selected = isSelected(row);
-      row.classList.toggle('refund-row-selected', selected);
-      row.setAttribute('aria-pressed', selected ? 'true' : 'false');
-    };
 
     const selectedRows = () => rows().filter((row) => isSelected(row));
 
@@ -94,35 +80,48 @@
       }).join('');
     };
 
-    const updateUi = () => {
-      rows().forEach(syncRowVisual);
+    const syncVisual = () => {
+      rows().forEach((row) => {
+        const selected = isSelected(row);
+        row.classList.toggle('refund-row-selected', selected);
+        row.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      });
+    };
 
-      const count = selectedRows().length;
-      const total = refundableTotal();
-      const amount = refundNow();
+    const syncButton = () => {
+      const hasSelection = selectedRows().length > 0;
+      openButton.disabled = !hasSelection;
+      openButton.classList.toggle('opacity-50', !hasSelection);
+      openButton.classList.toggle('disabled', !hasSelection);
+      openButton.style.pointerEvents = hasSelection ? 'auto' : 'none';
+      openButton.setAttribute('aria-disabled', hasSelection ? 'false' : 'true');
 
+      if (submitButton) {
+        submitButton.disabled = !hasSelection || refundNow() <= 0;
+      }
+    };
+
+    const syncSummary = () => {
       const countNode = document.getElementById('refund-modal-selected-count');
       const totalNode = document.getElementById('refund-modal-selected-total');
       const stockNode = document.getElementById('refund-modal-stock-return-count');
       const externalNode = document.getElementById('refund-modal-external-count');
       const refundNowNode = document.getElementById('refund-modal-refund-now');
 
-      if (countNode) countNode.textContent = format(count);
-      if (totalNode) totalNode.textContent = format(total);
+      if (countNode) countNode.textContent = format(selectedRows().length);
+      if (totalNode) totalNode.textContent = format(refundableTotal());
       if (stockNode) stockNode.textContent = format(stockReturnCount());
       if (externalNode) externalNode.textContent = format(externalCount());
-      if (refundNowNode) refundNowNode.textContent = format(amount);
-
-      openButton.disabled = count <= 0;
-      openButton.classList.toggle('disabled', count <= 0);
-      openButton.setAttribute('aria-disabled', count <= 0 ? 'true' : 'false');
-
-      if (submitButton) {
-        submitButton.disabled = count <= 0 || amount <= 0;
-      }
+      if (refundNowNode) refundNowNode.textContent = format(refundNow());
 
       buildHiddenInputs();
       buildSelectedLinesSummary();
+    };
+
+    const syncAll = () => {
+      syncVisual();
+      syncButton();
+      syncSummary();
     };
 
     const toggleRow = (row) => {
@@ -135,11 +134,8 @@
         selectedIds.add(rowId);
       }
 
-      updateUi();
+      syncAll();
     };
-
-    hydrateInitialSelection();
-    updateUi();
 
     document.addEventListener('click', (event) => {
       const target = event.target;
@@ -156,8 +152,7 @@
         if (selectedRows().length <= 0) {
           return;
         }
-
-        updateUi();
+        syncAll();
         modal?.show();
       }
     });
@@ -174,8 +169,11 @@
       toggleRow(row);
     });
 
-    form.addEventListener('input', updateUi);
-    form.addEventListener('change', updateUi);
+    form.addEventListener('input', syncAll);
+    form.addEventListener('change', syncAll);
+
+    selectedIds.clear();
+    syncAll();
   };
 
   if (document.readyState === 'loading') {

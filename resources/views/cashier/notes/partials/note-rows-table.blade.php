@@ -3,7 +3,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
         <h4 class="card-title mb-1">Daftar Line Nota</h4>
-        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Row gelap berarti sedang dipilih.</p>
+        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Hover dan selected sekarang dibedakan tegas.</p>
       </div>
       <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
     </div>
@@ -12,16 +12,21 @@
     <style>
       .refund-row-hoverable {
         cursor: pointer;
-        transition: background-color .15s ease, box-shadow .15s ease;
+        transition: background-color .15s ease, box-shadow .15s ease, transform .05s ease;
       }
 
       .refund-row-hoverable:hover > td {
-        background-color: rgba(148, 163, 184, 0.14) !important;
+        background-color: rgba(148, 163, 184, 0.12) !important;
       }
 
       .refund-row-selected > td {
-        background-color: rgba(30, 64, 175, 0.16) !important;
-        box-shadow: inset 0 0 0 9999px rgba(30, 64, 175, 0.08);
+        background-color: rgba(30, 41, 59, 0.24) !important;
+        box-shadow: inset 0 0 0 9999px rgba(30, 41, 59, 0.18);
+      }
+
+      .refund-row-selected td .refund-row-hint {
+        color: #0f172a !important;
+        font-weight: 700;
       }
     </style>
 
@@ -44,13 +49,12 @@
           @forelse ($note['rows'] as $row)
             @php
               $isRefundable = (bool) ($row['can_refund'] ?? false);
-              $isSelected = in_array($row['id'], old('selected_row_ids', []), true);
             @endphp
             <tr
               @if ($isRefundable)
                 role="button"
                 tabindex="0"
-                class="refund-row-hoverable {{ $isSelected ? 'refund-row-selected' : '' }}"
+                class="refund-row-hoverable"
                 data-refund-row="1"
                 data-row-id="{{ $row['id'] }}"
                 data-line-no="{{ $row['line_no'] }}"
@@ -60,15 +64,14 @@
                 data-store-return-count="{{ (int) ($row['refund_stock_return_count'] ?? 0) }}"
                 data-external-count="{{ (int) ($row['refund_external_count'] ?? 0) }}"
                 data-preview-label="{{ $row['refund_preview_label'] ?? '-' }}"
-                data-initial-selected="{{ $isSelected ? '1' : '0' }}"
-                aria-pressed="{{ $isSelected ? 'true' : 'false' }}"
+                aria-pressed="false"
               @endif
             >
               <td>{{ $row['line_no'] }}</td>
               <td>
                 <div class="fw-semibold">{{ $row['line_label'] ?? '-' }}</div>
                 @if ($isRefundable)
-                  <div class="small text-muted">Klik untuk pilih refund</div>
+                  <div class="small text-muted refund-row-hint">Klik untuk pilih refund</div>
                 @endif
               </td>
               <td>{{ $row['type_label'] }}</td>
