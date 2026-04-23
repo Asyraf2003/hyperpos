@@ -2,6 +2,7 @@
 
 use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
+use App\Application\Procurement\Services\SupplierListProjectionService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -14,13 +15,14 @@ Artisan::command(
     'projection:rebuild-indexes {scope=all} {--chunk=200}',
     function (
         SupplierInvoiceListProjectionService $procurementProjection,
+        SupplierListProjectionService $supplierProjection,
         NoteHistoryProjectionService $noteProjection
     ): int {
         $scope = strtolower(trim((string) $this->argument('scope')));
         $chunkSize = max((int) $this->option('chunk'), 1);
 
-        if (! in_array($scope, ['all', 'procurement', 'note'], true)) {
-            $this->error('Scope harus salah satu dari: all, procurement, note.');
+        if (! in_array($scope, ['all', 'procurement', 'supplier', 'note'], true)) {
+            $this->error('Scope harus salah satu dari: all, procurement, supplier, note.');
 
             return 1;
         }
@@ -45,6 +47,28 @@ Artisan::command(
                 });
 
             $this->info('Rebuild projection procurement selesai.');
+        }
+
+        if ($scope === 'all' || $scope === 'supplier') {
+            $this->info('Rebuild projection supplier dimulai.');
+            DB::table('supplier_list_projection')->delete();
+
+            $total = (int) DB::table('suppliers')->count();
+            $processed = 0;
+
+            DB::table('suppliers')
+                ->select('id')
+                ->orderBy('id')
+                ->chunk($chunkSize, function ($rows) use (&$processed, $total, $supplierProjection): void {
+                    foreach ($rows as $row) {
+                        $supplierProjection->syncSupplier((string) $row->id);
+                        $processed++;
+                    }
+
+                    $this->line("Supplier projection: {$processed}/{$total}");
+                });
+
+            $this->info('Rebuild projection supplier selesai.');
         }
 
         if ($scope === 'all' || $scope === 'note') {
@@ -73,4 +97,4 @@ Artisan::command(
 
         return 0;
     }
-)->purpose('Rebuild read-model projection untuk procurement invoices dan admin note history');
+)->purpose('Rebuild read-model projection untuk procurement invoices, supplier list, dan admin note history');
