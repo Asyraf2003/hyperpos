@@ -9,15 +9,23 @@ use App\Application\Procurement\UseCases\RecordSupplierPaymentHandler;
 use App\Application\Procurement\UseCases\UpdateSupplierHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalProcurementFixture;
 use Tests\TestCase;
 
 final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalProcurementFixture;
 
     public function test_supplier_list_projection_updates_after_create_invoice_and_payment(): void
     {
-        $this->seedSupplier('supplier-1', 'PT Runtime Supplier');
+        $this->seedMinimalSupplier('supplier-1', 'PT Runtime Supplier', 'pt runtime supplier');
+        $this->seedMinimalProduct('product-1', 'KB-RT-001', 'Produk Runtime', 'Runtime', 90, 100000);
+
+        DB::table('actor_accesses')->updateOrInsert(
+            ['actor_id' => 'admin-1'],
+            ['role' => 'admin'],
+        );
 
         $create = app(CreateSupplierInvoiceFlowHandler::class)->handle(
             nomorFaktur: 'INV-RUNTIME-001',
@@ -37,7 +45,7 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             sourceChannel: 'test',
         );
 
-        $this->assertTrue($create->isSuccess());
+        $this->assertTrue($create->isSuccess(), json_encode($create->errors(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $projectionAfterCreate = DB::table('supplier_list_projection')
             ->where('supplier_id', 'supplier-1')
@@ -57,7 +65,7 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
             performedByActorId: 'admin-1',
         );
 
-        $this->assertTrue($payment->isSuccess());
+        $this->assertTrue($payment->isSuccess(), json_encode($payment->errors(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $projectionAfterPayment = DB::table('supplier_list_projection')
             ->where('supplier_id', 'supplier-1')
@@ -70,7 +78,7 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
 
     public function test_supplier_list_projection_updates_after_supplier_rename(): void
     {
-        $this->seedSupplier('supplier-1', 'PT Nama Lama');
+        $this->seedMinimalSupplier('supplier-1', 'PT Nama Lama', 'pt nama lama');
         $this->syncSupplierListProjectionForTest('supplier-1');
 
         $result = app(UpdateSupplierHandler::class)->handle('supplier-1', 'PT Nama Baru');
@@ -83,39 +91,5 @@ final class SupplierListProjectionRuntimeSyncFeatureTest extends TestCase
 
         $this->assertNotNull($projection);
         $this->assertSame('PT Nama Baru', $projection->nama_pt_pengirim);
-    }
-
-    private function seedSupplier(string $id, string $namaPtPengirim): void
-    {
-        DB::table('suppliers')->insert([
-            'id' => $id,
-            'nama_pt_pengirim' => $namaPtPengirim,
-            'nama_pt_pengirim_normalized' => mb_strtolower($namaPtPengirim),
-        ]);
-
-        DB::table('actor_accesses')->insert([
-            'actor_id' => 'admin-1',
-            'role' => 'admin',
-        ]);
-    }
-
-    private function seedProduct(string $id, string $namaBarang, int $hargaJual = 100000): void
-    {
-        DB::table('products')->insert([
-            'id' => $id,
-            'kode_barang' => strtoupper(str_replace('-', '_', $id)),
-            'nama_barang' => $namaBarang,
-            'merek' => 'Runtime',
-            'ukuran' => 90,
-            'harga_jual' => $hargaJual,
-        ]);
-
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->seedProduct('product-1', 'Produk Runtime');
     }
 }
