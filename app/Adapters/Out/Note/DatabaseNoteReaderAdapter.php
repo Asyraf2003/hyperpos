@@ -32,17 +32,15 @@ final class DatabaseNoteReaderAdapter implements NoteReaderPort
             ->get()
             ->all();
 
-        $activeItemRows = $this->activeRows->filter($itemRows);
-        $ids = array_map(fn ($row) => (string) $row->id, $activeItemRows);
+        $ids = array_map(fn ($row) => (string) $row->id, $itemRows);
+
+        $detailMap = $this->details->loadDetails($ids);
+        $externalMap = $this->details->loadExternals($ids);
+        $stockMap = $this->details->loadStocks($ids);
 
         $workItems = array_map(
-            fn ($row) => WorkItemMapper::map(
-                $row,
-                $this->details->loadDetails($ids),
-                $this->details->loadExternals($ids),
-                $this->details->loadStocks($ids),
-            ),
-            $activeItemRows
+            fn ($row) => WorkItemMapper::map($row, $detailMap, $externalMap, $stockMap),
+            $itemRows
         );
 
         return NoteMapper::map($noteRow, $workItems);

@@ -27,20 +27,22 @@ final class NoteMapper
             ? new DateTimeImmutable((string) $row->reopened_at)
             : null;
 
-        $activeTotal = self::sumActiveItems($items);
-
         return Note::rehydrate(
             (string) $row->id,
             (string) $row->customer_name,
             $customerPhone,
             new DateTimeImmutable((string) $row->transaction_date),
-            $activeTotal,
+            self::sumActiveItems($items),
             $items,
             property_exists($row, 'note_state') ? (string) $row->note_state : Note::STATE_OPEN,
             $closedAt,
-            property_exists($row, 'closed_by_actor_id') ? ($row->closed_by_actor_id === null ? null : (string) $row->closed_by_actor_id) : null,
+            property_exists($row, 'closed_by_actor_id')
+                ? ($row->closed_by_actor_id === null ? null : (string) $row->closed_by_actor_id)
+                : null,
             $reopenedAt,
-            property_exists($row, 'reopened_by_actor_id') ? ($row->reopened_by_actor_id === null ? null : (string) $row->reopened_by_actor_id) : null,
+            property_exists($row, 'reopened_by_actor_id')
+                ? ($row->reopened_by_actor_id === null ? null : (string) $row->reopened_by_actor_id)
+                : null,
         );
     }
 
@@ -50,6 +52,10 @@ final class NoteMapper
         $total = Money::zero();
 
         foreach ($items as $item) {
+            if ($item->status() === WorkItem::STATUS_CANCELED) {
+                continue;
+            }
+
             $total = $total->add($item->subtotalRupiah());
         }
 
