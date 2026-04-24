@@ -43,9 +43,20 @@ final class CashierDetailRenderedBillingRowsPaymentFeatureTest extends TestCase
         $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
         $response->assertSessionHasNoErrors();
 
-        $this->assertDatabaseHas('customer_payments', [
+        $this->assertDatabaseHas('payment_component_allocations', [
             'note_id' => 'note-1',
-            'amount_rupiah' => 50000,
+            'work_item_id' => 'wi-1',
+            'component_type' => 'service_store_stock_part',
+            'component_ref_id' => 'ssl-1',
+            'allocated_amount_rupiah' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-1',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-1',
+            'allocated_amount_rupiah' => 30000,
         ]);
     }
 
