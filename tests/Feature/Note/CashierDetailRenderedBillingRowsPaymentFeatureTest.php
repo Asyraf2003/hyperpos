@@ -29,7 +29,7 @@ final class CashierDetailRenderedBillingRowsPaymentFeatureTest extends TestCase
 
         preg_match_all('/data-billing-row-id="([^"]+)"/', $html, $matches);
 
-        $selectedRowIds = array_values(array_unique($matches[1] ?? []));
+        $selectedRowIds = array_values(array_unique($matches[1]));
 
         $this->assertNotSame([], $selectedRowIds, 'Detail page must render payment billing row IDs.');
 
