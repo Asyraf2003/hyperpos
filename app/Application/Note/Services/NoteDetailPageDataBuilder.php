@@ -31,7 +31,7 @@ final class NoteDetailPageDataBuilder
         if ($workspacePanel === null) return null;
 
         $operational = $this->operationals->build((array) ($workspacePanel['note_totals'] ?? []));
-        $billingRows = $this->billingProjection->buildFromWorkspaceRows($workspacePanel['rows'] ?? []);
+        $billingRows = $this->billingProjection->build($note->id()) ?? [];
         $history = $this->history->build($note->id());
         $refundOptions = $this->refundPaymentOptions->build($note->id());
         $revisionView = $this->revisionView->build($note);
