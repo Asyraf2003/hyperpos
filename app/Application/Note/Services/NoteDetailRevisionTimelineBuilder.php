@@ -11,6 +11,7 @@ final class NoteDetailRevisionTimelineBuilder
     public function __construct(
         private readonly NoteRevisionTimelineSummaryBuilder $summaries,
         private readonly NoteRevisionTimelineParentResolver $parents,
+        private readonly NoteRevisionLineSnapshotViewMapper $lineSnapshots,
     ) {
     }
 
@@ -61,6 +62,7 @@ final class NoteDetailRevisionTimelineBuilder
                 $revision,
                 $this->parents->resolve($revision, $all),
             ),
+            'line_snapshot_rows' => $this->lineSnapshots->mapMany($revision->lines()),
         ];
     }
 

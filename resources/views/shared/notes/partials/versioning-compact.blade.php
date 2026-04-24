@@ -23,6 +23,36 @@
         </div>
       </div>
 
+      @if (!empty($currentRevision['line_snapshot_rows']))
+        <div class="fw-semibold small mb-2">Isi Revision Aktif</div>
+        <div class="d-flex flex-column gap-2 mb-3">
+          @foreach (($currentRevision['line_snapshot_rows'] ?? []) as $line)
+            <div class="border rounded p-2 bg-white">
+              <div class="d-flex justify-content-between gap-2">
+                <div>
+                  <div class="fw-semibold">
+                    Line {{ (int) ($line['line_no'] ?? 0) }} · {{ $line['label'] ?? '-' }}
+                  </div>
+                  <div class="small text-muted">
+                    {{ $line['type_label'] ?? '-' }} · {{ $line['status'] ?? '-' }}
+                  </div>
+                </div>
+                <div class="fw-semibold text-end">
+                  {{ number_format((int) ($line['subtotal_rupiah'] ?? 0), 0, ',', '.') }}
+                </div>
+              </div>
+              @if (!empty($line['details']))
+                <div class="small text-muted mt-2">
+                  @foreach (($line['details'] ?? []) as $detail)
+                    <div>{{ $detail }}</div>
+                  @endforeach
+                </div>
+              @endif
+            </div>
+          @endforeach
+        </div>
+      @endif
+
       @if (!empty($currentRevision['change_summary_lines']))
         <div class="d-flex flex-column gap-2">
           @foreach (($currentRevision['change_summary_lines'] ?? []) as $summary)
@@ -47,6 +77,38 @@
                 @endif
               </div>
             </div>
+
+            @if (!empty($entry['line_snapshot_rows']))
+              <div class="fw-semibold small mb-2">
+                Isi Revision R{{ (int) ($entry['revision_number'] ?? 0) }}
+              </div>
+              <div class="d-flex flex-column gap-2 mb-3">
+                @foreach (($entry['line_snapshot_rows'] ?? []) as $line)
+                  <div class="border rounded p-2 bg-light">
+                    <div class="d-flex justify-content-between gap-2">
+                      <div>
+                        <div class="fw-semibold">
+                          Line {{ (int) ($line['line_no'] ?? 0) }} · {{ $line['label'] ?? '-' }}
+                        </div>
+                        <div class="small text-muted">
+                          {{ $line['type_label'] ?? '-' }} · {{ $line['status'] ?? '-' }}
+                        </div>
+                      </div>
+                      <div class="fw-semibold text-end">
+                        {{ number_format((int) ($line['subtotal_rupiah'] ?? 0), 0, ',', '.') }}
+                      </div>
+                    </div>
+                    @if (!empty($line['details']))
+                      <div class="small text-muted mt-2">
+                        @foreach (($line['details'] ?? []) as $detail)
+                          <div>{{ $detail }}</div>
+                        @endforeach
+                      </div>
+                    @endif
+                  </div>
+                @endforeach
+              </div>
+            @endif
 
             @if (!empty($entry['change_summary_lines']))
               <div class="d-flex flex-column gap-2 mb-2">
