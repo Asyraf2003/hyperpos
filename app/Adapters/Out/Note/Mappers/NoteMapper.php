@@ -32,7 +32,7 @@ final class NoteMapper
             (string) $row->customer_name,
             $customerPhone,
             new DateTimeImmutable((string) $row->transaction_date),
-            self::sumActiveItems($items),
+            self::resolveMappedTotal($row, $items),
             $items,
             property_exists($row, 'note_state') ? (string) $row->note_state : Note::STATE_OPEN,
             $closedAt,
@@ -47,8 +47,12 @@ final class NoteMapper
     }
 
     /** @param list<WorkItem> $items */
-    private static function sumActiveItems(array $items): Money
+    private static function resolveMappedTotal(stdClass $row, array $items): Money
     {
+        if ($items === []) {
+            return Money::fromInt((int) ($row->total_rupiah ?? 0));
+        }
+
         $total = Money::zero();
 
         foreach ($items as $item) {
