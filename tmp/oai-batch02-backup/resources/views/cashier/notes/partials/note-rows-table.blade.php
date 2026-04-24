@@ -2,7 +2,8 @@
   <div class="card-header">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
-        <h4 class="card-title mb-0">Daftar Line Nota</h4>
+        <h4 class="card-title mb-1">Daftar Line Nota</h4>
+        <p class="mb-0 text-muted">Klik row untuk menandai line refund. Hover dan selected sekarang dibedakan tegas.</p>
       </div>
       <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
     </div>
@@ -34,14 +35,14 @@
         <thead>
           <tr>
             <th>Line</th>
-            <th>Item / Service</th>
-            <th>Tipe</th>
-            <th>Status</th>
+            <th>Label</th>
+            <th>Tipe Domain</th>
+            <th>Status Line</th>
             <th class="text-end">Subtotal</th>
             <th class="text-end">Sudah Dibayar</th>
             <th class="text-end">Refund</th>
             <th class="text-end">Sisa</th>
-            <th>Dampak Refund</th>
+            <th>Preview Refund</th>
           </tr>
         </thead>
         <tbody>
@@ -67,19 +68,12 @@
               <td>{{ $row['line_no'] }}</td>
               <td>
                 <div class="fw-semibold">{{ $row['line_label'] ?? '-' }}</div>
-                @if (!empty($row['line_subtitle']))
-                  <div class="small text-muted">{{ $row['line_subtitle'] }}</div>
-                @endif
                 @if ((bool) ($row['can_refund'] ?? false))
                   <div class="small text-muted refund-row-hint">Klik untuk pilih refund</div>
                 @endif
               </td>
               <td>{{ $row['type_label'] }}</td>
-              <td>
-                <span class="badge bg-light text-dark border text-uppercase">
-                  {{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}
-                </span>
-              </td>
+              <td><span class="badge bg-light text-dark border text-uppercase">{{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}</span></td>
               <td class="text-end">{{ number_format((int) ($row['subtotal_rupiah'] ?? 0), 0, ',', '.') }}</td>
               <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>
               <td class="text-end">{{ number_format((int) ($row['refunded_rupiah'] ?? 0), 0, ',', '.') }}</td>
@@ -90,7 +84,7 @@
                   <div class="small">Stok toko kembali: {{ (int) ($row['refund_stock_return_count'] ?? 0) }}</div>
                 @endif
                 @if ((int) ($row['refund_external_count'] ?? 0) > 0)
-                  <div class="small">External dinetralkan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
+                  <div class="small">External disederhanakan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
                 @endif
               </td>
             </tr>
@@ -100,6 +94,6 @@
         </tbody>
       </table>
     </div>
-    <div class="small text-muted mt-3">Refund dipilih dari line yang aktif.</div>
+    <div class="small text-muted mt-3">Refund dipilih dari tabel line. Payment tetap memakai billing projection agar layer baca line tidak bercampur dengan komponen tagihan.</div>
   </div>
 </div>

@@ -2,7 +2,8 @@
   <div class="card-header">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
       <div>
-        <h4 class="card-title mb-0">Header Nota</h4>
+        <h4 class="card-title mb-1">Header Nota</h4>
+        <p class="mb-0 text-muted">Ringkasan utama nota aktif yang sedang dipakai saat ini.</p>
       </div>
       <span class="badge bg-light text-dark border">
         {{ count($note['rows']) }} Line
@@ -32,10 +33,10 @@
     </div>
 
     <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
-      <small>Status Operasional</small>
+      <small>Status</small>
       <div class="text-end">
         <span class="badge bg-light text-dark border text-uppercase">
-          {{ $note['operational_status'] ?? $note['payment_status'] ?? '-' }}
+          {{ $note['payment_status'] ?? '-' }}
         </span>
       </div>
     </div>

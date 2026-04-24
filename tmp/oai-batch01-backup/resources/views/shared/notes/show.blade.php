@@ -8,7 +8,8 @@
 <section class="section">
   <div class="ui-page-intro">
     <div class="small text-muted text-uppercase fw-semibold">{{ $pageIntroEyebrow }}</div>
-    <h4 class="ui-page-intro-title mb-0">{{ $pageIntroTitle }}</h4>
+    <h4 class="ui-page-intro-title">{{ $pageIntroTitle }}</h4>
+    <p class="ui-page-intro-subtitle">{{ $pageIntroSubtitle }}</p>
   </div>
 
   <div class="row g-4 align-items-start">

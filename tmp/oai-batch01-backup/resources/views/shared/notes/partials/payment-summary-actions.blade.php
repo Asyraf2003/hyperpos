@@ -1,6 +1,7 @@
 <div class="card">
   <div class="card-header">
-    <h4 class="card-title mb-0">Status & Aksi Nota</h4>
+    <h4 class="card-title mb-1">Status & Aksi Nota</h4>
+    <p class="mb-0 text-muted">Aksi operasional utama nota aktif.</p>
   </div>
 
   <div class="card-body">
@@ -19,18 +20,18 @@
       <strong>{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+    <div class="d-flex justify-content-between align-items-center py-3">
       <span class="fw-semibold">Sisa Tagihan</span>
       <strong class="fs-5">{{ number_format($note['outstanding_rupiah'], 0, ',', '.') }}</strong>
     </div>
 
     <div class="border rounded p-3 bg-light mb-3">
       <div class="small text-muted mb-1">Status Operasional</div>
-      <div class="fw-bold text-uppercase">{{ $note['operational_status'] ?? $note['payment_status'] ?? '-' }}</div>
+      <div class="fw-bold">{{ $note['payment_status'] ?? '-' }}</div>
     </div>
 
-    @if ($note['can_show_payment_form'] ?? false)
-      <div class="d-grid gap-2">
+    <div class="d-grid gap-2">
+      @if ($note['can_show_payment_form'] ?? false)
         <button
           type="button"
           class="btn btn-primary js-open-payment-intent"
@@ -52,7 +53,18 @@
         >
           Lunasi
         </button>
-      </div>
-    @endif
+      @endif
+
+      @if ($note['can_show_refund_form'] ?? false)
+        <button
+          type="button"
+          class="btn btn-outline-danger"
+          data-bs-toggle="modal"
+          data-bs-target="#note-refund-modal"
+        >
+          Refund
+        </button>
+      @endif
+    </div>
   </div>
 </div>
