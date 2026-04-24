@@ -26,8 +26,12 @@ final class SelectedRowsRefundPlan
      * @param list<string> $unpaidRowIds
      * @param list<SelectedRowsRefundPaymentBucket> $paymentBuckets
      */
-    public static function create(string $noteId, array $selectedRowIds, array $unpaidRowIds, array $paymentBuckets): self
-    {
+    public static function create(
+        string $noteId,
+        array $selectedRowIds,
+        array $unpaidRowIds,
+        array $paymentBuckets,
+    ): self {
         $normalizedNoteId = trim($noteId);
 
         if ($normalizedNoteId === '') {
@@ -46,16 +50,25 @@ final class SelectedRowsRefundPlan
         return $this->noteId;
     }
 
+    /**
+     * @return list<string>
+     */
     public function selectedRowIds(): array
     {
         return $this->selectedRowIds;
     }
 
+    /**
+     * @return list<string>
+     */
     public function unpaidRowIds(): array
     {
         return $this->unpaidRowIds;
     }
 
+    /**
+     * @return list<SelectedRowsRefundPaymentBucket>
+     */
     public function paymentBuckets(): array
     {
         return $this->paymentBuckets;
@@ -69,8 +82,26 @@ final class SelectedRowsRefundPlan
         ));
     }
 
+    /**
+     * @return array{
+     *   note_id: string,
+     *   selected_row_ids: list<string>,
+     *   unpaid_row_ids: list<string>,
+     *   total_refund_rupiah: int,
+     *   payment_buckets: list<array{customer_payment_id: string, row_ids: list<string>, amount_rupiah: int}>
+     * }
+     */
     public function toArray(): array
     {
-        return (new SelectedRowsRefundPlanArraySerializer())->serialize($this);
+        return [
+            'note_id' => $this->noteId,
+            'selected_row_ids' => $this->selectedRowIds,
+            'unpaid_row_ids' => $this->unpaidRowIds,
+            'total_refund_rupiah' => $this->totalRefundRupiah(),
+            'payment_buckets' => array_map(
+                static fn (SelectedRowsRefundPaymentBucket $bucket): array => $bucket->toArray(),
+                $this->paymentBuckets,
+            ),
+        ];
     }
 }
