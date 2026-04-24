@@ -26,8 +26,6 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
                 'selected_row_ids' => ['wi-1'],
-                'customer_payment_id' => 'payment-1',
-                'amount_rupiah' => 50000,
                 'refunded_at' => date('Y-m-d'),
                 'reason' => 'Refund penuh part stok toko',
             ])
@@ -67,7 +65,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         ]);
     }
 
-    public function test_partial_refund_that_touches_store_stock_component_does_not_reverse_inventory_yet(): void
+    public function test_selected_row_refund_for_closed_store_stock_note_refunds_whole_row_components(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidStoreStockNote();
@@ -76,10 +74,8 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
                 'selected_row_ids' => ['wi-1'],
-                'customer_payment_id' => 'payment-1',
-                'amount_rupiah' => 30000,
                 'refunded_at' => date('Y-m-d'),
-                'reason' => 'Refund sebagian, service fee penuh dan part sebagian',
+                'reason' => 'Refund full selected stock row',
             ])
             ->assertRedirect(route('cashier.notes.index'))
             ->assertSessionHas('success');
@@ -97,30 +93,12 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
             'customer_refund_id' => $refundId,
             'component_type' => 'service_store_stock_part',
             'component_ref_id' => 'ssl-1',
-            'refunded_amount_rupiah' => 10000,
+            'refunded_amount_rupiah' => 30000,
         ]);
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'note_state' => 'closed',
-        ]);
-
-        $this->assertDatabaseMissing('inventory_movements', [
-            'product_id' => 'product-1',
-            'movement_type' => 'stock_in',
-            'source_type' => 'work_item_store_stock_line_reversal',
-            'source_id' => 'ssl-1',
-        ]);
-
-        $this->assertDatabaseHas('product_inventory', [
-            'product_id' => 'product-1',
-            'qty_on_hand' => 3,
-        ]);
-
-        $this->assertDatabaseHas('product_inventory_costing', [
-            'product_id' => 'product-1',
-            'avg_cost_rupiah' => 15000,
-            'inventory_value_rupiah' => 45000,
+            'note_state' => 'refunded',
         ]);
     }
 

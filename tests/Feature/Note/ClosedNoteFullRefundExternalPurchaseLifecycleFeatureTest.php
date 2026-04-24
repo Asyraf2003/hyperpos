@@ -17,7 +17,7 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_partial_refund_for_closed_external_purchase_note_refunds_external_part_first_and_keeps_note_closed(): void
+    public function test_selected_row_refund_for_closed_external_purchase_note_refunds_the_whole_row_and_marks_note_refunded(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidExternalPurchaseNote();
@@ -26,15 +26,19 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
                 'selected_row_ids' => ['wi-1'],
-                'customer_payment_id' => 'payment-1',
-                'amount_rupiah' => 2000,
                 'refunded_at' => date('Y-m-d'),
-                'reason' => 'Refund biaya barang luar dulu',
+                'reason' => 'Refund full selected external row',
             ])
             ->assertRedirect(route('cashier.notes.index'))
             ->assertSessionHas('success');
 
         $refundId = (string) DB::table('customer_refunds')->value('id');
+
+        $this->assertDatabaseHas('customer_refunds', [
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'amount_rupiah' => 11000,
+        ]);
 
         $this->assertDatabaseHas('refund_component_allocations', [
             'customer_refund_id' => $refundId,
@@ -46,21 +50,25 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
             'refunded_amount_rupiah' => 2000,
         ]);
 
-        $this->assertDatabaseMissing('refund_component_allocations', [
+        $this->assertDatabaseHas('refund_component_allocations', [
             'customer_refund_id' => $refundId,
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-1',
             'component_type' => 'service_fee',
             'component_ref_id' => 'wi-1',
+            'refunded_amount_rupiah' => 9000,
         ]);
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'note_state' => 'closed',
+            'note_state' => 'refunded',
         ]);
 
         $this->assertDatabaseCount('inventory_movements', 0);
     }
 
-    public function test_full_refund_for_closed_external_purchase_note_marks_note_as_refunded(): void
+    public function test_full_selected_row_refund_for_closed_external_purchase_note_keeps_inventory_untouched(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidExternalPurchaseNote();
@@ -69,19 +77,11 @@ final class ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest extends Tes
             ->from(route('cashier.notes.index'))
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
                 'selected_row_ids' => ['wi-1'],
-                'customer_payment_id' => 'payment-1',
-                'amount_rupiah' => 11000,
                 'refunded_at' => date('Y-m-d'),
-                'reason' => 'Refund penuh external + servis',
+                'reason' => 'Refund full selected row and keep inventory untouched',
             ])
             ->assertRedirect(route('cashier.notes.index'))
             ->assertSessionHas('success');
-
-        $this->assertDatabaseHas('customer_refunds', [
-            'customer_payment_id' => 'payment-1',
-            'note_id' => 'note-1',
-            'amount_rupiah' => 11000,
-        ]);
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',

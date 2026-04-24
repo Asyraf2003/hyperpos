@@ -14,8 +14,8 @@ final class PaymentComponentTypePriority
         return match ($componentType) {
             PaymentComponentType::PRODUCT_ONLY_WORK_ITEM => 1,
             PaymentComponentType::SERVICE_STORE_STOCK_PART => 2,
-            PaymentComponentType::SERVICE_FEE => 3,
-            PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART => 4,
+            PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART => 3,
+            PaymentComponentType::SERVICE_FEE => 4,
             default => throw new DomainException('Payment component type tidak valid untuk prioritas alokasi.'),
         };
     }
