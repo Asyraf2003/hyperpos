@@ -495,3 +495,48 @@ These are explicitly blocked.
 # 10. Minimal Verify Order For Next Chat
 Next chat should not start with full random coding. Start with this verify order after each step.
 
+## After Step 1
+```bash
+php artisan test \
+  tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php \
+  tests/Feature/Note/UpdateWorkItemStatusFeatureTest.php \
+  tests/Feature/Payment/AllocateCustomerPaymentFeatureTest.php \
+  tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php
+ tests/Feature/Note/ClosedNoteFullRefundLifecycleFeatureTest.php \
+  tests/Feature/Note/ClosedNoteFullRefundProductOnlyInventoryLifecycleFeatureTest.php \
+  tests/Feature/Note/ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest.php \
+  tests/Feature/Note/ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest.php
+tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php \
+  tests/Feature/Payment/RecordSelectedRowsClosedNoteRefundHttpFeatureTest.php \
+  tests/Feature/Note/CashierRefundRejectsOpenLineFeatureTest.php
+tests/Feature/Note/CashierHybridNoteDetailFeatureTest.php \
+  tests/Feature/Note/CashierNoteDetailBillingUsesCurrentRevisionFeatureTest.php \
+  tests/Feature/Note/CashierNoteDetailUsesCurrentRevisionLinesFeatureTest.php \
+  tests/Feature/Note/CashierNoteMutationHistoryViewFeatureTest.php \
+  tests/Feature/Note/CashierNoteRevisionSmokeTest.php \
+  tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php \
+  tests/Feature/Note/NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest.php \
+  tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php
+  
+  make verify
+11. Handoff Conclusion
+Status now
+UI direction: mostly locked and materially improved
+Backend direction: chosen, but still in migration
+Branch health: not yet safe
+Full target: not achieved yet
+What next chat must do first
+
+Do Step 1 from this document.
+Do not reopen direction debate.
+Do not start from UI cosmetics.
+Do not jump to full suite before the targeted subset for Step 1 is green.
+
+Final reminder
+
+The correct reading of current progress is:
+
+40% overall
+75% UI
+Anything higher is fiction.
+
