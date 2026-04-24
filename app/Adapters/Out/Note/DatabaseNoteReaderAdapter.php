@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 final class DatabaseNoteReaderAdapter implements NoteReaderPort
 {
     public function __construct(
-        private readonly DatabaseNoteActiveWorkItemFilter $activeRows,
         private readonly DatabaseNoteWorkItemDetailLoader $details,
     ) {
     }
