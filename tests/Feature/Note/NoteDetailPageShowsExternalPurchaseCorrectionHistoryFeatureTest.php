@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
-use App\Core\Note\WorkItem\ExternalPurchaseLine;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
-use App\Core\Shared\ValueObjects\Money;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -56,8 +54,7 @@ final class NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest exte
 
         $this->seedNoteBase('note-1', 'Budi', $today, 52000, 'open');
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 52000);
-        $this->seedServiceDetailBase('wi-1', 'Servis AC', 50000, ServiceDetail::PART_SOURCE_EXTERNAL_PURCHASE);
-
+        $this->seedServiceDetailBase('wi-1', 'Servis AC', 50000, ServiceDetail::PART_SOURCE_EXTERNAL);
         DB::table('work_item_external_purchase_lines')->insert([
             'id' => 'ext-1',
             'work_item_id' => 'wi-1',
