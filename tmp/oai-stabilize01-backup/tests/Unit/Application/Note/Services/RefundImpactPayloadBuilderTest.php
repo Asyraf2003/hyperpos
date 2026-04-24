@@ -6,8 +6,6 @@ namespace Tests\Unit\Application\Note\Services;
 
 use App\Application\Note\Services\RefundImpactPayloadBuilder;
 use App\Application\Note\Services\RefundImpactProductLabelResolver;
-use App\Application\Note\Services\RefundImpactReturnsMapper;
-use App\Application\Note\Services\RefundImpactSourceValueReader;
 use App\Core\Note\WorkItem\ExternalPurchaseLine;
 use App\Core\Note\WorkItem\StoreStockLine;
 use App\Core\ProductCatalog\Product\Product;
@@ -21,10 +19,7 @@ final class RefundImpactPayloadBuilderTest extends TestCase
     public function test_it_builds_refund_impact_from_scalar_snapshot_payload(): void
     {
         $builder = new RefundImpactPayloadBuilder(
-            new RefundImpactReturnsMapper(
-                new RefundImpactProductLabelResolver($this->products()),
-                new RefundImpactSourceValueReader(),
-            )
+            new RefundImpactProductLabelResolver($this->products())
         );
 
         $impact = $builder->fromRevisionPayload([
@@ -52,10 +47,7 @@ final class RefundImpactPayloadBuilderTest extends TestCase
     public function test_it_builds_refund_impact_from_object_payload_lines(): void
     {
         $builder = new RefundImpactPayloadBuilder(
-            new RefundImpactReturnsMapper(
-                new RefundImpactProductLabelResolver($this->products()),
-                new RefundImpactSourceValueReader(),
-            )
+            new RefundImpactProductLabelResolver($this->products())
         );
 
         $impact = $builder->fromRevisionPayload([
@@ -85,13 +77,37 @@ final class RefundImpactPayloadBuilderTest extends TestCase
                     return null;
                 }
 
-                return Product::rehydrate('product-1', 'PRD-1', 'Produk A', 'Merek A', null, Money::fromInt(25000), null, null);
+                return Product::rehydrate(
+                    'product-1',
+                    'PRD-1',
+                    'Produk A',
+                    'Merek A',
+                    null,
+                    Money::fromInt(25000),
+                    null,
+                    null,
+                );
             }
 
-            public function findAll(): array { return []; }
-            public function search(string $query): array { return []; }
-            public function findPaginated(int $perPage = 10): LengthAwarePaginator { return new LengthAwarePaginator([], 0, $perPage); }
-            public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator { return new LengthAwarePaginator([], 0, $perPage); }
+            public function findAll(): array
+            {
+                return [];
+            }
+
+            public function search(string $query): array
+            {
+                return [];
+            }
+
+            public function findPaginated(int $perPage = 10): LengthAwarePaginator
+            {
+                return new LengthAwarePaginator([], 0, $perPage);
+            }
+
+            public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator
+            {
+                return new LengthAwarePaginator([], 0, $perPage);
+            }
         };
     }
 }

@@ -7,9 +7,7 @@ namespace Tests\Feature\Payment;
 use App\Application\Payment\UseCases\AllocateCustomerPaymentHandler;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
 use App\Application\Shared\DTO\Result;
-use App\Adapters\Out\Note\DatabaseNoteActiveWorkItemFilter;
 use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
-use App\Adapters\Out\Note\DatabaseNoteWorkItemDetailLoader;
 use App\Adapters\Out\Payment\DatabaseCustomerPaymentReaderAdapter;
 use App\Adapters\Out\Payment\DatabasePaymentAllocationReaderAdapter;
 use App\Adapters\Out\Payment\DatabasePaymentAllocationWriterAdapter;
@@ -31,6 +29,7 @@ final class AllocateCustomerPaymentFeatureTest extends TestCase
         $this->seedCustomerPayment('payment-1', 150000, '2026-03-15');
 
         $handler = $this->buildHandler('allocation-1');
+
         $result = $handler->handle('payment-1', 'note-1', 40000);
 
         $this->assertInstanceOf(Result::class, $result);
@@ -55,10 +54,7 @@ final class AllocateCustomerPaymentFeatureTest extends TestCase
             new DatabaseCustomerPaymentReaderAdapter(),
             new DatabasePaymentAllocationReaderAdapter(),
             new DatabasePaymentAllocationWriterAdapter(),
-            new DatabaseNoteReaderAdapter(
-                new DatabaseNoteActiveWorkItemFilter(),
-                new DatabaseNoteWorkItemDetailLoader(),
-            ),
+            new DatabaseNoteReaderAdapter(),
             new PaymentAllocationPolicy(),
             new class () implements TransactionManagerPort {
                 public function begin(): void { DB::beginTransaction(); }
@@ -76,13 +72,11 @@ final class AllocateCustomerPaymentFeatureTest extends TestCase
         );
     }
 
-    private function seedNote(string $id, string $name, string $date, int $total): void
-    {
+    private function seedNote(string $id, string $name, string $date, int $total): void {
         DB::table('notes')->insert(['id' => $id, 'customer_name' => $name, 'transaction_date' => $date, 'total_rupiah' => $total]);
     }
 
-    private function seedCustomerPayment(string $id, int $amount, string $paidAt): void
-    {
+    private function seedCustomerPayment(string $id, int $amount, string $paidAt): void {
         DB::table('customer_payments')->insert(['id' => $id, 'amount_rupiah' => $amount, 'paid_at' => $paidAt]);
     }
 }
