@@ -3,7 +3,7 @@
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title mb-0">Refund Nota</h5>
+        <h5 class="modal-title mb-0">Refund</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
       </div>
 
@@ -19,7 +19,7 @@
                 <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                   <div>
                     <div class="fw-semibold">Line Terpilih</div>
-                    <div class="small text-muted">Hanya line yang Anda klik akan masuk ke refund.</div>
+                    <div class="small text-muted">Hanya line yang Anda klik akan diproses. Line belum dibayar akan dibatalkan tanpa refund uang.</div>
                   </div>
                   <span class="badge bg-light text-dark border" id="refund-modal-selected-count">0</span>
                 </div>
@@ -33,7 +33,7 @@
             <div class="col-12 col-lg-6">
               <div class="d-flex flex-column gap-3">
                 <div class="border rounded p-3">
-                  <div class="fw-semibold mb-3">Perkiraan Hasil Refund</div>
+                  <div class="fw-semibold mb-3">Perkiraan Dampak</div>
 
                   <div class="d-flex justify-content-between py-2 border-bottom">
                     <span class="text-muted">Nominal Refund</span>
@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="border rounded p-3">
-                  <div class="fw-semibold mb-3">Alasan Refund</div>
+                  <div class="fw-semibold mb-3">Alasan Refund / Pembatalan</div>
 
                   <div class="mb-3">
                     <label class="form-label">Alasan</label>
@@ -82,13 +82,13 @@
                       class="form-control"
                       required
                       autocomplete="off"
-                      placeholder="Tulis alasan refund"
+                      placeholder="Tulis alasan refund / pembatalan"
                     >
                   </div>
 
                   <div class="row g-3">
                     <div class="col-12">
-                      <label class="form-label">Tanggal Refund</label>
+                      <label class="form-label">Tanggal Refund / Pembatalan</label>
                       <input
                         type="date"
                         name="refunded_at"
@@ -108,7 +108,7 @@
         <div class="modal-footer">
           <div class="ui-form-actions w-100 justify-content-between">
             <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary" id="note-refund-submit" disabled>Catat Refund</button>
+            <button type="submit" class="btn btn-danger" id="note-refund-submit" disabled>Catat Refund / Batalkan Line</button>
           </div>
         </div>
       </form>

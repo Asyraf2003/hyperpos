@@ -85,7 +85,10 @@ final class CurrentRevisionDetailRowMapper
             'line_status' => $lineStatus,
             'can_edit' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
             'can_pay' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_OPEN,
-            'can_refund' => $lineStatus === WorkItemOperationalStatusResolver::STATUS_CLOSE,
+            'can_refund' => in_array($lineStatus, [
+                WorkItemOperationalStatusResolver::STATUS_OPEN,
+                WorkItemOperationalStatusResolver::STATUS_CLOSE,
+            ], true),
             'can_view_detail' => true,
         ];
     }

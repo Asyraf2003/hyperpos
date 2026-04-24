@@ -16,7 +16,7 @@
         @if ($note['can_show_refund_form'] ?? false)
           <button
             type="button"
-            class="btn btn-outline-warning opacity-50 disabled"
+            class="btn btn-outline-danger opacity-50 disabled"
             data-bs-toggle="modal"
             data-bs-target="#note-refund-modal"
             id="note-refund-open-button"

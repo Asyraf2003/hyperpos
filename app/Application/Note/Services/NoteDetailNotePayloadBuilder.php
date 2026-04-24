@@ -21,7 +21,6 @@ final class NoteDetailNotePayloadBuilder
         bool $hasOutstandingBillingRow,
     ): array {
         $openLineCount = (int) ($workspacePanel['line_summary']['open_count'] ?? 0);
-        $closeLineCount = (int) ($workspacePanel['line_summary']['close_count'] ?? 0);
         $refundRequired = max((int) $operational['net_paid_rupiah'] - (int) $operational['grand_total_rupiah'], 0);
 
         return $base + [
@@ -40,7 +39,7 @@ final class NoteDetailNotePayloadBuilder
             'can_edit_workspace' => $isOpen,
             'can_show_workspace_panel' => $isOpen || $isClosed,
             'can_show_payment_form' => $isOpen && $openLineCount > 0 && $hasOutstandingBillingRow,
-            'can_show_refund_form' => $closeLineCount > 0 && $refundPaymentOptions !== [] && $refundRows !== [],
+            'can_show_refund_form' => $refundRows !== [],
             'refund_payment_options' => $refundPaymentOptions,
             'can_show_correction_actions' => false,
             'correction_notice' => $isClosed

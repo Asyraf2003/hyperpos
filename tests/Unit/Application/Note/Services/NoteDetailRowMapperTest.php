@@ -36,7 +36,7 @@ final class NoteDetailRowMapperTest extends TestCase
         self::assertSame('Service', $row[0]['type_label']);
         self::assertSame(30000, $row[0]['outstanding_rupiah']);
         self::assertSame('open', $row[0]['line_status']);
-        self::assertFalse($row[0]['can_refund']);
+        self::assertTrue($row[0]['can_refund']);
     }
 
     public function test_it_builds_refund_preview_for_external_purchase_line(): void
