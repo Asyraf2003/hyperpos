@@ -53,8 +53,21 @@ final class NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest exte
         $today = date('Y-m-d');
 
         $this->seedNoteBase('note-1', 'Budi', $today, 52000, 'open');
-        $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 52000);
-        $this->seedServiceDetailBase('wi-1', 'Servis AC', 50000, ServiceDetail::PART_SOURCE_EXTERNAL);
+        $this->seedWorkItemBase(
+            'wi-1',
+            'note-1',
+            1,
+            WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE,
+            WorkItem::STATUS_OPEN,
+            52000
+        );
+        $this->seedServiceDetailBase(
+            'wi-1',
+            'Servis AC',
+            50000,
+            ServiceDetail::PART_SOURCE_EXTERNAL_PURCHASE
+        );
+
         DB::table('work_item_external_purchase_lines')->insert([
             'id' => 'ext-1',
             'work_item_id' => 'wi-1',
