@@ -5,36 +5,25 @@ declare(strict_types=1);
 namespace App\Adapters\Out\Note\Mappers;
 
 use App\Core\Note\Note\Note;
-use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Shared\ValueObjects\Money;
 use DateTimeImmutable;
 use stdClass;
 
 final class NoteMapper
 {
-    /** @param list<WorkItem> $items */
+    /** @param list<\App\Core\Note\WorkItem\WorkItem> $items */
     public static function map(stdClass $row, array $items): Note
     {
-        $customerPhone = property_exists($row, 'customer_phone')
-            ? ($row->customer_phone === null ? null : (string) $row->customer_phone)
-            : null;
-
-        $closedAt = property_exists($row, 'closed_at') && $row->closed_at !== null
-            ? new DateTimeImmutable((string) $row->closed_at)
-            : null;
-
-        $reopenedAt = property_exists($row, 'reopened_at') && $row->reopened_at !== null
-            ? new DateTimeImmutable((string) $row->reopened_at)
-            : null;
-
-        $activeTotal = self::sumActiveItems($items);
+        $customerPhone = property_exists($row, 'customer_phone') ? ($row->customer_phone === null ? null : (string) $row->customer_phone) : null;
+        $closedAt = property_exists($row, 'closed_at') && $row->closed_at !== null ? new DateTimeImmutable((string) $row->closed_at) : null;
+        $reopenedAt = property_exists($row, 'reopened_at') && $row->reopened_at !== null ? new DateTimeImmutable((string) $row->reopened_at) : null;
 
         return Note::rehydrate(
             (string) $row->id,
             (string) $row->customer_name,
             $customerPhone,
             new DateTimeImmutable((string) $row->transaction_date),
-            $activeTotal,
+            Money::fromInt((int) $row->total_rupiah),
             $items,
             property_exists($row, 'note_state') ? (string) $row->note_state : Note::STATE_OPEN,
             $closedAt,
@@ -42,17 +31,5 @@ final class NoteMapper
             $reopenedAt,
             property_exists($row, 'reopened_by_actor_id') ? ($row->reopened_by_actor_id === null ? null : (string) $row->reopened_by_actor_id) : null,
         );
-    }
-
-    /** @param list<WorkItem> $items */
-    private static function sumActiveItems(array $items): Money
-    {
-        $total = Money::zero();
-
-        foreach ($items as $item) {
-            $total = $total->add($item->subtotalRupiah());
-        }
-
-        return $total;
     }
 }
