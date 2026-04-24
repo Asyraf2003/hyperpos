@@ -13,7 +13,7 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
 {
     use RefreshDatabase;
 
-    public function test_workspace_create_page_does_not_embed_invalid_service_part_source_values(): void
+    public function test_workspace_create_page_embeds_explicit_service_part_source_values(): void
     {
         $this->loginAsKasir();
 
@@ -31,7 +31,8 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response = $this->actingAs($user)->get(route('cashier.notes.workspace.create'));
 
         $response->assertOk();
-        $response->assertDontSee('name="items[__INDEX__][part_source]" value="store_stock"', false);
-        $response->assertDontSee('name="items[__INDEX__][part_source]" value="external_purchase"', false);
+        $response->assertSee('name="items[__INDEX__][part_source]" value="none"', false);
+        $response->assertSee('name="items[__INDEX__][part_source]" value="store_stock"', false);
+        $response->assertSee('name="items[__INDEX__][part_source]" value="external_purchase"', false);
     }
 }

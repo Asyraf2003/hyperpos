@@ -29,7 +29,7 @@ final class CashierClosedNoteRefundViewFeatureTest extends TestCase
             ->assertSee('Header Nota')
             ->assertSee('List Line Nota')
             ->assertSee('Refund')
-            ->assertSee('Refund Nota')
+            ->assertSee('Refund / Batalkan Line')
             ->assertDontSee('name="customer_payment_id"', false)
             ->assertDontSee('name="amount_rupiah"', false)
             ->assertDontSee('Lunasi')
