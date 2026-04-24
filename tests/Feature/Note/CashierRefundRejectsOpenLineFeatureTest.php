@@ -35,7 +35,7 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
 
         $this->assertDatabaseHas('refund_component_allocations', [
             'note_id' => 'note-1',
-            'component_ref_id' => 'wi-1',
+            'work_item_id' => 'wi-1',
         ]);
     }
 
@@ -64,6 +64,7 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
         $this->seedNoteBase('note-1', 'Budi', $today, 20000, 'open');
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 20000);
         $this->seedServiceDetailBase('wi-1', 'Servis Open', 20000, ServiceDetail::PART_SOURCE_NONE);
+
         $this->seedCustomerPaymentBase('payment-1', 10000, $today);
         $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 10000);
 

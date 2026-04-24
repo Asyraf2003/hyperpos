@@ -17,7 +17,7 @@ final class CashierNoteDetailUsesCurrentRevisionLinesFeatureTest extends TestCas
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_detail_page_reads_current_revision_lines_for_active_workspace(): void
+    public function test_detail_page_reads_current_revision_lines_instead_of_old_root_lines_for_active_workspace(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
