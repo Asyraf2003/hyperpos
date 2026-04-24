@@ -3,7 +3,7 @@
   const digits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
   const format = (value) => Number(value || 0).toLocaleString("id-ID");
 
-  NS.rowTotal = (row) => {
+  const rowParts = (row) => {
     const type = row.dataset.itemType || "";
     const service = digits(row.querySelector('[name$="[service][price_rupiah]"]')?.value);
     const qty = digits(
@@ -13,10 +13,17 @@
     const product = digits(row.querySelector('input[name$="[product_lines][0][unit_price_rupiah]"]')?.value);
     const external = digits(row.querySelector('input[name$="[external_purchase_lines][0][unit_cost_rupiah]"]')?.value);
 
-    if (type === "product") return qty * product;
-    if (type === "service_store_stock") return service + (qty * product);
-    if (type === "service_external") return service + (qty * external);
-    return service;
+    if (type === "product") return { service: 0, product: qty * product };
+    if (type === "service_store_stock") return { service, product: qty * product };
+    if (type === "service_external") return { service, product: qty * external };
+    return { service, product: 0 };
+  };
+
+  NS.rowProductTotal = (row) => rowParts(row).product;
+
+  NS.rowTotal = (row) => {
+    const parts = rowParts(row);
+    return parts.service + parts.product;
   };
 
   NS.syncQtyGuard = (row) => {
@@ -38,6 +45,7 @@
       index: Number(row.dataset.rowIndex || "0"),
       title: row.querySelector("[data-line-title]")?.textContent?.trim() || "Rincian",
       total: NS.rowTotal(row),
+      productTotal: NS.rowProductTotal(row),
     }));
 
   NS.updateSummary = () => {

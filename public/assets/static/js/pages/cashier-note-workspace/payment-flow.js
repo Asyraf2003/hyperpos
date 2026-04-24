@@ -111,12 +111,27 @@
   const grandTotal = () =>
     currentRows().reduce((sum, item) => sum + Number(item?.total || 0), 0);
 
-  const partialAmount = (total) => {
-    const inputValue = digits(
-      partialAmountInput()?.value || hiddenValue("inline_payment_amount_paid_rupiah")
+  const productDefaultAmount = (total) => {
+    const productTotal = currentRows().reduce(
+      (sum, item) => sum + Number(item?.productTotal || 0),
+      0
     );
 
-    return Math.min(inputValue, total);
+    return productTotal > 0 && productTotal < total ? productTotal : 0;
+  };
+
+  const partialAmount = (total) => {
+    const input = partialAmountInput();
+    const inputValue = digits(
+      input?.value || hiddenValue("inline_payment_amount_paid_rupiah")
+    );
+
+    if (inputValue > 0 && input?.dataset.partialDefault !== "product") {
+      return Math.min(inputValue, total);
+    }
+
+    const defaultAmount = productDefaultAmount(total);
+    return defaultAmount > 0 ? defaultAmount : Math.min(inputValue, total);
   };
 
   const payableAmount = (total) => {
@@ -220,10 +235,13 @@
 
   const syncPartialAmount = (total) => {
     const amount = partialAmount(total);
+    const defaultAmount = productDefaultAmount(total);
     updateHidden("inline_payment_amount_paid_rupiah", amount > 0 ? amount : "");
 
     const input = partialAmountInput();
     if (input && document.activeElement !== input) {
+      input.dataset.partialDefault =
+        amount > 0 && amount === defaultAmount ? "product" : "";
       input.value = amount > 0 ? format(amount) : "";
     }
   };
@@ -579,7 +597,9 @@
 
   document.addEventListener("input", (event) => {
     if (event.target.id === "inline_payment_amount_paid_display") {
-      const numeric = formatActiveMoneyInput(partialAmountInput());
+      const input = partialAmountInput();
+      if (input) input.dataset.partialDefault = "";
+      const numeric = formatActiveMoneyInput(input);
       updateHidden("inline_payment_amount_paid_rupiah", numeric);
       NS.refreshPaymentUi();
       return;
