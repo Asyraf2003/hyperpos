@@ -11,7 +11,6 @@ use App\Application\Payment\DTO\RecordedSelectedRowsRefundPlanResult;
 use App\Application\Payment\DTO\SelectedRowsRefundPlan;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\TransactionManagerPort;
 use Throwable;
 
@@ -22,7 +21,7 @@ final class RecordSelectedRowsRefundPlanTransaction
         private readonly CancelSelectedRowsAndSyncActiveNoteTotal $cancelRows,
         private readonly FinalizeRefundedNoteFromActiveRows $finalizeRefunded,
         private readonly TransactionManagerPort $transactions,
-        private readonly AuditLogPort $audit,
+        private readonly RecordSelectedRowsRefundPlanAuditRecorder $audit,
         private readonly NoteHistoryProjectionService $projection,
     ) {
     }
@@ -41,56 +40,35 @@ final class RecordSelectedRowsRefundPlanTransaction
             $started = true;
 
             $processed = $this->buckets->process($plan, $refundedAt, $reason);
-            $canceled = $this->cancelRows->execute(
-                $plan->noteId(),
-                $plan->selectedRowIds(),
-                $actorId,
-                $actorRole,
-                $reason,
-            );
+            $canceled = $this->cancelRows->execute($plan->noteId(), $plan->selectedRowIds(), $actorId, $actorRole, $reason);
 
             if ($canceled->isFailure()) {
                 throw new DomainException($canceled->message() ?? 'Gagal membatalkan line refund.');
             }
 
-            $finalized = $this->finalizeRefunded->execute(
-                $plan->noteId(),
-                $actorId,
-                $actorRole,
-                $reason,
-            );
+            $finalized = $this->finalizeRefunded->execute($plan->noteId(), $actorId, $actorRole, $reason);
 
             if ($finalized->isFailure()) {
                 throw new DomainException($finalized->message() ?? 'Gagal finalisasi note refund.');
             }
 
             $this->projection->syncNote($plan->noteId());
-
-            $this->audit->record('selected_rows_refund_plan_recorded', [
-                'note_id' => $plan->noteId(),
-                'actor_id' => $actorId,
-                'actor_role' => $actorRole,
-                'selected_row_ids' => $plan->selectedRowIds(),
-                'unpaid_row_ids' => $plan->unpaidRowIds(),
-                'refund_ids' => $processed['refund_ids'],
-                'allocation_count' => $processed['allocation_count'],
-                'total_refund_rupiah' => $plan->totalRefundRupiah(),
-                'final_note_state' => $finalized->data()['note_state'] ?? null,
-            ]);
+            $this->audit->record($plan, $actorId, $actorRole, $processed, $finalized->data());
 
             $this->transactions->commit();
 
-            $result = new RecordedSelectedRowsRefundPlanResult(
-                $plan->noteId(),
-                $processed['refund_ids'],
-                $plan->selectedRowIds(),
-                $plan->unpaidRowIds(),
-                (int) $processed['allocation_count'],
-                $plan->totalRefundRupiah(),
-                (int) ($canceled->data()['active_total_rupiah'] ?? 0),
+            return Result::success(
+                (new RecordedSelectedRowsRefundPlanResult(
+                    $plan->noteId(),
+                    $processed['refund_ids'],
+                    $plan->selectedRowIds(),
+                    $plan->unpaidRowIds(),
+                    (int) $processed['allocation_count'],
+                    $plan->totalRefundRupiah(),
+                    (int) ($canceled->data()['active_total_rupiah'] ?? 0),
+                ))->toArray(),
+                'Refund selected rows berhasil dicatat.',
             );
-
-            return Result::success($result->toArray(), 'Refund selected rows berhasil dicatat.');
         } catch (DomainException $e) {
             if ($started) {
                 $this->transactions->rollBack();
