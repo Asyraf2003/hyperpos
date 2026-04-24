@@ -10,7 +10,7 @@
       <form method="POST" action="{{ $refundModalConfig['action'] ?? $refundAction }}" id="note-refund-form">
         @csrf
         <div id="note-refund-hidden-selected-rows"></div>
-        <input type="hidden" id="refund_amount_rupiah" name="amount_rupiah" value="">
+        <input type="hidden" id="refund_amount_rupiah" value="">
 
         <div class="modal-body">
           <div class="row g-4 align-items-start">
@@ -98,16 +98,6 @@
                       >
                     </div>
 
-                    <div class="col-12">
-                      <label class="form-label">Sumber Pembayaran</label>
-                      <select name="customer_payment_id" class="form-select" required>
-                        @foreach (($note['refund_payment_options'] ?? []) as $option)
-                          <option value="{{ $option['value'] }}" {{ old('customer_payment_id') === $option['value'] ? 'selected' : '' }}>
-                            {{ $option['label'] }}
-                          </option>
-                        @endforeach
-                      </select>
-                    </div>
                   </div>
                 </div>
               </div>
