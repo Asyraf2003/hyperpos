@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AllocatePaymentAcrossComponentsTest extends TestCase
 {
-    public function test_it_prioritizes_service_fee_before_external_purchase_component(): void
+    public function test_it_prioritizes_external_purchase_component_before_service_fee(): void
     {
         $service = new AllocatePaymentAcrossComponents(
             new class () implements PaymentComponentAllocationReaderPort {
@@ -42,7 +42,7 @@ final class AllocatePaymentAcrossComponentsTest extends TestCase
         $this->assertSame(PaymentComponentType::PRODUCT_ONLY_WORK_ITEM, $allocations[0]->componentType());
         $this->assertSame(5000, $allocations[0]->allocatedAmountRupiah()->amount());
 
-        $this->assertSame(PaymentComponentType::SERVICE_FEE, $allocations[1]->componentType());
+        $this->assertSame(PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART, $allocations[1]->componentType());
         $this->assertSame(2000, $allocations[1]->allocatedAmountRupiah()->amount());
     }
 }
