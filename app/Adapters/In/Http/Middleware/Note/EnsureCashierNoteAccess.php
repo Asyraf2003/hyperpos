@@ -33,7 +33,8 @@ final class EnsureCashierNoteAccess
         abort_if($note === null, 404);
 
         try {
-            if ($request->routeIs('cashier.notes.show')) {
+            if ($request->routeIs('cashier.notes.show')
+                || $request->routeIs('cashier.notes.workspace.edit')) {
                 $this->guard->assertCanView($note, $this->clock->now());
             } else {
                 $this->guard->assertCanMutateOpenNote($note, $this->clock->now());

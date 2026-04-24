@@ -15,6 +15,22 @@ final class EditableWorkspaceNoteGuard
     ) {
     }
 
+
+    public function assertWorkspaceEditPageAccessible(string $noteId): void
+    {
+        $normalized = trim($noteId);
+
+        if ($normalized === '') {
+            throw new DomainException('Note id wajib ada.');
+        }
+
+        $note = $this->notes->getById($normalized);
+
+        if ($note === null) {
+            throw new DomainException('Nota tidak ditemukan.');
+        }
+    }
+
     public function assertEditable(string $noteId): void
     {
         $normalized = trim($noteId);

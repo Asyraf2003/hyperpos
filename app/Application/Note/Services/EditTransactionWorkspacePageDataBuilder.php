@@ -27,7 +27,7 @@ final class EditTransactionWorkspacePageDataBuilder
     {
         $normalized = trim($noteId);
 
-        $this->guard->assertEditable($normalized);
+        $this->guard->assertWorkspaceEditPageAccessible($normalized);
 
         $note = $this->notes->getById($normalized);
 
