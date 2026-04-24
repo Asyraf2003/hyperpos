@@ -9,7 +9,7 @@
         </div>
 
         <input type="hidden" name="items[__INDEX__][entry_mode]" value="service">
-        <input type="hidden" name="items[__INDEX__][part_source]" value="none">
+        <input type="hidden" name="items[__INDEX__][part_source]" value="store_stock">
         <input type="hidden" name="items[__INDEX__][pay_now]" value="0" data-pay-now>
 
         <div class="row">
