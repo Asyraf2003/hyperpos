@@ -6,7 +6,7 @@
                     <div>
                         <h5 class="modal-title mb-1">Refund Nota</h5>
                         <p class="mb-0 text-muted small">
-                            Pilih line close yang ingin direfund, lalu catat nominal dan alasan refund.
+                            Pilih line yang ingin direfund. Sumber pembayaran dan nominal refund diselesaikan otomatis oleh sistem.
                         </p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
@@ -16,19 +16,13 @@
                     @csrf
 
                     <div class="modal-body">
-                        @if ($errors->has('refund') || $errors->has('selected_row_ids') || $errors->has('customer_payment_id') || $errors->has('amount_rupiah') || $errors->has('refunded_at') || $errors->has('reason'))
+                        @if ($errors->has('refund') || $errors->has('selected_row_ids') || $errors->has('refunded_at') || $errors->has('reason'))
                             <div class="alert alert-danger py-2 px-3 mb-4">
                                 @if ($errors->has('refund'))
                                     <div>{{ $errors->first('refund') }}</div>
                                 @endif
                                 @if ($errors->has('selected_row_ids'))
                                     <div>{{ $errors->first('selected_row_ids') }}</div>
-                                @endif
-                                @if ($errors->has('customer_payment_id'))
-                                    <div>{{ $errors->first('customer_payment_id') }}</div>
-                                @endif
-                                @if ($errors->has('amount_rupiah'))
-                                    <div>{{ $errors->first('amount_rupiah') }}</div>
                                 @endif
                                 @if ($errors->has('refunded_at'))
                                     <div>{{ $errors->first('refunded_at') }}</div>
@@ -67,25 +61,6 @@
                         </div>
 
                         <div class="form-group mb-4">
-                            <label for="workspace_refund_customer_payment_id" class="form-label">Sumber Pembayaran Histori</label>
-                            <select
-                                id="workspace_refund_customer_payment_id"
-                                name="customer_payment_id"
-                                class="form-select"
-                                required
-                            >
-                                @foreach (($refundPaymentOptions ?? []) as $option)
-                                    <option
-                                        value="{{ $option['value'] }}"
-                                        {{ old('customer_payment_id') === $option['value'] ? 'selected' : '' }}
-                                    >
-                                        {{ $option['label'] }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-4">
                             <label for="workspace_refund_refunded_at" class="form-label">Tanggal Refund</label>
                             <input
                                 type="date"
@@ -94,20 +69,6 @@
                                 name="refunded_at"
                                 value="{{ old('refunded_at', $refundDateDefault) }}"
                                 class="form-control"
-                                required
-                            >
-                        </div>
-
-                        <div class="form-group mb-4">
-                            <label for="workspace_refund_amount_rupiah" class="form-label">Nominal Refund</label>
-                            <input
-                                type="number"
-                                min="1"
-                                id="workspace_refund_amount_rupiah"
-                                name="amount_rupiah"
-                                value="{{ old('amount_rupiah') }}"
-                                class="form-control"
-                                placeholder="Isi nominal refund"
                                 required
                             >
                         </div>
