@@ -39,6 +39,10 @@ final class CashierClosedNoteWorkspaceReplacementSubmitFeatureTest extends TestC
             'allocation_priority' => 20,
         ]);
 
+        $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
+            ->assertOk();
+
         $response = $this->actingAs($user)->patch(
             route('cashier.notes.workspace.update', ['noteId' => 'note-1']),
             [
