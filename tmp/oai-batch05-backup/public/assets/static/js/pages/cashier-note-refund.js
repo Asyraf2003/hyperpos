@@ -9,24 +9,13 @@
     const reasonInput = document.getElementById('note-refund-reason');
     const submitButton = document.getElementById('note-refund-submit');
 
-    if (
-      !modalEl
-      || !form
-      || !openButton
-      || !selectedContainer
-      || !hiddenInputsContainer
-      || !amountInput
-      || !reasonInput
-      || !submitButton
-    ) {
+    if (!modalEl || !form || !openButton || !selectedContainer || !hiddenInputsContainer || !amountInput || !reasonInput) {
       return;
     }
 
     const modal = window.bootstrap?.Modal
       ? window.bootstrap.Modal.getOrCreateInstance(modalEl)
       : null;
-
-    const storageKey = `note-refund-selection:${window.location.pathname}`;
 
     const parseNumber = (value) =>
       Number.parseInt(String(value || '').replace(/[^0-9]/g, '') || '0', 10);
@@ -44,36 +33,6 @@
 
     const rows = () => Array.from(document.querySelectorAll('[data-refund-row="1"]'));
     const selectedIds = new Set();
-
-    const readStoredSelections = () => {
-      try {
-        const raw = window.sessionStorage.getItem(storageKey);
-        if (!raw) {
-          return [];
-        }
-
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed.map((value) => String(value)) : [];
-      } catch (_error) {
-        return [];
-      }
-    };
-
-    const persistSelections = () => {
-      try {
-        window.sessionStorage.setItem(storageKey, JSON.stringify(Array.from(selectedIds)));
-      } catch (_error) {
-        // ignore storage failure
-      }
-    };
-
-    const clearStoredSelections = () => {
-      try {
-        window.sessionStorage.removeItem(storageKey);
-      } catch (_error) {
-        // ignore storage failure
-      }
-    };
 
     const isSelected = (row) => selectedIds.has(String(row.dataset.rowId || ''));
     const selectedRows = () => rows().filter((row) => isSelected(row));
@@ -108,10 +67,11 @@
       selectedRows().flatMap((row) => {
         const impact = parseRefundImpact(row);
         const items = Array.isArray(impact.store_returns) ? impact.store_returns : [];
-
         return items.map((item) => ({
           lineNo: row.dataset.lineNo || '-',
           lineLabel: row.dataset.lineLabel || '-',
+          sourceLineId: String(item.source_line_id || ''),
+          productId: String(item.product_id || ''),
           productLabel: String(item.product_label || item.product_id || '-'),
           qty: parseNumber(item.qty),
         }));
@@ -121,10 +81,10 @@
       selectedRows().flatMap((row) => {
         const impact = parseRefundImpact(row);
         const items = Array.isArray(impact.external_returns) ? impact.external_returns : [];
-
         return items.map((item) => ({
           lineNo: row.dataset.lineNo || '-',
           lineLabel: row.dataset.lineLabel || '-',
+          sourceLineId: String(item.source_line_id || ''),
           description: String(item.description || '-'),
           qty: parseNumber(item.qty),
           amountRupiah: parseNumber(item.amount_rupiah),
@@ -152,13 +112,20 @@
         const typeLabel = row.dataset.typeLabel || '-';
         const preview = row.dataset.previewLabel || '-';
         const refundable = format(parseNumber(impact.refund_amount_rupiah ?? row.dataset.refundableRupiah));
+        const stockCount = parseNumber(impact.effect_summary?.stock_store_return_count);
+        const externalCount = parseNumber(impact.effect_summary?.external_item_count);
 
         return `
           <div class="border rounded px-3 py-2">
-            <div class="fw-semibold">Line ${escapeHtml(lineNo)} · ${escapeHtml(label)}</div>
-            <div class="small text-muted">${escapeHtml(typeLabel)}</div>
-            <div class="small text-muted">${escapeHtml(preview)}</div>
-            <div class="small mt-2">Refund uang: <strong>${refundable}</strong></div>
+            <div class="d-flex justify-content-between align-items-start gap-3">
+              <div>
+                <div class="fw-semibold">Line ${escapeHtml(lineNo)} · ${escapeHtml(label)}</div>
+                <div class="small text-muted">${escapeHtml(typeLabel)}</div>
+                <div class="small text-muted">${escapeHtml(preview)}</div>
+                <div class="small text-muted">Stok toko kembali: ${format(stockCount)} · External dinetralkan: ${format(externalCount)}</div>
+              </div>
+              <strong>${refundable}</strong>
+            </div>
           </div>
         `;
       }).join('');
@@ -166,9 +133,7 @@
 
     const renderStoreReturns = () => {
       const container = document.getElementById('refund-modal-store-returns');
-      if (!container) {
-        return;
-      }
+      if (!container) return;
 
       const items = selectedStoreReturns();
 
@@ -192,9 +157,7 @@
 
     const renderExternalReturns = () => {
       const container = document.getElementById('refund-modal-external-returns');
-      if (!container) {
-        return;
-      }
+      if (!container) return;
 
       const items = selectedExternalReturns();
 
@@ -233,14 +196,15 @@
 
     const syncButton = () => {
       const hasSelection = selectedRows().length > 0;
-
       openButton.disabled = !hasSelection;
       openButton.classList.toggle('opacity-50', !hasSelection);
       openButton.classList.toggle('disabled', !hasSelection);
       openButton.style.pointerEvents = hasSelection ? 'auto' : 'none';
       openButton.setAttribute('aria-disabled', hasSelection ? 'false' : 'true');
 
-      submitButton.disabled = !hasSelection || refundableTotal() <= 0 || !hasReason();
+      if (submitButton) {
+        submitButton.disabled = !hasSelection || refundableTotal() <= 0 || !hasReason();
+      }
     };
 
     const syncSummary = () => {
@@ -250,30 +214,15 @@
       const externalNode = document.getElementById('refund-modal-external-count');
       const impactNode = document.getElementById('refund-modal-impact-note');
 
-      if (countNode) {
-        countNode.textContent = format(selectedRows().length);
-      }
-
-      if (totalNode) {
-        totalNode.textContent = format(refundableTotal());
-      }
-
-      if (stockNode) {
-        stockNode.textContent = format(stockReturnCount());
-      }
-
-      if (externalNode) {
-        externalNode.textContent = format(externalCount());
-      }
+      if (countNode) countNode.textContent = format(selectedRows().length);
+      if (totalNode) totalNode.textContent = format(refundableTotal());
+      if (stockNode) stockNode.textContent = format(stockReturnCount());
+      if (externalNode) externalNode.textContent = format(externalCount());
 
       if (impactNode) {
-        if (selectedRows().length === 0) {
-          impactNode.textContent = 'Pilih line lebih dulu untuk melihat perkiraan hasil refund.';
-        } else if (refundableTotal() > 0) {
-          impactNode.textContent = `Perkiraan refund uang ${format(refundableTotal())}. Dampak stok dan external mengikuti line yang dipilih.`;
-        } else {
-          impactNode.textContent = 'Line terpilih sudah tercatat, tetapi nominal refund uang saat ini masih 0 pada contract backend yang aktif.';
-        }
+        impactNode.textContent = selectedRows().length > 0
+          ? `Refund akan dicatat otomatis sebesar ${format(refundableTotal())}. Line terpilih menjadi netral setelah refund.`
+          : 'Refund akan dicatat untuk line yang dipilih sesuai total refundable saat ini.';
       }
 
       buildHiddenInputs();
@@ -287,14 +236,11 @@
       syncAmount();
       syncButton();
       syncSummary();
-      persistSelections();
     };
 
     const toggleRow = (row) => {
       const rowId = String(row.dataset.rowId || '');
-      if (rowId === '') {
-        return;
-      }
+      if (rowId === '') return;
 
       if (selectedIds.has(rowId)) {
         selectedIds.delete(rowId);
@@ -305,61 +251,37 @@
       syncAll();
     };
 
-    const restoreSelections = () => {
-      readStoredSelections().forEach((rowId) => {
-        const exists = rows().some((row) => String(row.dataset.rowId || '') === rowId);
-        if (exists) {
-          selectedIds.add(rowId);
-        }
-      });
-    };
-
-    const maybeAutoOpenModal = () => {
-      if (selectedRows().length > 0 && hasReason()) {
-        modal?.show();
-      }
-    };
-
     document.addEventListener('click', (event) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
+      if (!(target instanceof HTMLElement)) return;
 
       const row = target.closest('[data-refund-row="1"]');
       if (row && !target.closest('a, button, input, textarea, select, label')) {
         toggleRow(row);
+        return;
+      }
+
+      if (target === openButton) {
+        event.preventDefault();
+        if (selectedRows().length <= 0) {
+          return;
+        }
+
+        syncAll();
+        modal?.show();
       }
     });
 
     document.addEventListener('keydown', (event) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
-        return;
-      }
+      if (!(target instanceof HTMLElement)) return;
 
       const row = target.closest('[data-refund-row="1"]');
-      if (!row) {
-        return;
-      }
+      if (!row) return;
 
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
-
+      if (event.key !== 'Enter' && event.key !== ' ') return;
       event.preventDefault();
       toggleRow(row);
-    });
-
-    openButton.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      if (selectedRows().length <= 0) {
-        return;
-      }
-
-      syncAll();
-      modal?.show();
     });
 
     modalEl.addEventListener('shown.bs.modal', () => {
@@ -381,22 +303,11 @@
       form.requestSubmit();
     });
 
-    form.addEventListener('submit', () => {
-      persistSelections();
-    });
-
     form.addEventListener('input', syncAll);
     form.addEventListener('change', syncAll);
 
-    modalEl.addEventListener('hidden.bs.modal', () => {
-      if (selectedRows().length === 0) {
-        clearStoredSelections();
-      }
-    });
-
-    restoreSelections();
+    selectedIds.clear();
     syncAll();
-    maybeAutoOpenModal();
   };
 
   if (document.readyState === 'loading') {
