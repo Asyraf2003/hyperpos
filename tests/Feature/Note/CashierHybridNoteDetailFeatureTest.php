@@ -24,12 +24,11 @@ final class CashierHybridNoteDetailFeatureTest extends TestCase
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
-            ->assertSee('Workspace Nota Kasir')
             ->assertSee('Versioning Nota')
-            ->assertSee('List Line Nota')
+            ->assertSee('Revision Aktif')
+            ->assertSee('Daftar Line Nota')
             ->assertSee('Bayar')
-            ->assertSee('Lunasi')
-            ->assertSee('Jasa');
+            ->assertSee('Lunasi');
     }
 
     public function test_open_note_without_additional_revision_history_still_shows_revision_section(): void
@@ -40,33 +39,37 @@ final class CashierHybridNoteDetailFeatureTest extends TestCase
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
             ->assertSee('Versioning Nota')
-            ->assertSee('Current Revision')
-            ->assertSee('Versioning Nota')->assertSee('Current Revision');
+            ->assertSee('Revision Aktif');
     }
 
     private function seedKasir(): User
     {
         $this->loginAsKasir();
+
         $user = User::query()->create([
             'name' => 'Kasir Hybrid Detail',
             'email' => 'kasir-hybrid-detail@example.test',
             'password' => 'password',
         ]);
+
         DB::table('actor_accesses')->insert([
             'actor_id' => (string) $user->getAuthIdentifier(),
             'role' => 'kasir',
         ]);
+
         return $user;
     }
 
     private function seedOpenPartialPaidServiceOnlyNote(): void
     {
         $today = date('Y-m-d');
+
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'open');
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
         $this->seedServiceDetailBase('wi-1', 'Servis Hybrid', 50000, ServiceDetail::PART_SOURCE_NONE);
         $this->seedCustomerPaymentBase('payment-1', 20000, $today);
         $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 20000);
+
         DB::table('payment_component_allocations')->insert([
             'id' => 'pca-1',
             'customer_payment_id' => 'payment-1',

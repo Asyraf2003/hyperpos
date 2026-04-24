@@ -17,7 +17,7 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_refund_rejects_operationally_open_line_selection(): void
+    public function test_refund_allows_operationally_open_line_selection_under_a1_contract(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenPartialPaidNote();
@@ -26,16 +26,17 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
             ->actingAs($user)
             ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
                 'selected_row_ids' => ['wi-1'],
-                'customer_payment_id' => 'payment-1',
                 'refunded_at' => date('Y-m-d'),
-                'amount_rupiah' => 10000,
-                'reason' => 'Coba refund line open operasional',
+                'reason' => 'Refund line open operasional',
             ]);
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors('refund');
+        $response->assertRedirect(route('cashier.notes.index'));
+        $response->assertSessionHas('success');
 
-        $this->assertDatabaseCount('refund_component_allocations', 0);
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-1',
+        ]);
     }
 
     private function seedKasir(): User

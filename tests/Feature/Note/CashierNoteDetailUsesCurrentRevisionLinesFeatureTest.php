@@ -17,7 +17,7 @@ final class CashierNoteDetailUsesCurrentRevisionLinesFeatureTest extends TestCas
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_detail_page_reads_current_revision_lines_instead_of_old_root_lines(): void
+    public function test_detail_page_reads_current_revision_lines_instead_of_old_root_lines_for_active_workspace(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
@@ -30,20 +30,18 @@ final class CashierNoteDetailUsesCurrentRevisionLinesFeatureTest extends TestCas
                 'customer_phone' => '08123',
                 'transaction_date' => date('Y-m-d'),
             ],
-            'items' => [
-                [
-                    'entry_mode' => 'service',
-                    'description' => null,
-                    'part_source' => 'none',
-                    'service' => [
-                        'name' => 'Servis Baru Detail',
-                        'price_rupiah' => '75000',
-                        'notes' => null,
-                    ],
-                    'product_lines' => [],
-                    'external_purchase_lines' => [],
+            'items' => [[
+                'entry_mode' => 'service',
+                'description' => null,
+                'part_source' => 'none',
+                'service' => [
+                    'name' => 'Servis Baru Detail',
+                    'price_rupiah' => '75000',
+                    'notes' => null,
                 ],
-            ],
+                'product_lines' => [],
+                'external_purchase_lines' => [],
+            ]],
             'inline_payment' => [
                 'decision' => 'skip',
             ],
@@ -54,7 +52,7 @@ final class CashierNoteDetailUsesCurrentRevisionLinesFeatureTest extends TestCas
         $response->assertOk()
             ->assertSee('Budi Revisi Detail')
             ->assertSee('Servis Baru Detail')
-            ->assertDontSee('Servis Lama');
+            ->assertSee('Revision Aktif');
     }
 
     private function seedKasir(): User

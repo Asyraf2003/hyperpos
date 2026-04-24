@@ -17,7 +17,7 @@ final class CashierNoteDetailBillingUsesCurrentRevisionFeatureTest extends TestC
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_detail_billing_panel_uses_current_revision_totals(): void
+    public function test_detail_page_uses_current_revision_totals_without_legacy_billing_projection_panel(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
@@ -50,9 +50,9 @@ final class CashierNoteDetailBillingUsesCurrentRevisionFeatureTest extends TestC
         $response = $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk()
-            ->assertSee('Billing Projection')
             ->assertSee('Servis Baru Billing')
-            ->assertSee('75.000');
+            ->assertSee('75.000')
+            ->assertDontSee('Billing Projection');
     }
 
     private function seedKasir(): User

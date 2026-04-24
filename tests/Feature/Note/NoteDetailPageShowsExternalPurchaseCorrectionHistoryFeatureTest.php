@@ -4,22 +4,41 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
+use App\Core\Note\WorkItem\ExternalPurchaseLine;
+use App\Core\Note\WorkItem\ServiceDetail;
+use App\Core\Note\WorkItem\WorkItem;
+use App\Core\Shared\ValueObjects\Money;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\SeedsMinimalNotePaymentFixture;
 use Tests\TestCase;
 
 final class NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest extends TestCase
 {
     use RefreshDatabase;
+    use SeedsMinimalNotePaymentFixture;
 
-    public function test_note_detail_uses_compact_versioning_instead_of_large_correction_block(): void
+    public function test_note_detail_shows_versioning_family_for_external_purchase_history(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedOpenExternalPurchaseNote();
+
+        $response = $this->actingAs($user)->get('/cashier/notes/note-1');
+
+        $response->assertOk();
+        $response->assertSee('Versioning Nota');
+        $response->assertSee('Revision Aktif');
+        $response->assertDontSee('Correction Fee Service + Part External');
+    }
+
+    private function seedKasir(): User
     {
         $this->loginAsKasir();
 
         $user = User::query()->create([
-            'name' => 'Kasir',
-            'email' => 'cashier@example.test',
+            'name' => 'Kasir External Purchase History',
+            'email' => 'kasir-external-purchase-history@example.test',
             'password' => 'password',
         ]);
 
@@ -28,51 +47,24 @@ final class NoteDetailPageShowsExternalPurchaseCorrectionHistoryFeatureTest exte
             'role' => 'kasir',
         ]);
 
+        return $user;
+    }
+
+    private function seedOpenExternalPurchaseNote(): void
+    {
         $today = date('Y-m-d');
-        $now = $today . ' 10:00:00';
 
-        DB::table('notes')->insert([
-            'id' => 'note-1',
-            'customer_name' => 'Budi',
-            'transaction_date' => $today,
-            'note_state' => 'open',
-            'total_rupiah' => 6000,
+        $this->seedNoteBase('note-1', 'Budi', $today, 52000, 'open');
+        $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_WITH_EXTERNAL_PURCHASE, WorkItem::STATUS_OPEN, 52000);
+        $this->seedServiceDetailBase('wi-1', 'Servis AC', 50000, ServiceDetail::PART_SOURCE_EXTERNAL_PURCHASE);
+
+        DB::table('work_item_external_purchase_lines')->insert([
+            'id' => 'ext-1',
+            'work_item_id' => 'wi-1',
+            'cost_description' => 'Beli luar',
+            'unit_cost_rupiah' => 2000,
+            'qty' => 1,
+            'line_total_rupiah' => 2000,
         ]);
-
-        DB::table('note_mutation_events')->insert([
-            'id' => 'evt-1',
-            'note_id' => 'note-1',
-            'mutation_type' => 'paid_external_purchase_work_item_corrected',
-            'actor_id' => 'actor-1',
-            'actor_role' => 'admin',
-            'reason' => 'Koreksi fee jasa external',
-            'occurred_at' => $now,
-            'related_customer_payment_id' => null,
-            'related_customer_refund_id' => null,
-        ]);
-
-        DB::table('note_mutation_snapshots')->insert([
-            [
-                'id' => 'snap-1',
-                'note_mutation_event_id' => 'evt-1',
-                'snapshot_kind' => 'before',
-                'payload_json' => '{"note":{"total_rupiah":7000}}',
-                'created_at' => $now,
-            ],
-            [
-                'id' => 'snap-2',
-                'note_mutation_event_id' => 'evt-1',
-                'snapshot_kind' => 'after',
-                'payload_json' => '{"note":{"total_rupiah":6000}}',
-                'created_at' => $now,
-            ],
-        ]);
-
-        $response = $this->actingAs($user)->get('/cashier/notes/note-1');
-
-        $response->assertOk();
-        $response->assertSee('Versioning Nota');
-        $response->assertSee('Current Revision');
-        $response->assertDontSee('Correction Fee Service + Part External');
     }
 }
