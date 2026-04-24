@@ -30,6 +30,7 @@ final class CashierOpenNoteRefundStandbyViewFeatureTest extends TestCase
             WorkItem::STATUS_OPEN,
             30000
         );
+        $this->seedServiceDetailBase('wi-1', 'Servis Ringan', 30000, 'none');
 
         $response = $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']));
