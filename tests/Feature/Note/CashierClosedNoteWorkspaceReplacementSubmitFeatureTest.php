@@ -22,7 +22,7 @@ final class CashierClosedNoteWorkspaceReplacementSubmitFeatureTest extends TestC
         $user = $this->seedKasir();
         $today = date('Y-m-d');
 
-        $this->seedNoteBase('note-1', 'Budi Lama', $today, 50000, 'open');
+        $this->seedNoteBase('note-1', 'Budi Lama', $today, 50000, 'closed');
         $this->seedWorkItemBase('wi-old-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
         $this->seedServiceDetailBase('wi-old-1', 'Servis Lama', 50000, ServiceDetail::PART_SOURCE_NONE);
         $this->seedCustomerPaymentBase('pay-1', 50000, $today);
