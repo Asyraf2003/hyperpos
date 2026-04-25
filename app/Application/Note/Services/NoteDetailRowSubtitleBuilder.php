@@ -10,6 +10,11 @@ use App\Core\Note\WorkItem\WorkItem;
 
 final class NoteDetailRowSubtitleBuilder
 {
+    public function __construct(
+        private readonly NoteDetailProductLabelResolver $products,
+    ) {
+    }
+
     public function resolve(WorkItem $item): ?string
     {
         return match ($item->transactionType()) {
@@ -33,7 +38,7 @@ final class NoteDetailRowSubtitleBuilder
         $parts = [];
 
         foreach ($lines as $line) {
-            $parts[] = $line->productId() . ' x' . $line->qty();
+            $parts[] = $this->products->resolve($line->productId()) . ' x' . $line->qty();
         }
 
         return implode(' • ', $parts);

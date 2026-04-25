@@ -10,6 +10,11 @@ use App\Core\Note\WorkItem\WorkItem;
 
 final class NoteDetailRowPrimaryLabelResolver
 {
+    public function __construct(
+        private readonly NoteDetailProductLabelResolver $products,
+    ) {
+    }
+
     public function resolve(WorkItem $item): string
     {
         $serviceName = trim((string) ($item->serviceDetail()?->serviceName() ?? ''));
@@ -36,7 +41,7 @@ final class NoteDetailRowPrimaryLabelResolver
             return null;
         }
 
-        $label = 'Produk ' . $lines[0]->productId();
+        $label = $this->products->resolve($lines[0]->productId());
         $remaining = count($lines) - 1;
 
         return $remaining > 0 ? $label . ' +' . $remaining . ' item' : $label;
