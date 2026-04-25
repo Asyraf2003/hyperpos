@@ -66,7 +66,11 @@ final class CashierClosedNoteWorkspaceReplacementSubmitFeatureTest extends TestC
                     ],
                 ],
                 'inline_payment' => [
-                    'decision' => 'skip',
+                    'decision' => 'pay_full',
+                    'payment_method' => null,
+                    'paid_at' => null,
+                    'amount_paid_rupiah' => null,
+                    'amount_received_rupiah' => null,
                 ],
             ],
         );
