@@ -12,6 +12,7 @@ final class SelectedNoteRowsPaymentAmountResolver
     public function __construct(
         private readonly NoteReaderPort $notes,
         private readonly NoteBillingProjectionBuilder $billingProjection,
+        private readonly SelectedNoteRowsPaymentSelectionExpander $selectionExpander,
     ) {
     }
 
@@ -39,27 +40,8 @@ final class SelectedNoteRowsPaymentAmountResolver
                 0,
             );
         } else {
-            $billingRowsById = [];
-            foreach ($billingRows as $row) {
-                $billingRowsById[(string) ($row['id'] ?? '')] = $row;
-            }
-
-            $expandedIds = [];
-            foreach ($selectedIds as $selectedId) {
-                if (isset($billingRowsById[$selectedId])) {
-                    $expandedIds[] = $selectedId;
-                    continue;
-                }
-
-                foreach ($billingRows as $row) {
-                    if ((string) ($row['work_item_id'] ?? '') === $selectedId
-                        && (int) ($row['outstanding_rupiah'] ?? 0) > 0) {
-                        $expandedIds[] = (string) ($row['id'] ?? '');
-                    }
-                }
-            }
-
-            $selectedIds = array_values(array_unique(array_filter($expandedIds)));
+            $billingRowsById = $this->selectionExpander->indexById($billingRows);
+            $selectedIds = $this->selectionExpander->expand($billingRows, $selectedIds);
 
             $matchedIds = [];
             $selectedOutstandingTotal = 0;
