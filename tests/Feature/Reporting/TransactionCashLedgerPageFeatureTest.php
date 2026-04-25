@@ -49,8 +49,8 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('2026-04-04');
         $response->assertSee('note-1');
         $response->assertSee('note-2');
-        $response->assertSee('payment_allocation');
-        $response->assertSee('refund');
+        $response->assertSee('Alokasi Pembayaran');
+        $response->assertSee('Pengembalian Dana');
         $response->assertSee('Rp 12.000');
         $response->assertSee('Rp 1.000');
         $response->assertSee('Rp 11.000');

@@ -66,7 +66,7 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('Hutang Supplier');
+        $response->assertSee('Hutang Pemasok');
         $response->assertSee('supplier-payable-report-filter-form', false);
         $response->assertSee('2030-01-01 s/d 2030-01-31');
         $response->assertSee('Status jatuh tempo dievaluasi terhadap tanggal referensi 2030-01-31.');
