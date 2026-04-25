@@ -13,27 +13,31 @@
       </a>
 
       @if ($note['can_show_payment_form'] ?? false)
-        <button
-          type="button"
-          class="btn btn-primary js-open-payment-intent"
-          data-bs-toggle="modal"
-          data-bs-target="#note-payment-modal"
-          data-payment-intent="pay"
-          data-payment-preset="manual"
-        >
-          Buka Modal Bayar
-        </button>
+        @if ((int) ($note['net_paid_rupiah'] ?? 0) <= 0)
+          <button
+            type="button"
+            class="btn btn-primary js-open-payment-intent"
+            data-bs-toggle="modal"
+            data-bs-target="#note-payment-modal"
+            data-payment-intent="pay"
+            data-payment-preset="manual"
+          >
+            Bayar Sebagian
+          </button>
+        @endif
 
-        <button
-          type="button"
-          class="btn btn-outline-primary js-open-payment-intent"
-          data-bs-toggle="modal"
-          data-bs-target="#note-payment-modal"
-          data-payment-intent="settle"
-          data-payment-preset="manual"
-        >
-          Lunasi Pembayaran
-        </button>
+        @if ((int) ($note['outstanding_rupiah'] ?? 0) > 0)
+          <button
+            type="button"
+            class="btn btn-outline-primary js-open-payment-intent"
+            data-bs-toggle="modal"
+            data-bs-target="#note-payment-modal"
+            data-payment-intent="settle"
+            data-payment-preset="manual"
+          >
+            Lunasi
+          </button>
+        @endif
       @endif
 
       @if ($note['can_show_refund_form'] ?? false)
