@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\NoteCurrentRevisionResolver;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\NoteRevisionBootstrapFactory;
+use App\Application\Note\Services\UpdateTransactionWorkspaceWorkItemPersister;
+use App\Ports\Out\Note\NoteWriterPort;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
@@ -20,6 +23,9 @@ final class CreateNoteRevisionHandler
         private readonly NoteRevisionBootstrapFactory $factory,
         private readonly CreateNoteRevisionPayloadNoteBuilder $notesFromPayload,
         private readonly CreateNoteRevisionCommitter $committer,
+        private readonly NoteWriterPort $noteWriter,
+        private readonly UpdateTransactionWorkspaceWorkItemPersister $workItems,
+        private readonly NoteHistoryProjectionService $projection,
         private readonly ClockPort $clock,
         private readonly TransactionManagerPort $transactions,
     ) {
@@ -50,11 +56,13 @@ final class CreateNoteRevisionHandler
             $nextRevisionNumber = $this->currentRevision->nextRevisionNumber($root->id());
             $reason = (string) ($payload['reason'] ?? '');
 
+            $replacement = $this->notesFromPayload->build($root->id(), $payload);
+
             $revision = $this->factory->createNextRevision(
                 sprintf('%s-r%03d', $root->id(), $nextRevisionNumber),
                 $current->id(),
                 $nextRevisionNumber,
-                $this->notesFromPayload->build($root->id(), $payload),
+                $replacement,
                 $actorId,
                 $this->clock->now(),
                 $reason,
@@ -67,6 +75,17 @@ final class CreateNoteRevisionHandler
                 $reason,
                 $revision,
             );
+
+            $root->updateHeader(
+                $replacement->customerName(),
+                $replacement->customerPhone(),
+                $replacement->transactionDate(),
+            );
+
+            $this->noteWriter->updateHeader($root);
+            $this->workItems->persist($root, $payload['items'] ?? [], $root->transactionDate());
+            $this->noteWriter->updateTotal($root);
+            $this->projection->syncNote($root->id());
 
             $this->transactions->commit();
 
