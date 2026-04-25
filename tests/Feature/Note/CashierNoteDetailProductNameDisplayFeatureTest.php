@@ -29,8 +29,6 @@ final class CashierNoteDetailProductNameDisplayFeatureTest extends TestCase
             'merek_normalized' => 'federal',
             'ukuran' => 800,
             'harga_jual' => 50000,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         $today = date('Y-m-d');
