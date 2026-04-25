@@ -50,7 +50,7 @@ final class NoteBillingProjectionRowMapper
             'is_outstanding' => $outstanding > 0,
             'is_product_component' => $isProduct,
             'is_service_component' => ! $isProduct,
-            'eligible_for_dp_preset' => $isProduct && $outstanding > 0,
+            'eligible_for_dp_preset' => ! $isProduct && $outstanding > 0,
             'can_select_manually' => ! $blocked && $outstanding > 0,
             'selection_blocked_reason' => $blocked ? 'Komponen sebelumnya pada line ini belum lunas. Ikuti urutan tagihan existing.' : null,
             'status_label' => $outstanding <= 0 ? 'Lunas' : ($netPaid > 0 ? 'Parsial' : 'Belum Dibayar'),

@@ -4,16 +4,16 @@
   id="note-payment-modal"
   tabindex="-1"
   aria-hidden="true"
-  data-total-rupiah="{{ (int) ($note['grand_total_rupiah'] ?? 0) }}"
-  data-outstanding-rupiah="{{ (int) ($note['outstanding_rupiah'] ?? 0) }}"
+  data-allow-partial="{{ ($note['can_show_partial_payment_action'] ?? false) ? '1' : '0' }}"
+  data-default-mode="{{ ($note['can_show_partial_payment_action'] ?? false) ? 'partial' : 'full' }}"
 >
   <div class="modal-dialog modal-xl modal-dialog-centered" id="note-payment-modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <div>
-          <h5 class="modal-title mb-1" id="note-payment-modal-title">Proses Pembayaran</h5>
-          <p class="mb-0 text-muted small" id="note-payment-modal-subtitle">
-            Pilih transfer atau cash. Sistem otomatis memilih tagihan aktif yang masih outstanding.
+          <h5 class="modal-title mb-1" id="detail-payment-title">Proses Nota</h5>
+          <p class="mb-0 text-muted small" id="detail-payment-subtitle">
+            Pilih aksi pembayaran, cek nominal, lalu bayar transfer atau cash.
           </p>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
@@ -21,12 +21,12 @@
 
       <form method="POST" action="{{ $paymentModalConfig['action'] ?? $paymentAction }}" id="note-payment-form">
         @csrf
+
         <input type="hidden" name="payment_scope" value="partial">
-        <input type="hidden" name="payment_method" id="detail-payment-method" value="">
-        <input type="hidden" name="paid_at" id="detail-payment-paid-at" value="{{ $paymentModalConfig['date_default'] ?? $paymentDateDefault }}">
-        <input type="hidden" name="amount_paid" id="detail-payment-amount-paid" value="">
-        <input type="hidden" name="amount_received" id="detail-payment-amount-received" value="">
-        <input type="hidden" id="detail-payment-intent" value="{{ ($note['can_show_partial_payment_action'] ?? false) ? 'pay' : 'settle' }}">
+        <input type="hidden" name="payment_method" id="detail_payment_method" value="">
+        <input type="hidden" name="paid_at" id="detail_payment_paid_at" value="{{ $paymentModalConfig['date_default'] ?? $paymentDateDefault }}">
+        <input type="hidden" name="amount_paid" id="detail_payment_amount_paid" value="">
+        <input type="hidden" name="amount_received" id="detail_payment_amount_received" value="">
 
         <div id="payment-selected-row-ids"></div>
 
@@ -41,6 +41,9 @@
                 data-label="Line {{ $row['line_no'] }} · {{ $row['component_label'] }}"
                 data-type-label="{{ $row['domain_type_label'] ?? '-' }}"
                 data-outstanding-rupiah="{{ (int) ($row['outstanding_rupiah'] ?? 0) }}"
+                data-is-service-component="{{ ($row['is_service_component'] ?? false) ? '1' : '0' }}"
+                data-is-product-component="{{ ($row['is_product_component'] ?? false) ? '1' : '0' }}"
+                data-eligible-dp="{{ ($row['eligible_for_dp_preset'] ?? false) ? '1' : '0' }}"
               ></span>
             @endif
           @endforeach
@@ -55,10 +58,12 @@
                     <div>
                       <div class="fw-semibold">Ringkasan Pembayaran</div>
                       <div class="small text-muted">
-                        Tagihan aktif dipilih otomatis. Detail teknis billing row disimpan hidden untuk menjaga allocation.
+                        Tagihan aktif dipilih otomatis. Data billing row tetap dikirim hidden untuk allocation.
                       </div>
                     </div>
-                    <span class="badge bg-light text-dark border" id="detail-payment-mode-badge">{{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}</span>
+                    <span class="badge bg-light text-dark border" id="detail-payment-mode-text">
+                      {{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}
+                    </span>
                   </div>
 
                   <div class="d-flex flex-column gap-2" id="detail-payment-line-summary">
@@ -69,7 +74,7 @@
 
               <div class="col-12 col-lg-5">
                 <div class="border rounded p-3 mb-3">
-                  <div class="small text-muted mb-2">Total Terpilih</div>
+                  <div class="small text-muted mb-2">Ringkasan Nominal</div>
                   <div class="d-flex justify-content-between py-2 border-bottom">
                     <span class="text-muted">Outstanding Terpilih</span>
                     <strong id="detail-payment-selected-total">0</strong>
@@ -86,12 +91,12 @@
                     <input
                       type="text"
                       class="form-control"
-                      id="detail-payment-amount-paid-display"
+                      id="detail_payment_amount_paid_display"
                       value="{{ old('amount_paid') }}"
                       placeholder="Contoh: 50.000"
                     >
                     <div class="small text-muted mt-2">
-                      Default mengikuti tagihan outstanding terpilih. Nominal masih bisa diedit.
+                      Default mengikuti komponen service jika ada. Jika tidak ada service, default mengikuti outstanding terpilih.
                     </div>
                   </div>
                 @endif
@@ -112,8 +117,10 @@
 
           <div id="detail-payment-cash-view" class="d-none">
             <div class="border rounded p-3 mb-3 bg-light">
-              <div class="small text-muted mb-1">Mode Cash</div>
-              <div class="fw-semibold" id="detail-payment-cash-mode-text">{{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}</div>
+              <div class="small text-muted mb-1">Pembayaran Cash</div>
+              <div class="fw-semibold" id="detail-payment-cash-mode-text">
+                {{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}
+              </div>
             </div>
 
             <div class="row g-3">
@@ -122,11 +129,12 @@
                 <input
                   type="text"
                   class="form-control form-control-lg"
-                  id="detail-payment-amount-received-display"
+                  id="detail_payment_amount_received_display"
                   value="{{ old('amount_received') }}"
                   placeholder="Masukkan uang pelanggan"
                 >
               </div>
+
               <div class="col-12">
                 <div class="border rounded p-3">
                   <div class="d-flex justify-content-between py-2 border-bottom">

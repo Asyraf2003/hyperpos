@@ -4,25 +4,16 @@
   if (!modal || !form) return;
 
   const byId = (id) => document.getElementById(id);
-  const digits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
-  const format = (value) => new Intl.NumberFormat("id-ID").format(Number.isFinite(value) ? value : 0);
-  const rows = () => Array.from(document.querySelectorAll("[data-payment-row-source]"));
-  const outstanding = () => selectedRows().reduce((sum, row) => sum + digits(row.dataset.outstandingRupiah), 0);
-  const hiddenRows = () => byId("payment-selected-row-ids");
-  const amountPaidHidden = () => byId("detail-payment-amount-paid");
-  const amountReceivedHidden = () => byId("detail-payment-amount-received");
-  const methodHidden = () => byId("detail-payment-method");
-  const intentHidden = () => byId("detail-payment-intent");
-  const paidInput = () => byId("detail-payment-amount-paid-display");
-  const receivedInput = () => byId("detail-payment-amount-received-display");
+  const digits = (value) =>
+    Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
+  const format = (value) => Number(value || 0).toLocaleString("id-ID");
+  const moneyInput = (id) => byId(id);
+  const rowSources = () => Array.from(document.querySelectorAll("[data-payment-row-source]"));
+  const allowPartial = () => modal.dataset.allowPartial === "1";
 
-  let intent = intentHidden()?.value === "settle" ? "settle" : "pay";
-  let cashStep = false;
-  let selected = [];
-
-  const setText = (id, value) => {
-    const el = byId(id);
-    if (el) el.textContent = format(value);
+  const state = {
+    mode: modal.dataset.defaultMode === "partial" ? "partial" : "full",
+    cashStep: false,
   };
 
   const escapeHtml = (value) =>
@@ -33,86 +24,84 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
 
-  const setMethod = (method) => {
-    const input = methodHidden();
-    if (input) input.value = method;
+  const setText = (id, value) => {
+    const el = byId(id);
+    if (el) el.textContent = format(value);
   };
 
-  const setAmountPaid = (amount) => {
-    const input = amountPaidHidden();
-    if (input) input.value = amount > 0 ? String(amount) : "";
+  const setValue = (id, value) => {
+    const el = byId(id);
+    if (el) el.value = String(value ?? "");
   };
 
-  const setAmountReceived = (amount) => {
-    const input = amountReceivedHidden();
-    if (input) input.value = amount > 0 ? String(amount) : "";
+  const selectedRows = () => {
+    const rows = rowSources();
+
+    if (state.mode === "full") {
+      return rows;
+    }
+
+    const serviceRows = rows.filter((row) => row.dataset.isServiceComponent === "1");
+    return serviceRows.length > 0 ? serviceRows : rows;
   };
 
-  const selectedRows = () => selected;
+  const selectedTotal = () =>
+    selectedRows().reduce((sum, row) => sum + digits(row.dataset.outstandingRupiah), 0);
 
-  const chooseRows = () => {
-    const available = rows();
-    selected = available;
+  const typedPartialAmount = () => {
+    const input = moneyInput("detail_payment_amount_paid_display");
+    return digits(input?.value || byId("detail_payment_amount_paid")?.value || "");
+  };
 
-    const container = hiddenRows();
+  const payableAmount = () => {
+    const total = selectedTotal();
+
+    if (state.mode === "full") {
+      return total;
+    }
+
+    const typed = typedPartialAmount();
+    return typed > 0 ? Math.min(typed, total) : total;
+  };
+
+  const syncHiddenRows = () => {
+    const container = byId("payment-selected-row-ids");
     if (!container) return;
 
-    container.innerHTML = selected
+    container.innerHTML = selectedRows()
       .map((row) => `<input type="hidden" name="selected_row_ids[]" value="${escapeHtml(row.dataset.rowId)}">`)
       .join("");
   };
 
-  const payable = () => {
-    const total = outstanding();
-
-    if (intent === "settle") {
-      return total;
-    }
-
-    const typed = digits(paidInput()?.value || amountPaidHidden()?.value || "");
-    return typed > 0 ? Math.min(typed, total) : total;
-  };
-
-  const syncAmountInput = () => {
-    const input = paidInput();
-    if (!input || intent !== "pay") return;
-
-    const current = digits(input.value || "");
-    if (document.activeElement === input) {
-      setAmountPaid(Math.min(current, outstanding()));
+  const syncPartialInput = () => {
+    const input = moneyInput("detail_payment_amount_paid_display");
+    if (!input || state.mode !== "partial") {
+      setValue("detail_payment_amount_paid", "");
       return;
     }
 
-    const amount = current > 0 ? Math.min(current, outstanding()) : outstanding();
-    input.value = amount > 0 ? format(amount) : "";
-    setAmountPaid(amount);
-  };
+    const total = selectedTotal();
+    const typed = typedPartialAmount();
+    const amount = typed > 0 ? Math.min(typed, total) : total;
 
-  const syncHidden = () => {
-    const intentInput = intentHidden();
-    if (intentInput) intentInput.value = intent;
-
-    if (intent === "settle") {
-      setAmountPaid(0);
-    } else {
-      syncAmountInput();
+    if (document.activeElement !== input) {
+      input.value = amount > 0 ? format(amount) : "";
     }
 
-    if (!cashStep) {
-      setAmountReceived(0);
-    }
+    setValue("detail_payment_amount_paid", amount > 0 ? amount : "");
   };
 
   const renderRows = () => {
-    const container = byId("detail-payment-line-summary");
-    if (!container) return;
+    const target = byId("detail-payment-line-summary");
+    if (!target) return;
 
-    if (selectedRows().length === 0) {
-      container.innerHTML = '<div class="p-3 text-muted small">Belum ada tagihan outstanding.</div>';
+    const rows = selectedRows();
+    if (rows.length === 0) {
+      target.innerHTML = '<div class="p-3 text-muted small">Belum ada tagihan outstanding.</div>';
       return;
     }
 
-    container.innerHTML = selectedRows()
+    target.innerHTML = rows
       .map((row) => `
         <div class="p-3 border rounded">
           <div class="d-flex justify-content-between align-items-start gap-3">
@@ -127,156 +116,199 @@
       .join("");
   };
 
-  const updateUi = () => {
-    chooseRows();
-    syncHidden();
-    renderRows();
-
-    const total = outstanding();
-    const paid = payable();
-    const received = digits(receivedInput()?.value || amountReceivedHidden()?.value || "");
-
+  const syncDialog = () => {
     const dialog = byId("note-payment-modal-dialog");
-    if (dialog) {
-      dialog.classList.toggle("modal-xl", !cashStep);
-      dialog.style.maxWidth = cashStep ? "560px" : "";
-      dialog.style.width = cashStep ? "calc(100% - 2rem)" : "";
+    if (!dialog) return;
+
+    dialog.classList.toggle("modal-xl", !state.cashStep);
+    dialog.style.maxWidth = state.cashStep ? "560px" : "";
+    dialog.style.width = state.cashStep ? "calc(100% - 2rem)" : "";
+  };
+
+  const syncHeader = () => {
+    const title = byId("detail-payment-title");
+    const subtitle = byId("detail-payment-subtitle");
+
+    if (state.cashStep) {
+      if (title) title.textContent = "Pembayaran Cash";
+      if (subtitle) {
+        subtitle.textContent = "Masukkan uang pelanggan, cek kembalian, lalu simpan cash.";
+      }
+      return;
     }
 
-    const title = byId("note-payment-modal-title");
-    if (title) title.textContent = cashStep ? "Pembayaran Cash" : "Proses Pembayaran";
-
-    const subtitle = byId("note-payment-modal-subtitle");
+    if (title) title.textContent = "Proses Nota";
     if (subtitle) {
-      subtitle.textContent = cashStep
-        ? "Masukkan uang pelanggan, cek kembalian, lalu simpan cash."
-        : "Pilih transfer atau cash. Sistem otomatis memilih tagihan aktif yang masih outstanding.";
+      subtitle.textContent = "Pilih aksi pembayaran, cek nominal, lalu bayar transfer atau cash.";
+    }
+  };
+
+  const syncModeText = () => {
+    const label = state.mode === "partial" ? "Bayar Sebagian" : "Lunasi";
+
+    const modeText = byId("detail-payment-mode-text");
+    if (modeText) modeText.textContent = label;
+
+    const cashText = byId("detail-payment-cash-mode-text");
+    if (cashText) cashText.textContent = label;
+  };
+
+  const syncViews = () => {
+    byId("detail-payment-standard-view")?.classList.toggle("d-none", state.cashStep);
+    byId("detail-payment-cash-view")?.classList.toggle("d-none", !state.cashStep);
+    byId("detail-payment-footer-main")?.classList.toggle("d-none", state.cashStep);
+    byId("detail-payment-footer-cash")?.classList.toggle("d-none", !state.cashStep);
+
+    const partialPanel = byId("detail-payment-partial-panel");
+    if (partialPanel) partialPanel.classList.toggle("d-none", state.mode !== "partial");
+  };
+
+  const refresh = () => {
+    if (!allowPartial() && state.mode === "partial") {
+      state.mode = "full";
     }
 
-    const badge = byId("detail-payment-mode-badge");
-    if (badge) badge.textContent = intent === "settle" ? "Lunasi" : "Bayar Sebagian";
+    syncHiddenRows();
+    syncPartialInput();
+    renderRows();
+    syncDialog();
+    syncHeader();
+    syncModeText();
+    syncViews();
 
-    const cashMode = byId("detail-payment-cash-mode-text");
-    if (cashMode) cashMode.textContent = intent === "settle" ? "Lunasi" : "Bayar Sebagian";
+    const selected = selectedTotal();
+    const payable = payableAmount();
+    const received = digits(moneyInput("detail_payment_amount_received_display")?.value || "");
 
-    const standard = byId("detail-payment-standard-view");
-    const cash = byId("detail-payment-cash-view");
-    const partialPanel = byId("detail-payment-partial-panel");
-    const footerMain = byId("detail-payment-footer-main");
-    const footerCash = byId("detail-payment-footer-cash");
+    if (state.cashStep) {
+      setValue("detail_payment_amount_received", received > 0 ? received : "");
+    }
 
-    if (standard) standard.classList.toggle("d-none", cashStep);
-    if (cash) cash.classList.toggle("d-none", !cashStep);
-    if (partialPanel) partialPanel.classList.toggle("d-none", intent !== "pay");
-    if (footerMain) footerMain.classList.toggle("d-none", cashStep);
-    if (footerCash) footerCash.classList.toggle("d-none", !cashStep);
+    if (!state.cashStep) {
+      setValue("detail_payment_amount_received", "");
+    }
 
-    setText("detail-payment-selected-total", total);
-    setText("detail-payment-payable-text", paid);
-    setText("detail-payment-remaining-text", Math.max(total - paid, 0));
-    setText("detail-payment-cash-payable-text", paid);
-    setText("detail-payment-change-text", Math.max(received - paid, 0));
+    setText("detail-payment-selected-total", selected);
+    setText("detail-payment-payable-text", payable);
+    setText("detail-payment-remaining-text", Math.max(selected - payable, 0));
+    setText("detail-payment-cash-payable-text", payable);
+    setText("detail-payment-change-text", Math.max(received - payable, 0));
 
+    const hasRows = selectedRows().length > 0;
     const transfer = byId("detail-payment-submit-transfer");
     const openCash = byId("detail-payment-open-cash");
     const submitCash = byId("detail-payment-submit-cash");
 
-    if (transfer) transfer.disabled = paid <= 0 || selectedRows().length === 0;
-    if (openCash) openCash.disabled = paid <= 0 || selectedRows().length === 0;
-    if (submitCash) submitCash.disabled = paid <= 0 || received < paid || selectedRows().length === 0;
+    if (transfer) transfer.disabled = !hasRows || payable <= 0;
+    if (openCash) openCash.disabled = !hasRows || payable <= 0;
+    if (submitCash) submitCash.disabled = !hasRows || payable <= 0 || received < payable;
   };
 
-  const openCash = () => {
-    cashStep = true;
-    setMethod("cash");
-    updateUi();
-    window.requestAnimationFrame(() => receivedInput()?.focus());
+  const applyMode = (mode) => {
+    state.mode = mode === "partial" && allowPartial() ? "partial" : "full";
+    state.cashStep = false;
+    setValue("detail_payment_method", "");
+    setValue("detail_payment_amount_received", "");
+    refresh();
   };
 
-  const closeCash = () => {
-    cashStep = false;
-    setMethod("");
-    setAmountReceived(0);
-    if (receivedInput()) receivedInput().value = "";
-    updateUi();
+  const openCashStep = () => {
+    state.cashStep = true;
+    setValue("detail_payment_method", "cash");
+    refresh();
+
+    window.requestAnimationFrame(() => {
+      const input = moneyInput("detail_payment_amount_received_display");
+      input?.focus();
+      input?.select?.();
+    });
+  };
+
+  const closeCashStep = () => {
+    state.cashStep = false;
+    setValue("detail_payment_method", "");
+    setValue("detail_payment_amount_received", "");
+    const input = moneyInput("detail_payment_amount_received_display");
+    if (input) input.value = "";
+    refresh();
   };
 
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest(".js-open-payment-intent");
     if (trigger) {
-      intent = trigger.dataset.paymentIntent === "settle" ? "settle" : "pay";
-      cashStep = false;
-      setMethod("");
-      setAmountReceived(0);
-      if (receivedInput()) receivedInput().value = "";
-      updateUi();
+      applyMode(trigger.dataset.paymentIntent === "pay" ? "partial" : "full");
       return;
     }
 
     if (event.target.closest("#detail-payment-open-cash")) {
       event.preventDefault();
-      openCash();
+      openCashStep();
       return;
     }
 
     if (event.target.closest("#detail-payment-back-cash")) {
       event.preventDefault();
-      closeCash();
+      closeCashStep();
       return;
     }
 
     if (event.target.closest("#detail-payment-submit-transfer")) {
-      setMethod("tf");
-      updateUi();
+      setValue("detail_payment_method", "tf");
+      refresh();
       return;
     }
 
     if (event.target.closest("#detail-payment-submit-cash")) {
-      setMethod("cash");
-      setAmountReceived(digits(receivedInput()?.value || ""));
-      updateUi();
+      setValue("detail_payment_method", "cash");
+      setValue(
+        "detail_payment_amount_received",
+        digits(moneyInput("detail_payment_amount_received_display")?.value || "")
+      );
+      refresh();
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    if (event.target.id === "detail_payment_amount_paid_display") {
+      const value = Math.min(digits(event.target.value || ""), selectedTotal());
+      event.target.value = value > 0 ? format(value) : "";
+      setValue("detail_payment_amount_paid", value > 0 ? value : "");
+      refresh();
+      return;
+    }
+
+    if (event.target.id === "detail_payment_amount_received_display") {
+      const value = digits(event.target.value || "");
+      event.target.value = value > 0 ? format(value) : "";
+      setValue("detail_payment_amount_received", value > 0 ? value : "");
+      refresh();
     }
   });
 
   form.addEventListener("submit", () => {
-    if (cashStep) {
-      setMethod("cash");
-      setAmountReceived(digits(receivedInput()?.value || ""));
-    }
+    syncHiddenRows();
 
-    if (methodHidden()?.value !== "cash") {
-      setMethod("tf");
-    }
-
-    updateUi();
-  });
-
-  document.addEventListener("input", (event) => {
-    if (event.target.id === "detail-payment-amount-paid-display") {
-      const numeric = Math.min(digits(event.target.value || ""), outstanding());
-      event.target.value = numeric > 0 ? format(numeric) : "";
-      setAmountPaid(numeric);
-      updateUi();
+    if (state.cashStep) {
+      setValue("detail_payment_method", "cash");
+      setValue(
+        "detail_payment_amount_received",
+        digits(moneyInput("detail_payment_amount_received_display")?.value || "")
+      );
       return;
     }
 
-    if (event.target.id === "detail-payment-amount-received-display") {
-      const numeric = digits(event.target.value || "");
-      event.target.value = numeric > 0 ? format(numeric) : "";
-      setAmountReceived(numeric);
-      updateUi();
-    }
+    setValue("detail_payment_method", "tf");
   });
 
   modal.addEventListener("shown.bs.modal", () => {
-    updateUi();
+    refresh();
 
-    if (intent === "pay" && paidInput()) {
-      paidInput()?.focus();
-      paidInput()?.select();
+    if (state.mode === "partial") {
+      const input = moneyInput("detail_payment_amount_paid_display");
+      input?.focus();
+      input?.select?.();
     }
   });
 
-  chooseRows();
-  updateUi();
+  refresh();
 })();

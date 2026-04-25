@@ -42,7 +42,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
         self::assertSame('Jasa', $row['component_label']);
         self::assertSame(50000, $row['outstanding_rupiah']);
         self::assertTrue($row['can_select_manually']);
-        self::assertFalse($row['eligible_for_dp_preset']);
+        self::assertTrue($row['eligible_for_dp_preset']);
         self::assertSame('Belum Dibayar', $row['status_label']);
     }
 
@@ -79,7 +79,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
         $first = $mapper->map($productComponent, $item, [], [], $lineOutstanding);
         $second = $mapper->map($serviceComponent, $item, [], [], $lineOutstanding);
 
-        self::assertTrue($first['eligible_for_dp_preset']);
+        self::assertFalse($first['eligible_for_dp_preset']);
         self::assertTrue($first['can_select_manually']);
         self::assertSame('Part External', $first['component_label']);
 
