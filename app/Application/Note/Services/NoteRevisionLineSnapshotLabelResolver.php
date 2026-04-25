@@ -23,7 +23,7 @@ final class NoteRevisionLineSnapshotLabelResolver
             $label = $this->firstNonEmpty([
                 $first['product_label'] ?? null,
                 $first['product_name'] ?? null,
-                $first['product_id'] ?? null,
+                $first['product_nama_barang'] ?? null,
             ]);
 
             if ($label !== null) {

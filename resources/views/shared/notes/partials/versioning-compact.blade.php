@@ -17,9 +17,6 @@
         </div>
         <div class="text-end small text-muted">
           <div>{{ $currentRevision['created_at'] ?? '-' }}</div>
-          @if (!empty($currentRevision['created_by_actor_id']))
-            <div>{{ $currentRevision['created_by_actor_id'] }}</div>
-          @endif
         </div>
       </div>
 

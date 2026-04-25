@@ -94,7 +94,7 @@
                   <small class="text-muted">{{ $entry['created_at'] ?? '-' }}</small>
                 </div>
                 <span class="badge bg-light-secondary text-secondary align-self-start">
-                  {{ $entry['revision_id'] ?? '-' }}
+                  Revisi Nota
                 </span>
               </div>
 
@@ -127,6 +127,27 @@
                     <div class="fw-semibold">{{ number_format((int) ($entry['grand_total_rupiah'] ?? 0), 0, ',', '.') }}</div>
                   </div>
                 </div>
+
+                @if (!empty($entry['line_snapshot_rows']))
+                  <div class="mt-3 pt-3 border-top">
+                    <div class="small fw-semibold mb-2">Isi Revisi</div>
+                    <div class="d-flex flex-column gap-2">
+                      @foreach (($entry['line_snapshot_rows'] ?? []) as $line)
+                        <div class="d-flex justify-content-between align-items-start gap-3 small">
+                          <div>
+                            <div class="fw-semibold">
+                              Line {{ (int) ($line['line_no'] ?? 0) }} · {{ $line['label'] ?? '-' }}
+                            </div>
+                            <div class="text-muted">{{ $line['type_label'] ?? '-' }}</div>
+                          </div>
+                          <div class="text-end fw-semibold">
+                            Rp {{ number_format((int) ($line['subtotal_rupiah'] ?? 0), 0, ',', '.') }}
+                          </div>
+                        </div>
+                      @endforeach
+                    </div>
+                  </div>
+                @endif
               </div>
             </div>
           @endforeach
