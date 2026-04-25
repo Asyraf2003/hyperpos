@@ -44,6 +44,23 @@ final class SelectedNoteRowsPaymentAmountResolver
                 $billingRowsById[(string) ($row['id'] ?? '')] = $row;
             }
 
+            $expandedIds = [];
+            foreach ($selectedIds as $selectedId) {
+                if (isset($billingRowsById[$selectedId])) {
+                    $expandedIds[] = $selectedId;
+                    continue;
+                }
+
+                foreach ($billingRows as $row) {
+                    if ((string) ($row['work_item_id'] ?? '') === $selectedId
+                        && (int) ($row['outstanding_rupiah'] ?? 0) > 0) {
+                        $expandedIds[] = (string) ($row['id'] ?? '');
+                    }
+                }
+            }
+
+            $selectedIds = array_values(array_unique(array_filter($expandedIds)));
+
             $matchedIds = [];
             $selectedOutstandingTotal = 0;
 

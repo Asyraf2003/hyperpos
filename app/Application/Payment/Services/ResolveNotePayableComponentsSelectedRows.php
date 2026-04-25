@@ -34,7 +34,10 @@ final class ResolveNotePayableComponentsSelectedRows
             $resolved = PayableComponentsFromWorkItem::resolve($item, $nextOrder);
 
             foreach ($resolved as $component) {
-                if (in_array($this->ids->fromComponent($component), $selectedIds, true)) {
+                $componentId = $this->ids->fromComponent($component);
+
+                if (in_array($componentId, $selectedIds, true)
+                    || in_array($component->workItemId(), $selectedIds, true)) {
                     $components[] = $component;
                 }
             }
@@ -42,10 +45,13 @@ final class ResolveNotePayableComponentsSelectedRows
             $nextOrder += count($resolved);
         }
 
-        $matchedIds = array_map(
-            fn (PayableNoteComponent $component): string => $this->ids->fromComponent($component),
-            $components,
-        );
+        $matchedIds = [];
+        foreach ($components as $component) {
+            $matchedIds[] = $this->ids->fromComponent($component);
+            $matchedIds[] = $component->workItemId();
+        }
+
+        $matchedIds = array_values(array_unique($matchedIds));
 
         if (array_values(array_diff($selectedIds, $matchedIds)) !== []) {
             throw new DomainException('Billing row pembayaran yang dipilih tidak valid untuk nota ini.');
