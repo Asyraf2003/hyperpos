@@ -139,7 +139,7 @@
                             @forelse ($movementRows as $row)
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold">{{ $row['nama_barang'] ?? $row['product_id'] }}</div>
+                                        <div class="fw-semibold">{{ $row['nama_barang'] ?? ($row['kode_barang'] ?? '-') }}</div>
                                         <div class="small text-muted">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</div>
                                     </td>
                                     <td class="text-end">{{ number_format($row['qty_in'], 0, ',', '.') }}</td>
@@ -154,6 +154,10 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    @include('layouts.partials.pagination', ['paginator' => $movementRows])
                 </div>
             </div>
         </div>

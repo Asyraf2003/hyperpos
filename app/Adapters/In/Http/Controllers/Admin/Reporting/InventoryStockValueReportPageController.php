@@ -30,7 +30,11 @@ final class InventoryStockValueReportPageController extends Controller
                 $request,
                 'snapshot_page',
             ),
-            'movementRows' => is_array($payload['movement_rows'] ?? null) ? $payload['movement_rows'] : [],
+            'movementRows' => $paginator->paginate(
+                is_array($payload['movement_rows'] ?? null) ? $payload['movement_rows'] : [],
+                $request,
+                'movement_page',
+            ),
         ]);
     }
 }
