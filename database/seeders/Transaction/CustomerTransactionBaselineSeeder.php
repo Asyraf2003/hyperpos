@@ -22,7 +22,7 @@ final class CustomerTransactionBaselineSeeder extends Seeder
         AddWorkItemHandler $addWorkItem,
         ReverseNoteStoreStockInventoryOperation $reverseInventory,
     ): void {
-        $window = SeedWindow::baselineWeek();
+        $window = SeedWindow::baselineMonth();
         $density = SeedDensity::baseline();
 
         $products = DB::table('products')
@@ -88,7 +88,7 @@ final class CustomerTransactionBaselineSeeder extends Seeder
             }
         }
 
-        $this->command?->info('CustomerTransactionBaselineSeeder selesai: baseline transaksi 7 hari dibuat.');
+        $this->command?->info('CustomerTransactionBaselineSeeder selesai: baseline transaksi 1 bulan dibuat.');
     }
 
     /**

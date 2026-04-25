@@ -60,13 +60,13 @@ final class ExpenseBaselineSeeder extends Seeder
 
     public function run(): void
     {
-        $window = SeedWindow::baselineWeek();
+        $window = SeedWindow::baselineMonth();
         $density = SeedDensity::baseline();
 
         $this->seedCategories();
         $this->seedExpenses($window['days'], $density['expense_rows_per_day']);
 
-        $this->command?->info('ExpenseBaselineSeeder selesai: baseline expense 7 hari deterministic dibuat.');
+        $this->command?->info('ExpenseBaselineSeeder selesai: baseline expense 1 bulan deterministic dibuat.');
     }
 
     private function seedCategories(): void

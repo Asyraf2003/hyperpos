@@ -29,8 +29,8 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
             return;
         }
 
-        $invoicePlan = [2, 3, 4, 2, 4, 3, 3];
-        $startDate = CarbonImmutable::today()->subDays(6);
+        $startDate = CarbonImmutable::today('Asia/Jakarta')->subDays(29);
+        $invoicePlan = $this->buildMonthlyInvoicePlan();
 
         $primarySuppliers = $suppliers->take(5)->values();
         $secondarySuppliers = $suppliers->slice(5)->values();
@@ -83,7 +83,28 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
             }
         }
 
-        $this->command?->info('SupplierInvoiceBaselineSeeder selesai: 21 faktur baseline 7 hari dibuat.');
+        $this->command?->info(sprintf(
+            'SupplierInvoiceBaselineSeeder selesai: %d faktur baseline 1 bulan dibuat.',
+            $invoiceRunningNo - 1
+        ));
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function buildMonthlyInvoicePlan(): array
+    {
+        $plan = [];
+
+        for ($day = 1; $day <= 30; $day++) {
+            $plan[] = match (true) {
+                $day % 10 === 0 => 4,
+                $day % 5 === 0 => 3,
+                default => 2,
+            };
+        }
+
+        return $plan;
     }
 
     private function pickSupplier(

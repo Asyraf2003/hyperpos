@@ -34,6 +34,25 @@ final class SeedWindow
      *   days: list<CarbonImmutable>
      * }
      */
+    public static function baselineMonth(?CarbonImmutable $anchor = null): array
+    {
+        $end = ($anchor ?? CarbonImmutable::today('Asia/Jakarta'))->startOfDay();
+        $start = $end->subDays(29);
+
+        return [
+            'start' => $start,
+            'end' => $end,
+            'days' => self::daysBetween($start, $end),
+        ];
+    }
+
+    /**
+     * @return array{
+     *   start: CarbonImmutable,
+     *   end: CarbonImmutable,
+     *   days: list<CarbonImmutable>
+     * }
+     */
     public static function loadYear(?CarbonImmutable $anchor = null): array
     {
         $end = ($anchor ?? CarbonImmutable::today('Asia/Jakarta'))->startOfDay();
