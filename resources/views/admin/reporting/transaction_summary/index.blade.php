@@ -76,7 +76,7 @@
 
 <div class="row g-3">
     <div class="col-12 col-xl-4">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-body">
                 <h5 class="card-title mb-3">Breakdown Per Tanggal</h5>
 
@@ -111,7 +111,7 @@
     </div>
 
     <div class="col-12 col-xl-3">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-body">
                 <h5 class="card-title mb-3">Breakdown Customer</h5>
 
