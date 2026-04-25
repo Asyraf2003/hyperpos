@@ -32,7 +32,7 @@
 
         <div class="d-none" id="detail-payment-row-source">
           @foreach (($note['billing_rows'] ?? []) as $row)
-            @if (!($row['is_paid'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0 && ($row['can_select_manually'] ?? true))
+            @if (!($row['is_paid'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0)
               <span
                 data-payment-row-source
                 data-billing-row-id="{{ $row['id'] }}"
