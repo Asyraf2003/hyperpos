@@ -116,34 +116,54 @@
           </div>
 
           <div id="detail-payment-cash-view" class="d-none">
-            <div class="border rounded p-3 mb-3 bg-light">
-              <div class="small text-muted mb-1">Pembayaran Cash</div>
-              <div class="fw-semibold" id="detail-payment-cash-mode-text">
-                {{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}
-              </div>
-            </div>
-
-            <div class="row g-3">
-              <div class="col-12">
-                <label class="form-label">Uang Masuk</label>
-                <input
-                  type="text"
-                  class="form-control form-control-lg"
-                  id="detail_payment_amount_received_display"
-                  value="{{ old('amount_received') }}"
-                  placeholder="Masukkan uang pelanggan"
-                >
-              </div>
-
-              <div class="col-12">
-                <div class="border rounded p-3">
-                  <div class="d-flex justify-content-between py-2 border-bottom">
-                    <span class="text-muted">Harus Dibayar</span>
-                    <strong id="detail-payment-cash-payable-text">0</strong>
+            <div style="max-width: 460px; margin: 0 auto;">
+              <div class="border rounded p-4">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+                  <div>
+                    <div class="fw-semibold fs-4">Kalkulator Cash</div>
+                    <div class="text-muted">
+                      Hanya tiga angka utama. Angka tengah langsung bisa diisi.
+                    </div>
                   </div>
-                  <div class="d-flex justify-content-between pt-2">
-                    <span class="text-muted">Kembalian Cash</span>
-                    <strong id="detail-payment-change-text">0</strong>
+
+                  <div class="text-end">
+                    <div class="small text-muted">Mode Pembayaran</div>
+                    <div class="fw-semibold fs-5" id="workspace-cash-mode-text">
+                      {{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Bayar Penuh' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-grid gap-3">
+                  <div class="border rounded p-4 text-center">
+                    <div class="small text-muted mb-2">Tagihan</div>
+                    <div class="fs-1 fw-bold lh-sm" id="workspace-cash-payable-text">0</div>
+                  </div>
+
+                  <div class="border rounded p-4 text-center" data-money-input-group>
+                    <div class="small text-muted mb-2">Uang Pelanggan</div>
+
+                    <input type="hidden" value="" data-money-raw data-cash-received-raw>
+
+                    <input
+                      type="text"
+                      id="inline_payment_amount_received_display"
+                      value=""
+                      class="form-control border-0 bg-transparent text-center fs-1 fw-bold lh-sm p-0 shadow-none"
+                      inputmode="numeric"
+                      placeholder="0"
+                      data-money-display
+                      autocomplete="off"
+                    >
+
+                    <div class="form-text mt-3">
+                      Ketik nominal lalu tekan Enter untuk simpan saat jumlah cukup.
+                    </div>
+                  </div>
+
+                  <div class="border rounded p-4 text-center">
+                    <div class="small text-muted mb-2">Kembalian</div>
+                    <div class="fs-1 fw-bold lh-sm" id="workspace-cash-change-text">0</div>
                   </div>
                 </div>
               </div>

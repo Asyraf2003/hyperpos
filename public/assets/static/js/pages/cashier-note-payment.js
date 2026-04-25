@@ -149,7 +149,7 @@
     const modeText = byId("detail-payment-mode-text");
     if (modeText) modeText.textContent = label;
 
-    const cashText = byId("detail-payment-cash-mode-text");
+    const cashText = byId("workspace-cash-mode-text");
     if (cashText) cashText.textContent = label;
   };
 
@@ -178,7 +178,7 @@
 
     const selected = selectedTotal();
     const payable = payableAmount();
-    const received = digits(moneyInput("detail_payment_amount_received_display")?.value || "");
+    const received = digits(moneyInput("inline_payment_amount_received_display")?.value || "");
 
     if (state.cashStep) {
       setValue("detail_payment_amount_received", received > 0 ? received : "");
@@ -191,8 +191,8 @@
     setText("detail-payment-selected-total", selected);
     setText("detail-payment-payable-text", payable);
     setText("detail-payment-remaining-text", Math.max(selected - payable, 0));
-    setText("detail-payment-cash-payable-text", payable);
-    setText("detail-payment-change-text", Math.max(received - payable, 0));
+    setText("workspace-cash-payable-text", payable);
+    setText("workspace-cash-change-text", Math.max(received - payable, 0));
 
     const hasRows = selectedRows().length > 0;
     const transfer = byId("detail-payment-submit-transfer");
@@ -218,7 +218,7 @@
     refresh();
 
     window.requestAnimationFrame(() => {
-      const input = moneyInput("detail_payment_amount_received_display");
+      const input = moneyInput("inline_payment_amount_received_display");
       input?.focus();
       input?.select?.();
     });
@@ -228,7 +228,7 @@
     state.cashStep = false;
     setValue("detail_payment_method", "");
     setValue("detail_payment_amount_received", "");
-    const input = moneyInput("detail_payment_amount_received_display");
+    const input = moneyInput("inline_payment_amount_received_display");
     if (input) input.value = "";
     refresh();
   };
@@ -262,7 +262,7 @@
       setValue("detail_payment_method", "cash");
       setValue(
         "detail_payment_amount_received",
-        digits(moneyInput("detail_payment_amount_received_display")?.value || "")
+        digits(moneyInput("inline_payment_amount_received_display")?.value || "")
       );
       refresh();
     }
@@ -277,7 +277,7 @@
       return;
     }
 
-    if (event.target.id === "detail_payment_amount_received_display") {
+    if (event.target.id === "inline_payment_amount_received_display") {
       const value = digits(event.target.value || "");
       event.target.value = value > 0 ? format(value) : "";
       setValue("detail_payment_amount_received", value > 0 ? value : "");
@@ -292,7 +292,7 @@
       setValue("detail_payment_method", "cash");
       setValue(
         "detail_payment_amount_received",
-        digits(moneyInput("detail_payment_amount_received_display")?.value || "")
+        digits(moneyInput("inline_payment_amount_received_display")?.value || "")
       );
       return;
     }

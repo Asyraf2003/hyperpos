@@ -35,8 +35,9 @@ final class CashierNoteDetailSimplePaymentModalUxFeatureTest extends TestCase
         $response->assertSee('Lunasi');
         $response->assertSee('Bayar Transfer');
         $response->assertSee('Bayar Cash');
-        $response->assertSee('Uang Masuk');
-        $response->assertSee('Kembalian Cash');
+        $response->assertSee('Kalkulator Cash');
+        $response->assertSee('Uang Pelanggan');
+        $response->assertSee('Kembalian');
         $response->assertDontSee('Billing Row yang Bisa Dipilih');
         $response->assertDontSee('Mode Bayar');
         $response->assertDontSee('Preset DP');
