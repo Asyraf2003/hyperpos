@@ -13,7 +13,6 @@ final class SelectedNoteRowsPaymentAmountResolver
         private readonly NoteReaderPort $notes,
         private readonly NoteBillingProjectionBuilder $billingProjection,
         private readonly SelectedNoteRowsPaymentSelectionExpander $selectionExpander,
-        private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
     ) {
     }
 
@@ -28,12 +27,7 @@ final class SelectedNoteRowsPaymentAmountResolver
             return Result::failure('Nota tidak ditemukan.', ['payment' => ['PAYMENT_INVALID_TARGET']]);
         }
 
-        $workspacePanel = $this->workspacePanel->build($note->id());
-        $billingRows = $workspacePanel === null
-            ? ($this->billingProjection->build($note->id()) ?? [])
-            : $this->billingProjection->buildFromWorkspaceRows(
-                (array) ($workspacePanel['rows'] ?? [])
-            );
+        $billingRows = $this->billingProjection->build($note->id()) ?? [];
         $selectedIds = array_values(array_unique(array_filter(
             $selectedRowIds,
             static fn (string $id): bool => trim($id) !== ''
