@@ -17,24 +17,17 @@ final class CreateNoteRevisionHandler
 {
     public function __construct(
         private readonly NoteReaderPort $notes,
-        private readonly NoteCurrentRevisionResolver $currentRevision,
+        private readonly NoteCurrentRevisionResolver $current,
         private readonly NoteRevisionBootstrapFactory $factory,
-        private readonly CreateNoteRevisionPayloadNoteBuilder $notesFromPayload,
+        private readonly CreateNoteRevisionPayloadNoteBuilder $payloadNotes,
         private readonly CreateNoteRevisionCommitter $committer,
-        private readonly ApplyNoteRevisionAsActiveReplacement $replacementApplier,
+        private readonly ApplyNoteRevisionAsActiveReplacement $applier,
         private readonly ClockPort $clock,
         private readonly TransactionManagerPort $transactions,
     ) {
     }
 
-    /**
-     * @param array{
-     *   note: array<string, mixed>,
-     *   items: list<array<string, mixed>>,
-     *   reason?: string,
-     *   inline_payment?: array<string, mixed>
-     * } $payload
-     */
+    /** @param array<string, mixed> $payload */
     public function handle(
         string $noteRootId,
         array $payload,
@@ -45,9 +38,7 @@ final class CreateNoteRevisionHandler
         try {
             $this->transactions->begin();
             $started = true;
-
-            $result = $this->createAndApply($noteRootId, $payload, $actorId);
-
+            $result = $this->createRevisionAndApply($noteRootId, $payload, $actorId);
             $this->transactions->commit();
 
             return $result;
@@ -66,15 +57,8 @@ final class CreateNoteRevisionHandler
         }
     }
 
-    /**
-     * @param array{
-     *   note: array<string, mixed>,
-     *   items: list<array<string, mixed>>,
-     *   reason?: string,
-     *   inline_payment?: array<string, mixed>
-     * } $payload
-     */
-    private function createAndApply(
+    /** @param array<string, mixed> $payload */
+    private function createRevisionAndApply(
         string $noteRootId,
         array $payload,
         ?string $actorId,
@@ -85,15 +69,14 @@ final class CreateNoteRevisionHandler
             return CreateNoteRevisionResult::failure('Root note tidak ditemukan.');
         }
 
-        $current = $this->currentRevision->resolveOrFail($root->id());
-        $nextNumber = $this->currentRevision->nextRevisionNumber($root->id());
+        $current = $this->current->resolveOrFail($root->id());
+        $number = $this->current->nextRevisionNumber($root->id());
         $reason = (string) ($payload['reason'] ?? '');
-        $replacement = $this->notesFromPayload->build($root->id(), $payload);
-
+        $replacement = $this->payloadNotes->build($root->id(), $payload);
         $revision = $this->factory->createNextRevision(
-            sprintf('%s-r%03d', $root->id(), $nextNumber),
+            sprintf('%s-r%03d', $root->id(), $number),
             $current->id(),
-            $nextNumber,
+            $number,
             $replacement,
             $actorId,
             $this->clock->now(),
@@ -108,7 +91,7 @@ final class CreateNoteRevisionHandler
             $revision,
         );
 
-        $this->replacementApplier->apply($root, $replacement, $payload['items'] ?? []);
+        $this->applier->apply($root, $replacement, $payload['items'] ?? []);
 
         return $result;
     }
