@@ -22,9 +22,9 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         $this->seedSupplier('supplier-1', 'PT Sumber Makmur');
         $this->seedSupplier('supplier-2', 'PT Sentosa Jaya');
 
-        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 100000);
-        $this->seedSupplierInvoice('invoice-2', 'supplier-2', '2026-03-16', '2026-04-16', 50000);
-        $this->seedSupplierInvoice('invoice-3', 'supplier-1', '2026-03-18', '2026-04-18', 30000);
+        $this->seedSupplierInvoice('invoice-1', 'supplier-1', 'F-001', '2026-03-15', '2026-04-15', 100000);
+        $this->seedSupplierInvoice('invoice-2', 'supplier-2', 'F-002', '2026-03-16', '2026-04-16', 50000);
+        $this->seedSupplierInvoice('invoice-3', 'supplier-1', 'F-003', '2026-03-18', '2026-04-18', 30000);
 
         $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 100000, 50000);
         $this->seedSupplierInvoiceLine('invoice-line-2', 'invoice-1', 'product-2', 1, 50000, 50000);
@@ -57,7 +57,9 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
         $this->assertSame([
             [
                 'supplier_invoice_id' => 'invoice-1',
+                'nomor_faktur' => 'F-001',
                 'supplier_id' => 'supplier-1',
+                'supplier_name' => 'PT Sumber Makmur',
                 'shipment_date' => '2026-03-15',
                 'due_date' => '2026-04-15',
                 'grand_total_rupiah' => 100000,
@@ -70,7 +72,9 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
             ],
             [
                 'supplier_invoice_id' => 'invoice-2',
+                'nomor_faktur' => 'F-002',
                 'supplier_id' => 'supplier-2',
+                'supplier_name' => 'PT Sentosa Jaya',
                 'shipment_date' => '2026-03-16',
                 'due_date' => '2026-04-16',
                 'grand_total_rupiah' => 50000,
@@ -122,12 +126,15 @@ final class GetSupplierPayableSummaryFeatureTest extends TestCase
     private function seedSupplierInvoice(
         string $id,
         string $supplierId,
+        string $nomorFaktur,
         string $shipmentDate,
         string $dueDate,
         int $grandTotalRupiah
     ): void {
         DB::table('supplier_invoices')->insert([
             'id' => $id,
+            'nomor_faktur' => $nomorFaktur,
+            'nomor_faktur_normalized' => strtolower($nomorFaktur),
             'supplier_id' => $supplierId,
             'supplier_nama_pt_pengirim_snapshot' => DB::table('suppliers')->where('id', $supplierId)->value('nama_pt_pengirim'),
             'tanggal_pengiriman' => $shipmentDate,
