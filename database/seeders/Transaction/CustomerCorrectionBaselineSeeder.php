@@ -88,7 +88,7 @@ final class CustomerCorrectionBaselineSeeder extends Seeder
             }
         }
 
-        $this->command?->info('CustomerCorrectionBaselineSeeder selesai: baseline correction 7 hari dibuat.');
+        $this->command?->info('CustomerCorrectionBaselineSeeder selesai: baseline correction 1 bulan dibuat.');
     }
 
     private function findNominalTarget(): ?object

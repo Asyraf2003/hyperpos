@@ -19,7 +19,7 @@ final class CustomerRefundBaselineSeeder extends Seeder
 
         $this->purgeSeededRefunds();
 
-        $targets = $this->pickRefundTargets($density['refund_notes_per_week']);
+        $targets = $this->pickRefundTargets($density['refund_notes_per_month']);
 
         if ($targets->isEmpty()) {
             $this->command?->warn('CustomerRefundBaselineSeeder dilewati: target refund baseline tidak ditemukan.');
@@ -80,7 +80,7 @@ final class CustomerRefundBaselineSeeder extends Seeder
             ]);
         }
 
-        $this->command?->info('CustomerRefundBaselineSeeder selesai: baseline refund 7 hari dibuat.');
+        $this->command?->info('CustomerRefundBaselineSeeder selesai: baseline refund 1 bulan dibuat.');
     }
 
     private function purgeSeededRefunds(): void

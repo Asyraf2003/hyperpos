@@ -99,7 +99,7 @@ final class CustomerPaymentBaselineSeeder extends Seeder
             // unpaid: sengaja tidak dibuat payment
         }
 
-        $this->command?->info('CustomerPaymentBaselineSeeder selesai: baseline payment/allocation/component allocation 7 hari dibuat.');
+        $this->command?->info('CustomerPaymentBaselineSeeder selesai: baseline payment/allocation/component allocation 1 bulan dibuat.');
     }
 
     private function purgeSeededPayments(): void
