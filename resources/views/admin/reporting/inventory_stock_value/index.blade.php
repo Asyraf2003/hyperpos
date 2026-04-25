@@ -111,6 +111,10 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    @include('layouts.partials.pagination', ['paginator' => $snapshotRows])
+                </div>
             </div>
         </div>
     </div>

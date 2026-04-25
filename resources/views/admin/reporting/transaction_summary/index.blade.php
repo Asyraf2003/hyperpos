@@ -139,6 +139,10 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    @include('layouts.partials.pagination', ['paginator' => $customerRows])
+                </div>
             </div>
         </div>
     </div>
@@ -152,7 +156,7 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Note ID</th>
+                                <th>Nota</th>
                                 <th>Tanggal</th>
                                 <th>Customer</th>
                                 <th class="text-end">Gross</th>
@@ -163,7 +167,10 @@
                         <tbody id="transaction-report-table-body">
                             @forelse ($rows as $row)
                                 <tr>
-                                    <td>{{ $row['note_id'] }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ $row['customer_name'] }}</div>
+                                        <div class="small text-muted">{{ $row['transaction_date'] }}</div>
+                                    </td>
                                     <td>{{ $row['transaction_date'] }}</td>
                                     <td>{{ $row['customer_name'] }}</td>
                                     <td class="text-end">Rp {{ number_format($row['gross_transaction_rupiah'], 0, ',', '.') }}</td>
@@ -177,6 +184,10 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    @include('layouts.partials.pagination', ['paginator' => $rows])
                 </div>
             </div>
         </div>

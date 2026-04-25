@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Admin\Reporting;
 
 use App\Adapters\In\Http\Requests\Reporting\SupplierPayableReportPageRequest;
+use App\Adapters\In\Http\Support\ReportArrayPaginator;
 use App\Application\Reporting\DTO\SupplierPayableReportPageQuery;
 use App\Application\Reporting\UseCases\GetSupplierPayableReportDatasetHandler;
 use Illuminate\Contracts\View\View;
@@ -15,6 +16,7 @@ final class SupplierPayableReportPageController extends Controller
     public function __invoke(
         SupplierPayableReportPageRequest $request,
         GetSupplierPayableReportDatasetHandler $useCase,
+        ReportArrayPaginator $paginator,
     ): View {
         $query = SupplierPayableReportPageQuery::fromValidated($request->validated());
         $result = $useCase->handle(
@@ -29,7 +31,11 @@ final class SupplierPayableReportPageController extends Controller
             'summary' => is_array($payload['summary'] ?? null) ? $payload['summary'] : [],
             'periodRows' => is_array($payload['period_rows'] ?? null) ? $payload['period_rows'] : [],
             'supplierRows' => is_array($payload['supplier_rows'] ?? null) ? $payload['supplier_rows'] : [],
-            'rows' => is_array($payload['rows'] ?? null) ? $payload['rows'] : [],
+            'rows' => $paginator->paginate(
+                is_array($payload['rows'] ?? null) ? $payload['rows'] : [],
+                $request,
+                'detail_page',
+            ),
         ]);
     }
 }

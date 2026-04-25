@@ -196,7 +196,7 @@
                         <tbody id="supplier-payable-report-table-body">
                             @forelse ($rows as $row)
                                 <tr>
-                                    <td>{{ $row['supplier_invoice_id'] }}</td>
+                                    <td>{{ $row['nomor_faktur'] ?? $row['supplier_invoice_id'] }}</td>
                                     <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
                                     <td>{{ $row['shipment_date'] }}</td>
                                     <td>{{ $row['due_date'] }}</td>
@@ -222,6 +222,10 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-end">
+                    @include('layouts.partials.pagination', ['paginator' => $rows])
                 </div>
             </div>
         </div>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Admin\Reporting;
 
 use App\Adapters\In\Http\Requests\Reporting\TransactionCashLedgerPageRequest;
+use App\Adapters\In\Http\Support\ReportArrayPaginator;
 use App\Application\Reporting\DTO\TransactionCashLedgerPageQuery;
 use App\Application\Reporting\Services\TransactionCashLedgerPeriodTableBuilder;
 use App\Application\Reporting\Services\TransactionCashLedgerSummaryBuilder;
@@ -19,6 +20,7 @@ final class TransactionCashLedgerPageController extends Controller
         GetTransactionCashLedgerPerNoteHandler $useCase,
         TransactionCashLedgerSummaryBuilder $summary,
         TransactionCashLedgerPeriodTableBuilder $periods,
+        ReportArrayPaginator $paginator,
     ): View {
         $query = TransactionCashLedgerPageQuery::fromValidated($request->validated());
         $result = $useCase->handle($query->fromEventDate(), $query->toEventDate());
@@ -29,7 +31,7 @@ final class TransactionCashLedgerPageController extends Controller
             'filters' => $query->toViewData(),
             'summary' => $summary->build($rows),
             'periodRows' => $periods->build($rows),
-            'rows' => $rows,
+            'rows' => $paginator->paginate($rows, $request, 'detail_page'),
         ]);
     }
 }
