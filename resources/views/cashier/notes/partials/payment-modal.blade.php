@@ -35,6 +35,7 @@
             @if (!($row['is_paid'] ?? false) && (int) ($row['outstanding_rupiah'] ?? 0) > 0 && ($row['can_select_manually'] ?? true))
               <span
                 data-payment-row-source
+                data-billing-row-id="{{ $row['id'] }}"
                 data-row-id="{{ $row['id'] }}"
                 data-work-item-id="{{ $row['work_item_id'] }}"
                 data-label="Line {{ $row['line_no'] }} · {{ $row['component_label'] }}"
