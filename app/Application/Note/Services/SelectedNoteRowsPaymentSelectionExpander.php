@@ -22,10 +22,12 @@ final class SelectedNoteRowsPaymentSelectionExpander
                 continue;
             }
 
-            foreach ($billingRows as $row) {
-                if ((string) ($row['work_item_id'] ?? '') === $selectedId
-                    && (int) ($row['outstanding_rupiah'] ?? 0) > 0) {
-                    $expandedIds[] = (string) ($row['id'] ?? '');
+            foreach ($this->candidateWorkItemIds($selectedId) as $candidateId) {
+                foreach ($billingRows as $row) {
+                    if ((string) ($row['work_item_id'] ?? '') === $candidateId
+                        && (int) ($row['outstanding_rupiah'] ?? 0) > 0) {
+                        $expandedIds[] = (string) ($row['id'] ?? '');
+                    }
                 }
             }
         }
@@ -46,5 +48,20 @@ final class SelectedNoteRowsPaymentSelectionExpander
         }
 
         return $indexed;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function candidateWorkItemIds(string $selectedId): array
+    {
+        $ids = [$selectedId];
+        $parts = explode('::', $selectedId);
+
+        if (($parts[0] ?? '') !== '') {
+            $ids[] = $parts[0];
+        }
+
+        return array_values(array_unique($ids));
     }
 }
