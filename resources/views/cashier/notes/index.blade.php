@@ -17,7 +17,7 @@
                             type="text"
                             id="cashier-note-search-input"
                             class="form-control"
-                            placeholder="Cari no nota, nama customer, atau no telp"
+                            placeholder="Cari customer, no telp, atau ringkasan line"
                             autocomplete="off"
                             value="{{ $filters['search'] }}"
                         >
@@ -41,7 +41,7 @@
                         <tr class="text-nowrap">
                             <th style="width: 64px;">No</th>
                             <th>Tanggal</th>
-                            <th>No Nota</th>
+                            <th>Nota</th>
                             <th>Customer</th>
                             <th class="text-end">Grand Total</th>
                             <th class="text-end">Sudah Dibayar</th>

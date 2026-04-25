@@ -19,7 +19,7 @@
                             type="text"
                             id="admin-note-search-input"
                             class="form-control py-2"
-                            placeholder="Cari no nota, customer, no telp"
+                            placeholder="Cari customer, no telp, atau ringkasan line"
                             autocomplete="off"
                             value="{{ $filters['search'] }}"
                             style="min-height: 40px;"
@@ -40,7 +40,7 @@
                         <tr class="text-nowrap">
                             <th style="width: 64px;">No</th>
                             <th>Tanggal</th>
-                            <th>No Nota</th>
+                            <th>Nota</th>
                             <th>Customer</th>
                             <th class="text-end">Grand Total</th>
                             <th class="text-end">Sudah Dibayar</th>

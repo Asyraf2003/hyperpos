@@ -210,7 +210,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr>
                     <td>${((page - 1) * perPage) + index + 1}</td>
                     <td>${escapeHtml(item.transaction_date ?? '-')}</td>
-                    <td>${escapeHtml(item.note_number ?? '-')}</td>
+                    <td>
+                        <div class="fw-semibold">${escapeHtml(item.customer_name ?? 'Nota Pelanggan')}</div>
+                        <div class="small text-muted">${escapeHtml(item.transaction_date ?? '-')}</div>
+                    </td>
                     <td>${escapeHtml(item.customer_name ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.grand_total_text ?? '-')}</td>
                     <td class="text-end">${escapeHtml(item.total_paid_text ?? '-')}</td>
