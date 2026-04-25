@@ -17,7 +17,8 @@ final class ReportArrayPaginator
         string $pageName,
         int $perPage = self::DEFAULT_PER_PAGE,
     ): LengthAwarePaginator {
-        $page = max(1, (int) $request->query($pageName, 1));
+        $rawPage = $request->query($pageName);
+        $page = is_scalar($rawPage) ? max(1, (int) $rawPage) : 1;
         $offset = ($page - 1) * $perPage;
 
         $paginator = new LengthAwarePaginator(
@@ -31,6 +32,8 @@ final class ReportArrayPaginator
             ],
         );
 
-        return $paginator->appends($request->query());
+        $query = $request->query();
+
+        return $paginator->appends(is_array($query) ? $query : []);
     }
 }

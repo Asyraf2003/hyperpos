@@ -169,7 +169,7 @@
                                 <tr>
                                     <td>
                                         <div class="fw-semibold">{{ $row['customer_name'] }}</div>
-                                        <div class="small text-muted">{{ $row['transaction_date'] }}</div>
+                                        <div class="small text-muted">{{ $row['transaction_date'] }} · {{ $row['note_id'] }}</div>
                                     </td>
                                     <td>{{ $row['transaction_date'] }}</td>
                                     <td>{{ $row['customer_name'] }}</td>
