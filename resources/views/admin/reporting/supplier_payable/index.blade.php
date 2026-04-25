@@ -1,8 +1,8 @@
 @extends('layouts.app')
 @include('layouts.partials.date-picker-assets')
 
-@section('title', 'Hutang Supplier')
-@section('heading', 'Hutang Supplier')
+@section('title', 'Hutang Pemasok')
+@section('heading', 'Hutang Pemasok')
 
 @section('content')
 @include('admin.reporting.partials.period_filter', [
@@ -11,7 +11,7 @@
     'resetUrl' => route('admin.reports.supplier_payable.index'),
     'rangeLabelText' => 'Rentang pengiriman aktif',
     'basisDateLabel' => 'Tanggal pengiriman invoice',
-    'basisDateNote' => 'Data invoice masuk dihitung dari tanggal pengiriman.',
+    'basisDateNote' => 'Data faktur masuk dihitung dari tanggal pengiriman.',
     'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . ($filters['reference_date'] ?? '-') . '.',
 ])
 
@@ -19,7 +19,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Total Invoice</div>
+                <div class="text-muted small">Total Faktur</div>
                 <div class="fs-5 fw-bold">{{ number_format($summary['total_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -28,7 +28,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Grand Total</div>
+                <div class="text-muted small">Total Tagihan</div>
                 <div class="fs-5 fw-bold">Rp {{ number_format($summary['grand_total_rupiah'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -82,7 +82,7 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Outstanding Overdue</div>
+                <div class="text-muted small">Sisa Hutang Lewat Tempo</div>
                 <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['overdue_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -91,7 +91,7 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Open</div>
+                <div class="text-muted small">Belum Lunas</div>
                 <div class="fs-5 fw-bold">{{ number_format($summary['open_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -111,7 +111,7 @@
     <div class="col-12 col-xl-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Per Tanggal</h5>
+                <h5 class="card-title mb-3">Rincian Per Tanggal</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -131,7 +131,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada invoice pada periode ini.</td>
+                                    <td colspan="3" class="text-center text-muted">Belum ada faktur pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -144,7 +144,7 @@
     <div class="col-12 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Supplier</h5>
+                <h5 class="card-title mb-3">Rincian Pemasok</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -164,7 +164,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada supplier pada periode ini.</td>
+                                    <td colspan="3" class="text-center text-muted">Belum ada pemasok pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -177,7 +177,7 @@
     <div class="col-12 col-xl-5">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Detail Hutang Supplier</h5>
+                <h5 class="card-title mb-3">Detail Hutang Pemasok</h5>
 
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -185,10 +185,10 @@
                             <tr>
                                 <th>No Faktur</th>
                                 <th>Supplier</th>
-                                <th>Shipment</th>
+                                <th>Tanggal Kirim</th>
                                 <th>Due Date</th>
                                 <th>Status</th>
-                                <th class="text-end">Grand Total</th>
+                                <th class="text-end">Total Tagihan</th>
                                 <th class="text-end">Dibayar</th>
                                 <th class="text-end">Outstanding</th>
                             </tr>
@@ -217,7 +217,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">Belum ada invoice pada periode ini.</td>
+                                    <td colspan="8" class="text-center text-muted">Belum ada faktur pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

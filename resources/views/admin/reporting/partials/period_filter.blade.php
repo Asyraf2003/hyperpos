@@ -47,11 +47,11 @@
                         id="{{ $formId }}-open-filter"
                         class="btn btn-primary text-nowrap"
                     >
-                        Filter
+                        Saring
                     </button>
 
                     <a href="{{ $resetUrl }}" class="btn btn-outline-secondary text-nowrap">
-                        Reset
+                        Atur Ulang
                     </a>
                 </div>
             </div>
@@ -72,7 +72,7 @@
 >
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Filter Laporan</h5>
+            <h5 class="mb-0">Saring Laporan</h5>
             <button
                 type="button"
                 id="{{ $formId }}-close-filter"
@@ -150,8 +150,8 @@
             </div>
 
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                <a href="{{ $resetUrl }}" class="btn btn-light-secondary">Reset</a>
+                <button type="submit" class="btn btn-primary">Terapkan Saringan</button>
+                <a href="{{ $resetUrl }}" class="btn btn-light-secondary">Atur Ulang</a>
             </div>
         </form>
     </div>

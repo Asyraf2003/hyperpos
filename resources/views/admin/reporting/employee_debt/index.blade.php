@@ -54,7 +54,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Status Paid</div>
+                <div class="text-muted small">Status Lunas</div>
                 <div class="fs-5 fw-bold">{{ number_format($summary['paid_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -63,7 +63,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Status Unpaid</div>
+                <div class="text-muted small">Status Belum Lunas</div>
                 <div class="fs-5 fw-bold">{{ number_format($summary['unpaid_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -74,7 +74,7 @@
     <div class="col-12 col-xl-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Per Tanggal</h5>
+                <h5 class="card-title mb-3">Rincian Per Tanggal</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -107,7 +107,7 @@
     <div class="col-12 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Status</h5>
+                <h5 class="card-title mb-3">Rincian Status</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -146,8 +146,8 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Recorded At</th>
-                                <th>Debt ID</th>
+                                <th>Tanggal Catat</th>
+                                <th>Referensi Hutang</th>
                                 <th>Employee ID</th>
                                 <th>Status</th>
                                 <th class="text-end">Total</th>

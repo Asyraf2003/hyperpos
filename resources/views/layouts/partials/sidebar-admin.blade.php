@@ -123,7 +123,7 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_cash_ledger.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.transaction_cash_ledger.index') }}" class="sidebar-link">
                         <i class="bi bi-arrow-left-right"></i>
-                        <span>Ledger Kas Transaksi</span>
+                        <span>Buku Kas Transaksi</span>
                     </a>
                 </li>
 
@@ -158,7 +158,7 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.supplier_payable.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.supplier_payable.index') }}" class="sidebar-link">
                         <i class="bi bi-receipt"></i>
-                        <span>Hutang Supplier</span>
+                        <span>Hutang Pemasok</span>
                     </a>
                 </li>
 

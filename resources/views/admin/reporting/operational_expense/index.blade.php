@@ -19,7 +19,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Jumlah Entry</div>
+                <div class="text-muted small">Jumlah Catatan</div>
                 <div class="fs-5 fw-bold">{{ number_format($summary['total_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
@@ -66,7 +66,7 @@
     <div class="col-12 col-xl-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Per Tanggal</h5>
+                <h5 class="card-title mb-3">Rincian Per Tanggal</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -99,7 +99,7 @@
     <div class="col-12 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Kategori</h5>
+                <h5 class="card-title mb-3">Rincian Kategori</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -142,7 +142,7 @@
                                 <th>Kategori</th>
                                 <th>Deskripsi</th>
                                 <th>Metode</th>
-                                <th>Ref</th>
+                                <th>Referensi</th>
                                 <th class="text-end">Nominal</th>
                             </tr>
                         </thead>
@@ -152,7 +152,17 @@
                                     <td>{{ $row['expense_date'] }}</td>
                                     <td>{{ $row['category_name'] }}</td>
                                     <td>{{ $row['description'] }}</td>
-                                    <td>{{ strtoupper($row['payment_method']) }}</td>
+                                    <td>
+                                        {{ match ($row['payment_method'] ?? '') {
+                                            'cash' => 'Tunai',
+                                            'transfer' => 'Transfer',
+                                            'bank_transfer' => 'Transfer Bank',
+                                            'debit' => 'Debit',
+                                            'credit' => 'Kredit',
+                                            'qris' => 'QRIS',
+                                            default => strtoupper((string) ($row['payment_method'] ?? '-')),
+                                        } }}
+                                    </td>
                                     <td>{{ $row['reference_no'] ?? '-' }}</td>
                                     <td class="text-end">Rp {{ number_format($row['amount_rupiah'], 0, ',', '.') }}</td>
                                 </tr>

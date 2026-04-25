@@ -24,14 +24,14 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Produk Movement</div>
+            <div class="text-muted small">Produk Bermutasi</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['movement_product_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty On Hand</div>
+            <div class="text-muted small">Qty Tersedia</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['total_qty_on_hand'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -45,28 +45,28 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty In Periode</div>
+            <div class="text-muted small">Qty Masuk Periode</div>
             <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_qty_in'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Out Periode</div>
+            <div class="text-muted small">Qty Keluar Periode</div>
             <div class="fs-5 fw-bold text-danger">{{ number_format($summary['period_qty_out'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Net Qty Periode</div>
+            <div class="text-muted small">Selisih Qty Periode</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['period_net_qty_delta'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Net Cost Periode</div>
+            <div class="text-muted small">Selisih Nilai Pokok Periode</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['period_net_cost_delta_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -86,7 +86,7 @@
                                 <th>Kode</th>
                                 <th>Nama</th>
                                 <th class="text-end">Qty</th>
-                                <th class="text-end">Avg Cost</th>
+                                <th class="text-end">Harga Pokok Rata-rata</th>
                                 <th class="text-end">Inventory Value</th>
                             </tr>
                         </thead>
@@ -105,7 +105,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">Belum ada snapshot inventory.</td>
+                                    <td colspan="6" class="text-center text-muted">Belum ada snapshot persediaan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -122,7 +122,7 @@
     <div class="col-12 col-xl-6">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Movement Summary Periode</h5>
+                <h5 class="card-title mb-3">Ringkasan Mutasi Periode</h5>
 
                 <div class="table-responsive">
                     <table class="table align-middle mb-0">
@@ -149,7 +149,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Belum ada movement pada periode ini.</td>
+                                    <td colspan="5" class="text-center text-muted">Belum ada mutasi pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

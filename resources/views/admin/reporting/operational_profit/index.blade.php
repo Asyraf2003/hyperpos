@@ -9,10 +9,10 @@
     'formId' => 'operational-profit-report-filter-form',
     'action' => route('admin.reports.operational_profit.index'),
     'resetUrl' => route('admin.reports.operational_profit.index'),
-    'rangeLabelText' => 'Rentang event aktif',
-    'basisDateLabel' => 'Tanggal event komponen kas dan biaya',
-    'basisDateNote' => 'Mode harian hanya menghitung event yang jatuh tepat pada hari itu. Tidak ada carry-forward ke hari berikutnya.',
-    'noteText' => 'Laporan ini sekarang cash-based: uang masuk dikurangi refund, harga beli produk, biaya operasional, gaji, dan hutang karyawan.',
+    'rangeLabelText' => 'Rentang kejadian aktif',
+    'basisDateLabel' => 'Tanggal kejadian komponen kas dan biaya',
+    'basisDateNote' => 'Mode harian hanya menghitung kejadian yang jatuh tepat pada hari itu. Tidak ada saldo bawaan ke hari berikutnya.',
+    'noteText' => 'Laporan ini sekarang berbasis kas: uang masuk dikurangi pengembalian dana, harga beli produk, biaya operasional, gaji, dan hutang karyawan.',
 ])
 
 <div class="row g-3">
@@ -25,21 +25,21 @@
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Refund</div>
+            <div class="text-muted small">Pengembalian Dana</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($row['refunded_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Pembelian External</div>
+            <div class="text-muted small">Pembelian Eksternal</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($row['external_purchase_cost_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">COGS Stok Toko</div>
+            <div class="text-muted small">HPP Stok Toko</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($row['store_stock_cogs_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>

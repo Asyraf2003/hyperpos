@@ -55,7 +55,7 @@
     <div class="col-12 col-xl-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Per Tanggal</h5>
+                <h5 class="card-title mb-3">Rincian Per Tanggal</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
@@ -88,7 +88,7 @@
     <div class="col-12 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title mb-3">Breakdown Mode</h5>
+                <h5 class="card-title mb-3">Rincian Mode</h5>
 
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">

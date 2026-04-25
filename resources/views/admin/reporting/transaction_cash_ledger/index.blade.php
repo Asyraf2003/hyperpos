@@ -9,16 +9,16 @@
     'formId' => 'transaction-cash-ledger-filter-form',
     'action' => route('admin.reports.transaction_cash_ledger.index'),
     'resetUrl' => route('admin.reports.transaction_cash_ledger.index'),
-    'rangeLabelText' => 'Rentang event aktif',
-    'basisDateLabel' => 'Tanggal event kas',
-    'basisDateNote' => 'Mode harian hanya menghitung event kas pada tanggal tersebut, bukan akumulasi hari sebelumnya.',
+    'rangeLabelText' => 'Rentang kejadian aktif',
+    'basisDateLabel' => 'Tanggal kejadian kas',
+    'basisDateNote' => 'Mode harian hanya menghitung kejadian kas pada tanggal tersebut, bukan akumulasi hari sebelumnya.',
 ])
 
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Total Event</div>
+                <div class="text-muted small">Total Kejadian</div>
                 <div class="fs-4 fw-bold">{{ number_format($summary['total_events'], 0, ',', '.') }}</div>
             </div>
         </div>
@@ -27,7 +27,7 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Cash In</div>
+                <div class="text-muted small">Kas Masuk</div>
                 <div class="fs-4 fw-bold text-success">Rp {{ number_format($summary['total_cash_in_rupiah'], 0, ',', '.') }}</div>
             </div>
         </div>
@@ -36,7 +36,7 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Cash Out</div>
+                <div class="text-muted small">Kas Keluar</div>
                 <div class="fs-4 fw-bold text-danger">Rp {{ number_format($summary['total_cash_out_rupiah'], 0, ',', '.') }}</div>
             </div>
         </div>
@@ -45,7 +45,7 @@
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
-                <div class="text-muted small">Net Amount</div>
+                <div class="text-muted small">Nilai Bersih</div>
                 <div class="fs-4 fw-bold {{ $summary['net_amount_rupiah'] >= 0 ? 'text-primary' : 'text-danger' }}">
                     Rp {{ number_format($summary['net_amount_rupiah'], 0, ',', '.') }}
                 </div>
@@ -78,7 +78,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada event kas pada periode ini.</td>
+                                    <td colspan="3" class="text-center text-muted">Belum ada kejadian kas pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -99,11 +99,11 @@
                             <tr>
                                 <th>Tanggal Event</th>
                                 <th>Nota</th>
-                                <th>Jenis Event</th>
+                                <th>Jenis Kejadian</th>
                                 <th>Arah</th>
                                 <th class="text-end">Nominal</th>
-                                <th>Payment</th>
-                                <th>Refund</th>
+                                <th>Pembayaran</th>
+                                <th>Pengembalian Dana</th>
                             </tr>
                         </thead>
                         <tbody id="transaction-cash-ledger-table-body">
@@ -111,10 +111,17 @@
                                 <tr>
                                     <td>{{ $row['event_date'] }}</td>
                                     <td>{{ $row['note_label'] ?? $row['note_id'] }}</td>
-                                    <td>{{ $row['event_type'] }}</td>
+                                    <td>
+                                        {{ match ($row['event_type'] ?? '') {
+                                            'payment_allocation' => 'Alokasi Pembayaran',
+                                            'payment' => 'Pembayaran',
+                                            'refund' => 'Pengembalian Dana',
+                                            default => $row['event_type'] ?? '-',
+                                        } }}
+                                    </td>
                                     <td>
                                         <span class="badge {{ $row['direction'] === 'in' ? 'bg-success' : 'bg-danger' }}">
-                                            {{ $row['direction'] }}
+                                            {{ ($row['direction'] ?? '') === 'in' ? 'Masuk' : (($row['direction'] ?? '') === 'out' ? 'Keluar' : '-') }}
                                         </span>
                                     </td>
                                     <td class="text-end">Rp {{ number_format($row['event_amount_rupiah'], 0, ',', '.') }}</td>
@@ -123,7 +130,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">Belum ada event kas pada periode ini.</td>
+                                    <td colspan="7" class="text-center text-muted">Belum ada kejadian kas pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

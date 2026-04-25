@@ -24,35 +24,35 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Gross Transaksi</div>
+            <div class="text-muted small">Nilai Bruto Transaksi</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['gross_transaction_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Allocated Payment</div>
+            <div class="text-muted small">Pembayaran Dialokasikan</div>
             <div class="fs-5 fw-bold text-success">Rp {{ number_format($summary['allocated_payment_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Refunded</div>
+            <div class="text-muted small">Dana Dikembalikan</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['refunded_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Net Cash</div>
+            <div class="text-muted small">Kas Bersih</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['net_cash_collected_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Outstanding</div>
+            <div class="text-muted small">Sisa Tagihan</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -61,14 +61,14 @@
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Settled</div>
+            <div class="text-muted small">Nota Lunas</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['settled_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Outstanding</div>
+            <div class="text-muted small">Nota Sisa Tagihan</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['outstanding_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -87,7 +87,7 @@
                                 <th>Tanggal</th>
                                 <th class="text-end">Nota</th>
                                 <th class="text-end">Gross</th>
-                                <th class="text-end">Outstanding</th>
+                                <th class="text-end">Sisa Tagihan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -160,8 +160,8 @@
                                 <th>Tanggal</th>
                                 <th>Customer</th>
                                 <th class="text-end">Gross</th>
-                                <th class="text-end">Net Cash</th>
-                                <th class="text-end">Outstanding</th>
+                                <th class="text-end">Kas Bersih</th>
+                                <th class="text-end">Sisa Tagihan</th>
                             </tr>
                         </thead>
                         <tbody id="transaction-report-table-body">
