@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Application\Note\Services;
 
+use App\Application\Note\Services\NoteDetailProductLabelResolver;
 use App\Application\Note\Services\NoteDetailRowMapper;
 use App\Application\Note\Services\NoteDetailRowPresentationSupport;
 use App\Application\Note\Services\NoteDetailRowPrimaryLabelResolver;
@@ -65,9 +66,14 @@ final class NoteDetailRowMapperTest extends TestCase
             new RefundImpactSourceValueReader(),
         );
 
+        $productLabels = new NoteDetailProductLabelResolver($this->products());
+
         return new NoteDetailRowMapper(
             new WorkItemOperationalStatusResolver(),
-            new NoteDetailRowPresentationSupport(new NoteDetailRowPrimaryLabelResolver(), new NoteDetailRowSubtitleBuilder()),
+            new NoteDetailRowPresentationSupport(
+                new NoteDetailRowPrimaryLabelResolver($productLabels),
+                new NoteDetailRowSubtitleBuilder($productLabels),
+            ),
             new RefundImpactPayloadBuilder($returns),
         );
     }
