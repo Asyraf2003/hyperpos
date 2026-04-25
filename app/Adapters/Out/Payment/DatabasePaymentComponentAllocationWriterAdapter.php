@@ -30,4 +30,11 @@ final class DatabasePaymentComponentAllocationWriterAdapter implements PaymentCo
             $allocations
         ));
     }
+
+    public function deleteByNoteId(string $noteId): void
+    {
+        DB::table('payment_component_allocations')
+            ->where('note_id', trim($noteId))
+            ->delete();
+    }
 }

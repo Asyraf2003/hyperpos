@@ -98,6 +98,18 @@ final class CashierClosedNoteWorkspaceReplacementSubmitFeatureTest extends TestC
             'customer_name' => 'Budi Baru',
             'grand_total_rupiah' => 70000,
         ]);
+
+        $this->assertDatabaseMissing('payment_component_allocations', [
+            'work_item_id' => 'wi-old-1',
+        ]);
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'customer_payment_id' => 'pay-1',
+            'note_id' => 'note-1',
+            'component_type' => 'service_fee',
+            'component_amount_rupiah_snapshot' => 70000,
+            'allocated_amount_rupiah' => 50000,
+        ]);
     }
 
     private function seedKasir(): User

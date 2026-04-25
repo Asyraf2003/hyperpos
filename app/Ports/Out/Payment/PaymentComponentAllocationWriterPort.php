@@ -12,4 +12,6 @@ interface PaymentComponentAllocationWriterPort
      * @param list<PaymentComponentAllocation> $allocations
      */
     public function createMany(array $allocations): void;
+
+    public function deleteByNoteId(string $noteId): void;
 }
