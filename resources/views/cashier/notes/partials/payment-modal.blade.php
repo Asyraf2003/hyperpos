@@ -26,7 +26,7 @@
         <input type="hidden" name="paid_at" id="detail-payment-paid-at" value="{{ $paymentModalConfig['date_default'] ?? $paymentDateDefault }}">
         <input type="hidden" name="amount_paid" id="detail-payment-amount-paid" value="">
         <input type="hidden" name="amount_received" id="detail-payment-amount-received" value="">
-        <input type="hidden" id="detail-payment-intent" value="pay">
+        <input type="hidden" id="detail-payment-intent" value="{{ ($note['can_show_partial_payment_action'] ?? false) ? 'pay' : 'settle' }}">
 
         <div id="payment-selected-row-ids"></div>
 
@@ -57,7 +57,7 @@
                         Tagihan aktif dipilih otomatis. Detail teknis billing row disimpan hidden untuk menjaga allocation.
                       </div>
                     </div>
-                    <span class="badge bg-light text-dark border" id="detail-payment-mode-badge">Bayar Sebagian</span>
+                    <span class="badge bg-light text-dark border" id="detail-payment-mode-badge">{{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}</span>
                   </div>
 
                   <div class="d-flex flex-column gap-2" id="detail-payment-line-summary">
@@ -79,19 +79,21 @@
                   </div>
                 </div>
 
-                <div class="border rounded p-3 mb-3" id="detail-payment-partial-panel">
-                  <label class="form-label">Nominal Bayar Sebagian</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="detail-payment-amount-paid-display"
-                    value="{{ old('amount_paid') }}"
-                    placeholder="Contoh: 50.000"
-                  >
-                  <div class="small text-muted mt-2">
-                    Default mengikuti tagihan outstanding terpilih. Nominal masih bisa diedit.
+                @if ($note['can_show_partial_payment_action'] ?? false)
+                  <div class="border rounded p-3 mb-3" id="detail-payment-partial-panel">
+                    <label class="form-label">Nominal Bayar Sebagian</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="detail-payment-amount-paid-display"
+                      value="{{ old('amount_paid') }}"
+                      placeholder="Contoh: 50.000"
+                    >
+                    <div class="small text-muted mt-2">
+                      Default mengikuti tagihan outstanding terpilih. Nominal masih bisa diedit.
+                    </div>
                   </div>
-                </div>
+                @endif
 
                 <div class="border rounded p-3">
                   <div class="d-flex justify-content-between py-2 border-bottom">
@@ -110,7 +112,7 @@
           <div id="detail-payment-cash-view" class="d-none">
             <div class="border rounded p-3 mb-3 bg-light">
               <div class="small text-muted mb-1">Mode Cash</div>
-              <div class="fw-semibold" id="detail-payment-cash-mode-text">Bayar</div>
+              <div class="fw-semibold" id="detail-payment-cash-mode-text">{{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}</div>
             </div>
 
             <div class="row g-3">

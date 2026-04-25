@@ -16,7 +16,7 @@
   const paidInput = () => byId("detail-payment-amount-paid-display");
   const receivedInput = () => byId("detail-payment-amount-received-display");
 
-  let intent = "pay";
+  let intent = intentHidden()?.value === "settle" ? "settle" : "pay";
   let cashStep = false;
   let selected = [];
 
@@ -271,7 +271,7 @@
   modal.addEventListener("shown.bs.modal", () => {
     updateUi();
 
-    if (intent === "pay") {
+    if (intent === "pay" && paidInput()) {
       paidInput()?.focus();
       paidInput()?.select();
     }
