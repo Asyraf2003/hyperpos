@@ -30,7 +30,7 @@ final class CashierNoteDetailSimplePaymentModalUxFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk();
-        $response->assertSee('Proses Pembayaran');
+        $response->assertSee('Proses Nota');
         $response->assertSee('Bayar Sebagian');
         $response->assertSee('Lunasi');
         $response->assertSee('Bayar Transfer');
