@@ -43,7 +43,7 @@ final class CashierNoteDetailServiceProductNameDisplayFeatureTest extends TestCa
             WorkItem::STATUS_OPEN,
             130000
         );
-        $this->seedServiceDetailBase('wi-1', 'Ganti Oli', 30000, ServiceDetail::PART_SOURCE_STORE_STOCK);
+        $this->seedServiceDetailBase('wi-1', 'Ganti Oli', 30000, ServiceDetail::PART_SOURCE_NONE);
         $this->seedStoreStockLineBase('line-1', 'wi-1', 'product-oli-1', 2, 100000);
 
         $response = $this->actingAs($user)
