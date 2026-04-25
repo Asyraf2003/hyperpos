@@ -87,7 +87,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Karyawan</div>
-                                    <div class="small opacity-75">Lihat identitas dan riwayat versi karyawan.</div>
                                 </a>
                             </div>
 
@@ -98,7 +97,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Gaji</div>
-                                    <div class="small opacity-75">Buka riwayat gaji khusus karyawan ini.</div>
                                 </a>
                             </div>
 
@@ -109,9 +107,6 @@
                                     class="btn btn-outline-danger w-100 text-start py-3 px-4"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Reversal</div>
-                                    <div class="small opacity-75" id="payroll-action-reversal-note">
-                                        Buka form pembatalan dengan alasan yang jelas.
-                                    </div>
                                 </button>
                             </div>
                         </div>

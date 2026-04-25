@@ -110,7 +110,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Karyawan</div>
-                                    <div class="small opacity-75">Lihat profil karyawan.</div>
                                 </a>
                             </div>
 
@@ -121,7 +120,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Tambah Hutang</div>
-                                    <div class="small opacity-75">Masuk ke halaman tambah hutang.</div>
                                 </a>
                             </div>
 
@@ -132,7 +130,6 @@
                                     class="btn btn-outline-success w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Bayar Hutang</div>
-                                    <div class="small opacity-75">Buka dialog pembayaran hutang.</div>
                                 </button>
                             </div>
 
@@ -143,7 +140,6 @@
                                     class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100"
                                 >
                                     <div class="fw-bold fs-5 mb-1">Detail Hutang</div>
-                                    <div class="small opacity-75">Buka detail hutang dari karyawan yang dipilih.</div>
                                 </a>
                             </div>
                         </div>

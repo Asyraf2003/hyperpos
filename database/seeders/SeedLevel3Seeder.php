@@ -9,6 +9,7 @@ use Database\Seeders\Load\CustomerPaymentLoadSeeder;
 use Database\Seeders\Load\CustomerRefundLoadSeeder;
 use Database\Seeders\Load\CustomerTransactionLoadSeeder;
 use Database\Seeders\Load\ExpenseLoadSeeder;
+use Database\Seeders\Load\ProductLoadSeeder;
 use Database\Seeders\Load\ProcurementLoadSeeder;
 use Illuminate\Database\Seeder;
 
@@ -19,6 +20,7 @@ final class SeedLevel3Seeder extends Seeder
         $this->call([
             UserSeeder::class,
             ProductSeeder::class,
+            ProductLoadSeeder::class,
             SupplierSeeder::class,
             EmployeeFinanceBaselineSeeder::class,
             ProcurementLoadSeeder::class,
