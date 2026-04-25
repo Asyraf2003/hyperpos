@@ -285,7 +285,26 @@
     }
   });
 
-  form.addEventListener("submit", () => {
+  const lockPaymentSubmit = () => {
+    form.dataset.submitted = "1";
+
+    [
+      "detail-payment-submit-transfer",
+      "detail-payment-open-cash",
+      "detail-payment-submit-cash",
+      "detail-payment-back-cash",
+    ].forEach((id) => {
+      const button = byId(id);
+      if (button) button.disabled = true;
+    });
+  };
+
+  form.addEventListener("submit", (event) => {
+    if (form.dataset.submitted === "1") {
+      event.preventDefault();
+      return;
+    }
+
     syncHiddenRows();
 
     if (state.cashStep) {
@@ -294,10 +313,12 @@
         "detail_payment_amount_received",
         digits(moneyInput("inline_payment_amount_received_display")?.value || "")
       );
+      lockPaymentSubmit();
       return;
     }
 
     setValue("detail_payment_method", "tf");
+    lockPaymentSubmit();
   });
 
   modal.addEventListener("shown.bs.modal", () => {
