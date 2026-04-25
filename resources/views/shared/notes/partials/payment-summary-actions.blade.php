@@ -24,26 +24,14 @@
       <strong class="fs-5">{{ number_format($note['outstanding_rupiah'], 0, ',', '.') }}</strong>
     </div>
 
-    @php
-      $netPaid = (int) ($note['net_paid_rupiah'] ?? 0);
-      $outstanding = (int) ($note['outstanding_rupiah'] ?? 0);
-      $status = (string) ($note['operational_status'] ?? $note['payment_status'] ?? '');
-      $statusLabel = match ($status) {
-          'close', 'closed', 'paid' => 'Lunas',
-          'refunded' => 'Refund',
-          'canceled' => 'Batal',
-          default => $netPaid > 0 ? 'Belum Lunas / Sebagian' : 'Belum Lunas',
-      };
-    @endphp
-
     <div class="border rounded p-3 bg-light mb-3">
       <div class="small text-muted mb-1">Status Operasional</div>
-      <div class="fw-bold text-uppercase">{{ $statusLabel }}</div>
+      <div class="fw-bold text-uppercase">{{ $note['payment_status_label'] ?? '-' }}</div>
     </div>
 
     @if ($note['can_show_payment_form'] ?? false)
       <div class="d-grid gap-2">
-        @if ($netPaid <= 0)
+        @if ($note['can_show_partial_payment_action'] ?? false)
           <button
             type="button"
             class="btn btn-primary js-open-payment-intent"
@@ -56,7 +44,7 @@
           </button>
         @endif
 
-        @if ($outstanding > 0)
+        @if ($note['can_show_settle_payment_action'] ?? false)
           <button
             type="button"
             class="btn btn-outline-primary js-open-payment-intent"

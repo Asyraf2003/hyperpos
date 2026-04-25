@@ -13,7 +13,7 @@
       </a>
 
       @if ($note['can_show_payment_form'] ?? false)
-        @if ((int) ($note['net_paid_rupiah'] ?? 0) <= 0)
+        @if ($note['can_show_partial_payment_action'] ?? false)
           <button
             type="button"
             class="btn btn-primary js-open-payment-intent"
@@ -26,7 +26,7 @@
           </button>
         @endif
 
-        @if ((int) ($note['outstanding_rupiah'] ?? 0) > 0)
+        @if ($note['can_show_settle_payment_action'] ?? false)
           <button
             type="button"
             class="btn btn-outline-primary js-open-payment-intent"

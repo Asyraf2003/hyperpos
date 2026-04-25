@@ -21,7 +21,14 @@ final class NoteDetailNotePayloadBuilder
         bool $hasOutstandingBillingRow,
     ): array {
         $openLineCount = (int) ($workspacePanel['line_summary']['open_count'] ?? 0);
-        $refundRequired = max((int) $operational['net_paid_rupiah'] - (int) $operational['grand_total_rupiah'], 0);
+        $netPaid = (int) ($operational['net_paid_rupiah'] ?? 0);
+        $outstanding = (int) ($operational['outstanding_rupiah'] ?? 0);
+        $status = (string) ($operational['operational_status'] ?? '');
+        $refundRequired = max($netPaid - (int) $operational['grand_total_rupiah'], 0);
+        $canShowPayment = ! $isRefunded
+            && (int) ($operational['outstanding_rupiah'] ?? 0) > 0
+            && $hasOutstandingBillingRow;
+        $statusLabel = $this->statusLabel($status, $netPaid, $isRefunded);
 
         return $base + [
             'operational_status' => $operational['operational_status'],
@@ -38,7 +45,10 @@ final class NoteDetailNotePayloadBuilder
             'can_show_edit_actions' => $isOpen,
             'can_edit_workspace' => $isOpen,
             'can_show_workspace_panel' => $isOpen || $isClosed,
-            'can_show_payment_form' => $isOpen && $openLineCount > 0 && $hasOutstandingBillingRow,
+            'can_show_payment_form' => $canShowPayment,
+            'can_show_partial_payment_action' => $canShowPayment && $netPaid <= 0,
+            'can_show_settle_payment_action' => $canShowPayment && $outstanding > 0,
+            'payment_status_label' => $statusLabel,
             'can_show_refund_form' => $refundRows !== [],
             'refund_payment_options' => $refundPaymentOptions,
             'can_show_correction_actions' => false,
@@ -52,5 +62,18 @@ final class NoteDetailNotePayloadBuilder
             'revision_timeline' => $revisionTimeline,
             'correction_history' => $history,
         ];
+    }
+
+    private function statusLabel(string $status, int $netPaid, bool $isRefunded): string
+    {
+        if ($isRefunded) {
+            return 'Refund';
+        }
+
+        return match ($status) {
+            'close', 'closed', 'paid' => 'Lunas',
+            'canceled' => 'Batal',
+            default => $netPaid > 0 ? 'Belum Lunas / Sebagian' : 'Belum Lunas',
+        };
     }
 }

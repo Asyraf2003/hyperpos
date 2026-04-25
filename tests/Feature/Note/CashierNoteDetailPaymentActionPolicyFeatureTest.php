@@ -58,6 +58,35 @@ final class CashierNoteDetailPaymentActionPolicyFeatureTest extends TestCase
         $response->assertSee('Lunasi');
     }
 
+    public function test_closed_note_with_new_outstanding_after_replacement_shows_settle_action(): void
+    {
+        $user = $this->seedKasir();
+        $today = date('Y-m-d');
+
+        $this->seedServiceNote('note-replaced', 'wi-replaced', 70000, 'closed');
+        $this->seedCustomerPaymentBase('pay-replaced', 50000, $today);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-replaced',
+            'customer_payment_id' => 'pay-replaced',
+            'note_id' => 'note-replaced',
+            'work_item_id' => 'wi-replaced',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-replaced',
+            'component_amount_rupiah_snapshot' => 70000,
+            'allocated_amount_rupiah' => 50000,
+            'allocation_priority' => 20,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-replaced']));
+
+        $response->assertOk();
+        $response->assertSee('Belum Lunas / Sebagian');
+        $response->assertDontSee('Bayar Sebagian');
+        $response->assertSee('Lunasi');
+    }
+
     public function test_fully_paid_note_hides_payment_actions(): void
     {
         $user = $this->seedKasir();
