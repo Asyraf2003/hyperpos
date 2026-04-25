@@ -11,6 +11,8 @@ final class InventoryMovementSummaryBuilder
     /**
      * @param list<array{
      *   product_id:string,
+     *   kode_barang:?string,
+     *   nama_barang:string,
      *   qty_in:int,
      *   qty_out:int,
      *   net_qty_delta:int,
@@ -28,6 +30,8 @@ final class InventoryMovementSummaryBuilder
         return array_map(
             static fn (array $row): InventoryMovementSummaryRow => new InventoryMovementSummaryRow(
                 $row['product_id'],
+                $row['kode_barang'] ?? null,
+                $row['nama_barang'] ?? $row['product_id'],
                 $row['qty_in'],
                 $row['qty_out'],
                 $row['net_qty_delta'],

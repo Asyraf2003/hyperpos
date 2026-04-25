@@ -8,6 +8,10 @@ trait InventoryMovementSummaryRowAccessors
 {
     public function productId(): string { return $this->productId; }
 
+    public function kodeBarang(): ?string { return $this->kodeBarang; }
+
+    public function namaBarang(): string { return $this->namaBarang; }
+
     public function qtyIn(): int { return $this->qtyIn; }
 
     public function qtyOut(): int { return $this->qtyOut; }

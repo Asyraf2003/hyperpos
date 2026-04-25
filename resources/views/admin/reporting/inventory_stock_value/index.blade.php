@@ -139,8 +139,12 @@
                             @forelse ($movementRows as $row)
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold">{{ $row['nama_barang'] ?? ($row['kode_barang'] ?? '-') }}</div>
-                                        <div class="small text-muted">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</div>
+                                        <div class="fw-bold">
+                                            {{ $row['nama_barang'] ?? '-' }}
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.85rem;">
+                                            {{ $row['kode_barang'] ?? '-' }}
+                                        </div>
                                     </td>
                                     <td class="text-end">{{ number_format($row['qty_in'], 0, ',', '.') }}</td>
                                     <td class="text-end">{{ number_format($row['qty_out'], 0, ',', '.') }}</td>

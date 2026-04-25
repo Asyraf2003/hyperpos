@@ -12,6 +12,8 @@ final class InventoryMovementSummaryRow
 
     public function __construct(
         private readonly string $productId,
+        private readonly ?string $kodeBarang,
+        private readonly string $namaBarang,
         private readonly int $qtyIn,
         private readonly int $qtyOut,
         private readonly int $netQtyDelta,
@@ -28,6 +30,8 @@ final class InventoryMovementSummaryRow
     {
         return [
             'product_id' => $this->productId,
+            'kode_barang' => $this->kodeBarang,
+            'nama_barang' => $this->namaBarang,
             'qty_in' => $this->qtyIn,
             'qty_out' => $this->qtyOut,
             'net_qty_delta' => $this->netQtyDelta,
