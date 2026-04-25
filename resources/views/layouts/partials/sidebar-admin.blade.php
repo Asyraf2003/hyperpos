@@ -130,14 +130,14 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.payroll.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.payroll.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
-                        <span>Rekap Gaji</span>
+                        <span>Laporan Gaji</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.employee_debt.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.employee_debt.index') }}" class="sidebar-link">
                         <i class="bi bi-wallet2"></i>
-                        <span>Rekap Hutang Karyawan</span>
+                        <span>Laporan Hutang</span>
                     </a>
                 </li>
 
@@ -151,7 +151,7 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.operational_expense.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.operational_expense.index') }}" class="sidebar-link">
                         <i class="bi bi-cash-coin"></i>
-                        <span>Rekap Biaya Operasional</span>
+                        <span>Laporan Operasional</span>
                     </a>
                 </li>
 
@@ -165,14 +165,14 @@
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.inventory_stock_value.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.inventory_stock_value.index') }}" class="sidebar-link">
                         <i class="bi bi-box-seam"></i>
-                        <span>Stok dan Nilai Persediaan</span>
+                        <span>Stok dan Persediaan</span>
                     </a>
                 </li>
 
                 <li class="sidebar-item {{ request()->routeIs('admin.reports.transaction_summary.index') ? 'active' : '' }}">
                     <a href="{{ route('admin.reports.transaction_summary.index') }}" class="sidebar-link">
                         <i class="bi bi-journal-text"></i>
-                        <span>Rekap Transaksi per Nota</span>
+                        <span>Laporan Transaksi per Nota</span>
                     </a>
                 </li>
 

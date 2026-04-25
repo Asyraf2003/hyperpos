@@ -101,9 +101,6 @@
             data-filter-close-button-id="{{ $formId }}-close-filter"
             data-filter-drawer-id="{{ $formId }}-filter-drawer"
             data-filter-backdrop-id="{{ $formId }}-filter-backdrop"
-            data-mode-help-daily="{{ $modeHelpDaily ?? 'Menampilkan data tepat pada tanggal ini.' }}"
-            data-mode-help-weekly="{{ $modeHelpWeekly ?? 'Sistem mengambil Senin sampai Minggu dari minggu tanggal ini.' }}"
-            data-mode-help-monthly="{{ $modeHelpMonthly ?? 'Sistem mengambil seluruh bulan dari tanggal ini.' }}"
             class="d-grid gap-3"
         >
             <div class="form-group">
@@ -118,20 +115,6 @@
                     <option value="weekly" {{ ($filters['period_mode'] ?? 'monthly') === 'weekly' ? 'selected' : '' }}>Mingguan</option>
                     <option value="monthly" {{ ($filters['period_mode'] ?? 'monthly') === 'monthly' ? 'selected' : '' }}>Bulanan</option>
                 </select>
-            </div>
-
-            <div
-                class="alert alert-light border small mb-0"
-                data-report-mode-help
-                aria-live="polite"
-            >
-                @if (($filters['period_mode'] ?? 'monthly') === 'weekly')
-                    {{ $modeHelpWeekly ?? 'Sistem mengambil Senin sampai Minggu dari minggu tanggal ini.' }}
-                @elseif (($filters['period_mode'] ?? 'monthly') === 'monthly')
-                    {{ $modeHelpMonthly ?? 'Sistem mengambil seluruh bulan dari tanggal ini.' }}
-                @else
-                    {{ $modeHelpDaily ?? 'Menampilkan data tepat pada tanggal ini.' }}
-                @endif
             </div>
 
             <div class="form-group" data-report-reference-group>
