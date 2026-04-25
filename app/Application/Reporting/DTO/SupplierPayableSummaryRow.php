@@ -8,7 +8,9 @@ final class SupplierPayableSummaryRow
 {
     public function __construct(
         private readonly string $supplierInvoiceId,
+        private readonly string $nomorFaktur,
         private readonly string $supplierId,
+        private readonly string $supplierName,
         private readonly string $shipmentDate,
         private readonly string $dueDate,
         private readonly int $grandTotalRupiah,
@@ -22,7 +24,9 @@ final class SupplierPayableSummaryRow
     }
 
     public function supplierInvoiceId(): string { return $this->supplierInvoiceId; }
+    public function nomorFaktur(): string { return $this->nomorFaktur; }
     public function supplierId(): string { return $this->supplierId; }
+    public function supplierName(): string { return $this->supplierName; }
     public function shipmentDate(): string { return $this->shipmentDate; }
     public function dueDate(): string { return $this->dueDate; }
     public function grandTotalRupiah(): int { return $this->grandTotalRupiah; }
@@ -37,7 +41,9 @@ final class SupplierPayableSummaryRow
     {
         return [
             'supplier_invoice_id' => $this->supplierInvoiceId(),
+            'nomor_faktur' => $this->nomorFaktur(),
             'supplier_id' => $this->supplierId(),
+            'supplier_name' => $this->supplierName(),
             'shipment_date' => $this->shipmentDate(),
             'due_date' => $this->dueDate(),
             'grand_total_rupiah' => $this->grandTotalRupiah(),

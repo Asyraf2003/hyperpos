@@ -150,7 +150,7 @@
                     <table class="table table-sm align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Supplier ID</th>
+                                <th>Supplier</th>
                                 <th class="text-end">Invoice</th>
                                 <th class="text-end">Outstanding</th>
                             </tr>
@@ -158,7 +158,7 @@
                         <tbody>
                             @forelse ($supplierRows as $row)
                                 <tr>
-                                    <td>{{ $row['supplier_id'] }}</td>
+                                    <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
                                     <td class="text-end">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
                                 </tr>
@@ -183,8 +183,8 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Invoice ID</th>
-                                <th>Supplier ID</th>
+                                <th>No Faktur</th>
+                                <th>Supplier</th>
                                 <th>Shipment</th>
                                 <th>Due Date</th>
                                 <th>Status</th>
@@ -197,7 +197,7 @@
                             @forelse ($rows as $row)
                                 <tr>
                                     <td>{{ $row['supplier_invoice_id'] }}</td>
-                                    <td>{{ $row['supplier_id'] }}</td>
+                                    <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
                                     <td>{{ $row['shipment_date'] }}</td>
                                     <td>{{ $row['due_date'] }}</td>
                                     <td>

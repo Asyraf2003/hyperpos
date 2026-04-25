@@ -32,7 +32,9 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
             ->orderBy('supplier_invoices.id')
             ->get([
                 'supplier_invoices.id as supplier_invoice_id',
+                'supplier_invoices.nomor_faktur',
                 'supplier_invoices.supplier_id',
+                'supplier_invoices.supplier_nama_pt_pengirim_snapshot as supplier_name',
                 'supplier_invoices.tanggal_pengiriman as shipment_date',
                 'supplier_invoices.jatuh_tempo as due_date',
                 'supplier_invoices.grand_total_rupiah',
@@ -42,7 +44,9 @@ final class DatabaseSupplierPayableReportingSourceReaderAdapter implements Suppl
             ])
             ->map(static fn (object $row): array => [
                 'supplier_invoice_id' => (string) $row->supplier_invoice_id,
+                'nomor_faktur' => $row->nomor_faktur !== null ? (string) $row->nomor_faktur : (string) $row->supplier_invoice_id,
                 'supplier_id' => (string) $row->supplier_id,
+                'supplier_name' => $row->supplier_name !== null ? (string) $row->supplier_name : (string) $row->supplier_id,
                 'shipment_date' => (string) $row->shipment_date,
                 'due_date' => (string) $row->due_date,
                 'grand_total_rupiah' => (int) $row->grand_total_rupiah,

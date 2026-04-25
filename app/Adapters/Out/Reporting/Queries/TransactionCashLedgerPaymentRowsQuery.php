@@ -13,14 +13,19 @@ final class TransactionCashLedgerPaymentRowsQuery
     {
         $componentRows = DB::table('payment_component_allocations')
             ->join('customer_payments', 'customer_payments.id', '=', 'payment_component_allocations.customer_payment_id')
+            ->leftJoin('notes', 'notes.id', '=', 'payment_component_allocations.note_id')
             ->whereBetween('customer_payments.paid_at', [$fromEventDate, $toEventDate])
             ->groupBy(
                 'payment_component_allocations.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_payments.paid_at',
                 'payment_component_allocations.customer_payment_id'
             )
             ->get([
                 'payment_component_allocations.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_payments.paid_at as event_date',
                 DB::raw('SUM(payment_component_allocations.allocated_amount_rupiah) as event_amount_rupiah'),
                 'payment_component_allocations.customer_payment_id',
@@ -29,6 +34,9 @@ final class TransactionCashLedgerPaymentRowsQuery
         if ($componentRows->isNotEmpty()) {
             return $componentRows->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
+                'note_label' => trim((string) ($row->customer_name ?? '')) !== ''
+                    ? (string) $row->customer_name . ' · ' . (string) ($row->transaction_date ?? $row->event_date)
+                    : 'Nota ' . (string) ($row->transaction_date ?? $row->event_date),
                 'event_date' => (string) $row->event_date,
                 'event_type' => 'payment_allocation',
                 'direction' => 'in',
@@ -40,15 +48,21 @@ final class TransactionCashLedgerPaymentRowsQuery
 
         return DB::table('payment_allocations')
             ->join('customer_payments', 'customer_payments.id', '=', 'payment_allocations.customer_payment_id')
+            ->leftJoin('notes', 'notes.id', '=', 'payment_allocations.note_id')
             ->whereBetween('customer_payments.paid_at', [$fromEventDate, $toEventDate])
             ->get([
                 'payment_allocations.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_payments.paid_at as event_date',
                 'payment_allocations.amount_rupiah as event_amount_rupiah',
                 'payment_allocations.customer_payment_id',
             ])
             ->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
+                'note_label' => trim((string) ($row->customer_name ?? '')) !== ''
+                    ? (string) $row->customer_name . ' · ' . (string) ($row->transaction_date ?? $row->event_date)
+                    : 'Nota ' . (string) ($row->transaction_date ?? $row->event_date),
                 'event_date' => (string) $row->event_date,
                 'event_type' => 'payment_allocation',
                 'direction' => 'in',

@@ -25,7 +25,9 @@ final class SupplierPayableSummaryBuilder
 
             return new SupplierPayableSummaryRow(
                 $row['supplier_invoice_id'],
+                $row['nomor_faktur'] ?? $row['supplier_invoice_id'],
                 $row['supplier_id'],
+                $row['supplier_name'] ?? $row['supplier_id'],
                 $row['shipment_date'],
                 $row['due_date'],
                 $row['grand_total_rupiah'],

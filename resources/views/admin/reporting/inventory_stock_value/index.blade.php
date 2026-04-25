@@ -82,7 +82,7 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Product ID</th>
+                                <th>Barang</th>
                                 <th>Kode</th>
                                 <th>Nama</th>
                                 <th class="text-end">Qty</th>
@@ -93,7 +93,10 @@
                         <tbody id="inventory-stock-value-snapshot-table-body">
                             @forelse ($snapshotRows as $row)
                                 <tr>
-                                    <td>{{ $row['product_id'] }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ $row['nama_barang'] }}</div>
+                                        <div class="small text-muted">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</div>
+                                    </td>
                                     <td>{{ $row['kode_barang'] ?? '-' }}</td>
                                     <td>{{ $row['nama_barang'] }}</td>
                                     <td class="text-end">{{ number_format($row['current_qty_on_hand'], 0, ',', '.') }}</td>
@@ -121,7 +124,7 @@
                     <table class="table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Product ID</th>
+                                <th>Barang</th>
                                 <th class="text-end">Qty In</th>
                                 <th class="text-end">Qty Out</th>
                                 <th class="text-end">Net Qty</th>
@@ -131,7 +134,10 @@
                         <tbody id="inventory-stock-value-movement-table-body">
                             @forelse ($movementRows as $row)
                                 <tr>
-                                    <td>{{ $row['product_id'] }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ $row['nama_barang'] ?? $row['product_id'] }}</div>
+                                        <div class="small text-muted">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</div>
+                                    </td>
                                     <td class="text-end">{{ number_format($row['qty_in'], 0, ',', '.') }}</td>
                                     <td class="text-end">{{ number_format($row['qty_out'], 0, ',', '.') }}</td>
                                     <td class="text-end">{{ number_format($row['net_qty_delta'], 0, ',', '.') }}</td>

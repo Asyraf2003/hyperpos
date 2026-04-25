@@ -11,15 +11,19 @@ final class InventoryMovementSummaryDatabaseQuery
     public static function get(string $fromMutationDate, string $toMutationDate): array
     {
         return DB::table('inventory_movements')
+            ->leftJoin('products', 'products.id', '=', 'inventory_movements.product_id')
             ->leftJoin('product_inventory', 'product_inventory.product_id', '=', 'inventory_movements.product_id')
             ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'inventory_movements.product_id')
             ->whereBetween('inventory_movements.tanggal_mutasi', [$fromMutationDate, $toMutationDate])
             ->groupBy(
                 'inventory_movements.product_id',
+                'products.kode_barang',
+                'products.nama_barang',
                 'product_inventory.qty_on_hand',
                 'product_inventory_costing.avg_cost_rupiah',
                 'product_inventory_costing.inventory_value_rupiah',
             )
+            ->orderBy('products.nama_barang')
             ->orderBy('inventory_movements.product_id')
             ->get(self::columns())
             ->map(static fn (object $row): array => InventoryMovementSummaryRowMapper::map($row))
@@ -30,6 +34,8 @@ final class InventoryMovementSummaryDatabaseQuery
     {
         return [
             'inventory_movements.product_id',
+            'products.kode_barang',
+            DB::raw('COALESCE(products.nama_barang, inventory_movements.product_id) as nama_barang'),
             DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.qty_delta > 0 THEN inventory_movements.qty_delta ELSE 0 END), 0) as qty_in'),
             DB::raw('COALESCE(SUM(CASE WHEN inventory_movements.qty_delta < 0 THEN ABS(inventory_movements.qty_delta) ELSE 0 END), 0) as qty_out'),
             DB::raw('COALESCE(SUM(inventory_movements.qty_delta), 0) as net_qty_delta'),

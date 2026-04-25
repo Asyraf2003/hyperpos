@@ -98,19 +98,19 @@
                         <thead>
                             <tr>
                                 <th>Tanggal Event</th>
-                                <th>Note</th>
+                                <th>Nota</th>
                                 <th>Jenis Event</th>
                                 <th>Arah</th>
                                 <th class="text-end">Nominal</th>
-                                <th>Payment ID</th>
-                                <th>Refund ID</th>
+                                <th>Payment</th>
+                                <th>Refund</th>
                             </tr>
                         </thead>
                         <tbody id="transaction-cash-ledger-table-body">
                             @forelse ($rows as $row)
                                 <tr>
                                     <td>{{ $row['event_date'] }}</td>
-                                    <td>{{ $row['note_id'] }}</td>
+                                    <td>{{ $row['note_label'] ?? $row['note_id'] }}</td>
                                     <td>{{ $row['event_type'] }}</td>
                                     <td>
                                         <span class="badge {{ $row['direction'] === 'in' ? 'bg-success' : 'bg-danger' }}">
@@ -118,8 +118,8 @@
                                         </span>
                                     </td>
                                     <td class="text-end">Rp {{ number_format($row['event_amount_rupiah'], 0, ',', '.') }}</td>
-                                    <td>{{ $row['customer_payment_id'] ?? '-' }}</td>
-                                    <td>{{ $row['refund_id'] ?? '-' }}</td>
+                                    <td>{{ ($row['customer_payment_id'] ?? null) ? 'Ada' : '-' }}</td>
+                                    <td>{{ ($row['refund_id'] ?? null) ? 'Ada' : '-' }}</td>
                                 </tr>
                             @empty
                                 <tr>

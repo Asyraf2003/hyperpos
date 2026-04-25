@@ -23,7 +23,7 @@
             <div class="card-body">
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
                     <small>No. Nota</small>
-                    <div class="text-end">{{ $note['id'] }}</div>
+                    <div class="text-end">{{ $note['customer_name'] ?? ($note['note_header']['customer_name'] ?? 'Nota Pelanggan') }}</div>
                 </div>
 
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">

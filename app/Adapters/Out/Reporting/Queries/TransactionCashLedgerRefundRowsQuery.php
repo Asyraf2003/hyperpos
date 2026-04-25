@@ -13,14 +13,19 @@ final class TransactionCashLedgerRefundRowsQuery
     {
         $componentRows = DB::table('refund_component_allocations')
             ->join('customer_refunds', 'customer_refunds.id', '=', 'refund_component_allocations.customer_refund_id')
+            ->leftJoin('notes', 'notes.id', '=', 'refund_component_allocations.note_id')
             ->whereBetween('customer_refunds.refunded_at', [$fromEventDate, $toEventDate])
             ->groupBy(
                 'refund_component_allocations.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_refunds.refunded_at',
                 'refund_component_allocations.customer_refund_id'
             )
             ->get([
                 'refund_component_allocations.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_refunds.refunded_at as event_date',
                 DB::raw('SUM(refund_component_allocations.refunded_amount_rupiah) as event_amount_rupiah'),
                 'refund_component_allocations.customer_refund_id as refund_id',
@@ -29,6 +34,9 @@ final class TransactionCashLedgerRefundRowsQuery
         if ($componentRows->isNotEmpty()) {
             return $componentRows->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
+                'note_label' => trim((string) ($row->customer_name ?? '')) !== ''
+                    ? (string) $row->customer_name . ' · ' . (string) ($row->transaction_date ?? $row->event_date)
+                    : 'Nota ' . (string) ($row->transaction_date ?? $row->event_date),
                 'event_date' => (string) $row->event_date,
                 'event_type' => 'refund',
                 'direction' => 'out',
@@ -39,15 +47,21 @@ final class TransactionCashLedgerRefundRowsQuery
         }
 
         return DB::table('customer_refunds')
+            ->leftJoin('notes', 'notes.id', '=', 'customer_refunds.note_id')
             ->whereBetween('customer_refunds.refunded_at', [$fromEventDate, $toEventDate])
             ->get([
                 'customer_refunds.note_id',
+                'notes.customer_name',
+                'notes.transaction_date',
                 'customer_refunds.refunded_at as event_date',
                 'customer_refunds.amount_rupiah as event_amount_rupiah',
                 'customer_refunds.id as refund_id',
             ])
             ->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
+                'note_label' => trim((string) ($row->customer_name ?? '')) !== ''
+                    ? (string) $row->customer_name . ' · ' . (string) ($row->transaction_date ?? $row->event_date)
+                    : 'Nota ' . (string) ($row->transaction_date ?? $row->event_date),
                 'event_date' => (string) $row->event_date,
                 'event_type' => 'refund',
                 'direction' => 'out',

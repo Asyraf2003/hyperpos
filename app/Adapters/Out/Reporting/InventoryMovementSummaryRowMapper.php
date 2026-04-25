@@ -10,6 +10,8 @@ final class InventoryMovementSummaryRowMapper
     {
         return [
             'product_id' => (string) $row->product_id,
+            'kode_barang' => $row->kode_barang !== null ? (string) $row->kode_barang : null,
+            'nama_barang' => (string) $row->nama_barang,
             'qty_in' => (int) $row->qty_in,
             'qty_out' => (int) $row->qty_out,
             'net_qty_delta' => (int) $row->net_qty_delta,
