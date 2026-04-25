@@ -26,10 +26,11 @@ final class CustomerTransactionLoadSeeder extends Seeder
         $density = SeedDensity::monster();
 
         $products = DB::table('products')
-            ->select('id', 'nama_barang', 'harga_jual')
-            ->whereNull('deleted_at')
-            ->orderBy('nama_barang')
-            ->limit(24)
+            ->join('product_inventory', 'product_inventory.product_id', '=', 'products.id')
+            ->select('products.id', 'products.nama_barang', 'products.harga_jual')
+            ->whereNull('products.deleted_at')
+            ->where('product_inventory.qty_on_hand', '>', 0)
+            ->orderBy('products.nama_barang')
             ->get()
             ->values();
 
