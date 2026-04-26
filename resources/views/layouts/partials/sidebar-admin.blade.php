@@ -90,6 +90,13 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item {{ request()->routeIs('admin.due-note-reminders.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.due-note-reminders.index') }}" class="sidebar-link">
+                        <i class="bi bi-bell-fill"></i>
+                        <span>Reminder Jatuh Tempo</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-item {{ request()->routeIs('admin.employees.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.employees.index') }}" class="sidebar-link">
                         <i class="bi bi-people-fill"></i>

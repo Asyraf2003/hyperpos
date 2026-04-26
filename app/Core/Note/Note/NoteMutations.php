@@ -21,6 +21,7 @@ trait NoteMutations
         $this->customerName = trim($customerName);
         $this->customerPhone = self::normalizeCustomerPhone($customerPhone);
         $this->transactionDate = $transactionDate;
+        $this->dueDate = self::calculateDueDate($transactionDate);
     }
 
     /** @param list<WorkItem> $workItems */

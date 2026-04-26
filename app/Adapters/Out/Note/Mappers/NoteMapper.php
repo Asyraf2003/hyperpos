@@ -27,6 +27,10 @@ final class NoteMapper
             ? new DateTimeImmutable((string) $row->reopened_at)
             : null;
 
+        $dueDate = property_exists($row, 'due_date') && $row->due_date !== null
+            ? new DateTimeImmutable((string) $row->due_date)
+            : null;
+
         return Note::rehydrate(
             (string) $row->id,
             (string) $row->customer_name,
@@ -43,6 +47,7 @@ final class NoteMapper
             property_exists($row, 'reopened_by_actor_id')
                 ? ($row->reopened_by_actor_id === null ? null : (string) $row->reopened_by_actor_id)
                 : null,
+            $dueDate,
         );
     }
 

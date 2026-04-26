@@ -25,7 +25,20 @@ final class Note
     {
         self::assertValidIdentity($id, $name);
 
-        return new self(trim($id), trim($name), self::normalizeCustomerPhone($customerPhone), $date, [], Money::zero(), self::STATE_OPEN, null, null, null, null);
+        return new self(
+            trim($id),
+            trim($name),
+            self::normalizeCustomerPhone($customerPhone),
+            $date,
+            self::calculateDueDate($date),
+            [],
+            Money::zero(),
+            self::STATE_OPEN,
+            null,
+            null,
+            null,
+            null,
+        );
     }
 
     /** @param list<WorkItem> $workItems */
@@ -41,6 +54,7 @@ final class Note
         ?string $closedByActorId = null,
         ?DateTimeImmutable $reopenedAt = null,
         ?string $reopenedByActorId = null,
+        ?DateTimeImmutable $dueDate = null,
     ): self {
         self::assertValidIdentity($id, $name);
         self::assertValidWorkItems($workItems);
@@ -56,6 +70,7 @@ final class Note
             trim($name),
             self::normalizeCustomerPhone($customerPhone),
             $date,
+            $dueDate ?? self::calculateDueDate($date),
             array_values($workItems),
             $total,
             trim($noteState),
@@ -64,5 +79,22 @@ final class Note
             $reopenedAt,
             self::normalizeActorId($reopenedByActorId),
         );
+    }
+
+    private static function calculateDueDate(DateTimeImmutable $transactionDate): DateTimeImmutable
+    {
+        $month = (int) $transactionDate->format('n') + 1;
+        $year = (int) $transactionDate->format('Y');
+
+        if ($month > 12) {
+            $month = 1;
+            $year++;
+        }
+
+        $lastDay = (int) (new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month)))
+            ->modify('last day of this month')
+            ->format('j');
+
+        return $transactionDate->setDate($year, $month, min((int) $transactionDate->format('j'), $lastDay));
     }
 }

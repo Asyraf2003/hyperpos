@@ -17,6 +17,7 @@ final class DatabaseNoteWriterAdapter implements NoteWriterPort
             'customer_name' => $note->customerName(),
             'customer_phone' => $note->customerPhone(),
             'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+            'due_date' => $note->dueDate()->format('Y-m-d'),
             'note_state' => $note->noteState(),
             'closed_at' => $note->closedAt()?->format('Y-m-d H:i:s'),
             'closed_by_actor_id' => $note->closedByActorId(),
@@ -32,6 +33,7 @@ final class DatabaseNoteWriterAdapter implements NoteWriterPort
             'customer_name' => $note->customerName(),
             'customer_phone' => $note->customerPhone(),
             'transaction_date' => $note->transactionDate()->format('Y-m-d'),
+            'due_date' => $note->dueDate()->format('Y-m-d'),
         ]);
     }
 

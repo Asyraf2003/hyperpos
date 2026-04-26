@@ -16,6 +16,7 @@ trait NoteState
         private string $customerName,
         private ?string $customerPhone,
         private DateTimeImmutable $transactionDate,
+        private DateTimeImmutable $dueDate,
         private array $workItems,
         private Money $totalRupiah,
         private string $noteState,
@@ -30,6 +31,7 @@ trait NoteState
     public function customerName(): string { return $this->customerName; }
     public function customerPhone(): ?string { return $this->customerPhone; }
     public function transactionDate(): DateTimeImmutable { return $this->transactionDate; }
+    public function dueDate(): DateTimeImmutable { return $this->dueDate; }
 
     /** @return list<WorkItem> */
     public function workItems(): array { return $this->workItems; }
