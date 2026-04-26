@@ -37,6 +37,7 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
 
         $edit->assertOk();
         $edit->assertSee('100000');
+        $edit->assertSee('revision_snapshot');
 
         $response = $this->actingAs($user)->patch(
             route('admin.notes.workspace.update', ['noteId' => 'note-1']),
@@ -61,6 +62,7 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
                                 'product_id' => 'product-1',
                                 'qty' => 2,
                                 'unit_price_rupiah' => 100000,
+                                'price_basis' => 'revision_snapshot',
                             ],
                         ],
                         'external_purchase_lines' => [],
