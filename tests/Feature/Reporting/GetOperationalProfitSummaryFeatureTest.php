@@ -102,6 +102,98 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         ], $data['row']);
     }
 
+    public function test_get_operational_profit_summary_handler_offsets_store_stock_cogs_when_refunded_stock_returns_to_inventory(): void
+    {
+        $this->seedProduct('product-refund-1', 'KB-RFD-001', 'Ban Refund', 'Federal', 100, 100000);
+
+        DB::table('notes')->insert([
+            'id' => 'note-refund-1',
+            'customer_name' => 'Budi Refund',
+            'transaction_date' => '2026-04-01',
+            'total_rupiah' => 100000,
+        ]);
+
+        DB::table('work_items')->insert([
+            'id' => 'wi-refund-1',
+            'note_id' => 'note-refund-1',
+            'line_no' => 1,
+            'transaction_type' => 'store_stock_sale_only',
+            'status' => 'open',
+            'subtotal_rupiah' => 100000,
+        ]);
+
+        DB::table('work_item_store_stock_lines')->insert([
+            'id' => 'ssl-refund-1',
+            'work_item_id' => 'wi-refund-1',
+            'product_id' => 'product-refund-1',
+            'qty' => 1,
+            'line_total_rupiah' => 100000,
+        ]);
+
+        DB::table('customer_payments')->insert([
+            'id' => 'payment-refund-1',
+            'amount_rupiah' => 100000,
+            'paid_at' => '2026-04-01',
+        ]);
+
+        DB::table('customer_refunds')->insert([
+            'id' => 'refund-refund-1',
+            'customer_payment_id' => 'payment-refund-1',
+            'note_id' => 'note-refund-1',
+            'amount_rupiah' => 100000,
+            'refunded_at' => '2026-04-01 10:00:00',
+            'reason' => 'Refund penuh barang kembali',
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'movement-sale-refund-1',
+                'product_id' => 'product-refund-1',
+                'movement_type' => 'stock_out',
+                'source_type' => 'work_item_store_stock_line',
+                'source_id' => 'ssl-refund-1',
+                'tanggal_mutasi' => '2026-04-01',
+                'qty_delta' => -1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => -10000,
+            ],
+            [
+                'id' => 'movement-return-refund-1',
+                'product_id' => 'product-refund-1',
+                'movement_type' => 'stock_in',
+                'source_type' => 'work_item_store_stock_line_reversal',
+                'source_id' => 'ssl-refund-1',
+                'tanggal_mutasi' => '2026-04-01',
+                'qty_delta' => 1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 10000,
+            ],
+        ]);
+
+        $result = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-04-01', '2026-04-01');
+
+        $this->assertTrue($result->isSuccess());
+
+        $data = $result->data();
+        $this->assertIsArray($data);
+        $this->assertIsArray($data['row'] ?? null);
+
+        $this->assertSame([
+            'from_date' => '2026-04-01',
+            'to_date' => '2026-04-01',
+            'cash_in_rupiah' => 100000,
+            'refunded_rupiah' => 100000,
+            'external_purchase_cost_rupiah' => 0,
+            'store_stock_cogs_rupiah' => 0,
+            'product_purchase_cost_rupiah' => 0,
+            'operational_expense_rupiah' => 0,
+            'payroll_disbursement_rupiah' => 0,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => 0,
+        ], $data['row']);
+    }
+
     public function test_get_operational_profit_summary_handler_excludes_reversed_payroll_from_profit_metrics(): void
     {
         $this->seedEmployee('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Montir Reversal');
