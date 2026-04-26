@@ -34,7 +34,9 @@ final class EditTransactionWorkspacePageController extends Controller
             abort(500, $e->getMessage());
         }
 
-        $page = $builder->build($noteId);
+        $routeArea = $request->routeIs('admin.notes.*') ? 'admin' : 'cashier';
+
+        $page = $builder->build($noteId, $routeArea);
         $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];
         $draftPayload = $this->loadDraftPayload($request, $drafts, $noteId, $sessionHasOldInput);
 

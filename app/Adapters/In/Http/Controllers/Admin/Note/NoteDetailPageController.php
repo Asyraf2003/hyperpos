@@ -42,7 +42,7 @@ final class NoteDetailPageController extends Controller
             'pageIntroTitle' => 'Detail Nota',
             'pageIntroSubtitle' => 'Detail operasional nota aktif untuk admin dengan akses histori lebih luas.',
             'detailConfig' => [
-                'workspace_edit_route' => 'admin.notes.workspace.update',
+                'workspace_edit_route' => 'admin.notes.workspace.edit',
             ],
             'addRowsAction' => route('admin.notes.rows.store', ['noteId' => $noteId]),
             'oldRows' => array_values(old('rows', [['line_type' => 'service']])),

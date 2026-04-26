@@ -45,8 +45,8 @@
         'productLookupEndpoint' => $productLookupEndpoint ?? null,
         'workspaceMode' => $workspaceMode ?? 'create',
         'noteId' => $noteId ?? null,
-        'draftLoadEndpoint' => route('cashier.notes.workspace.draft.show'),
-        'draftSaveEndpoint' => route('cashier.notes.workspace.draft.save'),
+        'draftLoadEndpoint' => $draftLoadEndpoint ?? route('cashier.notes.workspace.draft.show'),
+        'draftSaveEndpoint' => $draftSaveEndpoint ?? route('cashier.notes.workspace.draft.save'),
         'csrfToken' => csrf_token(),
         'hasOldInput' => $hasOldInput ?? !empty(session()->getOldInput()),
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>

@@ -27,9 +27,13 @@ final class StoreNoteRevisionRequest extends FormRequest
         ];
 
         $reason = $this->input('reason');
+        $defaultReason = $this->routeIs('admin.notes.*')
+            ? 'Revisi workspace nota admin'
+            : 'Revisi workspace nota kasir';
+
         $normalized['reason'] = is_string($reason) && trim($reason) !== ''
             ? trim($reason)
-            : 'Revisi workspace nota kasir';
+            : $defaultReason;
 
         $this->merge($normalized);
     }

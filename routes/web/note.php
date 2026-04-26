@@ -22,7 +22,6 @@ use App\Adapters\In\Http\Controllers\Note\RecordClosedNoteRefundController;
 use App\Adapters\In\Http\Controllers\Note\RecordNotePaymentController;
 use App\Adapters\In\Http\Controllers\Note\StoreNoteRevisionController;
 use App\Adapters\In\Http\Controllers\Note\StoreTransactionWorkspaceController;
-use App\Adapters\In\Http\Controllers\Note\UpdateTransactionWorkspaceController;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureAdminPageAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureCashierAreaAccess;
 use App\Adapters\In\Http\Middleware\IdentityAccess\EnsureTransactionEntryAllowed;
@@ -41,12 +40,16 @@ Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
     ->group(function (): void {
         Route::get('/', AdminNoteHistoryPageController::class)->name('index');
         Route::get('/table', AdminNoteHistoryTableDataController::class)->name('table');
+        Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/workspace/draft', GetTransactionWorkspaceDraftController::class)->name('workspace.draft.show');
+        Route::post('/workspace/draft', SaveTransactionWorkspaceDraftController::class)->name('workspace.draft.save');
+        Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
         Route::get('/{noteId}', AdminNoteDetailPageController::class)->name('show');
 
         Route::post('/{noteId}/refunds', RecordClosedNoteRefundController::class)->name('refunds.store');
         Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
         Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
-        Route::patch('/{noteId}/workspace', UpdateTransactionWorkspaceController::class)->name('workspace.update');
+        Route::patch('/{noteId}/workspace', StoreNoteRevisionController::class)->name('workspace.update');
 
         Route::post('/{noteId}/reopen', AdminReopenClosedNoteController::class)->name('reopen');
     });
