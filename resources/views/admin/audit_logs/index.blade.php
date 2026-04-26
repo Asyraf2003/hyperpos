@@ -9,10 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Audit Log Sistem</h4>
-                        <p class="text-muted mb-0">
-                            Halaman ini hanya untuk membaca jejak audit. Data audit tidak bisa diedit atau dihapus.
-                        </p>
+                        <h4 class="card-title mb-1">Halaman ini hanya untuk membaca jejak audit</h4>
                     </div>
 
                     <form method="get" action="{{ route('admin.audit-logs.index') }}" class="m-0 d-flex gap-2">
@@ -44,9 +41,6 @@
             </div>
 
             <div class="card-body">
-                <div class="alert alert-light-primary">
-                    Audit log bersifat read-only. Tidak ada tombol edit, hapus, void, atau mutation lain di halaman ini.
-                </div>
 
                 <div class="table-responsive">
                     <table class="table table-lg">

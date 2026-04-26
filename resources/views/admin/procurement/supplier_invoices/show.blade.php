@@ -8,7 +8,7 @@
 @section('content')
     <section class="section">
         <div class="row g-4">
-            <div class="col-12 col-xl-4">
+            <div class="col-12 col-xl-4 order-2">
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center gap-2">
@@ -238,7 +238,7 @@
                 @endif
             </div>
 
-            <div class="col-12 col-xl-8">
+            <div class="col-12 col-xl-8 order-1">
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title mb-1">Rincian Nota</h4>
