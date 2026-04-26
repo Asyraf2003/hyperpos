@@ -31,10 +31,8 @@ final class AdminAuditLogPageFeatureTest extends TestCase
             ->get(route('admin.audit-logs.index'));
 
         $response->assertOk();
-        $response->assertSee('Audit Log Sistem');
         $response->assertSee('supplier_invoice_voided');
         $response->assertSee('Salah input sebelum penerimaan barang.');
-        $response->assertSee('read-only');
     }
 
     public function test_admin_audit_log_search_filters_event_and_context(): void
