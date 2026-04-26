@@ -179,6 +179,69 @@ Status:
 - PASS
 - Under the current project rule, `Tests: xxx passed (...)` means `make verify` is accepted as full PASS because `make verify` runs serial verification.
 
+
+## 4. Finance Invariant Test
+
+File:
+
+~~~text
+tests/Feature/Reporting/SeederNewFinanceInvariantFeatureTest.php
+~~~
+
+Targeted command:
+
+~~~bash
+php artisan test tests/Feature/Reporting/SeederNewFinanceInvariantFeatureTest.php
+~~~
+
+Targeted proof output:
+
+~~~text
+PASS  Tests\Feature\Reporting\SeederNewFinanceInvariantFeatureTest
+✓ core finance money invariants hold for seed like fixture
+
+Tests:    1 passed (5 assertions)
+Duration: 4.41s
+~~~
+
+Covered invariants:
+
+- customer payment total equals payment allocation total
+- customer payment total equals payment component allocation total
+- customer refund total equals refund component allocation total
+- active supplier invoice total equals active supplier invoice current line total
+- voided supplier invoice payment does not leak into active payable calculation
+
+Excluded from this first minimal invariant test:
+
+- note/work item mismatch
+- inventory qty/value mismatch
+- ledger invariant
+
+Reason:
+
+Those are currently audit metrics, not audit command failures. They need exact scenario tracing before becoming hard tests.
+
+## 5. Full Verification After Finance Invariant Test
+
+Command:
+
+~~~bash
+make verify
+~~~
+
+Proof output:
+
+~~~text
+Tests:    741 passed (3861 assertions)
+Duration: 33.12s
+~~~
+
+Status:
+
+- PASS
+- Finance invariant test is now included in the full suite.
+
 ## Files Related To Audit Command Work
 
 Created:
