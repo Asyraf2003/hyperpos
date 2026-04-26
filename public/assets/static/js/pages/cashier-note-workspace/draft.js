@@ -188,7 +188,6 @@
               valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
             ),
             price_basis: valueOf("[data-price-basis]", row) || "current_catalog",
-            price_basis: valueOf("[data-price-basis]", row) || "current_catalog",
           },
         ],
       };
