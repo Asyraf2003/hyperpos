@@ -19,10 +19,18 @@ final class ProductCostMetricQuery
 
     public function storeStockCogs(string $fromDate, string $toDate): int
     {
-        return (int) (DB::table('inventory_movements')
+        $issued = (int) (DB::table('inventory_movements')
             ->where('movement_type', 'stock_out')
             ->where('source_type', 'work_item_store_stock_line')
             ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
             ->sum(DB::raw('ABS(total_cost_rupiah)')) ?? 0);
+
+        $returned = (int) (DB::table('inventory_movements')
+            ->where('movement_type', 'stock_in')
+            ->where('source_type', 'work_item_store_stock_line_reversal')
+            ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
+            ->sum('total_cost_rupiah') ?? 0);
+
+        return max($issued - $returned, 0);
     }
 }
