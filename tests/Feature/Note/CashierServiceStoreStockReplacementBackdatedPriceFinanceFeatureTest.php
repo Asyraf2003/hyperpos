@@ -50,7 +50,7 @@ final class CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest 
                     [
                         'entry_mode' => 'service',
                         'description' => null,
-                        'part_source' => 'none',
+                        'part_source' => 'store_stock',
                         'service' => [
                             'name' => 'Servis Rem Revised',
                             'price_rupiah' => 50000,
@@ -110,7 +110,7 @@ final class CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest 
             'work_item_id' => (string) $newWorkItem->id,
             'service_name' => 'Servis Rem Revised',
             'service_price_rupiah' => 50000,
-            'part_source' => 'store_stock',
+            'part_source' => 'none',
         ]);
 
         $newStoreLine = DB::table('work_item_store_stock_lines')
