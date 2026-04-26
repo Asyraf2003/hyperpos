@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Adapters\Out\Audit;
 
 use App\Ports\Out\AuditLogReaderPort;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
@@ -43,5 +45,63 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
         }
 
         return $entries;
+    }
+
+    public function listForAdmin(string $search = '', int $perPage = 20): LengthAwarePaginator
+    {
+        $normalizedSearch = trim($search);
+        $safePerPage = max(1, min($perPage, 100));
+
+        $query = DB::table('audit_logs')
+            ->select(['id', 'event', 'context', 'created_at'])
+            ->orderByDesc('id');
+
+        if ($normalizedSearch !== '') {
+            $like = '%' . $normalizedSearch . '%';
+
+            $query->where(function (QueryBuilder $query) use ($like): void {
+                $query
+                    ->where('event', 'like', $like)
+                    ->orWhere('context', 'like', $like);
+            });
+        }
+
+        /** @var LengthAwarePaginator<int, object> $paginator */
+        $paginator = $query->paginate($safePerPage)->withQueryString();
+
+        return $paginator->through(function (object $row): array {
+            $context = json_decode((string) $row->context, true);
+
+            if (! is_array($context)) {
+                $context = [];
+            }
+
+            $contextJson = json_encode($context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+            return [
+                'id' => (int) $row->id,
+                'event' => (string) $row->event,
+                'reason' => $this->resolveReason($context),
+                'context' => $context,
+                'context_json' => is_string($contextJson) ? $contextJson : '{}',
+                'created_at' => (string) $row->created_at,
+            ];
+        });
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    private function resolveReason(array $context): string
+    {
+        foreach (['reason', 'alasan', 'void_reason', 'correction_reason', 'note', 'notes'] as $key) {
+            $value = $context[$key] ?? null;
+
+            if (is_scalar($value) && trim((string) $value) !== '') {
+                return (string) $value;
+            }
+        }
+
+        return '-';
     }
 }

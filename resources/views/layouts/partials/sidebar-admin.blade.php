@@ -176,6 +176,15 @@
                     </a>
                 </li>
 
+                <li class="sidebar-title">Sistem</li>
+
+                <li class="sidebar-item {{ request()->routeIs('admin.audit-logs.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.audit-logs.index') }}" class="sidebar-link">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Audit Log</span>
+                    </a>
+                </li>
+
                 <li class="sidebar-title">Ganti Role</li>
 
                 @if (($appShell['can_access_cashier_area'] ?? false) === true)
