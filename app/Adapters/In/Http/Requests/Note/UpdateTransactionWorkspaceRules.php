@@ -31,6 +31,7 @@ final class UpdateTransactionWorkspaceRules
             'items.*.product_lines.0.product_id' => ['nullable', 'string'],
             'items.*.product_lines.0.qty' => ['nullable', 'integer', 'min:1'],
             'items.*.product_lines.0.unit_price_rupiah' => ['nullable', 'integer', 'min:1'],
+            'items.*.product_lines.0.price_basis' => ['nullable', 'string', 'in:current_catalog,revision_snapshot'],
 
             'items.*.external_purchase_lines' => ['nullable', 'array'],
             'items.*.external_purchase_lines.0.label' => ['nullable', 'string'],

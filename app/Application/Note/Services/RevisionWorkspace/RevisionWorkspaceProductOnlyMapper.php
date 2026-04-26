@@ -40,6 +40,7 @@ final class RevisionWorkspaceProductOnlyMapper
                 'product_id' => $productLine['product_id'],
                 'qty' => $productLine['qty'],
                 'unit_price_rupiah' => $productLine['unit_price_rupiah'],
+                'price_basis' => $productLine['price_basis'],
             ]],
             'external_purchase_lines' => [],
         ];

@@ -32,6 +32,7 @@
                 <div class="form-group mb-3 position-relative">
                     <label class="form-label">Sparepart Toko</label>
                     <input type="hidden" name="items[__INDEX__][product_lines][0][product_id]" value="" data-product-id>
+                    <input type="hidden" name="items[__INDEX__][product_lines][0][price_basis]" value="current_catalog" data-price-basis>
                     <input type="text" class="form-control" placeholder="Ketik minimal 2 huruf untuk mencari produk" autocomplete="off" data-product-search>
                     <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
                 </div>

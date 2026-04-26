@@ -47,6 +47,7 @@ final class TransactionWorkspaceExistingProductOnlyMapper
                 'product_id' => $line->productId(),
                 'qty' => $line->qty(),
                 'unit_price_rupiah' => intdiv($line->lineTotalRupiah()->amount(), $line->qty()),
+                'price_basis' => 'revision_snapshot',
             ]],
             'external_purchase_lines' => [],
             'selected_label' => $meta['selected_label'],

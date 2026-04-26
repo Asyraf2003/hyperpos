@@ -184,6 +184,7 @@
     set('textarea[name$="[service][notes]"]', item?.service?.notes || "");
     set("[data-product-search]", item?.selected_label || "");
     set("[data-product-id]", item?.product_lines?.[0]?.product_id || "");
+    set("[data-price-basis]", item?.product_lines?.[0]?.price_basis || "current_catalog");
     set('input[name$="[external_purchase_lines][0][label]"]', item?.external_purchase_lines?.[0]?.label || "");
     set('input[name$="[external_purchase_lines][0][qty]"]', item?.external_purchase_lines?.[0]?.qty || "1");
     set('input[name$="[product_lines][0][qty]"]', item?.product_lines?.[0]?.qty || "1");

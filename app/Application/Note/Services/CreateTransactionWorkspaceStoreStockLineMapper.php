@@ -22,6 +22,7 @@ final class CreateTransactionWorkspaceStoreStockLineMapper
             'product_id' => $this->requiredString($line['product_id'] ?? null, 'Product wajib dipilih.'),
             'qty' => $qty,
             'line_total_rupiah' => $qty * $unitPrice,
+            'price_basis' => $this->priceBasis($line['price_basis'] ?? null),
         ];
     }
 
@@ -38,6 +39,11 @@ final class CreateTransactionWorkspaceStoreStockLineMapper
         $first = array_values($value)[0] ?? [];
 
         return is_array($first) ? $first : [];
+    }
+
+    private function priceBasis(mixed $value): string
+    {
+        return $value === 'revision_snapshot' ? 'revision_snapshot' : 'current_catalog';
     }
 
     private function requiredString(mixed $value, string $message): string

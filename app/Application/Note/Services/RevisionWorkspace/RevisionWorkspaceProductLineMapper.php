@@ -36,6 +36,7 @@ final class RevisionWorkspaceProductLineMapper
             'product_id' => $productId,
             'qty' => $qty,
             'unit_price_rupiah' => $unitPrice,
+            'price_basis' => 'revision_snapshot',
             'selected_label' => $selectedLabel,
         ];
     }

@@ -18,6 +18,7 @@ final class StoreTransactionWorkspaceProductLineNormalizer
             'product_id' => self::trimOrNull($line['product_id'] ?? null),
             'qty' => self::integerOrNull($line['qty'] ?? null),
             'unit_price_rupiah' => self::integerOrNull($line['unit_price_rupiah'] ?? null),
+            'price_basis' => self::trimOrNull($line['price_basis'] ?? null),
         ];
     }
 

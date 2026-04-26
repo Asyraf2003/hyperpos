@@ -108,11 +108,16 @@
     const raw = row.querySelector('[name$="[unit_price_rupiah]"]');
     const display = row.querySelector("[data-price-input]");
     const qty = row.querySelector("[data-qty-input]");
+    const priceBasis = row.querySelector("[data-price-basis]");
 
     if (!search || !hidden) return;
 
     search.value = item.label;
     hidden.value = item.id;
+    if (priceBasis) {
+      priceBasis.value = "current_catalog";
+    }
+
     row.dataset.minimumUnitPriceRupiah = String(
       item.minimum_unit_price_rupiah || item.default_unit_price_rupiah || 0
     );
@@ -154,6 +159,7 @@
       }
 
       hidden.value = "";
+      row.querySelector("[data-price-basis]")?.setAttribute("value", "current_catalog");
 
       if (query.length < 2 || !endpoint) {
         clearResults(row);
