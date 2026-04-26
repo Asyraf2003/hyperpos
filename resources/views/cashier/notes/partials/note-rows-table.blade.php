@@ -70,9 +70,6 @@
                 @if (!empty($row['line_subtitle']))
                   <div class="small text-muted">{{ $row['line_subtitle'] }}</div>
                 @endif
-                @if ((bool) ($row['can_refund'] ?? false))
-                  <div class="small text-muted refund-row-hint">Klik untuk pilih refund / batal line</div>
-                @endif
               </td>
               <td>{{ $row['type_label'] }}</td>
               <td>
