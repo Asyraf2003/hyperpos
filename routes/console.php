@@ -3,6 +3,7 @@
 use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierListProjectionService;
+use App\Application\PushNotification\UseCases\SendDueNoteReminderPushHandler;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -98,5 +99,31 @@ Artisan::command(
         return 0;
     }
 )->purpose('Rebuild read-model projection untuk procurement invoices, supplier list, dan admin note history');
+
+
+Artisan::command(
+    'push-notifications:send-due-note-reminders {--today=} {--note-limit=100} {--subscription-limit=500}',
+    function (SendDueNoteReminderPushHandler $handler): int {
+        $today = trim((string) ($this->option('today') ?: now()->toDateString()));
+        $noteLimit = max(1, (int) $this->option('note-limit'));
+        $subscriptionLimit = max(1, (int) $this->option('subscription-limit'));
+
+        try {
+            $summary = $handler->handle($today, $noteLimit, $subscriptionLimit);
+        } catch (Throwable $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
+
+        $this->info('Due reminder notes: '.$summary->dueNoteCount);
+        $this->info('Push subscriptions: '.$summary->subscriptionCount);
+        $this->info('Push sent: '.$summary->sentCount);
+        $this->info('Push failed: '.$summary->failedCount);
+
+        return $summary->failedCount > 0 ? 1 : 0;
+    }
+)->purpose('Send push notification untuk nota pelanggan yang mendekati atau melewati jatuh tempo');
+
 
 require __DIR__ . '/console_audit.php';
