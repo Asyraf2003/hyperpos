@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Note;
 
 use App\Core\Note\WorkItem\WorkItem;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\SeedsMinimalNotePaymentFixture;
@@ -197,21 +196,4 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
         ]);
     }
 
-    private function seedKasir(): User
-    {
-        $this->loginAsKasir();
-
-        $user = User::query()->create([
-            'name' => 'Kasir Product Replacement Finance',
-            'email' => 'kasir-product-replacement-finance@example.test',
-            'password' => 'password',
-        ]);
-
-        DB::table('actor_accesses')->insert([
-            'actor_id' => (string) $user->getAuthIdentifier(),
-            'role' => 'kasir',
-        ]);
-
-        return $user;
-    }
 }
