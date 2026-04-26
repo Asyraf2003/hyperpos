@@ -126,19 +126,44 @@ Artisan::command('audit:seed-level {level}', function () use (
     $this->line('');
     $this->line('== SUPPLIER INVOICE LEVEL 2 COUNTS ==');
 
-    $siBlInvoices = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'like', 'seed-si-bl-%'));
-    $siBlVersions = $seedAuditCount('supplier_invoice_versions', static fn ($query) => $query->where('supplier_invoice_id', 'like', 'seed-si-bl-%'));
-    $siBlProjections = $seedAuditCount('supplier_invoice_list_projection', static fn ($query) => $query->where('supplier_invoice_id', 'like', 'seed-si-bl-%'));
-    $scenarioInvoicesActive = $seedAuditCount('supplier_invoices', static function ($query): void {
-        $query
-            ->where('id', 'like', 'seed-si-%')
-            ->where('id', 'not like', 'seed-si-bl-%')
-            ->where('lifecycle_status', '!=', 'voided');
-    });
-    $voidScenarioInvoicesTotal = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'like', 'seed-si-void-%'));
-    $void001Voided = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'seed-si-void-001')->where('lifecycle_status', 'voided'));
-    $voidReuseVoided = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'seed-si-void-reuse-001')->where('lifecycle_status', 'voided'));
-    $voidReuseActive = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'seed-si-void-reuse-001-active')->where('lifecycle_status', '!=', 'voided'));
+    $scenarioNos = [
+        'SI-EDIT-001',
+        'SI-RECV-001',
+        'SI-PAYP-001',
+        'SI-PROOF-001',
+        'SI-FULL-001',
+    ];
+
+    $siBlInvoiceIds = DB::table('supplier_invoices')
+        ->select('id')
+        ->where('nomor_faktur', 'like', 'SI-BL-%');
+
+    $siBlInvoices = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('nomor_faktur', 'like', 'SI-BL-%'));
+    $siBlVersions = $seedAuditCount('supplier_invoice_versions', static fn ($query) => $query
+        ->whereIn('supplier_invoice_id', DB::table('supplier_invoices')->select('id')->where('nomor_faktur', 'like', 'SI-BL-%'))
+    );
+    $siBlProjections = $seedAuditCount('supplier_invoice_list_projection', static fn ($query) => $query
+        ->whereIn('supplier_invoice_id', DB::table('supplier_invoices')->select('id')->where('nomor_faktur', 'like', 'SI-BL-%'))
+    );
+    $scenarioInvoicesActive = $seedAuditCount('supplier_invoices', static fn ($query) => $query
+        ->whereIn('nomor_faktur', $scenarioNos)
+        ->whereNull('voided_at')
+    );
+    $voidScenarioInvoicesTotal = $seedAuditCount('supplier_invoices', static fn ($query) => $query
+        ->whereIn('nomor_faktur', ['SI-VOID-001', 'SI-VOID-REUSE-001'])
+    );
+    $void001Voided = $seedAuditCount('supplier_invoices', static fn ($query) => $query
+        ->where('nomor_faktur', 'SI-VOID-001')
+        ->whereNotNull('voided_at')
+    );
+    $voidReuseVoided = $seedAuditCount('supplier_invoices', static fn ($query) => $query
+        ->where('nomor_faktur', 'SI-VOID-REUSE-001')
+        ->whereNotNull('voided_at')
+    );
+    $voidReuseActive = $seedAuditCount('supplier_invoices', static fn ($query) => $query
+        ->where('nomor_faktur', 'SI-VOID-REUSE-001')
+        ->whereNull('voided_at')
+    );
 
     $seedAuditPrintLine('SI-BL invoices', $siBlInvoices);
     $seedAuditPrintLine('SI-BL versions', $siBlVersions);
@@ -206,7 +231,7 @@ Artisan::command('audit:seed-level {level}', function () use (
                 DB::table('supplier_invoices')
                     ->select('nomor_faktur_normalized')
                     ->selectRaw('COUNT(*) as duplicate_count')
-                    ->where('lifecycle_status', '!=', 'voided')
+                    ->whereNull('voided_at')
                     ->groupBy('nomor_faktur_normalized')
                     ->havingRaw('COUNT(*) > 1'),
                 'duplicates'
