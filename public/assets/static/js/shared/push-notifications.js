@@ -2,15 +2,29 @@
   const readConfig = () => {
     const node = document.getElementById('push-notification-config');
 
-    if (!node || !node.textContent) {
+    if (!node) {
       return null;
     }
 
-    try {
-      return JSON.parse(node.textContent);
-    } catch (error) {
-      return null;
+    const text = node.textContent ? node.textContent.trim() : '';
+
+    if (text !== '') {
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        return null;
+      }
     }
+
+    return {
+      serviceWorkerUrl: node.dataset.serviceWorkerUrl || '',
+      serviceWorkerScope: node.dataset.serviceWorkerScope || '/',
+      subscribeUrl: node.dataset.subscribeUrl || '',
+      unsubscribeUrl: node.dataset.unsubscribeUrl || '',
+      vapidPublicKey: node.dataset.vapidPublicKey || '',
+      defaultIcon: node.dataset.defaultIcon || '',
+      defaultUrl: node.dataset.defaultUrl || '',
+    };
   };
 
   const base64UrlToUint8Array = (base64Url) => {

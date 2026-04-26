@@ -60,15 +60,17 @@
     <script src="{{ asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}?v={{ filemtime(public_path('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')) }}"></script>
     <script src="{{ asset('assets/compiled/js/app.js') }}?v={{ filemtime(public_path('assets/compiled/js/app.js')) }}"></script>
     <script src="{{ asset('assets/static/js/shared/page-freshness.js') }}?v={{ filemtime(public_path('assets/static/js/shared/page-freshness.js')) }}"></script>
-    <script id="push-notification-config" type="application/json">@json([
-        'serviceWorkerUrl' => asset('service-worker.js'),
-        'serviceWorkerScope' => '/',
-        'subscribeUrl' => route('push-notifications.subscriptions.store'),
-        'unsubscribeUrl' => route('push-notifications.subscriptions.destroy'),
-        'vapidPublicKey' => config('services.webpush.vapid_public_key', ''),
-        'defaultIcon' => asset('assets/compiled/svg/favicon.svg'),
-        'defaultUrl' => route('admin.due-note-reminders.index'),
-    ])</script>
+    <script
+        id="push-notification-config"
+        type="application/json"
+        data-service-worker-url="{{ asset('service-worker.js') }}"
+        data-service-worker-scope="/"
+        data-subscribe-url="{{ route('push-notifications.subscriptions.store') }}"
+        data-unsubscribe-url="{{ route('push-notifications.subscriptions.destroy') }}"
+        data-vapid-public-key="{{ config('services.webpush.vapid_public_key', '') }}"
+        data-default-icon="{{ asset('assets/compiled/svg/favicon.svg') }}"
+        data-default-url="{{ route('admin.due-note-reminders.index') }}"
+    ></script>
     <script src="{{ asset('assets/static/js/shared/push-notifications.js') }}?v={{ filemtime(public_path('assets/static/js/shared/push-notifications.js')) }}"></script>
     @stack('scripts')
 </body>
