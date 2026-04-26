@@ -9,11 +9,13 @@
   </div>
 
   <div class="card-body">
-    <div class="border rounded p-3 mb-4 bg-body"> 
+
+    {{-- ========== REVISION AKTIF (INDUK STYLE) ========== --}}
+    <div class="border rounded p-3 mb-4 bg-body">
       <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
         <div>
           <div class="small text-muted">Revision Aktif</div>
-          <div class="fw-bold text-body">R{{ (int) ($currentRevision['revision_number'] ?? 0) }}</div> 
+          <div class="fw-bold text-body">R{{ (int) ($currentRevision['revision_number'] ?? 0) }}</div>
         </div>
         <div class="text-end small text-muted">
           <div>{{ $currentRevision['created_at'] ?? '-' }}</div>
@@ -24,7 +26,8 @@
         <div class="fw-semibold small mb-2 text-muted">Isi Revision Aktif</div>
         <div class="d-flex flex-column gap-2 mb-3">
           @foreach (($currentRevision['line_snapshot_rows'] ?? []) as $line)
-            <div class="border rounded p-2 bg-body"> 
+            {{-- [INDUK] Struktur line item —  border rounded p-2 bg-body --}}
+            <div class="border rounded p-2 bg-body">
               <div class="d-flex justify-content-between gap-2">
                 <div>
                   <div class="fw-semibold text-body">
@@ -42,7 +45,7 @@
           @endforeach
         </div>
       @endif
-      
+
       @if (!empty($currentRevision['change_summary_lines']))
         <div class="d-flex flex-column gap-1">
           @foreach (($currentRevision['change_summary_lines'] ?? []) as $summary)
@@ -52,6 +55,7 @@
       @endif
     </div>
 
+    {{-- ========== RIWAYAT REVISI ========== --}}
     <h6 class="mb-3 text-muted">Riwayat Revisi</h6>
     @if ($timelineRevisions === [])
       <div class="text-muted">Belum ada riwayat revisi.</div>
@@ -72,17 +76,18 @@
             @if (!empty($entry['line_snapshot_rows']))
               <div class="d-flex flex-column gap-2 mb-3">
                 @foreach (($entry['line_snapshot_rows'] ?? []) as $line)
-                  <div class="border-start border-3 border-secondary ps-3 py-1">
+                  {{-- [IKUT INDUK] Struktur sama persis dengan Revision Aktif --}}
+                  <div class="border rounded p-2 bg-body">
                     <div class="d-flex justify-content-between gap-2">
                       <div>
-                        <div class="small fw-bold text-body">
+                        <div class="fw-semibold text-body">
                           Line {{ (int) ($line['line_no'] ?? 0) }} · {{ $line['label'] ?? '-' }}
                         </div>
-                        <div class="small text-muted" style="font-size: 0.75rem;">
+                        <div class="small text-muted">
                           {{ $line['type_label'] ?? '-' }} · {{ $line['status'] ?? '-' }}
                         </div>
                       </div>
-                      <div class="small fw-bold text-end text-body">
+                      <div class="fw-semibold text-end text-body">
                         {{ number_format((int) ($line['subtotal_rupiah'] ?? 0), 0, ',', '.') }}
                       </div>
                     </div>
@@ -107,5 +112,6 @@
         @endforeach
       </div>
     @endif
+
   </div>
 </div>
