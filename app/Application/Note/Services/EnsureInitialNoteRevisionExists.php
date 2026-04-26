@@ -29,7 +29,23 @@ final class EnsureInitialNoteRevisionExists
             throw new DomainException('Note root id wajib diisi.');
         }
 
-        if ($this->revisions->existsForRootId($normalized)) {
+        $currentRevision = $this->revisions->findCurrentByRootId($normalized);
+
+        if ($currentRevision !== null) {
+            return;
+        }
+
+        $timeline = $this->revisions->findTimelineByRootId($normalized, 1);
+
+        if ($timeline !== []) {
+            $latestRevision = $timeline[0];
+
+            $this->revisionWriter->setCurrentRevision(
+                $normalized,
+                $latestRevision->id(),
+                $latestRevision->revisionNumber(),
+            );
+
             return;
         }
 
