@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Application\Procurement\UseCases\CreateSupplierInvoiceFlowHandler;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 
 final class SupplierInvoiceBaselineSeeder extends Seeder
 {
+    private const INVOICE_NO_PREFIX = 'SI-BL-';
+
     public function run(): void
     {
         $suppliers = DB::table('suppliers')
@@ -19,7 +24,7 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
             ->get();
 
         $products = DB::table('products')
-            ->select('id', 'kode_barang', 'nama_barang', 'merek', 'ukuran')
+            ->select('id', 'nama_barang')
             ->whereNull('deleted_at')
             ->orderBy('nama_barang')
             ->get();
@@ -29,6 +34,9 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
             return;
         }
 
+        $this->purgeSeededInvoices();
+
+        $handler = app(CreateSupplierInvoiceFlowHandler::class);
         $startDate = CarbonImmutable::today('Asia/Jakarta')->subDays(29);
         $invoicePlan = $this->buildMonthlyInvoicePlan();
 
@@ -41,8 +49,12 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
             $shipDate = $startDate->addDays($dayOffset);
 
             for ($n = 1; $n <= $invoiceCount; $n++) {
-                $invoiceId = sprintf('seed-baseline-si-%03d', $invoiceRunningNo);
-                $invoiceNo = sprintf('SI-BL-%s-%03d', $shipDate->format('Ymd'), $invoiceRunningNo);
+                $invoiceNo = sprintf(
+                    '%s%s-%03d',
+                    self::INVOICE_NO_PREFIX,
+                    $shipDate->format('Ymd'),
+                    $invoiceRunningNo
+                );
 
                 $supplier = $this->pickSupplier(
                     $invoiceRunningNo,
@@ -50,41 +62,31 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
                     $secondarySuppliers
                 );
 
-                $lines = $this->buildLines(
-                    invoiceId: $invoiceId,
-                    invoiceRunningNo: $invoiceRunningNo,
-                    products: $products,
+                $result = $handler->handle(
+                    $invoiceNo,
+                    (string) $supplier->nama_pt_pengirim,
+                    $shipDate->format('Y-m-d'),
+                    $this->buildLines($invoiceRunningNo, $products),
+                    false,
+                    null,
+                    'seed-system',
+                    'seeder',
+                    'seeder'
                 );
 
-                DB::table('supplier_invoices')->updateOrInsert(
-                    ['id' => $invoiceId],
-                    [
-                        'supplier_id' => (string) $supplier->id,
-                        'supplier_nama_pt_pengirim_snapshot' => (string) $supplier->nama_pt_pengirim,
-                        'nomor_faktur' => $invoiceNo,
-                        'nomor_faktur_normalized' => mb_strtolower($invoiceNo, 'UTF-8'),
-                        'document_kind' => 'invoice',
-                        'lifecycle_status' => 'active',
-                        'origin_supplier_invoice_id' => null,
-                        'superseded_by_supplier_invoice_id' => null,
-                        'tanggal_pengiriman' => $shipDate->format('Y-m-d'),
-                        'jatuh_tempo' => $shipDate->addDays(30)->format('Y-m-d'),
-                        'grand_total_rupiah' => array_sum(array_column($lines, 'line_total_rupiah')),
-                        'voided_at' => null,
-                        'void_reason' => null,
-                        'last_revision_no' => 1,
-                    ]
-                );
-
-                DB::table('supplier_invoice_lines')->where('supplier_invoice_id', $invoiceId)->delete();
-                DB::table('supplier_invoice_lines')->insert($lines);
+                if ($result->isFailure()) {
+                    throw new RuntimeException(
+                        'SupplierInvoiceBaselineSeeder gagal membuat ' . $invoiceNo . ': '
+                        . ($result->message() ?? 'unknown error')
+                    );
+                }
 
                 $invoiceRunningNo++;
             }
         }
 
         $this->command?->info(sprintf(
-            'SupplierInvoiceBaselineSeeder selesai: %d faktur baseline 1 bulan dibuat.',
+            'SupplierInvoiceBaselineSeeder selesai: %d faktur baseline 1 bulan dibuat via system path.',
             $invoiceRunningNo - 1
         ));
     }
@@ -120,43 +122,88 @@ final class SupplierInvoiceBaselineSeeder extends Seeder
     }
 
     /**
-     * @return list<array<string, mixed>>
+     * @return list<array<string, int|string>>
      */
-    private function buildLines(
-        string $invoiceId,
-        int $invoiceRunningNo,
-        Collection $products,
-    ): array {
-        $lineCount = 3 + (($invoiceRunningNo - 1) % 6);
+    private function buildLines(int $invoiceRunningNo, Collection $products): array
+    {
+        $lineCount = min(3 + (($invoiceRunningNo - 1) % 6), $products->count());
+        $productOffset = (($invoiceRunningNo - 1) * 7) % $products->count();
         $lines = [];
 
         for ($lineNo = 1; $lineNo <= $lineCount; $lineNo++) {
-            $productIndex = (($invoiceRunningNo * 7) + ($lineNo * 3)) % $products->count();
+            $productIndex = ($productOffset + $lineNo - 1) % $products->count();
             $product = $products[$productIndex];
+
             $qty = 1 + (($invoiceRunningNo + ($lineNo * 2)) % 20);
             $unitCost = 18000 + ((($invoiceRunningNo * 6500) + ($lineNo * 3750)) % 280000);
-            $lineTotal = $qty * $unitCost;
 
             $lines[] = [
-                'id' => sprintf('%s-line-%02d', $invoiceId, $lineNo),
-                'supplier_invoice_id' => $invoiceId,
-                'revision_no' => 1,
-                'is_current' => 1,
-                'source_line_id' => null,
-                'superseded_by_line_id' => null,
-                'superseded_at' => null,
                 'line_no' => $lineNo,
                 'product_id' => (string) $product->id,
-                'product_kode_barang_snapshot' => $product->kode_barang,
-                'product_nama_barang_snapshot' => $product->nama_barang,
-                'product_merek_snapshot' => $product->merek,
-                'product_ukuran_snapshot' => $product->ukuran,
                 'qty_pcs' => $qty,
-                'line_total_rupiah' => $lineTotal,
-                'unit_cost_rupiah' => $unitCost,
+                'line_total_rupiah' => $qty * $unitCost,
             ];
         }
 
         return $lines;
+    }
+
+    private function purgeSeededInvoices(): void
+    {
+        if (! Schema::hasTable('supplier_invoices')) {
+            return;
+        }
+
+        $invoiceIds = DB::table('supplier_invoices')
+            ->where('nomor_faktur', 'like', self::INVOICE_NO_PREFIX . '%')
+            ->pluck('id')
+            ->map(static fn ($id): string => (string) $id)
+            ->values();
+
+        if ($invoiceIds->isEmpty()) {
+            return;
+        }
+
+        if (Schema::hasTable('audit_events')) {
+            $auditEventIds = DB::table('audit_events')
+                ->where('aggregate_type', 'supplier_invoice')
+                ->whereIn('aggregate_id', $invoiceIds)
+                ->pluck('id')
+                ->map(static fn ($id): string => (string) $id)
+                ->values();
+
+            if ($auditEventIds->isNotEmpty() && Schema::hasTable('audit_event_snapshots')) {
+                DB::table('audit_event_snapshots')
+                    ->whereIn('audit_event_id', $auditEventIds)
+                    ->delete();
+            }
+
+            DB::table('audit_events')
+                ->where('aggregate_type', 'supplier_invoice')
+                ->whereIn('aggregate_id', $invoiceIds)
+                ->delete();
+        }
+
+        if (Schema::hasTable('supplier_invoice_list_projection')) {
+            DB::table('supplier_invoice_list_projection')
+                ->whereIn('supplier_invoice_id', $invoiceIds)
+                ->delete();
+        }
+
+        if (Schema::hasTable('supplier_invoice_versions')) {
+            DB::table('supplier_invoice_versions')
+                ->whereIn('supplier_invoice_id', $invoiceIds)
+                ->delete();
+        }
+
+        if (Schema::hasTable('supplier_invoice_lines')) {
+            DB::table('supplier_invoice_lines')
+                ->whereIn('supplier_invoice_id', $invoiceIds)
+                ->delete();
+        }
+
+        DB::table('supplier_invoices')
+            ->whereIn('id', $invoiceIds)
+            ->delete();
     }
 }
