@@ -30,8 +30,8 @@ final class InventoryMovementSummaryBuilder
         return array_map(
             static fn (array $row): InventoryMovementSummaryRow => new InventoryMovementSummaryRow(
                 $row['product_id'],
-                $row['kode_barang'] ?? null,
-                $row['nama_barang'] ?? $row['product_id'],
+                $row['kode_barang'],
+                $row['nama_barang'],
                 $row['qty_in'],
                 $row['qty_out'],
                 $row['net_qty_delta'],

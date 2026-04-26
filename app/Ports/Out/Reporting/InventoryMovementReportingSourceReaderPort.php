@@ -9,6 +9,8 @@ interface InventoryMovementReportingSourceReaderPort
     /**
      * @return list<array{
      *   product_id:string,
+     *   kode_barang:?string,
+     *   nama_barang:string,
      *   qty_in:int,
      *   qty_out:int,
      *   net_qty_delta:int,

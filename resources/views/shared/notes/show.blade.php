@@ -6,6 +6,17 @@
 
 @section('content')
 <section class="section">
+  <div class="ui-page-intro mb-4">
+    <div class="small text-muted text-uppercase fw-semibold">
+      {{ $pageIntroEyebrow ?? '' }}
+    </div>
+    <h4 class="ui-page-intro-title mb-1">
+      {{ $pageIntroTitle ?? $pageTitle }}
+    </h4>
+    @if (! empty($pageIntroSubtitle))
+      <p class="text-muted mb-0">{{ $pageIntroSubtitle }}</p>
+    @endif
+  </div>
 
   <div class="row g-4 align-items-start">
     <div class="col-12 col-xl-8">

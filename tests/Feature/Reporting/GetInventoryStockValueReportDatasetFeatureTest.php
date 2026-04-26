@@ -151,6 +151,8 @@ final class GetInventoryStockValueReportDatasetFeatureTest extends TestCase
         $this->assertSame([
             [
                 'product_id' => 'product-1',
+                'kode_barang' => 'KB-001',
+                'nama_barang' => 'Supra',
                 'qty_in' => 10,
                 'qty_out' => 4,
                 'net_qty_delta' => 6,
@@ -163,6 +165,8 @@ final class GetInventoryStockValueReportDatasetFeatureTest extends TestCase
             ],
             [
                 'product_id' => 'product-2',
+                'kode_barang' => 'KB-002',
+                'nama_barang' => 'Vario',
                 'qty_in' => 3,
                 'qty_out' => 0,
                 'net_qty_delta' => 3,
