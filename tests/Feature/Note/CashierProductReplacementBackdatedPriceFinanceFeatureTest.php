@@ -18,14 +18,14 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
 
     public function test_cashier_product_replacement_keeps_snapshot_price_reconciles_stock_and_caps_old_payment(): void
     {
-        $user = $this->seedKasir();
+        $user = $this->loginAsAuthorizedAdmin();
         $oldDate = date('Y-m-d', strtotime('-4 days'));
         $today = date('Y-m-d');
 
         $this->seedPaidProductOnlyNote($oldDate);
 
         $this->actingAs($user)
-            ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
+            ->get(route('admin.notes.show', ['noteId' => 'note-1']))
             ->assertOk();
 
         DB::table('products')
@@ -33,13 +33,13 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
             ->update(['harga_jual' => 110000]);
 
         $edit = $this->actingAs($user)
-            ->get(route('cashier.notes.workspace.edit', ['noteId' => 'note-1']));
+            ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
 
         $edit->assertOk();
         $edit->assertSee('100000');
 
         $response = $this->actingAs($user)->patch(
-            route('cashier.notes.workspace.update', ['noteId' => 'note-1']),
+            route('admin.notes.workspace.update', ['noteId' => 'note-1']),
             [
                 'note' => [
                     'customer_name' => 'Budi Revised Product',
@@ -76,7 +76,7 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
             ],
         );
 
-        $response->assertRedirect(route('cashier.notes.show', ['noteId' => 'note-1']));
+        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-1']));
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('notes', [
