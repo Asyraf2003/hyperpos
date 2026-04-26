@@ -16,6 +16,11 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
         'paid_service_only_work_item_corrected',
     ];
 
+    public function __construct(
+        private readonly AuditLogAdminRowMapper $adminRowMapper = new AuditLogAdminRowMapper(),
+    ) {
+    }
+
     public function findLatestNoteCorrections(string $noteId, int $limit = 10): array
     {
         $rows = DB::table('audit_logs')
@@ -69,39 +74,8 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
         /** @var LengthAwarePaginator<int, object> $paginator */
         $paginator = $query->paginate($safePerPage)->withQueryString();
 
-        return $paginator->through(function (object $row): array {
-            $context = json_decode((string) $row->context, true);
-
-            if (! is_array($context)) {
-                $context = [];
-            }
-
-            $contextJson = json_encode($context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-
-            return [
-                'id' => (int) $row->id,
-                'event' => (string) $row->event,
-                'reason' => $this->resolveReason($context),
-                'context' => $context,
-                'context_json' => is_string($contextJson) ? $contextJson : '{}',
-                'created_at' => (string) $row->created_at,
-            ];
-        });
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function resolveReason(array $context): string
-    {
-        foreach (['reason', 'alasan', 'void_reason', 'correction_reason', 'note', 'notes'] as $key) {
-            $value = $context[$key] ?? null;
-
-            if (is_scalar($value) && trim((string) $value) !== '') {
-                return (string) $value;
-            }
-        }
-
-        return '-';
+        return $paginator->through(
+            fn (object $row): array => $this->adminRowMapper->map($row),
+        );
     }
 }
