@@ -150,6 +150,18 @@ final class CustomerTransactionLoadSeeder extends Seeder
 
         DB::table('refund_component_allocations')
             ->where('customer_refund_id', 'like', 'seed-ref-load-%')
+            ->orWhere('customer_payment_id', 'like', 'seed-pay-load-%')
+            ->orWhereIn(
+                'customer_refund_id',
+                DB::table('customer_refunds')
+                    ->select('id')
+                    ->where('customer_payment_id', 'like', 'seed-pay-load-%')
+            )
+            ->delete();
+
+        DB::table('customer_refunds')
+            ->where('id', 'like', 'seed-ref-load-%')
+            ->orWhere('customer_payment_id', 'like', 'seed-pay-load-%')
             ->delete();
 
         DB::table('payment_component_allocations')
@@ -158,10 +170,6 @@ final class CustomerTransactionLoadSeeder extends Seeder
 
         DB::table('payment_allocations')
             ->where('customer_payment_id', 'like', 'seed-pay-load-%')
-            ->delete();
-
-        DB::table('customer_refunds')
-            ->where('id', 'like', 'seed-ref-load-%')
             ->delete();
 
         DB::table('customer_payments')

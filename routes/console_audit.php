@@ -92,10 +92,166 @@ Artisan::command('audit:seed-level {level}', function () use (
     }
 
     if ($level === '3') {
-        $this->warn('make 3 audit command is registered but NOT PROVEN yet.');
-        $this->warn('Run make 3 idempotency and finance audit before claiming level 3 pass.');
+        $window = \Database\Seeders\Support\SeedWindow::loadYear();
+        $density = \Database\Seeders\Support\SeedDensity::monster();
 
-        return 1;
+        $expectedInvoices = 0;
+        $expectedReceipts = 0;
+        $expectedPayments = 0;
+        $expectedFullPayments = 0;
+        $expectedPartialPayments = 0;
+        $expectedPendingProofs = 0;
+        $expectedUploadedProofs = 0;
+        $expectedInventoryMovements = 0;
+        $invoiceRunningNo = 1;
+
+        foreach ($window['days'] as $dayIndex => $day) {
+            $weekday = (int) $day->dayOfWeekIso;
+            $invoiceCount = in_array($weekday, [2, 4, 6], true)
+                ? (int) $density['procurement_invoices_spike_per_day']
+                : (int) $density['procurement_invoices_normal_per_day'];
+
+            if ((int) $day->day >= 26) {
+                $invoiceCount = (int) ceil($invoiceCount * ((int) $density['month_end_procurement_multiplier_percent']) / 100);
+            }
+
+            $invoiceCount = max(1, $invoiceCount);
+            $expectedInvoices += $invoiceCount;
+
+            for ($slot = 1; $slot <= $invoiceCount; $slot++) {
+                $statePattern = ($invoiceRunningNo - 1) % 6;
+                $lineCount = 4 + (($invoiceRunningNo + $slot + $dayIndex) % 5);
+
+                if (in_array($statePattern, [1, 2, 3, 4, 5], true)) {
+                    $expectedReceipts++;
+                    $expectedInventoryMovements += $lineCount;
+                }
+
+                if (in_array($statePattern, [2, 3, 4, 5], true)) {
+                    $expectedPayments++;
+
+                    if ($statePattern === 2) {
+                        $expectedPartialPayments++;
+                    } else {
+                        $expectedFullPayments++;
+                    }
+
+                    if (in_array($statePattern, [4, 5], true)) {
+                        $expectedUploadedProofs++;
+                    } else {
+                        $expectedPendingProofs++;
+                    }
+                }
+
+                $invoiceRunningNo++;
+            }
+        }
+
+        $expectedExpenses = count($window['days']) * (int) $density['expense_rows_per_day'];
+
+        $this->line('');
+        $this->line('== LEVEL 3 LOAD COUNTS ==');
+        $seedAuditPrintLine('window start', $window['start']->format('Y-m-d'));
+        $seedAuditPrintLine('window end', $window['end']->format('Y-m-d'));
+        $seedAuditPrintLine('window days', count($window['days']));
+
+        $loadInvoices = $seedAuditCount('supplier_invoices', static fn ($query) => $query->where('id', 'like', 'seed-load-si-%'));
+        $loadReceipts = $seedAuditCount('supplier_receipts', static fn ($query) => $query->where('id', 'like', 'seed-load-sr-%'));
+        $loadReceiptLines = $seedAuditCount('supplier_receipt_lines', static fn ($query) => $query->where('id', 'like', 'seed-load-sr-%'));
+        $loadPayments = $seedAuditCount('supplier_payments', static fn ($query) => $query->where('id', 'like', 'seed-load-sp-%'));
+        $loadInventoryMovements = $seedAuditCount('inventory_movements', static fn ($query) => $query->where('id', 'like', 'seed-load-im-%'));
+        $loadAuditLogs = $seedAuditCount('audit_logs', static fn ($query) => $query
+            ->where('event', 'supplier_receipt_created')
+            ->where('context', 'like', '%seed-load-sr-%')
+        );
+        $loadExpenses = $seedAuditCount('operational_expenses', static fn ($query) => $query->where('id', 'like', 'seed-exp-load-%'));
+
+        $loadFullPayments = $seedAuditCount('supplier_payments', static fn ($query) => $query
+            ->join('supplier_invoices', 'supplier_invoices.id', '=', 'supplier_payments.supplier_invoice_id')
+            ->where('supplier_payments.id', 'like', 'seed-load-sp-%')
+            ->whereColumn('supplier_payments.amount_rupiah', '=', 'supplier_invoices.grand_total_rupiah')
+        );
+        $loadPartialPayments = $seedAuditCount('supplier_payments', static fn ($query) => $query
+            ->join('supplier_invoices', 'supplier_invoices.id', '=', 'supplier_payments.supplier_invoice_id')
+            ->where('supplier_payments.id', 'like', 'seed-load-sp-%')
+            ->whereColumn('supplier_payments.amount_rupiah', '<', 'supplier_invoices.grand_total_rupiah')
+        );
+        $loadPendingProofs = $seedAuditCount('supplier_payments', static fn ($query) => $query
+            ->where('id', 'like', 'seed-load-sp-%')
+            ->where('proof_status', 'pending')
+        );
+        $loadUploadedProofs = $seedAuditCount('supplier_payments', static fn ($query) => $query
+            ->where('id', 'like', 'seed-load-sp-%')
+            ->where('proof_status', 'uploaded')
+        );
+
+        $seedAuditPrintLine('expected procurement invoices', $expectedInvoices);
+        $seedAuditPrintLine('load procurement invoices', $loadInvoices);
+        $seedAuditPrintLine('expected supplier receipts', $expectedReceipts);
+        $seedAuditPrintLine('load supplier receipts', $loadReceipts);
+        $seedAuditPrintLine('expected supplier receipt lines', $expectedInventoryMovements);
+        $seedAuditPrintLine('load supplier receipt lines', $loadReceiptLines);
+        $seedAuditPrintLine('expected supplier payments', $expectedPayments);
+        $seedAuditPrintLine('load supplier payments', $loadPayments);
+        $seedAuditPrintLine('expected supplier payments full', $expectedFullPayments);
+        $seedAuditPrintLine('load supplier payments full', $loadFullPayments);
+        $seedAuditPrintLine('expected supplier payments partial', $expectedPartialPayments);
+        $seedAuditPrintLine('load supplier payments partial', $loadPartialPayments);
+        $seedAuditPrintLine('expected supplier payments proof pending', $expectedPendingProofs);
+        $seedAuditPrintLine('load supplier payments proof pending', $loadPendingProofs);
+        $seedAuditPrintLine('expected supplier payments proof uploaded', $expectedUploadedProofs);
+        $seedAuditPrintLine('load supplier payments proof uploaded', $loadUploadedProofs);
+        $seedAuditPrintLine('expected inventory movements', $expectedInventoryMovements);
+        $seedAuditPrintLine('load inventory movements', $loadInventoryMovements);
+        $seedAuditPrintLine('load audit logs', $loadAuditLogs);
+        $seedAuditPrintLine('expected operational expenses load', $expectedExpenses);
+        $seedAuditPrintLine('load operational expenses', $loadExpenses);
+
+        $orphanLoadInvoiceLines = $seedAuditTableExists('supplier_invoice_lines')
+            ? DB::table('supplier_invoice_lines as lines')
+                ->leftJoin('supplier_invoices as invoices', 'invoices.id', '=', 'lines.supplier_invoice_id')
+                ->where('lines.supplier_invoice_id', 'like', 'seed-load-si-%')
+                ->whereNull('invoices.id')
+                ->count()
+            : 0;
+
+        $orphanLoadReceiptLines = $seedAuditTableExists('supplier_receipt_lines')
+            ? DB::table('supplier_receipt_lines as lines')
+                ->leftJoin('supplier_receipts as receipts', 'receipts.id', '=', 'lines.supplier_receipt_id')
+                ->where('lines.id', 'like', 'seed-load-sr-%')
+                ->whereNull('receipts.id')
+                ->count()
+            : 0;
+
+        $seedAuditPrintLine('orphan load supplier invoice lines', (int) $orphanLoadInvoiceLines);
+        $seedAuditPrintLine('orphan load supplier receipt lines', (int) $orphanLoadReceiptLines);
+
+        foreach ([
+            'load procurement invoices' => $loadInvoices === $expectedInvoices,
+            'load supplier receipts' => $loadReceipts === $expectedReceipts,
+            'load supplier receipt lines' => $loadReceiptLines === $expectedInventoryMovements,
+            'load supplier payments' => $loadPayments === $expectedPayments,
+            'load supplier payments full' => $loadFullPayments === $expectedFullPayments,
+            'load supplier payments partial' => $loadPartialPayments === $expectedPartialPayments,
+            'load supplier payments proof pending' => $loadPendingProofs === $expectedPendingProofs,
+            'load supplier payments proof uploaded' => $loadUploadedProofs === $expectedUploadedProofs,
+            'load inventory movements' => $loadInventoryMovements === $expectedInventoryMovements,
+            'load audit logs' => $loadAuditLogs === $expectedReceipts,
+            'load operational expenses' => $loadExpenses === $expectedExpenses,
+            'orphan load supplier invoice lines' => (int) $orphanLoadInvoiceLines === 0,
+            'orphan load supplier receipt lines' => (int) $orphanLoadReceiptLines === 0,
+        ] as $check => $passed) {
+            if (! $passed) {
+                $this->error('FAILED: ' . $check);
+                $failures++;
+            }
+        }
+
+        $this->line('');
+        $this->line('== RESULT ==');
+        $seedAuditPrintLine('failures', $failures);
+
+        return $failures === 0 ? 0 : 1;
     }
 
     $this->line('');
