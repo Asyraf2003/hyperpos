@@ -85,7 +85,7 @@
                     </small>
 
                     <div>
-                        {{ $logs->links() }}
+                        @include('layouts.partials.pagination', ['paginator' => $logs])
                     </div>
                 </div>
             </div>
