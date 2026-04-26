@@ -50,7 +50,7 @@ final class CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest 
                     [
                         'entry_mode' => 'service',
                         'description' => null,
-                        'part_source' => 'store_stock',
+                        'part_source' => 'none',
                         'service' => [
                             'name' => 'Servis Rem Revised',
                             'price_rupiah' => 50000,
@@ -188,7 +188,7 @@ final class CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest 
             WorkItem::STATUS_OPEN,
             350000
         );
-        $this->seedServiceDetailBase('wi-service-stock-old-1', 'Servis Rem Lama', 50000, 'store_stock');
+        $this->seedServiceDetailBase('wi-service-stock-old-1', 'Servis Rem Lama', 50000, 'none');
         $this->seedStoreStockLineBase('ssl-service-stock-old-1', 'wi-service-stock-old-1', 'product-1', 3, 300000);
 
         DB::table('product_inventory')->insert([
