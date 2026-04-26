@@ -98,3 +98,5 @@ Artisan::command(
         return 0;
     }
 )->purpose('Rebuild read-model projection untuk procurement invoices, supplier list, dan admin note history');
+
+require __DIR__ . '/console_audit.php';
