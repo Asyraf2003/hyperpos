@@ -1,0 +1,18 @@
+{
+  "name": "AsyrafCloud Bengkel",
+  "short_name": "Bengkel",
+  "description": "Aplikasi operasional bengkel dengan reminder nota jatuh tempo.",
+  "start_url": "/admin/due-note-reminders",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#435ebe",
+  "icons": [
+    {
+      "src": "/assets/compiled/svg/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

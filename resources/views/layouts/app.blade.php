@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'AsyrafCloud')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
 
     <link rel="shortcut icon" href="{{ asset('assets/compiled/svg/favicon.svg') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('assets/compiled/css/app.css') }}?v={{ filemtime(public_path('assets/compiled/css/app.css')) }}">
@@ -58,6 +60,16 @@
     <script src="{{ asset('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js') }}?v={{ filemtime(public_path('assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js')) }}"></script>
     <script src="{{ asset('assets/compiled/js/app.js') }}?v={{ filemtime(public_path('assets/compiled/js/app.js')) }}"></script>
     <script src="{{ asset('assets/static/js/shared/page-freshness.js') }}?v={{ filemtime(public_path('assets/static/js/shared/page-freshness.js')) }}"></script>
+    <script id="push-notification-config" type="application/json">@json([
+        'serviceWorkerUrl' => asset('service-worker.js'),
+        'serviceWorkerScope' => '/',
+        'subscribeUrl' => route('push-notifications.subscriptions.store'),
+        'unsubscribeUrl' => route('push-notifications.subscriptions.destroy'),
+        'vapidPublicKey' => config('services.webpush.vapid_public_key', ''),
+        'defaultIcon' => asset('assets/compiled/svg/favicon.svg'),
+        'defaultUrl' => route('admin.due-note-reminders.index'),
+    ])</script>
+    <script src="{{ asset('assets/static/js/shared/push-notifications.js') }}?v={{ filemtime(public_path('assets/static/js/shared/push-notifications.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

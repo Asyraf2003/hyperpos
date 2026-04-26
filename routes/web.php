@@ -6,6 +6,7 @@ require __DIR__.'/web/health.php';
 require __DIR__.'/web/auth.php';
 require __DIR__.'/web/dashboard.php';
 require __DIR__.'/web/identity_access.php';
+require __DIR__.'/web/push_notifications.php';
 
 require __DIR__.'/web/admin_products.php';
 require __DIR__.'/web/admin_suppliers.php';
