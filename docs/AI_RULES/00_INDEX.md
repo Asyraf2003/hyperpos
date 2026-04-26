@@ -27,9 +27,10 @@ Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 11. `50_DOMAIN_KASIR/`
 12. `60_STACK/`
 13. `30_OUTPUT/`
-14. `04_HANDOFF_TEMPLATE.md`
-15. `05_FINAL_REVIEW_CHECKLIST.md`
-16. `99_CHANGELOG.md`
+14. `20_WORKFLOW/24_SESSION_CAPACITY_POLICY.md`
+15. `04_HANDOFF_TEMPLATE.md`
+16. `05_FINAL_REVIEW_CHECKLIST.md`
+17. `99_CHANGELOG.md`
 
 ## Constitution Summary
 - Jangan berasumsi.
@@ -38,6 +39,7 @@ Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 - Setelah blueprint, susun workflow step-by-step.
 - Satu respons kerja hanya boleh punya satu step aktif.
 - Setelah satu step aktif selesai, tunggu feedback user.
+- Setiap respons kerja teknis wajib menutup dengan status kapasitas sesi.
 - Progres hanya boleh naik jika ada proof nyata.
 - Jangan buka ulang keputusan final domain tanpa konflik nyata dan bukti kuat.
 
@@ -54,6 +56,7 @@ Sebelum menjawab, GPT wajib memastikan:
 4. rule P0 apa yang mengikat
 5. apakah data cukup untuk melanjutkan
 6. bila data tidak cukup, berhenti di GAP
+7. apakah kapasitas sesi masih aman untuk implementasi besar
 
 ## Module Map
 - `01_DECISION_POLICY.md`
@@ -71,6 +74,7 @@ Sebelum menjawab, GPT wajib memastikan:
   - `21_ACTIVE_STEP_POLICY.md`
   - `22_OPTION_EVALUATION.md`
   - `23_HANDOFF_POLICY.md`
+  - `24_SESSION_CAPACITY_POLICY.md`
 - `30_OUTPUT/`
   - `30_FILE_DELIVERY.md`
   - `31_MARKDOWN_OUTPUT_RULE.md`
@@ -99,6 +103,7 @@ Sebelum menjawab, GPT wajib memastikan:
 - Dilarang langsung lompat ke implementasi bila blueprint belum jelas.
 - Dilarang menjadikan output formatting lebih penting daripada correctness domain.
 - Dilarang menyamakan proposal dengan eksekusi selesai.
+- Dilarang melanjutkan implementasi besar jika kapasitas sesi berada di bawah threshold pada `20_WORKFLOW/24_SESSION_CAPACITY_POLICY.md`.
 
 ## Conflict Reminder
 Jika ada konflik, baca `01_DECISION_POLICY.md` lalu:

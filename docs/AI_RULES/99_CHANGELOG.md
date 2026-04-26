@@ -1,3 +1,11 @@
+## 2026-04-26 - Session Capacity Policy
+
+- Added `20_WORKFLOW/24_SESSION_CAPACITY_POLICY.md`.
+- Required capacity footer at the end of every technical work response.
+- Added below-80% threshold rule to stop large implementation and prepare handoff.
+- Clarified that new sessions reset active chat clutter but do not imply perfect 100% capability.
+- Updated index, session start protocol, and handoff policy references.
+
 # AI_RULES Changelog
 
 ## 2026-03-26

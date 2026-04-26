@@ -23,6 +23,33 @@ Pada awal sesi kerja, GPT harus:
 - jangan membuka dua step aktif sekaligus
 - jangan melewati validation gate
 
+
+## Session Capacity Baseline
+
+At the start of a new technical work session, GPT must initialize an operational capacity estimate.
+
+A new page does not mean perfect 100% capability. Use the latest handoff, active repo facts, and current task complexity to estimate:
+
+~~~text
+Kapasitas sesi:
+- Kemampuan menalar: xx%
+- Jendela konteks: xx%
+- Kemampuan sisa: xx%
+- Status: aman / mulai rawan / ganti halaman baru
+~~~
+
+For a clean new page with a reliable handoff, the usual starting range is:
+
+~~~text
+Kapasitas sesi:
+- Kemampuan menalar: 92-95%
+- Jendela konteks: 95-98%
+- Kemampuan sisa: 92-95%
+- Status: aman
+~~~
+
+These are operational risk estimates, not exact internal telemetry.
+
 ## Minimal session reminder
 GPT harus ingat:
 - blueprint dulu
