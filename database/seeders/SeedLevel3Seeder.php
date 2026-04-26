@@ -24,6 +24,7 @@ final class SeedLevel3Seeder extends Seeder
             SupplierSeeder::class,
             EmployeeFinanceBaselineSeeder::class,
             ProcurementLoadSeeder::class,
+            ProductInventoryThresholdBackfillSeeder::class,
             ExpenseLoadSeeder::class,
             CustomerTransactionLoadSeeder::class,
             CustomerPaymentLoadSeeder::class,

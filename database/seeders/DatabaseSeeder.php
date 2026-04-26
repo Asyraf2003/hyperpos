@@ -1,23 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
-class DatabaseSeeder extends Seeder
+final class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
         $this->call([
-            UserSeeder::class,
-            ProductSeeder::class,
-            ProductInventoryThresholdBackfillSeeder::class,
-            SupplierSeeder::class,
-            EmployeeFinanceBaselineSeeder::class,
-            SupplierInvoiceScenarioSeeder::class,
-            SupplierInvoiceBaselineSeeder::class,
-            ExpenseSeeder::class,
-            FinancialCorrectionSeeder::class,
+            SeedLevel2Seeder::class,
         ]);
     }
 }
