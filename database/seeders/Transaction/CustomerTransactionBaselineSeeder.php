@@ -212,6 +212,22 @@ final class CustomerTransactionBaselineSeeder extends Seeder
             ->whereIn('note_id', $noteIds)
             ->delete();
 
+        $mutationEventIds = DB::table('note_mutation_events')
+            ->whereIn('note_id', $noteIds)
+            ->pluck('id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+
+        if ($mutationEventIds !== []) {
+            DB::table('note_mutation_snapshots')
+                ->whereIn('note_mutation_event_id', $mutationEventIds)
+                ->delete();
+
+            DB::table('note_mutation_events')
+                ->whereIn('id', $mutationEventIds)
+                ->delete();
+        }
+
         DB::table('notes')
             ->whereIn('id', $noteIds)
             ->delete();
