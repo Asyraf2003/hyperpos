@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\Out\PushNotification;
 
 use App\Application\PushNotification\DTO\PushNotificationPayload;
+use App\Application\PushNotification\DTO\PushNotificationSendResult;
 use App\Application\PushNotification\DTO\StoredPushSubscription;
 use App\Ports\Out\PushNotification\PushNotificationSenderPort;
 use InvalidArgumentException;
@@ -14,8 +15,10 @@ use RuntimeException;
 
 final class WebPushNotificationSenderAdapter implements PushNotificationSenderPort
 {
-    public function send(StoredPushSubscription $subscription, PushNotificationPayload $payload): bool
-    {
+    public function send(
+        StoredPushSubscription $subscription,
+        PushNotificationPayload $payload,
+    ): PushNotificationSendResult {
         $webPush = new WebPush([
             'VAPID' => [
                 'subject' => $this->requiredConfig('services.webpush.vapid_subject'),
@@ -40,8 +43,20 @@ final class WebPushNotificationSenderAdapter implements PushNotificationSenderPo
         }
 
         $report = $webPush->sendOneNotification($webSubscription, $encodedPayload);
+        $response = $report->getResponse();
+        $status = $response === null ? null : $response->getStatusCode();
+        $responseReason = $response === null ? null : $response->getReasonPhrase();
 
-        return $report->isSuccess();
+        if ($report->isSuccess()) {
+            return PushNotificationSendResult::success($status, $responseReason);
+        }
+
+        return PushNotificationSendResult::failed(
+            subscriptionExpired: $report->isSubscriptionExpired(),
+            responseStatus: $status,
+            responseReason: $responseReason,
+            reason: $report->getReason(),
+        );
     }
 
     private function requiredConfig(string $key): string

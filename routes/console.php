@@ -119,6 +119,7 @@ Artisan::command(
         $this->info('Due reminder notes: '.$summary->dueNoteCount);
         $this->info('Push subscriptions: '.$summary->subscriptionCount);
         $this->info('Push sent: '.$summary->sentCount);
+        $this->info('Push expired: '.$summary->expiredCount);
         $this->info('Push failed: '.$summary->failedCount);
 
         return $summary->failedCount > 0 ? 1 : 0;

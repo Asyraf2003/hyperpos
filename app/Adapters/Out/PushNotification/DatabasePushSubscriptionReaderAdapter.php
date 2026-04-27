@@ -13,6 +13,7 @@ final class DatabasePushSubscriptionReaderAdapter implements PushSubscriptionRea
     public function findActive(int $limit = 500): array
     {
         $rows = DB::table('push_subscriptions')
+            ->whereNull('expired_at')
             ->orderByDesc('last_seen_at')
             ->orderBy('id')
             ->limit(max(1, $limit))

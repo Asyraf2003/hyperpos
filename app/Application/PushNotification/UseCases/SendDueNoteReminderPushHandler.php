@@ -10,12 +10,14 @@ use App\Application\PushNotification\DTO\DueNoteReminderPushSendSummary;
 use App\Application\PushNotification\DTO\PushNotificationPayload;
 use App\Ports\Out\PushNotification\PushNotificationSenderPort;
 use App\Ports\Out\PushNotification\PushSubscriptionReaderPort;
+use App\Ports\Out\PushNotification\PushSubscriptionWriterPort;
 
 final class SendDueNoteReminderPushHandler
 {
     public function __construct(
         private readonly GetDueNoteRemindersHandler $reminders,
         private readonly PushSubscriptionReaderPort $subscriptions,
+        private readonly PushSubscriptionWriterPort $subscriptionWriter,
         private readonly PushNotificationSenderPort $sender,
     ) {
     }
@@ -28,17 +30,31 @@ final class SendDueNoteReminderPushHandler
         $reminders = $this->reminders->handle($today, $noteLimit);
 
         if ($reminders === []) {
-            return new DueNoteReminderPushSendSummary(0, 0, 0, 0);
+            return new DueNoteReminderPushSendSummary(0, 0, 0, 0, 0);
         }
 
         $subscriptions = $this->subscriptions->findActive($subscriptionLimit);
         $payload = $this->payload($today, $reminders);
         $sent = 0;
         $failed = 0;
+        $expired = 0;
 
         foreach ($subscriptions as $subscription) {
-            if ($this->sender->send($subscription, $payload)) {
+            $result = $this->sender->send($subscription, $payload);
+
+            if ($result->success) {
                 $sent++;
+
+                continue;
+            }
+
+            if ($result->subscriptionExpired) {
+                $expired++;
+                $this->subscriptionWriter->markExpiredByEndpoint(
+                    $subscription->endpoint,
+                    $result->responseStatus,
+                    $result->reason,
+                );
 
                 continue;
             }
@@ -51,6 +67,7 @@ final class SendDueNoteReminderPushHandler
             subscriptionCount: count($subscriptions),
             sentCount: $sent,
             failedCount: $failed,
+            expiredCount: $expired,
         );
     }
 

@@ -29,6 +29,9 @@ final class DatabasePushSubscriptionWriterAdapter implements PushSubscriptionWri
                 'content_encoding' => $contentEncoding,
                 'user_agent' => $subscription->userAgent,
                 'last_seen_at' => $now,
+                'expired_at' => null,
+                'last_failure_status' => null,
+                'last_failure_reason' => null,
                 'updated_at' => $now,
                 'created_at' => DB::raw('COALESCE(created_at, '.$this->quotedNow($now).')'),
             ],
@@ -45,6 +48,24 @@ final class DatabasePushSubscriptionWriterAdapter implements PushSubscriptionWri
             ->delete();
     }
 
+    public function markExpiredByEndpoint(
+        string $endpoint,
+        ?int $failureStatus,
+        ?string $failureReason,
+    ): void {
+        $normalizedEndpoint = $this->required($endpoint, 'Endpoint push wajib diisi.');
+        $now = now()->format('Y-m-d H:i:s');
+
+        DB::table('push_subscriptions')
+            ->where('endpoint_hash', hash('sha256', $normalizedEndpoint))
+            ->update([
+                'expired_at' => $now,
+                'last_failure_status' => $failureStatus,
+                'last_failure_reason' => $this->shortReason($failureReason),
+                'updated_at' => $now,
+            ]);
+    }
+
     private function required(string $value, string $message): string
     {
         $trimmed = trim($value);
@@ -59,5 +80,20 @@ final class DatabasePushSubscriptionWriterAdapter implements PushSubscriptionWri
     private function quotedNow(string $now): string
     {
         return DB::getPdo()->quote($now);
+    }
+
+    private function shortReason(?string $reason): ?string
+    {
+        if ($reason === null) {
+            return null;
+        }
+
+        $trimmed = trim($reason);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        return substr($trimmed, 0, 255);
     }
 }

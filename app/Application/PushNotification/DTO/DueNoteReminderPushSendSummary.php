@@ -11,6 +11,7 @@ final readonly class DueNoteReminderPushSendSummary
         public int $subscriptionCount,
         public int $sentCount,
         public int $failedCount,
+        public int $expiredCount,
     ) {
     }
 }
