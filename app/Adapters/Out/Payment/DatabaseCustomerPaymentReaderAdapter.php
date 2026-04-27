@@ -33,6 +33,7 @@ final class DatabaseCustomerPaymentReaderAdapter implements CustomerPaymentReade
             (string) $row->id,
             Money::fromInt((int) $row->amount_rupiah),
             $this->parseDate((string) $row->paid_at),
+            (string) ($row->payment_method ?? CustomerPayment::METHOD_UNKNOWN),
         );
     }
 

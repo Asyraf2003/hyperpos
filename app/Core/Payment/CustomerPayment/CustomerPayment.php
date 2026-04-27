@@ -10,10 +10,15 @@ use DateTimeImmutable;
 
 final class CustomerPayment
 {
+    public const METHOD_CASH = 'cash';
+    public const METHOD_TRANSFER = 'tf';
+    public const METHOD_UNKNOWN = 'unknown';
+
     private function __construct(
         private string $id,
         private Money $amountRupiah,
         private DateTimeImmutable $paidAt,
+        private string $paymentMethod,
     ) {
     }
 
@@ -21,13 +26,16 @@ final class CustomerPayment
         string $id,
         Money $amountRupiah,
         DateTimeImmutable $paidAt,
+        string $paymentMethod = self::METHOD_UNKNOWN,
     ): self {
-        self::assertValid($id, $amountRupiah);
+        $normalizedPaymentMethod = self::normalizePaymentMethod($paymentMethod);
+        self::assertValid($id, $amountRupiah, $normalizedPaymentMethod);
 
         return new self(
             trim($id),
             $amountRupiah,
             $paidAt,
+            $normalizedPaymentMethod,
         );
     }
 
@@ -35,13 +43,16 @@ final class CustomerPayment
         string $id,
         Money $amountRupiah,
         DateTimeImmutable $paidAt,
+        string $paymentMethod = self::METHOD_UNKNOWN,
     ): self {
-        self::assertValid($id, $amountRupiah);
+        $normalizedPaymentMethod = self::normalizePaymentMethod($paymentMethod);
+        self::assertValid($id, $amountRupiah, $normalizedPaymentMethod);
 
         return new self(
             trim($id),
             $amountRupiah,
             $paidAt,
+            $normalizedPaymentMethod,
         );
     }
 
@@ -60,9 +71,15 @@ final class CustomerPayment
         return $this->paidAt;
     }
 
+    public function paymentMethod(): string
+    {
+        return $this->paymentMethod;
+    }
+
     private static function assertValid(
         string $id,
         Money $amountRupiah,
+        string $paymentMethod,
     ): void {
         if (trim($id) === '') {
             throw new DomainException('Customer payment id wajib ada.');
@@ -71,5 +88,32 @@ final class CustomerPayment
         if ($amountRupiah->greaterThan(Money::zero()) === false) {
             throw new DomainException('Amount rupiah pada customer payment harus lebih besar dari nol.');
         }
+
+        if (! in_array($paymentMethod, self::allowedPaymentMethods(), true)) {
+            throw new DomainException('Metode pembayaran customer payment tidak valid.');
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function allowedPaymentMethods(): array
+    {
+        return [
+            self::METHOD_CASH,
+            self::METHOD_TRANSFER,
+            self::METHOD_UNKNOWN,
+        ];
+    }
+
+    private static function normalizePaymentMethod(string $paymentMethod): string
+    {
+        $normalized = trim($paymentMethod);
+
+        if ($normalized === 'transfer') {
+            return self::METHOD_TRANSFER;
+        }
+
+        return $normalized === '' ? self::METHOD_UNKNOWN : $normalized;
     }
 }

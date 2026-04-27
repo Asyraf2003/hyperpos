@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::table('customer_payments', function (Blueprint $table): void {
             $table->string('payment_method', 20)
-                ->default('cash')
+                ->default('unknown')
                 ->after('amount_rupiah');
 
             $table->index(['payment_method', 'paid_at']);
