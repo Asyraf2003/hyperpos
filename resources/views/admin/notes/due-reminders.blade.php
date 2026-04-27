@@ -49,10 +49,6 @@
         </div>
 
         <div class="card-body">
-            <div class="alert alert-light-secondary mb-3">
-                Halaman ini hanya untuk membaca reminder. Tidak ada aksi edit atau hapus dari daftar ini.
-            </div>
-
             <div class="table-responsive">
                 <table class="table table-lg">
                     <thead>
