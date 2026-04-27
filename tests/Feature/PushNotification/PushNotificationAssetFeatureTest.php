@@ -15,7 +15,7 @@ final class PushNotificationAssetFeatureTest extends TestCase
     {
         $this->loginAsAuthorizedAdmin();
 
-        $response = $this->get(route('admin.due-note-reminders.index'));
+        $response = $this->get(route('admin.notes.index'));
 
         $response->assertOk();
         $response->assertSee('name="csrf-token"', false);

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Adapters\In\Http\Controllers\Admin\Note\DueNoteReminderPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteDetailPageController as AdminNoteDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryPageController as AdminNoteHistoryPageController;
 use App\Adapters\In\Http\Controllers\Admin\Note\NoteHistoryTableDataController as AdminNoteHistoryTableDataController;
@@ -35,9 +34,6 @@ Route::middleware(['web', 'transaction.entry'])->group(function (): void {
     Route::post('/notes/workspace/store', StoreTransactionWorkspaceController::class)->name('notes.workspace.store');
 });
 
-Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
-    ->get('/admin/due-note-reminders', DueNoteReminderPageController::class)
-    ->name('admin.due-note-reminders.index');
 
 Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
     ->prefix('admin/notes')

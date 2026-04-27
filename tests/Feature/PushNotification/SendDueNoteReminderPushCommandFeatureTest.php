@@ -40,7 +40,7 @@ final class SendDueNoteReminderPushCommandFeatureTest extends TestCase
         $this->assertSame('Reminder Jatuh Tempo Nota', $sender->payloads[0]->title);
         $this->assertStringContainsString('Ada 1 nota jatuh tempo/perlu dicek.', $sender->payloads[0]->body);
         $this->assertStringContainsString('Rp 150.000', $sender->payloads[0]->body);
-        $this->assertSame('/admin/due-note-reminders?today=2026-04-25', $sender->payloads[0]->url);
+        $this->assertSame('/admin/notes', $sender->payloads[0]->url);
         $this->assertSame('due-note-reminder-2026-04-25', $sender->payloads[0]->tag);
     }
 

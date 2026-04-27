@@ -69,7 +69,7 @@
         data-unsubscribe-url="{{ route('push-notifications.subscriptions.destroy') }}"
         data-vapid-public-key="{{ config('services.webpush.vapid_public_key', '') }}"
         data-default-icon="{{ asset('assets/compiled/svg/favicon.svg') }}"
-        data-default-url="{{ route('admin.due-note-reminders.index') }}"
+        data-default-url="{{ route('admin.notes.index') }}"
     ></script>
     <script src="{{ asset('assets/static/js/shared/push-notifications.js') }}?v={{ filemtime(public_path('assets/static/js/shared/push-notifications.js')) }}"></script>
     @stack('scripts')

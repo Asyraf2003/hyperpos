@@ -18,7 +18,7 @@ final class PushNotificationRenderedConfigSafetyFeatureTest extends TestCase
 
         $this->loginAsAuthorizedAdmin();
 
-        $response = $this->get(route('admin.due-note-reminders.index'));
+        $response = $this->get(route('admin.notes.index'));
 
         $response->assertOk();
         $response->assertSee('push-notification-config', false);

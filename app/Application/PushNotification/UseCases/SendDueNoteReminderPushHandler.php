@@ -98,7 +98,7 @@ final class SendDueNoteReminderPushHandler
             body: $body,
             icon: '/assets/compiled/svg/favicon.svg',
             badge: '/assets/compiled/svg/favicon.svg',
-            url: '/admin/due-note-reminders?today='.rawurlencode($today),
+            url: '/admin/notes',
             tag: 'due-note-reminder-'.$today,
         );
     }
