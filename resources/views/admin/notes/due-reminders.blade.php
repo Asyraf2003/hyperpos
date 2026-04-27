@@ -30,6 +30,9 @@
                         >
                             Aktifkan Notifikasi
                         </button>
+                        <p class="text-muted small mb-0">
+                            Tidak ada aksi edit atau hapus
+                        </p>
                         <button
                             type="button"
                             class="btn btn-sm btn-outline-secondary"
