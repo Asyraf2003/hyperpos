@@ -59,6 +59,10 @@ final class AdminDueNoteReminderPageFeatureTest extends TestCase
         $response->assertSee('0 hari');
         $response->assertSee(route('admin.notes.show', ['noteId' => 'note-due-1']), false);
         $response->assertSee('Tidak ada aksi edit atau hapus', false);
+        $response->assertSee('Aktifkan Notifikasi', false);
+        $response->assertSee('Matikan Notifikasi', false);
+        $response->assertSee('data-push-enable-button', false);
+        $response->assertSee('data-push-disable-button', false);
         $response->assertDontSee('btn-danger', false);
     }
 

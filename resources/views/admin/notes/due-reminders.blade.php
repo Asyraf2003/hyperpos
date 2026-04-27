@@ -22,6 +22,28 @@
                     <div class="small text-muted mt-1">
                         Maksimal 100 nota
                     </div>
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-xl-end mt-2">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            data-push-enable-button
+                        >
+                            Aktifkan Notifikasi
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-secondary"
+                            data-push-disable-button
+                        >
+                            Matikan Notifikasi
+                        </button>
+                    </div>
+                    <div
+                        class="small text-muted mt-2"
+                        data-push-status
+                    >
+                        Notifikasi belum dicek.
+                    </div>
                 </div>
             </div>
         </div>
@@ -87,3 +109,72 @@
     </div>
 </section>
 @endsection
+
+
+@push('scripts')
+<script>
+    (() => {
+        const enableButton = document.querySelector('[data-push-enable-button]');
+        const disableButton = document.querySelector('[data-push-disable-button]');
+        const statusNode = document.querySelector('[data-push-status]');
+
+        const setStatus = (message) => {
+            if (statusNode) {
+                statusNode.textContent = message;
+            }
+        };
+
+        if (enableButton) {
+            enableButton.addEventListener('click', async () => {
+                if (!window.AppPushNotifications) {
+                    setStatus('Browser belum memuat modul notifikasi.');
+
+                    return;
+                }
+
+                setStatus('Meminta izin notifikasi...');
+
+                try {
+                    const result = await window.AppPushNotifications.enable();
+
+                    if (result.enabled) {
+                        setStatus('Notifikasi aktif untuk browser ini.');
+
+                        return;
+                    }
+
+                    setStatus(`Notifikasi gagal aktif: ${result.reason || 'unknown'}`);
+                } catch (error) {
+                    setStatus('Notifikasi gagal aktif. Cek koneksi dan izin browser.');
+                }
+            });
+        }
+
+        if (disableButton) {
+            disableButton.addEventListener('click', async () => {
+                if (!window.AppPushNotifications) {
+                    setStatus('Browser belum memuat modul notifikasi.');
+
+                    return;
+                }
+
+                setStatus('Mematikan notifikasi...');
+
+                try {
+                    const result = await window.AppPushNotifications.disable();
+
+                    if (result.deleted) {
+                        setStatus('Notifikasi dimatikan untuk browser ini.');
+
+                        return;
+                    }
+
+                    setStatus(`Notifikasi gagal dimatikan: ${result.reason || 'unknown'}`);
+                } catch (error) {
+                    setStatus('Notifikasi gagal dimatikan. Cek koneksi dan izin browser.');
+                }
+            });
+        }
+    })();
+</script>
+@endpush
