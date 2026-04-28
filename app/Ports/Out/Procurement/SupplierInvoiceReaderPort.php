@@ -9,4 +9,6 @@ use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
 interface SupplierInvoiceReaderPort
 {
     public function getById(string $supplierInvoiceId): ?SupplierInvoice;
+
+    public function getByIdForUpdate(string $supplierInvoiceId): ?SupplierInvoice;
 }

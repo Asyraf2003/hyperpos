@@ -22,50 +22,51 @@ final class VoidSupplierInvoiceHandler
     ): Result {
         $normalizedInvoiceId = trim($supplierInvoiceId);
 
-        $invoice = DB::table('supplier_invoices')
-            ->where('id', $normalizedInvoiceId)
-            ->first([
-                'id',
-                'voided_at',
-            ]);
+        return DB::transaction(function () use ($normalizedInvoiceId, $voidReason, $performedByActorId): Result {
+            $invoice = DB::table('supplier_invoices')
+                ->where('id', $normalizedInvoiceId)
+                ->lockForUpdate()
+                ->first([
+                    'id',
+                    'voided_at',
+                ]);
 
-        if ($invoice === null) {
-            return Result::failure(
-                'Nota supplier tidak ditemukan.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_NOT_FOUND']]
-            );
-        }
+            if ($invoice === null) {
+                return Result::failure(
+                    'Nota supplier tidak ditemukan.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_NOT_FOUND']]
+                );
+            }
 
-        if ($invoice->voided_at !== null) {
-            return Result::failure(
-                'Nota supplier ini sudah dibatalkan.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_ALREADY_VOIDED']]
-            );
-        }
+            if ($invoice->voided_at !== null) {
+                return Result::failure(
+                    'Nota supplier ini sudah dibatalkan.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_ALREADY_VOIDED']]
+                );
+            }
 
-        $receiptExists = DB::table('supplier_receipts')
-            ->where('supplier_invoice_id', $normalizedInvoiceId)
-            ->exists();
+            $receiptExists = DB::table('supplier_receipts')
+                ->where('supplier_invoice_id', $normalizedInvoiceId)
+                ->exists();
 
-        if ($receiptExists) {
-            return Result::failure(
-                'Nota supplier tidak bisa dibatalkan karena receipt sudah tercatat.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_VOID_RECEIPT_EXISTS']]
-            );
-        }
+            if ($receiptExists) {
+                return Result::failure(
+                    'Nota supplier tidak bisa dibatalkan karena receipt sudah tercatat.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_VOID_RECEIPT_EXISTS']]
+                );
+            }
 
-        $paymentExists = DB::table('supplier_payments')
-            ->where('supplier_invoice_id', $normalizedInvoiceId)
-            ->exists();
+            $paymentExists = DB::table('supplier_payments')
+                ->where('supplier_invoice_id', $normalizedInvoiceId)
+                ->exists();
 
-        if ($paymentExists) {
-            return Result::failure(
-                'Nota supplier tidak bisa dibatalkan karena pembayaran sudah tercatat.',
-                ['supplier_invoice' => ['SUPPLIER_INVOICE_VOID_PAYMENT_EXISTS']]
-            );
-        }
+            if ($paymentExists) {
+                return Result::failure(
+                    'Nota supplier tidak bisa dibatalkan karena pembayaran sudah tercatat.',
+                    ['supplier_invoice' => ['SUPPLIER_INVOICE_VOID_PAYMENT_EXISTS']]
+                );
+            }
 
-        DB::transaction(function () use ($normalizedInvoiceId, $voidReason, $performedByActorId): void {
             DB::table('supplier_invoices')
                 ->where('id', $normalizedInvoiceId)
                 ->update([
@@ -86,11 +87,11 @@ final class VoidSupplierInvoiceHandler
             }
 
             $this->projection->syncInvoice($normalizedInvoiceId);
-        });
 
-        return Result::success(
-            ['supplier_invoice_id' => $normalizedInvoiceId],
-            'Nota supplier berhasil dibatalkan.'
-        );
+            return Result::success(
+                ['supplier_invoice_id' => $normalizedInvoiceId],
+                'Nota supplier berhasil dibatalkan.'
+            );
+        });
     }
 }

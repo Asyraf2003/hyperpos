@@ -15,7 +15,17 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
 {
     public function getById(string $supplierInvoiceId): ?SupplierInvoice
     {
-        $invoiceRow = DB::table('supplier_invoices')
+        return $this->fetch($supplierInvoiceId, false);
+    }
+
+    public function getByIdForUpdate(string $supplierInvoiceId): ?SupplierInvoice
+    {
+        return $this->fetch($supplierInvoiceId, true);
+    }
+
+    private function fetch(string $supplierInvoiceId, bool $lock): ?SupplierInvoice
+    {
+        $query = DB::table('supplier_invoices')
             ->select([
                 'id',
                 'supplier_id',
@@ -28,8 +38,13 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
                 'tanggal_pengiriman',
                 'jatuh_tempo',
             ])
-            ->where('id', $supplierInvoiceId)
-            ->first();
+            ->where('id', $supplierInvoiceId);
+
+        if ($lock) {
+            $query = $query->lockForUpdate();
+        }
+
+        $invoiceRow = $query->first();
 
         if ($invoiceRow === null) {
             return null;
