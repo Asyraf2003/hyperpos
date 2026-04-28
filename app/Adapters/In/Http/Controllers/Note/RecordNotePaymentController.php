@@ -37,8 +37,12 @@ final class RecordNotePaymentController extends Controller
         }
 
         $amount = (int) ($amountResult->data()['amount_rupiah'] ?? 0);
+        $paymentMethod = (string) ($data['payment_method'] ?? 'unknown');
+        $amountReceived = $paymentMethod === 'cash'
+            ? (int) ($data['amount_received'] ?? 0)
+            : null;
 
-        if (($data['payment_method'] ?? '') === 'cash' && (int) ($data['amount_received'] ?? 0) < $amount) {
+        if ($paymentMethod === 'cash' && (int) ($data['amount_received'] ?? 0) < $amount) {
             return back()->withErrors(['payment' => 'Uang masuk cash tidak boleh kurang dari total yang dibayar.'])->withInput();
         }
 
@@ -47,6 +51,8 @@ final class RecordNotePaymentController extends Controller
             $amount,
             (string) $data['paid_at'],
             $selectedRowIds,
+            $paymentMethod,
+            $amountReceived,
         );
 
         if ($result->isFailure()) {
