@@ -7,6 +7,7 @@ namespace App\Application\Payment\Services;
 use App\Application\Note\Services\AutoCloseNoteWhenFullyPaid;
 use App\Application\Payment\DTO\RecordedNotePayment;
 use App\Core\Payment\CustomerPayment\CustomerPayment;
+use App\Core\Payment\CustomerPayment\CustomerPaymentCashDetail;
 use App\Core\Payment\Policies\PaymentAllocationPolicy;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
@@ -34,8 +35,14 @@ final class RecordAndAllocateNotePaymentOperation
     /**
      * @param list<string> $selectedRowIds
      */
-    public function execute(string $noteId, int $amountRupiah, string $paidAt, array $selectedRowIds = []): RecordedNotePayment
-    {
+    public function execute(
+        string $noteId,
+        int $amountRupiah,
+        string $paidAt,
+        array $selectedRowIds = [],
+        string $paymentMethod = CustomerPayment::METHOD_UNKNOWN,
+        ?int $amountReceivedRupiah = null,
+    ): RecordedNotePayment {
         $note = $this->notes->getById(trim($noteId))
             ?? throw new DomainException('Target payment allocation tidak ditemukan.');
 
@@ -47,7 +54,10 @@ final class RecordAndAllocateNotePaymentOperation
                 $paidAt,
                 'Paid at pada customer payment wajib berupa tanggal yang valid dengan format Y-m-d.'
             ),
+            $paymentMethod,
         );
+
+        $cashDetail = $this->cashDetailFor($payment, $amount, $amountReceivedRupiah);
 
         $this->policy->assertAllocatable(
             $amount,
@@ -63,10 +73,30 @@ final class RecordAndAllocateNotePaymentOperation
 
         $allocations = $this->allocator->allocate($payment->id(), $note->id(), $amount, $components);
 
-        $this->payments->create($payment);
+        $this->payments->create($payment, $cashDetail);
         $this->allocationWriter->createMany($allocations);
         $this->autoClose->closeIfEligible($note, $payment->id());
 
         return new RecordedNotePayment($payment, count($allocations));
+    }
+
+    private function cashDetailFor(
+        CustomerPayment $payment,
+        Money $amount,
+        ?int $amountReceivedRupiah,
+    ): ?CustomerPaymentCashDetail {
+        if ($payment->paymentMethod() !== CustomerPayment::METHOD_CASH) {
+            return null;
+        }
+
+        if ($amountReceivedRupiah === null) {
+            throw new DomainException('Uang masuk wajib diisi untuk pembayaran cash.');
+        }
+
+        return CustomerPaymentCashDetail::create(
+            $payment->id(),
+            $amount,
+            Money::fromInt($amountReceivedRupiah),
+        );
     }
 }

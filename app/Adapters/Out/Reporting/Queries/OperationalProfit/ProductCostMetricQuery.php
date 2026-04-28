@@ -31,6 +31,6 @@ final class ProductCostMetricQuery
             ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
             ->sum('total_cost_rupiah') ?? 0);
 
-        return max($issued - $returned, 0);
+        return $issued - $returned;
     }
 }

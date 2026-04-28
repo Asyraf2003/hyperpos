@@ -39,7 +39,7 @@ final class AutoReverseRefundedStoreStockInventory
             }
 
             $key = $type . '::' . $allocation->componentRefId();
-            if (($allocated[$key] ?? 0) < 1 || ($refunded[$key] ?? 0) < ($allocated[$key] ?? 0)) {
+            if (($allocated[$key] ?? 0) < 1 || ($refunded[$key] ?? 0) < 1) {
                 continue;
             }
 
