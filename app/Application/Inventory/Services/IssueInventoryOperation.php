@@ -32,7 +32,7 @@ final class IssueInventoryOperation
         if ($pId === '' || $sType === '' || $sId === '') throw new DomainException('Input inventory issue wajib lengkap.');
         if ($qty <= 0) throw new DomainException('Qty issue inventory harus > 0.');
 
-        $inv = $this->productInventories->getByProductId($pId) ?? ProductInventory::create($pId, 0);
+        $inv = $this->productInventories->getByProductIdForUpdate($pId) ?? ProductInventory::create($pId, 0);
         $this->negativeStockPolicy->assertCanIssue($inv->qtyOnHand(), $qty);
 
         $costing = $this->costingReader->getByProductId($pId) ?? throw new DomainException('Costing tidak ditemukan.');

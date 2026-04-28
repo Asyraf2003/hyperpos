@@ -12,10 +12,25 @@ final class DatabaseProductInventoryReaderAdapter implements ProductInventoryRea
 {
     public function getByProductId(string $productId): ?ProductInventory
     {
-        $row = DB::table('product_inventory')
+        return $this->fetch($productId, false);
+    }
+
+    public function getByProductIdForUpdate(string $productId): ?ProductInventory
+    {
+        return $this->fetch($productId, true);
+    }
+
+    private function fetch(string $productId, bool $lock): ?ProductInventory
+    {
+        $query = DB::table('product_inventory')
             ->select(['product_id', 'qty_on_hand'])
-            ->where('product_id', $productId)
-            ->first();
+            ->where('product_id', $productId);
+
+        if ($lock) {
+            $query = $query->lockForUpdate();
+        }
+
+        $row = $query->first();
 
         if ($row === null) {
             return null;

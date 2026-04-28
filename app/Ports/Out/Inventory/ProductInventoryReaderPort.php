@@ -9,4 +9,6 @@ use App\Core\Inventory\ProductInventory\ProductInventory;
 interface ProductInventoryReaderPort
 {
     public function getByProductId(string $productId): ?ProductInventory;
+
+    public function getByProductIdForUpdate(string $productId): ?ProductInventory;
 }
