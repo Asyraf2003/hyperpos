@@ -112,4 +112,66 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
             'total_refund_rupiah' => 100000,
         ], $dataset['summary']);
     }
+
+    public function test_dashboard_operational_performance_allows_negative_store_stock_cogs_for_cross_period_refund(): void
+    {
+        DB::table('products')->insert([
+            'id' => 'product-dashboard-cross-refund-1',
+            'kode_barang' => 'DB-XR-001',
+            'nama_barang' => 'Produk Dashboard Cross Refund',
+            'nama_barang_normalized' => 'produk dashboard cross refund',
+            'merek' => 'Federal',
+            'merek_normalized' => 'federal',
+            'ukuran' => 100,
+            'harga_jual' => 100000,
+            'deleted_at' => null,
+            'deleted_by_actor_id' => null,
+            'delete_reason' => null,
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'movement-dashboard-cross-sale-1',
+                'product_id' => 'product-dashboard-cross-refund-1',
+                'movement_type' => 'stock_out',
+                'source_type' => 'work_item_store_stock_line',
+                'source_id' => 'ssl-dashboard-cross-refund-1',
+                'tanggal_mutasi' => '2026-04-30',
+                'qty_delta' => -1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => -10000,
+            ],
+            [
+                'id' => 'movement-dashboard-cross-return-1',
+                'product_id' => 'product-dashboard-cross-refund-1',
+                'movement_type' => 'stock_in',
+                'source_type' => 'work_item_store_stock_line_reversal',
+                'source_id' => 'ssl-dashboard-cross-refund-1',
+                'tanggal_mutasi' => '2026-05-01',
+                'qty_delta' => 1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 10000,
+            ],
+        ]);
+
+        $dataset = app(GetDashboardOperationalPerformanceDatasetHandler::class)
+            ->handle('2026-05-01', '2026-05-01');
+
+        $this->assertSame([
+            [
+                'period_key' => '2026-05-01',
+                'period_label' => '2026-05-01',
+                'operational_profit_rupiah' => 10000,
+                'operational_expense_rupiah' => 0,
+                'refund_rupiah' => 0,
+            ],
+        ], $dataset['period_rows']);
+
+        $this->assertSame([
+            'total_operational_profit_rupiah' => 10000,
+            'total_operational_expense_rupiah' => 0,
+            'total_refund_rupiah' => 0,
+        ], $dataset['summary']);
+    }
+
 }
