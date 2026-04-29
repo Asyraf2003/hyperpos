@@ -1055,44 +1055,18 @@
                 </div>
             </div>
         </div>
+        @include('admin.dashboard.partials.cash-change-denominations', [
+            'cashChangeDenominations' => $dashboard['analytics']['cash_change_denominations'] ?? [],
+            'cashChangeRange' => $dashboard['analytics']['charts']['operational_performance_bar']['range'] ?? [],
+        ])
 
-        <div class="col-12 col-lg-6">
-            <div class="analytics-stage-card h-100">
-                <div class="analytics-stage-head">
-                    <div>
-                        <h6 class="section-title mb-1">Kinerja Operasional Bulan Ini</h6>
-                        <p class="analytics-stage-range">
-                            Range:
-                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
-                            s.d.
-                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
-                        </p>
-                    </div>
-                    <span class="badge-soft bg-soft-danger">
-                        <i class="bi bi-graph-down-arrow"></i>
-                        {{ count($dashboard['analytics']['charts']['operational_performance_bar']['labels'] ?? []) }} Titik
-                    </span>
-                </div>
-
-                <div class="chart-shell chart-placeholder">
-                    <div
-                        class="chart-canvas-shell"
-                        id="admin-chart-operational-performance-bar"
-                        data-chart-key="operational_performance_bar"
-                    ></div>
-                </div>
-            </div>
-        </div>
     </section>
-
-    @include('admin.dashboard.partials.cash-change-denominations', [
-        'cashChangeDenominations' => $dashboard['analytics']['cash_change_denominations'] ?? [],
-        'cashChangeRange' => $dashboard['analytics']['charts']['operational_performance_bar']['range'] ?? [],
-    ])
 
     <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
         @json($dashboard['analytics'] ?? [])
     </script>
+
+
 </div>
 @endsection
 

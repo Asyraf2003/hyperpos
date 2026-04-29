@@ -1,5 +1,4 @@
-<section class="row g-4 mb-4">
-    <div class="col-12">
+<div class="col-12 col-lg-6">
         <div class="analytics-stage-card h-100">
             <div class="analytics-stage-head">
                 <div>
@@ -43,10 +42,5 @@
                     </tbody>
                 </table>
             </div>
-
-            <p class="helper-note mt-3 mb-0">
-                Breakdown ini membaca potensi kembalian cash untuk persiapan laci kas, bukan komponen laba operasional.
-            </p>
         </div>
-    </div>
-</section>
+</div>
