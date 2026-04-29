@@ -15,6 +15,7 @@ namespace App\Ports\Out\Reporting;
  *   operational_expense_rupiah:int,
  *   payroll_disbursement_rupiah:int,
  *   employee_debt_cash_out_rupiah:int,
+ *   potential_change_rupiah:int,
  *   operational_profit_rupiah:int
  * }
  */

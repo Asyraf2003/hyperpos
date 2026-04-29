@@ -23,12 +23,14 @@ final class GetDashboardOperationalPerformanceDatasetHandler
      *     period_label:string,
      *     operational_profit_rupiah:int,
      *     operational_expense_rupiah:int,
-     *     refund_rupiah:int
+     *     refund_rupiah:int,
+     *     potential_change_rupiah:int
      *   }>,
      *   summary:array{
      *     total_operational_profit_rupiah:int,
      *     total_operational_expense_rupiah:int,
-     *     total_refund_rupiah:int
+     *     total_refund_rupiah:int,
+     *     total_potential_change_rupiah:int
      *   }
      * }
      */
@@ -48,6 +50,7 @@ final class GetDashboardOperationalPerformanceDatasetHandler
                 'operational_profit_rupiah' => $row['operational_profit_rupiah'],
                 'operational_expense_rupiah' => $row['operational_expense_rupiah'],
                 'refund_rupiah' => $row['refund_rupiah'],
+                'potential_change_rupiah' => $row['potential_change_rupiah'],
             ];
         }
 
@@ -57,13 +60,14 @@ final class GetDashboardOperationalPerformanceDatasetHandler
                 'total_operational_profit_rupiah' => $this->sum($rows, 'operational_profit_rupiah'),
                 'total_operational_expense_rupiah' => $this->sum($rows, 'operational_expense_rupiah'),
                 'total_refund_rupiah' => $this->sum($rows, 'refund_rupiah'),
+                'total_potential_change_rupiah' => $this->sum($rows, 'potential_change_rupiah'),
             ],
         ];
     }
 
     /**
      * @param list<DashboardOperationalPerformancePeriodRow> $rows
-     * @param 'operational_profit_rupiah'|'operational_expense_rupiah'|'refund_rupiah' $field
+     * @param 'operational_profit_rupiah'|'operational_expense_rupiah'|'refund_rupiah'|'potential_change_rupiah' $field
      */
     private function sum(array $rows, string $field): int
     {

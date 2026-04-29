@@ -103,6 +103,7 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
                 'operational_profit_rupiah' => 0,
                 'operational_expense_rupiah' => 0,
                 'refund_rupiah' => 100000,
+                'potential_change_rupiah' => 0,
             ],
         ], $dataset['period_rows']);
 
@@ -110,6 +111,7 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
             'total_operational_profit_rupiah' => 0,
             'total_operational_expense_rupiah' => 0,
             'total_refund_rupiah' => 100000,
+            'total_potential_change_rupiah' => 0,
         ], $dataset['summary']);
     }
 
@@ -164,6 +166,7 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
                 'operational_profit_rupiah' => 10000,
                 'operational_expense_rupiah' => 0,
                 'refund_rupiah' => 0,
+                'potential_change_rupiah' => 0,
             ],
         ], $dataset['period_rows']);
 
@@ -171,7 +174,61 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
             'total_operational_profit_rupiah' => 10000,
             'total_operational_expense_rupiah' => 0,
             'total_refund_rupiah' => 0,
+            'total_potential_change_rupiah' => 0,
         ], $dataset['summary']);
+    }
+
+    public function test_dashboard_operational_performance_includes_potential_change_without_affecting_profit(): void
+    {
+        DB::table('customer_payments')->insert([
+            [
+                'id' => 'payment-dashboard-change-1',
+                'amount_rupiah' => 100000,
+                'payment_method' => 'cash',
+                'paid_at' => '2026-04-03',
+            ],
+            [
+                'id' => 'payment-dashboard-change-2',
+                'amount_rupiah' => 50000,
+                'payment_method' => 'cash',
+                'paid_at' => '2026-04-03',
+            ],
+            [
+                'id' => 'payment-dashboard-change-outside',
+                'amount_rupiah' => 70000,
+                'payment_method' => 'cash',
+                'paid_at' => '2026-04-04',
+            ],
+        ]);
+
+        DB::table('customer_payment_cash_details')->insert([
+            [
+                'customer_payment_id' => 'payment-dashboard-change-1',
+                'amount_paid_rupiah' => 100000,
+                'amount_received_rupiah' => 120000,
+                'change_rupiah' => 20000,
+            ],
+            [
+                'customer_payment_id' => 'payment-dashboard-change-2',
+                'amount_paid_rupiah' => 50000,
+                'amount_received_rupiah' => 100000,
+                'change_rupiah' => 50000,
+            ],
+            [
+                'customer_payment_id' => 'payment-dashboard-change-outside',
+                'amount_paid_rupiah' => 70000,
+                'amount_received_rupiah' => 100000,
+                'change_rupiah' => 30000,
+            ],
+        ]);
+
+        $dataset = app(GetDashboardOperationalPerformanceDatasetHandler::class)
+            ->handle('2026-04-03', '2026-04-03');
+
+        $this->assertSame(70000, $dataset['period_rows'][0]['potential_change_rupiah']);
+        $this->assertSame(150000, $dataset['period_rows'][0]['operational_profit_rupiah']);
+        $this->assertSame(70000, $dataset['summary']['total_potential_change_rupiah']);
+        $this->assertSame(150000, $dataset['summary']['total_operational_profit_rupiah']);
     }
 
 }
