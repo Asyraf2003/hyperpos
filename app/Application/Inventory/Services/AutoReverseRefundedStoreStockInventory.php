@@ -43,18 +43,39 @@ final class AutoReverseRefundedStoreStockInventory
                 continue;
             }
 
-            foreach ($this->targetLineIds($type, $allocation->componentRefId()) as $lineId) {
-                if ($this->movements->getBySource('work_item_store_stock_line_reversal', $lineId) !== []) {
-                    continue;
-                }
+            $this->reverseTargetLines($type, $allocation->componentRefId(), $refund);
+        }
+    }
 
-                $this->reverseIssuedInventory->execute(
-                    'work_item_store_stock_line',
-                    $lineId,
-                    $refund->refundedAt(),
-                    'work_item_store_stock_line_reversal',
-                );
+    public function executeFullRowReversal(CustomerRefund $refund): void
+    {
+        foreach ($this->refundAllocations->listByNoteId($refund->noteId()) as $allocation) {
+            if ($allocation->customerRefundId() !== $refund->id()) {
+                continue;
             }
+
+            $type = $allocation->componentType();
+            if (! $this->supports($type)) {
+                continue;
+            }
+
+            $this->reverseTargetLines($type, $allocation->componentRefId(), $refund);
+        }
+    }
+
+    private function reverseTargetLines(string $type, string $componentRefId, CustomerRefund $refund): void
+    {
+        foreach ($this->targetLineIds($type, $componentRefId) as $lineId) {
+            if ($this->movements->getBySource('work_item_store_stock_line_reversal', $lineId) !== []) {
+                continue;
+            }
+
+            $this->reverseIssuedInventory->execute(
+                'work_item_store_stock_line',
+                $lineId,
+                $refund->refundedAt(),
+                'work_item_store_stock_line_reversal',
+            );
         }
     }
 

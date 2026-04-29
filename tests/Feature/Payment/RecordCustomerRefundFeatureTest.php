@@ -78,6 +78,64 @@ final class RecordCustomerRefundFeatureTest extends TestCase
         $this->assertDatabaseCount('customer_refunds', 1);
     }
 
+    public function test_generic_partial_store_stock_refund_does_not_reverse_inventory(): void
+    {
+        $this->seedNote();
+        $this->seedPaymentAndAllocations();
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-2',
+            'qty_on_hand' => 9,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-2',
+            'avg_cost_rupiah' => 3000,
+            'inventory_value_rupiah' => 27000,
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            'id' => 'move-sto-2',
+            'product_id' => 'product-2',
+            'movement_type' => 'stock_out',
+            'source_type' => 'work_item_store_stock_line',
+            'source_id' => 'sto-2',
+            'tanggal_mutasi' => '2026-04-02',
+            'qty_delta' => -1,
+            'unit_cost_rupiah' => 3000,
+            'total_cost_rupiah' => -3000,
+        ]);
+
+        $result = app(RecordCustomerRefundHandler::class)->handle(
+            'payment-1',
+            'note-1',
+            7000,
+            '2026-04-03',
+            'Refund sebagian part stok toko',
+            'actor-1',
+        );
+
+        $this->assertTrue($result->isSuccess());
+        $refundId = (string) DB::table('customer_refunds')->value('id');
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'component_type' => 'service_store_stock_part',
+            'component_ref_id' => 'sto-2',
+            'refunded_amount_rupiah' => 1000,
+        ]);
+
+        $this->assertDatabaseMissing('inventory_movements', [
+            'source_type' => 'work_item_store_stock_line_reversal',
+            'source_id' => 'sto-2',
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-2',
+            'qty_on_hand' => 9,
+        ]);
+    }
+
     private function seedNote(): void
     {
         $this->seedNotePaymentProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 5000);
