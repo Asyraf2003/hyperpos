@@ -1085,6 +1085,11 @@
         </div>
     </section>
 
+    @include('admin.dashboard.partials.cash-change-denominations', [
+        'cashChangeDenominations' => $dashboard['analytics']['cash_change_denominations'] ?? [],
+        'cashChangeRange' => $dashboard['analytics']['charts']['operational_performance_bar']['range'] ?? [],
+    ])
+
     <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
         @json($dashboard['analytics'] ?? [])
     </script>
