@@ -52,7 +52,7 @@ Doc categories:
   Error and audit notes.
 
 Known cleanup warnings:
-- ADR 0014 and ADR 0015 currently overlap. One must be marked superseded later, not deleted blindly.
+- ADR 0014 is now a superseded pointer to ADR 0015. ADR 0015 is the canonical decision record.
 - docs/handoff/handoff_template.md is legacy compared with docs/AI_RULES/04_HANDOFF_TEMPLATE.md.
 - docs/v2/feature-continuation/00-blueprint.md is more like a control ledger than a normal blueprint.
 - Some docs reference stale paths such as docs/setting_control. Treat them as historical unless proven active.

@@ -117,12 +117,15 @@ Use these tags in docs when possible:
 
 ### ADR 0014 and ADR 0015
 
-These two files overlap heavily:
+ADR 0014 is now a superseded pointer to ADR 0015.
 
-    docs/adr/0014-note-operational-status-open-close-editable-partial-payment.md
+Canonical decision record:
+
     docs/adr/0015-note-operational-status-open-close-editable-partial-payment.md
 
-Recommended cleanup: Mark one as superseded and keep one as canonical. Do not delete blindly.
+Historical superseded pointer:
+
+    docs/adr/0014-note-operational-status-open-close-editable-partial-payment.md
 
 ### Handoff template
 
