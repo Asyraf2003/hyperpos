@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Application\Reporting\Services\CashChangeDenominationCalculator;
 use App\Ports\Out\Reporting\DashboardOperationalPerformanceReaderPort;
 
 /**
@@ -13,6 +14,7 @@ final class GetDashboardOperationalPerformanceDatasetHandler
 {
     public function __construct(
         private readonly DashboardOperationalPerformanceReaderPort $sourceReader,
+        private readonly CashChangeDenominationCalculator $cashChangeDenominations,
     ) {
     }
 
@@ -31,7 +33,12 @@ final class GetDashboardOperationalPerformanceDatasetHandler
      *     total_operational_expense_rupiah:int,
      *     total_refund_rupiah:int,
      *     total_potential_change_rupiah:int
-     *   }
+     *   },
+     *   cash_change_denominations:list<array{
+     *     denomination:int,
+     *     count:int,
+     *     total_rupiah:int
+     *   }>
      * }
      */
     public function handle(string $fromDate, string $toDate): array
@@ -62,6 +69,9 @@ final class GetDashboardOperationalPerformanceDatasetHandler
                 'total_refund_rupiah' => $this->sum($rows, 'refund_rupiah'),
                 'total_potential_change_rupiah' => $this->sum($rows, 'potential_change_rupiah'),
             ],
+            'cash_change_denominations' => $this->cashChangeDenominations->aggregate(
+                $this->sourceReader->getPotentialChangeAmountsRupiah($fromDate, $toDate),
+            ),
         ];
     }
 

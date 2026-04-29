@@ -28,4 +28,12 @@ interface DashboardOperationalPerformanceReaderPort
         string $fromDate,
         string $toDate,
     ): array;
+
+    /**
+     * @return list<int>
+     */
+    public function getPotentialChangeAmountsRupiah(
+        string $fromDate,
+        string $toDate,
+    ): array;
 }

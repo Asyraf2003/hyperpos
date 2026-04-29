@@ -230,5 +230,4 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
         $this->assertSame(70000, $dataset['summary']['total_potential_change_rupiah']);
         $this->assertSame(150000, $dataset['summary']['total_operational_profit_rupiah']);
     }
-
 }
