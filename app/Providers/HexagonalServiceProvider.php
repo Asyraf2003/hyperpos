@@ -72,6 +72,7 @@ use App\Adapters\Out\Procurement\DatabaseProcurementInvoiceDetailReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentReaderAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierPayableReminderReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierReceiptLineReaderAdapter;
@@ -190,6 +191,7 @@ use App\Ports\Out\Procurement\ProcurementInvoiceDetailReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentWriterPort;
 use App\Ports\Out\Procurement\SupplierPaymentReaderPort;
+use App\Ports\Out\Procurement\SupplierPayableReminderReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentWriterPort;
 use App\Ports\Out\Procurement\SupplierReaderPort;
 use App\Ports\Out\Procurement\SupplierReceiptLineReaderPort;
@@ -288,6 +290,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierReceiptWriterPort::class, DatabaseSupplierReceiptWriterAdapter::class);
         $this->app->singleton(SupplierPaymentWriterPort::class, DatabaseSupplierPaymentWriterAdapter::class);
         $this->app->singleton(SupplierPaymentReaderPort::class, DatabaseSupplierPaymentReaderAdapter::class);
+        $this->app->singleton(SupplierPayableReminderReaderPort::class, DatabaseSupplierPayableReminderReaderAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentWriterPort::class, DatabaseSupplierPaymentProofAttachmentWriterAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentReaderPort::class, DatabaseSupplierPaymentProofAttachmentReaderAdapter::class);
 
