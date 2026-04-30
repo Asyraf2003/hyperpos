@@ -42,7 +42,7 @@ Mulai sekarang semua kasus fitur tertinggal dikerjakan dengan sistem:
 6. `make verify`.
 7. Commit kecil.
 8. Handoff per kasus di folder ini.
-9. Update ledger di `docs/v2/feature-continuation/00-blueprint.md`.
+9. Update ledger di `docs/blueprint/v2/feature-continuation/00-blueprint.md`.
 
 ## Latest Repo Analysis Summary
 
@@ -195,8 +195,8 @@ Reason:
 
 ## Files Added
 
-- `docs/v2/feature-continuation/00-blueprint.md`
-- `docs/v2/feature-continuation/handoffs/2026-04-29-FC-000-system-ambiguity-inventory.md`
+- `docs/blueprint/v2/feature-continuation/00-blueprint.md`
+- `docs/handoff/v2/feature-continuation/01-system-ambiguity-inventory.md`
 
 ## What Was Closed
 
@@ -245,9 +245,9 @@ State terakhir:
 - Baseline HEAD: `c0ce90a6`
 - Audit 1461 selective patch sudah closed.
 - Feature continuation blueprint:
-  `docs/v2/feature-continuation/00-blueprint.md`
+  `docs/blueprint/v2/feature-continuation/00-blueprint.md`
 - Handoff bootstrap:
-  `docs/v2/feature-continuation/handoffs/2026-04-29-FC-000-system-ambiguity-inventory.md`
+  `docs/handoff/v2/feature-continuation/01-system-ambiguity-inventory.md`
 - UI refund label stash masih outside-scope:
   `stash@{0}: temp-ui-refund-label-outside-audit`
 

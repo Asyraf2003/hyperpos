@@ -88,7 +88,7 @@ latest branch and HEAD, next safe step, opening prompt for the next session.
 
 Do not treat an old handoff as permanent truth unless its decision was promoted into ADR or active blueprint.
 
-### docs/v2
+### docs/blueprint/v2 or docs/handoff/v2
 
 V2 continuation lane.
 
@@ -97,7 +97,7 @@ live local gaps, UI continuation handoffs, V2 session recovery.
 
 This folder is not automatically more authoritative than ADR or AI_RULES.
 
-### docs/error_log
+### docs/handoff/ui
 
 Error and audit notes. Use for: investigation notes, error-specific documentation, bug trail.
 
@@ -135,11 +135,11 @@ Legacy template: docs/handoff/handoff_template.md
 Recommended cleanup: Convert the legacy template into a pointer or archive it
 after confirming no active workflow depends on it.
 
-### docs/v2/feature-continuation
+### docs/blueprint/v2/feature-continuation
 
 This path contains a feature control ledger:
 
-    docs/v2/feature-continuation/00-blueprint.md
+    docs/blueprint/v2/feature-continuation/00-blueprint.md
 
 Recommended cleanup: Keep it, but document that it is a V2 continuation control ledger, not a permanent ADR.
 
@@ -157,7 +157,7 @@ These paths are historical unless proven active.
 ADR preferred:       docs/adr/0016-short-decision-name.md
 Blueprint preferred: docs/blueprint/v2/scope/YYYY-MM-DD-scope-name.md
 Handoff preferred:   docs/handoff/v2/scope/YYYY-MM-DD-short-session-name.md
-Audit preferred:     docs/error_log/YYYY-MM-DD-short-error-name.md
+Audit preferred:     docs/handoff/ui/YYYY-MM-DD-short-error-name.md
 
 ## Promotion Rule
 

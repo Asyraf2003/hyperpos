@@ -98,8 +98,8 @@ Use for session recovery.
 Current handoff locations include:
 - docs/handoff
 - docs/handoff/v2
-- docs/v2/feature-continuation/handoffs
-- docs/v2/ui
+- docs/handoff/v2/feature-continuation
+- docs/handoff/v2/ui
 
 Put here:
 - branch and HEAD at the time, dirty state, stash warnings
@@ -152,10 +152,10 @@ Do not paste the entire docs tree unless the task is docs audit.
 | Permanent decision                   | docs/adr                                         |
 | Active scope design                  | docs/blueprint                                  |
 | Daily work recovery                  | handoff                                          |
-| Feature status ledger                | docs/v2/feature-continuation or dedicated doc    |
+| Feature status ledger                | docs/blueprint/v2/feature-continuation or dedicated doc    |
 | Test output                          | handoff or proof note                            |
 | Commit hash                          | handoff                                          |
-| Bug found in live local              | handoff or error_log                             |
+| Bug found in live local              | handoff or docs/handoff/ui                             |
 | Final source of truth domain map     | docs/AI_RULES and ADR when needed                |
 
 ## Promotion From Handoff To ADR

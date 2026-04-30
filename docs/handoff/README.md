@@ -42,7 +42,7 @@ Do not use this folder as the only place for:
 
 Permanent decisions must be promoted into `docs/adr`.
 
-Active implementation contracts should be promoted into `docs/blueprints`.
+Active implementation contracts should be promoted into `docs/blueprint`.
 
 Mandatory AI/session rules belong in `docs/AI_RULES`.
 
@@ -115,7 +115,7 @@ The legacy template is kept only for old links and historical references.
 - Do not treat old handoffs as permanent truth by default.
 - Do not mass-edit historical handoffs just to modernize wording.
 - If a handoff contains a permanent decision, promote the decision into ADR.
-- If a handoff contains an active implementation contract, promote it into `docs/blueprints`.
+- If a handoff contains an active implementation contract, promote it into `docs/blueprint`.
 - Always verify old handoff claims against current repo files and local command output.
 
 ## Recommended session start

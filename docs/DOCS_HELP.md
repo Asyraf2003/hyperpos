@@ -44,17 +44,17 @@ Doc categories:
   Historical session logs and recovery notes.
   Do not treat old handoffs as permanent decisions unless promoted into ADR or active blueprint.
 
-- docs/v2
+- docs/blueprint/v2 or docs/handoff/v2
   V2 continuation lane.
   This is for app-running-while-improving work, feature continuation, live local gaps, and UI/session recovery notes.
 
-- docs/error_log
+- docs/handoff/ui
   Error and audit notes.
 
 Known cleanup warnings:
 - ADR 0014 is now a superseded pointer to ADR 0015. ADR 0015 is the canonical decision record.
 - docs/handoff/handoff_template.md is legacy compared with docs/AI_RULES/04_HANDOFF_TEMPLATE.md.
-- docs/v2/feature-continuation/00-blueprint.md is more like a control ledger than a normal blueprint.
+- docs/blueprint/v2/feature-continuation/00-blueprint.md is more like a control ledger than a normal blueprint.
 - Some docs reference stale paths such as docs/setting_control. Treat them as historical unless proven active.
 - Do not move docs before grep backlink audit.
 
