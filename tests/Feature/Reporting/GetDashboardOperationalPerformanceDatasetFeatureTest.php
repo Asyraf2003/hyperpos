@@ -178,6 +178,36 @@ final class GetDashboardOperationalPerformanceDatasetFeatureTest extends TestCas
         ], $dataset['summary']);
     }
 
+
+    public function test_dashboard_operational_performance_does_not_crash_on_unrepresentable_cash_change(): void
+    {
+        DB::table('customer_payments')->insert([
+            'id' => 'payment-dashboard-change-unrepresentable',
+            'amount_rupiah' => 445800,
+            'payment_method' => 'cash',
+            'paid_at' => '2026-04-30',
+        ]);
+
+        DB::table('customer_payment_cash_details')->insert([
+            'customer_payment_id' => 'payment-dashboard-change-unrepresentable',
+            'amount_paid_rupiah' => 445800,
+            'amount_received_rupiah' => 500000,
+            'change_rupiah' => 54200,
+        ]);
+
+        $dataset = app(GetDashboardOperationalPerformanceDatasetHandler::class)
+            ->handle('2026-04-30', '2026-04-30');
+
+        $this->assertSame(54200, $dataset['period_rows'][0]['potential_change_rupiah']);
+        $this->assertSame(54200, $dataset['summary']['total_potential_change_rupiah']);
+
+        $this->assertSame([
+            ['denomination' => 50000, 'count' => 1, 'total_rupiah' => 50000],
+            ['denomination' => 2000, 'count' => 2, 'total_rupiah' => 4000],
+        ], $dataset['cash_change_denominations']);
+    }
+
+
     public function test_dashboard_operational_performance_includes_potential_change_without_affecting_profit(): void
     {
         DB::table('customer_payments')->insert([

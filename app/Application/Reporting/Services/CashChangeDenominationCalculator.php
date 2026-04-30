@@ -85,6 +85,12 @@ final class CashChangeDenominationCalculator
         return $rows;
     }
 
+    /** @param list<int> $changeAmountsRupiah @return list<CashChangeDenominationRow> */
+    public function aggregateRepresentable(array $changeAmountsRupiah): array
+    {
+        return $this->aggregate(array_values(array_filter(array_map(static fn (int $amount): int => $amount - ($amount % 500), $changeAmountsRupiah), static fn (int $amount): bool => $amount > 0)));
+    }
+
     private function assertValidChangeAmount(int $changeRupiah): void
     {
         if ($changeRupiah < 0) {

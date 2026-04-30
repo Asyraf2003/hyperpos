@@ -69,7 +69,7 @@ final class GetDashboardOperationalPerformanceDatasetHandler
                 'total_refund_rupiah' => $this->sum($rows, 'refund_rupiah'),
                 'total_potential_change_rupiah' => $this->sum($rows, 'potential_change_rupiah'),
             ],
-            'cash_change_denominations' => $this->cashChangeDenominations->aggregate(
+            'cash_change_denominations' => $this->cashChangeDenominations->aggregateRepresentable(
                 $this->sourceReader->getPotentialChangeAmountsRupiah($fromDate, $toDate),
             ),
         ];

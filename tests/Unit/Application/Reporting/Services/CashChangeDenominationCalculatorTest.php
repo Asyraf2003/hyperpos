@@ -61,6 +61,19 @@ final class CashChangeDenominationCalculatorTest extends TestCase
         );
     }
 
+    public function test_it_aggregates_only_representable_change_amounts_for_dashboard_breakdown(): void
+    {
+        $calculator = new CashChangeDenominationCalculator();
+
+        $this->assertSame(
+            [
+                ['denomination' => 50000, 'count' => 1, 'total_rupiah' => 50000],
+                ['denomination' => 2000, 'count' => 2, 'total_rupiah' => 4000],
+            ],
+            $calculator->aggregateRepresentable([54200, 200]),
+        );
+    }
+
     public function test_it_rejects_negative_change_amount(): void
     {
         $calculator = new CashChangeDenominationCalculator();
