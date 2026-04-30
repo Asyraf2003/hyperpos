@@ -27,20 +27,36 @@ trait WorkItemDeletesTrait
             return;
         }
 
-        DB::table('work_item_service_details')
+        $protectedWorkItemIds = DB::table('refund_component_allocations')
             ->whereIn('work_item_id', $workItemIds)
+            ->pluck('work_item_id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+
+        $protected = array_flip($protectedWorkItemIds);
+        $deletableWorkItemIds = array_values(array_filter(
+            $workItemIds,
+            static fn (string $id): bool => ! isset($protected[$id])
+        ));
+
+        if ($deletableWorkItemIds === []) {
+            return;
+        }
+
+        DB::table('work_item_service_details')
+            ->whereIn('work_item_id', $deletableWorkItemIds)
             ->delete();
 
         DB::table('work_item_external_purchase_lines')
-            ->whereIn('work_item_id', $workItemIds)
+            ->whereIn('work_item_id', $deletableWorkItemIds)
             ->delete();
 
         DB::table('work_item_store_stock_lines')
-            ->whereIn('work_item_id', $workItemIds)
+            ->whereIn('work_item_id', $deletableWorkItemIds)
             ->delete();
 
         DB::table('work_items')
-            ->whereIn('id', $workItemIds)
+            ->whereIn('id', $deletableWorkItemIds)
             ->delete();
     }
 }

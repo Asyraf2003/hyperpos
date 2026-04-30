@@ -104,12 +104,12 @@
 
                         <div class="mb-3">
                             <small class="text-muted d-block">Tanggal Pengiriman</small>
-                            <strong>{{ \App\Support\ViewDateFormatter::display($summaryView['shipment_date'] ?? null) }}</strong>
+                            <strong>{{ $summaryView['shipment_date'] ?? '-' }}</strong>
                         </div>
 
                         <div class="mb-3">
                             <small class="text-muted d-block">Tanggal Jatuh Tempo</small>
-                            <strong>{{ \App\Support\ViewDateFormatter::display($summaryView['due_date'] ?? null) }}</strong>
+                            <strong>{{ $summaryView['due_date'] ?? '-' }}</strong>
                         </div>
 
                         <hr>
