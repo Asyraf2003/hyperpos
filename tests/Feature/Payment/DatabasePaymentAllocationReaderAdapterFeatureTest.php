@@ -81,4 +81,94 @@ final class DatabasePaymentAllocationReaderAdapterFeatureTest extends TestCase
                 ->amount(),
         );
     }
+    public function test_pair_total_is_capped_by_payment_amount_after_full_refund(): void
+    {
+        $today = date('Y-m-d');
+
+        $this->seedNoteBase('note-1', 'Budi', $today, 0, 'refunded');
+        $this->seedCustomerPaymentBase('payment-1', 265000, $today);
+        $this->seedWorkItemBase(
+            'wi-old-1',
+            'note-1',
+            1,
+            WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+            WorkItem::STATUS_CANCELED,
+            122000,
+        );
+        $this->seedWorkItemBase(
+            'wi-new-1',
+            'note-1',
+            1,
+            WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+            WorkItem::STATUS_CANCELED,
+            143000,
+        );
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-active-1',
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-new-1',
+            'component_type' => 'product_only_work_item',
+            'component_ref_id' => 'wi-new-1',
+            'component_amount_rupiah_snapshot' => 143000,
+            'allocated_amount_rupiah' => 143000,
+            'allocation_priority' => 1,
+        ]);
+
+        DB::table('customer_refunds')->insert([
+            [
+                'id' => 'refund-old-1',
+                'customer_payment_id' => 'payment-1',
+                'note_id' => 'note-1',
+                'amount_rupiah' => 122000,
+                'refunded_at' => $today,
+                'reason' => 'Refund historical row before revision',
+            ],
+            [
+                'id' => 'refund-active-1',
+                'customer_payment_id' => 'payment-1',
+                'note_id' => 'note-1',
+                'amount_rupiah' => 143000,
+                'refunded_at' => $today,
+                'reason' => 'Refund active row after revision',
+            ],
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            [
+                'id' => 'rca-old-1',
+                'customer_refund_id' => 'refund-old-1',
+                'customer_payment_id' => 'payment-1',
+                'note_id' => 'note-1',
+                'work_item_id' => 'wi-old-1',
+                'component_type' => 'product_only_work_item',
+                'component_ref_id' => 'wi-old-1',
+                'refunded_amount_rupiah' => 122000,
+                'refund_priority' => 1,
+            ],
+            [
+                'id' => 'rca-active-1',
+                'customer_refund_id' => 'refund-active-1',
+                'customer_payment_id' => 'payment-1',
+                'note_id' => 'note-1',
+                'work_item_id' => 'wi-new-1',
+                'component_type' => 'product_only_work_item',
+                'component_ref_id' => 'wi-new-1',
+                'refunded_amount_rupiah' => 143000,
+                'refund_priority' => 1,
+            ],
+        ]);
+
+        $reader = new DatabasePaymentAllocationReaderAdapter();
+
+        self::assertSame(
+            265000,
+            $reader
+                ->getTotalAllocatedAmountByCustomerPaymentIdAndNoteId('payment-1', 'note-1')
+                ->amount(),
+        );
+    }
+
+
 }

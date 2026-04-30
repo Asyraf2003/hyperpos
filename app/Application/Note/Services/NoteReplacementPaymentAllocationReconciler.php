@@ -41,10 +41,7 @@ final class NoteReplacementPaymentAllocationReconciler
             $amounts[$paymentId] = max(($amounts[$paymentId] ?? 0) - $refund->refundedAmountRupiah()->amount(), 0);
         }
 
-        return array_filter(
-            $amounts,
-            static fn (int $amount): bool => $amount > 0,
-        );
+        return array_filter($amounts, static fn (int $amount): bool => $amount > 0);
     }
 
     public function deleteExisting(string $noteId): void
@@ -84,13 +81,10 @@ final class NoteReplacementPaymentAllocationReconciler
      */
     private function totalComponentAmount(array $components): int
     {
-        $total = 0;
-
-        foreach ($components as $component) {
-            $total += $component->amountRupiah()->amount();
-        }
-
-        return $total;
+        return array_sum(array_map(
+            static fn ($component): int => $component->amountRupiah()->amount(),
+            $components,
+        ));
     }
 
     /**
@@ -98,12 +92,9 @@ final class NoteReplacementPaymentAllocationReconciler
      */
     private function totalAllocatedAmount(array $allocations): int
     {
-        $total = 0;
-
-        foreach ($allocations as $allocation) {
-            $total += $allocation->allocatedAmountRupiah()->amount();
-        }
-
-        return $total;
+        return array_sum(array_map(
+            static fn ($allocation): int => $allocation->allocatedAmountRupiah()->amount(),
+            $allocations,
+        ));
     }
 }

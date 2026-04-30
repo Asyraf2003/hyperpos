@@ -18,7 +18,10 @@ final class SelectedRowsRefundBucketsBuilder
      */
     public function build(array $selectedRowIds, array $allocations, array $refundAllocations = []): array
     {
-        $selectedIds = $this->normalizeRowIds($selectedRowIds);
+        $selectedIds = array_values(array_unique(array_filter(
+            array_map(static fn (string $id): string => trim($id), $selectedRowIds),
+            static fn (string $id): bool => $id !== '',
+        )));
         $refunded = $this->refundedByPaymentComponent($refundAllocations);
         $groups = [];
 
@@ -62,18 +65,6 @@ final class SelectedRowsRefundBucketsBuilder
             array_keys($groups),
             array_values($groups),
         ));
-    }
-
-    /**
-     * @param list<string> $rowIds
-     * @return list<string>
-     */
-    private function normalizeRowIds(array $rowIds): array
-    {
-        return array_values(array_unique(array_filter(
-            array_map(static fn (string $id): string => trim($id), $rowIds),
-            static fn (string $id): bool => $id !== '',
-        )));
     }
 
     /**

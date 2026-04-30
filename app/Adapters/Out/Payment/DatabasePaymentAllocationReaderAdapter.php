@@ -45,7 +45,17 @@ final class DatabasePaymentAllocationReaderAdapter implements PaymentAllocationR
             ->sum('refunded_amount_rupiah');
 
         if ($componentTotal > 0 || $componentRefundTotal > 0) {
-            return Money::fromInt($componentTotal + $componentRefundTotal);
+            $paymentAmount = (int) DB::table('customer_payments')
+                ->where('id', $paymentId)
+                ->value('amount_rupiah');
+
+            $componentPairTotal = $componentTotal + $componentRefundTotal;
+
+            if ($paymentAmount > 0) {
+                return Money::fromInt(min($paymentAmount, $componentPairTotal));
+            }
+
+            return Money::fromInt($componentPairTotal);
         }
 
         return Money::fromInt((int) DB::table('payment_allocations')
