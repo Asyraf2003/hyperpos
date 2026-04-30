@@ -1,9 +1,31 @@
 # ADR-0005 — Paid Note Correction Requires Audit
 
-- Status: Accepted
+- Status: SUPERSEDED IN PART by ADR-0016
 - Date: 2026-03-09
 - Deciders: Project Owner, Architecture Decision
 - Scope: Core Domain / Note / Payment / Audit / Reporting / Authorization
+
+## Supersession Note
+
+ADR-0005 is superseded in part by ADR-0016.
+
+Still valid from ADR-0005:
+
+- paid note mutation must not be silent overwrite
+- reason is required
+- actor is required
+- timestamp is required
+- before/after snapshot is required
+- sensitive mutation must be auditable
+- reporting must be able to reconstruct change history
+
+Changed by ADR-0016:
+
+- closed/paid/refunded note is no longer treated as a terminal mutation lock
+- adding line after paid/refund can be valid when performed through audited revision/event flow
+- refund can neutralize selected rows in the same note
+- refund/cancel of unpaid row can still reverse inventory and reduce outstanding
+- post-consequence note mutation is allowed if financial ledger, inventory ledger, audit timeline, and reporting projection remain consistent
 
 ## Context
 
