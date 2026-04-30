@@ -31,7 +31,7 @@ final class RecordSelectedRowsRefundPlanBucketProcessor
             );
 
             $refund = $recorded->refund();
-            $this->reverseInventory->execute($refund);
+            $this->reverseInventory->executeFullRowReversal($refund);
 
             $refundIds[] = $refund->id();
             $allocationCount += $recorded->allocationCount();

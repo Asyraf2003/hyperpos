@@ -1,3 +1,23 @@
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 <div class="card">
   <div class="card-header">
     <div class="d-flex justify-content-between align-items-start gap-2">
@@ -23,7 +43,7 @@
           </div>
         </div>
         <div class="text-end small text-muted">
-          <div>{{ $currentRevision['created_at'] ?? '-' }}</div>
+          <div>{{ $_uiDateDisplay($currentRevision['created_at'] ?? null, true) }}</div>
         </div>
       </div>
 
@@ -77,7 +97,7 @@
                 R{{ (int) ($entry['revision_number'] ?? 0) }}
               </div>
               <div class="text-end small text-muted">
-                <div>{{ $entry['created_at'] ?? '-' }}</div>
+                <div>{{ $_uiDateDisplay($entry['created_at'] ?? null, true) }}</div>
                 @if (!empty($entry['created_by_actor_id']))
                   <div class="badge bg-light-secondary text-secondary mt-1">
                     {{ $entry['created_by_actor_id'] }}

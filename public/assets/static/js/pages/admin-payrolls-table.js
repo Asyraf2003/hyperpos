@@ -36,12 +36,33 @@
   let req = 0;
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
   }[m]));
+
+  const tanggalId = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    const text = String(value);
+
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) {
+      return text;
+    }
+
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) {
+      return text;
+    }
+
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  };
+
 
   const trim = (v) => String(v ?? "").trim();
 
@@ -186,7 +207,7 @@
       return `
       <tr>
         <td>${(m.page - 1) * m.per_page + i + 1}</td>
-        <td>${esc(r.disbursement_date)}</td>
+        <td>${esc(tanggalId(r.disbursement_date))}</td>
         <td>${esc(r.employee_name)}</td>
         <td>Rp${esc(r.amount_formatted)}</td>
         <td>${esc(r.mode_label)}${statusHtml}</td>

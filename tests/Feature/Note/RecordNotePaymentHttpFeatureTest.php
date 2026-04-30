@@ -60,10 +60,18 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
         $this->assertDatabaseHas('customer_payments', [
             'amount_rupiah' => 50000,
             'paid_at' => $today,
+            'payment_method' => 'cash',
         ]);
 
         $paymentId = (string) DB::table('customer_payments')->value('id');
         $this->assertNotSame('', $paymentId);
+
+        $this->assertDatabaseHas('customer_payment_cash_details', [
+            'customer_payment_id' => $paymentId,
+            'amount_paid_rupiah' => 50000,
+            'amount_received_rupiah' => 70000,
+            'change_rupiah' => 20000,
+        ]);
 
         $this->assertDatabaseHas('payment_component_allocations', [
             'customer_payment_id' => $paymentId,

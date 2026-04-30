@@ -52,10 +52,8 @@ final class StoreStockCogsPerDayQuery
             static fn (string $periodKey): array => [
                 'period_key' => $periodKey,
                 'period_label' => $periodKey,
-                'amount_rupiah' => max(
-                    (int) ($issuedRows[$periodKey] ?? 0) - (int) ($returnedRows[$periodKey] ?? 0),
-                    0
-                ),
+                'amount_rupiah' => (int) ($issuedRows[$periodKey] ?? 0)
+                    - (int) ($returnedRows[$periodKey] ?? 0),
             ],
             $periodKeys
         );

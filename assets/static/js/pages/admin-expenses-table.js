@@ -43,12 +43,33 @@
   let requestCounter = 0;
 
   const esc = (v) => String(v ?? "").replace(/[&<>\"']/g, (m) => ({
+
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
   }[m]));
+
+  const tanggalId = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    const text = String(value);
+
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) {
+      return text;
+    }
+
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) {
+      return text;
+    }
+
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  };
+
 
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
   const trimValue = (v) => String(v ?? "").trim();
@@ -159,13 +180,13 @@
     }
 
     deleteForm.action = deleteUrl(expense.id);
-    deleteModalSubtitle.textContent = `${expense.category_name} • ${expense.expense_date} • ${rupiah(expense.amount_rupiah)}`;
+    deleteModalSubtitle.textContent = `${expense.category_name} • ${tanggalId(expense.expense_date)} • ${rupiah(expense.amount_rupiah)}`;
   };
 
   const rowHtml = (r, i, meta) => `
     <tr>
       <td>${(meta.page - 1) * meta.per_page + i + 1}</td>
-      <td class="text-nowrap">${esc(r.expense_date)}</td>
+      <td class="text-nowrap">${esc(tanggalId(r.expense_date))}</td>
       <td>${esc(r.category_name)}<br><small class="text-muted">${esc(r.category_code)}</small></td>
       <td>${esc(r.description)}</td>
       <td class="text-nowrap fw-bold">${rupiah(r.amount_rupiah)}</td>

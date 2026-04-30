@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use App\Application\Reporting\UseCases\Charts\BuildCashflowLineChart;
-use App\Application\Reporting\UseCases\Charts\BuildOperationalPerformanceBarChart;
-use App\Application\Reporting\UseCases\Charts\BuildStockStatusDonutChart;
-use App\Application\Reporting\UseCases\Charts\BuildTopSellingBarChart;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 
 final class AdminDashboardAnalyticsPayloadBuilder
@@ -17,10 +13,7 @@ final class AdminDashboardAnalyticsPayloadBuilder
         private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
         private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
         private readonly GetDashboardOperationalPerformanceDatasetHandler $operationalPerformance,
-        private readonly BuildStockStatusDonutChart $stockStatusDonut,
-        private readonly BuildTopSellingBarChart $topSellingBar,
-        private readonly BuildCashflowLineChart $cashflowLine,
-        private readonly BuildOperationalPerformanceBarChart $operationalPerformanceBar,
+        private readonly AdminDashboardAnalyticsChartsPayloadBuilder $charts,
     ) {
     }
 
@@ -69,32 +62,14 @@ final class AdminDashboardAnalyticsPayloadBuilder
                 'granularity' => 'daily',
                 'generated_at' => now()->toISOString(),
             ],
-            'charts' => [
-                'stock_status_donut' => $this->stockStatusDonut->build(
-                    $inventorySummary,
-                    $period['to'],
-                ),
-                'top_selling_bar' => $this->topSellingBar->build(
-                    $topSellingRows,
-                    $period['from'],
-                    $period['to'],
-                ),
-                'cashflow_line' => $this->cashflowLine->build(
-                    $cashLedgerRows,
-                    $period['from'],
-                    $period['to'],
-                ),
-                'operational_performance_bar' => $this->operationalPerformanceBar->build(
-                    is_array($operationalPerformanceDataset['period_rows'] ?? null)
-                        ? $operationalPerformanceDataset['period_rows']
-                        : [],
-                    is_array($operationalPerformanceDataset['summary'] ?? null)
-                        ? $operationalPerformanceDataset['summary']
-                        : [],
-                    $period['from'],
-                    $period['to'],
-                ),
-            ],
+            'cash_change_denominations' => $operationalPerformanceDataset['cash_change_denominations'] ?? [],
+            'charts' => $this->charts->build(
+                $inventorySummary,
+                $topSellingRows,
+                $cashLedgerRows,
+                $operationalPerformanceDataset,
+                $period,
+            ),
         ];
     }
 }

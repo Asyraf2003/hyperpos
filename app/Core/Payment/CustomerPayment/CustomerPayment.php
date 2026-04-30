@@ -10,9 +10,9 @@ use DateTimeImmutable;
 
 final class CustomerPayment
 {
-    public const METHOD_CASH = 'cash';
-    public const METHOD_TRANSFER = 'tf';
-    public const METHOD_UNKNOWN = 'unknown';
+    public const METHOD_CASH = CustomerPaymentMethod::CASH;
+    public const METHOD_TRANSFER = CustomerPaymentMethod::TRANSFER;
+    public const METHOD_UNKNOWN = CustomerPaymentMethod::UNKNOWN;
 
     private function __construct(
         private string $id,
@@ -28,7 +28,7 @@ final class CustomerPayment
         DateTimeImmutable $paidAt,
         string $paymentMethod = self::METHOD_UNKNOWN,
     ): self {
-        $normalizedPaymentMethod = self::normalizePaymentMethod($paymentMethod);
+        $normalizedPaymentMethod = CustomerPaymentMethod::normalize($paymentMethod);
         self::assertValid($id, $amountRupiah, $normalizedPaymentMethod);
 
         return new self(
@@ -45,7 +45,7 @@ final class CustomerPayment
         DateTimeImmutable $paidAt,
         string $paymentMethod = self::METHOD_UNKNOWN,
     ): self {
-        $normalizedPaymentMethod = self::normalizePaymentMethod($paymentMethod);
+        $normalizedPaymentMethod = CustomerPaymentMethod::normalize($paymentMethod);
         self::assertValid($id, $amountRupiah, $normalizedPaymentMethod);
 
         return new self(
@@ -89,31 +89,6 @@ final class CustomerPayment
             throw new DomainException('Amount rupiah pada customer payment harus lebih besar dari nol.');
         }
 
-        if (! in_array($paymentMethod, self::allowedPaymentMethods(), true)) {
-            throw new DomainException('Metode pembayaran customer payment tidak valid.');
-        }
-    }
-
-    /**
-     * @return list<string>
-     */
-    private static function allowedPaymentMethods(): array
-    {
-        return [
-            self::METHOD_CASH,
-            self::METHOD_TRANSFER,
-            self::METHOD_UNKNOWN,
-        ];
-    }
-
-    private static function normalizePaymentMethod(string $paymentMethod): string
-    {
-        $normalized = trim($paymentMethod);
-
-        if ($normalized === 'transfer') {
-            return self::METHOD_TRANSFER;
-        }
-
-        return $normalized === '' ? self::METHOD_UNKNOWN : $normalized;
+        CustomerPaymentMethod::assertValid($paymentMethod);
     }
 }

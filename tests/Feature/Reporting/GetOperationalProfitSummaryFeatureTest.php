@@ -194,6 +194,60 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         ], $data['row']);
     }
 
+
+    public function test_get_operational_profit_summary_handler_allows_negative_store_stock_cogs_for_cross_period_refund(): void
+    {
+        $this->seedProduct('product-cross-refund-1', 'KB-XR-001', 'Ban Cross Refund', 'Federal', 100, 100000);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'movement-cross-sale-1',
+                'product_id' => 'product-cross-refund-1',
+                'movement_type' => 'stock_out',
+                'source_type' => 'work_item_store_stock_line',
+                'source_id' => 'ssl-cross-refund-1',
+                'tanggal_mutasi' => '2026-04-30',
+                'qty_delta' => -1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => -10000,
+            ],
+            [
+                'id' => 'movement-cross-return-1',
+                'product_id' => 'product-cross-refund-1',
+                'movement_type' => 'stock_in',
+                'source_type' => 'work_item_store_stock_line_reversal',
+                'source_id' => 'ssl-cross-refund-1',
+                'tanggal_mutasi' => '2026-05-01',
+                'qty_delta' => 1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 10000,
+            ],
+        ]);
+
+        $result = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-05-01', '2026-05-01');
+
+        $this->assertTrue($result->isSuccess());
+
+        $data = $result->data();
+        $this->assertIsArray($data);
+        $this->assertIsArray($data['row'] ?? null);
+
+        $this->assertSame([
+            'from_date' => '2026-05-01',
+            'to_date' => '2026-05-01',
+            'cash_in_rupiah' => 0,
+            'refunded_rupiah' => 0,
+            'external_purchase_cost_rupiah' => 0,
+            'store_stock_cogs_rupiah' => -10000,
+            'product_purchase_cost_rupiah' => -10000,
+            'operational_expense_rupiah' => 0,
+            'payroll_disbursement_rupiah' => 0,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => 10000,
+        ], $data['row']);
+    }
+
     public function test_get_operational_profit_summary_handler_excludes_reversed_payroll_from_profit_metrics(): void
     {
         $this->seedEmployee('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Montir Reversal');

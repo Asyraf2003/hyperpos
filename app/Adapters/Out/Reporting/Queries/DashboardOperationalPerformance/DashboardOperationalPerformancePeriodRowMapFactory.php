@@ -34,6 +34,7 @@ final class DashboardOperationalPerformancePeriodRowMapFactory
                 'operational_expense_rupiah' => 0,
                 'payroll_disbursement_rupiah' => 0,
                 'employee_debt_cash_out_rupiah' => 0,
+                'potential_change_rupiah' => 0,
                 'operational_profit_rupiah' => 0,
             ];
 

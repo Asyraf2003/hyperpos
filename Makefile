@@ -36,3 +36,10 @@ seed-3:
 2: seed-2
 3: seed-3
 # <<< seed targets <<<
+
+# >>> docs targets >>>
+.PHONY: docs-help
+
+docs-help:
+	@cat docs/DOCS_HELP.md
+# <<< docs targets <<<

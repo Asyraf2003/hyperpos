@@ -83,12 +83,33 @@
   let pendingVoidAction = null;
 
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => ({
+
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
   }[m]));
+
+  const tanggalId = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    const text = String(value);
+
+    if (/^\d{2}\/\d{2}\/\d{4}/.test(text)) {
+      return text;
+    }
+
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) {
+      return text;
+    }
+
+    return `${match[3]}/${match[2]}/${match[1]}`;
+  };
+
 
   const trimValue = (v) => String(v ?? "").trim();
   const rupiah = (v) => "Rp " + Number(v || 0).toLocaleString("id-ID");
@@ -164,8 +185,8 @@
     }
 
     if (trimValue(s.shipment_date_from) !== "" || trimValue(s.shipment_date_to) !== "") {
-      const from = trimValue(s.shipment_date_from) || "...";
-      const to = trimValue(s.shipment_date_to) || "...";
+      const from = tanggalId(trimValue(s.shipment_date_from)) || "...";
+      const to = tanggalId(trimValue(s.shipment_date_to)) || "...";
       entries.push({ label: "Tanggal Kirim", value: `${from} s.d. ${to}` });
     }
 
@@ -411,8 +432,8 @@
       <td>${(meta.page - 1) * meta.per_page + index + 1}</td>
       <td>${invoiceCellHtml(row)}</td>
       <td>${supplierCellHtml(row)}</td>
-      <td>${esc(row.shipment_date)}</td>
-      <td>${esc(row.due_date)}</td>
+      <td>${esc(tanggalId(row.shipment_date))}</td>
+      <td>${esc(tanggalId(row.due_date))}</td>
       <td>${rupiah(row.grand_total_rupiah)}</td>
       <td>${rupiah(row.total_paid_rupiah)}</td>
       <td>${rupiah(row.outstanding_rupiah)}</td>

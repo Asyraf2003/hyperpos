@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Application\PushNotification\UseCases;
 
-use App\Application\Note\DTO\DueNoteReminderRow;
 use App\Application\Note\UseCases\GetDueNoteRemindersHandler;
 use App\Application\PushNotification\DTO\DueNoteReminderPushSendSummary;
-use App\Application\PushNotification\DTO\PushNotificationPayload;
+use App\Application\PushNotification\Services\DueNoteReminderPushPayloadFactory;
 use App\Ports\Out\PushNotification\PushNotificationSenderPort;
 use App\Ports\Out\PushNotification\PushSubscriptionReaderPort;
 use App\Ports\Out\PushNotification\PushSubscriptionWriterPort;
@@ -19,6 +18,7 @@ final class SendDueNoteReminderPushHandler
         private readonly PushSubscriptionReaderPort $subscriptions,
         private readonly PushSubscriptionWriterPort $subscriptionWriter,
         private readonly PushNotificationSenderPort $sender,
+        private readonly DueNoteReminderPushPayloadFactory $payloads,
     ) {
     }
 
@@ -34,7 +34,7 @@ final class SendDueNoteReminderPushHandler
         }
 
         $subscriptions = $this->subscriptions->findActive($subscriptionLimit);
-        $payload = $this->payload($today, $reminders);
+        $payload = $this->payloads->make($today, $reminders);
         $sent = 0;
         $failed = 0;
         $expired = 0;
@@ -68,38 +68,6 @@ final class SendDueNoteReminderPushHandler
             sentCount: $sent,
             failedCount: $failed,
             expiredCount: $expired,
-        );
-    }
-
-    /**
-     * @param list<DueNoteReminderRow> $reminders
-     */
-    private function payload(string $today, array $reminders): PushNotificationPayload
-    {
-        $count = count($reminders);
-        $overdue = count(array_filter(
-            $reminders,
-            fn (DueNoteReminderRow $row): bool => $row->daysOverdue > 0,
-        ));
-        $total = array_sum(array_map(
-            fn (DueNoteReminderRow $row): int => $row->outstandingRupiah,
-            $reminders,
-        ));
-
-        $body = 'Ada '.$count.' nota jatuh tempo/perlu dicek. Total tagihan Rp '
-            .number_format($total, 0, ',', '.').'.';
-
-        if ($overdue > 0) {
-            $body .= ' '.$overdue.' nota sudah lewat jatuh tempo.';
-        }
-
-        return new PushNotificationPayload(
-            title: 'Reminder Jatuh Tempo Nota',
-            body: $body,
-            icon: '/assets/compiled/svg/favicon.svg',
-            badge: '/assets/compiled/svg/favicon.svg',
-            url: '/admin/notes',
-            tag: 'due-note-reminder-'.$today,
         );
     }
 }

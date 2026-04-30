@@ -19,7 +19,7 @@ final class DashboardOperationalPerformancePeriodAmountMerger
     /**
      * @param array<string, DashboardOperationalPerformancePeriodRow> $rowsByKey
      * @param list<DashboardOperationalPerformanceAmountRow> $amountRows
-     * @param 'cash_in_rupiah'|'refund_rupiah'|'external_purchase_cost_rupiah'|'store_stock_cogs_rupiah'|'operational_expense_rupiah'|'payroll_disbursement_rupiah'|'employee_debt_cash_out_rupiah' $field
+     * @param 'cash_in_rupiah'|'refund_rupiah'|'external_purchase_cost_rupiah'|'store_stock_cogs_rupiah'|'operational_expense_rupiah'|'payroll_disbursement_rupiah'|'employee_debt_cash_out_rupiah'|'potential_change_rupiah' $field
      */
     public function merge(array &$rowsByKey, array $amountRows, string $field): void
     {

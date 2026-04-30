@@ -12,6 +12,7 @@ use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\EmployeeD
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\ExternalPurchaseCostPerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\OperationalExpensePerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\PayrollDisbursementPerDayQuery;
+use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\PotentialChangePerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\RefundPerDayQuery;
 use App\Adapters\Out\Reporting\Queries\DashboardOperationalPerformance\StoreStockCogsPerDayQuery;
 use App\Ports\Out\Reporting\DashboardOperationalPerformanceReaderPort;
@@ -29,6 +30,7 @@ final class DashboardOperationalPerformancePeriodQuery
         private readonly OperationalExpensePerDayQuery $operationalExpense,
         private readonly PayrollDisbursementPerDayQuery $payrollDisbursement,
         private readonly EmployeeDebtCashOutPerDayQuery $employeeDebtCashOut,
+        private readonly PotentialChangePerDayQuery $potentialChange,
         private readonly DashboardOperationalPerformancePeriodRowMapFactory $rowMapFactory,
         private readonly DashboardOperationalPerformancePeriodAmountMerger $amountMerger,
         private readonly DashboardOperationalPerformancePeriodProfitCalculator $profitCalculator,
@@ -49,6 +51,7 @@ final class DashboardOperationalPerformancePeriodQuery
         $this->amountMerger->merge($rowsByKey, $this->operationalExpense->rows($fromDate, $toDate), 'operational_expense_rupiah');
         $this->amountMerger->merge($rowsByKey, $this->payrollDisbursement->rows($fromDate, $toDate), 'payroll_disbursement_rupiah');
         $this->amountMerger->merge($rowsByKey, $this->employeeDebtCashOut->rows($fromDate, $toDate), 'employee_debt_cash_out_rupiah');
+        $this->amountMerger->merge($rowsByKey, $this->potentialChange->rows($fromDate, $toDate), 'potential_change_rupiah');
 
         $this->profitCalculator->calculate($rowsByKey);
 

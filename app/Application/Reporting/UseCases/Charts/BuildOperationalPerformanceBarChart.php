@@ -12,12 +12,14 @@ final class BuildOperationalPerformanceBarChart
      *   period_label:string,
      *   operational_profit_rupiah:int,
      *   operational_expense_rupiah:int,
-     *   refund_rupiah:int
+     *   refund_rupiah:int,
+     *   potential_change_rupiah:int
      * }> $periodRows
      * @param array{
      *   total_operational_profit_rupiah:int,
      *   total_operational_expense_rupiah:int,
-     *   total_refund_rupiah:int
+     *   total_refund_rupiah:int,
+     *   total_potential_change_rupiah:int
      * } $summary
      */
     public function build(array $periodRows, array $summary, string $fromDate, string $toDate): array
@@ -26,12 +28,14 @@ final class BuildOperationalPerformanceBarChart
         $profitValues = [];
         $expenseValues = [];
         $refundValues = [];
+        $potentialChangeValues = [];
 
         foreach ($periodRows as $row) {
             $labels[] = (string) ($row['period_label'] ?? '');
             $profitValues[] = (int) ($row['operational_profit_rupiah'] ?? 0);
             $expenseValues[] = (int) ($row['operational_expense_rupiah'] ?? 0);
             $refundValues[] = (int) ($row['refund_rupiah'] ?? 0);
+            $potentialChangeValues[] = (int) ($row['potential_change_rupiah'] ?? 0);
         }
 
         return [
@@ -58,11 +62,17 @@ final class BuildOperationalPerformanceBarChart
                     'label' => 'Refund',
                     'values' => $refundValues,
                 ],
+                [
+                    'key' => 'potential_change',
+                    'label' => 'Potensi Kembalian',
+                    'values' => $potentialChangeValues,
+                ],
             ],
             'summary' => [
                 'total_operational_profit_rupiah' => (int) ($summary['total_operational_profit_rupiah'] ?? 0),
                 'total_operational_expense_rupiah' => (int) ($summary['total_operational_expense_rupiah'] ?? 0),
                 'total_refund_rupiah' => (int) ($summary['total_refund_rupiah'] ?? 0),
+                'total_potential_change_rupiah' => (int) ($summary['total_potential_change_rupiah'] ?? 0),
             ],
         ];
     }

@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Laporan Transaksi')
@@ -169,9 +189,9 @@
                                 <tr>
                                     <td>
                                         <div class="fw-semibold">{{ $row['customer_name'] }}</div>
-                                        <div class="small text-muted">{{ $row['transaction_date'] }} · {{ $row['note_id'] }}</div>
+                                        <div class="small text-muted">{{ $_uiDateDisplay($row['transaction_date'] ?? null) }} · {{ $row['note_id'] }}</div>
                                     </td>
-                                    <td>{{ $row['transaction_date'] }}</td>
+                                    <td>{{ $_uiDateDisplay($row['transaction_date'] ?? null) }}</td>
                                     <td>{{ $row['customer_name'] }}</td>
                                     <td class="text-end">Rp {{ number_format($row['gross_transaction_rupiah'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['net_cash_collected_rupiah'], 0, ',', '.') }}</td>

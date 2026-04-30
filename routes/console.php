@@ -4,6 +4,7 @@ use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierListProjectionService;
 use App\Application\PushNotification\UseCases\SendDueNoteReminderPushHandler;
+use App\Application\PushNotification\UseCases\SendSupplierPayableReminderPushHandler;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -125,6 +126,32 @@ Artisan::command(
         return $summary->failedCount > 0 ? 1 : 0;
     }
 )->purpose('Send push notification untuk nota pelanggan yang mendekati atau melewati jatuh tempo');
+
+
+Artisan::command(
+    'push-notifications:send-supplier-payable-reminders {--today=} {--invoice-limit=100} {--subscription-limit=500}',
+    function (SendSupplierPayableReminderPushHandler $handler): int {
+        $today = trim((string) ($this->option('today') ?: now()->toDateString()));
+        $invoiceLimit = max(1, (int) $this->option('invoice-limit'));
+        $subscriptionLimit = max(1, (int) $this->option('subscription-limit'));
+
+        try {
+            $summary = $handler->handle($today, $invoiceLimit, $subscriptionLimit);
+        } catch (Throwable $e) {
+            $this->error($e->getMessage());
+
+            return 1;
+        }
+
+        $this->info('Supplier payable reminders: '.$summary->supplierPayableReminderCount);
+        $this->info('Push subscriptions: '.$summary->subscriptionCount);
+        $this->info('Push sent: '.$summary->sentCount);
+        $this->info('Push expired: '.$summary->expiredCount);
+        $this->info('Push failed: '.$summary->failedCount);
+
+        return $summary->failedCount > 0 ? 1 : 0;
+    }
+)->purpose('Send push notification untuk hutang pemasok yang mendekati atau melewati jatuh tempo');
 
 
 require __DIR__ . '/console_audit.php';

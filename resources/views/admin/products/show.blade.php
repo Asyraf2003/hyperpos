@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 
 @section('title', 'Detail Produk')
 @section('heading', 'Detail Produk')
@@ -219,7 +239,7 @@
                                                     <div class="col-12 col-md-6">
                                                         <div class="ui-key-value">
                                                             <small>Dihapus Pada</small>
-                                                            <div>{{ $entry['snapshot']['deleted_at'] }}</div>
+                                                            <div>{{ $_uiDateDisplay($entry['snapshot']['deleted_at'] ?? null, true) }}</div>
                                                         </div>
                                                     </div>
                                                 @endif

@@ -7,7 +7,6 @@ namespace App\Application\Payment\Services;
 use App\Application\Note\Services\AutoCloseNoteWhenFullyPaid;
 use App\Application\Payment\DTO\RecordedNotePayment;
 use App\Core\Payment\CustomerPayment\CustomerPayment;
-use App\Core\Payment\CustomerPayment\CustomerPaymentCashDetail;
 use App\Core\Payment\Policies\PaymentAllocationPolicy;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
@@ -29,6 +28,7 @@ final class RecordAndAllocateNotePaymentOperation
         private readonly AllocatePaymentAcrossComponents $allocator,
         private readonly AutoCloseNoteWhenFullyPaid $autoClose,
         private readonly UuidPort $uuid,
+        private readonly BuildCustomerPaymentCashDetail $cashDetails,
     ) {
     }
 
@@ -57,7 +57,7 @@ final class RecordAndAllocateNotePaymentOperation
             $paymentMethod,
         );
 
-        $cashDetail = $this->cashDetailFor($payment, $amount, $amountReceivedRupiah);
+        $cashDetail = $this->cashDetails->execute($payment, $amount, $amountReceivedRupiah);
 
         $this->policy->assertAllocatable(
             $amount,
@@ -78,25 +78,5 @@ final class RecordAndAllocateNotePaymentOperation
         $this->autoClose->closeIfEligible($note, $payment->id());
 
         return new RecordedNotePayment($payment, count($allocations));
-    }
-
-    private function cashDetailFor(
-        CustomerPayment $payment,
-        Money $amount,
-        ?int $amountReceivedRupiah,
-    ): ?CustomerPaymentCashDetail {
-        if ($payment->paymentMethod() !== CustomerPayment::METHOD_CASH) {
-            return null;
-        }
-
-        if ($amountReceivedRupiah === null) {
-            throw new DomainException('Uang masuk wajib diisi untuk pembayaran cash.');
-        }
-
-        return CustomerPaymentCashDetail::create(
-            $payment->id(),
-            $amount,
-            Money::fromInt($amountReceivedRupiah),
-        );
     }
 }
