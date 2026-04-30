@@ -6,6 +6,7 @@ namespace App\Application\Payment\Services;
 
 use App\Application\Payment\DTO\PayableNoteComponent;
 use App\Core\Note\Note\Note;
+use App\Core\Note\WorkItem\WorkItem;
 
 final class ResolveNotePayableComponents
 {
@@ -23,6 +24,10 @@ final class ResolveNotePayableComponents
         $nextOrder = 1;
 
         foreach ($note->workItems() as $item) {
+            if ($item->status() === WorkItem::STATUS_CANCELED) {
+                continue;
+            }
+
             $resolved = PayableComponentsFromWorkItem::resolve($item, $nextOrder);
             $components = [...$components, ...$resolved];
             $nextOrder += count($resolved);

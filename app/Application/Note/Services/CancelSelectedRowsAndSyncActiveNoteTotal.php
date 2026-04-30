@@ -55,7 +55,7 @@ final class CancelSelectedRowsAndSyncActiveNoteTotal
             $before = $this->snapshots->build($note);
 
             foreach ($resolved['selected_items'] as $item) {
-                $updated = $this->transitions->findAndApply($note, $item->lineNo(), WorkItem::STATUS_CANCELED);
+                $updated = $this->transitions->findAndApplyById($note, $item->id(), WorkItem::STATUS_CANCELED);
                 $this->workItems->updateStatus($updated);
             }
 

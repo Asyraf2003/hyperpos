@@ -10,12 +10,14 @@ use App\Core\Note\Note\Note;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 
 final class NoteReplacementPaymentAllocationReconciler
 {
     public function __construct(
         private readonly PaymentComponentAllocationReaderPort $reader,
         private readonly PaymentComponentAllocationWriterPort $writer,
+        private readonly RefundComponentAllocationReaderPort $refunds,
         private readonly ResolveNotePayableComponents $components,
         private readonly AllocatePaymentAcrossComponents $allocator,
     ) {
@@ -34,7 +36,15 @@ final class NoteReplacementPaymentAllocationReconciler
                 + $allocation->allocatedAmountRupiah()->amount();
         }
 
-        return $amounts;
+        foreach ($this->refunds->listByNoteId($noteId) as $refund) {
+            $paymentId = $refund->customerPaymentId();
+            $amounts[$paymentId] = max(($amounts[$paymentId] ?? 0) - $refund->refundedAmountRupiah()->amount(), 0);
+        }
+
+        return array_filter(
+            $amounts,
+            static fn (int $amount): bool => $amount > 0,
+        );
     }
 
     public function deleteExisting(string $noteId): void

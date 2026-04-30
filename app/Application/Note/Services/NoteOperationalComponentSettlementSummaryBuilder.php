@@ -29,13 +29,18 @@ final class NoteOperationalComponentSettlementSummaryBuilder
             $allocated = $paymentTotals[$workItemId] ?? 0;
             $refunded = $refundTotals[$workItemId] ?? 0;
             $netPaid = max($allocated - $refunded, 0);
+            $isCanceled = $item->status() === WorkItem::STATUS_CANCELED;
+            $outstanding = $isCanceled ? 0 : max($subtotal - $netPaid, 0);
+            $settlementLabel = $isCanceled && $refunded > 0
+                ? 'refund'
+                : $this->labels->resolve($subtotal, $netPaid);
 
             $summary[$workItemId] = [
                 'allocated_rupiah' => $allocated,
                 'refunded_rupiah' => $refunded,
                 'net_paid_rupiah' => $netPaid,
-                'outstanding_rupiah' => max($subtotal - $netPaid, 0),
-                'settlement_label' => $this->labels->resolve($subtotal, $netPaid),
+                'outstanding_rupiah' => $outstanding,
+                'settlement_label' => $settlementLabel,
             ];
         }
 

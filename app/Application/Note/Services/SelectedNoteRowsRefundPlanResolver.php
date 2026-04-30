@@ -9,6 +9,7 @@ use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 
 final class SelectedNoteRowsRefundPlanResolver
 {
@@ -17,6 +18,7 @@ final class SelectedNoteRowsRefundPlanResolver
         private readonly NoteOperationalRowSettlementProjector $settlements,
         private readonly WorkItemOperationalStatusResolver $statuses,
         private readonly PaymentComponentAllocationReaderPort $allocations,
+        private readonly RefundComponentAllocationReaderPort $refunds,
         private readonly SelectedRowsRefundBucketsBuilder $buckets,
     ) {
     }
@@ -61,6 +63,7 @@ final class SelectedNoteRowsRefundPlanResolver
         $paymentBuckets = $this->buckets->build(
             $selectedIds,
             $this->allocations->listByNoteId($note->id()),
+            $this->refunds->listByNoteId($note->id()),
         );
 
         $paidRowIds = [];

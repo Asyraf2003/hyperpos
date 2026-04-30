@@ -12,18 +12,30 @@ final class WorkItemStatusTransitionService
 {
     public function findAndApply(Note $note, int $lineNo, string $target): WorkItem
     {
-        $workItem = null;
         foreach ($note->workItems() as $item) {
             if ($item->lineNo() === $lineNo) {
-                $workItem = $item;
-                break;
+                return $this->apply($item, $target);
             }
         }
 
-        if ($workItem === null) {
-            throw new DomainException('Work item pada note tidak ditemukan.');
+        throw new DomainException('Work item pada note tidak ditemukan.');
+    }
+
+    public function findAndApplyById(Note $note, string $workItemId, string $target): WorkItem
+    {
+        $normalizedId = trim($workItemId);
+
+        foreach ($note->workItems() as $item) {
+            if ($item->id() === $normalizedId) {
+                return $this->apply($item, $target);
+            }
         }
 
+        throw new DomainException('Work item pada note tidak ditemukan.');
+    }
+
+    private function apply(WorkItem $workItem, string $target): WorkItem
+    {
         match ($target) {
             WorkItem::STATUS_DONE => $workItem->markDone(),
             WorkItem::STATUS_CANCELED => $workItem->cancel(),

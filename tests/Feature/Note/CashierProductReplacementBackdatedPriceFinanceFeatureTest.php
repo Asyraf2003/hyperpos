@@ -150,6 +150,116 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
         ]);
     }
 
+    public function test_cashier_product_replacement_reuses_only_net_payment_after_refund(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-4 days'));
+        $today = date('Y-m-d');
+
+        $this->seedPaidProductOnlyNote($oldDate);
+
+        DB::table('customer_refunds')->insert([
+            'id' => 'refund-1',
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'amount_rupiah' => 100000,
+            'refunded_at' => $oldDate,
+            'reason' => 'Refund sebagian sebelum revisi',
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            'id' => 'rca-1',
+            'customer_refund_id' => 'refund-1',
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'work_item_id' => 'wi-old-1',
+            'component_type' => 'product_only_work_item',
+            'component_ref_id' => 'wi-old-1',
+            'refunded_amount_rupiah' => 100000,
+            'refund_priority' => 1,
+        ]);
+
+        DB::table('products')
+            ->where('id', 'product-1')
+            ->update(['harga_jual' => 110000]);
+
+        $this->actingAs($user)
+            ->get(route('admin.notes.show', ['noteId' => 'note-1']))
+            ->assertOk();
+
+        $edit = $this->actingAs($user)
+            ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
+
+        $edit->assertOk();
+        $edit->assertSee('revision_snapshot');
+
+        $response = $this->actingAs($user)->patch(
+            route('admin.notes.workspace.update', ['noteId' => 'note-1']),
+            [
+                'note' => [
+                    'customer_name' => 'Budi Revised Product Net Refund',
+                    'customer_phone' => '08123456789',
+                    'transaction_date' => $today,
+                ],
+                'items' => [
+                    [
+                        'entry_mode' => 'product',
+                        'description' => null,
+                        'part_source' => 'store_stock',
+                        'service' => [
+                            'name' => null,
+                            'price_rupiah' => null,
+                            'notes' => null,
+                        ],
+                        'product_lines' => [
+                            [
+                                'product_id' => 'product-1',
+                                'qty' => 3,
+                                'unit_price_rupiah' => 100000,
+                                'price_basis' => 'revision_snapshot',
+                            ],
+                        ],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => null,
+                    'amount_paid_rupiah' => null,
+                    'amount_received_rupiah' => null,
+                ],
+            ],
+        );
+
+        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-1']));
+        $response->assertSessionHasNoErrors();
+
+        $this->assertSame(
+            200000,
+            (int) DB::table('payment_component_allocations')
+                ->where('note_id', 'note-1')
+                ->where('customer_payment_id', 'payment-1')
+                ->sum('allocated_amount_rupiah')
+        );
+
+        $this->assertSame(
+            100000,
+            (int) DB::table('refund_component_allocations')
+                ->where('note_id', 'note-1')
+                ->where('customer_payment_id', 'payment-1')
+                ->sum('refunded_amount_rupiah')
+        );
+
+        $this->assertSame(
+            300000,
+            (int) DB::table('customer_payments')
+                ->where('id', 'payment-1')
+                ->value('amount_rupiah')
+        );
+    }
+
+
     private function seedPaidProductOnlyNote(string $oldDate): void
     {
         $this->seedNoteBase('note-1', 'Budi Product Lama', $oldDate, 300000, 'closed');
