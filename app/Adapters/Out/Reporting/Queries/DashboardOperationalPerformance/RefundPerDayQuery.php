@@ -18,7 +18,10 @@ final class RefundPerDayQuery
     public function rows(string $fromDate, string $toDate): array
     {
         return DB::table('customer_refunds')
-            ->whereBetween(DB::raw('DATE(refunded_at)'), [$fromDate, $toDate])
+            ->whereBetween('refunded_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->selectRaw('DATE(refunded_at) as period_key, COALESCE(SUM(amount_rupiah), 0) as amount_rupiah')
             ->groupBy(DB::raw('DATE(refunded_at)'))
             ->orderBy(DB::raw('DATE(refunded_at)'))
@@ -30,5 +33,14 @@ final class RefundPerDayQuery
             ])
             ->values()
             ->all();
+    }
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

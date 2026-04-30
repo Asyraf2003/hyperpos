@@ -24,7 +24,10 @@ final class PotentialChangePerDayQuery
                 '=',
                 'customer_payment_cash_details.customer_payment_id',
             )
-            ->whereBetween(DB::raw('DATE(customer_payments.paid_at)'), [$fromDate, $toDate])
+            ->whereBetween('customer_payments.paid_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->selectRaw(
                 'DATE(customer_payments.paid_at) as period_key, '
                 .'COALESCE(SUM(customer_payment_cash_details.change_rupiah), 0) as amount_rupiah'
@@ -39,5 +42,14 @@ final class PotentialChangePerDayQuery
             ])
             ->values()
             ->all();
+    }
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

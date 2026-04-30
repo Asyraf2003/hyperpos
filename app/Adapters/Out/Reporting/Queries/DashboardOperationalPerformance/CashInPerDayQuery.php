@@ -18,7 +18,10 @@ final class CashInPerDayQuery
     public function rows(string $fromDate, string $toDate): array
     {
         return DB::table('customer_payments')
-            ->whereBetween(DB::raw('DATE(paid_at)'), [$fromDate, $toDate])
+            ->whereBetween('paid_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->selectRaw('DATE(paid_at) as period_key, COALESCE(SUM(amount_rupiah), 0) as amount_rupiah')
             ->groupBy(DB::raw('DATE(paid_at)'))
             ->orderBy(DB::raw('DATE(paid_at)'))
@@ -30,5 +33,14 @@ final class CashInPerDayQuery
             ])
             ->values()
             ->all();
+    }
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

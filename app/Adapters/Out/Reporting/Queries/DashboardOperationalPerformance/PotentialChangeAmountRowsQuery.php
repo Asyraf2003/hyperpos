@@ -20,12 +20,24 @@ final class PotentialChangeAmountRowsQuery
                 '=',
                 'customer_payment_cash_details.customer_payment_id',
             )
-            ->whereBetween(DB::raw('DATE(customer_payments.paid_at)'), [$fromDate, $toDate])
+            ->whereBetween('customer_payments.paid_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->orderBy('customer_payments.paid_at')
             ->orderBy('customer_payment_cash_details.customer_payment_id')
             ->pluck('customer_payment_cash_details.change_rupiah')
             ->all();
 
         return array_map(static fn (mixed $amount): int => (int) $amount, $rows);
+    }
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }
