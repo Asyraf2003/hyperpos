@@ -1061,9 +1061,7 @@
 
     </section>
 
-    <script type="application/json" id="admin-dashboard-analytics-payload" class="analytics-json">
-        @json($dashboard['analytics'] ?? [])
-    </script>
+    <script type="application/json" id="admin-dashboard-analytics-payload" data-url="{{ route('admin.dashboard.analytics') }}">{}</script>
 
 
 </div>

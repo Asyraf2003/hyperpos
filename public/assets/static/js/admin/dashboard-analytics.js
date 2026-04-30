@@ -7,12 +7,49 @@
 
     let payload = {};
 
-    try {
-        payload = JSON.parse(payloadElement.textContent || '{}');
-    } catch (error) {
-        console.error('Payload analytics dashboard tidak valid.', error);
-        return;
-    }
+    const parseInlinePayload = () => {
+        try {
+            payload = JSON.parse(payloadElement.textContent || '{}');
+            return true;
+        } catch (error) {
+            console.error('Payload analytics dashboard tidak valid.', error);
+            payload = {};
+            return false;
+        }
+    };
+
+    const loadRemotePayload = async () => {
+        const url = payloadElement.dataset.url || '';
+
+        if (!url) {
+            parseInlinePayload();
+            renderAll();
+            return;
+        }
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            payload = await response.json();
+            renderAll();
+        } catch (error) {
+            console.error('Gagal memuat analytics dashboard.', error);
+
+            if (parseInlinePayload()) {
+                renderAll();
+            }
+        }
+    };
 
     const containers = {
         stock: document.getElementById('admin-chart-stock-status-donut'),
@@ -543,7 +580,7 @@
         renderOperationalBar();
     };
 
-    renderAll();
+    loadRemotePayload();
 
     let frame = null;
     const rerender = () => {

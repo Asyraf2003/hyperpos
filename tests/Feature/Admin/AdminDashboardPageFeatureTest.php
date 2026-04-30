@@ -52,10 +52,7 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Nilai Persediaan');
             $response->assertSee('Rp 211.000');
             $response->assertSee('Status Stok Saat Ini');
-            $response->assertSee('Stok Aman');
-            $response->assertSee('Mulai Perlu Restok');
-            $response->assertSee('Stok Kritis');
-            $response->assertSee('Belum Diatur');
+            $response->assertSee(route('admin.dashboard.analytics'), false);
             $response->assertSee('Prioritas Restok');
             $response->assertSee('Lihat Detail');
             $response->assertSee(route('admin.products.show', ['productId' => 'product-2']), false);
@@ -94,16 +91,32 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('2 Unit');
             $response->assertSee('1 Unit');
             $response->assertSee('Rp 17.000');
-            $response->assertSeeInOrder([
-                'Stok Aman',
-                '1',
-                'Mulai Perlu Restok',
-                '1',
-                'Stok Kritis',
-                '1',
-                'Belum Diatur',
-                '1',
-            ]);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_admin_can_fetch_dashboard_analytics_payload(): void
+    {
+        Carbon::setTestNow('2030-01-09 08:00:00');
+
+        try {
+            $this->seedDashboardFixtures();
+
+            $response = $this->actingAs($this->user('admin'))
+                ->getJson(route('admin.dashboard.analytics'));
+
+            $response->assertOk();
+            $response->assertJsonPath('charts.stock_status_donut.segments.0.label', 'Stok Aman');
+            $response->assertJsonPath('charts.stock_status_donut.segments.0.value', 1);
+            $response->assertJsonPath('charts.stock_status_donut.segments.1.label', 'Mulai Restok');
+            $response->assertJsonPath('charts.stock_status_donut.segments.1.value', 1);
+            $response->assertJsonPath('charts.stock_status_donut.segments.2.label', 'Stok Kritis');
+            $response->assertJsonPath('charts.stock_status_donut.segments.2.value', 1);
+            $response->assertJsonPath('charts.stock_status_donut.segments.3.label', 'Belum Diatur');
+            $response->assertJsonPath('charts.stock_status_donut.segments.3.value', 1);
+            $response->assertJsonPath('charts.cashflow_line.summary.total_cash_in_rupiah', 149999);
+            $response->assertJsonPath('charts.operational_performance_bar.summary.total_operational_expense_rupiah', 5000);
         } finally {
             Carbon::setTestNow();
         }

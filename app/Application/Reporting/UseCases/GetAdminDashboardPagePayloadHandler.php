@@ -8,17 +8,11 @@ final class GetAdminDashboardPagePayloadHandler
 {
     public function __construct(
         private readonly GetAdminDashboardOverviewHandler $overview,
-        private readonly GetAdminDashboardAnalyticsHandler $analytics,
     ) {
     }
 
     public function handle(): array
     {
-        return array_merge(
-            $this->overview->handle(),
-            [
-                'analytics' => $this->analytics->handle(),
-            ],
-        );
+        return $this->overview->handle();
     }
 }
