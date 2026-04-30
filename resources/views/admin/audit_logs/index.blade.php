@@ -1,25 +1,4 @@
 @extends('layouts.app')
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
-
 @section('title', 'Audit Log')
 @section('heading', 'Audit Log')
 
@@ -77,7 +56,7 @@
                             @forelse ($logs as $entry)
                                 <tr>
                                     <td>{{ $entry['id'] }}</td>
-                                    <td class="text-nowrap">{{ $_uiDateDisplay($entry['created_at'] ?? null, true) }}</td>
+                                    <td class="text-nowrap">{{ \App\Support\ViewDateFormatter::display($entry['created_at'] ?? null, true) }}</td>
                                     <td>
                                         <span class="badge bg-light-primary text-primary">
                                             {{ $entry['event'] }}

@@ -1,23 +1,3 @@
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
 <div class="card">
   <div class="card-header">
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
@@ -43,7 +23,7 @@
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Tanggal Nota</small>
-            <div class="text-end">{{ $_uiDateDisplay($currentRevision['transaction_date'] ?? null) }}</div>
+            <div class="text-end">{{ \App\Support\ViewDateFormatter::display($currentRevision['transaction_date'] ?? null) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Jumlah Line</small>
@@ -55,7 +35,7 @@
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2">
             <small>Dibuat Pada</small>
-            <div class="text-end">{{ $_uiDateDisplay($currentRevision['created_at'] ?? null, true) }}</div>
+            <div class="text-end">{{ \App\Support\ViewDateFormatter::display($currentRevision['created_at'] ?? null, true) }}</div>
           </div>
         </div>
       </div>
@@ -75,7 +55,7 @@
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Tanggal Nota</small>
-            <div class="text-end">{{ $_uiDateDisplay($baselineRevision['transaction_date'] ?? null) }}</div>
+            <div class="text-end">{{ \App\Support\ViewDateFormatter::display($baselineRevision['transaction_date'] ?? null) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
             <small>Jumlah Line</small>
@@ -87,7 +67,7 @@
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2">
             <small>Dibuat Pada</small>
-            <div class="text-end">{{ $_uiDateDisplay($baselineRevision['created_at'] ?? null, true) }}</div>
+            <div class="text-end">{{ \App\Support\ViewDateFormatter::display($baselineRevision['created_at'] ?? null, true) }}</div>
           </div>
         </div>
       </div>
@@ -111,7 +91,7 @@
               <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
                 <div>
                   <h6 class="mb-1">Revision R{{ (int) ($entry['revision_number'] ?? 0) }}</h6>
-                  <small class="text-muted">{{ $_uiDateDisplay($entry['created_at'] ?? null, true) }}</small>
+                  <small class="text-muted">{{ \App\Support\ViewDateFormatter::display($entry['created_at'] ?? null, true) }}</small>
                 </div>
                 <span class="badge bg-light-secondary text-secondary align-self-start">
                   Revisi Nota
@@ -136,7 +116,7 @@
                   </div>
                   <div class="col-12 col-md-4">
                     <small class="text-muted d-block">Tanggal Nota</small>
-                    <div class="fw-semibold">{{ $_uiDateDisplay($entry['transaction_date'] ?? null) }}</div>
+                    <div class="fw-semibold">{{ \App\Support\ViewDateFormatter::display($entry['transaction_date'] ?? null) }}</div>
                   </div>
                   <div class="col-12 col-md-2">
                     <small class="text-muted d-block">Line</small>

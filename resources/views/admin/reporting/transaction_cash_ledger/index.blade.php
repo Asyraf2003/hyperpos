@@ -1,24 +1,4 @@
 @extends('layouts.app')
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Arus Kas Transaksi')
@@ -129,7 +109,7 @@
                         <tbody id="transaction-cash-ledger-table-body">
                             @forelse ($rows as $row)
                                 <tr>
-                                    <td>{{ $_uiDateDisplay($row['event_date'] ?? null) }}</td>
+                                    <td>{{ \App\Support\ViewDateFormatter::display($row['event_date'] ?? null) }}</td>
                                     <td>{{ $row['note_label'] ?? $row['note_id'] }}</td>
                                     <td>
                                         {{ match ($row['event_type'] ?? '') {

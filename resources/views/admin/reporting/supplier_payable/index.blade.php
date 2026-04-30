@@ -1,24 +1,4 @@
 @extends('layouts.app')
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Hutang Pemasok')
@@ -218,8 +198,8 @@
                                 <tr>
                                     <td>{{ $row['nomor_faktur'] ?? $row['supplier_invoice_id'] }}</td>
                                     <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
-                                    <td>{{ $_uiDateDisplay($row['shipment_date'] ?? null) }}</td>
-                                    <td>{{ $_uiDateDisplay($row['due_date'] ?? null) }}</td>
+                                    <td>{{ \App\Support\ViewDateFormatter::display($row['shipment_date'] ?? null) }}</td>
+                                    <td>{{ \App\Support\ViewDateFormatter::display($row['due_date'] ?? null) }}</td>
                                     <td>
                                         @if (($row['due_status'] ?? '') === 'settled')
                                             <span class="badge bg-success">{{ $row['due_status_label'] }}</span>

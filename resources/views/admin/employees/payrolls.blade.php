@@ -1,25 +1,4 @@
 @extends('layouts.app')
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
-
 @section('title', 'Detail Gaji Karyawan')
 @section('heading', 'Detail Gaji Karyawan')
 
@@ -92,7 +71,7 @@
                     <div class="card-body">
                         <div class="fw-semibold">Rp{{ $payrollSummary['total_disbursed_amount_formatted'] }}</div>
                         <div class="small text-muted mt-1">
-                            Terakhir: {{ $_uiDateDisplay($payrollSummary['latest_disbursement_date'] ?? null) }}
+                            Terakhir: {{ \App\Support\ViewDateFormatter::display($payrollSummary['latest_disbursement_date'] ?? null) }}
                         </div>
                     </div>
                 </div>

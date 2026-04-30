@@ -1,24 +1,4 @@
 @extends('layouts.app')
-@php
-    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
-        if ($value === null || $value === '') {
-            return '-';
-        }
-
-        $text = (string) $value;
-
-        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
-            return $text;
-        }
-
-        try {
-            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
-        } catch (\Throwable) {
-            return $text;
-        }
-    };
-@endphp
-
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Biaya Operasional')
@@ -169,7 +149,7 @@
                         <tbody id="operational-expense-report-table-body">
                             @forelse ($rows as $row)
                                 <tr>
-                                    <td>{{ $_uiDateDisplay($row['expense_date'] ?? null) }}</td>
+                                    <td>{{ \App\Support\ViewDateFormatter::display($row['expense_date'] ?? null) }}</td>
                                     <td>{{ $row['category_name'] }}</td>
                                     <td>{{ $row['description'] }}</td>
                                     <td>
