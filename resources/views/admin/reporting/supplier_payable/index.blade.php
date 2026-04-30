@@ -14,7 +14,7 @@
     'basisDateNote' => 'Data faktur masuk dihitung dari tanggal pengiriman.',
     'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . \App\Support\ViewDateFormatter::display($filters['reference_date'] ?? null) . '.',
 ])
-\n<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
     <div>
         <div class="fw-semibold">Notifikasi hutang faktur belum aktif.</div>
