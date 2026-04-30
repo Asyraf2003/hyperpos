@@ -18,7 +18,10 @@ final class EmployeeDebtCashOutPerDayQuery
     public function rows(string $fromDate, string $toDate): array
     {
         return DB::table('employee_debts')
-            ->whereBetween(DB::raw('DATE(employee_debts.created_at)'), [$fromDate, $toDate])
+            ->whereBetween('employee_debts.created_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->selectRaw(
                 'DATE(employee_debts.created_at) as period_key, ' .
                 'COALESCE(SUM(employee_debts.total_debt), 0) as amount_rupiah'
@@ -33,5 +36,15 @@ final class EmployeeDebtCashOutPerDayQuery
             ])
             ->values()
             ->all();
+    }
+
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

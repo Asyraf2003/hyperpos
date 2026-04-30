@@ -25,10 +25,10 @@ final class PayrollDisbursementPerDayQuery
                 'payroll_disbursement_reversals.payroll_disbursement_id',
             )
             ->whereNull('payroll_disbursement_reversals.id')
-            ->whereBetween(
-                DB::raw('DATE(payroll_disbursements.disbursement_date)'),
-                [$fromDate, $toDate],
-            )
+            ->whereBetween('payroll_disbursements.disbursement_date', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->selectRaw(
                 'DATE(payroll_disbursements.disbursement_date) as period_key, ' .
                 'COALESCE(SUM(payroll_disbursements.amount), 0) as amount_rupiah'
@@ -43,5 +43,15 @@ final class PayrollDisbursementPerDayQuery
             ])
             ->values()
             ->all();
+    }
+
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

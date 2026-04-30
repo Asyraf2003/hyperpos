@@ -26,14 +26,30 @@ final class OperatingCostMetricQuery
                 'payroll_disbursement_reversals.payroll_disbursement_id'
             )
             ->whereNull('payroll_disbursement_reversals.id')
-            ->whereBetween(DB::raw('DATE(payroll_disbursements.disbursement_date)'), [$fromDate, $toDate])
+            ->whereBetween('payroll_disbursements.disbursement_date', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->sum('payroll_disbursements.amount') ?? 0);
     }
 
     public function employeeDebtCashOut(string $fromDate, string $toDate): int
     {
         return (int) (DB::table('employee_debts')
-            ->whereBetween(DB::raw('DATE(employee_debts.created_at)'), [$fromDate, $toDate])
+            ->whereBetween('employee_debts.created_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->sum('employee_debts.total_debt') ?? 0);
+    }
+
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }

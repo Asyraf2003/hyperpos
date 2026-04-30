@@ -19,7 +19,10 @@ final class ProductCostMetricQuery
         $returned = (int) (DB::table('refund_component_allocations')
             ->join('customer_refunds', 'customer_refunds.id', '=', 'refund_component_allocations.customer_refund_id')
             ->where('refund_component_allocations.component_type', 'service_external_purchase_part')
-            ->whereBetween(DB::raw('DATE(customer_refunds.refunded_at)'), [$fromDate, $toDate])
+            ->whereBetween('customer_refunds.refunded_at', [
+                $this->startOfDay($fromDate),
+                $this->endOfDay($toDate),
+            ])
             ->sum('refund_component_allocations.refunded_amount_rupiah') ?? 0);
 
         return $issued - $returned;
@@ -40,5 +43,15 @@ final class ProductCostMetricQuery
             ->sum('total_cost_rupiah') ?? 0);
 
         return $issued - $returned;
+    }
+
+    private function startOfDay(string $date): string
+    {
+        return $date . ' 00:00:00';
+    }
+
+    private function endOfDay(string $date): string
+    {
+        return $date . ' 23:59:59';
     }
 }
