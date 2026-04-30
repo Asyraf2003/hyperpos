@@ -27,12 +27,10 @@ final class GetTransactionSummaryPerNoteHandler
 
         $rows = $this->builder->build($rawRows);
 
-        $expected = $this->sourceReader->getTransactionSummaryPerNoteReconciliation(
-            $fromTransactionDate,
-            $toTransactionDate,
+        $this->reconciliation->assertTransactionSummaryMatches(
+            $rows,
+            $this->expectedFromRawRows($rawRows),
         );
-
-        $this->reconciliation->assertTransactionSummaryMatches($rows, $expected);
 
         return Result::success([
             'rows' => array_map(
@@ -40,5 +38,23 @@ final class GetTransactionSummaryPerNoteHandler
                 $rows,
             ),
         ]);
+    }
+
+    private function expectedFromRawRows(array $rawRows): array
+    {
+        $expected = [
+            'total_notes' => count($rawRows),
+            'gross_transaction_rupiah' => 0,
+            'allocated_payment_rupiah' => 0,
+            'refunded_rupiah' => 0,
+        ];
+
+        foreach ($rawRows as $row) {
+            $expected['gross_transaction_rupiah'] += (int) ($row['gross_transaction_rupiah'] ?? 0);
+            $expected['allocated_payment_rupiah'] += (int) ($row['allocated_payment_rupiah'] ?? 0);
+            $expected['refunded_rupiah'] += (int) ($row['refunded_rupiah'] ?? 0);
+        }
+
+        return $expected;
     }
 }

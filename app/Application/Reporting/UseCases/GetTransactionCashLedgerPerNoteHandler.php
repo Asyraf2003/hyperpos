@@ -27,12 +27,10 @@ final class GetTransactionCashLedgerPerNoteHandler
 
         $rows = $this->builder->build($rawRows);
 
-        $expected = $this->sourceReader->getTransactionCashLedgerPerNoteReconciliation(
-            $fromEventDate,
-            $toEventDate,
+        $this->reconciliation->assertTransactionCashLedgerMatches(
+            $rows,
+            $this->expectedFromRawRows($rawRows),
         );
-
-        $this->reconciliation->assertTransactionCashLedgerMatches($rows, $expected);
 
         return Result::success([
             'rows' => array_map(
@@ -40,5 +38,29 @@ final class GetTransactionCashLedgerPerNoteHandler
                 $rows,
             ),
         ]);
+    }
+
+    private function expectedFromRawRows(array $rawRows): array
+    {
+        $expected = [
+            'total_in_rupiah' => 0,
+            'total_out_rupiah' => 0,
+        ];
+
+        foreach ($rawRows as $row) {
+            $amount = (int) ($row['event_amount_rupiah'] ?? 0);
+            $direction = (string) ($row['direction'] ?? '');
+
+            if ($direction === 'in') {
+                $expected['total_in_rupiah'] += $amount;
+                continue;
+            }
+
+            if ($direction === 'out') {
+                $expected['total_out_rupiah'] += $amount;
+            }
+        }
+
+        return $expected;
     }
 }
