@@ -102,6 +102,214 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
         ], $data['row']);
     }
 
+
+    public function test_get_operational_profit_summary_handler_nets_fully_refunded_note_product_costs_to_zero(): void
+    {
+        $this->seedProduct('product-full-refund-1', 'KB-FULL-RFD-001', 'Ban Full Refund', 'Federal', 100, 150000);
+
+        DB::table('notes')->insert([
+            'id' => 'note-full-refund-1',
+            'customer_name' => 'Budi Full Refund',
+            'transaction_date' => '2026-04-02',
+            'note_state' => 'refunded',
+            'total_rupiah' => 0,
+        ]);
+
+        DB::table('work_items')->insert([
+            [
+                'id' => 'wi-full-refund-stock-1',
+                'note_id' => 'note-full-refund-1',
+                'line_no' => 1,
+                'transaction_type' => 'service_with_store_stock_part',
+                'status' => 'canceled',
+                'subtotal_rupiah' => 142000,
+            ],
+            [
+                'id' => 'wi-full-refund-external-1',
+                'note_id' => 'note-full-refund-1',
+                'line_no' => 2,
+                'transaction_type' => 'service_with_external_purchase',
+                'status' => 'canceled',
+                'subtotal_rupiah' => 61000,
+            ],
+        ]);
+
+        DB::table('work_item_store_stock_lines')->insert([
+            'id' => 'ssl-full-refund-1',
+            'work_item_id' => 'wi-full-refund-stock-1',
+            'product_id' => 'product-full-refund-1',
+            'qty' => 1,
+            'line_total_rupiah' => 122000,
+        ]);
+
+        DB::table('work_item_external_purchase_lines')->insert([
+            'id' => 'ext-full-refund-1',
+            'work_item_id' => 'wi-full-refund-external-1',
+            'cost_description' => 'Beli luar full refund',
+            'unit_cost_rupiah' => 21000,
+            'qty' => 1,
+            'line_total_rupiah' => 21000,
+        ]);
+
+        DB::table('customer_payments')->insert([
+            'id' => 'payment-full-refund-1',
+            'amount_rupiah' => 203000,
+            'paid_at' => '2026-04-02',
+        ]);
+
+        DB::table('payment_component_allocations')->insert([
+            [
+                'id' => 'pca-full-refund-1',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-stock-1',
+                'component_type' => 'service_store_stock_part',
+                'component_ref_id' => 'ssl-full-refund-1',
+                'component_amount_rupiah_snapshot' => 122000,
+                'allocated_amount_rupiah' => 122000,
+                'allocation_priority' => 1,
+            ],
+            [
+                'id' => 'pca-full-refund-2',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-stock-1',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-full-refund-stock-1',
+                'component_amount_rupiah_snapshot' => 20000,
+                'allocated_amount_rupiah' => 20000,
+                'allocation_priority' => 2,
+            ],
+            [
+                'id' => 'pca-full-refund-3',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-external-1',
+                'component_type' => 'service_external_purchase_part',
+                'component_ref_id' => 'ext-full-refund-1',
+                'component_amount_rupiah_snapshot' => 21000,
+                'allocated_amount_rupiah' => 21000,
+                'allocation_priority' => 3,
+            ],
+            [
+                'id' => 'pca-full-refund-4',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-external-1',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-full-refund-external-1',
+                'component_amount_rupiah_snapshot' => 40000,
+                'allocated_amount_rupiah' => 40000,
+                'allocation_priority' => 4,
+            ],
+        ]);
+
+        DB::table('customer_refunds')->insert([
+            'id' => 'refund-full-refund-1',
+            'customer_payment_id' => 'payment-full-refund-1',
+            'note_id' => 'note-full-refund-1',
+            'amount_rupiah' => 203000,
+            'refunded_at' => '2026-04-02 10:00:00',
+            'reason' => 'Refund penuh nota reporting neutrality',
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            [
+                'id' => 'rca-full-refund-1',
+                'customer_refund_id' => 'refund-full-refund-1',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-stock-1',
+                'component_type' => 'service_store_stock_part',
+                'component_ref_id' => 'ssl-full-refund-1',
+                'refunded_amount_rupiah' => 122000,
+                'refund_priority' => 1,
+            ],
+            [
+                'id' => 'rca-full-refund-2',
+                'customer_refund_id' => 'refund-full-refund-1',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-stock-1',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-full-refund-stock-1',
+                'refunded_amount_rupiah' => 20000,
+                'refund_priority' => 2,
+            ],
+            [
+                'id' => 'rca-full-refund-3',
+                'customer_refund_id' => 'refund-full-refund-1',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-external-1',
+                'component_type' => 'service_external_purchase_part',
+                'component_ref_id' => 'ext-full-refund-1',
+                'refunded_amount_rupiah' => 21000,
+                'refund_priority' => 3,
+            ],
+            [
+                'id' => 'rca-full-refund-4',
+                'customer_refund_id' => 'refund-full-refund-1',
+                'customer_payment_id' => 'payment-full-refund-1',
+                'note_id' => 'note-full-refund-1',
+                'work_item_id' => 'wi-full-refund-external-1',
+                'component_type' => 'service_fee',
+                'component_ref_id' => 'wi-full-refund-external-1',
+                'refunded_amount_rupiah' => 40000,
+                'refund_priority' => 4,
+            ],
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'movement-full-refund-stock-out-1',
+                'product_id' => 'product-full-refund-1',
+                'movement_type' => 'stock_out',
+                'source_type' => 'work_item_store_stock_line',
+                'source_id' => 'ssl-full-refund-1',
+                'tanggal_mutasi' => '2026-04-02',
+                'qty_delta' => -1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => -10000,
+            ],
+            [
+                'id' => 'movement-full-refund-stock-return-1',
+                'product_id' => 'product-full-refund-1',
+                'movement_type' => 'stock_in',
+                'source_type' => 'work_item_store_stock_line_reversal',
+                'source_id' => 'ssl-full-refund-1',
+                'tanggal_mutasi' => '2026-04-02',
+                'qty_delta' => 1,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 10000,
+            ],
+        ]);
+
+        $result = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-04-02', '2026-04-02');
+
+        $this->assertTrue($result->isSuccess());
+
+        $data = $result->data();
+        $this->assertIsArray($data);
+        $this->assertIsArray($data['row'] ?? null);
+
+        $this->assertSame([
+            'from_date' => '2026-04-02',
+            'to_date' => '2026-04-02',
+            'cash_in_rupiah' => 203000,
+            'refunded_rupiah' => 203000,
+            'external_purchase_cost_rupiah' => 0,
+            'store_stock_cogs_rupiah' => 0,
+            'product_purchase_cost_rupiah' => 0,
+            'operational_expense_rupiah' => 0,
+            'payroll_disbursement_rupiah' => 0,
+            'employee_debt_cash_out_rupiah' => 0,
+            'cash_operational_profit_rupiah' => 0,
+        ], $data['row']);
+    }
+
+
     public function test_get_operational_profit_summary_handler_offsets_store_stock_cogs_when_refunded_stock_returns_to_inventory(): void
     {
         $this->seedProduct('product-refund-1', 'KB-RFD-001', 'Ban Refund', 'Federal', 100, 100000);
