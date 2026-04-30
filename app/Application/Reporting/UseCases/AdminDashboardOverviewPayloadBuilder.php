@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 
 final class AdminDashboardOverviewPayloadBuilder
@@ -12,7 +13,7 @@ final class AdminDashboardOverviewPayloadBuilder
         private readonly GetTransactionReportDatasetHandler $transactionReport,
         private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
         private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
-        private readonly GetInventoryStockValueReportDatasetHandler $inventoryStockValue,
+        private readonly DashboardInventoryOverviewReaderPort $inventory,
         private readonly GetOperationalProfitSummaryHandler $operationalProfit,
         private readonly GetSupplierPayableReportDatasetHandler $supplierPayable,
         private readonly GetEmployeeDebtReportDatasetHandler $employeeDebt,
@@ -29,9 +30,7 @@ final class AdminDashboardOverviewPayloadBuilder
             $this->transactionReport->handle($period['from'], $period['to'])
         );
 
-        $inventoryResult = $this->inventoryStockValue->handle($period['from'], $period['to']);
-        $inventorySummary = ReportingResultDataExtractor::summary($inventoryResult);
-        $inventorySnapshotRows = ReportingResultDataExtractor::snapshotRows($inventoryResult);
+        $inventorySummary = $this->inventory->getInventorySummary($period['from'], $period['to']);
 
         $operationalProfitRow = ReportingResultDataExtractor::row(
             $this->operationalProfit->handle($period['from'], $period['to'])
@@ -73,7 +72,7 @@ final class AdminDashboardOverviewPayloadBuilder
             $todayCash,
             $monthCash,
             $topSellingRows,
-            DashboardRestockPriorityRows::fromSnapshotRows($inventorySnapshotRows, 5),
+            $this->inventory->getRestockPriorityRows(5),
         );
     }
 }

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 
 final class AdminDashboardAnalyticsPayloadBuilder
 {
     public function __construct(
-        private readonly GetInventoryStockValueReportDatasetHandler $inventoryStockValue,
+        private readonly DashboardInventoryOverviewReaderPort $inventory,
         private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
         private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
         private readonly GetDashboardOperationalPerformanceDatasetHandler $operationalPerformance,
@@ -27,12 +28,10 @@ final class AdminDashboardAnalyticsPayloadBuilder
      */
     public function build(array $period): array
     {
-        $inventoryResult = $this->inventoryStockValue->handle(
+        $inventorySummary = $this->inventory->getInventorySummary(
             $period['from'],
             $period['to'],
         );
-
-        $inventorySummary = ReportingResultDataExtractor::summary($inventoryResult);
 
         $topSellingRows = $this->topSellingProducts->getTopSellingProducts(
             $period['from'],
