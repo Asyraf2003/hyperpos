@@ -71,7 +71,19 @@ Accepted.
 
 Cleanup note:
 
-This file is accepted, but its filename does not follow the numbered ADR convention. Do not rename it until all backlinks are audited and updated.
+This file is accepted, but its filename does not follow the numbered ADR convention.
+
+Backlink audit result:
+
+- docs/adr/README.md
+- docs/blueprints/2026-04-29-note-finance-current-projection-addendum.md
+- docs/handoff/v2/note-finance/2026-04-29-current-projection-refund-edit-handoff.md
+
+Decision:
+
+Keep the dated filename until an explicit ADR number is assigned.
+
+Do not rename it only for visual cleanup.
 
 ## Naming Rule
 
