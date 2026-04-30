@@ -44,9 +44,9 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Total Penjualan Bulan Ini');
             $response->assertSee('Rp 150.000');
             $response->assertSee('Net Cash Bulan Ini');
-            $response->assertSee('Rp 115.000');
+            $response->assertSee('Rp 140.999');
             $response->assertSee('Outstanding Bulan Ini');
-            $response->assertSee('Rp 35.000');
+            $response->assertSee('Rp 9.001');
             $response->assertSee('Total Qty On Hand');
             $response->assertSee('21 Unit');
             $response->assertSee('Nilai Persediaan');

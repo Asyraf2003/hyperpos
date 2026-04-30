@@ -70,28 +70,28 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
         $this->assertSame([
             'total_rows' => 1,
             'gross_transaction_rupiah' => 100000,
-            'allocated_payment_rupiah' => 70000,
-            'refunded_rupiah' => 5000,
-            'net_cash_collected_rupiah' => 65000,
-            'outstanding_rupiah' => 35000,
+            'allocated_payment_rupiah' => 99999,
+            'refunded_rupiah' => 9000,
+            'net_cash_collected_rupiah' => 90999,
+            'outstanding_rupiah' => 9001,
         ], $daily);
 
         $this->assertSame([
             'total_rows' => 2,
             'gross_transaction_rupiah' => 150000,
-            'allocated_payment_rupiah' => 120000,
-            'refunded_rupiah' => 5000,
-            'net_cash_collected_rupiah' => 115000,
-            'outstanding_rupiah' => 35000,
+            'allocated_payment_rupiah' => 149999,
+            'refunded_rupiah' => 9000,
+            'net_cash_collected_rupiah' => 140999,
+            'outstanding_rupiah' => 9001,
         ], $weekly);
 
         $this->assertSame([
             'total_rows' => 2,
             'gross_transaction_rupiah' => 150000,
-            'allocated_payment_rupiah' => 120000,
-            'refunded_rupiah' => 5000,
-            'net_cash_collected_rupiah' => 115000,
-            'outstanding_rupiah' => 35000,
+            'allocated_payment_rupiah' => 149999,
+            'refunded_rupiah' => 9000,
+            'net_cash_collected_rupiah' => 140999,
+            'outstanding_rupiah' => 9001,
         ], $monthly);
 
         $this->assertSame($monthly, $custom);
@@ -109,10 +109,10 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
             'transaction_date' => '2030-01-07',
             'customer_name' => 'Budi',
             'gross_transaction_rupiah' => 100000,
-            'allocated_payment_rupiah' => 70000,
-            'refunded_rupiah' => 5000,
-            'net_cash_collected_rupiah' => 65000,
-            'outstanding_rupiah' => 35000,
+            'allocated_payment_rupiah' => 99999,
+            'refunded_rupiah' => 9000,
+            'net_cash_collected_rupiah' => 90999,
+            'outstanding_rupiah' => 9001,
         ], $rows[0]);
     }
 

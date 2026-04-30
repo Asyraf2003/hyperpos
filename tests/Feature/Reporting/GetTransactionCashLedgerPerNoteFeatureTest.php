@@ -66,7 +66,7 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'event_type' => 'refund',
                 'direction' => 'out',
                 'event_amount_rupiah' => 10000,
-                'customer_payment_id' => null,
+                'customer_payment_id' => 'payment-1',
                 'refund_id' => 'refund-1',
             ],
         ], $data['rows']);

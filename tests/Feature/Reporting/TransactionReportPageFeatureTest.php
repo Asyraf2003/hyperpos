@@ -84,10 +84,10 @@ final class TransactionReportPageFeatureTest extends TestCase
         $response->assertSee('transaction-report-filter-form', false);
         $response->assertSee('01/01/2030 s/d 31/01/2030');
         $response->assertSee('Rp 150.000');
-        $response->assertSee('Rp 120.000');
-        $response->assertSee('Rp 5.000');
-        $response->assertSee('Rp 115.000');
-        $response->assertSee('Rp 35.000');
+        $response->assertSee('Rp 149.999');
+        $response->assertSee('Rp 9.000');
+        $response->assertSee('Rp 140.999');
+        $response->assertSee('Rp 9.001');
         $response->assertSee('note-1');
         $response->assertSee('note-2');
         $response->assertSee('Budi');

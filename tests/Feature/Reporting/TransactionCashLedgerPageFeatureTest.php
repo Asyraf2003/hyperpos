@@ -44,9 +44,9 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Arus Kas Transaksi');
         $response->assertSee('transaction-cash-ledger-filter-form', false);
-        $response->assertSee('2026-04-02');
-        $response->assertSee('2026-04-03');
-        $response->assertSee('2026-04-04');
+        $response->assertSee('02/04/2026');
+        $response->assertSee('03/04/2026');
+        $response->assertSee('04/04/2026');
         $response->assertSee('note-1');
         $response->assertSee('note-2');
         $response->assertSee('Alokasi Pembayaran');
@@ -177,6 +177,13 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
             'id' => $paymentId,
             'amount_rupiah' => $amountRupiah,
             'paid_at' => $paidAt,
+        ]);
+
+        DB::table('payment_allocations')->insert([
+            'id' => 'payment-allocation-' . $paymentId,
+            'customer_payment_id' => $paymentId,
+            'note_id' => $noteId,
+            'amount_rupiah' => $amountRupiah,
         ]);
 
         DB::table('payment_component_allocations')->insert([

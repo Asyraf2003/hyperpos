@@ -13,7 +13,7 @@ final class TransactionCashLedgerReportingQueryFeatureTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_groups_cash_events_from_component_ledgers(): void
+    public function test_it_groups_cash_events_from_cash_records(): void
     {
         $this->seedNote('note-1', 'Budi', '2026-04-02', 26000);
         $this->seedNote('note-2', 'Sari', '2026-04-03', 10000);
@@ -24,6 +24,21 @@ final class TransactionCashLedgerReportingQueryFeatureTest extends TestCase
 
         $this->seedCustomerPayment('pay-1', 8000, '2026-04-02');
         $this->seedCustomerPayment('pay-2', 4000, '2026-04-03');
+
+        DB::table('payment_allocations')->insert([
+            [
+                'id' => 'pa-1',
+                'customer_payment_id' => 'pay-1',
+                'note_id' => 'note-1',
+                'amount_rupiah' => 8000,
+            ],
+            [
+                'id' => 'pa-2',
+                'customer_payment_id' => 'pay-2',
+                'note_id' => 'note-2',
+                'amount_rupiah' => 4000,
+            ],
+        ]);
 
         $this->seedCustomerRefund('ref-1', 'pay-1', 'note-1', 1000, '2026-04-04', 'Refund');
 
@@ -91,6 +106,69 @@ final class TransactionCashLedgerReportingQueryFeatureTest extends TestCase
         $this->assertSame(12000, $recon['total_in_rupiah']);
         $this->assertSame(1000, $recon['total_out_rupiah']);
     }
+
+    public function test_cash_ledger_uses_cash_records_when_component_allocations_are_rebuilt_after_refund_revision(): void
+    {
+        $this->seedNote('note-revision-cash', 'Budi Revision', '2026-04-30', 0);
+        $this->seedWorkItem('wi-old-refunded', 'note-revision-cash', 1, 122000);
+        $this->seedWorkItem('wi-current', 'note-revision-cash', 2, 143000);
+
+        $this->seedCustomerPayment('pay-revision', 265000, '2026-04-30');
+
+        DB::table('payment_allocations')->insert([
+            'id' => 'pa-revision',
+            'customer_payment_id' => 'pay-revision',
+            'note_id' => 'note-revision-cash',
+            'amount_rupiah' => 265000,
+        ]);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-current-after-rebuild',
+            'customer_payment_id' => 'pay-revision',
+            'note_id' => 'note-revision-cash',
+            'work_item_id' => 'wi-current',
+            'component_type' => 'product_only_work_item',
+            'component_ref_id' => 'wi-current',
+            'component_amount_rupiah_snapshot' => 143000,
+            'allocated_amount_rupiah' => 143000,
+            'allocation_priority' => 1,
+        ]);
+
+        $this->seedCustomerRefund('refund-old-line', 'pay-revision', 'note-revision-cash', 122000, '2026-04-30', 'Refund old component');
+        $this->seedCustomerRefund('refund-current-line', 'pay-revision', 'note-revision-cash', 143000, '2026-04-30', 'Refund current component');
+
+        DB::table('refund_component_allocations')->insert([
+            [
+                'id' => 'rca-old-line',
+                'customer_refund_id' => 'refund-old-line',
+                'customer_payment_id' => 'pay-revision',
+                'note_id' => 'note-revision-cash',
+                'work_item_id' => 'wi-old-refunded',
+                'component_type' => 'product_only_work_item',
+                'component_ref_id' => 'wi-old-refunded',
+                'refunded_amount_rupiah' => 122000,
+                'refund_priority' => 1,
+            ],
+            [
+                'id' => 'rca-current-line',
+                'customer_refund_id' => 'refund-current-line',
+                'customer_payment_id' => 'pay-revision',
+                'note_id' => 'note-revision-cash',
+                'work_item_id' => 'wi-current',
+                'component_type' => 'product_only_work_item',
+                'component_ref_id' => 'wi-current',
+                'refunded_amount_rupiah' => 143000,
+                'refund_priority' => 1,
+            ],
+        ]);
+
+        $query = app(TransactionCashLedgerReportingQuery::class);
+        $recon = $query->reconciliation('2026-04-01', '2026-04-30');
+
+        $this->assertSame(265000, $recon['total_in_rupiah']);
+        $this->assertSame(265000, $recon['total_out_rupiah']);
+    }
+
 
     private function seedNote(string $id, string $customerName, string $transactionDate, int $totalRupiah): void
     {
