@@ -1,0 +1,107 @@
+resources/views/shared/notes/partials/versioning-compact.blade.php:26:          <div>{{ $currentRevision['created_at'] ?? '-' }}</div>
+resources/views/shared/notes/partials/versioning-compact.blade.php:80:                <div>{{ $entry['created_at'] ?? '-' }}</div>
+resources/views/shared/notes/partials/header-summary.blade.php:31:      <div class="text-end fw-semibold">{{ $note['transaction_date'] }}</div>
+resources/views/admin/products/show.blade.php:218:                                                @if ($entry['snapshot']['deleted_at'] !== null)
+resources/views/admin/products/show.blade.php:222:                                                            <div>{{ $entry['snapshot']['deleted_at'] }}</div>
+resources/views/admin/reporting/operational_expense/index.blade.php:152:                                    <td>{{ $row['expense_date'] }}</td>
+resources/views/admin/reporting/payroll/index.blade.php:35:            <div class="fs-5 fw-bold">{{ $summary['latest_disbursement_date'] ?? '-' }}</div>
+resources/views/admin/reporting/payroll/index.blade.php:140:                                    <td>{{ $row['disbursement_date'] }}</td>
+resources/views/admin/reporting/supplier_payable/index.blade.php:201:                                    <td>{{ $row['shipment_date'] }}</td>
+resources/views/admin/reporting/supplier_payable/index.blade.php:202:                                    <td>{{ $row['due_date'] }}</td>
+resources/views/admin/reporting/transaction_cash_ledger/index.blade.php:112:                                    <td>{{ $row['event_date'] }}</td>
+resources/views/admin/reporting/transaction_summary/index.blade.php:172:                                        <div class="small text-muted">{{ $row['transaction_date'] }} · {{ $row['note_id'] }}</div>
+resources/views/admin/reporting/transaction_summary/index.blade.php:174:                                    <td>{{ $row['transaction_date'] }}</td>
+resources/views/admin/expenses/index.blade.php:55:                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="expense_date">
+resources/views/admin/expenses/index.blade.php:57:                                        <span class="ms-1 text-muted" data-sort-indicator="expense_date">↕</span>
+resources/views/admin/expenses/create.blade.php:69:                                        <label for="expense_date" class="form-label">Tanggal</label>
+resources/views/admin/expenses/create.blade.php:73:                                            id="expense_date"
+resources/views/admin/expenses/create.blade.php:74:                                            name="expense_date"
+resources/views/admin/expenses/create.blade.php:75:                                            value="{{ old('expense_date', now()->format('Y-m-d')) }}"
+resources/views/admin/expenses/create.blade.php:76:                                            class="form-control @error('expense_date') is-invalid @enderror"
+resources/views/admin/expenses/create.blade.php:79:                                        @error('expense_date')
+resources/views/admin/expenses/partials/filter_drawer.blade.php:31:                        data-range-start-name="date_from"
+resources/views/admin/expenses/partials/filter_drawer.blade.php:32:                        data-range-end-name="date_to"
+resources/views/admin/expenses/partials/filter_drawer.blade.php:63:                <input type="hidden" id="filter-date-from" name="date_from" value="">
+resources/views/admin/expenses/partials/filter_drawer.blade.php:64:                <input type="hidden" id="filter-date-to" name="date_to" value="">
+resources/views/admin/employee_debts/show.blade.php:67:                                            <td>{{ $payment['payment_date'] }}</td>
+resources/views/admin/employee_debts/show.blade.php:105:                                            <td>{{ $reversal['payment_date'] }}</td>
+resources/views/admin/payrolls/index.blade.php:39:                                <th><button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="disbursement_date">Tanggal <span class="ms-1 text-muted" data-sort-indicator="disbursement_date">↕</span></button></th>
+resources/views/admin/payrolls/create.blade.php:91:                                        <label for="disbursement_date_string" class="form-label">Tanggal Pencairan</label>
+resources/views/admin/payrolls/create.blade.php:95:                                            id="disbursement_date_string"
+resources/views/admin/payrolls/create.blade.php:96:                                            name="disbursement_date_string"
+resources/views/admin/payrolls/create.blade.php:97:                                            value="{{ old('disbursement_date_string', now()->format('Y-m-d')) }}"
+resources/views/admin/payrolls/create.blade.php:98:                                            class="form-control @error('disbursement_date_string') is-invalid @enderror"
+resources/views/admin/payrolls/create.blade.php:101:                                        @error('disbursement_date_string')
+resources/views/admin/employees/payrolls.blade.php:75:                            Terakhir: {{ $payrollSummary['latest_disbursement_date'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:901:                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:903:                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:930:                            Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:1038:                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:1040:                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+resources/views/admin/dashboard/partials/cash-change-denominations.blade.php:8:                        {{ $cashChangeRange['date_from'] ?? '-' }}
+resources/views/admin/dashboard/partials/cash-change-denominations.blade.php:10:                        {{ $cashChangeRange['date_to'] ?? '-' }}
+resources/views/admin/suppliers/index.blade.php:58:                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="last_shipment_date">
+resources/views/admin/suppliers/index.blade.php:60:                                        <span class="ms-1 text-muted" data-sort-indicator="last_shipment_date">↕</span>
+resources/views/admin/notes/partials/filter-drawer.blade.php:29:                    data-range-start-name="date_from"
+resources/views/admin/notes/partials/filter-drawer.blade.php:30:                    data-range-end-name="date_to"
+resources/views/admin/notes/partials/filter-drawer.blade.php:33:                <input type="hidden" id="admin-note-date-from" name="date_from" value="{{ $filters['date_from'] }}">
+resources/views/admin/notes/partials/filter-drawer.blade.php:34:                <input type="hidden" id="admin-note-date-to" name="date_to" value="{{ $filters['date_to'] }}">
+resources/views/admin/audit_logs/index.blade.php:60:                                    <td class="text-nowrap">{{ $entry['created_at'] }}</td>
+resources/views/admin/procurement/supplier_invoices/index.blade.php:53:                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="shipment_date">
+resources/views/admin/procurement/supplier_invoices/index.blade.php:55:                                        <span class="ms-1 text-muted" data-sort-indicator="shipment_date">↕</span>
+resources/views/admin/procurement/supplier_invoices/index.blade.php:59:                                    <button type="button" class="btn btn-link p-0 text-decoration-none" data-sort-by="due_date">
+resources/views/admin/procurement/supplier_invoices/index.blade.php:61:                                        <span class="ms-1 text-muted" data-sort-indicator="due_date">↕</span>
+resources/views/admin/procurement/supplier_invoices/index.blade.php:227:                                    name="payment_date"
+resources/views/admin/procurement/supplier_invoices/index.blade.php:228:                                    value="{{ old('payment_date', now()->format('Y-m-d')) }}"
+resources/views/admin/procurement/supplier_invoices/index.blade.php:229:                                    class="form-control @error('payment_date') is-invalid @enderror"
+resources/views/admin/procurement/supplier_invoices/index.blade.php:232:                                @error('payment_date')
+resources/views/admin/procurement/supplier_invoices/index.blade.php:354:            oldPaymentDate: @json(old('payment_date', now()->format('Y-m-d'))),
+resources/views/admin/procurement/supplier_invoices/show.blade.php:107:                            <strong>{{ $summaryView['shipment_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/show.blade.php:112:                            <strong>{{ $summaryView['due_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/partials/filter_drawer.blade.php:30:                    data-range-start-name="shipment_date_from"
+resources/views/admin/procurement/supplier_invoices/partials/filter_drawer.blade.php:31:                    data-range-end-name="shipment_date_to"
+resources/views/admin/procurement/supplier_invoices/partials/filter_drawer.blade.php:34:                <input type="hidden" id="filter-shipment-date-from" name="shipment_date_from" value="">
+resources/views/admin/procurement/supplier_invoices/partials/filter_drawer.blade.php:35:                <input type="hidden" id="filter-shipment-date-to" name="shipment_date_to" value="">
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:36:                                    <label for="payment_date" class="form-label">Tanggal Pembayaran</label>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:40:                                        id="payment_date"
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:41:                                        name="payment_date"
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:42:                                        value="{{ old('payment_date', now()->format('Y-m-d')) }}"
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:43:                                        class="form-control @error('payment_date') is-invalid @enderror"
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:46:                                    @error('payment_date')
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:119:                                            <strong>{{ $payment['paid_at'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:288:                            <strong>{{ $summaryView['shipment_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:293:                            <strong>{{ $summaryView['due_date'] }}</strong>
+resources/views/cashier/notes/workspace/partials/payment-modal.blade.php:18:                id="inline_payment_paid_at_hidden"
+resources/views/cashier/notes/workspace/partials/payment-modal.blade.php:19:                name="inline_payment[paid_at]"
+resources/views/cashier/notes/workspace/partials/payment-modal.blade.php:20:                value="{{ $oldInlinePayment['paid_at'] ?? $oldNote['transaction_date'] }}"
+resources/views/cashier/notes/workspace/partials/info-card.blade.php:52:                <label for="note_transaction_date" class="form-label">Tanggal Nota</label>
+resources/views/cashier/notes/workspace/partials/info-card.blade.php:56:                    id="note_transaction_date"
+resources/views/cashier/notes/workspace/partials/info-card.blade.php:57:                    name="note[transaction_date]"
+resources/views/cashier/notes/workspace/partials/info-card.blade.php:58:                    value="{{ $oldNote['transaction_date'] }}"
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:19:                        @if ($errors->has('refund') || $errors->has('selected_row_ids') || $errors->has('refunded_at') || $errors->has('reason'))
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:27:                                @if ($errors->has('refunded_at'))
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:28:                                    <div>{{ $errors->first('refunded_at') }}</div>
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:64:                            <label for="workspace_refund_refunded_at" class="form-label">Tanggal Refund</label>
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:68:                                id="workspace_refund_refunded_at"
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:69:                                name="refunded_at"
+resources/views/cashier/notes/workspace/partials/refund-modal.blade.php:70:                                value="{{ old('refunded_at', $refundDateDefault) }}"
+resources/views/cashier/notes/partials/note-overview.blade.php:43:                    <div class="text-end">{{ $note['transaction_date'] }}</div>
+resources/views/cashier/notes/partials/payment-modal.blade.php:27:        <input type="hidden" name="paid_at" id="detail_payment_paid_at" value="{{ $paymentModalConfig['date_default'] ?? $paymentDateDefault }}">
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:26:            <div class="text-end">{{ $currentRevision['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:38:            <div class="text-end">{{ $currentRevision['created_at'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:58:            <div class="text-end">{{ $baselineRevision['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:70:            <div class="text-end">{{ $baselineRevision['created_at'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:94:                  <small class="text-muted">{{ $entry['created_at'] ?? '-' }}</small>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:119:                    <div class="fw-semibold">{{ $entry['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/refund-form.blade.php:13:        @if ($errors->has('refund') || $errors->has('selected_row_ids') || $errors->has('customer_payment_id') || $errors->has('amount_rupiah') || $errors->has('refunded_at') || $errors->has('reason'))
+resources/views/cashier/notes/partials/refund-form.blade.php:27:                @if ($errors->has('refunded_at'))
+resources/views/cashier/notes/partials/refund-form.blade.php:28:                    <div>{{ $errors->first('refunded_at') }}</div>
+resources/views/cashier/notes/partials/refund-form.blade.php:81:                    <label for="refund_refunded_at" class="form-label">Tanggal Refund</label>
+resources/views/cashier/notes/partials/refund-form.blade.php:84:                        id="refund_refunded_at"
+resources/views/cashier/notes/partials/refund-form.blade.php:85:                        name="refunded_at"
+resources/views/cashier/notes/partials/refund-form.blade.php:86:                        value="{{ old('refunded_at', $refundDateDefault) }}"
+resources/views/cashier/notes/partials/payment-form.blade.php:76:                            name="paid_at"
+resources/views/cashier/notes/partials/payment-form.blade.php:77:                            value="{{ old('paid_at', $paymentDateDefault) }}"
+resources/views/cashier/notes/partials/correction-history.blade.php:10:                        <div class="small text-muted">{{ $entry['created_at'] }}</div>
+resources/views/cashier/notes/partials/refund-modal.blade.php:94:                        name="refunded_at"
+resources/views/cashier/notes/partials/refund-modal.blade.php:95:                        value="{{ old('refunded_at', $refundModalConfig['date_default'] ?? $refundDateDefault) }}"

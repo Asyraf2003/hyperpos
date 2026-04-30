@@ -1,0 +1,36 @@
+resources/views/shared/notes/partials/versioning-compact.blade.php:26:          <div>{{ $currentRevision['created_at'] ?? '-' }}</div>
+resources/views/shared/notes/partials/versioning-compact.blade.php:80:                <div>{{ $entry['created_at'] ?? '-' }}</div>
+resources/views/shared/notes/partials/header-summary.blade.php:31:      <div class="text-end fw-semibold">{{ $note['transaction_date'] }}</div>
+resources/views/admin/products/show.blade.php:222:                                                            <div>{{ $entry['snapshot']['deleted_at'] }}</div>
+resources/views/admin/reporting/operational_expense/index.blade.php:152:                                    <td>{{ $row['expense_date'] }}</td>
+resources/views/admin/reporting/payroll/index.blade.php:35:            <div class="fs-5 fw-bold">{{ $summary['latest_disbursement_date'] ?? '-' }}</div>
+resources/views/admin/reporting/payroll/index.blade.php:140:                                    <td>{{ $row['disbursement_date'] }}</td>
+resources/views/admin/reporting/supplier_payable/index.blade.php:201:                                    <td>{{ $row['shipment_date'] }}</td>
+resources/views/admin/reporting/supplier_payable/index.blade.php:202:                                    <td>{{ $row['due_date'] }}</td>
+resources/views/admin/reporting/transaction_cash_ledger/index.blade.php:112:                                    <td>{{ $row['event_date'] }}</td>
+resources/views/admin/reporting/transaction_summary/index.blade.php:172:                                        <div class="small text-muted">{{ $row['transaction_date'] }} · {{ $row['note_id'] }}</div>
+resources/views/admin/reporting/transaction_summary/index.blade.php:174:                                    <td>{{ $row['transaction_date'] }}</td>
+resources/views/admin/employee_debts/show.blade.php:67:                                            <td>{{ $payment['payment_date'] }}</td>
+resources/views/admin/employee_debts/show.blade.php:105:                                            <td>{{ $reversal['payment_date'] }}</td>
+resources/views/admin/employees/payrolls.blade.php:75:                            Terakhir: {{ $payrollSummary['latest_disbursement_date'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:901:                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:903:                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:930:                            Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:1038:                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+resources/views/admin/dashboard/index.blade.php:1040:                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+resources/views/admin/dashboard/partials/cash-change-denominations.blade.php:8:                        {{ $cashChangeRange['date_from'] ?? '-' }}
+resources/views/admin/dashboard/partials/cash-change-denominations.blade.php:10:                        {{ $cashChangeRange['date_to'] ?? '-' }}
+resources/views/admin/audit_logs/index.blade.php:60:                                    <td class="text-nowrap">{{ $entry['created_at'] }}</td>
+resources/views/admin/procurement/supplier_invoices/show.blade.php:107:                            <strong>{{ $summaryView['shipment_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/show.blade.php:112:                            <strong>{{ $summaryView['due_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:119:                                            <strong>{{ $payment['paid_at'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:288:                            <strong>{{ $summaryView['shipment_date'] }}</strong>
+resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php:293:                            <strong>{{ $summaryView['due_date'] }}</strong>
+resources/views/cashier/notes/partials/note-overview.blade.php:43:                    <div class="text-end">{{ $note['transaction_date'] }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:26:            <div class="text-end">{{ $currentRevision['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:38:            <div class="text-end">{{ $currentRevision['created_at'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:58:            <div class="text-end">{{ $baselineRevision['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:70:            <div class="text-end">{{ $baselineRevision['created_at'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:94:                  <small class="text-muted">{{ $entry['created_at'] ?? '-' }}</small>
+resources/views/cashier/notes/partials/note-revision-timeline.blade.php:119:                    <div class="fw-semibold">{{ $entry['transaction_date'] ?? '-' }}</div>
+resources/views/cashier/notes/partials/correction-history.blade.php:10:                        <div class="small text-muted">{{ $entry['created_at'] }}</div>

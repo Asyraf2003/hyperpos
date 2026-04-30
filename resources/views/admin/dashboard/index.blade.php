@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 
 @section('title', 'Dashboard Laporan')
 @section('heading', 'Dashboard Laporan')
@@ -898,9 +918,9 @@
                         <h6 class="section-title mb-1">Top Produk Terjual Bulan Ini</h6>
                         <p class="analytics-stage-range">
                             Range:
-                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? '-' }}
+                            {{ $_uiDateDisplay($dashboard['analytics']['charts']['top_selling_bar']['range']['date_from'] ?? null) }}
                             s.d.
-                            {{ $dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? '-' }}
+                            {{ $_uiDateDisplay($dashboard['analytics']['charts']['top_selling_bar']['range']['date_to'] ?? null) }}
                         </p>
                     </div>
                     <span class="badge-soft bg-soft-warning">
@@ -927,7 +947,7 @@
                     <div>
                         <h6 class="section-title mb-1">Status Stok Saat Ini</h6>
                         <p class="analytics-stage-range">
-                            Snapshot stok pada {{ $dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? '-' }}
+                            Snapshot stok pada {{ $_uiDateDisplay($dashboard['analytics']['charts']['stock_status_donut']['snapshot_date'] ?? null) }}
                         </p>
                     </div>
                     <span class="badge-soft bg-soft-success">
@@ -1035,9 +1055,9 @@
                         <h6 class="section-title mb-1">Laba Operasional Bulan Ini</h6>
                         <p class="analytics-stage-range">
                             Range:
-                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? '-' }}
+                            {{ $_uiDateDisplay($dashboard['analytics']['charts']['operational_performance_bar']['range']['date_from'] ?? null) }}
                             s.d.
-                            {{ $dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? '-' }}
+                            {{ $_uiDateDisplay($dashboard['analytics']['charts']['operational_performance_bar']['range']['date_to'] ?? null) }}
                         </p>
                     </div>
                     <span class="badge-soft bg-soft-info">

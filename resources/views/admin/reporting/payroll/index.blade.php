@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Laporan Gaji')
@@ -32,7 +52,7 @@
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
             <div class="text-muted small">Tanggal Terakhir</div>
-            <div class="fs-5 fw-bold">{{ $summary['latest_disbursement_date'] ?? '-' }}</div>
+            <div class="fs-5 fw-bold">{{ $_uiDateDisplay($summary['latest_disbursement_date'] ?? null) }}</div>
         </div></div>
     </div>
 
@@ -137,7 +157,7 @@
                         <tbody id="payroll-report-table-body">
                             @forelse ($rows as $row)
                                 <tr>
-                                    <td>{{ $row['disbursement_date'] }}</td>
+                                    <td>{{ $_uiDateDisplay($row['disbursement_date'] ?? null) }}</td>
                                     <td>{{ $row['employee_name'] }}</td>
                                     <td>{{ $row['mode_label'] }}</td>
                                     <td>{{ $row['notes'] ?? '-' }}</td>

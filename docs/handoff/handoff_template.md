@@ -1,109 +1,26 @@
-# Handoff Template
+# Legacy Handoff Template Pointer
 
-## Metadata
-- Tanggal:
-- Nama slice / topik:
-- Workflow step:
-- Status:
-- Progres:
+Status: Legacy pointer
 
-## Target halaman kerja
-Tuliskan target spesifik halaman kerja yang baru saja dikerjakan.
+This file is kept only for old links and historical references.
 
-## Referensi yang dipakai `[REF]`
-- Blueprint:
-- Workflow:
-- DoD:
-- ADR:
-- Handoff sebelumnya:
-- Snapshot repo / output command yang dipakai:
+Canonical handoff template:
 
-## Fakta terkunci `[FACT]`
-Tuliskan hanya fakta yang benar-benar terbukti.
+- docs/AI_RULES/04_HANDOFF_TEMPLATE.md
 
-- 
-- 
-- 
+Rules:
 
-## Scope yang dipakai
-### `[SCOPE-IN]`
-- 
-- 
-- 
+- Do not use this file as the source of truth for new handoffs.
+- Do not copy old paths from historical handoffs without checking current docs.
+- Permanent decisions must be promoted into ADR or blueprint docs.
+- Handoff files are session recovery notes, not canonical decisions by default.
 
-### `[SCOPE-OUT]`
-- 
-- 
-- 
+Use this instead:
 
-## Keputusan yang dikunci `[DECISION]`
-Tuliskan keputusan nyata yang sudah diambil.
+- Read docs/AI_RULES/04_HANDOFF_TEMPLATE.md
+- Follow docs/AI_RULES/00_INDEX.md
+- Follow docs/AI_RULES/01_DECISION_POLICY.md
 
-- 
-- 
-- 
+Historical note:
 
-## File yang dibuat/diubah `[FILES]`
-
-### File baru
-- 
-
-### File diubah
-- 
-
-## Bukti verifikasi `[PROOF]`
-Tuliskan bukti yang benar-benar ada.
-
-- command:
-  - hasil:
-- command:
-  - hasil:
-- command:
-  - hasil:
-
-## Blocker aktif `[BLOCKER]`
-- tidak ada blocker aktif
-
-atau
-
-- 
-- 
-
-## State repo yang penting untuk langkah berikutnya
-Tuliskan state minimum yang harus diketahui halaman kerja berikutnya.
-
-- 
-- 
-- 
-
-## Next step paling aman `[NEXT]`
-Tuliskan satu langkah berikut paling aman.
-
-- 
-
-## Catatan masuk halaman berikutnya
-Saat membuka halaman kerja berikutnya, bawa minimal:
-- file handoff ini
-- `docs/setting_control/first_in.md`
-- `docs/setting_control/ai_contract.md`
-- referensi docs yang relevan saja
-- snapshot file/output terbaru bila diperlukan
-
-## Ringkasan singkat siap tempel
-Gunakan blok ini untuk dibawa ke halaman berikutnya.
-
-### Ringkasan
-- target:
-- status:
-- progres:
-- hasil utama:
-- next step:
-
-### Jangan dibuka ulang
-- 
-- 
-
-### Data minimum bila ingin lanjut
-- 
-- 
-- 
+Older handoffs may reference removed or renamed paths. Treat those references as historical unless proven active by current repo files, current docs index, or command output.

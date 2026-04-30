@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 @include('layouts.partials.date-picker-assets')
 
 @section('title', 'Detail Nota Pemasok')
@@ -104,12 +124,12 @@
 
                         <div class="mb-3">
                             <small class="text-muted d-block">Tanggal Pengiriman</small>
-                            <strong>{{ $summaryView['shipment_date'] }}</strong>
+                            <strong>{{ $_uiDateDisplay($summaryView['shipment_date'] ?? null) }}</strong>
                         </div>
 
                         <div class="mb-3">
                             <small class="text-muted d-block">Tanggal Jatuh Tempo</small>
-                            <strong>{{ $summaryView['due_date'] }}</strong>
+                            <strong>{{ $_uiDateDisplay($summaryView['due_date'] ?? null) }}</strong>
                         </div>
 
                         <hr>

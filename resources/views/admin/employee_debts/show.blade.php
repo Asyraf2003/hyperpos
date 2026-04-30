@@ -1,4 +1,24 @@
 @extends('layouts.app')
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 
 @section('title', 'Detail Hutang Karyawan')
 @section('heading', 'Detail Hutang Karyawan')
@@ -64,7 +84,7 @@
                                     @forelse ($detail['payments'] as $payment)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $payment['payment_date'] }}</td>
+                                            <td>{{ $_uiDateDisplay($payment['payment_date'] ?? null) }}</td>
                                             <td>Rp{{ $payment['amount_formatted'] }}</td>
                                             <td>{{ $payment['notes'] ?? '-' }}</td>
                                         </tr>
@@ -102,7 +122,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $reversal['recorded_at'] }}</td>
-                                            <td>{{ $reversal['payment_date'] }}</td>
+                                            <td>{{ $_uiDateDisplay($reversal['payment_date'] ?? null) }}</td>
                                             <td>Rp{{ $reversal['amount_formatted'] }}</td>
                                             <td>{{ $reversal['payment_notes'] ?? '-' }}</td>
                                             <td>{{ $reversal['reason'] }}</td>

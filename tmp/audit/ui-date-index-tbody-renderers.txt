@@ -1,0 +1,18 @@
+./tmp/audit/ui-date-index-renderer-candidates.txt:3:resources/views/admin/expenses/index.blade.php:76:                        <tbody id="expense-table-body">
+./tmp/audit/ui-date-index-renderer-candidates.txt:14:resources/views/admin/payrolls/index.blade.php:47:                        <tbody id="payroll-table-body">
+./tmp/audit/ui-date-index-renderer-candidates.txt:24:resources/views/admin/suppliers/index.blade.php:66:                        <tbody id="supplier-table-body">
+./tmp/audit/ui-date-index-renderer-candidates.txt:30:resources/views/admin/procurement/supplier_invoices/index.blade.php:97:                        <tbody id="procurement-invoice-table-body">
+./resources/views/admin/expenses/index.blade.php:76:                        <tbody id="expense-table-body">
+./resources/views/admin/payrolls/index.blade.php:47:                        <tbody id="payroll-table-body">
+./resources/views/admin/suppliers/index.blade.php:66:                        <tbody id="supplier-table-body">
+./resources/views/admin/procurement/supplier_invoices/index.blade.php:97:                        <tbody id="procurement-invoice-table-body">
+./assets/static/js/pages/admin-expenses-table.js:19:  const body = $("expense-table-body");
+./tests/Feature/EmployeeFinance/PayrollIndexPageFeatureTest.php:38:        $response->assertSee('payroll-table-body', false);
+./tests/Feature/Expense/ExpenseIndexPageFeatureTest.php:39:        $response->assertSee('expense-table-body', false);
+./tests/Feature/Procurement/SupplierIndexPageFeatureTest.php:36:        $response->assertSee('supplier-table-body', false);
+./tests/Feature/Procurement/ProcurementInvoiceIndexPageFeatureTest.php:40:        $response->assertSee('procurement-invoice-table-body', false);
+./public/assets/static/js/pages/admin-expenses-table.js:19:  const body = $("expense-table-body");
+./public/assets/static/js/pages/admin-procurement-invoices-table.js:29:  const body = $("procurement-invoice-table-body");
+./public/assets/static/js/pages/admin-suppliers-table.js:22:  const body = $("supplier-table-body");
+./public/assets/static/js/pages/admin-employee-payroll-table.js:6:  const body = $('employee-payroll-table-body');
+./public/assets/static/js/pages/admin-payrolls-table.js:8:  const body = $("payroll-table-body");

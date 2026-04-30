@@ -1,3 +1,23 @@
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 @if ($note['correction_history'] !== [])
     <div class="card mt-3">
         <div class="card-body">
@@ -7,7 +27,7 @@
                 @foreach ($note['correction_history'] as $entry)
                     <div class="border rounded p-3">
                         <div class="fw-bold">{{ $entry['event_label'] }}</div>
-                        <div class="small text-muted">{{ $entry['created_at'] }}</div>
+                        <div class="small text-muted">{{ $_uiDateDisplay($entry['created_at'] ?? null, true) }}</div>
 
                         @if ($entry['reason'] !== null)
                             <div class="mt-2"><span class="text-muted">Alasan:</span> {{ $entry['reason'] }}</div>

@@ -1,3 +1,23 @@
+@php
+    $_uiDateDisplay = static function ($value, bool $withTime = false): string {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\d{2}\/\d{2}\/\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return \Illuminate\Support\Carbon::parse($value)->format($withTime ? 'd/m/Y H:i' : 'd/m/Y');
+        } catch (\Throwable) {
+            return $text;
+        }
+    };
+@endphp
+
 <div class="col-12 col-lg-6">
         <div class="analytics-stage-card h-100">
             <div class="analytics-stage-head">
@@ -5,9 +25,9 @@
                     <h6 class="section-title mb-1">Pecahan Kembalian Kas</h6>
                     <p class="analytics-stage-range">
                         Range:
-                        {{ $cashChangeRange['date_from'] ?? '-' }}
+                        {{ $_uiDateDisplay($cashChangeRange['date_from'] ?? null) }}
                         s.d.
-                        {{ $cashChangeRange['date_to'] ?? '-' }}
+                        {{ $_uiDateDisplay($cashChangeRange['date_to'] ?? null) }}
                     </p>
                 </div>
                 <span class="badge-soft bg-soft-warning">
