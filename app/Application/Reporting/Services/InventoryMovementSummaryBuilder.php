@@ -9,20 +9,7 @@ use App\Application\Reporting\DTO\InventoryMovementSummaryRow;
 final class InventoryMovementSummaryBuilder
 {
     /**
-     * @param list<array{
-     *   product_id:string,
-     *   kode_barang:?string,
-     *   nama_barang:string,
-     *   qty_in:int,
-     *   qty_out:int,
-     *   net_qty_delta:int,
-     *   total_in_cost_rupiah:int,
-     *   total_out_cost_rupiah:int,
-     *   net_cost_delta_rupiah:int,
-     *   current_qty_on_hand:int,
-     *   current_avg_cost_rupiah:int,
-     *   current_inventory_value_rupiah:int
-     * }> $rows
+     * @param list<array<string,mixed>> $rows
      * @return list<InventoryMovementSummaryRow>
      */
     public function build(array $rows): array
@@ -32,6 +19,10 @@ final class InventoryMovementSummaryBuilder
                 $row['product_id'],
                 $row['kode_barang'],
                 $row['nama_barang'],
+                (int) ($row['supply_in_qty'] ?? 0),
+                (int) ($row['sale_out_qty'] ?? 0),
+                (int) ($row['refund_reversal_qty'] ?? 0),
+                (int) ($row['revision_correction_qty'] ?? 0),
                 $row['qty_in'],
                 $row['qty_out'],
                 $row['net_qty_delta'],

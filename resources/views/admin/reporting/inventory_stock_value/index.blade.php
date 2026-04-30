@@ -52,15 +52,29 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Masuk Periode</div>
-            <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_qty_in'] ?? 0, 0, ',', '.') }}</div>
+            <div class="text-muted small">Qty Masuk Pembelian</div>
+            <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_supply_in_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Keluar Periode</div>
-            <div class="fs-5 fw-bold text-danger">{{ number_format($summary['period_qty_out'] ?? 0, 0, ',', '.') }}</div>
+            <div class="text-muted small">Qty Keluar Penjualan</div>
+            <div class="fs-5 fw-bold text-danger">{{ number_format($summary['period_sale_out_qty'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-2">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Qty Balik Refund/Reversal</div>
+            <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_refund_reversal_qty'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-2">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Qty Koreksi/Revisi</div>
+            <div class="fs-5 fw-bold">{{ number_format($summary['period_revision_correction_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
@@ -136,8 +150,10 @@
                         <thead>
                             <tr>
                                 <th>Barang</th>
-                                <th class="text-end">Qty In</th>
-                                <th class="text-end">Qty Out</th>
+                                <th class="text-end">Supply In</th>
+                                <th class="text-end">Sale Out</th>
+                                <th class="text-end">Refund/Reversal</th>
+                                <th class="text-end">Koreksi/Revisi</th>
                                 <th class="text-end">Net Qty</th>
                                 <th class="text-end">Net Cost</th>
                             </tr>
@@ -153,14 +169,16 @@
                                             {{ $row['kode_barang'] ?? '-' }}
                                         </div>
                                     </td>
-                                    <td class="text-end">{{ number_format($row['qty_in'], 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($row['qty_out'], 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($row['supply_in_qty'], 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($row['sale_out_qty'], 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($row['refund_reversal_qty'], 0, ',', '.') }}</td>
+                                    <td class="text-end">{{ number_format($row['revision_correction_qty'], 0, ',', '.') }}</td>
                                     <td class="text-end">{{ number_format($row['net_qty_delta'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['net_cost_delta_rupiah'], 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Belum ada mutasi pada periode ini.</td>
+                                    <td colspan="7" class="text-center text-muted">Belum ada mutasi pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>

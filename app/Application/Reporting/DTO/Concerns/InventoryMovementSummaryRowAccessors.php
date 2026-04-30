@@ -12,6 +12,14 @@ trait InventoryMovementSummaryRowAccessors
 
     public function namaBarang(): string { return $this->namaBarang; }
 
+    public function supplyInQty(): int { return $this->supplyInQty; }
+
+    public function saleOutQty(): int { return $this->saleOutQty; }
+
+    public function refundReversalQty(): int { return $this->refundReversalQty; }
+
+    public function revisionCorrectionQty(): int { return $this->revisionCorrectionQty; }
+
     public function qtyIn(): int { return $this->qtyIn; }
 
     public function qtyOut(): int { return $this->qtyOut; }
