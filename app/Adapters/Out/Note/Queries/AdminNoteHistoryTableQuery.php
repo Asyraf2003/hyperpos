@@ -11,6 +11,7 @@ final class AdminNoteHistoryTableQuery
     public function __construct(
         private readonly AdminNoteHistoryProjectionFilters $filters,
         private readonly AdminNoteHistoryProjectionItemMapper $mapper,
+        private readonly CashierNoteHistoryValueFormatter $formatter,
     ) {
     }
 
@@ -60,8 +61,8 @@ final class AdminNoteHistoryTableQuery
             'summary' => [
                 'label' => sprintf(
                     'Daftar nota admin %s sampai %s.',
-                    $criteria->dateFromText,
-                    $criteria->dateToText,
+                    $this->formatter->date($criteria->dateFromText),
+                    $this->formatter->date($criteria->dateToText),
                 ),
             ],
         ];

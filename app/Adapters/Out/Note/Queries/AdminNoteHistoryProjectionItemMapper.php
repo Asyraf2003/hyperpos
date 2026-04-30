@@ -26,7 +26,7 @@ final class AdminNoteHistoryProjectionItemMapper
 
         return [
             'note_id' => (string) $row->note_id,
-            'transaction_date' => (string) $row->transaction_date,
+            'transaction_date' => $this->formatter->date($row->transaction_date),
             'note_number' => (string) $row->note_id,
             'customer_name' => $this->formatter->customerLabel(
                 (string) $row->customer_name,

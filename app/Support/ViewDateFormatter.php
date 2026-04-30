@@ -27,4 +27,9 @@ final class ViewDateFormatter
             return $text;
         }
     }
+    public static function range(mixed $from, mixed $to): string
+    {
+        return self::display($from) . ' s/d ' . self::display($to);
+    }
+
 }

@@ -25,7 +25,7 @@
 
                             <div>
                                 <div class="text-muted small">{{ $rangeLabelText ?? 'Rentang Aktif' }}</div>
-                                <div class="fw-semibold">{{ $filters['range_label'] }}</div>
+                                <div class="fw-semibold">{{ \App\Support\ViewDateFormatter::range($filters['date_from'] ?? null, $filters['date_to'] ?? null) }}</div>
                             </div>
                         </div>
 

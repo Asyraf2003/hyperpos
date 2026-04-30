@@ -41,7 +41,7 @@ final class PayrollReportPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Laporan Gaji');
         $response->assertSee('payroll-report-filter-form', false);
-        $response->assertSee('2030-01-01 s/d 2030-01-31');
+        $response->assertSee('01/01/2030 s/d 31/01/2030');
         $response->assertSee('Montir A');
         $response->assertSee('Montir B');
         $response->assertSee('Harian');

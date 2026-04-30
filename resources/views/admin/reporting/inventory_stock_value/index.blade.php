@@ -13,6 +13,13 @@
     'basisDateLabel' => 'Tanggal mutasi movement',
     'basisDateNote' => 'Filter memengaruhi ringkasan movement periodik. Snapshot stok saat ini tetap menampilkan posisi stok terbaru.',
 ])
+\n<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+    <div aria-hidden="true">🔔</div>
+    <div>
+        <div class="fw-semibold">Notifikasi stok belum aktif.</div>
+        <div class="small mb-0">Template UI reminder stok masih hardcoded; pengiriman notifikasi otomatis belum diaktifkan pada flow produksi.</div>
+    </div>
+</div>
 
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">

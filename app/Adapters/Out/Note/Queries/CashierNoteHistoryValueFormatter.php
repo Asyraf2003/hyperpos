@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Note\Queries;
 
+use Illuminate\Support\Carbon;
+use Throwable;
+
 final class CashierNoteHistoryValueFormatter
 {
     public function customerLabel(string $name, ?string $phone): string
@@ -53,6 +56,26 @@ final class CashierNoteHistoryValueFormatter
             'partial' => 'Dibayar Sebagian',
             default => 'Belum Dibayar',
         };
+    }
+
+
+    public function date(mixed $value): string
+    {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $text = (string) $value;
+
+        if (preg_match('/^\\d{2}\\/\\d{2}\\/\\d{4}/', $text) === 1) {
+            return $text;
+        }
+
+        try {
+            return Carbon::parse($value)->format('d/m/Y');
+        } catch (Throwable) {
+            return $text;
+        }
     }
 
     public function rupiah(int $amount): string

@@ -69,7 +69,7 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('2026-04-02 s/d 2026-04-02');
+        $response->assertSee('02/04/2026 s/d 02/04/2026');
         $response->assertSee('note-daily-1');
         $response->assertDontSee('note-daily-2');
         $response->assertSee('Rp 7.000');
@@ -90,7 +90,7 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('2026-04-06 s/d 2026-04-12');
+        $response->assertSee('06/04/2026 s/d 12/04/2026');
         $response->assertSee('note-week-1');
         $response->assertSee('note-week-2');
         $response->assertDontSee('note-week-3');
@@ -111,7 +111,7 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('2026-04-01 s/d 2026-04-30');
+        $response->assertSee('01/04/2026 s/d 30/04/2026');
         $response->assertSee('note-month-1');
         $response->assertSee('note-month-2');
         $response->assertDontSee('note-month-3');

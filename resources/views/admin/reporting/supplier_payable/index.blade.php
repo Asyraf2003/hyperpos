@@ -12,8 +12,15 @@
     'rangeLabelText' => 'Rentang pengiriman aktif',
     'basisDateLabel' => 'Tanggal pengiriman invoice',
     'basisDateNote' => 'Data faktur masuk dihitung dari tanggal pengiriman.',
-    'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . ($filters['reference_date'] ?? '-') . '.',
+    'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . \App\Support\ViewDateFormatter::display($filters['reference_date'] ?? null) . '.',
 ])
+\n<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
+    <div aria-hidden="true">🔔</div>
+    <div>
+        <div class="fw-semibold">Notifikasi hutang faktur belum aktif.</div>
+        <div class="small mb-0">Template UI reminder hutang faktur masih hardcoded; pengiriman notifikasi otomatis belum diaktifkan pada flow produksi.</div>
+    </div>
+</div>
 
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
