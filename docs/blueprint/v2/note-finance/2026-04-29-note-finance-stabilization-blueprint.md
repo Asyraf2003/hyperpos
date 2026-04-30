@@ -380,7 +380,7 @@ Scope ini belum boleh disebut selesai sebelum semua item berikut terpenuhi.
 
 ### 9.1 Documentation DoD
 
-- Blueprint ini ada di docs/blueprints/.
+- Blueprint ini ada di docs/blueprint/v2/note-finance/.
 - Setiap keputusan domain baru dicatat di blueprint atau ADR/handoff terkait.
 - Jika AI_RULES perlu pointer baru, changelog harus ditambah.
 - Tidak semua detail scope dimasukkan ke AI_RULES; AI_RULES tetap constitution kerja, blueprint ini menjadi contract scope.
@@ -442,7 +442,7 @@ Saat membuka sesi baru untuk scope ini, AI wajib membaca:
 
 1. docs/AI_RULES/00_INDEX.md
 2. docs/AI_RULES/01_DECISION_POLICY.md
-3. docs/blueprints/2026-04-29-note-finance-stabilization-blueprint.md
+3. docs/blueprint/v2/note-finance/2026-04-29-note-finance-stabilization-blueprint.md
 4. handoff terakhir yang relevan
 5. command output lokal terbaru dari user
 

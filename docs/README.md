@@ -59,7 +59,7 @@ task checklist, local command output dump.
 
 ADR files should be stable. If a decision is replaced, mark the old ADR as superseded instead of deleting it.
 
-### docs/blueprints
+### docs/blueprint
 
 Design contracts for active or recent scopes.
 
@@ -155,7 +155,7 @@ These paths are historical unless proven active.
 ## Naming Rules
 
 ADR preferred:       docs/adr/0016-short-decision-name.md
-Blueprint preferred: docs/blueprints/YYYY-MM-DD-scope-name.md
+Blueprint preferred: docs/blueprint/v2/scope/YYYY-MM-DD-scope-name.md
 Handoff preferred:   docs/handoff/v2/scope/YYYY-MM-DD-short-session-name.md
 Audit preferred:     docs/error_log/YYYY-MM-DD-short-error-name.md
 

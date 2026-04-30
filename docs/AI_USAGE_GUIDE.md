@@ -75,7 +75,7 @@ Do not put here:
 
 If a decision changes, create a new ADR or mark the old ADR as superseded.
 
-## Layer 5: docs/blueprints
+## Layer 5: docs/blueprint
 
 Use for active or recent scope design.
 
@@ -150,7 +150,7 @@ Do not paste the entire docs tree unless the task is docs audit.
 | Project-level operating default      | Project custom instructions                      |
 | Mandatory AI rule                    | docs/AI_RULES                                    |
 | Permanent decision                   | docs/adr                                         |
-| Active scope design                  | docs/blueprints                                  |
+| Active scope design                  | docs/blueprint                                  |
 | Daily work recovery                  | handoff                                          |
 | Feature status ledger                | docs/v2/feature-continuation or dedicated doc    |
 | Test output                          | handoff or proof note                            |

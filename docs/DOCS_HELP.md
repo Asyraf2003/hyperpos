@@ -29,7 +29,7 @@ Doc categories:
   Permanent accepted decisions.
   Use for long-lived architecture, domain, lifecycle, and reporting decisions.
 
-- docs/blueprints
+- docs/blueprint
   Active or recent design contracts for a scope.
   Use before implementation.
 
