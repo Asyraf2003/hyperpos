@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use App\Application\Reporting\UseCases\Charts\BuildCashflowLineChart;
 use App\Application\Reporting\UseCases\Charts\BuildOperationalPerformanceBarChart;
 use App\Application\Reporting\UseCases\Charts\BuildStockStatusDonutChart;
 use App\Application\Reporting\UseCases\Charts\BuildTopSellingBarChart;
@@ -14,7 +13,6 @@ final class AdminDashboardAnalyticsChartsPayloadBuilder
     public function __construct(
         private readonly BuildStockStatusDonutChart $stockStatusDonut,
         private readonly BuildTopSellingBarChart $topSellingBar,
-        private readonly BuildCashflowLineChart $cashflowLine,
         private readonly BuildOperationalPerformanceBarChart $operationalPerformanceBar,
     ) {
     }
@@ -22,7 +20,6 @@ final class AdminDashboardAnalyticsChartsPayloadBuilder
     /**
      * @param array<string,mixed> $inventorySummary
      * @param list<array<string,mixed>> $topSellingRows
-     * @param list<array<string,mixed>> $cashLedgerRows
      * @param array<string,mixed> $operationalPerformanceDataset
      * @param array{from:string,to:string} $period
      *
@@ -31,7 +28,6 @@ final class AdminDashboardAnalyticsChartsPayloadBuilder
     public function build(
         array $inventorySummary,
         array $topSellingRows,
-        array $cashLedgerRows,
         array $operationalPerformanceDataset,
         array $period,
     ): array {
@@ -42,11 +38,6 @@ final class AdminDashboardAnalyticsChartsPayloadBuilder
             ),
             'top_selling_bar' => $this->topSellingBar->build(
                 $topSellingRows,
-                $period['from'],
-                $period['to'],
-            ),
-            'cashflow_line' => $this->cashflowLine->build(
-                $cashLedgerRows,
                 $period['from'],
                 $period['to'],
             ),

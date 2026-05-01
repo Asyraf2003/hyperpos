@@ -120,7 +120,8 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertJsonPath('charts.stock_status_donut.segments.2.value', 1);
             $response->assertJsonPath('charts.stock_status_donut.segments.3.label', 'Belum Diatur');
             $response->assertJsonPath('charts.stock_status_donut.segments.3.value', 1);
-            $response->assertJsonPath('charts.cashflow_line.summary.total_cash_in_rupiah', 149999);
+            $payload = $response->json();
+            $this->assertArrayNotHasKey('cashflow_line', $payload['charts'] ?? []);
             $response->assertJsonPath('charts.operational_performance_bar.summary.total_operational_expense_rupiah', 5000);
         } finally {
             Carbon::setTestNow();

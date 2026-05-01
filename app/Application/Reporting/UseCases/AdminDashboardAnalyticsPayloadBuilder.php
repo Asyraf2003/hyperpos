@@ -12,7 +12,6 @@ final class AdminDashboardAnalyticsPayloadBuilder
     public function __construct(
         private readonly DashboardInventoryOverviewReaderPort $inventory,
         private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
-        private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
         private readonly GetDashboardOperationalPerformanceDatasetHandler $operationalPerformance,
         private readonly AdminDashboardAnalyticsChartsPayloadBuilder $charts,
     ) {
@@ -39,13 +38,6 @@ final class AdminDashboardAnalyticsPayloadBuilder
             5,
         );
 
-        $cashLedgerResult = $this->transactionCashLedger->handle(
-            $period['from'],
-            $period['to'],
-        );
-
-        $cashLedgerRows = ReportingResultDataExtractor::rows($cashLedgerResult);
-
         $operationalPerformanceDataset = $this->operationalPerformance->handle(
             $period['from'],
             $period['to'],
@@ -65,7 +57,6 @@ final class AdminDashboardAnalyticsPayloadBuilder
             'charts' => $this->charts->build(
                 $inventorySummary,
                 $topSellingRows,
-                $cashLedgerRows,
                 $operationalPerformanceDataset,
                 $period,
             ),
