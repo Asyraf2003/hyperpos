@@ -85,6 +85,74 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertSee(route('admin.reports.supplier_payable.index'), false);
     }
 
+    public function test_custom_mode_uses_explicit_date_range_and_date_to_as_default_reference_date(): void
+    {
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 100, 50000);
+        $this->seedSupplier('supplier-1', 'PT Custom A');
+        $this->seedSupplier('supplier-2', 'PT Custom B');
+        $this->seedSupplier('supplier-3', 'PT Outside');
+
+        $this->seedSupplierInvoice('invoice-in-1', 'supplier-1', '2030-01-07', '2030-01-08', 100000);
+        $this->seedSupplierInvoice('invoice-in-2', 'supplier-2', '2030-01-09', '2030-01-09', 50000);
+        $this->seedSupplierInvoice('invoice-out', 'supplier-3', '2030-01-11', '2030-01-11', 90000);
+
+        $this->seedSupplierInvoiceLine('invoice-line-in-1', 'invoice-in-1', 'product-1', 2, 100000, 50000);
+        $this->seedSupplierInvoiceLine('invoice-line-in-2', 'invoice-in-2', 'product-1', 5, 50000, 10000);
+        $this->seedSupplierInvoiceLine('invoice-line-out', 'invoice-out', 'product-1', 9, 90000, 10000);
+
+        $this->seedSupplierPayment('payment-in-1', 'invoice-in-1', 40000, '2030-01-07', 'pending');
+
+        $this->seedSupplierReceipt('receipt-in-1', 'invoice-in-1', '2030-01-07');
+        $this->seedSupplierReceipt('receipt-in-2', 'invoice-in-2', '2030-01-09');
+        $this->seedSupplierReceipt('receipt-out', 'invoice-out', '2030-01-11');
+
+        $this->seedSupplierReceiptLine('receipt-line-in-1', 'receipt-in-1', 'invoice-line-in-1', 2);
+        $this->seedSupplierReceiptLine('receipt-line-in-2', 'receipt-in-2', 'invoice-line-in-2', 5);
+        $this->seedSupplierReceiptLine('receipt-line-out', 'receipt-out', 'invoice-line-out', 9);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.supplier_payable.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-07',
+                'date_to' => '2030-01-09',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('07/01/2030 s/d 09/01/2030');
+        $response->assertSee('Status jatuh tempo dievaluasi terhadap tanggal referensi 09/01/2030.');
+        $response->assertSee('Rp 150.000');
+        $response->assertSee('Rp 40.000');
+        $response->assertSee('Rp 110.000');
+        $response->assertSee('invoice-in-1');
+        $response->assertSee('invoice-in-2');
+        $response->assertDontSee('invoice-out');
+    }
+
+    public function test_custom_mode_requires_explicit_date_range(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.supplier_payable.index', [
+                'period_mode' => 'custom',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_custom_mode_rejects_invalid_date_order(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.supplier_payable.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-10',
+                'date_to' => '2030-01-01',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
