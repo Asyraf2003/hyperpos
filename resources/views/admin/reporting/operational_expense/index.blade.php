@@ -13,6 +13,13 @@
     'basisDateLabel' => 'Tanggal biaya operasional',
     'basisDateNote' => 'Mode harian hanya menghitung biaya pada tanggal pengeluaran tersebut. Data tidak dibawa ke hari berikutnya.',
     'noteText' => 'Report ini hanya membaca expense aktif dan mengabaikan row yang sudah soft delete.',
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.operational_expense.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 
 <div class="row g-3 mb-4">

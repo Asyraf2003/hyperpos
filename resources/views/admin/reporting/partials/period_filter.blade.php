@@ -1,4 +1,6 @@
-@php($hasExportActions = ! empty($exportActions ?? []))
+@php($exportActions = $exportActions ?? [])
+@php($hasExportActions = ! empty($exportActions))
+@php($exportActionColumnClass = count($exportActions) === 1 ? 'col-12 col-sm-4' : 'col-6')
 
 <div class="card mb-4">
     <div class="card-body">
@@ -47,7 +49,7 @@
             <div class="{{ $hasExportActions ? 'col-12 col-xl-5' : 'col-12 col-xl-3' }}">
                 @if ($hasExportActions)
                     <div class="row g-2">
-                        <div class="col-6 d-grid">
+                        <div class="{{ $exportActionColumnClass }} d-grid">
                             <button
                                 type="button"
                                 id="{{ $formId }}-open-filter"
@@ -57,14 +59,14 @@
                             </button>
                         </div>
 
-                        <div class="col-6 d-grid">
+                        <div class="{{ $exportActionColumnClass }} d-grid">
                             <a href="{{ $resetUrl }}" class="btn btn-outline-secondary text-nowrap w-100">
                                 Atur Ulang
                             </a>
                         </div>
 
                         @foreach (($exportActions ?? []) as $exportAction)
-                            <div class="col-6 d-grid">
+                            <div class="{{ $exportActionColumnClass }} d-grid">
                                 <a
                                     href="{{ $exportAction['url'] }}"
                                     class="{{ trim(($exportAction['class'] ?? 'btn btn-outline-secondary text-nowrap') . ' w-100') }}"
