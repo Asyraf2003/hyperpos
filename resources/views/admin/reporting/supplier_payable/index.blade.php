@@ -20,6 +20,11 @@
             'url' => route('admin.reports.supplier_payable.export_excel', request()->query()),
             'class' => 'btn btn-outline-success text-nowrap',
         ],
+        [
+            'label' => 'Unduh PDF',
+            'url' => route('admin.reports.supplier_payable.export_pdf', request()->query()),
+            'class' => 'btn btn-outline-danger text-nowrap',
+        ],
     ],
 ])
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
