@@ -12,6 +12,7 @@
     'rangeLabelText' => 'Rentang pencatatan aktif',
     'basisDateLabel' => 'Tanggal pencatatan hutang',
     'basisDateNote' => 'Mode harian hanya menghitung hutang yang dicatat pada tanggal tersebut. Data tidak dibawa ke hari berikutnya.',
+    'supportsCustomRange' => true,
 ])
 
 <div class="row g-3 mb-4">

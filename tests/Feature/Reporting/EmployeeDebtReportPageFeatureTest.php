@@ -65,6 +65,56 @@ final class EmployeeDebtReportPageFeatureTest extends TestCase
         $response->assertSee(route('admin.reports.employee_debt.index'), false);
     }
 
+    public function test_custom_mode_uses_explicit_date_range(): void
+    {
+        $this->seedEmployee('employee-1', 'Montir A');
+        $this->seedEmployee('employee-2', 'Montir B');
+        $this->seedEmployee('employee-3', 'Montir C');
+
+        $this->seedDebt('debt-in-1', 'employee-1', 100000, 60000, 'unpaid', 'Kasbon in 1', '2030-01-07 08:00:00');
+        $this->seedDebt('debt-in-2', 'employee-2', 50000, 50000, 'unpaid', 'Kasbon in 2', '2030-01-09 09:00:00');
+        $this->seedDebt('debt-out', 'employee-3', 90000, 90000, 'unpaid', 'Kasbon outside', '2030-01-11 10:00:00');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.employee_debt.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-07',
+                'date_to' => '2030-01-09',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('07/01/2030 s/d 09/01/2030');
+        $response->assertSee('Rp 150.000');
+        $response->assertSee('debt-in-1');
+        $response->assertSee('debt-in-2');
+        $response->assertDontSee('debt-out');
+    }
+
+    public function test_custom_mode_requires_explicit_date_range(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.employee_debt.index', [
+                'period_mode' => 'custom',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_custom_mode_rejects_invalid_date_order(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.employee_debt.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-10',
+                'date_to' => '2030-01-01',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
