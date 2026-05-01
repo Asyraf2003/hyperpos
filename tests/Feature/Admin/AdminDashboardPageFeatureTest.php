@@ -80,6 +80,11 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Rp -74.000');
             $response->assertSee('Kas Keluar Bulan Ini');
             $response->assertSee('Rp 5.000');
+            $response->assertSee('Aktivitas Ledger Periode Ini');
+            $response->assertSee('Kas Masuk Sebelum Refund');
+            $response->assertSee('Refund Keluar Periode Ini');
+            $response->assertSee('Qty Keluar Sebelum Reversal');
+            $response->assertSee('Net Qty Setelah Reversal');
             $response->assertSee('Outstanding Supplier');
             $response->assertSee('Rp 30.000');
             $response->assertSee('Hutang Karyawan');

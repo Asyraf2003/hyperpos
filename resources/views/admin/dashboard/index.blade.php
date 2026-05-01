@@ -731,6 +731,73 @@
 
     <section class="row g-4 mb-4">
         <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Aktivitas Ledger Periode Ini</h5>
+                            <p class="section-subtitle">
+                                Konteks aktivitas kas dan stok sebelum dibaca sebagai posisi aktif/current.
+                            </p>
+                        </div>
+                        <span class="badge-soft bg-soft-warning">
+                            <i class="bi bi-journal-check"></i>
+                            Audit Context
+                        </span>
+                    </div>
+
+                    @if((bool) ($dashboard['ledger_activity']['is_cash_fully_refunded_period'] ?? false))
+                        <div class="helper-note mb-3">
+                            Periode ini punya kas masuk Rp {{ number_format($dashboard['ledger_activity']['cash_in_before_refund_rupiah'] ?? 0, 0, ',', '.') }},
+                            tetapi refund juga tercatat Rp {{ number_format($dashboard['ledger_activity']['cash_refund_out_rupiah'] ?? 0, 0, ',', '.') }}.
+                            Karena itu net cash dan current sales bisa tampil 0 meskipun aktivitas ledger pernah terjadi.
+                        </div>
+                    @endif
+
+                    <div class="finance-grid">
+                        <div class="finance-box">
+                            <div class="finance-label">Kas Masuk Sebelum Refund</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['ledger_activity']['cash_in_before_refund_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                            <p class="finance-note meta-up">
+                                <i class="bi bi-arrow-up-right"></i>
+                                Gross kas masuk dari ledger periode aktif
+                            </p>
+                        </div>
+
+                        <div class="finance-box">
+                            <div class="finance-label">Refund Keluar Periode Ini</div>
+                            <div class="finance-value">Rp {{ number_format($dashboard['ledger_activity']['cash_refund_out_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                            <p class="finance-note meta-down">
+                                <i class="bi bi-arrow-down-right"></i>
+                                Kas keluar karena refund periode aktif
+                            </p>
+                        </div>
+
+                        <div class="finance-box">
+                            <div class="finance-label">Qty Keluar Sebelum Reversal</div>
+                            <div class="finance-value">{{ number_format($dashboard['ledger_activity']['stock_out_qty_before_reversal'] ?? 0, 0, ',', '.') }} Unit</div>
+                            <p class="finance-note meta-flat">
+                                <i class="bi bi-box-arrow-up"></i>
+                                Stok keluar menurut inventory movement periode aktif
+                            </p>
+                        </div>
+
+                        <div class="finance-box">
+                            <div class="finance-label">Net Qty Setelah Reversal</div>
+                            <div class="finance-value">{{ number_format($dashboard['ledger_activity']['net_stock_out_qty'] ?? 0, 0, ',', '.') }} Unit</div>
+                            <p class="finance-note meta-flat">
+                                <i class="bi bi-arrow-repeat"></i>
+                                Qty keluar dikurangi reversal/refund stok
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12">
             <div class="card">
                 <div class="panel-card-body">
                     <div class="card-head">
