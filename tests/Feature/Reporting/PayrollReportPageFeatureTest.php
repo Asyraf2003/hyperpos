@@ -41,6 +41,9 @@ final class PayrollReportPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Laporan Gaji');
         $response->assertSee('payroll-report-filter-form', false);
+        $response->assertSee('value="custom"', false);
+        $response->assertSee('name="date_from"', false);
+        $response->assertSee('name="date_to"', false);
         $response->assertSee('01/01/2030 s/d 31/01/2030');
         $response->assertSee('Montir A');
         $response->assertSee('Montir B');
@@ -48,6 +51,54 @@ final class PayrollReportPageFeatureTest extends TestCase
         $response->assertSee('Mingguan');
         $response->assertSee('Rp 100.000');
         $response->assertSee('2030-01-07');
+    }
+
+    public function test_custom_mode_uses_explicit_date_range(): void
+    {
+        $this->seedEmployee('employee-custom-1', 'Montir Custom A');
+        $this->seedEmployee('employee-custom-2', 'Montir Custom B');
+        $this->seedPayroll('payroll-custom-1', 'employee-custom-1', 50000, '2030-01-06 08:00:00', 'daily', 'Outside A');
+        $this->seedPayroll('payroll-custom-2', 'employee-custom-2', 40000, '2030-01-07 09:00:00', 'weekly', 'Inside B');
+        $this->seedPayroll('payroll-custom-3', 'employee-custom-1', 10000, '2030-01-08 10:00:00', 'daily', 'Outside C');
+
+        $response = $this->actingAs($this->user('admin'))->get(route('admin.reports.payroll.index', [
+            'period_mode' => 'custom',
+            'date_from' => '2030-01-07',
+            'date_to' => '2030-01-07',
+        ]));
+
+        $response->assertOk();
+        $response->assertSee('07/01/2030 s/d 07/01/2030');
+        $response->assertSee('Montir Custom B');
+        $response->assertDontSee('Montir Custom A');
+        $response->assertSee('Rp 40.000');
+        $response->assertDontSee('Rp 50.000');
+    }
+
+    public function test_custom_mode_requires_explicit_date_range(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.payroll.index'))
+            ->get(route('admin.reports.payroll.index', [
+                'period_mode' => 'custom',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.payroll.index'));
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_custom_mode_rejects_invalid_date_order(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.payroll.index'))
+            ->get(route('admin.reports.payroll.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-08',
+                'date_to' => '2030-01-07',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.payroll.index'));
+        $response->assertSessionHasErrors(['date_from']);
     }
 
     private function user(string $role): User

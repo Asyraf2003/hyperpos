@@ -12,6 +12,7 @@
     'rangeLabelText' => 'Rentang pencairan aktif',
     'basisDateLabel' => 'Tanggal pencairan gaji',
     'basisDateNote' => 'Mode harian hanya menghitung payroll yang cair pada tanggal tersebut. Payroll yang direversal tidak ikut dihitung.',
+    'supportsCustomRange' => true,
 ])
 
 <div class="row g-3 mb-4">
