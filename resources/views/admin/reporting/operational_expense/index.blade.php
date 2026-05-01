@@ -12,6 +12,7 @@
     'rangeLabelText' => 'Rentang biaya aktif',
     'basisDateLabel' => 'Tanggal biaya operasional',
     'basisDateNote' => 'Mode harian hanya menghitung biaya pada tanggal pengeluaran tersebut. Data tidak dibawa ke hari berikutnya.',
+    'supportsCustomRange' => true,
     'noteText' => 'Report ini hanya membaca expense aktif dan mengabaikan row yang sudah soft delete.',
     'exportActions' => [
         [

@@ -1,5 +1,6 @@
 @php($exportActions = $exportActions ?? [])
 @php($hasExportActions = ! empty($exportActions))
+@php($supportsCustomRange = (bool) ($supportsCustomRange ?? false))
 @php($exportActionColumnClass = count($exportActions) === 1 ? 'col-12 col-sm-4' : 'col-6')
 
 <div class="card mb-4">
@@ -151,6 +152,9 @@
                     <option value="daily" {{ ($filters['period_mode'] ?? 'monthly') === 'daily' ? 'selected' : '' }}>Harian</option>
                     <option value="weekly" {{ ($filters['period_mode'] ?? 'monthly') === 'weekly' ? 'selected' : '' }}>Mingguan</option>
                     <option value="monthly" {{ ($filters['period_mode'] ?? 'monthly') === 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                    @if ($supportsCustomRange)
+                        <option value="custom" {{ ($filters['period_mode'] ?? 'monthly') === 'custom' ? 'selected' : '' }}>Custom</option>
+                    @endif
                 </select>
             </div>
 
@@ -168,6 +172,40 @@
                     autocomplete="off"
                 >
             </div>
+
+            @if ($supportsCustomRange)
+                <div class="form-group">
+                    <label for="{{ $formId }}-date-from" class="form-label">Tanggal Mulai Custom</label>
+                    <input
+                        type="date"
+                        name="date_from"
+                        id="{{ $formId }}-date-from"
+                        class="form-control"
+                        value="{{ $filters['date_from'] ?? '' }}"
+                        data-ui-date="single"
+                        data-ui-date-placeholder="Pilih tanggal mulai"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ $formId }}-date-to" class="form-label">Tanggal Akhir Custom</label>
+                    <input
+                        type="date"
+                        name="date_to"
+                        id="{{ $formId }}-date-to"
+                        class="form-control"
+                        value="{{ $filters['date_to'] ?? '' }}"
+                        data-ui-date="single"
+                        data-ui-date-placeholder="Pilih tanggal akhir"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="small text-muted">
+                    Tanggal mulai dan akhir hanya wajib untuk mode custom.
+                </div>
+            @endif
 
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Terapkan Filter</button>

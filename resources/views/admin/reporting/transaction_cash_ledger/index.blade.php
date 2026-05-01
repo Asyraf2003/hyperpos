@@ -12,6 +12,7 @@
     'rangeLabelText' => 'Rentang kejadian aktif',
     'basisDateLabel' => 'Tanggal kejadian kas',
     'basisDateNote' => 'Mode harian hanya menghitung kejadian kas pada tanggal tersebut, bukan akumulasi hari sebelumnya.',
+    'supportsCustomRange' => true,
 ])
 
 <div class="row g-3 mb-4">

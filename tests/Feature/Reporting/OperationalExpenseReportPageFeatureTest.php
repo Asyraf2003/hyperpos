@@ -48,6 +48,9 @@ final class OperationalExpenseReportPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Biaya Operasional');
+        $response->assertSee('value="custom"', false);
+        $response->assertSee('name="date_from"', false);
+        $response->assertSee('name="date_to"', false);
         $response->assertSee('operational-expense-report-filter-form', false);
         $response->assertSee('01/01/2030 s/d 31/01/2030');
         $response->assertSee('Listrik');

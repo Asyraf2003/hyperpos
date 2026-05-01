@@ -44,6 +44,9 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Arus Kas Transaksi');
         $response->assertSee('transaction-cash-ledger-filter-form', false);
+        $response->assertSee('value="custom"', false);
+        $response->assertSee('name="date_from"', false);
+        $response->assertSee('name="date_to"', false);
         $response->assertSee('02/04/2026');
         $response->assertSee('03/04/2026');
         $response->assertSee('04/04/2026');
@@ -118,17 +121,52 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('Rp 7.000');
     }
 
-    public function test_custom_mode_is_rejected(): void
+    public function test_custom_mode_uses_explicit_date_range(): void
+    {
+        $this->seedCashInEvent('note-custom-1', 'wi-custom-1', 'pay-custom-1', '2026-04-02', 7000, 'Custom A');
+        $this->seedCashInEvent('note-custom-2', 'wi-custom-2', 'pay-custom-2', '2026-04-04', 9000, 'Custom B');
+        $this->seedCashInEvent('note-custom-3', 'wi-custom-3', 'pay-custom-3', '2026-04-05', 11000, 'Outside Custom');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2026-04-02',
+                'date_to' => '2026-04-04',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('02/04/2026 s/d 04/04/2026');
+        $response->assertSee('note-custom-1');
+        $response->assertSee('note-custom-2');
+        $response->assertDontSee('note-custom-3');
+        $response->assertSee('Rp 16.000');
+    }
+
+    public function test_custom_mode_requires_explicit_date_range(): void
     {
         $response = $this->actingAs($this->user('admin'))
             ->from(route('admin.reports.transaction_cash_ledger.index'))
             ->get(route('admin.reports.transaction_cash_ledger.index', [
                 'period_mode' => 'custom',
-                'reference_date' => '2026-04-01',
             ]));
 
         $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
-        $response->assertSessionHasErrors(['period_mode']);
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_custom_mode_rejects_invalid_date_order(): void
+    {
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.reports.transaction_cash_ledger.index'))
+            ->get(route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2026-04-04',
+                'date_to' => '2026-04-02',
+            ]));
+
+        $response->assertRedirect(route('admin.reports.transaction_cash_ledger.index'));
+        $response->assertSessionHasErrors(['date_from']);
     }
 
 
