@@ -88,6 +88,20 @@ final class TransactionReportExcelExportFeatureTest extends TestCase
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
     }
 
+    public function test_excel_export_rejects_range_longer_than_366_days(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_summary.export_excel', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-01',
+                'date_to' => '2031-01-02',
+            ])
+        );
+
+        $response->assertStatus(422);
+        $response->assertSeeText('Export Excel maksimal 366 hari.');
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
