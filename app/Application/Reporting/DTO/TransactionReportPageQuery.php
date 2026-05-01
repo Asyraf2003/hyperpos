@@ -12,19 +12,30 @@ final class TransactionReportPageQuery
     private function __construct(
         private readonly string $periodMode,
         private readonly ?string $referenceDate,
+        private readonly ?string $dateFrom,
+        private readonly ?string $dateTo,
     ) {
     }
 
     public static function fromValidated(array $validated): self
     {
+        $periodMode = is_string($validated['period_mode'] ?? null)
+            ? $validated['period_mode']
+            : 'monthly';
+
         return new self(
-            is_string($validated['period_mode'] ?? null) ? $validated['period_mode'] : 'monthly',
+            $periodMode,
             is_string($validated['reference_date'] ?? null) ? $validated['reference_date'] : null,
+            is_string($validated['date_from'] ?? null) ? $validated['date_from'] : null,
+            is_string($validated['date_to'] ?? null) ? $validated['date_to'] : null,
         );
     }
 
     public function fromTransactionDate(): string
     {
+        if ($this->periodMode === 'custom' && $this->dateFrom !== null) {
+            return CarbonImmutable::parse($this->dateFrom)->toDateString();
+        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -37,6 +48,9 @@ final class TransactionReportPageQuery
 
     public function toTransactionDate(): string
     {
+        if ($this->periodMode === 'custom' && $this->dateTo !== null) {
+            return CarbonImmutable::parse($this->dateTo)->toDateString();
+        }
 
         $reference = $this->resolvedReferenceDate();
 
@@ -60,6 +74,14 @@ final class TransactionReportPageQuery
 
     private function resolvedReferenceDate(): CarbonImmutable
     {
-        return CarbonImmutable::parse($this->referenceDate ?? 'today');
+        if ($this->referenceDate !== null) {
+            return CarbonImmutable::parse($this->referenceDate);
+        }
+
+        if ($this->dateFrom !== null) {
+            return CarbonImmutable::parse($this->dateFrom);
+        }
+
+        return CarbonImmutable::parse('today');
     }
 }

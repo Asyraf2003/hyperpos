@@ -13,6 +13,7 @@ final class TransactionSummaryPerNoteRow
         private readonly int $grossTransactionRupiah,
         private readonly int $allocatedPaymentRupiah,
         private readonly int $refundedRupiah,
+        private readonly string $paymentStatusLabel,
     ) {
     }
 
@@ -56,6 +57,11 @@ final class TransactionSummaryPerNoteRow
         return $this->grossTransactionRupiah - $this->allocatedPaymentRupiah + $this->refundedRupiah;
     }
 
+    public function paymentStatusLabel(): string
+    {
+        return $this->paymentStatusLabel;
+    }
+
     /**
      * @return array{
      *   note_id:string,
@@ -65,7 +71,8 @@ final class TransactionSummaryPerNoteRow
      *   allocated_payment_rupiah:int,
      *   refunded_rupiah:int,
      *   net_cash_collected_rupiah:int,
-     *   outstanding_rupiah:int
+     *   outstanding_rupiah:int,
+     *   payment_status_label:string
      * }
      */
     public function toArray(): array
@@ -79,6 +86,7 @@ final class TransactionSummaryPerNoteRow
             'refunded_rupiah' => $this->refundedRupiah(),
             'net_cash_collected_rupiah' => $this->netCashCollectedRupiah(),
             'outstanding_rupiah' => $this->outstandingRupiah(),
+            'payment_status_label' => $this->paymentStatusLabel(),
         ];
     }
 }

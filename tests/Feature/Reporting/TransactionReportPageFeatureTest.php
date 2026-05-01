@@ -100,6 +100,41 @@ final class TransactionReportPageFeatureTest extends TestCase
         $response->assertSee(route('admin.reports.transaction_summary.index'), false);
     }
 
+
+    public function test_admin_can_filter_transaction_report_with_custom_range(): void
+    {
+        $this->seedNote('note-outside-before', 'Outside Before', '2030-01-04', 10000);
+        $this->seedNote('note-inside', 'Inside Range', '2030-01-05', 25000);
+        $this->seedNote('note-outside-after', 'Outside After', '2030-01-07', 30000);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_summary.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-05',
+                'date_to' => '2030-01-05',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('05/01/2030 s/d 05/01/2030');
+        $response->assertSee('Rp 25.000');
+        $response->assertSee('note-inside');
+        $response->assertDontSee('note-outside-before');
+        $response->assertDontSee('note-outside-after');
+    }
+
+    public function test_custom_range_requires_start_and_end_dates(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_summary.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-05',
+            ])
+        );
+
+        $response->assertSessionHasErrors('date_to');
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([

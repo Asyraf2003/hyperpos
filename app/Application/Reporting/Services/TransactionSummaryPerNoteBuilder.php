@@ -8,6 +8,11 @@ use App\Application\Reporting\DTO\TransactionSummaryPerNoteRow;
 
 final class TransactionSummaryPerNoteBuilder
 {
+    public function __construct(
+        private readonly TransactionPaymentStatusLabelResolver $statusLabels,
+    ) {
+    }
+
     /**
      * @param list<array{
      *   note_id:string,
@@ -22,13 +27,18 @@ final class TransactionSummaryPerNoteBuilder
     public function build(array $rows): array
     {
         return array_map(
-            static fn (array $row): TransactionSummaryPerNoteRow => new TransactionSummaryPerNoteRow(
+            fn (array $row): TransactionSummaryPerNoteRow => new TransactionSummaryPerNoteRow(
                 $row['note_id'],
                 $row['transaction_date'],
                 $row['customer_name'],
                 $row['gross_transaction_rupiah'],
                 $row['allocated_payment_rupiah'],
                 $row['refunded_rupiah'],
+                $this->statusLabels->resolve(
+                    $row['gross_transaction_rupiah'],
+                    $row['allocated_payment_rupiah'],
+                    $row['refunded_rupiah'],
+                ),
             ),
             $rows,
         );

@@ -48,6 +48,7 @@ final class GetTransactionSummaryPerNoteFeatureTest extends TestCase
                 'refunded_rupiah' => 10000,
                 'net_cash_collected_rupiah' => 50000,
                 'outstanding_rupiah' => 50000,
+                'payment_status_label' => 'Ada Refund',
             ],
             [
                 'note_id' => 'note-2',
@@ -58,6 +59,7 @@ final class GetTransactionSummaryPerNoteFeatureTest extends TestCase
                 'refunded_rupiah' => 0,
                 'net_cash_collected_rupiah' => 50000,
                 'outstanding_rupiah' => 0,
+                'payment_status_label' => 'Lunas',
             ],
         ], $data['rows']);
     }
