@@ -13,6 +13,7 @@ final class AuditLogAdminListQuery
     public function __construct(
         private readonly AuditLogAdminQueryFilters $filters = new AuditLogAdminQueryFilters(),
         private readonly AuditLogAdminEntrySorter $sorter = new AuditLogAdminEntrySorter(),
+        private readonly AuditLogAdminRowsQuery $rows = new AuditLogAdminRowsQuery(),
     ) {
     }
 
@@ -56,60 +57,16 @@ final class AuditLogAdminListQuery
     ): array {
         $entries = [];
 
-        foreach ($this->legacyRows($legacyQuery, $take) as $row) {
+        foreach ($this->rows->legacyRows($legacyQuery, $take) as $row) {
             $entries[] = $mapper->mapLegacy($row);
         }
 
-        foreach ($this->eventRows($eventQuery, $take) as $row) {
+        foreach ($this->rows->eventRows($eventQuery, $take) as $row) {
             $entries[] = $mapper->mapEvent($row);
         }
 
         $this->sorter->sortNewestFirst($entries);
 
         return $entries;
-    }
-
-    /**
-     * @return iterable<int, object>
-     */
-    private function legacyRows(QueryBuilder $query, int $take): iterable
-    {
-        return (clone $query)
-            ->orderByDesc('created_at')
-            ->orderByDesc('id')
-            ->limit($take)
-            ->get(['id', 'event', 'context', 'created_at']);
-    }
-
-    /**
-     * @return iterable<int, object>
-     */
-    private function eventRows(QueryBuilder $query, int $take): iterable
-    {
-        return (clone $query)
-            ->orderByDesc('occurred_at')
-            ->orderByDesc('id')
-            ->limit($take)
-            ->get($this->eventColumns());
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function eventColumns(): array
-    {
-        return [
-            'id',
-            'bounded_context',
-            'aggregate_type',
-            'aggregate_id',
-            'event_name',
-            'actor_id',
-            'actor_role',
-            'reason',
-            'source_channel',
-            'metadata_json',
-            'occurred_at',
-        ];
     }
 }
