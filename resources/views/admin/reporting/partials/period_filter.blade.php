@@ -1,12 +1,7 @@
-@php($exportActions = $exportActions ?? [])
-@php($hasExportActions = ! empty($exportActions))
-@php($supportsCustomRange = (bool) ($supportsCustomRange ?? false))
-@php($exportActionColumnClass = count($exportActions) === 1 ? 'col-12 col-sm-4' : 'col-6')
-
 <div class="card mb-4">
     <div class="card-body">
         <div class="row g-3 align-items-start">
-            <div class="{{ $hasExportActions ? 'col-12 col-xl-7' : 'col-12 col-xl-9' }}">
+            <div class="{{ ! empty($exportActions ?? []) ? 'col-12 col-xl-7' : 'col-12 col-xl-9' }}">
                 <div class="border rounded p-3 bg-light-subtle mb-0">
                     <div class="d-flex flex-column gap-2">
                         <div class="d-flex flex-column flex-md-row gap-3">
@@ -47,10 +42,10 @@
                 </div>
             </div>
 
-            <div class="{{ $hasExportActions ? 'col-12 col-xl-5' : 'col-12 col-xl-3' }}">
-                @if ($hasExportActions)
+            <div class="{{ ! empty($exportActions ?? []) ? 'col-12 col-xl-5' : 'col-12 col-xl-3' }}">
+                @if (! empty($exportActions ?? []))
                     <div class="row g-2">
-                        <div class="{{ $exportActionColumnClass }} d-grid">
+                        <div class="{{ count($exportActions ?? []) === 1 ? 'col-12 col-sm-4' : 'col-6' }} d-grid">
                             <button
                                 type="button"
                                 id="{{ $formId }}-open-filter"
@@ -60,14 +55,14 @@
                             </button>
                         </div>
 
-                        <div class="{{ $exportActionColumnClass }} d-grid">
+                        <div class="{{ count($exportActions ?? []) === 1 ? 'col-12 col-sm-4' : 'col-6' }} d-grid">
                             <a href="{{ $resetUrl }}" class="btn btn-outline-secondary text-nowrap w-100">
                                 Atur Ulang
                             </a>
                         </div>
 
                         @foreach (($exportActions ?? []) as $exportAction)
-                            <div class="{{ $exportActionColumnClass }} d-grid">
+                            <div class="{{ count($exportActions ?? []) === 1 ? 'col-12 col-sm-4' : 'col-6' }} d-grid">
                                 <a
                                     href="{{ $exportAction['url'] }}"
                                     class="{{ trim(($exportAction['class'] ?? 'btn btn-outline-secondary text-nowrap') . ' w-100') }}"
@@ -152,7 +147,7 @@
                     <option value="daily" {{ ($filters['period_mode'] ?? 'monthly') === 'daily' ? 'selected' : '' }}>Harian</option>
                     <option value="weekly" {{ ($filters['period_mode'] ?? 'monthly') === 'weekly' ? 'selected' : '' }}>Mingguan</option>
                     <option value="monthly" {{ ($filters['period_mode'] ?? 'monthly') === 'monthly' ? 'selected' : '' }}>Bulanan</option>
-                    @if ($supportsCustomRange)
+                    @if (($supportsCustomRange ?? false))
                         <option value="custom" {{ ($filters['period_mode'] ?? 'monthly') === 'custom' ? 'selected' : '' }}>Custom</option>
                     @endif
                 </select>
@@ -173,7 +168,7 @@
                 >
             </div>
 
-            @if ($supportsCustomRange)
+            @if (($supportsCustomRange ?? false))
                 <div class="form-group">
                     <label for="{{ $formId }}-date-from" class="form-label">Tanggal Mulai Custom</label>
                     <input
