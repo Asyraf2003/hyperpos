@@ -58,7 +58,7 @@
         operational: document.getElementById('admin-chart-operational-performance-bar'),
     };
 
-    const charts = payload && typeof payload === 'object' ? payload.charts || {} : {};
+    const currentCharts = () => (payload && typeof payload === 'object' ? payload.charts || {} : {});
     const instances = {};
 
     const formatNumber = (value) => new Intl.NumberFormat('id-ID').format(Number(value || 0));
@@ -218,6 +218,7 @@
     });
 
     const renderStock = () => {
+        const charts = currentCharts();
         const key = 'stock';
         const container = containers.stock;
         const data = charts.stock_status_donut || {};
@@ -294,6 +295,7 @@
     };
 
     const renderTopSelling = () => {
+        const charts = currentCharts();
         const key = 'topSelling';
         const container = containers.topSelling;
         const data = charts.top_selling_bar || {};
@@ -394,6 +396,7 @@
     };
 
     const renderOperationalArea = () => {
+        const charts = currentCharts();
         const key = 'cashflow';
         const container = containers.cashflow;
         const data = charts.operational_performance_bar || {};
@@ -488,6 +491,7 @@
     };
 
     const renderOperationalBar = () => {
+        const charts = currentCharts();
         const key = 'operational';
         const container = containers.operational;
         const data = charts.operational_performance_bar || {};
