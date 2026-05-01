@@ -13,6 +13,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPage
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPdfExportController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerPageController;
@@ -63,6 +64,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/operational-expenses', OperationalExpenseReportPageController::class)
         ->name('admin.reports.operational_expense.index');
+
+    Route::get('/admin/reports/supplier-payables/export.xlsx', SupplierPayableReportExcelExportController::class)
+        ->name('admin.reports.supplier_payable.export_excel');
 
     Route::get('/admin/reports/supplier-payables', SupplierPayableReportPageController::class)
         ->name('admin.reports.supplier_payable.index');

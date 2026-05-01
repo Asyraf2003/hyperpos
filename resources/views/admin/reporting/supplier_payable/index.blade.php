@@ -14,6 +14,13 @@
     'basisDateNote' => 'Data faktur masuk dihitung dari tanggal pengiriman.',
     'noteText' => 'Status jatuh tempo dievaluasi terhadap tanggal referensi ' . \App\Support\ViewDateFormatter::display($filters['reference_date'] ?? null) . '.',
     'supportsCustomRange' => true,
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.supplier_payable.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
