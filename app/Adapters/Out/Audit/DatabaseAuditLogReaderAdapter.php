@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Adapters\Out\Audit;
 
 use App\Ports\Out\AuditLogReaderPort;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +17,7 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
 
     public function __construct(
         private readonly AuditLogAdminRowMapper $adminRowMapper = new AuditLogAdminRowMapper(),
+        private readonly AuditLogAdminListQuery $adminListQuery = new AuditLogAdminListQuery(),
     ) {
     }
 
@@ -54,28 +54,6 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
 
     public function listForAdmin(string $search = '', int $perPage = 20): LengthAwarePaginator
     {
-        $normalizedSearch = trim($search);
-        $safePerPage = max(1, min($perPage, 100));
-
-        $query = DB::table('audit_logs')
-            ->select(['id', 'event', 'context', 'created_at'])
-            ->orderByDesc('id');
-
-        if ($normalizedSearch !== '') {
-            $like = '%' . $normalizedSearch . '%';
-
-            $query->where(function (QueryBuilder $query) use ($like): void {
-                $query
-                    ->where('event', 'like', $like)
-                    ->orWhere('context', 'like', $like);
-            });
-        }
-
-        /** @var LengthAwarePaginator<int, object> $paginator */
-        $paginator = $query->paginate($safePerPage)->withQueryString();
-
-        return $paginator->through(
-            fn (object $row): array => $this->adminRowMapper->map($row),
-        );
+        return $this->adminListQuery->paginate($search, $perPage, $this->adminRowMapper);
     }
 }

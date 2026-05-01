@@ -9,6 +9,9 @@
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
                         <h4 class="card-title mb-1">Halaman ini hanya untuk membaca jejak audit</h4>
+                        <p class="text-muted mb-0">
+                            Alasan perubahan dicatat dari fitur asal. Halaman ini hanya untuk investigasi.
+                        </p>
                     </div>
 
                     <form method="get" action="{{ route('admin.audit-logs.index') }}" class="m-0 d-flex gap-2">
@@ -17,7 +20,7 @@
                             name="q"
                             value="{{ $search }}"
                             class="form-control"
-                            placeholder="Cari event atau alasan"
+                            placeholder="Cari event, alasan, actor, atau entity"
                             autocomplete="off"
                             style="min-height: 48px;"
                         >
@@ -40,36 +43,26 @@
             </div>
 
             <div class="card-body">
-
                 <div class="table-responsive">
-                    <table class="table table-lg">
+                    <table class="table table-lg align-middle">
                         <thead>
                             <tr class="text-nowrap">
                                 <th style="width: 80px;">ID</th>
                                 <th style="width: 180px;">Waktu</th>
+                                <th style="width: 150px;">Source</th>
                                 <th style="width: 260px;">Event</th>
+                                <th style="width: 220px;">Actor</th>
+                                <th style="width: 260px;">Entity</th>
                                 <th style="width: 260px;">Alasan</th>
                                 <th>Context</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($logs as $entry)
-                                <tr>
-                                    <td>{{ $entry['id'] }}</td>
-                                    <td class="text-nowrap">{{ \App\Support\ViewDateFormatter::display($entry['created_at'] ?? null, true) }}</td>
-                                    <td>
-                                        <span class="badge bg-light-primary text-primary">
-                                            {{ $entry['event'] }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $entry['reason'] }}</td>
-                                    <td>
-                                        <pre class="mb-0 small text-muted" style="white-space: pre-wrap;">{{ $entry['context_json'] }}</pre>
-                                    </td>
-                                </tr>
+                                @include('admin.audit_logs.partials.row', ['entry' => $entry])
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">
+                                    <td colspan="8" class="text-center text-muted py-4">
                                         Belum ada audit log yang cocok.
                                     </td>
                                 </tr>
