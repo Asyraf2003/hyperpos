@@ -13,6 +13,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPdf
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPdfExportController;
@@ -58,6 +59,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/operational-profit/export.xlsx', OperationalProfitReportExcelExportController::class)
         ->name('admin.reports.operational_profit.export_excel');
+
+    Route::get('/admin/reports/operational-profit/export.pdf', OperationalProfitReportPdfExportController::class)
+        ->name('admin.reports.operational_profit.export_pdf');
 
     Route::get('/admin/reports/operational-profit', OperationalProfitReportPageController::class)
         ->name('admin.reports.operational_profit.index');
