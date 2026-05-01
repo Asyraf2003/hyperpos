@@ -48,7 +48,9 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('name="date_from"', false);
         $response->assertSee('name="date_to"', false);
         $response->assertSee('Unduh Excel');
+        $response->assertSee('Unduh PDF');
         $response->assertSee('admin/reports/transaction-cash-ledger/export.xlsx', false);
+        $response->assertSee('admin/reports/transaction-cash-ledger/export.pdf', false);
         $response->assertSee('period_mode=monthly', false);
         $response->assertSee('reference_date=2026-04-01', false);
         $response->assertSee('02/04/2026');
