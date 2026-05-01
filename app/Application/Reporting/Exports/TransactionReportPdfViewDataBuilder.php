@@ -55,7 +55,7 @@ final class TransactionReportPdfViewDataBuilder
 
     private function formatRange(string $from, string $to): string
     {
-        return $this->formatDate($from) . ' s/d ' . $this->formatDate($to);
+        return $this->formatDate($from).' s/d '.$this->formatDate($to);
     }
 
     private function formatDate(string $value): string
@@ -73,7 +73,7 @@ final class TransactionReportPdfViewDataBuilder
 
     private function rupiah(mixed $value): string
     {
-        return 'Rp ' . number_format($this->integerValue($value), 0, ',', '.');
+        return 'Rp '.number_format($this->integerValue($value), 0, ',', '.');
     }
 
     private function integerValue(mixed $value): int

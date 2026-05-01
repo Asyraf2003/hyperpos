@@ -12,12 +12,11 @@ final class InventoryStockValueReportExcelWorkbookBuilder
         private readonly InventoryStockValueReportExcelSummarySheetWriter $summaryWriter,
         private readonly InventoryStockValueReportExcelSnapshotSheetWriter $snapshotWriter,
         private readonly InventoryStockValueReportExcelMovementSheetWriter $movementWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

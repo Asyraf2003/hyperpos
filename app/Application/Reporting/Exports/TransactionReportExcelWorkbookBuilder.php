@@ -13,12 +13,11 @@ final class TransactionReportExcelWorkbookBuilder
         private readonly TransactionReportExcelDetailSheetWriter $detailWriter,
         private readonly TransactionReportExcelPeriodSheetWriter $periodWriter,
         private readonly TransactionReportExcelCustomerSheetWriter $customerWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

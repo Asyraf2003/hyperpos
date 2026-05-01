@@ -39,8 +39,8 @@ final class InventoryStockValueReportExcelSummarySheetWriter
 
         foreach ($rows as $index => $row) {
             $excelRow = $index + 1;
-            $sheet->setCellValue('A' . $excelRow, $row[0]);
-            $sheet->setCellValue('B' . $excelRow, $row[1]);
+            $sheet->setCellValue('A'.$excelRow, $row[0]);
+            $sheet->setCellValue('B'.$excelRow, $row[1]);
         }
 
         $sheet->getStyle('A1')->getFont()->setBold(true);
@@ -56,7 +56,7 @@ final class InventoryStockValueReportExcelSummarySheetWriter
 
     private function formatRange(mixed $from, mixed $to): string
     {
-        return $this->formatDate($from) . ' s/d ' . $this->formatDate($to);
+        return $this->formatDate($from).' s/d '.$this->formatDate($to);
     }
 
     private function formatDate(mixed $value): string

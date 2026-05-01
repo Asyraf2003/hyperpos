@@ -13,12 +13,11 @@ final class PayrollReportExcelWorkbookBuilder
         private readonly PayrollReportExcelDetailSheetWriter $detailWriter,
         private readonly PayrollReportExcelPeriodSheetWriter $periodWriter,
         private readonly PayrollReportExcelModeSheetWriter $modeWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

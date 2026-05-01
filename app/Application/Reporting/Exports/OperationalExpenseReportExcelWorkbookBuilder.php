@@ -13,12 +13,11 @@ final class OperationalExpenseReportExcelWorkbookBuilder
         private readonly OperationalExpenseReportExcelDetailSheetWriter $detailWriter,
         private readonly OperationalExpenseReportExcelPeriodSheetWriter $periodWriter,
         private readonly OperationalExpenseReportExcelCategorySheetWriter $categoryWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

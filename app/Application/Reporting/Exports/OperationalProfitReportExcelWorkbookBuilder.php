@@ -10,12 +10,11 @@ final class OperationalProfitReportExcelWorkbookBuilder
 {
     public function __construct(
         private readonly OperationalProfitReportExcelSummarySheetWriter $summaryWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

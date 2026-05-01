@@ -11,8 +11,7 @@ final class OperationalProfitReportExcelSummarySheetWriter
 {
     public function __construct(
         private readonly TransactionReportExcelTableWriter $tables,
-    ) {
-    }
+    ) {}
 
     public function write(Worksheet $sheet, array $row, array $filters): void
     {

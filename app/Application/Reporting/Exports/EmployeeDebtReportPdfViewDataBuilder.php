@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Exports;
 
+use App\Application\Reporting\Exports\Concerns\FormatsPdfReportValues;
 use Carbon\CarbonImmutable;
-use Throwable;
 
 final class EmployeeDebtReportPdfViewDataBuilder
 {
+    use FormatsPdfReportValues;
+
     public function build(array $dataset, array $filters): array
     {
         $summary = is_array($dataset['summary'] ?? null) ? $dataset['summary'] : [];
@@ -76,43 +78,5 @@ final class EmployeeDebtReportPdfViewDataBuilder
             'remaining_balance' => $this->rupiah($row['remaining_balance'] ?? 0),
             'notes' => $this->nullableString($row['notes'] ?? null),
         ];
-    }
-
-    private function formatRange(string $from, string $to): string
-    {
-        return $this->formatDate($from) . ' s/d ' . $this->formatDate($to);
-    }
-
-    private function formatDate(string $value): string
-    {
-        if ($value === '') {
-            return '-';
-        }
-
-        try {
-            return CarbonImmutable::parse($value)->format('d/m/Y');
-        } catch (Throwable) {
-            return $value;
-        }
-    }
-
-    private function rupiah(mixed $value): string
-    {
-        return 'Rp ' . number_format($this->integerValue($value), 0, ',', '.');
-    }
-
-    private function integerValue(mixed $value): int
-    {
-        return is_numeric($value) ? (int) $value : 0;
-    }
-
-    private function nullableString(mixed $value): string
-    {
-        return is_string($value) && $value !== '' ? $value : '-';
-    }
-
-    private function stringValue(mixed $value): string
-    {
-        return is_string($value) ? $value : '';
     }
 }

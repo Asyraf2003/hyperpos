@@ -12,12 +12,11 @@ final class TransactionCashLedgerExcelWorkbookBuilder
         private readonly TransactionCashLedgerExcelSummarySheetWriter $summaryWriter,
         private readonly TransactionCashLedgerExcelDetailSheetWriter $detailWriter,
         private readonly TransactionCashLedgerExcelPeriodSheetWriter $periodWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

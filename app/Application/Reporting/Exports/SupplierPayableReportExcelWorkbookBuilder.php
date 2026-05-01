@@ -13,12 +13,11 @@ final class SupplierPayableReportExcelWorkbookBuilder
         private readonly SupplierPayableReportExcelDetailSheetWriter $detailWriter,
         private readonly SupplierPayableReportExcelPeriodSheetWriter $periodWriter,
         private readonly SupplierPayableReportExcelSupplierSheetWriter $supplierWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

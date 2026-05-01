@@ -13,12 +13,11 @@ final class EmployeeDebtReportExcelWorkbookBuilder
         private readonly EmployeeDebtReportExcelDetailSheetWriter $detailWriter,
         private readonly EmployeeDebtReportExcelPeriodSheetWriter $periodWriter,
         private readonly EmployeeDebtReportExcelStatusSheetWriter $statusWriter,
-    ) {
-    }
+    ) {}
 
     public function build(array $dataset, array $filters): Spreadsheet
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
 
         $this->summaryWriter->write(
             $spreadsheet->getActiveSheet(),

@@ -11,8 +11,7 @@ final class OperationalExpenseReportExcelPeriodSheetWriter
 {
     public function __construct(
         private readonly TransactionReportExcelTableWriter $tables,
-    ) {
-    }
+    ) {}
 
     public function write(Worksheet $sheet, array $rows): void
     {

@@ -12,7 +12,7 @@ final class TransactionReportExcelTableWriter
     public function writeTable(Worksheet $sheet, int $startRow, array $headers, array $rows): void
     {
         $this->writeRow($sheet, $startRow, $headers);
-        $sheet->getStyle('A' . $startRow . ':' . Coordinate::stringFromColumnIndex(count($headers)) . $startRow)
+        $sheet->getStyle('A'.$startRow.':'.Coordinate::stringFromColumnIndex(count($headers)).$startRow)
             ->getFont()
             ->setBold(true);
 
@@ -20,7 +20,7 @@ final class TransactionReportExcelTableWriter
             $this->writeRow($sheet, $startRow + $offset + 1, $row);
         }
 
-        $sheet->freezePane('A' . ($startRow + 1));
+        $sheet->freezePane('A'.($startRow + 1));
     }
 
     public function autosize(Worksheet $sheet, int $columns): void
@@ -34,7 +34,7 @@ final class TransactionReportExcelTableWriter
     {
         foreach (array_values($values) as $index => $value) {
             $sheet->setCellValue(
-                Coordinate::stringFromColumnIndex($index + 1) . $rowNumber,
+                Coordinate::stringFromColumnIndex($index + 1).$rowNumber,
                 $value,
             );
         }
