@@ -110,6 +110,99 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee(route('admin.reports.inventory_stock_value.index'), false);
     }
 
+
+    public function test_custom_mode_uses_explicit_date_range_for_period_movements(): void
+    {
+        $this->seedProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+        $this->seedProduct('product-2', 'KB-002', 'Vario', 'Federal', 90, 17000);
+        $this->seedProduct('product-out', 'KB-999', 'Outside', 'Federal', 80, 16000);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'custom-m1',
+                'product_id' => 'product-1',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'custom-sr1',
+                'tanggal_mutasi' => '2030-01-07',
+                'qty_delta' => 10,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 100000,
+            ],
+            [
+                'id' => 'custom-m2',
+                'product_id' => 'product-2',
+                'movement_type' => 'stock_out',
+                'source_type' => 'work_item_store_stock_line',
+                'source_id' => 'custom-sto1',
+                'tanggal_mutasi' => '2030-01-09',
+                'qty_delta' => -4,
+                'unit_cost_rupiah' => 12000,
+                'total_cost_rupiah' => -48000,
+            ],
+            [
+                'id' => 'custom-m-out',
+                'product_id' => 'product-out',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'custom-sr-out',
+                'tanggal_mutasi' => '2030-01-11',
+                'qty_delta' => 99,
+                'unit_cost_rupiah' => 10000,
+                'total_cost_rupiah' => 990000,
+            ],
+        ]);
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'product-1', 'qty_on_hand' => 10],
+            ['product_id' => 'product-2', 'qty_on_hand' => 4],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'product-1', 'avg_cost_rupiah' => 10000, 'inventory_value_rupiah' => 100000],
+            ['product_id' => 'product-2', 'avg_cost_rupiah' => 12000, 'inventory_value_rupiah' => 48000],
+        ]);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-07',
+                'date_to' => '2030-01-09',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('07/01/2030 s/d 09/01/2030');
+        $response->assertSee('Supra');
+        $response->assertSee('Vario');
+        $response->assertSee('Rp 52.000');
+        $response->assertDontSee('Outside');
+    }
+
+    public function test_custom_mode_requires_explicit_date_range(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.index', [
+                'period_mode' => 'custom',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_custom_mode_rejects_invalid_date_order(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-10',
+                'date_to' => '2030-01-01',
+            ])
+        );
+
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([

@@ -12,6 +12,8 @@ final class InventoryStockValueReportPageQuery
     private function __construct(
         private readonly string $periodMode,
         private readonly ?string $referenceDate,
+        private readonly ?string $dateFrom,
+        private readonly ?string $dateTo,
     ) {
     }
 
@@ -20,6 +22,8 @@ final class InventoryStockValueReportPageQuery
         return new self(
             is_string($validated['period_mode'] ?? null) ? $validated['period_mode'] : 'monthly',
             is_string($validated['reference_date'] ?? null) ? $validated['reference_date'] : null,
+            is_string($validated['date_from'] ?? null) ? $validated['date_from'] : null,
+            is_string($validated['date_to'] ?? null) ? $validated['date_to'] : null,
         );
     }
 
@@ -29,6 +33,7 @@ final class InventoryStockValueReportPageQuery
         $reference = $this->resolvedReferenceDate();
 
         return match ($this->periodMode) {
+            'custom' => $this->dateFrom ?? $reference->toDateString(),
             'weekly' => $reference->startOfWeek(CarbonInterface::MONDAY)->toDateString(),
             'monthly' => $reference->startOfMonth()->toDateString(),
             default => $reference->toDateString(),
@@ -41,6 +46,7 @@ final class InventoryStockValueReportPageQuery
         $reference = $this->resolvedReferenceDate();
 
         return match ($this->periodMode) {
+            'custom' => $this->dateTo ?? $reference->toDateString(),
             'weekly' => $reference->endOfWeek(CarbonInterface::SUNDAY)->toDateString(),
             'monthly' => $reference->endOfMonth()->toDateString(),
             default => $reference->toDateString(),
@@ -60,6 +66,6 @@ final class InventoryStockValueReportPageQuery
 
     private function resolvedReferenceDate(): CarbonImmutable
     {
-        return CarbonImmutable::parse($this->referenceDate ?? 'today');
+        return CarbonImmutable::parse($this->referenceDate ?? $this->dateTo ?? $this->dateFrom ?? 'today');
     }
 }

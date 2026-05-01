@@ -12,6 +12,7 @@
     'rangeLabelText' => 'Rentang movement aktif',
     'basisDateLabel' => 'Tanggal mutasi movement',
     'basisDateNote' => 'Filter memengaruhi ringkasan movement periodik. Snapshot stok saat ini tetap menampilkan posisi stok terbaru.',
+    'supportsCustomRange' => true,
 ])
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
