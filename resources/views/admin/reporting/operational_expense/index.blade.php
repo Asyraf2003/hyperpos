@@ -19,6 +19,11 @@
             'url' => route('admin.reports.operational_expense.export_excel', request()->query()),
             'class' => 'btn btn-outline-success text-nowrap',
         ],
+        [
+            'label' => 'Unduh PDF',
+            'url' => route('admin.reports.operational_expense.export_pdf', request()->query()),
+            'class' => 'btn btn-outline-danger text-nowrap',
+        ],
     ],
 ])
 
