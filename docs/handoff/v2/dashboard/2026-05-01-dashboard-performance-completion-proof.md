@@ -105,3 +105,24 @@ Recommended final manual check:
 - Confirm analytics charts render.
 - Confirm ledger activity context remains visible for refund/reversal periods.
 - Confirm browser network page + analytics feel below 1 second on local dataset.
+## Manual Browser Verification
+
+Manual browser/local dashboard verification after commit `5007fff2` was reported successful by operator.
+
+Verified scope:
+- Admin dashboard opens successfully.
+- Active month selector works.
+- Summary cards are visible.
+- Analytics charts render.
+- Ledger activity / refund-reversal context remains visible.
+- Dashboard no longer hides relevant data.
+- Local browser verification was reported successful after automated bulk proof.
+
+Manual verification boundary:
+- Exact DevTools Network timing artifact was not pasted into the session.
+- Exact console verification object was not pasted into the session.
+- Automated local bulk proof remains the timing source of truth for recorded performance numbers.
+
+Result:
+- Scope is considered functionally complete for local dashboard performance and visibility.
+- Remaining future work should start from new evidence, not from re-opening already proven duplicate-query cleanup.
