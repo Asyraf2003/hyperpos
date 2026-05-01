@@ -21,9 +21,11 @@ final class TransactionReportPageController extends Controller
         $query = TransactionReportPageQuery::fromValidated($request->validated());
         $result = $useCase->handle($query->fromTransactionDate(), $query->toTransactionDate());
         $payload = is_array($result->data()) ? $result->data() : [];
+        $filters = $query->toViewData();
 
         return view('admin.reporting.transaction_summary.index', [
-            'filters' => $query->toViewData(),
+            'filters' => $filters,
+            'exportExcelUrl' => route('admin.reports.transaction_summary.export_excel', $filters),
             'summary' => is_array($payload['summary'] ?? null) ? $payload['summary'] : [],
             'periodRows' => is_array($payload['period_rows'] ?? null) ? $payload['period_rows'] : [],
             'customerRows' => $paginator->paginate(

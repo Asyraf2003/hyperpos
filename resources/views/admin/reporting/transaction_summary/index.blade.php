@@ -14,6 +14,12 @@
     'basisDateNote' => 'Mode harian hanya menghitung nota pada tanggal transaksi tersebut.',
 ])
 
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ $exportExcelUrl }}" class="btn btn-outline-success">
+        Unduh Excel
+    </a>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
