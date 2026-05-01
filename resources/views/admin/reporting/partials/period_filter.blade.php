@@ -8,7 +8,9 @@
                             <div>
                                 <div class="text-muted small">Mode Aktif</div>
                                 <div class="fw-semibold">
-                                    @if (($filters['period_mode'] ?? 'monthly') === 'weekly')
+                                    @if (($filters['period_mode'] ?? 'monthly') === 'custom')
+                                        Custom
+                                    @elseif (($filters['period_mode'] ?? 'monthly') === 'weekly')
                                         Mingguan
                                     @elseif (($filters['period_mode'] ?? 'monthly') === 'monthly')
                                         Bulanan

@@ -27,7 +27,7 @@ final class OperationalExpenseReportPageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'period_mode' => ['nullable', 'in:daily,weekly,monthly'],
+            'period_mode' => ['nullable', 'in:daily,weekly,monthly,custom'],
             'reference_date' => ['nullable', 'date_format:Y-m-d'],
             'date_from' => ['nullable', 'date_format:Y-m-d'],
             'date_to' => ['nullable', 'date_format:Y-m-d'],
@@ -44,6 +44,20 @@ final class OperationalExpenseReportPageRequest extends FormRequest
         $mode = $this->input('period_mode', 'monthly');
         $from = $this->input('date_from');
         $to = $this->input('date_to');
+
+        if ($mode === 'custom' && $from === null) {
+            $validator->errors()->add(
+                'date_from',
+                'Tanggal mulai wajib diisi untuk mode custom.'
+            );
+        }
+
+        if ($mode === 'custom' && $to === null) {
+            $validator->errors()->add(
+                'date_to',
+                'Tanggal akhir wajib diisi untuk mode custom.'
+            );
+        }
 
         if ($from !== null && $to !== null && (string) $from > (string) $to) {
             $validator->errors()->add(

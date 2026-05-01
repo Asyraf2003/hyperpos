@@ -58,6 +58,61 @@ final class OperationalExpenseReportPageFeatureTest extends TestCase
         $response->assertDontSee('Deleted row');
     }
 
+    public function test_admin_can_filter_operational_expense_report_with_custom_range(): void
+    {
+        $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
+        $this->seedExpenseCategory('expense-category-2', 'MAKAN', 'Makan');
+
+        $this->seedOperationalExpense('expense-1', 'expense-category-1', 100000, '2030-01-09', 'Before custom range', 'cash', null);
+        $this->seedOperationalExpense('expense-2', 'expense-category-2', 50000, '2030-01-10', 'Inside custom range', 'cash', null);
+        $this->seedOperationalExpense('expense-3', 'expense-category-1', 75000, '2030-01-31', 'Inside custom end', 'cash', null);
+        $this->seedOperationalExpense('expense-4', 'expense-category-2', 999000, '2030-02-01', 'After custom range', 'cash', null);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.operational_expense.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-01-10',
+                'date_to' => '2030-01-31',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('Custom');
+        $response->assertSee('10/01/2030 s/d 31/01/2030');
+        $response->assertSee('Inside custom range');
+        $response->assertSee('Inside custom end');
+        $response->assertSee('Rp 125.000');
+        $response->assertSee('Rp 5.681');
+        $response->assertDontSee('Before custom range');
+        $response->assertDontSee('After custom range');
+    }
+
+    public function test_operational_expense_custom_range_requires_start_and_end_dates(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.operational_expense.index', [
+                'period_mode' => 'custom',
+            ])
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['date_from', 'date_to']);
+    }
+
+    public function test_operational_expense_custom_range_rejects_start_date_after_end_date(): void
+    {
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.operational_expense.index', [
+                'period_mode' => 'custom',
+                'date_from' => '2030-02-01',
+                'date_to' => '2030-01-31',
+            ])
+        );
+
+        $response->assertRedirect();
+        $response->assertSessionHasErrors(['date_from']);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
