@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportExcelExportController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportPageController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/transactions/export.xlsx', TransactionReportExcelExportController::class)
         ->name('admin.reports.transaction_summary.export_excel');
+
+    Route::get('/admin/reports/transactions/export.pdf', TransactionReportPdfExportController::class)
+        ->name('admin.reports.transaction_summary.export_pdf');
 
     Route::get('/admin/reports/transactions', TransactionReportPageController::class)
         ->name('admin.reports.transaction_summary.index');

@@ -18,6 +18,9 @@
     <a href="{{ $exportExcelUrl }}" class="btn btn-outline-success">
         Unduh Excel
     </a>
+    <a href="{{ route('admin.reports.transaction_summary.export_pdf', request()->query()) }}" class="btn btn-outline-danger">
+        Unduh PDF
+    </a>
 </div>
 
 <div class="row g-3 mb-4">
