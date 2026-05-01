@@ -13,6 +13,13 @@
     'basisDateLabel' => 'Tanggal pencatatan hutang',
     'basisDateNote' => 'Mode harian hanya menghitung hutang yang dicatat pada tanggal tersebut. Data tidak dibawa ke hari berikutnya.',
     'supportsCustomRange' => true,
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.employee_debt.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 
 <div class="row g-3 mb-4">
