@@ -57,6 +57,19 @@
         cashflow: document.getElementById('admin-chart-cashflow-line'),
     };
 
+    const targets = {
+        topSellingRange: document.querySelector('[data-dashboard-analytics-target="top-selling-range"]'),
+        topSellingBadge: document.querySelector('[data-dashboard-analytics-target="top-selling-badge"]'),
+        stockRange: document.querySelector('[data-dashboard-analytics-target="stock-range"]'),
+        stockBadge: document.querySelector('[data-dashboard-analytics-target="stock-badge"]'),
+        stockSegments: document.querySelector('[data-dashboard-analytics-target="stock-segments"]'),
+        operationalRange: document.querySelector('[data-dashboard-analytics-target="operational-range"]'),
+        operationalBadge: document.querySelector('[data-dashboard-analytics-target="operational-badge"]'),
+        cashChangeRange: document.querySelector('[data-dashboard-analytics-target="cash-change-range"]'),
+        cashChangeBadge: document.querySelector('[data-dashboard-analytics-target="cash-change-badge"]'),
+        cashChangeRows: document.querySelector('[data-dashboard-analytics-target="cash-change-rows"]'),
+    };
+
     const currentCharts = () => (payload && typeof payload === 'object' ? payload.charts || {} : {});
     const instances = {};
 
@@ -120,6 +133,137 @@
     const shortDate = (value) => {
         const text = String(value || '');
         return text.length >= 10 ? text.slice(-2) : text;
+    };
+
+    const displayDate = (value) => {
+        const text = String(value || '');
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+            return '-';
+        }
+
+        const [year, month, day] = text.split('-');
+
+        return `${day}-${month}-${year}`;
+    };
+
+    const displayRange = (range) => {
+        const from = displayDate(range?.date_from);
+        const to = displayDate(range?.date_to);
+
+        return `Range: ${from} s.d. ${to}`;
+    };
+
+    const setText = (target, value) => {
+        if (target) {
+            target.textContent = value;
+        }
+    };
+
+    const renderStockSegmentsSummary = (data) => {
+        const target = targets.stockSegments;
+
+        if (!target) {
+            return;
+        }
+
+        const segments = Array.isArray(data?.segments) ? data.segments : [];
+
+        target.innerHTML = '';
+
+        if (!segments.length) {
+            const empty = document.createElement('div');
+            empty.className = 'text-center text-muted border rounded px-3 py-3 fw-semibold';
+            empty.textContent = 'Belum ada data status stok saat ini.';
+            target.appendChild(empty);
+            return;
+        }
+
+        segments.forEach((segment) => {
+            const row = document.createElement('div');
+            row.className = 'd-flex justify-content-between align-items-center border rounded px-3 py-2';
+
+            const label = document.createElement('span');
+            label.className = 'fw-semibold';
+            label.textContent = segment?.label || '-';
+
+            const value = document.createElement('span');
+            value.className = 'badge bg-light text-dark border';
+            value.textContent = formatNumber(segment?.value || 0);
+
+            row.append(label, value);
+            target.appendChild(row);
+        });
+    };
+
+    const renderCashChangeRowsSummary = (rows) => {
+        const target = targets.cashChangeRows;
+
+        if (!target) {
+            return;
+        }
+
+        const normalizedRows = Array.isArray(rows) ? rows : [];
+
+        target.innerHTML = '';
+
+        if (!normalizedRows.length) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 3;
+            cell.className = 'text-center text-muted py-4';
+            cell.textContent = 'Belum ada data kembalian cash pada periode ini.';
+            row.appendChild(cell);
+            target.appendChild(row);
+            return;
+        }
+
+        normalizedRows.forEach((item) => {
+            const row = document.createElement('tr');
+
+            const denomination = document.createElement('td');
+            denomination.textContent = formatRupiah(item?.denomination || 0);
+
+            const count = document.createElement('td');
+            count.textContent = `${formatNumber(item?.count || 0)} Lembar/Koin`;
+
+            const total = document.createElement('td');
+            total.textContent = formatRupiah(item?.total_rupiah || 0);
+
+            row.append(denomination, count, total);
+            target.appendChild(row);
+        });
+    };
+
+    const renderAnalyticsSummaries = () => {
+        const charts = currentCharts();
+        const topSelling = charts.top_selling_bar || {};
+        const stock = charts.stock_status_donut || {};
+        const operational = charts.operational_performance_bar || {};
+        const topSellingCategories = Array.isArray(topSelling.categories) ? topSelling.categories : [];
+        const operationalLabels = Array.isArray(operational.labels) ? operational.labels : [];
+        const cashChangeRows = Array.isArray(payload?.cash_change_denominations)
+            ? payload.cash_change_denominations
+            : [];
+        const fallbackPeriodRange = {
+            date_from: payload?.period?.date_from,
+            date_to: payload?.period?.date_to,
+        };
+        const cashChangeRange = operational.range || fallbackPeriodRange;
+
+        setText(targets.topSellingRange, displayRange(topSelling.range || fallbackPeriodRange));
+        setText(targets.topSellingBadge, `${formatNumber(topSellingCategories.length)} Produk`);
+
+        setText(targets.stockRange, `Snapshot stok pada ${displayDate(stock.snapshot_date || payload?.period?.anchor_date)}`);
+        setText(targets.stockBadge, `${formatNumber(stock.total_value || 0)} Produk`);
+        renderStockSegmentsSummary(stock);
+
+        setText(targets.operationalRange, displayRange(operational.range || fallbackPeriodRange));
+        setText(targets.operationalBadge, `${formatNumber(operationalLabels.length)} Titik`);
+
+        setText(targets.cashChangeRange, displayRange(cashChangeRange));
+        setText(targets.cashChangeBadge, `${formatNumber(cashChangeRows.length)} Pecahan`);
+        renderCashChangeRowsSummary(cashChangeRows);
     };
 
     const destroy = (key) => {
@@ -490,6 +634,7 @@
     };
 
     const renderAll = () => {
+        renderAnalyticsSummaries();
         renderStock();
         renderTopSelling();
         renderOperationalArea();

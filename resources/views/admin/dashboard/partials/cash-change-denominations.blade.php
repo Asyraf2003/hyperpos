@@ -3,14 +3,14 @@
             <div class="analytics-stage-head">
                 <div>
                     <h6 class="section-title mb-1">Pecahan Kembalian Kas</h6>
-                    <p class="analytics-stage-range">
+                    <p class="analytics-stage-range" data-dashboard-analytics-target="cash-change-range">
                         Range:
                         {{ \App\Support\ViewDateFormatter::display($cashChangeRange['date_from'] ?? null) }}
                         s.d.
                         {{ \App\Support\ViewDateFormatter::display($cashChangeRange['date_to'] ?? null) }}
                     </p>
                 </div>
-                <span class="badge-soft bg-soft-warning">
+                <span class="badge-soft bg-soft-warning" data-dashboard-analytics-target="cash-change-badge">
                     <i class="bi bi-cash-stack"></i>
                     {{ count($cashChangeDenominations ?? []) }} Pecahan
                 </span>
@@ -25,7 +25,7 @@
                             <th>Total Kembalian</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody data-dashboard-analytics-target="cash-change-rows">
                         @forelse ($cashChangeDenominations ?? [] as $row)
                             <tr>
                                 <td>Rp {{ number_format($row['denomination'] ?? 0, 0, ',', '.') }}</td>
