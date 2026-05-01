@@ -182,7 +182,7 @@
     </div>
 
     <div class="col-12 col-xl-5">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-body">
                 <h5 class="card-title mb-3">Detail Hutang Pemasok</h5>
 
