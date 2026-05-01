@@ -1,7 +1,7 @@
 (() => {
     const payloadElement = document.getElementById('admin-dashboard-analytics-payload');
 
-    if (!payloadElement || typeof ApexCharts === 'undefined') {
+    if (!payloadElement) {
         return;
     }
 
@@ -72,6 +72,8 @@
 
     const currentCharts = () => (payload && typeof payload === 'object' ? payload.charts || {} : {});
     const instances = {};
+
+    const canRenderCharts = () => typeof ApexCharts !== 'undefined';
 
     const formatNumber = (value) => new Intl.NumberFormat('id-ID').format(Number(value || 0));
     const formatRupiah = (value) => `Rp ${formatNumber(value)}`;
@@ -376,6 +378,11 @@
             return;
         }
 
+        if (!canRenderCharts()) {
+            emptyState(container, 'Library grafik belum tersedia. Ringkasan status stok tetap ditampilkan.', colors);
+            return;
+        }
+
         container.innerHTML = '';
 
         instances[key] = new ApexCharts(container, {
@@ -452,6 +459,11 @@
 
         if (!container || !categories.length || !values.length) {
             emptyState(container, 'Belum ada data produk terjual pada bulan aktif.', colors);
+            return;
+        }
+
+        if (!canRenderCharts()) {
+            emptyState(container, 'Library grafik belum tersedia. Ringkasan top produk tetap ditampilkan.', colors);
             return;
         }
 
@@ -551,6 +563,11 @@
 
         if (!container || !labels.length || !series.length) {
             emptyState(container, 'Belum ada data laba operasional pada bulan aktif.', colors);
+            return;
+        }
+
+        if (!canRenderCharts()) {
+            emptyState(container, 'Library grafik belum tersedia. Ringkasan laba operasional tetap ditampilkan.', colors);
             return;
         }
 
