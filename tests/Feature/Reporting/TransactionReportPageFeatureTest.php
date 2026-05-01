@@ -84,6 +84,8 @@ final class TransactionReportPageFeatureTest extends TestCase
         $response->assertSee('transaction-report-filter-form', false);
         $response->assertSee('Unduh Excel');
         $response->assertSee('/admin/reports/transactions/export.xlsx', false);
+        $response->assertSee('Unduh PDF');
+        $response->assertSee('/admin/reports/transactions/export.pdf', false);
         $response->assertSee('01/01/2030 s/d 31/01/2030');
         $response->assertSee('Rp 150.000');
         $response->assertSee('Rp 149.999');

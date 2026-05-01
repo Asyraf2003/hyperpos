@@ -12,16 +12,19 @@
     'rangeLabelText' => 'Rentang transaksi aktif',
     'basisDateLabel' => 'Tanggal transaksi nota',
     'basisDateNote' => 'Mode harian hanya menghitung nota pada tanggal transaksi tersebut.',
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => $exportExcelUrl,
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+        [
+            'label' => 'Unduh PDF',
+            'url' => route('admin.reports.transaction_summary.export_pdf', request()->query()),
+            'class' => 'btn btn-outline-danger text-nowrap',
+        ],
+    ],
 ])
-
-<div class="d-flex justify-content-end mb-3">
-    <a href="{{ $exportExcelUrl }}" class="btn btn-outline-success">
-        Unduh Excel
-    </a>
-    <a href="{{ route('admin.reports.transaction_summary.export_pdf', request()->query()) }}" class="btn btn-outline-danger">
-        Unduh PDF
-    </a>
-</div>
 
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
