@@ -10,6 +10,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPag
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportPdfExportController;
@@ -17,6 +18,9 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionReportPageContro
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
+    Route::get('/admin/reports/transaction-cash-ledger/export.xlsx', TransactionCashLedgerExcelExportController::class)
+        ->name('admin.reports.transaction_cash_ledger.export_excel');
+
     Route::get('/admin/reports/transaction-cash-ledger', TransactionCashLedgerPageController::class)
         ->name('admin.reports.transaction_cash_ledger.index');
 
