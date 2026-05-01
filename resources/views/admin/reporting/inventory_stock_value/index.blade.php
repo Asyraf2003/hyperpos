@@ -13,6 +13,13 @@
     'basisDateLabel' => 'Tanggal mutasi movement',
     'basisDateNote' => 'Filter memengaruhi ringkasan movement periodik. Snapshot stok saat ini tetap menampilkan posisi stok terbaru.',
     'supportsCustomRange' => true,
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.inventory_stock_value.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
