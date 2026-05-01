@@ -13,9 +13,9 @@ final class GetAdminDashboardAnalyticsHandler
     ) {
     }
 
-    public function handle(): array
+    public function handle(?string $month = null): array
     {
-        $period = AdminDashboardAnalyticsPeriod::build();
+        $period = AdminDashboardAnalyticsPeriod::build($month);
         $ttlSeconds = max(
             0,
             (int) config('performance.admin_dashboard_overview_cache_ttl_seconds', 30)
@@ -26,7 +26,8 @@ final class GetAdminDashboardAnalyticsHandler
         }
 
         $cacheKey = sprintf(
-            'reporting:admin_dashboard_analytics:%s:%s:%s',
+            'reporting:admin_dashboard_analytics:%s:%s:%s:%s',
+            $period['active_month'],
             $period['today'],
             $period['from'],
             $period['to'],

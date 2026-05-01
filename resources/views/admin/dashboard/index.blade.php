@@ -518,6 +518,54 @@
 
 <div class="dashboard-report">
     <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Periode Dashboard</h5>
+                            <p class="section-subtitle">
+                                Data dashboard sedang membaca periode
+                                {{ $dashboard['period']['date_from'] ?? '-' }}
+                                s.d.
+                                {{ $dashboard['period']['date_to'] ?? '-' }}.
+                            </p>
+                        </div>
+                        <span class="badge-soft bg-soft-primary">
+                            <i class="bi bi-calendar3"></i>
+                            {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
+                        </span>
+                    </div>
+
+                    <form method="get" action="{{ route('admin.dashboard') }}" class="row g-3 align-items-end">
+                        <div class="col-12 col-md-4 col-xl-3">
+                            <label for="dashboard-month" class="form-label fw-bold">Pilih Bulan</label>
+                            <input
+                                type="month"
+                                id="dashboard-month"
+                                name="month"
+                                class="form-control"
+                                value="{{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}"
+                            >
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <button type="submit" class="btn btn-primary fw-bold">
+                                <i class="bi bi-funnel me-2"></i>
+                                Terapkan Periode
+                            </button>
+                        </div>
+                        <div class="col-12 col-md-auto">
+                            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary fw-bold">
+                                Reset Bulan Aktif
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
         <div class="col-12 col-xl-9">
             <div class="card hero-card h-100">
                 <div class="card-body p-4 p-lg-5 hero-content">
@@ -1128,7 +1176,7 @@
 
     </section>
 
-    <script type="application/json" id="admin-dashboard-analytics-payload" data-url="{{ route('admin.dashboard.analytics') }}">{}</script>
+    <script type="application/json" id="admin-dashboard-analytics-payload" data-url="{{ route('admin.dashboard.analytics', ['month' => $dashboard['period']['active_month'] ?? now()->format('Y-m')]) }}">{}</script>
 
 
 </div>

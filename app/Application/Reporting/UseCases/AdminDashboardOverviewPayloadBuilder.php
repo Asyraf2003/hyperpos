@@ -62,7 +62,7 @@ final class AdminDashboardOverviewPayloadBuilder
             5,
         );
 
-        return AdminDashboardOverviewPayload::fromSources(
+        $payload = AdminDashboardOverviewPayload::fromSources(
             $transactionSummary,
             $inventorySummary,
             $operationalProfitRow,
@@ -74,5 +74,14 @@ final class AdminDashboardOverviewPayloadBuilder
             $topSellingRows,
             $this->inventory->getRestockPriorityRows(5),
         );
+
+        $payload['period'] = [
+            'today' => $period['today'],
+            'active_month' => $period['active_month'] ?? substr($period['from'], 0, 7),
+            'date_from' => $period['from'],
+            'date_to' => $period['to'],
+        ];
+
+        return $payload;
     }
 }

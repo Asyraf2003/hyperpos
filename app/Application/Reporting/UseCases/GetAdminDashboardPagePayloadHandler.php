@@ -11,8 +11,8 @@ final class GetAdminDashboardPagePayloadHandler
     ) {
     }
 
-    public function handle(): array
+    public function handle(?string $month = null): array
     {
-        return $this->overview->handle();
+        return $this->overview->handle($month);
     }
 }

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use Carbon\CarbonImmutable;
-
 final class AdminDashboardOverviewPeriod
 {
-    public static function build(): array
+    /**
+     * @return array{
+     *   today:string,
+     *   active_month:string,
+     *   from:string,
+     *   to:string
+     * }
+     */
+    public static function build(?string $month = null): array
     {
-        $today = CarbonImmutable::today();
-
-        return [
-            'today' => $today->toDateString(),
-            'from' => $today->startOfMonth()->toDateString(),
-            'to' => $today->endOfMonth()->toDateString(),
-        ];
+        return AdminDashboardPeriod::build($month);
     }
 }

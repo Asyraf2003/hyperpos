@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use Carbon\CarbonImmutable;
-
 final class AdminDashboardAnalyticsPeriod
 {
     /**
@@ -16,15 +14,8 @@ final class AdminDashboardAnalyticsPeriod
      *   to:string
      * }
      */
-    public static function build(): array
+    public static function build(?string $month = null): array
     {
-        $today = CarbonImmutable::today();
-
-        return [
-            'today' => $today->toDateString(),
-            'active_month' => $today->format('Y-m'),
-            'from' => $today->startOfMonth()->toDateString(),
-            'to' => $today->toDateString(),
-        ];
+        return AdminDashboardPeriod::build($month);
     }
 }

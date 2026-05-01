@@ -127,6 +127,36 @@ final class AdminDashboardPageFeatureTest extends TestCase
         }
     }
 
+    public function test_admin_can_view_dashboard_and_analytics_for_selected_month(): void
+    {
+        Carbon::setTestNow('2030-02-09 08:00:00');
+
+        try {
+            $this->seedDashboardFixtures();
+            $admin = $this->user('admin');
+
+            $response = $this->actingAs($admin)
+                ->get(route('admin.dashboard', ['month' => '2030-01']));
+
+            $response->assertOk();
+            $response->assertSee('Periode Dashboard');
+            $response->assertSee('value="2030-01"', false);
+            $response->assertSee('Rp 150.000');
+            $response->assertSee(route('admin.dashboard.analytics', ['month' => '2030-01']), false);
+
+            $payload = $this->actingAs($admin)
+                ->getJson(route('admin.dashboard.analytics', ['month' => '2030-01']));
+
+            $payload->assertOk();
+            $payload->assertJsonPath('period.active_month', '2030-01');
+            $payload->assertJsonPath('period.date_from', '2030-01-01');
+            $payload->assertJsonPath('period.date_to', '2030-01-31');
+            $payload->assertJsonPath('charts.stock_status_donut.segments.0.value', 1);
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
     private function seedDashboardFixtures(): void
     {
         $this->seedExpenseCategory('expense-category-1', 'LISTRIK', 'Listrik');
