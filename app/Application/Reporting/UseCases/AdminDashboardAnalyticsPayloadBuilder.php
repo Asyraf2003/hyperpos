@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
-use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
-
 final class AdminDashboardAnalyticsPayloadBuilder
 {
     public function __construct(
-        private readonly DashboardInventoryOverviewReaderPort $inventory,
-        private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
+        private readonly AdminDashboardSharedReportFragments $sharedFragments,
         private readonly GetDashboardOperationalPerformanceDatasetHandler $operationalPerformance,
         private readonly AdminDashboardAnalyticsChartsPayloadBuilder $charts,
     ) {
@@ -27,16 +23,9 @@ final class AdminDashboardAnalyticsPayloadBuilder
      */
     public function build(array $period): array
     {
-        $inventorySummary = $this->inventory->getInventorySummary(
-            $period['from'],
-            $period['to'],
-        );
+        $inventorySummary = $this->sharedFragments->inventorySummary($period);
 
-        $topSellingRows = $this->topSellingProducts->getTopSellingProducts(
-            $period['from'],
-            $period['to'],
-            5,
-        );
+        $topSellingRows = $this->sharedFragments->topSellingRows($period, 5);
 
         $operationalPerformanceDataset = $this->operationalPerformance->handle(
             $period['from'],

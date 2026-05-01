@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Application\Reporting\UseCases;
 
 use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
-use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
 
 final class AdminDashboardOverviewPayloadBuilder
 {
     public function __construct(
         private readonly GetTransactionReportDatasetHandler $transactionReport,
         private readonly GetTransactionCashLedgerPerNoteHandler $transactionCashLedger,
-        private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
+        private readonly AdminDashboardSharedReportFragments $sharedFragments,
         private readonly DashboardInventoryOverviewReaderPort $inventory,
         private readonly GetOperationalProfitSummaryHandler $operationalProfit,
         private readonly GetSupplierPayableReportDatasetHandler $supplierPayable,
@@ -30,7 +29,7 @@ final class AdminDashboardOverviewPayloadBuilder
             $this->transactionReport->handle($period['from'], $period['to'])
         );
 
-        $inventorySummary = $this->inventory->getInventorySummary($period['from'], $period['to']);
+        $inventorySummary = $this->sharedFragments->inventorySummary($period);
 
         $operationalProfitRow = ReportingResultDataExtractor::row(
             $this->operationalProfit->handle($period['from'], $period['to'])
@@ -56,11 +55,7 @@ final class AdminDashboardOverviewPayloadBuilder
             $this->transactionCashLedger->handle($period['from'], $period['to'])
         );
 
-        $topSellingRows = $this->topSellingProducts->getTopSellingProducts(
-            $period['from'],
-            $period['to'],
-            5,
-        );
+        $topSellingRows = $this->sharedFragments->topSellingRows($period, 5);
 
         $payload = AdminDashboardOverviewPayload::fromSources(
             $transactionSummary,
