@@ -8,6 +8,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportExc
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalProfitReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\PayrollReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\SupplierPayableReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\TransactionCashLedgerExcelExportController;
@@ -28,6 +29,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
     Route::get('/admin/reports/transaction-cash-ledger', TransactionCashLedgerPageController::class)
         ->name('admin.reports.transaction_cash_ledger.index');
 
+
+    Route::get('/admin/reports/payrolls/export.xlsx', PayrollReportExcelExportController::class)
+        ->name('admin.reports.payroll.export_excel');
 
     Route::get('/admin/reports/payrolls', PayrollReportPageController::class)
         ->name('admin.reports.payroll.index');

@@ -13,6 +13,13 @@
     'basisDateLabel' => 'Tanggal pencairan gaji',
     'basisDateNote' => 'Mode harian hanya menghitung payroll yang cair pada tanggal tersebut. Payroll yang direversal tidak ikut dihitung.',
     'supportsCustomRange' => true,
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.payroll.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 
 <div class="row g-3 mb-4">
