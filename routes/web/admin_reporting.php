@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPageController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPdfExportController;
@@ -43,6 +44,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/employee-debts/export.xlsx', EmployeeDebtReportExcelExportController::class)
         ->name('admin.reports.employee_debt.export_excel');
+
+    Route::get('/admin/reports/employee-debts/export.pdf', EmployeeDebtReportPdfExportController::class)
+        ->name('admin.reports.employee_debt.export_pdf');
 
     Route::get('/admin/reports/employee-debts', EmployeeDebtReportPageController::class)
         ->name('admin.reports.employee_debt.index');
