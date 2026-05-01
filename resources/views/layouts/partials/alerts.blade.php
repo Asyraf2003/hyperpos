@@ -12,7 +12,6 @@
     const rawPayload = (payloadElement.textContent || 'null').trim();
 
     if (rawPayload === '' || rawPayload === 'null') {
-        console.error('ui-feedback: payload kosong atau null', rawPayload);
         return;
     }
 

@@ -55,7 +55,6 @@
         stock: document.getElementById('admin-chart-stock-status-donut'),
         topSelling: document.getElementById('admin-chart-top-selling-bar'),
         cashflow: document.getElementById('admin-chart-cashflow-line'),
-        operational: document.getElementById('admin-chart-operational-performance-bar'),
     };
 
     const currentCharts = () => (payload && typeof payload === 'object' ? payload.charts || {} : {});
@@ -490,98 +489,10 @@
         instances[key].render();
     };
 
-    const renderOperationalBar = () => {
-        const charts = currentCharts();
-        const key = 'operational';
-        const container = containers.operational;
-        const data = charts.operational_performance_bar || {};
-        const colors = palette();
-        const labels = Array.isArray(data.labels) ? data.labels : [];
-        const series = Array.isArray(data.series) ? data.series : [];
-
-        destroy(key);
-
-        if (!container || !labels.length || !series.length) {
-            emptyState(container, 'Belum ada data kinerja operasional pada bulan aktif.', colors);
-            return;
-        }
-
-        container.innerHTML = '';
-
-        const colorMap = {
-            operational_profit: colors.primary,
-            operational_expense: colors.success,
-            refund: colors.warning,
-        };
-
-        instances[key] = new ApexCharts(container, {
-            ...baseOptions(colors),
-            chart: {
-                ...baseOptions(colors).chart,
-                type: 'bar',
-                height: 340,
-            },
-            series: series.map((row) => ({
-                name: row?.label || '-',
-                data: Array.isArray(row?.values) ? row.values.map((value) => Number(value || 0)) : [],
-            })),
-            colors: series.map((row) => colorMap[row?.key] || colors.info),
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    borderRadius: 8,
-                    columnWidth: '72%',
-                },
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent'],
-            },
-            xaxis: {
-                categories: labels.map((label) => shortDate(label)),
-                labels: {
-                    style: {
-                        colors: labels.map(() => colors.text),
-                        fontSize: '11px',
-                        fontWeight: 800,
-                    },
-                },
-                axisBorder: {
-                    color: colors.border,
-                },
-                axisTicks: {
-                    color: colors.border,
-                },
-            },
-            yaxis: {
-                labels: {
-                    style: {
-                        colors: [colors.muted],
-                        fontSize: '11px',
-                        fontWeight: 800,
-                    },
-                    formatter: (value) => compactNumber(value),
-                },
-            },
-            tooltip: {
-                shared: true,
-                intersect: false,
-                theme: isDark() ? 'dark' : 'light',
-                y: {
-                    formatter: (value) => formatRupiah(value),
-                },
-            },
-        });
-
-        instances[key].render();
-    };
-
     const renderAll = () => {
         renderStock();
         renderTopSelling();
         renderOperationalArea();
-        renderOperationalBar();
     };
 
     loadRemotePayload();
