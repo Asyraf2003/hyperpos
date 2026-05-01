@@ -11,10 +11,10 @@ Dashboard Hyperpos harus:
 
 ## Current Branch / Baseline
 
-Branch: main  
-HEAD / origin/main terakhir: 8d91f4c6 Split dashboard reporting files for audit limits  
-Working tree sebelum probe terakhir clean.  
-Temp probe files selalu removed.  
+Branch: main
+HEAD / origin/main terakhir: 8d91f4c6 Split dashboard reporting files for audit limits
+Working tree sebelum probe terakhir clean.
+Temp probe files selalu removed.
 Temp indexes terakhir dropped semua.
 
 ## Commits Completed and Pushed
@@ -35,7 +35,7 @@ Temp indexes terakhir dropped semua.
 
 ## Visibility Root Cause Proven
 
-Dashboard default membaca bulan aktif berdasarkan tanggal sistem.  
+Dashboard default membaca bulan aktif berdasarkan tanggal sistem.
 Saat sistem berada di 2026-05-01, data lokal penting berada di 2026-04-30, sehingga transaksi/refund/top selling terlihat kosong.
 
 Data April lokal fully refunded/reversed:
@@ -164,7 +164,7 @@ Selected April:
 
 ### Empty Dashboard Temporary Probe
 
-Dataset: empty dashboard fixture.  
+Dataset: empty dashboard fixture.
 Result:
 - page_ms = 104.66
 - analytics_ms = 27.02
