@@ -6,6 +6,7 @@ use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportExcelExpo
 use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\EmployeeDebtReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportExcelExportController;
+use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportPdfExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\InventoryStockValueReportPageController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportExcelExportController;
 use App\Adapters\In\Http\Controllers\Admin\Reporting\OperationalExpenseReportPdfExportController;
@@ -75,6 +76,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/reports/supplier-payables', SupplierPayableReportPageController::class)
         ->name('admin.reports.supplier_payable.index');
+
+    Route::get('/admin/reports/inventory-stock-value/export.pdf', InventoryStockValueReportPdfExportController::class)
+        ->name('admin.reports.inventory_stock_value.export_pdf');
 
     Route::get('/admin/reports/inventory-stock-value/export.xlsx', InventoryStockValueReportExcelExportController::class)
         ->name('admin.reports.inventory_stock_value.export_excel');
