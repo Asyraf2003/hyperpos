@@ -1167,6 +1167,46 @@
                         data-chart-key="operational_performance_bar"
                     ></div>
                 </div>
+                <div
+                    class="finance-grid mt-3"
+                    data-dashboard-analytics-target="operational-summary"
+                >
+                    <div class="finance-box">
+                        <div class="finance-label">Laba Operasional</div>
+                        <div class="finance-value">Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_profit_rupiah'] ?? 0), 0, ',', '.') }}</div>
+                        <p class="finance-note meta-up">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Tren laba dari payload dashboard
+                        </p>
+                    </div>
+
+                    <div class="finance-box">
+                        <div class="finance-label">Biaya Operasional</div>
+                        <div class="finance-value">Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_operational_expense_rupiah'] ?? 0), 0, ',', '.') }}</div>
+                        <p class="finance-note meta-flat">
+                            <i class="bi bi-cash-stack"></i>
+                            Beban periode aktif
+                        </p>
+                    </div>
+
+                    <div class="finance-box">
+                        <div class="finance-label">Refund</div>
+                        <div class="finance-value">Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_refund_rupiah'] ?? 0), 0, ',', '.') }}</div>
+                        <p class="finance-note meta-down">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Kas keluar refund
+                        </p>
+                    </div>
+
+                    <div class="finance-box">
+                        <div class="finance-label">Potensi Kembalian</div>
+                        <div class="finance-value">Rp {{ number_format((int) ($dashboard['analytics']['charts']['operational_performance_bar']['summary']['total_potential_change_rupiah'] ?? 0), 0, ',', '.') }}</div>
+                        <p class="finance-note meta-flat">
+                            <i class="bi bi-coin"></i>
+                            Estimasi pecahan cash
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
         @include('admin.dashboard.partials.cash-change-denominations', [

@@ -54,6 +54,8 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Status Stok Saat Ini');
             $response->assertSee(route('admin.dashboard.analytics'), false);
             $response->assertSee('admin-chart-operational-performance', false);
+            $response->assertSee('data-dashboard-analytics-target="operational-summary"', false);
+            $response->assertSee('Potensi Kembalian');
             $response->assertDontSee('admin-chart-cashflow-line', false);
             $response->assertSee('Prioritas Restok');
             $response->assertSee('Lihat Detail');

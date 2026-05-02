@@ -68,6 +68,7 @@
         cashChangeRange: document.querySelector('[data-dashboard-analytics-target="cash-change-range"]'),
         cashChangeBadge: document.querySelector('[data-dashboard-analytics-target="cash-change-badge"]'),
         cashChangeRows: document.querySelector('[data-dashboard-analytics-target="cash-change-rows"]'),
+        operationalSummary: document.querySelector('[data-dashboard-analytics-target="operational-summary"]'),
     };
 
     const currentCharts = () => (payload && typeof payload === 'object' ? payload.charts || {} : {});
@@ -237,6 +238,71 @@
         });
     };
 
+    const renderOperationalSummary = (summary) => {
+        const target = targets.operationalSummary;
+
+        if (!target) {
+            return;
+        }
+
+        const rows = [
+            {
+                label: 'Laba Operasional',
+                value: summary?.total_operational_profit_rupiah || 0,
+                note: 'Tren laba dari payload dashboard',
+                noteClass: Number(summary?.total_operational_profit_rupiah || 0) < 0 ? 'meta-down' : 'meta-up',
+                icon: Number(summary?.total_operational_profit_rupiah || 0) < 0 ? 'bi-graph-down-arrow' : 'bi-graph-up-arrow',
+            },
+            {
+                label: 'Biaya Operasional',
+                value: summary?.total_operational_expense_rupiah || 0,
+                note: 'Beban periode aktif',
+                noteClass: 'meta-flat',
+                icon: 'bi-cash-stack',
+            },
+            {
+                label: 'Refund',
+                value: summary?.total_refund_rupiah || 0,
+                note: 'Kas keluar refund',
+                noteClass: Number(summary?.total_refund_rupiah || 0) > 0 ? 'meta-down' : 'meta-flat',
+                icon: 'bi-arrow-counterclockwise',
+            },
+            {
+                label: 'Potensi Kembalian',
+                value: summary?.total_potential_change_rupiah || 0,
+                note: 'Estimasi pecahan cash',
+                noteClass: 'meta-flat',
+                icon: 'bi-coin',
+            },
+        ];
+
+        target.innerHTML = '';
+
+        rows.forEach((item) => {
+            const box = document.createElement('div');
+            box.className = 'finance-box';
+
+            const label = document.createElement('div');
+            label.className = 'finance-label';
+            label.textContent = item.label;
+
+            const value = document.createElement('div');
+            value.className = 'finance-value';
+            value.textContent = formatRupiah(item.value);
+
+            const note = document.createElement('p');
+            note.className = `finance-note ${item.noteClass}`;
+
+            const icon = document.createElement('i');
+            icon.className = `bi ${item.icon}`;
+
+            note.append(icon, document.createTextNode(` ${item.note}`));
+            box.append(label, value, note);
+            target.appendChild(box);
+        });
+    };
+
+
     const renderAnalyticsSummaries = () => {
         const charts = currentCharts();
         const topSelling = charts.top_selling_bar || {};
@@ -262,6 +328,7 @@
 
         setText(targets.operationalRange, displayRange(operational.range || fallbackPeriodRange));
         setText(targets.operationalBadge, `${formatNumber(operationalLabels.length)} Titik`);
+        renderOperationalSummary(operational.summary || {});
 
         setText(targets.cashChangeRange, displayRange(cashChangeRange));
         setText(targets.cashChangeBadge, `${formatNumber(cashChangeRows.length)} Pecahan`);
