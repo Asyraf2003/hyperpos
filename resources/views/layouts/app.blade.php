@@ -43,6 +43,7 @@
                                 <a
                                     href="@yield('back_url')"
                                     class="btn btn-light-secondary"
+                                    data-layout-smart-back
                                 >
                                     Kembali
                                 </a>
@@ -50,6 +51,7 @@
                                 <a
                                     href="{{ request()->routeIs('admin.*') ? route('admin.dashboard') : (request()->routeIs('cashier.*') ? route('cashier.dashboard') : url('/')) }}"
                                     class="btn btn-light-secondary"
+                                    data-layout-smart-back
                                 >
                                     Kembali
                                 </a>
@@ -82,5 +84,6 @@
     ></script>
     <script src="{{ asset('assets/static/js/shared/push-notifications.js') }}?v={{ filemtime(public_path('assets/static/js/shared/push-notifications.js')) }}"></script>
     @stack('scripts')
+    <script src="{{ asset('assets/static/js/layout-smart-back.js') }}?v={{ filemtime(public_path('assets/static/js/layout-smart-back.js')) }}"></script>
 </body>
 </html>
