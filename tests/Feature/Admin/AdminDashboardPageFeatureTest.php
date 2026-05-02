@@ -52,6 +52,16 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Nilai Persediaan');
             $response->assertSee('Rp 211.000');
             $response->assertSee('Status Stok Saat Ini');
+            $response->assertSee('Cetak Laporan Resmi');
+            $response->assertSee('Dashboard tidak membuat export sendiri');
+            $response->assertSee(route('admin.reports.transaction_summary.export_pdf', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
+            ]), false);
+            $response->assertSee(route('admin.reports.inventory_stock_value.export_pdf', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
+            ]), false);
             $response->assertSee(route('admin.dashboard.analytics'), false);
             $response->assertSee('admin-chart-operational-performance', false);
             $response->assertSee('data-dashboard-analytics-target="operational-summary"', false);

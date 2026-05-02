@@ -333,6 +333,27 @@
         gap: 1rem;
     }
 
+    .dashboard-report .report-export-shortcut-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .dashboard-report .report-export-shortcut-card {
+        border: 1px solid var(--report-border);
+        border-radius: var(--report-radius-lg);
+        background:
+            linear-gradient(180deg, rgba(var(--bs-primary-rgb), .02), rgba(var(--bs-primary-rgb), .045)),
+            var(--report-surface);
+        padding: 1rem;
+    }
+
+    .dashboard-report .report-export-shortcut-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+
     .dashboard-report .finance-box,
     .dashboard-report .inventory-item,
     .dashboard-report .asset-item {
@@ -561,7 +582,8 @@
 
     @media (max-width: 1199.98px) {
         .dashboard-report .hero-grid,
-        .dashboard-report .finance-grid {
+        .dashboard-report .finance-grid,
+        .dashboard-report .report-export-shortcut-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
     }
@@ -569,7 +591,8 @@
     @media (max-width: 767.98px) {
         .dashboard-report .hero-grid,
         .dashboard-report .finance-grid,
-        .dashboard-report .summary-strip {
+        .dashboard-report .summary-strip,
+        .dashboard-report .report-export-shortcut-grid {
             grid-template-columns: 1fr;
         }
 
@@ -630,6 +653,113 @@
                             </a>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card h-100">
+                <div class="panel-card-body">
+                    <div class="card-head">
+                        <div>
+                            <h5 class="section-title">Cetak Laporan Resmi</h5>
+                            <p class="section-subtitle">
+                                Shortcut dari dashboard ke PDF/Excel laporan canonical untuk bulan aktif.
+                            </p>
+                        </div>
+                        <span class="badge-soft bg-soft-primary">
+                            <i class="bi bi-printer"></i>
+                            Laporan
+                        </span>
+                    </div>
+
+                    <div class="helper-note mb-3">
+                        Dashboard tidak membuat export sendiri. Tombol di bawah membuka export laporan resmi agar angka tetap mengikuti dataset report, bukan chart atau DOM dashboard.
+                    </div>
+
+                    @php
+                        $dashboardExportQuery = [
+                            'period_mode' => 'monthly',
+                            'reference_date' => (string) ($dashboard['period']['date_to'] ?? now()->toDateString()),
+                        ];
+
+                        $dashboardReportExportShortcuts = [
+                            [
+                                'label' => 'Laporan Transaksi',
+                                'index' => 'admin.reports.transaction_summary.index',
+                                'pdf' => 'admin.reports.transaction_summary.export_pdf',
+                                'excel' => 'admin.reports.transaction_summary.export_excel',
+                            ],
+                            [
+                                'label' => 'Buku Kas Transaksi',
+                                'index' => 'admin.reports.transaction_cash_ledger.index',
+                                'pdf' => 'admin.reports.transaction_cash_ledger.export_pdf',
+                                'excel' => 'admin.reports.transaction_cash_ledger.export_excel',
+                            ],
+                            [
+                                'label' => 'Stok dan Nilai Persediaan',
+                                'index' => 'admin.reports.inventory_stock_value.index',
+                                'pdf' => 'admin.reports.inventory_stock_value.export_pdf',
+                                'excel' => 'admin.reports.inventory_stock_value.export_excel',
+                            ],
+                            [
+                                'label' => 'Laba Kas Operasional',
+                                'index' => 'admin.reports.operational_profit.index',
+                                'pdf' => 'admin.reports.operational_profit.export_pdf',
+                                'excel' => 'admin.reports.operational_profit.export_excel',
+                            ],
+                            [
+                                'label' => 'Biaya Operasional',
+                                'index' => 'admin.reports.operational_expense.index',
+                                'pdf' => 'admin.reports.operational_expense.export_pdf',
+                                'excel' => 'admin.reports.operational_expense.export_excel',
+                            ],
+                            [
+                                'label' => 'Payroll',
+                                'index' => 'admin.reports.payroll.index',
+                                'pdf' => 'admin.reports.payroll.export_pdf',
+                                'excel' => 'admin.reports.payroll.export_excel',
+                            ],
+                            [
+                                'label' => 'Hutang Karyawan',
+                                'index' => 'admin.reports.employee_debt.index',
+                                'pdf' => 'admin.reports.employee_debt.export_pdf',
+                                'excel' => 'admin.reports.employee_debt.export_excel',
+                            ],
+                            [
+                                'label' => 'Hutang Pemasok',
+                                'index' => 'admin.reports.supplier_payable.index',
+                                'pdf' => 'admin.reports.supplier_payable.export_pdf',
+                                'excel' => 'admin.reports.supplier_payable.export_excel',
+                            ],
+                        ];
+                    @endphp
+
+                    <div class="report-export-shortcut-grid">
+                        @foreach ($dashboardReportExportShortcuts as $shortcut)
+                            <div class="report-export-shortcut-card">
+                                <div class="inventory-title mb-2">{{ $shortcut['label'] }}</div>
+                                <p class="inventory-meta mb-3">
+                                    Periode dashboard: {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
+                                </p>
+                                <div class="report-export-shortcut-actions">
+                                    <a href="{{ route($shortcut['pdf'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-danger fw-bold">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i>
+                                        PDF
+                                    </a>
+                                    <a href="{{ route($shortcut['excel'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-success fw-bold">
+                                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                                        Excel
+                                    </a>
+                                    <a href="{{ route($shortcut['index'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-primary fw-bold">
+                                        Buka
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
