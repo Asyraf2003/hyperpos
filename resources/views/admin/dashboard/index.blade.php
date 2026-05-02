@@ -1132,10 +1132,12 @@
                     @foreach (($dashboard['analytics']['charts']['stock_status_donut']['segments'] ?? []) as $segment)
                         @php
                             $segmentLabel = (string) ($segment['label'] ?? '-');
-                            $segmentSeverity = match ($segmentLabel) {
-                                'Stok Aman' => 'is-safe',
-                                'Mulai Restok', 'Mulai Perlu Restok' => 'is-warning',
-                                'Stok Kritis', 'Kritis' => 'is-critical',
+                            $segmentKey = (string) ($segment['key'] ?? '');
+                            $segmentColorToken = (string) ($segment['color_token'] ?? '');
+                            $segmentSeverity = match (true) {
+                                $segmentKey === 'safe' || $segmentColorToken === 'success' => 'is-safe',
+                                $segmentKey === 'low' || $segmentColorToken === 'warning' => 'is-warning',
+                                $segmentKey === 'critical' || $segmentColorToken === 'danger' => 'is-critical',
                                 default => 'is-unconfigured',
                             };
                             $segmentBadgeClass = match ($segmentSeverity) {

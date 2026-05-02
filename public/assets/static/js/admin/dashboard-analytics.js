@@ -163,24 +163,26 @@
         }
     };
 
-    const stockSegmentSeverity = (label) => {
-        const normalized = String(label || '').toLowerCase();
+    const stockSegmentSeverity = (segment) => {
+        const key = String(segment?.key || '').toLowerCase();
+        const colorToken = String(segment?.color_token || '').toLowerCase();
+        const label = String(segment?.label || '').toLowerCase();
 
-        if (normalized.includes('aman')) {
+        if (key === 'safe' || colorToken === 'success' || label.includes('aman')) {
             return {
                 row: 'is-safe',
                 badge: 'bg-soft-success',
             };
         }
 
-        if (normalized.includes('kritis')) {
+        if (key === 'critical' || colorToken === 'danger' || label.includes('kritis')) {
             return {
                 row: 'is-critical',
                 badge: 'bg-soft-danger',
             };
         }
 
-        if (normalized.includes('restok')) {
+        if (key === 'low' || colorToken === 'warning' || label.includes('restok')) {
             return {
                 row: 'is-warning',
                 badge: 'bg-soft-warning',
@@ -213,7 +215,7 @@
         }
 
         segments.forEach((segment) => {
-            const severity = stockSegmentSeverity(segment?.label);
+            const severity = stockSegmentSeverity(segment);
             const row = document.createElement('div');
             row.className = `stock-status-row ${severity.row} d-flex justify-content-between align-items-center border rounded px-3 py-2`;
 
