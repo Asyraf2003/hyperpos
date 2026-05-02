@@ -81,6 +81,11 @@ final class TransactionReportPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Laporan Transaksi');
+        $content = (string) preg_replace('/\s+/', ' ', $response->getContent());
+        $this->assertStringContainsString(
+            'href="' . route('admin.dashboard') . '" class="btn btn-light-secondary" > Kembali </a>',
+            $content
+        );
         $response->assertSee('transaction-report-filter-form', false);
         $response->assertSee('Unduh Excel');
         $response->assertSee('/admin/reports/transactions/export.xlsx', false);
