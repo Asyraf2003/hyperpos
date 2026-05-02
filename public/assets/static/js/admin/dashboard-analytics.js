@@ -163,6 +163,36 @@
         }
     };
 
+    const stockSegmentSeverity = (label) => {
+        const normalized = String(label || '').toLowerCase();
+
+        if (normalized.includes('aman')) {
+            return {
+                row: 'is-safe',
+                badge: 'bg-soft-success',
+            };
+        }
+
+        if (normalized.includes('kritis')) {
+            return {
+                row: 'is-critical',
+                badge: 'bg-soft-danger',
+            };
+        }
+
+        if (normalized.includes('restok')) {
+            return {
+                row: 'is-warning',
+                badge: 'bg-soft-warning',
+            };
+        }
+
+        return {
+            row: 'is-unconfigured',
+            badge: 'bg-soft-info',
+        };
+    };
+
     const renderStockSegmentsSummary = (data) => {
         const target = targets.stockSegments;
 
@@ -183,15 +213,21 @@
         }
 
         segments.forEach((segment) => {
+            const severity = stockSegmentSeverity(segment?.label);
             const row = document.createElement('div');
-            row.className = 'd-flex justify-content-between align-items-center border rounded px-3 py-2';
+            row.className = `stock-status-row ${severity.row} d-flex justify-content-between align-items-center border rounded px-3 py-2`;
 
             const label = document.createElement('span');
-            label.className = 'fw-semibold';
-            label.textContent = segment?.label || '-';
+            label.className = 'stock-status-label fw-semibold';
+
+            const dot = document.createElement('span');
+            dot.className = 'stock-status-dot';
+            dot.setAttribute('aria-hidden', 'true');
+
+            label.append(dot, document.createTextNode(segment?.label || '-'));
 
             const value = document.createElement('span');
-            value.className = 'badge bg-light text-dark border';
+            value.className = `stock-status-value badge-soft ${severity.badge}`;
             value.textContent = formatNumber(segment?.value || 0);
 
             row.append(label, value);

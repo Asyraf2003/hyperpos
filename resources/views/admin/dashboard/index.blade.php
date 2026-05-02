@@ -397,6 +397,76 @@
         font-weight: 700;
     }
 
+    .dashboard-report .stock-status-row,
+    .dashboard-report .restock-priority-row {
+        background:
+            linear-gradient(90deg, rgba(var(--bs-primary-rgb), .025), transparent),
+            var(--report-surface);
+        transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+
+    .dashboard-report .stock-status-row:hover,
+    .dashboard-report .restock-priority-row:hover {
+        transform: translateX(2px);
+    }
+
+    .dashboard-report .stock-status-row.is-safe {
+        border-color: color-mix(in srgb, var(--dash-success) 30%, var(--report-border) 70%) !important;
+        background: linear-gradient(90deg, rgba(40, 199, 111, .09), transparent);
+    }
+
+    .dashboard-report .stock-status-row.is-warning,
+    .dashboard-report .restock-priority-row.is-warning {
+        border-color: color-mix(in srgb, var(--dash-warning) 34%, var(--report-border) 66%) !important;
+        background: linear-gradient(90deg, rgba(253, 172, 65, .12), transparent);
+    }
+
+    .dashboard-report .stock-status-row.is-critical,
+    .dashboard-report .restock-priority-row.is-critical {
+        border-color: color-mix(in srgb, var(--dash-danger) 38%, var(--report-border) 62%) !important;
+        background: linear-gradient(90deg, rgba(234, 84, 85, .12), transparent);
+    }
+
+    .dashboard-report .stock-status-row.is-unconfigured {
+        border-color: color-mix(in srgb, var(--dash-info) 28%, var(--report-border) 72%) !important;
+        background: linear-gradient(90deg, rgba(0, 207, 232, .08), transparent);
+    }
+
+    .dashboard-report .stock-status-label {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        color: var(--report-text);
+    }
+
+    .dashboard-report .stock-status-dot {
+        width: .58rem;
+        height: .58rem;
+        border-radius: 999px;
+        background: var(--dash-info);
+        box-shadow: 0 0 0 .22rem rgba(0, 207, 232, .12);
+    }
+
+    .dashboard-report .stock-status-row.is-safe .stock-status-dot {
+        background: var(--dash-success);
+        box-shadow: 0 0 0 .22rem rgba(40, 199, 111, .12);
+    }
+
+    .dashboard-report .stock-status-row.is-warning .stock-status-dot {
+        background: var(--dash-warning);
+        box-shadow: 0 0 0 .22rem rgba(253, 172, 65, .14);
+    }
+
+    .dashboard-report .stock-status-row.is-critical .stock-status-dot {
+        background: var(--dash-danger);
+        box-shadow: 0 0 0 .22rem rgba(234, 84, 85, .14);
+    }
+
+    .dashboard-report .stock-status-value {
+        min-width: 3.2rem;
+        justify-content: center;
+    }
+
     .dashboard-report .helper-note {
         padding: .95rem 1rem;
         border-radius: var(--report-radius-lg);
@@ -1060,9 +1130,27 @@
 
                 <div class="mt-3 d-grid gap-2" data-dashboard-analytics-target="stock-segments">
                     @foreach (($dashboard['analytics']['charts']['stock_status_donut']['segments'] ?? []) as $segment)
-                        <div class="d-flex justify-content-between align-items-center border rounded px-3 py-2">
-                            <span class="fw-semibold">{{ $segment['label'] ?? '-' }}</span>
-                            <span class="badge bg-light text-dark border">{{ (int) ($segment['value'] ?? 0) }}</span>
+                        @php
+                            $segmentLabel = (string) ($segment['label'] ?? '-');
+                            $segmentSeverity = match ($segmentLabel) {
+                                'Stok Aman' => 'is-safe',
+                                'Mulai Restok', 'Mulai Perlu Restok' => 'is-warning',
+                                'Stok Kritis', 'Kritis' => 'is-critical',
+                                default => 'is-unconfigured',
+                            };
+                            $segmentBadgeClass = match ($segmentSeverity) {
+                                'is-safe' => 'bg-soft-success',
+                                'is-warning' => 'bg-soft-warning',
+                                'is-critical' => 'bg-soft-danger',
+                                default => 'bg-soft-info',
+                            };
+                        @endphp
+                        <div class="stock-status-row {{ $segmentSeverity }} d-flex justify-content-between align-items-center border rounded px-3 py-2">
+                            <span class="stock-status-label fw-semibold">
+                                <span class="stock-status-dot" aria-hidden="true"></span>
+                                {{ $segmentLabel }}
+                            </span>
+                            <span class="stock-status-value badge-soft {{ $segmentBadgeClass }}">{{ (int) ($segment['value'] ?? 0) }}</span>
                         </div>
                     @endforeach
                 </div>
@@ -1103,7 +1191,7 @@
                                     </tr>
                                 @else
                                     @foreach (($dashboard['restock_priority_rows'] ?? []) as $row)
-                                        <tr>
+                                        <tr class="restock-priority-row {{ ($row['status'] ?? null) === 'critical' ? 'is-critical' : 'is-warning' }}">
                                             <td>
                                                 <div class="product-inline">
                                                     <span class="product-avatar {{ ($row['status'] ?? null) === 'critical' ? 'bg-soft-danger' : 'bg-soft-warning' }}">
