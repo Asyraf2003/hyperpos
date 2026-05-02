@@ -1163,8 +1163,8 @@
                 <div class="chart-shell chart-placeholder">
                     <div
                         class="chart-canvas-shell"
-                        id="admin-chart-cashflow-line"
-                        data-chart-key="cashflow_line"
+                        id="admin-chart-operational-performance"
+                        data-chart-key="operational_performance_bar"
                     ></div>
                 </div>
             </div>

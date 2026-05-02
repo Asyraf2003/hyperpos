@@ -54,7 +54,7 @@
     const containers = {
         stock: document.getElementById('admin-chart-stock-status-donut'),
         topSelling: document.getElementById('admin-chart-top-selling-bar'),
-        cashflow: document.getElementById('admin-chart-cashflow-line'),
+        operationalPerformance: document.getElementById('admin-chart-operational-performance'),
     };
 
     const targets = {
@@ -552,8 +552,8 @@
 
     const renderOperationalArea = () => {
         const charts = currentCharts();
-        const key = 'cashflow';
-        const container = containers.cashflow;
+        const key = 'operationalPerformance';
+        const container = containers.operationalPerformance;
         const data = charts.operational_performance_bar || {};
         const colors = palette();
         const labels = Array.isArray(data.labels) ? data.labels : [];

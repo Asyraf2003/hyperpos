@@ -53,6 +53,8 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Rp 211.000');
             $response->assertSee('Status Stok Saat Ini');
             $response->assertSee(route('admin.dashboard.analytics'), false);
+            $response->assertSee('admin-chart-operational-performance', false);
+            $response->assertDontSee('admin-chart-cashflow-line', false);
             $response->assertSee('Prioritas Restok');
             $response->assertSee('Lihat Detail');
             $response->assertSee(route('admin.products.show', ['productId' => 'product-2']), false);
@@ -122,6 +124,7 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertJsonPath('charts.stock_status_donut.segments.3.value', 1);
             $payload = $response->json();
             $this->assertArrayNotHasKey('cashflow_line', $payload['charts'] ?? []);
+            $this->assertArrayHasKey('operational_performance_bar', $payload['charts'] ?? []);
             $response->assertJsonPath('charts.operational_performance_bar.summary.total_operational_expense_rupiah', 5000);
         } finally {
             Carbon::setTestNow();
