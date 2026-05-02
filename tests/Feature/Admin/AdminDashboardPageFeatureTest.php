@@ -156,6 +156,9 @@ final class AdminDashboardPageFeatureTest extends TestCase
 
             $response->assertOk();
             $response->assertSee('Periode Dashboard');
+            $response->assertSee('Filter &amp; Cetak', false);
+            $response->assertSee('id="admin-dashboard-filter-drawer"', false);
+            $response->assertSee('name="month"', false);
             $response->assertSee('value="2030-01"', false);
             $response->assertSee('Rp 150.000');
             $response->assertSee(route('admin.dashboard.analytics', ['month' => '2030-01']), false);

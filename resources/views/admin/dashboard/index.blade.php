@@ -614,7 +614,7 @@
         <div class="col-12">
             <div class="card h-100">
                 <div class="panel-card-body">
-                    <div class="card-head">
+                    <div class="card-head mb-0">
                         <div>
                             <h5 class="section-title">Periode Dashboard</h5>
                             <p class="section-subtitle">
@@ -624,88 +624,30 @@
                                 {{ $dashboard['period']['date_to'] ?? '-' }}.
                             </p>
                         </div>
-                        <span class="badge-soft bg-soft-primary">
-                            <i class="bi bi-calendar3"></i>
-                            {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
-                        </span>
-                    </div>
 
-                    <form method="get" action="{{ route('admin.dashboard') }}" class="row g-3 align-items-end">
-                        <div class="col-12 col-md-4 col-xl-3">
-                            <label for="dashboard-month" class="form-label fw-bold">Pilih Bulan</label>
-                            <input
-                                type="month"
-                                id="dashboard-month"
-                                name="month"
-                                class="form-control"
-                                value="{{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}"
+                        <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
+                            <span class="badge-soft bg-soft-primary">
+                                <i class="bi bi-calendar3"></i>
+                                {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
+                            </span>
+
+                            <button
+                                type="button"
+                                id="admin-dashboard-filter-open-filter"
+                                class="btn btn-primary fw-bold"
                             >
-                        </div>
-                        <div class="col-12 col-md-auto">
-                            <button type="submit" class="btn btn-primary fw-bold">
                                 <i class="bi bi-funnel me-2"></i>
-                                Terapkan Periode
+                                Filter &amp; Cetak
                             </button>
                         </div>
-                        <div class="col-12 col-md-auto">
-                            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary fw-bold">
-                                Reset Bulan Aktif
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head">
-                        <div>
-                            <h5 class="section-title">Cetak Laporan Resmi</h5>
-                            <p class="section-subtitle">
-                                Shortcut dari dashboard ke PDF/Excel laporan canonical untuk bulan aktif.
-                            </p>
-                        </div>
-                        <span class="badge-soft bg-soft-primary">
-                            <i class="bi bi-printer"></i>
-                            Laporan
-                        </span>
-                    </div>
-
-                    <div class="helper-note mb-3">
-                        Dashboard tidak membuat export sendiri. Tombol di bawah membuka export laporan resmi agar angka tetap mengikuti dataset report, bukan chart atau DOM dashboard.
-                    </div>
-
-                    <div class="report-export-shortcut-grid">
-                        @foreach ($dashboardReportExportShortcuts as $shortcut)
-                            <div class="report-export-shortcut-card">
-                                <div class="inventory-title mb-2">{{ $shortcut['label'] }}</div>
-                                <p class="inventory-meta mb-3">
-                                    Periode dashboard: {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
-                                </p>
-                                <div class="report-export-shortcut-actions">
-                                    <a href="{{ route($shortcut['pdf'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-danger fw-bold">
-                                        <i class="bi bi-file-earmark-pdf me-1"></i>
-                                        PDF
-                                    </a>
-                                    <a href="{{ route($shortcut['excel'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-success fw-bold">
-                                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>
-                                        Excel
-                                    </a>
-                                    <a href="{{ route($shortcut['index'], $dashboardExportQuery) }}" class="btn btn-sm btn-outline-primary fw-bold">
-                                        Buka
-                                    </a>
-                                </div>
-                            </div>
-                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    @include('admin.dashboard.partials.filter_drawer')
+
 
     <section class="row g-4 mb-4">
         <div class="col-12 col-xl-9">
