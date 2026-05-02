@@ -1,6 +1,22 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Laporan')
 @section('heading', 'Dashboard Laporan')
+@section('heading_actions')
+    <span class="text-muted small fw-bold">
+        Periode:
+        {{ \App\Support\ViewDateFormatter::range($dashboard['period']['date_from'] ?? null, $dashboard['period']['date_to'] ?? null) }}
+    </span>
+
+    <button
+        type="button"
+        id="admin-dashboard-filter-open-filter"
+        class="btn btn-light-secondary fw-bold"
+    >
+        <i class="bi bi-funnel me-2"></i>
+        Filter &amp; Cetak
+    </button>
+@endsection
+
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/extensions/apexcharts/apexcharts.css') }}?v={{ filemtime(public_path('assets/extensions/apexcharts/apexcharts.css')) }}">
@@ -610,41 +626,9 @@
 </style>
 
 <div class="dashboard-report">
-    <section class="row g-4 mb-4">
-        <div class="col-12">
-            <div class="card h-100">
-                <div class="panel-card-body">
-                    <div class="card-head mb-0">
-                        <div>
-                            <h5 class="section-title">Periode Dashboard</h5>
-                            <p class="section-subtitle">
-                                Data dashboard sedang membaca periode
-                                {{ $dashboard['period']['date_from'] ?? '-' }}
-                                s.d.
-                                {{ $dashboard['period']['date_to'] ?? '-' }}.
-                            </p>
-                        </div>
+        @include('admin.dashboard.partials.filter_drawer')
 
-                        <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end">
-                            <span class="badge-soft bg-soft-primary">
-                                <i class="bi bi-calendar3"></i>
-                                {{ $dashboard['period']['active_month'] ?? now()->format('Y-m') }}
-                            </span>
 
-                            <button
-                                type="button"
-                                id="admin-dashboard-filter-open-filter"
-                                class="btn btn-primary fw-bold"
-                            >
-                                <i class="bi bi-funnel me-2"></i>
-                                Filter &amp; Cetak
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     @include('admin.dashboard.partials.filter_drawer')
 
