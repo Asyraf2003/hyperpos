@@ -22,9 +22,6 @@
         <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
             <div>
                 <h5 class="mb-1 fw-bold">Filter Dashboard</h5>
-                <p class="mb-0 text-muted small">
-                    Atur periode dashboard dan buka cetak laporan resmi dari periode aktif.
-                </p>
             </div>
 
             <button
@@ -49,13 +46,7 @@
         >
             <section class="d-grid gap-3">
                 <div>
-                    <div class="section-title mb-1">Periode Dashboard</div>
-                    <p class="section-subtitle">
-                        Data dashboard sedang membaca periode
-                        {{ $dashboard['period']['date_from'] ?? '-' }}
-                        s.d.
-                        {{ $dashboard['period']['date_to'] ?? '-' }}.
-                    </p>
+                    <div class="section-title mb-1">Periode Dashboard {{ $dashboard['period']['date_from'] ?? '-' }} s.d {{ $dashboard['period']['date_to'] ?? '-' }}</div>
                 </div>
 
                 <div class="form-group">
@@ -71,7 +62,6 @@
 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary fw-bold">
-                        <i class="bi bi-funnel me-2"></i>
                         Terapkan Periode
                     </button>
 
@@ -84,13 +74,6 @@
             <section class="d-grid gap-3">
                 <div>
                     <div class="section-title mb-1">Cetak Laporan Resmi</div>
-                    <p class="section-subtitle">
-                        Shortcut ke PDF/Excel laporan canonical untuk bulan aktif.
-                    </p>
-                </div>
-
-                <div class="helper-note">
-                    Dashboard tidak membuat export sendiri. Tombol di bawah membuka export laporan resmi agar angka tetap mengikuti dataset report, bukan chart atau DOM dashboard.
                 </div>
 
                 <div class="d-grid gap-3">

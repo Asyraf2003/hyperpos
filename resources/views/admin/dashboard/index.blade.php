@@ -12,7 +12,6 @@
         id="admin-dashboard-filter-open-filter"
         class="btn btn-light-secondary fw-bold"
     >
-        <i class="bi bi-funnel me-2"></i>
         Filter &amp; Cetak
     </button>
 @endsection
