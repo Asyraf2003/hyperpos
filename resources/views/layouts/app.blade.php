@@ -32,15 +32,6 @@
                 @include('layouts.partials.alerts')
 
                 @hasSection('heading')
-                    @php
-                        $layoutBackFallbackUrl = match (true) {
-                            request()->routeIs('admin.*') => route('admin.dashboard'),
-                            request()->routeIs('cashier.*') => route('cashier.dashboard'),
-                            default => url('/'),
-                        };
-                        $layoutBackUrl = trim($__env->yieldContent('back_url'));
-                    @endphp
-
                     <div class="page-heading d-flex justify-content-between align-items-center gap-3">
                         <a href="#" class="burger-btn d-block d-xl-none">
                             <i class="bi bi-justify fs-3"></i>
@@ -48,12 +39,21 @@
                         <h3 class="mb-0">@yield('heading')</h3>
 
                         @if (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))
-                            <a
-                                href="{{ $layoutBackUrl !== '' ? $layoutBackUrl : $layoutBackFallbackUrl }}"
-                                class="btn btn-light-secondary"
-                            >
-                                Kembali
-                            </a>
+                            @hasSection('back_url')
+                                <a
+                                    href="@yield('back_url')"
+                                    class="btn btn-light-secondary"
+                                >
+                                    Kembali
+                                </a>
+                            @else
+                                <a
+                                    href="{{ request()->routeIs('admin.*') ? route('admin.dashboard') : (request()->routeIs('cashier.*') ? route('cashier.dashboard') : url('/')) }}"
+                                    class="btn btn-light-secondary"
+                                >
+                                    Kembali
+                                </a>
+                            @endif
                         @endif
                     </div>
                 @endif
