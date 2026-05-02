@@ -1201,30 +1201,13 @@
                 </div>
 
                 <div class="mt-3 d-grid gap-2" data-dashboard-analytics-target="stock-segments">
-                    @foreach (($dashboard['analytics']['charts']['stock_status_donut']['segments'] ?? []) as $segment)
-                        @php
-                            $segmentLabel = (string) ($segment['label'] ?? '-');
-                            $segmentKey = (string) ($segment['key'] ?? '');
-                            $segmentColorToken = (string) ($segment['color_token'] ?? '');
-                            $segmentSeverity = match (true) {
-                                $segmentKey === 'safe' || $segmentColorToken === 'success' => 'is-safe',
-                                $segmentKey === 'low' || $segmentColorToken === 'warning' => 'is-warning',
-                                $segmentKey === 'critical' || $segmentColorToken === 'danger' => 'is-critical',
-                                default => 'is-unconfigured',
-                            };
-                            $segmentBadgeClass = match ($segmentSeverity) {
-                                'is-safe' => 'bg-soft-success',
-                                'is-warning' => 'bg-soft-warning',
-                                'is-critical' => 'bg-soft-danger',
-                                default => 'bg-soft-info',
-                            };
-                        @endphp
-                        <div class="stock-status-row {{ $segmentSeverity }} d-flex justify-content-between align-items-center border rounded px-3 py-2">
+                    @foreach ($dashboardStockStatusSegments as $segment)
+                        <div class="stock-status-row {{ $segment['severity_class'] }} d-flex justify-content-between align-items-center border rounded px-3 py-2">
                             <span class="stock-status-label fw-semibold">
                                 <span class="stock-status-dot" aria-hidden="true"></span>
-                                {{ $segmentLabel }}
+                                {{ $segment['label'] }}
                             </span>
-                            <span class="stock-status-value badge-soft {{ $segmentBadgeClass }}">{{ (int) ($segment['value'] ?? 0) }}</span>
+                            <span class="stock-status-value badge-soft {{ $segment['badge_class'] }}">{{ $segment['value'] }}</span>
                         </div>
                     @endforeach
                 </div>
