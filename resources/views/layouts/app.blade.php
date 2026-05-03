@@ -32,15 +32,25 @@
                 @include('layouts.partials.alerts')
 
                 @hasSection('heading')
-                    <div class="page-heading d-flex align-items-center gap-3 flex-wrap">
-                        <a href="#" class="burger-btn d-block d-xl-none">
+                    @php
+                        $layoutHeadingClasses = 'page-heading layout-page-heading d-flex align-items-center gap-3 flex-wrap';
+                    @endphp
+
+                    @hasSection('heading_actions')
+                        @php
+                            $layoutHeadingClasses .= ' has-heading-actions';
+                        @endphp
+                    @endif
+
+                    <div class="{{ $layoutHeadingClasses }}">
+                        <a href="#" class="burger-btn layout-heading-icon-action d-block d-xl-none">
                             <i class="bi bi-justify fs-3"></i>
                         </a>
 
-                        <h3 class="mb-0 me-auto">@yield('heading')</h3>
+                        <h3 class="mb-0 me-auto @yield('heading_title_class')">@yield('heading')</h3>
 
                         @hasSection('heading_actions')
-                            <div class="d-flex flex-wrap align-items-center justify-content-start justify-content-md-end gap-2 ms-md-auto">
+                            <div class="layout-heading-actions d-flex flex-wrap align-items-center justify-content-start justify-content-md-end gap-2 ms-md-auto">
                                 @yield('heading_actions')
                             </div>
                         @elseif (!request()->routeIs('admin.dashboard') && !request()->routeIs('cashier.dashboard'))

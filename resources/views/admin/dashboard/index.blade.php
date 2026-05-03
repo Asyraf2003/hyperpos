@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Laporan')
 @section('heading', 'Dashboard Laporan')
+@section('heading_title_class', 'dashboard-heading-title')
 @section('heading_actions')
     <span class="text-muted small fw-bold dashboard-heading-period">
         Periode:
@@ -10,11 +11,11 @@
     <button
         type="button"
         id="admin-dashboard-filter-open-filter"
-        class="btn btn-light-secondary fw-bold dashboard-heading-filter-action"
+        class="btn btn-light-secondary fw-bold layout-heading-icon-action dashboard-heading-filter-action"
         aria-label="Filter dan cetak dashboard"
     >
         <span class="dashboard-heading-filter-text">Filter &amp; Cetak</span>
-        <i class="dashboard-heading-filter-icon bi bi-funnel fs-3" aria-hidden="true"></i>
+        <i class="dashboard-heading-filter-icon bi bi-funnel" aria-hidden="true"></i>
     </button>
 @endsection
 
@@ -27,26 +28,17 @@
         }
 
         @media (max-width: 767.98px) {
-            .dashboard-heading-period {
-                display: none !important;
+            .dashboard-heading-title {
+                font-size: 1.12rem;
+                line-height: 1.2;
+                font-weight: 800;
+                letter-spacing: -0.02em;
             }
+        }
 
-            .dashboard-heading-filter-action {
-                padding: 0;
-                border: 0;
-                background: transparent;
-                box-shadow: none;
-                line-height: 1;
-                color: var(--bs-body-color);
-            }
 
-            .dashboard-heading-filter-action:hover,
-            .dashboard-heading-filter-action:focus {
-                background: transparent;
-                color: var(--bs-primary);
-                box-shadow: none;
-            }
-
+        @media (max-width: 767.98px) {
+            .dashboard-heading-period,
             .dashboard-heading-filter-text {
                 display: none !important;
             }

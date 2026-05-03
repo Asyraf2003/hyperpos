@@ -19,6 +19,87 @@
     letter-spacing: -0.01em;
 }
 
+.layout-heading-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.layout-heading-icon-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 767.98px) {
+    .page-heading.has-heading-actions {
+        display: grid !important;
+        grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+        align-items: center !important;
+        column-gap: 1rem !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .page-heading.has-heading-actions .burger-btn {
+        grid-column: 1;
+        width: 2rem;
+        height: 2rem;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .page-heading.has-heading-actions h3 {
+        grid-column: 2;
+        min-width: 0;
+        margin: 0 !important;
+        font-size: 1.18rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .page-heading.has-heading-actions .layout-heading-actions {
+        grid-column: 3;
+        width: 2rem;
+        height: 2rem;
+        margin-left: 0 !important;
+        justify-content: center !important;
+        gap: 0 !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .page-heading.has-heading-actions .layout-heading-icon-action {
+        width: 2rem;
+        height: 2rem;
+        min-width: 2rem;
+        min-height: 2rem;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        line-height: 1;
+        color: var(--bs-link-color) !important;
+    }
+
+    .page-heading.has-heading-actions .layout-heading-icon-action:hover,
+    .page-heading.has-heading-actions .layout-heading-icon-action:focus {
+        background: transparent !important;
+        background-color: transparent !important;
+        color: var(--bs-link-hover-color) !important;
+        box-shadow: none !important;
+    }
+
+    .page-heading.has-heading-actions .layout-heading-icon-action > i {
+        font-size: 1.75rem !important;
+        line-height: 1;
+    }
+}
+
 .card {
     border-radius: var(--ui-card-radius);
     overflow: hidden;
@@ -164,8 +245,8 @@ textarea.form-control {
         align-items: stretch !important;
     }
 
-    .page-heading .btn,
-    .page-heading a.btn,
+    .page-heading .btn:not(.layout-heading-icon-action),
+    .page-heading a.btn:not(.layout-heading-icon-action),
     .card-header .btn,
     .card-header a.btn,
     .ui-form-actions .btn,
