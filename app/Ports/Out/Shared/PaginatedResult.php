@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Ports\Out\Shared;
 
+/**
+ * @template TItem
+ */
 final class PaginatedResult
 {
     /**
-     * @param array<int, mixed> $items
+     * @param array<int, TItem> $items
      */
     public function __construct(
         public readonly array $items,
