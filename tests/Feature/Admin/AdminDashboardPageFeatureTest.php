@@ -53,7 +53,6 @@ final class AdminDashboardPageFeatureTest extends TestCase
             $response->assertSee('Rp 211.000');
             $response->assertSee('Status Stok Saat Ini');
             $response->assertSee('Cetak Laporan Resmi');
-            $response->assertSee('Dashboard tidak membuat export sendiri');
             $response->assertSee(route('admin.reports.transaction_summary.export_pdf', [
                 'period_mode' => 'monthly',
                 'reference_date' => '2030-01-09',

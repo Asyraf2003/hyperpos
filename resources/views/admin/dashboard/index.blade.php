@@ -629,7 +629,6 @@
 
 
 
-    @include('admin.dashboard.partials.filter_drawer')
 
 
     <section class="row g-4 mb-4">
