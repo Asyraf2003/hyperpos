@@ -13,7 +13,6 @@ use App\Core\Note\WorkItem\StoreStockLine;
 use App\Core\ProductCatalog\Product\Product;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
-use Illuminate\Pagination\LengthAwarePaginator;
 use PHPUnit\Framework\TestCase;
 
 final class RefundImpactPayloadBuilderTest extends TestCase
@@ -90,8 +89,6 @@ final class RefundImpactPayloadBuilderTest extends TestCase
 
             public function findAll(): array { return []; }
             public function search(string $query): array { return []; }
-            public function findPaginated(int $perPage = 10): LengthAwarePaginator { return new LengthAwarePaginator([], 0, $perPage); }
-            public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator { return new LengthAwarePaginator([], 0, $perPage); }
         };
     }
 }

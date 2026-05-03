@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\Out\Audit;
 
 use App\Ports\Out\AuditLogReaderPort;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Ports\Out\Shared\PaginatedResult;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
@@ -52,8 +52,15 @@ final class DatabaseAuditLogReaderAdapter implements AuditLogReaderPort
         return $entries;
     }
 
-    public function listForAdmin(string $search = '', int $perPage = 20): LengthAwarePaginator
+    public function listForAdmin(string $search = '', int $perPage = 20): PaginatedResult
     {
-        return $this->adminListQuery->paginate($search, $perPage, $this->adminRowMapper);
+        $paginator = $this->adminListQuery->paginate($search, $perPage, $this->adminRowMapper);
+
+        return new PaginatedResult(
+            items: $paginator->items(),
+            total: $paginator->total(),
+            perPage: $paginator->perPage(),
+            currentPage: $paginator->currentPage(),
+        );
     }
 }

@@ -8,7 +8,6 @@ use App\Adapters\Out\ProductCatalog\Concerns\ProductListQuery;
 use App\Adapters\Out\ProductCatalog\Concerns\ProductRowHydration;
 use App\Core\ProductCatalog\Product\Product;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class DatabaseProductReaderAdapter implements ProductReaderPort
 {
@@ -44,27 +43,5 @@ final class DatabaseProductReaderAdapter implements ProductReaderPort
         return $this->mapRowsToProducts(
             $this->applyOrdering($this->applySearch($this->baseSelect(), $normalizedQuery))->get()
         );
-    }
-
-    public function findPaginated(int $perPage = 10): LengthAwarePaginator
-    {
-        $paginator = $this->applyOrdering($this->baseSelect())->paginate($perPage);
-        $paginator->setCollection($paginator->getCollection()->map(fn (object $row): Product => $this->mapRowToProduct($row)));
-
-        return $paginator;
-    }
-
-    public function searchPaginated(string $query, int $perPage = 10): LengthAwarePaginator
-    {
-        $normalizedQuery = trim($query);
-
-        if ($normalizedQuery === '') {
-            return $this->findPaginated($perPage);
-        }
-
-        $paginator = $this->applyOrdering($this->applySearch($this->baseSelect(), $normalizedQuery))->paginate($perPage);
-        $paginator->setCollection($paginator->getCollection()->map(fn (object $row): Product => $this->mapRowToProduct($row)));
-
-        return $paginator;
     }
 }
