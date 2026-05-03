@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Application\Reporting\UseCases;
 
 use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
+use App\Ports\Out\Reporting\DashboardReportCachePort;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
-use Illuminate\Support\Facades\Cache;
 
 final class AdminDashboardSharedReportFragments
 {
     public function __construct(
         private readonly DashboardInventoryOverviewReaderPort $inventory,
         private readonly DashboardTopSellingProductReaderPort $topSellingProducts,
+        private readonly DashboardReportCachePort $cache,
     ) {
     }
 
@@ -54,20 +55,7 @@ final class AdminDashboardSharedReportFragments
      */
     private function remember(string $cacheKey, callable $resolver): array
     {
-        $ttlSeconds = max(
-            0,
-            (int) config('performance.admin_dashboard_overview_cache_ttl_seconds', 30)
-        );
-
-        if ($ttlSeconds === 0) {
-            return $resolver();
-        }
-
-        return Cache::remember(
-            $cacheKey,
-            now()->addSeconds($ttlSeconds),
-            $resolver,
-        );
+        return $this->cache->remember($cacheKey, $resolver);
     }
 
     /**

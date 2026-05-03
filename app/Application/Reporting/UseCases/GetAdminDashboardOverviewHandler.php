@@ -4,27 +4,19 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
-use Illuminate\Support\Facades\Cache;
+use App\Ports\Out\Reporting\DashboardReportCachePort;
 
 final class GetAdminDashboardOverviewHandler
 {
     public function __construct(
         private readonly AdminDashboardOverviewPayloadBuilder $builder,
+        private readonly DashboardReportCachePort $cache,
     ) {
     }
 
     public function handle(?string $month = null): array
     {
         $period = AdminDashboardOverviewPeriod::build($month);
-        $ttlSeconds = max(
-            0,
-            (int) config('performance.admin_dashboard_overview_cache_ttl_seconds', 30)
-        );
-
-        if ($ttlSeconds === 0) {
-            return $this->builder->build($period);
-        }
-
         $cacheKey = sprintf(
             'reporting:admin_dashboard_overview:%s:%s:%s:%s',
             $period['active_month'],
@@ -33,9 +25,8 @@ final class GetAdminDashboardOverviewHandler
             $period['to'],
         );
 
-        return Cache::remember(
+        return $this->cache->remember(
             $cacheKey,
-            now()->addSeconds($ttlSeconds),
             fn (): array => $this->builder->build($period),
         );
     }

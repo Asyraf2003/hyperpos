@@ -94,6 +94,7 @@ use App\Adapters\Out\Reporting\DatabaseEmployeeDebtReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseDashboardInventoryOverviewReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseDashboardOperationalPerformanceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseDashboardTopSellingProductReaderAdapter;
+use App\Adapters\Out\Reporting\LaravelDashboardReportCacheAdapter;
 use App\Adapters\Out\Reporting\DatabaseInventoryMovementReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalExpenseReportingSourceReaderAdapter;
 use App\Adapters\Out\Reporting\DatabaseOperationalProfitReportingSourceReaderAdapter;
@@ -218,6 +219,7 @@ use App\Ports\Out\Reporting\EmployeeDebtReportingSourceReaderPort;
 use App\Ports\Out\Reporting\DashboardInventoryOverviewReaderPort;
 use App\Ports\Out\Reporting\DashboardOperationalPerformanceReaderPort;
 use App\Ports\Out\Reporting\DashboardTopSellingProductReaderPort;
+use App\Ports\Out\Reporting\DashboardReportCachePort;
 use App\Ports\Out\Reporting\InventoryMovementReportingSourceReaderPort;
 use App\Ports\Out\Reporting\OperationalExpenseReportingSourceReaderPort;
 use App\Ports\Out\Reporting\OperationalProfitReportingSourceReaderPort;
@@ -345,6 +347,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(PaymentComponentAllocationWriterPort::class, DatabasePaymentComponentAllocationWriterAdapter::class);
         $this->app->singleton(PaymentComponentAllocationReaderPort::class, DatabasePaymentComponentAllocationReaderAdapter::class);
 
+        $this->app->singleton(DashboardReportCachePort::class, LaravelDashboardReportCacheAdapter::class);
         $this->app->singleton(DashboardInventoryOverviewReaderPort::class, DatabaseDashboardInventoryOverviewReaderAdapter::class);
         $this->app->singleton(DashboardOperationalPerformanceReaderPort::class, DatabaseDashboardOperationalPerformanceReaderAdapter::class);
         $this->app->singleton(DashboardTopSellingProductReaderPort::class, DatabaseDashboardTopSellingProductReaderAdapter::class);
