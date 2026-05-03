@@ -41,7 +41,8 @@ final class CreateSupplierInvoiceRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        $postValidator = new CreateSupplierInvoicePostValidator();
+        /** @var CreateSupplierInvoicePostValidator $postValidator */
+        $postValidator = app(CreateSupplierInvoicePostValidator::class);
         $validator->after(fn (Validator $v) => $postValidator->validate($this, $v));
     }
 

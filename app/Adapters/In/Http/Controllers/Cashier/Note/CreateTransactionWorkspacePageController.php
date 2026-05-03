@@ -9,7 +9,6 @@ use App\Ports\Out\Note\TransactionWorkspaceDraftReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
 
 final class CreateTransactionWorkspacePageController extends Controller
 {
@@ -19,7 +18,7 @@ final class CreateTransactionWorkspacePageController extends Controller
         TransactionWorkspaceDraftReaderPort $drafts,
     ): View {
         $page = $builder->build();
-        $defaultCustomerName = 'Pelanggan no ' . (((int) DB::table('notes')->count()) + 1);
+        $defaultCustomerName = (string) $page['defaultCustomerName'];
         $productLookupEndpoint = route('cashier.notes.products.lookup');
 
         $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];

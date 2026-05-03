@@ -4,31 +4,22 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Requests\Procurement;
 
-use Illuminate\Support\Facades\DB;
+use App\Application\Procurement\Services\SupplierInvoiceDuplicateNumberChecker;
 use Illuminate\Validation\Validator;
 
 final class CreateSupplierInvoiceDuplicateNumberPostValidation
 {
+    public function __construct(
+        private readonly SupplierInvoiceDuplicateNumberChecker $checker,
+    ) {
+    }
+
     public function validate(
         string $nomorFaktur,
         Validator $validator,
         ?string $excludeSupplierInvoiceId = null,
     ): void {
-        $normalized = mb_strtolower(trim($nomorFaktur), 'UTF-8');
-
-        if ($normalized === '') {
-            return;
-        }
-
-        $query = DB::table('supplier_invoices')
-            ->where('nomor_faktur_normalized', $normalized)
-            ->whereNull('voided_at');
-
-        if ($excludeSupplierInvoiceId !== null && trim($excludeSupplierInvoiceId) !== '') {
-            $query->where('id', '!=', trim($excludeSupplierInvoiceId));
-        }
-
-        $exists = $query->exists();
+        $exists = $this->checker->exists($nomorFaktur, $excludeSupplierInvoiceId);
 
         if (! $exists) {
             return;

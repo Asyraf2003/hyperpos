@@ -9,6 +9,11 @@ use Illuminate\Validation\Validator;
 
 final class CreateSupplierInvoicePostValidator
 {
+    public function __construct(
+        private readonly CreateSupplierInvoiceDuplicateNumberPostValidation $duplicateNumberValidation,
+    ) {
+    }
+
     public function validate(FormRequest $request, Validator $validator): void
     {
         $routeSupplierInvoiceId = $request->route('supplierInvoiceId');
@@ -16,7 +21,7 @@ final class CreateSupplierInvoicePostValidator
             ? trim($routeSupplierInvoiceId)
             : null;
 
-        (new CreateSupplierInvoiceDuplicateNumberPostValidation())->validate(
+        $this->duplicateNumberValidation->validate(
             (string) $request->input('nomor_faktur', ''),
             $validator,
             $excludeSupplierInvoiceId !== '' ? $excludeSupplierInvoiceId : null,

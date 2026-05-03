@@ -44,4 +44,9 @@ final class DatabaseNoteReaderAdapter implements NoteReaderPort
 
         return NoteMapper::map($noteRow, $workItems);
     }
+
+    public function countAll(): int
+    {
+        return (int) DB::table('notes')->count();
+    }
 }

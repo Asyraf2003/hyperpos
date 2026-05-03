@@ -65,6 +65,7 @@ use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceListProjectionWriterAdap
 use App\Adapters\Out\Procurement\DatabaseSupplierListProjectionSourceReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierListProjectionWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceReaderAdapter;
+use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceDuplicateNumberCheckerAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceVoidStatusReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceVoidWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierInvoiceWriterAdapter;
@@ -192,6 +193,7 @@ use App\Ports\Out\Procurement\SupplierListProjectionSourceReaderPort;
 use App\Ports\Out\Procurement\SupplierListProjectionWriterPort;
 use App\Ports\Out\Procurement\SupplierInvoiceLineReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
+use App\Ports\Out\Procurement\SupplierInvoiceDuplicateNumberCheckerPort;
 use App\Ports\Out\Procurement\SupplierInvoiceVoidStatusReaderPort;
 use App\Ports\Out\Procurement\SupplierInvoiceVoidWriterPort;
 use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
@@ -292,6 +294,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->scoped(SupplierInvoiceWriterPort::class, DatabaseVersionedSupplierInvoiceWriterAdapter::class);
         $this->app->scoped(SupplierInvoiceLifecyclePort::class, DatabaseVersionedSupplierInvoiceWriterAdapter::class);
         $this->app->singleton(SupplierInvoiceReaderPort::class, DatabaseSupplierInvoiceReaderAdapter::class);
+        $this->app->singleton(SupplierInvoiceDuplicateNumberCheckerPort::class, DatabaseSupplierInvoiceDuplicateNumberCheckerAdapter::class);
         $this->app->singleton(SupplierInvoiceVoidStatusReaderPort::class, DatabaseSupplierInvoiceVoidStatusReaderAdapter::class);
         $this->app->singleton(SupplierInvoiceVoidWriterPort::class, DatabaseSupplierInvoiceVoidWriterAdapter::class);
         $this->app->singleton(ProcurementInvoiceDetailReaderPort::class, DatabaseProcurementInvoiceDetailReaderAdapter::class);

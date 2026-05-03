@@ -9,4 +9,6 @@ use App\Core\Note\Note\Note;
 interface NoteReaderPort
 {
     public function getById(string $id): ?Note;
+
+    public function countAll(): int;
 }
