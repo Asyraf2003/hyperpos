@@ -11,7 +11,7 @@ use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
-use Illuminate\Database\QueryException;
+use App\Ports\Out\ProductCatalog\ProductWriteConflictException;
 
 final class UpdateProductHandler
 {
@@ -80,7 +80,7 @@ final class UpdateProductHandler
 
         try {
             $this->writer->update($product);
-        } catch (QueryException $e) {
+        } catch (ProductWriteConflictException $e) {
             $failure = $this->toProductWriteFailure($e);
 
             if ($failure !== null) {

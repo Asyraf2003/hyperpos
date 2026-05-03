@@ -13,7 +13,7 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
 use App\Ports\Out\UuidPort;
-use Illuminate\Database\QueryException;
+use App\Ports\Out\ProductCatalog\ProductWriteConflictException;
 
 final class CreateProductHandler
 {
@@ -72,7 +72,7 @@ final class CreateProductHandler
 
         try {
             $this->products->create($product);
-        } catch (QueryException $e) {
+        } catch (ProductWriteConflictException $e) {
             $failure = $this->toProductWriteFailure($e);
 
             if ($failure !== null) {
