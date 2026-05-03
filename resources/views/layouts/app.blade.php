@@ -32,17 +32,7 @@
                 @include('layouts.partials.alerts')
 
                 @hasSection('heading')
-                    @php
-                        $layoutHeadingClasses = 'page-heading layout-page-heading d-flex align-items-center gap-3 flex-wrap';
-                    @endphp
-
-                    @hasSection('heading_actions')
-                        @php
-                            $layoutHeadingClasses .= ' has-heading-actions';
-                        @endphp
-                    @endif
-
-                    <div class="{{ $layoutHeadingClasses }}">
+                    <div class="page-heading layout-page-heading d-flex align-items-center gap-3 flex-wrap @hasSection('heading_actions') has-heading-actions @endif">
                         <a href="#" class="burger-btn layout-heading-icon-action d-block d-xl-none">
                             <i class="bi bi-justify fs-3"></i>
                         </a>

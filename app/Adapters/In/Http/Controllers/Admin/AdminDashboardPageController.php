@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin;
 
+use App\Adapters\In\Http\ViewData\Admin\AdminDashboardFilterDrawerViewData;
 use App\Adapters\In\Http\ViewData\Admin\AdminDashboardReportExportShortcuts;
 use App\Application\Reporting\UseCases\GetAdminDashboardPagePayloadHandler;
 use Illuminate\Contracts\View\View;
@@ -50,6 +51,7 @@ final class AdminDashboardPageController extends Controller
                 'period_mode' => 'monthly',
                 'reference_date' => (string) ($dashboard['period']['date_to'] ?? now()->toDateString()),
             ],
+            'dashboardFilterDrawer' => AdminDashboardFilterDrawerViewData::fromDashboard($dashboard),
             'dashboardReportExportShortcuts' => AdminDashboardReportExportShortcuts::all(),
         ]);
     }

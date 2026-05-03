@@ -1,20 +1,11 @@
-@php
-    $dashboardFilterFormId = 'admin-dashboard-filter';
-    $dashboardFilterOpenButtonId = 'admin-dashboard-filter-open-filter';
-    $dashboardFilterCloseButtonId = 'admin-dashboard-filter-close-filter';
-    $dashboardFilterDrawerId = 'admin-dashboard-filter-drawer';
-    $dashboardFilterBackdropId = 'admin-dashboard-filter-backdrop';
-    $dashboardActiveMonth = (string) ($dashboard['period']['active_month'] ?? now()->format('Y-m'));
-@endphp
-
 <div
-    id="{{ $dashboardFilterBackdropId }}"
+    id="{{ $dashboardFilterDrawer['backdrop_id'] }}"
     class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-none"
     style="z-index: 1040;"
 ></div>
 
 <div
-    id="{{ $dashboardFilterDrawerId }}"
+    id="{{ $dashboardFilterDrawer['drawer_id'] }}"
     class="position-fixed top-0 end-0 h-100 bg-body border-start shadow d-none"
     style="width: 420px; max-width: 100%; z-index: 1050; overflow-y: auto;"
 >
@@ -26,7 +17,7 @@
 
             <button
                 type="button"
-                id="{{ $dashboardFilterCloseButtonId }}"
+                id="{{ $dashboardFilterDrawer['close_button_id'] }}"
                 class="btn btn-sm btn-light-secondary"
             >
                 Tutup
@@ -36,12 +27,12 @@
         <form
             method="get"
             action="{{ route('admin.dashboard') }}"
-            id="{{ $dashboardFilterFormId }}"
+            id="{{ $dashboardFilterDrawer['form_id'] }}"
             data-report-period-filter="1"
-            data-filter-open-button-id="{{ $dashboardFilterOpenButtonId }}"
-            data-filter-close-button-id="{{ $dashboardFilterCloseButtonId }}"
-            data-filter-drawer-id="{{ $dashboardFilterDrawerId }}"
-            data-filter-backdrop-id="{{ $dashboardFilterBackdropId }}"
+            data-filter-open-button-id="{{ $dashboardFilterDrawer['open_button_id'] }}"
+            data-filter-close-button-id="{{ $dashboardFilterDrawer['close_button_id'] }}"
+            data-filter-drawer-id="{{ $dashboardFilterDrawer['drawer_id'] }}"
+            data-filter-backdrop-id="{{ $dashboardFilterDrawer['backdrop_id'] }}"
             class="d-grid gap-4"
         >
             <section class="d-grid gap-3">
@@ -50,13 +41,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="{{ $dashboardFilterFormId }}-month" class="form-label fw-bold">Pilih Bulan</label>
+                    <label for="{{ $dashboardFilterDrawer['form_id'] }}-month" class="form-label fw-bold">Pilih Bulan</label>
                     <input
                         type="month"
-                        id="{{ $dashboardFilterFormId }}-month"
+                        id="{{ $dashboardFilterDrawer['form_id'] }}-month"
                         name="month"
                         class="form-control"
-                        value="{{ $dashboardActiveMonth }}"
+                        value="{{ $dashboardFilterDrawer['active_month'] }}"
                     >
                 </div>
 
@@ -81,7 +72,7 @@
                         <div class="report-export-shortcut-card">
                             <div class="inventory-title mb-2">{{ $shortcut['label'] }}</div>
                             <p class="inventory-meta mb-3">
-                                Periode dashboard: {{ $dashboardActiveMonth }}
+                                Periode dashboard: {{ $dashboardFilterDrawer['active_month'] }}
                             </p>
 
                             <div class="report-export-shortcut-actions">
