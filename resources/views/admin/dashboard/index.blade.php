@@ -2,7 +2,7 @@
 @section('title', 'Dashboard Laporan')
 @section('heading', 'Dashboard Laporan')
 @section('heading_actions')
-    <span class="text-muted small fw-bold">
+    <span class="text-muted small fw-bold dashboard-heading-period">
         Periode:
         {{ \App\Support\ViewDateFormatter::range($dashboard['period']['date_from'] ?? null, $dashboard['period']['date_to'] ?? null) }}
     </span>
@@ -10,15 +10,52 @@
     <button
         type="button"
         id="admin-dashboard-filter-open-filter"
-        class="btn btn-light-secondary fw-bold"
+        class="btn btn-light-secondary fw-bold dashboard-heading-filter-action"
+        aria-label="Filter dan cetak dashboard"
     >
-        Filter &amp; Cetak
+        <span class="dashboard-heading-filter-text">Filter &amp; Cetak</span>
+        <i class="dashboard-heading-filter-icon bi bi-funnel fs-3" aria-hidden="true"></i>
     </button>
 @endsection
 
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/extensions/apexcharts/apexcharts.css') }}?v={{ filemtime(public_path('assets/extensions/apexcharts/apexcharts.css')) }}">
+    <style>
+        .dashboard-heading-filter-icon {
+            display: none;
+        }
+
+        @media (max-width: 767.98px) {
+            .dashboard-heading-period {
+                display: none !important;
+            }
+
+            .dashboard-heading-filter-action {
+                padding: 0;
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+                line-height: 1;
+                color: var(--bs-body-color);
+            }
+
+            .dashboard-heading-filter-action:hover,
+            .dashboard-heading-filter-action:focus {
+                background: transparent;
+                color: var(--bs-primary);
+                box-shadow: none;
+            }
+
+            .dashboard-heading-filter-text {
+                display: none !important;
+            }
+
+            .dashboard-heading-filter-icon {
+                display: inline-block;
+            }
+        }
+    </style>
 @endpush
 
 @section('content')
