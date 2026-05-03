@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace App\Application\Procurement\Services;
 
 use App\Application\Shared\DTO\Result;
-use Illuminate\Support\Facades\DB;
+use App\Ports\Out\Procurement\SupplierPaymentReversalWriterPort;
 
 final class SupplierPaymentReversalPreflight
 {
+    public function __construct(
+        private readonly SupplierPaymentReversalWriterPort $reversals,
+    ) {
+    }
+
     public function prepare(string $supplierPaymentId, string $reason, string $performedByActorId): Result
     {
         $paymentId = trim($supplierPaymentId);
@@ -29,15 +34,7 @@ final class SupplierPaymentReversalPreflight
             );
         }
 
-        $payment = DB::table('supplier_payments')
-            ->where('id', $paymentId)
-            ->first([
-                'id',
-                'supplier_invoice_id',
-                'amount_rupiah',
-                'paid_at',
-                'proof_status',
-            ]);
+        $payment = $this->reversals->findPaymentSnapshotForReversal($paymentId);
 
         if ($payment === null) {
             return Result::failure(
@@ -46,11 +43,7 @@ final class SupplierPaymentReversalPreflight
             );
         }
 
-        $alreadyReversed = DB::table('supplier_payment_reversals')
-            ->where('supplier_payment_id', $paymentId)
-            ->exists();
-
-        if ($alreadyReversed) {
+        if ($this->reversals->paymentAlreadyReversed($paymentId)) {
             return Result::failure(
                 'Pembayaran supplier ini sudah direverse.',
                 ['supplier_payment_reversal' => ['SUPPLIER_PAYMENT_ALREADY_REVERSED']]
@@ -58,11 +51,11 @@ final class SupplierPaymentReversalPreflight
         }
 
         return Result::success([
-            'payment_id' => (string) $payment->id,
-            'supplier_invoice_id' => (string) $payment->supplier_invoice_id,
-            'amount_rupiah' => (int) $payment->amount_rupiah,
-            'paid_at' => (string) $payment->paid_at,
-            'proof_status' => (string) $payment->proof_status,
+            'payment_id' => $payment['payment_id'],
+            'supplier_invoice_id' => $payment['supplier_invoice_id'],
+            'amount_rupiah' => $payment['amount_rupiah'],
+            'paid_at' => $payment['paid_at'],
+            'proof_status' => $payment['proof_status'],
             'reason' => $reason,
             'actor_id' => $actorId,
         ]);

@@ -6,13 +6,19 @@ namespace App\Application\Procurement\Services;
 
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
-use Illuminate\Support\Facades\DB;
+use App\Ports\Out\Procurement\SupplierReceiptReversalWriterPort;
 use DateTimeImmutable;
 
 final class SupplierReceiptReversalPreflight
 {
+    public function __construct(
+        private readonly SupplierReceiptReversalWriterPort $reversals,
+    ) {
+    }
+
     public function prepare(string $supplierReceiptId, string $reversedAt, string $actorId): Result
     {
+        $receiptId = trim($supplierReceiptId);
         $actorId = trim($actorId);
 
         if ($actorId === '') {
@@ -25,9 +31,7 @@ final class SupplierReceiptReversalPreflight
             throw new DomainException('Tanggal reversal penerimaan supplier wajib valid dengan format Y-m-d.');
         }
 
-        $receipt = DB::table('supplier_receipts')
-            ->where('id', trim($supplierReceiptId))
-            ->first(['id', 'supplier_invoice_id']);
+        $receipt = $this->reversals->findReceiptSnapshotForReversal($receiptId);
 
         if ($receipt === null) {
             return Result::failure(
@@ -36,11 +40,7 @@ final class SupplierReceiptReversalPreflight
             );
         }
 
-        $alreadyReversed = DB::table('supplier_receipt_reversals')
-            ->where('supplier_receipt_id', trim($supplierReceiptId))
-            ->exists();
-
-        if ($alreadyReversed) {
+        if ($this->reversals->receiptAlreadyReversed($receiptId)) {
             return Result::failure(
                 'Penerimaan supplier ini sudah direverse.',
                 ['supplier_receipt_reversal' => ['SUPPLIER_RECEIPT_ALREADY_REVERSED']]
@@ -48,8 +48,8 @@ final class SupplierReceiptReversalPreflight
         }
 
         return Result::success([
-            'supplier_receipt_id' => (string) $receipt->id,
-            'supplier_invoice_id' => (string) $receipt->supplier_invoice_id,
+            'supplier_receipt_id' => $receipt['supplier_receipt_id'],
+            'supplier_invoice_id' => $receipt['supplier_invoice_id'],
             'reversed_at' => $date,
             'actor_id' => $actorId,
         ]);

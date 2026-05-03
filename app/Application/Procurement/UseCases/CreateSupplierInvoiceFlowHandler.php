@@ -9,7 +9,6 @@ use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\TransactionManagerPort;
-use Illuminate\Database\QueryException;
 use Throwable;
 
 final class CreateSupplierInvoiceFlowHandler
@@ -67,7 +66,7 @@ final class CreateSupplierInvoiceFlowHandler
             }
 
             return Result::failure($e->getMessage(), ['supplier_invoice' => ['INVALID_SUPPLIER_INVOICE']]);
-        } catch (QueryException $e) {
+        } catch (Throwable $e) {
             if ($started) {
                 $this->transactions->rollBack();
             }
@@ -76,12 +75,6 @@ final class CreateSupplierInvoiceFlowHandler
 
             if ($failure !== null) {
                 return $failure;
-            }
-
-            throw $e;
-        } catch (Throwable $e) {
-            if ($started) {
-                $this->transactions->rollBack();
             }
 
             throw $e;

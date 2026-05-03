@@ -8,7 +8,7 @@ use App\Application\EmployeeFinance\DTO\EmployeeDebtTableQuery;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDebtListPageQuery
+final class DatabaseEmployeeDebtListPageQuery implements \App\Ports\Out\EmployeeFinance\EmployeeDebtTableReaderPort
 {
     public function search(EmployeeDebtTableQuery $query): array
     {

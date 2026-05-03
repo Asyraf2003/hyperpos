@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Application\Procurement\Services;
 
 use App\Application\Shared\DTO\Result;
-use Illuminate\Database\QueryException;
+use Throwable;
 
 final class SupplierInvoiceQueryExceptionClassifier
 {
-    public function classify(QueryException $e): ?Result
+    public function classify(Throwable $e): ?Result
     {
-        $sqlState = (string) ($e->errorInfo[0] ?? $e->getCode());
+        $sqlState = $this->sqlState($e);
         $message = mb_strtolower($e->getMessage());
 
         if (
@@ -35,5 +35,20 @@ final class SupplierInvoiceQueryExceptionClassifier
         }
 
         return null;
+    }
+
+    private function sqlState(Throwable $e): string
+    {
+        $errorInfo = [];
+
+        if (property_exists($e, 'errorInfo')) {
+            $value = $e->errorInfo;
+
+            if (is_array($value)) {
+                $errorInfo = $value;
+            }
+        }
+
+        return (string) ($errorInfo[0] ?? $e->getCode());
     }
 }

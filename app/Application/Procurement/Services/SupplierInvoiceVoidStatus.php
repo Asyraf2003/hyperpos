@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Application\Procurement\Services;
 
-use Illuminate\Support\Facades\DB;
+use App\Ports\Out\Procurement\SupplierInvoiceVoidStatusReaderPort;
 
 final class SupplierInvoiceVoidStatus
 {
+    public function __construct(
+        private readonly SupplierInvoiceVoidStatusReaderPort $reader,
+    ) {
+    }
+
     public function isVoided(string $supplierInvoiceId): bool
     {
-        return DB::table('supplier_invoices')
-            ->where('id', $supplierInvoiceId)
-            ->whereNotNull('voided_at')
-            ->exists();
+        return $this->reader->isVoided($supplierInvoiceId);
     }
 }

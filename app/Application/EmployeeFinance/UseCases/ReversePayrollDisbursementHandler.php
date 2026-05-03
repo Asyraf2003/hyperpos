@@ -9,7 +9,6 @@ use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\EmployeeFinance\PayrollDisbursementReversalWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use App\Ports\Out\UuidPort;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Throwable;
 
@@ -32,20 +31,13 @@ final class ReversePayrollDisbursementHandler
         $this->transactionManager->begin();
 
         try {
-            $payroll = DB::table('payroll_disbursements')
-                ->select(['id', 'employee_id', 'amount', 'disbursement_date', 'mode', 'notes'])
-                ->where('id', $payrollId)
-                ->first();
+            $payroll = $this->reversalWriter->findPayrollSnapshotForReversal($payrollId);
 
             if ($payroll === null) {
                 throw new InvalidArgumentException('Data pencairan gaji tidak ditemukan.');
             }
 
-            $alreadyReversed = DB::table('payroll_disbursement_reversals')
-                ->where('payroll_disbursement_id', $payrollId)
-                ->exists();
-
-            if ($alreadyReversed) {
+            if ($this->reversalWriter->payrollAlreadyReversed($payrollId)) {
                 throw new DomainException('Pencairan gaji ini sudah direversal.');
             }
 
@@ -61,11 +53,11 @@ final class ReversePayrollDisbursementHandler
             $this->auditLog->record('payroll_disbursement_reversed', [
                 'reversal_id' => $reversalId,
                 'payroll_id' => $payrollId,
-                'employee_id' => (string) $payroll->employee_id,
-                'amount' => (int) $payroll->amount,
-                'disbursement_date' => (string) $payroll->disbursement_date,
-                'mode' => (string) $payroll->mode,
-                'notes' => $payroll->notes !== null ? (string) $payroll->notes : null,
+                'employee_id' => $payroll['employee_id'],
+                'amount' => $payroll['amount'],
+                'disbursement_date' => $payroll['disbursement_date'],
+                'mode' => $payroll['mode'],
+                'notes' => $payroll['notes'],
                 'reason' => $reason,
                 'performed_by_actor_id' => $actorId,
             ]);

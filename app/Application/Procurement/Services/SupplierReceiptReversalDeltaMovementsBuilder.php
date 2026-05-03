@@ -7,14 +7,15 @@ namespace App\Application\Procurement\Services;
 use App\Core\Inventory\Movement\InventoryMovement;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Inventory\InventoryMovementReaderPort;
+use App\Ports\Out\Procurement\SupplierReceiptLineReaderPort;
 use App\Ports\Out\UuidPort;
 use DateTimeImmutable;
-use Illuminate\Support\Facades\DB;
 
 final class SupplierReceiptReversalDeltaMovementsBuilder
 {
     public function __construct(
         private readonly InventoryMovementReaderPort $movements,
+        private readonly SupplierReceiptLineReaderPort $receiptLines,
         private readonly UuidPort $uuid,
     ) {
     }
@@ -24,11 +25,7 @@ final class SupplierReceiptReversalDeltaMovementsBuilder
      */
     public function build(string $supplierReceiptId, DateTimeImmutable $movementDate): array
     {
-        $receiptLineIds = DB::table('supplier_receipt_lines')
-            ->where('supplier_receipt_id', trim($supplierReceiptId))
-            ->pluck('id')
-            ->map(fn ($id): string => (string) $id)
-            ->all();
+        $receiptLineIds = $this->receiptLines->getIdsBySupplierReceiptId($supplierReceiptId);
 
         if ($receiptLineIds === []) {
             throw new DomainException('Supplier receipt line tidak ditemukan.');

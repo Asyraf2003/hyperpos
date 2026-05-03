@@ -6,7 +6,7 @@ namespace App\Application\Procurement\UseCases;
 
 use App\Application\Procurement\Services\SupplierInvoiceQueryExceptionClassifier;
 use App\Application\Shared\DTO\Result;
-use Illuminate\Database\QueryException;
+use Throwable;
 
 final class CreateSupplierInvoiceFlowQueryExceptionClassifier
 {
@@ -15,7 +15,7 @@ final class CreateSupplierInvoiceFlowQueryExceptionClassifier
     ) {
     }
 
-    public function classify(QueryException $e): ?Result
+    public function classify(Throwable $e): ?Result
     {
         return $this->classifier->classify($e);
     }

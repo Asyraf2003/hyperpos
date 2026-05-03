@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierReceiptLineReaderAdapter implements SupplierReceiptLineReaderPort
 {
+    public function getIdsBySupplierReceiptId(string $supplierReceiptId): array
+    {
+        return DB::table('supplier_receipt_lines')
+            ->where('supplier_receipt_id', trim($supplierReceiptId))
+            ->pluck('id')
+            ->map(fn ($id): string => (string) $id)
+            ->all();
+    }
+
     public function getReceivedQtyBySupplierInvoiceLineId(string $supplierInvoiceLineId): int
     {
         return (int) DB::table('supplier_receipt_lines')
