@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeListPageReaderPort;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeListPageQuery
+final class DatabaseEmployeeListPageQuery implements EmployeeListPageReaderPort
 {
     /**
      * @return list<array{
