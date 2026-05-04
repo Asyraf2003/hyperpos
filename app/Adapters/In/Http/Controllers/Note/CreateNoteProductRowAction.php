@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Application\Note\Services\NoteProductSaleOnlyLineTotalResolver;
 use App\Application\Note\UseCases\AddWorkItemHandler;
 use App\Application\Shared\DTO\Result;
 use App\Core\Note\WorkItem\WorkItem;
-use App\Ports\Out\ProductCatalog\ProductReaderPort;
 
 final class CreateNoteProductRowAction
 {
     public function __construct(
         private readonly AddWorkItemHandler $addWorkItem,
-        private readonly ProductReaderPort $products,
+        private readonly NoteProductSaleOnlyLineTotalResolver $lineTotals,
     ) {
     }
 
@@ -24,16 +24,14 @@ final class CreateNoteProductRowAction
     {
         $productId = (string) ($row['product_id'] ?? '');
         $qty = (int) ($row['qty'] ?? 0);
-        $product = $this->products->getById($productId);
+        $lineTotalRupiah = $this->lineTotals->resolve($productId, $qty);
 
-        if ($product === null) {
+        if ($lineTotalRupiah === null) {
             return Result::failure(
                 'Produk pada baris nota tidak ditemukan.',
                 ['note' => ['PRODUCT_NOT_FOUND']]
             );
         }
-
-        $lineTotalRupiah = $product->hargaJual()->amount() * $qty;
 
         return $this->addWorkItem->handle(
             $noteId,
