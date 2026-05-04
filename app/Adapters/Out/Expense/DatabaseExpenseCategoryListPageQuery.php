@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Expense;
 
+use App\Ports\Out\Expense\ExpenseCategoryOptionReaderPort;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseExpenseCategoryListPageQuery
+final class DatabaseExpenseCategoryListPageQuery implements ExpenseCategoryOptionReaderPort
 {
     /**
      * @return list<array{id:string,code:string,name:string,description:?string,is_active:bool}>
