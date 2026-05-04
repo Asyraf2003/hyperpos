@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Auth;
 
-use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
+use App\Application\IdentityAccess\Services\LoginActorAccessDecision;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 final class LoginPageController extends Controller
 {
     public function __construct(
-        private readonly ActorAccessReaderPort $actors,
+        private readonly LoginActorAccessDecision $actors,
     ) {
     }
 
@@ -26,23 +26,13 @@ final class LoginPageController extends Controller
             return view('auth.login');
         }
 
-        $actor = $this->actors->findByActorId((string) $actorId);
+        $decision = $this->actors->resolve((string) $actorId);
 
-        if ($actor === null) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()
-                ->route('login')
-                ->with('error', 'Aktor tidak dikenali.');
-        }
-
-        if ($actor->isAdmin()) {
+        if ($decision === LoginActorAccessDecision::ADMIN) {
             return redirect()->route('admin.dashboard');
         }
 
-        if ($actor->isKasir()) {
+        if ($decision === LoginActorAccessDecision::KASIR) {
             return redirect()->route('cashier.dashboard');
         }
 
@@ -52,6 +42,8 @@ final class LoginPageController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('error', 'Role aktor tidak didukung.');
+            ->with('error', $decision === LoginActorAccessDecision::UNKNOWN
+                ? 'Aktor tidak dikenali.'
+                : 'Role aktor tidak didukung.');
     }
 }
