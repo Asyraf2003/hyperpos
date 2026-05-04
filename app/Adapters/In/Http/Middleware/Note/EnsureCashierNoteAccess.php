@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Middleware\Note;
 
-use App\Application\Note\Policies\CashierNoteAccessGuard;
+use App\Application\Note\Services\CashierNoteRouteAccessData;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\ClockPort;
-use App\Ports\Out\Note\NoteReaderPort;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,9 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class EnsureCashierNoteAccess
 {
     public function __construct(
-        private readonly NoteReaderPort $notes,
-        private readonly CashierNoteAccessGuard $guard,
-        private readonly ClockPort $clock,
+        private readonly CashierNoteRouteAccessData $accessData,
     ) {
     }
 
@@ -25,25 +21,24 @@ final class EnsureCashierNoteAccess
     {
         $noteId = $request->route('noteId');
 
-        if (!is_string($noteId) || trim($noteId) === '') {
+        if (! is_string($noteId) || trim($noteId) === '') {
             return $next($request);
         }
-
-        $note = $this->notes->getById($noteId);
-        abort_if($note === null, 404);
 
         try {
             if ($request->routeIs('cashier.notes.show')
                 || $request->routeIs('cashier.notes.workspace.edit')
                 || $request->routeIs('cashier.notes.workspace.update')
                 || $request->routeIs('cashier.notes.payments.store')) {
-                $this->guard->assertCanView($note, $this->clock->now());
+                $canAccess = $this->accessData->ensureCanView($noteId);
             } else {
-                $this->guard->assertCanMutateOpenNote($note, $this->clock->now());
+                $canAccess = $this->accessData->ensureCanMutateOpenNote($noteId);
             }
         } catch (DomainException $e) {
             abort(403, $e->getMessage());
         }
+
+        abort_if(! $canAccess, 404);
 
         return $next($request);
     }
