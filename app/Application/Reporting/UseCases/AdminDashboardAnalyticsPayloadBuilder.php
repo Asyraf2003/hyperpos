@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\UseCases;
 
+use App\Ports\Out\ClockPort;
+use DateTimeZone;
+
 final class AdminDashboardAnalyticsPayloadBuilder
 {
     public function __construct(
         private readonly AdminDashboardSharedReportFragments $sharedFragments,
         private readonly GetDashboardOperationalPerformanceDatasetHandler $operationalPerformance,
         private readonly AdminDashboardAnalyticsChartsPayloadBuilder $charts,
+        private readonly ClockPort $clock,
     ) {
     }
 
@@ -20,6 +24,8 @@ final class AdminDashboardAnalyticsPayloadBuilder
      *   from:string,
      *   to:string
      * } $period
+     *
+     * @return array<string, mixed>
      */
     public function build(array $period): array
     {
@@ -40,7 +46,9 @@ final class AdminDashboardAnalyticsPayloadBuilder
                 'date_from' => $period['from'],
                 'date_to' => $period['to'],
                 'granularity' => 'daily',
-                'generated_at' => now()->toISOString(),
+                'generated_at' => $this->clock->now()
+                    ->setTimezone(new DateTimeZone('UTC'))
+                    ->format('Y-m-d\TH:i:s.u\Z'),
             ],
             'cash_change_denominations' => $operationalPerformanceDataset['cash_change_denominations'] ?? [],
             'charts' => $this->charts->build(
