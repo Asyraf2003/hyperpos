@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Note;
 
 use App\Application\Note\Services\NoteHistoryProjectionService;
+use App\Application\Note\Services\NoteRowsStartingLineNoResolver;
 use App\Application\Shared\DTO\Result;
-use App\Ports\Out\Note\NoteReaderPort;
 
 final class CreateNoteRowsAction
 {
     public function __construct(
-        private readonly NoteReaderPort $notes,
+        private readonly NoteRowsStartingLineNoResolver $lineNoResolver,
         private readonly CreateNoteProductRowAction $addProductRow,
         private readonly CreateNoteServiceRowAction $addServiceRow,
         private readonly NoteHistoryProjectionService $projection,
@@ -23,7 +23,7 @@ final class CreateNoteRowsAction
      */
     public function handle(string $noteId, array $rows): ?Result
     {
-        $lineNo = $this->resolveStartingLineNo($noteId);
+        $lineNo = $this->lineNoResolver->resolve($noteId);
 
         if ($lineNo === null) {
             return Result::failure('Nota tidak ditemukan.', ['note' => ['NOTE_NOT_FOUND']]);
@@ -57,22 +57,5 @@ final class CreateNoteRowsAction
                 ['note' => ['INVALID_LINE_TYPE']]
             ),
         };
-    }
-
-    private function resolveStartingLineNo(string $noteId): ?int
-    {
-        $note = $this->notes->getById(trim($noteId));
-
-        if ($note === null) {
-            return null;
-        }
-
-        $maxLineNo = 0;
-
-        foreach ($note->workItems() as $item) {
-            $maxLineNo = max($maxLineNo, $item->lineNo());
-        }
-
-        return $maxLineNo + 1;
     }
 }
