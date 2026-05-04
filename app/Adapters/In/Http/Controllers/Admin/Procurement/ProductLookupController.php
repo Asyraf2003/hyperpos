@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
-use App\Ports\Out\ProductCatalog\ProductReaderPort;
+use App\Application\Procurement\Services\ProcurementProductLookupData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,7 +13,7 @@ final class ProductLookupController extends Controller
 {
     public function __invoke(
         Request $request,
-        ProductReaderPort $products,
+        ProcurementProductLookupData $lookupData,
     ): JsonResponse {
         $query = trim((string) $request->query('q', ''));
 
@@ -55,7 +55,7 @@ final class ProductLookupController extends Controller
                     'ukuran' => $ukuran,
                 ];
             },
-            $products->search($query),
+            $lookupData->search($query),
         );
 
         return response()->json([
