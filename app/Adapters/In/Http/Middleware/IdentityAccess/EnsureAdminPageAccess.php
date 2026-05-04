@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Middleware\IdentityAccess;
 
-use App\Application\IdentityAccess\Policies\AdminPageAccessPolicy;
-use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
+use App\Application\IdentityAccess\Services\AdminPageRouteAccessDecision;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,8 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class EnsureAdminPageAccess
 {
     public function __construct(
-        private readonly AdminPageAccessPolicy $policy,
-        private readonly ActorAccessReaderPort $actors,
+        private readonly AdminPageRouteAccessDecision $access,
     ) {
     }
 
@@ -33,9 +31,9 @@ final class EnsureAdminPageAccess
                 ->with('error', 'Autentikasi dibutuhkan.');
         }
 
-        $actor = $this->actors->findByActorId((string) $actorId);
+        $decision = $this->access->resolve((string) $actorId);
 
-        if ($actor === null) {
+        if ($decision === AdminPageRouteAccessDecision::UNKNOWN) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -45,15 +43,13 @@ final class EnsureAdminPageAccess
                 ->with('error', 'Aktor tidak dikenali.');
         }
 
-        $decision = $this->policy->decide((string) $actorId);
+        if ($decision === AdminPageRouteAccessDecision::KASIR_REJECTED) {
+            return redirect()
+                ->route('cashier.dashboard')
+                ->with('error', 'Halaman admin hanya untuk role admin.');
+        }
 
-        if ($decision->isFailure()) {
-            if ($actor->isKasir()) {
-                return redirect()
-                    ->route('cashier.dashboard')
-                    ->with('error', 'Halaman admin hanya untuk role admin.');
-            }
-
+        if ($decision === AdminPageRouteAccessDecision::DENIED) {
             return redirect()
                 ->route('login')
                 ->with('error', 'Akses halaman admin ditolak.');
