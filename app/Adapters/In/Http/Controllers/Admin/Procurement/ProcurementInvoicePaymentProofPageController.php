@@ -6,10 +6,9 @@ namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
 use App\Adapters\In\Http\Controllers\Admin\Procurement\Concerns\BuildsProcurementInvoiceDetailPaymentsView;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\Concerns\BuildsProcurementInvoiceDetailViewData;
+use App\Application\Procurement\Services\ProcurementInvoicePaymentProofPageData;
 use App\Application\Procurement\UseCases\GetProcurementInvoiceDetailHandler;
 use App\Core\Procurement\SupplierPayment\SupplierPayment;
-use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentReaderPort;
-use App\Ports\Out\Procurement\SupplierPaymentReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -22,8 +21,7 @@ final class ProcurementInvoicePaymentProofPageController extends Controller
     public function __invoke(
         string $supplierInvoiceId,
         GetProcurementInvoiceDetailHandler $useCase,
-        SupplierPaymentReaderPort $payments,
-        SupplierPaymentProofAttachmentReaderPort $attachments,
+        ProcurementInvoicePaymentProofPageData $paymentProofPageData,
     ): View|RedirectResponse {
         $result = $useCase->handle($supplierInvoiceId);
 
@@ -37,12 +35,9 @@ final class ProcurementInvoicePaymentProofPageController extends Controller
         $detail = $result->data();
         $viewData = $this->buildViewData($detail);
 
-        $paymentRows = $payments->listBySupplierInvoiceId($supplierInvoiceId);
-        $attachmentMap = [];
-
-        foreach ($paymentRows as $payment) {
-            $attachmentMap[$payment->id()] = $attachments->listBySupplierPaymentId($payment->id());
-        }
+        $paymentProofData = $paymentProofPageData->load($supplierInvoiceId);
+        $paymentRows = $paymentProofData['paymentRows'];
+        $attachmentMap = $paymentProofData['attachmentMap'];
 
         $viewData['paymentsView'] = $this->buildPaymentsView(
             $paymentRows,
