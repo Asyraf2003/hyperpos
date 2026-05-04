@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement\Support;
 
+use App\Application\Procurement\Services\SupplierInvoiceProductOptionsData;
 use App\Core\ProductCatalog\Product\Product;
-use App\Ports\Out\ProductCatalog\ProductReaderPort;
 
 final class EditSupplierInvoiceLineItemsViewBuilder
 {
     public function __construct(
-        private readonly ProductReaderPort $products,
+        private readonly SupplierInvoiceProductOptionsData $productOptionsData,
     ) {
     }
 
@@ -22,7 +22,7 @@ final class EditSupplierInvoiceLineItemsViewBuilder
     {
         $productLabelsById = [];
 
-        foreach ($this->products->findAll() as $product) {
+        foreach ($this->productOptionsData->findAll() as $product) {
             $productLabelsById[$product->id()] = $this->buildProductLabel($product);
         }
 

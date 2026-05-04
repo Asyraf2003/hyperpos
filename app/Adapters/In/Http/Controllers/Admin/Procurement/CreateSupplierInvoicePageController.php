@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
+use App\Application\Procurement\Services\SupplierInvoiceProductOptionsData;
 use App\Core\ProductCatalog\Product\Product;
-use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Routing\Controller;
 
 final class CreateSupplierInvoicePageController extends Controller
 {
-    public function __invoke(ProductReaderPort $products): View
+    public function __invoke(SupplierInvoiceProductOptionsData $productOptionsData): View
     {
         return view('admin.procurement.supplier_invoices.create', [
-            'lineItemsView' => $this->buildLineItemsView($products->findAll()),
+            'lineItemsView' => $this->buildLineItemsView($productOptionsData->findAll()),
         ]);
     }
 
