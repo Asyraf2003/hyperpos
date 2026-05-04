@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
-use App\Ports\Out\Inventory\ProductInventoryReaderPort;
-use App\Ports\Out\ProductCatalog\ProductReaderPort;
+use App\Application\Note\Services\CashierNoteProductLookupData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -14,8 +13,7 @@ final class ProductLookupController extends Controller
 {
     public function __invoke(
         Request $request,
-        ProductReaderPort $products,
-        ProductInventoryReaderPort $inventories,
+        CashierNoteProductLookupData $lookupData,
     ): JsonResponse {
         $query = trim((string) $request->query('q', ''));
 
@@ -30,8 +28,8 @@ final class ProductLookupController extends Controller
 
         $rows = [];
 
-        foreach ($products->search($query) as $product) {
-            $inventory = $inventories->getByProductId($product->id());
+        foreach ($lookupData->searchProducts($query) as $product) {
+            $inventory = $lookupData->getInventoryByProductId($product->id());
             $availableStock = $inventory?->qtyOnHand() ?? 0;
 
             if ($availableStock <= 0) {
