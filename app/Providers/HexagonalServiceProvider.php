@@ -375,6 +375,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->scoped(EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseVersionedEmployeeWriterAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeTableReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeTableReaderAdapter::class);
         $this->app->singleton(EmployeeDebtReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtReaderAdapter::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtDetailPageReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtDetailPageQuery::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtAdjustmentListReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentListQuery::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtPaymentReversalListReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtPaymentReversalListQuery::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtTableReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtListPageQuery::class);
         $this->app->singleton(EmployeeDebtAdjustmentWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtAdjustmentWriterAdapter::class);
         $this->app->singleton(EmployeeDebtWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtWriterAdapter::class);

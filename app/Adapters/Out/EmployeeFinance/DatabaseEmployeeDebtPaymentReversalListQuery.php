@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeDebtPaymentReversalListReaderPort;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDebtPaymentReversalListQuery
+final class DatabaseEmployeeDebtPaymentReversalListQuery implements EmployeeDebtPaymentReversalListReaderPort
 {
     public function findByDebtId(string $debtId): array
     {

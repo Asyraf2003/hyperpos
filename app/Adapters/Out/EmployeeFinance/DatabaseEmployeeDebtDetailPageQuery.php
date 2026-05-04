@@ -5,10 +5,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeDebtDetailPageReaderPort;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDebtDetailPageQuery
+final class DatabaseEmployeeDebtDetailPageQuery implements EmployeeDebtDetailPageReaderPort
 {
     public function findById(string $debtId): ?array
     {

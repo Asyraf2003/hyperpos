@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeDebtAdjustmentListReaderPort;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDebtAdjustmentListQuery
+final class DatabaseEmployeeDebtAdjustmentListQuery implements EmployeeDebtAdjustmentListReaderPort
 {
     public function findByDebtId(string $debtId): array
     {
