@@ -40,7 +40,12 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
                 }
 
                 $storedPaths[] = $storedPath;
-                $storedFiles[] = $this->storedFile($storedPath, $file);
+                $storedFiles[] = [
+                    'storage_path' => $storedPath,
+                    'original_filename' => trim((string) ($file['original_filename'] ?? '')),
+                    'mime_type' => trim((string) ($file['mime_type'] ?? '')),
+                    'file_size_bytes' => (int) ($file['file_size_bytes'] ?? 0),
+                ];
             }
         } catch (Throwable) {
             $this->deleteMany($storedPaths);
@@ -67,12 +72,8 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
 
     public function get(string $path): ?string
     {
-        if (! $this->exists($path)) {
-            return null;
-        }
-
         try {
-            $content = Storage::disk('local')->get($path);
+            $content = $this->exists($path) ? Storage::disk('local')->get($path) : null;
         } catch (Throwable) {
             return null;
         }
@@ -87,19 +88,12 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
 
     private function filename(array $file): string
     {
-        $extension = strtolower((string) pathinfo((string) ($file['original_filename'] ?? ''), PATHINFO_EXTENSION));
-        $extension = preg_replace('/[^a-z0-9]/', '', $extension) ?? '';
+        $extension = preg_replace(
+            '/[^a-z0-9]/',
+            '',
+            strtolower((string) pathinfo((string) ($file['original_filename'] ?? ''), PATHINFO_EXTENSION)),
+        ) ?? '';
 
         return bin2hex(random_bytes(16)) . ($extension !== '' ? '.' . $extension : '');
-    }
-
-    private function storedFile(string $storedPath, array $file): array
-    {
-        return [
-            'storage_path' => $storedPath,
-            'original_filename' => trim((string) ($file['original_filename'] ?? '')),
-            'mime_type' => trim((string) ($file['mime_type'] ?? '')),
-            'file_size_bytes' => (int) ($file['file_size_bytes'] ?? 0),
-        ];
     }
 }
