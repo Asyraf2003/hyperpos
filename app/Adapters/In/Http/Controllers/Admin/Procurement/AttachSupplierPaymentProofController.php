@@ -7,8 +7,8 @@ namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 use App\Application\Procurement\UseCases\AttachSupplierPaymentProofHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Storage;
 
 final class AttachSupplierPaymentProofController extends Controller
 {
@@ -24,22 +24,17 @@ final class AttachSupplierPaymentProofController extends Controller
 
         $user = $request->user();
         $actorId = $user?->getAuthIdentifier();
-
         $uploadedFiles = [];
-        $storedPaths = [];
+        $proofFiles = is_array($data['proof_files'] ?? null) ? $data['proof_files'] : [];
 
-        foreach ($data['proof_files'] as $file) {
-            $storedPath = Storage::disk('local')->putFileAs(
-                'supplier-payment-proofs/' . trim($supplierPaymentId),
-                $file,
-                $file->hashName(),
-            );
+        foreach ($proofFiles as $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
 
-            if (! is_string($storedPath) || $storedPath === '') {
-                if ($storedPaths !== []) {
-                    Storage::disk('local')->delete($storedPaths);
-                }
+            $sourcePath = $file->getRealPath();
 
+            if (! is_string($sourcePath) || $sourcePath === '') {
                 return back()
                     ->withErrors([
                         'supplier_payment_proof' => 'Bukti pembayaran supplier gagal diunggah.',
@@ -47,9 +42,8 @@ final class AttachSupplierPaymentProofController extends Controller
                     ->withInput();
             }
 
-            $storedPaths[] = $storedPath;
             $uploadedFiles[] = [
-                'storage_path' => $storedPath,
+                'source_path' => $sourcePath,
                 'original_filename' => (string) $file->getClientOriginalName(),
                 'mime_type' => (string) $file->getClientMimeType(),
                 'file_size_bytes' => (int) $file->getSize(),
@@ -63,10 +57,6 @@ final class AttachSupplierPaymentProofController extends Controller
         );
 
         if ($result->isFailure()) {
-            if ($storedPaths !== []) {
-                Storage::disk('local')->delete($storedPaths);
-            }
-
             return back()
                 ->withErrors([
                     'supplier_payment_proof' => $result->message() ?? 'Bukti pembayaran supplier gagal diunggah.',

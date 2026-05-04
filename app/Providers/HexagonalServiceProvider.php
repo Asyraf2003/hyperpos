@@ -319,6 +319,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierPayableReminderReaderPort::class, DatabaseSupplierPayableReminderReaderAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentWriterPort::class, DatabaseSupplierPaymentProofAttachmentWriterAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentReaderPort::class, DatabaseSupplierPaymentProofAttachmentReaderAdapter::class);
+        $this->app->singleton(AppPortsOutProcurementSupplierPaymentProofFileStoragePort::class, AppAdaptersOutProcurementLaravelSupplierPaymentProofFileStorageAdapter::class);
 
         $this->app->singleton(InventoryMovementReaderPort::class, DatabaseInventoryMovementReaderAdapter::class);
         $this->app->singleton(InventoryMovementWriterPort::class, DatabaseInventoryMovementWriterAdapter::class);

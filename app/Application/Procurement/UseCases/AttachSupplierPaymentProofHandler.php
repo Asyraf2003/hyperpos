@@ -8,6 +8,7 @@ use App\Application\Procurement\Services\AttachSupplierPaymentProofTransaction;
 use App\Application\Procurement\Services\SupplierPaymentProofAttachmentFactory;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
+use App\Ports\Out\Procurement\SupplierPaymentProofFileStoragePort;
 use App\Ports\Out\Procurement\SupplierPaymentReaderPort;
 use Throwable;
 
@@ -15,6 +16,7 @@ final class AttachSupplierPaymentProofHandler
 {
     public function __construct(
         private readonly SupplierPaymentReaderPort $payments,
+        private readonly SupplierPaymentProofFileStoragePort $files,
         private readonly SupplierPaymentProofAttachmentFactory $attachmentFactory,
         private readonly AttachSupplierPaymentProofTransaction $transaction,
     ) {
@@ -22,7 +24,7 @@ final class AttachSupplierPaymentProofHandler
 
     /**
      * @param list<array{
-     * storage_path:string,
+     * source_path:string,
      * original_filename:string,
      * mime_type:string,
      * file_size_bytes:int
@@ -30,6 +32,8 @@ final class AttachSupplierPaymentProofHandler
      */
     public function handle(string $supplierPaymentId, array $proofFiles, string $performedByActorId): Result
     {
+        $storedPaths = [];
+
         try {
             $payment = $this->payments->getById(trim($supplierPaymentId));
 
@@ -47,12 +51,27 @@ final class AttachSupplierPaymentProofHandler
                 return $this->fail('Bukti pembayaran wajib diunggah.', 'SUPPLIER_PAYMENT_PROOF_REQUIRED');
             }
 
-            [$attachmentRecords, $storedPaths] = $this->attachmentFactory->makeMany($payment->id(), $proofFiles, $actorId);
+            $storedProofFiles = $this->files->storeMany($payment->id(), $proofFiles);
 
-            return $this->transaction->run($payment, $attachmentRecords, $storedPaths, $actorId);
+            if ($storedProofFiles === []) {
+                return $this->fail('Bukti pembayaran supplier gagal diunggah.', 'SUPPLIER_PAYMENT_PROOF_UPLOAD_FAILED');
+            }
+
+            [$attachmentRecords, $storedPaths] = $this->attachmentFactory->makeMany($payment->id(), $storedProofFiles, $actorId);
+            $result = $this->transaction->run($payment, $attachmentRecords, $storedPaths, $actorId);
+
+            if ($result->isFailure()) {
+                $this->files->deleteMany($storedPaths);
+            }
+
+            return $result;
         } catch (DomainException $e) {
+            $this->files->deleteMany($storedPaths);
+
             return $this->fail($e->getMessage(), 'INVALID_SUPPLIER_PAYMENT_PROOF');
         } catch (Throwable $e) {
+            $this->files->deleteMany($storedPaths);
+
             throw $e;
         }
     }
