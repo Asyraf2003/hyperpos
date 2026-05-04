@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Note\Queries;
 
+use App\Ports\Out\Note\AdminNoteHistoryTableReaderPort;
 use Illuminate\Support\Facades\DB;
 
-final class AdminNoteHistoryTableQuery
+final class AdminNoteHistoryTableQuery implements AdminNoteHistoryTableReaderPort
 {
     public function __construct(
         private readonly AdminNoteHistoryProjectionFilters $filters,

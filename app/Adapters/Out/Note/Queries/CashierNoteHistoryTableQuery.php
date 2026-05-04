@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Note\Queries;
 
-final class CashierNoteHistoryTableQuery
+use App\Ports\Out\Note\CashierNoteHistoryTableReaderPort;
+
+final class CashierNoteHistoryTableQuery implements CashierNoteHistoryTableReaderPort
 {
     public function __construct(
         private readonly CashierNoteHistoryBaseQuery $baseQuery,

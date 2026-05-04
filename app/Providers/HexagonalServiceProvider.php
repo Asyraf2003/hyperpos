@@ -46,6 +46,8 @@ use App\Adapters\Out\Note\DatabaseTransactionWorkspaceDraftReaderAdapter;
 use App\Adapters\Out\Note\DatabaseTransactionWorkspaceDraftWriterAdapter;
 use App\Adapters\Out\Note\DatabaseWorkItemWriterAdapter;
 use App\Adapters\Out\Note\DatabaseWorkItemStoreStockLineReaderAdapter;
+use App\Adapters\Out\Note\Queries\AdminNoteHistoryTableQuery;
+use App\Adapters\Out\Note\Queries\CashierNoteHistoryTableQuery;
 use App\Adapters\Out\Payment\DatabaseCustomerPaymentReaderAdapter;
 use App\Adapters\Out\Payment\DatabaseCustomerPaymentWriterAdapter;
 use App\Adapters\Out\Payment\DatabaseCustomerRefundReaderAdapter;
@@ -162,6 +164,8 @@ use App\Ports\Out\Inventory\ProductInventoryCostingWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryProjectionWriterPort;
 use App\Ports\Out\Inventory\ProductInventoryReaderPort;
 use App\Ports\Out\Inventory\ProductInventoryWriterPort;
+use App\Ports\Out\Note\AdminNoteHistoryTableReaderPort;
+use App\Ports\Out\Note\CashierNoteHistoryTableReaderPort;
 use App\Ports\Out\Note\DueNoteReminderReaderPort;
 use App\Ports\Out\Note\NoteCorrectionHistoryReaderPort;
 use App\Ports\Out\Note\NoteHistoryProjectionSourceReaderPort;
@@ -340,6 +344,8 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(NoteCorrectionHistoryReaderPort::class, DatabaseNoteCorrectionHistoryReaderAdapter::class);
         $this->app->singleton(NoteHistoryProjectionSourceReaderPort::class, DatabaseNoteHistoryProjectionSourceReaderAdapter::class);
         $this->app->singleton(NoteHistoryProjectionWriterPort::class, DatabaseNoteHistoryProjectionWriterAdapter::class);
+        $this->app->singleton(CashierNoteHistoryTableReaderPort::class, CashierNoteHistoryTableQuery::class);
+        $this->app->singleton(AdminNoteHistoryTableReaderPort::class, AdminNoteHistoryTableQuery::class);
 
         $this->app->singleton(CustomerPaymentWriterPort::class, DatabaseCustomerPaymentWriterAdapter::class);
         $this->app->singleton(CustomerPaymentReaderPort::class, DatabaseCustomerPaymentReaderAdapter::class);
