@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Middleware\IdentityAccess;
 
-use App\Application\IdentityAccess\Policies\CashierAreaAccessPolicy;
-use App\Ports\Out\IdentityAccess\ActorAccessReaderPort;
+use App\Application\IdentityAccess\Services\CashierAreaRouteAccessDecision;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,8 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class EnsureCashierAreaAccess
 {
     public function __construct(
-        private readonly CashierAreaAccessPolicy $policy,
-        private readonly ActorAccessReaderPort $actors,
+        private readonly CashierAreaRouteAccessDecision $access,
     ) {
     }
 
@@ -33,9 +31,12 @@ final class EnsureCashierAreaAccess
                 ->with('error', 'Autentikasi dibutuhkan.');
         }
 
-        $actor = $this->actors->findByActorId((string) $actorId);
+        $decision = $this->access->resolve((string) $actorId, [
+            'path' => $request->path(),
+            'route_name' => $request->route()->getName(),
+        ]);
 
-        if ($actor === null) {
+        if ($decision === CashierAreaRouteAccessDecision::UNKNOWN) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -45,18 +46,13 @@ final class EnsureCashierAreaAccess
                 ->with('error', 'Aktor tidak dikenali.');
         }
 
-        $decision = $this->policy->decide((string) $actorId, [
-            'path' => $request->path(),
-            'route_name' => $request->route()->getName(),
-        ]);
+        if ($decision === CashierAreaRouteAccessDecision::ADMIN_REJECTED) {
+            return redirect()
+                ->route('admin.dashboard')
+                ->with('error', 'Admin belum diizinkan mengakses area kasir.');
+        }
 
-        if ($decision->isFailure()) {
-            if ($actor->isAdmin()) {
-                return redirect()
-                    ->route('admin.dashboard')
-                    ->with('error', 'Admin belum diizinkan mengakses area kasir.');
-            }
-
+        if ($decision === CashierAreaRouteAccessDecision::DENIED) {
             return redirect()
                 ->route('login')
                 ->with('error', 'Akses area kasir ditolak.');
