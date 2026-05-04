@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeDetailPageReaderPort;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDetailPageQuery
+final class DatabaseEmployeeDetailPageQuery implements EmployeeDetailPageReaderPort
 {
     public function __construct(
         private EmployeeDetailCurrentIdentityMapper $currentIdentityMapper,

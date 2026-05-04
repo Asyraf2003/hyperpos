@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\EmployeeFinance;
 
+use App\Ports\Out\EmployeeFinance\EmployeeDebtSummaryByEmployeeReaderPort;
 use Illuminate\Support\Facades\DB;
 
-final class DatabaseEmployeeDebtSummaryByEmployeeQuery
+final class DatabaseEmployeeDebtSummaryByEmployeeQuery implements EmployeeDebtSummaryByEmployeeReaderPort
 {
     public function findByEmployeeId(string $employeeId): array
     {

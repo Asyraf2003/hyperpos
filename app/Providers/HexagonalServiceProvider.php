@@ -371,6 +371,9 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(OperationalProfitReportingSourceReaderPort::class, DatabaseOperationalProfitReportingSourceReaderAdapter::class);
 
         $this->app->singleton(EmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeReaderAdapter::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDetailPageReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDetailPageQuery::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeDebtSummaryByEmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeDebtSummaryByEmployeeQuery::class);
+        $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeePayrollSummaryByEmployeeReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeePayrollSummaryByEmployeeQuery::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeListPageReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeListPageQuery::class);
         $this->app->scoped(EmployeeWriterPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseVersionedEmployeeWriterAdapter::class);
         $this->app->singleton(\App\Ports\Out\EmployeeFinance\EmployeeTableReaderPort::class, \App\Adapters\Out\EmployeeFinance\DatabaseEmployeeTableReaderAdapter::class);
