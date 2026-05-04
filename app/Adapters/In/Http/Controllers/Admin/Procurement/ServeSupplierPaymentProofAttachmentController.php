@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
-use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentReaderPort;
+use App\Application\Procurement\Services\ServeSupplierPaymentProofAttachmentData;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -14,10 +14,10 @@ final class ServeSupplierPaymentProofAttachmentController extends Controller
 {
     public function __invoke(
         Request $request,
-        SupplierPaymentProofAttachmentReaderPort $attachments,
+        ServeSupplierPaymentProofAttachmentData $attachmentData,
         string $attachmentId,
     ): Response {
-        $attachment = $attachments->getById(trim($attachmentId));
+        $attachment = $attachmentData->getById($attachmentId);
 
         abort_if($attachment === null, 404);
 
