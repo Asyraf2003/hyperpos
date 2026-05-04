@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
-use App\Ports\Out\Note\TransactionWorkspaceDraftReaderPort;
+use App\Application\Note\Services\TransactionWorkspaceDraftData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,7 +13,7 @@ final class GetTransactionWorkspaceDraftController extends Controller
 {
     public function __invoke(
         Request $request,
-        TransactionWorkspaceDraftReaderPort $drafts,
+        TransactionWorkspaceDraftData $draftData,
     ): JsonResponse {
         $actorId = (string) $request->user()->getAuthIdentifier();
         $workspaceMode = trim((string) $request->query('workspace_mode', 'create'));
@@ -30,7 +30,7 @@ final class GetTransactionWorkspaceDraftController extends Controller
             ? 'edit:' . $noteId
             : 'create';
 
-        $draft = $drafts->findByActorAndWorkspaceKey($actorId, $workspaceKey);
+        $draft = $draftData->findByActorAndWorkspaceKey($actorId, $workspaceKey);
 
         return response()->json([
             'success' => true,
