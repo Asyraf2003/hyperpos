@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Expense;
 
-use App\Ports\Out\Expense\ExpenseCategoryReaderPort;
+use App\Application\Expense\Services\EditExpenseCategoryPageData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -12,13 +12,13 @@ use Illuminate\Routing\Controller;
 final class EditExpenseCategoryPageController extends Controller
 {
     public function __construct(
-        private readonly ExpenseCategoryReaderPort $categories,
+        private readonly EditExpenseCategoryPageData $pageData,
     ) {
     }
 
     public function __invoke(string $categoryId): View|RedirectResponse
     {
-        $category = $this->categories->findById($categoryId);
+        $category = $this->pageData->category($categoryId);
 
         if ($category === null) {
             return redirect()
