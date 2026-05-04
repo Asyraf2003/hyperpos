@@ -247,6 +247,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->bind(HealthCheckUseCase::class, HealthCheckHandler::class);
 
         $this->app->singleton(ClockPort::class, SystemClockAdapter::class);
+        $this->app->singleton(\App\Ports\Out\RouteUrlGeneratorPort::class, \App\Adapters\Out\Routing\LaravelRouteUrlGeneratorAdapter::class);
         $this->app->singleton(UuidPort::class, LaravelUuidAdapter::class);
         $this->app->singleton(AuditLogPort::class, DatabaseAuditLogAdapter::class);
         $this->app->singleton(AuditLogReaderPort::class, DatabaseAuditLogReaderAdapter::class);

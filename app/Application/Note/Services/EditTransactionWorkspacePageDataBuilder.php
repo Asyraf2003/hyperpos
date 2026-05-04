@@ -6,6 +6,7 @@ namespace App\Application\Note\Services;
 
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Note\NoteReaderPort;
+use App\Ports\Out\RouteUrlGeneratorPort;
 
 final class EditTransactionWorkspacePageDataBuilder
 {
@@ -17,6 +18,7 @@ final class EditTransactionWorkspacePageDataBuilder
         private readonly CreateTransactionWorkspacePageDataBuilder $options,
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
         private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
+        private readonly RouteUrlGeneratorPort $urls,
         private readonly EditTransactionWorkspaceRouteNames $routes,
     ) {
     }
@@ -45,6 +47,7 @@ final class EditTransactionWorkspacePageDataBuilder
         }
 
         $routeNames = $this->routes->resolve($routeArea);
+        $productLookupEndpoint = $this->urls->route($routeNames['products_lookup']);
 
         $oldNote = [
             'customer_name' => $currentRevision->customerName(),
@@ -57,9 +60,9 @@ final class EditTransactionWorkspacePageDataBuilder
         return [
             'pageTitle' => 'Edit Nota',
             'workspaceMode' => 'edit',
-            'formAction' => route($routeNames['workspace_update'], ['noteId' => $normalized]),
-            'cancelAction' => route($routeNames['show'], ['noteId' => $normalized]),
-            'refundAction' => route($routeNames['refunds_store'], ['noteId' => $normalized]),
+            'formAction' => $this->urls->route($routeNames['workspace_update'], ['noteId' => $normalized]),
+            'cancelAction' => $this->urls->route($routeNames['show'], ['noteId' => $normalized]),
+            'refundAction' => $this->urls->route($routeNames['refunds_store'], ['noteId' => $normalized]),
             'refundDateDefault' => date('Y-m-d'),
             'refundPaymentOptions' => $this->refundPaymentOptions->build($note->id()),
             'workspaceRefundRows' => [],
@@ -67,13 +70,13 @@ final class EditTransactionWorkspacePageDataBuilder
             'oldNote' => $oldNote,
             'oldItems' => $oldItems,
             'defaultCustomerName' => $oldNote['customer_name'],
-            'productLookupEndpoint' => route($routeNames['products_lookup']),
-            'draftLoadEndpoint' => route($routeNames['draft_show']),
-            'draftSaveEndpoint' => route($routeNames['draft_save']),
+            'productLookupEndpoint' => $productLookupEndpoint,
+            'draftLoadEndpoint' => $this->urls->route($routeNames['draft_show']),
+            'draftSaveEndpoint' => $this->urls->route($routeNames['draft_save']),
             'workspaceConfigJson' => json_encode([
                 'oldItems' => $oldItems,
                 'defaultCustomerName' => $oldNote['customer_name'],
-                'productLookupEndpoint' => route($routeNames['products_lookup']),
+                'productLookupEndpoint' => $productLookupEndpoint,
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}',
         ] + $this->options->build();
     }
