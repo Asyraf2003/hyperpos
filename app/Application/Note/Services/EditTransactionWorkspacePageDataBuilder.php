@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Core\Shared\Exceptions\DomainException;
+use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\RouteUrlGeneratorPort;
 
@@ -19,6 +20,7 @@ final class EditTransactionWorkspacePageDataBuilder
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
         private readonly NoteRefundPaymentOptionsBuilder $refundPaymentOptions,
         private readonly RouteUrlGeneratorPort $urls,
+        private readonly ClockPort $clock,
         private readonly EditTransactionWorkspaceRouteNames $routes,
     ) {
     }
@@ -47,12 +49,13 @@ final class EditTransactionWorkspacePageDataBuilder
         }
 
         $routeNames = $this->routes->resolve($routeArea);
+        $today = $this->clock->now()->format('Y-m-d');
         $productLookupEndpoint = $this->urls->route($routeNames['products_lookup']);
 
         $oldNote = [
             'customer_name' => $currentRevision->customerName(),
             'customer_phone' => $currentRevision->customerPhone() ?? '',
-            'transaction_date' => date('Y-m-d'),
+            'transaction_date' => $today,
         ];
 
         $oldItems = $this->revisionItems->mapMany($currentRevision);
@@ -63,7 +66,7 @@ final class EditTransactionWorkspacePageDataBuilder
             'formAction' => $this->urls->route($routeNames['workspace_update'], ['noteId' => $normalized]),
             'cancelAction' => $this->urls->route($routeNames['show'], ['noteId' => $normalized]),
             'refundAction' => $this->urls->route($routeNames['refunds_store'], ['noteId' => $normalized]),
-            'refundDateDefault' => date('Y-m-d'),
+            'refundDateDefault' => $today,
             'refundPaymentOptions' => $this->refundPaymentOptions->build($note->id()),
             'workspaceRefundRows' => [],
             'canShowRefundModal' => false,

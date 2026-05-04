@@ -8,10 +8,9 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Halaman ini hanya untuk membaca jejak audit</h4>
-                        <p class="text-muted mb-0">
-                            Alasan perubahan dicatat dari fitur asal. Halaman ini hanya untuk investigasi.
-                        </p>
+                        <h4 class="card-title mb-1">
+                            Alasan perubahan dicatat dari fitur asal. Halaman ini hanya untuk investigasi
+                        </h4>
                     </div>
 
                     <form method="get" action="{{ route('admin.audit-logs.index') }}" class="m-0 d-flex gap-2">
