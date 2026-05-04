@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Employee;
 
-use App\Ports\Out\EmployeeFinance\EmployeeReaderPort;
+use App\Application\EmployeeFinance\Services\EditEmployeePageData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
 final class EditEmployeePageController extends Controller
 {
-    public function __invoke(string $employeeId, EmployeeReaderPort $employeeReader): View|RedirectResponse
+    public function __construct(
+        private readonly EditEmployeePageData $pageData,
+    ) {
+    }
+
+    public function __invoke(string $employeeId): View|RedirectResponse
     {
-        $employee = $employeeReader->findById($employeeId);
+        $employee = $this->pageData->findById($employeeId);
 
         if ($employee === null) {
             return redirect()
