@@ -77,6 +77,7 @@ use App\Application\Procurement\Context\SupplierInvoiceChangeContext;
 use App\Adapters\Out\Procurement\DatabaseProcurementInvoiceDetailReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentProofAttachmentWriterAdapter;
+use App\Adapters\Out\Procurement\LaravelSupplierPaymentProofFileStorageAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPaymentReversalWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierPayableReminderReaderAdapter;
@@ -206,6 +207,7 @@ use App\Ports\Out\Procurement\SupplierInvoiceWriterPort;
 use App\Ports\Out\Procurement\ProcurementInvoiceDetailReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentProofAttachmentWriterPort;
+use App\Ports\Out\Procurement\SupplierPaymentProofFileStoragePort;
 use App\Ports\Out\Procurement\SupplierPaymentReaderPort;
 use App\Ports\Out\Procurement\SupplierPaymentReversalWriterPort;
 use App\Ports\Out\Procurement\SupplierPayableReminderReaderPort;
@@ -319,7 +321,7 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierPayableReminderReaderPort::class, DatabaseSupplierPayableReminderReaderAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentWriterPort::class, DatabaseSupplierPaymentProofAttachmentWriterAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentReaderPort::class, DatabaseSupplierPaymentProofAttachmentReaderAdapter::class);
-        $this->app->singleton(AppPortsOutProcurementSupplierPaymentProofFileStoragePort::class, AppAdaptersOutProcurementLaravelSupplierPaymentProofFileStorageAdapter::class);
+        $this->app->singleton(SupplierPaymentProofFileStoragePort::class, LaravelSupplierPaymentProofFileStorageAdapter::class);
 
         $this->app->singleton(InventoryMovementReaderPort::class, DatabaseInventoryMovementReaderAdapter::class);
         $this->app->singleton(InventoryMovementWriterPort::class, DatabaseInventoryMovementWriterAdapter::class);

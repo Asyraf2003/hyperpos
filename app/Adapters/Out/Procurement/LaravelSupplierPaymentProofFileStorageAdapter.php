@@ -40,12 +40,7 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
                 }
 
                 $storedPaths[] = $storedPath;
-                $storedFiles[] = [
-                    'storage_path' => $storedPath,
-                    'original_filename' => trim((string) ($file['original_filename'] ?? '')),
-                    'mime_type' => trim((string) ($file['mime_type'] ?? '')),
-                    'file_size_bytes' => (int) ($file['file_size_bytes'] ?? 0),
-                ];
+                $storedFiles[] = $this->storedFile($storedPath, $file);
             }
         } catch (Throwable) {
             $this->deleteMany($storedPaths);
@@ -58,11 +53,9 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
 
     public function deleteMany(array $paths): void
     {
-        if ($paths === []) {
-            return;
+        if ($paths !== []) {
+            Storage::disk('local')->delete($paths);
         }
-
-        Storage::disk('local')->delete($paths);
     }
 
     public function exists(string $path): bool
@@ -98,5 +91,15 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
         $extension = preg_replace('/[^a-z0-9]/', '', $extension) ?? '';
 
         return bin2hex(random_bytes(16)) . ($extension !== '' ? '.' . $extension : '');
+    }
+
+    private function storedFile(string $storedPath, array $file): array
+    {
+        return [
+            'storage_path' => $storedPath,
+            'original_filename' => trim((string) ($file['original_filename'] ?? '')),
+            'mime_type' => trim((string) ($file['mime_type'] ?? '')),
+            'file_size_bytes' => (int) ($file['file_size_bytes'] ?? 0),
+        ];
     }
 }
