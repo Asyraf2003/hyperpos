@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
-use App\Application\Procurement\Services\ServeSupplierPaymentProofAttachmentData;
-use App\Ports\Out\Procurement\SupplierPaymentProofFileStoragePort;
+use App\Application\Procurement\UseCases\GetSupplierPaymentProofAttachmentFileHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -14,32 +13,23 @@ final class ServeSupplierPaymentProofAttachmentController extends Controller
 {
     public function __invoke(
         Request $request,
-        ServeSupplierPaymentProofAttachmentData $attachmentData,
-        SupplierPaymentProofFileStoragePort $files,
+        GetSupplierPaymentProofAttachmentFileHandler $handler,
         string $attachmentId,
     ): Response {
-        $attachment = $attachmentData->getById($attachmentId);
+        $file = $handler->handle($attachmentId);
 
-        abort_if($attachment === null, 404);
-
-        $path = $attachment->storagePath();
-
-        abort_unless($files->exists($path), 404);
-
-        $content = $files->get($path);
-
-        abort_if($content === null, 404);
+        abort_if($file === null, 404);
 
         $contentDisposition = $request->boolean('download')
             ? 'attachment'
             : 'inline';
 
         return response(
-            $content,
+            $file->content(),
             200,
             [
-                'Content-Type' => $attachment->mimeType(),
-                'Content-Disposition' => $contentDisposition . '; filename="' . $attachment->originalFilename() . '"',
+                'Content-Type' => $file->mimeType(),
+                'Content-Disposition' => $contentDisposition . '; filename="' . $file->originalFilename() . '"',
             ],
         );
     }
