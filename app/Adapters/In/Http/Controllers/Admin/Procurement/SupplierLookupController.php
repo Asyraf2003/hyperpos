@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
-use App\Ports\Out\Procurement\SupplierReaderPort;
+use App\Application\Procurement\Services\SupplierLookupData;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -13,7 +13,7 @@ final class SupplierLookupController extends Controller
 {
     public function __invoke(
         Request $request,
-        SupplierReaderPort $suppliers,
+        SupplierLookupData $lookupData,
     ): JsonResponse {
         $query = trim((string) $request->query('q', ''));
 
@@ -32,7 +32,7 @@ final class SupplierLookupController extends Controller
                 'label' => $supplier->namaPtPengirim(),
                 'nama_pt_pengirim' => $supplier->namaPtPengirim(),
             ],
-            $suppliers->search($query),
+            $lookupData->search($query),
         );
 
         return response()->json([
