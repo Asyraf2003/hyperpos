@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
-use App\Application\Note\Policies\CashierNoteAccessGuard;
+use App\Application\Note\Services\CashierNoteDetailPageAccessData;
 use App\Application\Note\Services\EnsureInitialNoteRevisionExists;
 use App\Application\Note\Services\NoteCorrectionUiOptionsBuilder;
 use App\Application\Note\Services\NoteDetailPageDataBuilder;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\ClockPort;
-use App\Ports\Out\Note\NoteReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -20,21 +18,18 @@ final class NoteDetailPageController extends Controller
     public function __invoke(
         string $noteId,
         Request $request,
-        NoteReaderPort $notes,
+        CashierNoteDetailPageAccessData $accessData,
         NoteDetailPageDataBuilder $builder,
         NoteCorrectionUiOptionsBuilder $options,
-        CashierNoteAccessGuard $guard,
-        ClockPort $clock,
         EnsureInitialNoteRevisionExists $ensureInitialRevision,
     ): View {
-        $note = $notes->getById($noteId);
-        abort_if($note === null, 404);
-
         try {
-            $guard->assertCanView($note, $clock->now());
+            $canView = $accessData->ensureCanView($noteId);
         } catch (DomainException $e) {
             abort(403, $e->getMessage());
         }
+
+        abort_if(! $canView, 404);
 
         $user = $request->user();
         $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;

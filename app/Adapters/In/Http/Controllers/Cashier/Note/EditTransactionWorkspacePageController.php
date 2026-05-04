@@ -6,8 +6,8 @@ namespace App\Adapters\In\Http\Controllers\Cashier\Note;
 
 use App\Application\Note\Services\EditTransactionWorkspacePageDataBuilder;
 use App\Application\Note\Services\EnsureInitialNoteRevisionExists;
+use App\Application\Note\Services\TransactionWorkspaceDraftData;
 use App\Core\Shared\Exceptions\DomainException;
-use App\Ports\Out\Note\TransactionWorkspaceDraftReaderPort;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,7 +18,7 @@ final class EditTransactionWorkspacePageController extends Controller
         string $noteId,
         Request $request,
         EditTransactionWorkspacePageDataBuilder $builder,
-        TransactionWorkspaceDraftReaderPort $drafts,
+        TransactionWorkspaceDraftData $draftData,
         EnsureInitialNoteRevisionExists $ensureInitialRevision,
     ): View {
         $actorId = $request->user()?->getAuthIdentifier();
@@ -38,7 +38,7 @@ final class EditTransactionWorkspacePageController extends Controller
 
         $page = $builder->build($noteId, $routeArea);
         $sessionHasOldInput = is_array($request->session()->get('_old_input', [])) && $request->session()->get('_old_input', []) !== [];
-        $draftPayload = $this->loadDraftPayload($request, $drafts, $noteId, $sessionHasOldInput);
+        $draftPayload = $this->loadDraftPayload($request, $draftData, $noteId, $sessionHasOldInput);
 
         $oldNote = old('note');
         $oldItems = old('items');
@@ -74,7 +74,7 @@ final class EditTransactionWorkspacePageController extends Controller
      */
     private function loadDraftPayload(
         Request $request,
-        TransactionWorkspaceDraftReaderPort $drafts,
+        TransactionWorkspaceDraftData $draftData,
         string $noteId,
         bool $sessionHasOldInput,
     ): array {
@@ -88,7 +88,7 @@ final class EditTransactionWorkspacePageController extends Controller
             return [];
         }
 
-        $draft = $drafts->findByActorAndWorkspaceKey((string) $actorId, 'edit:' . trim($noteId));
+        $draft = $draftData->findByActorAndWorkspaceKey((string) $actorId, 'edit:' . trim($noteId));
         $payload = $draft['payload'] ?? null;
 
         return is_array($payload) ? $payload : [];
