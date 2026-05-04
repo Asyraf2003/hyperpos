@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Application\Reporting\Exports;
 
 use App\Application\Reporting\Exports\Concerns\FormatsPdfReportValues;
-use Carbon\CarbonImmutable;
+use App\Ports\Out\ClockPort;
 
 final class PayrollReportPdfViewDataBuilder
 {
     use FormatsPdfReportValues;
+
+    public function __construct(
+        private readonly ClockPort $clock,
+    ) {
+    }
 
     public function build(array $dataset, array $filters): array
     {
@@ -24,7 +29,7 @@ final class PayrollReportPdfViewDataBuilder
                 $this->stringValue($filters['date_from'] ?? ''),
                 $this->stringValue($filters['date_to'] ?? ''),
             ),
-            'generatedAt' => CarbonImmutable::now()->format('d/m/Y H:i'),
+            'generatedAt' => $this->clock->now()->format('d/m/Y H:i'),
             'summaryItems' => $this->summaryItems($summary),
             'periodRows' => array_map(fn (array $row): array => $this->periodRowData($row), $periodRows),
             'modeRows' => array_map(fn (array $row): array => $this->modeRowData($row), $modeRows),

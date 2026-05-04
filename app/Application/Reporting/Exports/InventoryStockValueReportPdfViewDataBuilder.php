@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace App\Application\Reporting\Exports;
 
 use App\Application\Reporting\Exports\Concerns\FormatsPdfReportValues;
-use Carbon\CarbonImmutable;
+use App\Ports\Out\ClockPort;
 
 final class InventoryStockValueReportPdfViewDataBuilder
 {
     use FormatsPdfReportValues;
+
+    public function __construct(
+        private readonly ClockPort $clock,
+    ) {
+    }
 
     public function build(array $dataset, array $filters): array
     {
@@ -24,7 +29,7 @@ final class InventoryStockValueReportPdfViewDataBuilder
                 $this->stringValue($filters['date_to'] ?? ''),
             ),
             'referenceDateLabel' => $this->formatDate($this->stringValue($filters['reference_date'] ?? '')),
-            'generatedAt' => CarbonImmutable::now()->format('d/m/Y H:i'),
+            'generatedAt' => $this->clock->now()->format('d/m/Y H:i'),
             'summaryItems' => $this->summaryItems($summary),
             'movementRows' => array_map(fn (array $row): array => $this->movementRowData($row), $movementRows),
             'snapshotRows' => array_map(fn (array $row): array => $this->snapshotRowData($row), $snapshotRows),

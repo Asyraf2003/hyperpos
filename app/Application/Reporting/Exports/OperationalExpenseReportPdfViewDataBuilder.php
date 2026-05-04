@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Exports;
 
+use App\Ports\Out\ClockPort;
 use Carbon\CarbonImmutable;
 use Throwable;
 
 final class OperationalExpenseReportPdfViewDataBuilder
 {
+    public function __construct(
+        private readonly ClockPort $clock,
+    ) {
+    }
+
     public function build(array $dataset, array $filters): array
     {
         $summary = is_array($dataset['summary'] ?? null) ? $dataset['summary'] : [];
@@ -20,7 +26,7 @@ final class OperationalExpenseReportPdfViewDataBuilder
                 $this->stringValue($filters['date_from'] ?? ''),
                 $this->stringValue($filters['date_to'] ?? ''),
             ),
-            'generatedAt' => CarbonImmutable::now()->format('d/m/Y H:i'),
+            'generatedAt' => $this->clock->now()->format('d/m/Y H:i'),
             'summaryItems' => $this->summaryItems($summary),
             'rows' => array_map(fn (array $row): array => $this->rowData($row), $rows),
         ];
