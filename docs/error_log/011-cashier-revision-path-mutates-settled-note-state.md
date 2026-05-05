@@ -325,3 +325,24 @@ This is not the same root cause as #011.
 Both findings require the editability policy to be enforced in two places:
 1. UI visibility for normal navigation
 2. server-side guard for direct route access and mutation
+
+## Related Workspace Inline Payment Finding From Error Log 017
+
+### Related Error Log
+
+- 017-workspace-edit-payments-ignore-existing-note-payments.md
+
+### Update
+
+Update 4.
+
+### Reason
+
+A later audit report found a separate issue in workspace edit/payment behavior.
+
+This is not the same root cause as #011.
+
+- #011 is about missing payment-derived editability guard before cashier revision mutates settled note state.
+- #017 is about inline payments during workspace edit ignoring existing note payments.
+
+Both findings show workspace edit must account for existing financial state before mutation.

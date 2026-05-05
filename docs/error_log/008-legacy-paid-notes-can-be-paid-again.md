@@ -311,3 +311,24 @@ This is not the same root cause as #008.
 - #012 is about selected-row payment selection accepting canceled work item components.
 
 Both findings show that selected-row payment validation must use the correct settlement basis and must exclude non-payable inactive rows.
+
+## Related Existing-Payment Validation Finding From Error Log 017
+
+### Related Error Log
+
+- 017-workspace-edit-payments-ignore-existing-note-payments.md
+
+### Update
+
+Update 4.
+
+### Reason
+
+A later audit report found a separate High severity issue where a payment flow ignored existing note payments.
+
+This is not the same root cause as #008.
+
+- #008 is about selected-row payment validation ignoring legacy payment_allocations.
+- #017 is about workspace edit inline payment treating existing allocated totals as zero and resolving pay_full to the full note total.
+
+Both findings show that all payment entry paths must validate against existing allocated/outstanding balance, including legacy allocations when supported.

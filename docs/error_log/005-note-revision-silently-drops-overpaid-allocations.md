@@ -349,3 +349,24 @@ This is not the same root cause as #005.
 - #011 is about missing payment-derived editability guard before revision mutates settled note state.
 
 Both findings show that note revision must be protected by both correct payment replay semantics and strict editability policy.
+
+## Related Workspace Inline Payment Finding From Error Log 017
+
+### Related Error Log
+
+- 017-workspace-edit-payments-ignore-existing-note-payments.md
+
+### Update
+
+Update 7.
+
+### Reason
+
+A later audit report found a separate payment allocation issue in workspace edit inline payment.
+
+This is not the same root cause as #005.
+
+- #005 is about note revision replay silently dropping overpaid allocation during downward revision.
+- #017 is about workspace edit inline payment ignoring existing allocations and over-recording payment against the full note total.
+
+Both findings affect financial integrity during note edit/revision flows.
