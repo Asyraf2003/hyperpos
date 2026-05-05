@@ -332,3 +332,83 @@ This is not the same root cause as #008.
 - #017 is about workspace edit inline payment treating existing allocated totals as zero and resolving pay_full to the full note total.
 
 Both findings show that all payment entry paths must validate against existing allocated/outstanding balance, including legacy allocations when supported.
+
+## Update - Legacy inline payments ignored in row settlement
+
+This report is classified as an update to #008, not a new error-log file.
+
+## Update Status
+
+Open / regression risk.
+
+## Summary
+
+A later row-settlement path can still ignore legacy inline payments.
+
+`NoteOperationalRowSettlementProjector` now reads only component allocation readers:
+
+- `PaymentComponentAllocationReaderPort::listByNoteId()`
+- `RefundComponentAllocationReaderPort::listByNoteId()`
+
+However, `CreateTransactionWorkspaceInlinePaymentRecorder` still writes inline workspace payments as legacy `PaymentAllocation` records.
+
+This creates an incompatible mixed state:
+
+- note has legacy `payment_allocations`
+- note has no `payment_component_allocations`
+- row settlement projector reports zero allocated per row
+- selected-row payment resolver treats the row as fully outstanding
+- final payment handler also checks prior allocation through component-only totals
+- duplicate component allocation can be created on top of the existing legacy payment
+
+Example from report:
+
+A Rp100,000 note with Rp40,000 legacy inline partial payment can be treated as having Rp100,000 outstanding. A new selected-row payment of Rp100,000 can then be accepted, leaving combined legacy + component payment records at Rp140,000.
+
+## Additional Vulnerable Path
+
+Legacy inline payment exists
+-> inline payment is stored in `payment_allocations`
+-> no matching `payment_component_allocations`
+-> `NoteOperationalRowSettlementProjector` reads component allocations only
+-> row outstanding is inflated
+-> `SelectedNoteRowsPaymentAmountResolver` accepts excessive selected-row payment
+-> `RecordAndAllocateNotePaymentHandler` checks component-only prior allocation
+-> duplicate payment component allocation is persisted
+-> financial records overstate received payment
+
+## Additional Evidence
+
+Affected files from report:
+
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentRecorder.php`
+- `app/Application/Note/Services/NoteOperationalRowSettlementProjector.php`
+- `app/Application/Note/Services/SelectedNoteRowsPaymentAmountResolver.php`
+- `app/Application/Payment/UseCases/RecordAndAllocateNotePaymentHandler.php`
+
+## Required Fix Direction
+
+Do not rely on component-only allocation readers while legacy inline payments can still exist.
+
+The safe fix must choose one explicit direction:
+
+1. make the row settlement projector legacy-aware again, or
+2. migrate/write inline payments into component allocations, or
+3. provide a compatibility adapter that merges legacy allocation totals and component allocation totals without double-counting.
+
+The final handler policy check must also use the same legacy-aware allocated total, not a different component-only source.
+
+## Verification Required
+
+No patch was included in this report.
+
+Future verification must include a regression test for:
+
+- note total Rp100,000
+- legacy inline payment Rp40,000
+- no component allocations
+- selected-row outstanding must be Rp60,000, not Rp100,000
+- attempt to pay Rp100,000 must be rejected
+- combined legacy + component allocated total must never exceed note total unless an explicit overpayment workflow exists
+
+No progress increase because this is the same root cause cluster as #008.

@@ -266,3 +266,7 @@ Laporan #017 valid sebagai High severity financial-integrity issue.
 Bug sebelumnya memakai inline payment flow yang cocok untuk note baru pada note yang sedang diedit dan sudah punya pembayaran. Akibatnya payment bisa dicatat terhadap full note total, bukan outstanding balance.
 
 Patch minimal sudah tepat: amount resolver dan recorder sekarang membaca existing allocated total dan menggunakan outstanding sebagai dasar payment. Namun patch masih membutuhkan behavior test karena php -l hanya membuktikan sintaks, bukan settlement benar.
+
+## Related #008 update - Legacy inline payments ignored in row settlement
+
+This update is related to #017 through the existing-payment visibility problem. #017 covers workspace edit payments ignoring existing note payments, while the #008 update covers selected-row row settlement and payment allocation paths ignoring legacy inline `payment_allocations` when only component allocation readers are used.
