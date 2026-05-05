@@ -281,3 +281,47 @@ Laporan #011 valid sebagai High severity authorization/business-logic issue.
 Bug sebelumnya membuat cashier revision path hanya bergantung pada stored note_state lewat middleware, sementara payment-derived close/settled status tidak dicek di handler. Akibatnya note yang secara settlement tidak boleh diedit dapat dimutasi jika note_state masih open.
 
 Patch minimal sudah benar untuk root cause langsung: panggil EditableWorkspaceNoteGuard::assertEditable() sebelum root-note mutation. Namun patch ini harus dijaga agar tidak menghapus row-lock fix dari #010, dan masih butuh behavior test karena php -l hanya membuktikan sintaks, bukan policy benar-benar bekerja.
+
+## Related Note-State Mutation Finding From Error Log 013
+
+### Related Error Log
+
+- 013-forged-row-refund-can-auto-finalize-unpaid-notes.md
+
+### Update
+
+Update 2.
+
+### Reason
+
+A later audit report found a separate High severity note-state mutation issue.
+
+This is not the same root cause as #011.
+
+- #011 is about cashier revision mutating payment-derived settled notes because CreateNoteRevisionHandler missed EditableWorkspaceNoteGuard.
+- #013 is about selected-row refund auto-finalizing unpaid zero-total notes as refunded without recorded refund allocations.
+
+Both findings show note-state transitions must be based on explicit financial evidence, not just mutable row totals or stored state shortcuts.
+
+## Related Refunded-Note Edit Visibility Finding From Error Log 015
+
+### Related Error Log
+
+- 015-refunded-notes-expose-edit-workspace.md
+
+### Update
+
+Update 3.
+
+### Reason
+
+A later audit report found a separate editability issue.
+
+This is not the same root cause as #011.
+
+- #011 is about missing application-level EditableWorkspaceNoteGuard in CreateNoteRevisionHandler.
+- #015 is about the shared note detail view exposing an Edit button despite can_edit_workspace being false.
+
+Both findings require the editability policy to be enforced in two places:
+1. UI visibility for normal navigation
+2. server-side guard for direct route access and mutation

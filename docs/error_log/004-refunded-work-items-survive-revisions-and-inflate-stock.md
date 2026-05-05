@@ -313,3 +313,45 @@ This is not the same root cause as #004.
 - #009 is about cashier PATCH workspace update being allowed for closed notes because the route used view-only access instead of mutation guard.
 
 Both findings affect note revision and can impact work items, payment allocations, and inventory state.
+
+## Related Inactive Row Flow Finding From Error Log 012
+
+### Related Error Log
+
+- 012-canceled-note-rows-re-enter-payment-flows.md
+
+### Update
+
+Update 5.
+
+### Reason
+
+A later audit report found a separate issue caused by inactive rows re-entering operational flows.
+
+This is not the same root cause as #004.
+
+- #004 is about refunded/stale work_items surviving revision deletion and causing duplicate inventory reversal.
+- #012 is about canceled work_items being rehydrated into note->workItems() and entering payment/status correction flows.
+
+Both findings show that historical/inactive rows must not be treated as active operational rows without explicit filtering.
+
+## Related Refund Row Finalization Finding From Error Log 013
+
+### Related Error Log
+
+- 013-forged-row-refund-can-auto-finalize-unpaid-notes.md
+
+### Update
+
+Update 6.
+
+### Reason
+
+A later audit report found a separate issue in refund/cancellation flow that can affect financial and potentially inventory consistency.
+
+This is not the same root cause as #004.
+
+- #004 is about refunded/stale work_items surviving revision deletion and causing duplicate inventory reversal.
+- #013 is about forged selected-row refund canceling unpaid rows and auto-finalizing a zero-total note as refunded without recorded refund allocations.
+
+Both should be considered when auditing refund-related row lifecycle and inventory/accounting side effects.

@@ -290,3 +290,24 @@ This is not the same root cause as #008.
 - #010 is about lost updates between concurrent payment recording and note revision allocation rebuild.
 
 Both findings affect payment allocation integrity and prove payment state must be validated against the correct settlement basis and protected against unsafe interleavings.
+
+## Related Selected-Row Payment Finding From Error Log 012
+
+### Related Error Log
+
+- 012-canceled-note-rows-re-enter-payment-flows.md
+
+### Update
+
+Update 3.
+
+### Reason
+
+A later audit report found a separate High severity issue in selected-row payment allocation.
+
+This is not the same root cause as #008.
+
+- #008 is about selected-row payment validation ignoring legacy payment_allocations.
+- #012 is about selected-row payment selection accepting canceled work item components.
+
+Both findings show that selected-row payment validation must use the correct settlement basis and must exclude non-payable inactive rows.

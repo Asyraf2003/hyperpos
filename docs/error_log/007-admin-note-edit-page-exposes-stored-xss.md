@@ -287,3 +287,184 @@ This is not the same root cause as #007.
 - #009 is about cashier closed-note mutation through workspace update authorization regression.
 
 Both are workspace-surface security findings, but one is browser injection and the other is server-side authorization.
+
+## Related Workspace Edit Surface Finding From Error Log 015
+
+### Related Error Log
+
+- 015-refunded-notes-expose-edit-workspace.md
+
+### Update
+
+Update 3.
+
+### Reason
+
+A later audit report found a separate issue involving the note edit workspace surface.
+
+This is not the same root cause as #007.
+
+- #007 is about stored XSS in workspace JSON rendering.
+- #015 is about Edit button visibility for refunded notes.
+
+Both affect workspace exposure, but one is browser injection and the other is editability/navigation control.
+
+## Additional Stored XSS Data Flow From Product Labels
+
+### Update 4
+
+### Related Report Title
+
+Stored XSS via product labels in note edit config
+
+### Relationship Classification
+
+Same sink / same root cause / additional data source.
+
+This is not a new error log because it uses the same vulnerable workspace bootstrap sink already documented in #007:
+
+resources/views/cashier/notes/workspace/create.blade.php
+
+The original #007 flow used cashier-controlled note/service fields.
+
+This update adds another confirmed data source:
+
+- product catalog name
+- RevisionWorkspaceProductLineMapper
+- selected_label
+- oldItems
+- cashier note workspace JSON config
+
+Both flows end in the same unsafe raw JSON script block.
+
+### Summary
+
+A stored XSS data flow was introduced by adding product catalog labels to the note workspace edit config.
+
+Product names are accepted as strings and can contain HTML parser-breaking payloads such as:
+
+</script><script>...</script>
+
+Revision workspace mapping resolves the product and copies product->namaBarang() into selected_label.
+
+That selected_label is included in oldItems for:
+
+- product-only revision rows
+- service-with-store-stock revision rows
+
+The workspace Blade view embeds oldItems into:
+
+<script type="application/json">
+
+Before the patch, it used raw:
+
+{!! json_encode(..., JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+
+Because literal </script> is not escaped, the browser can terminate the JSON script block and execute attacker-controlled JavaScript in the victim's same-origin session.
+
+### Affected Data Flow
+
+1. Authenticated transaction-entry user creates or updates product name.
+2. Product name contains script-breaking payload.
+3. Note/revision includes that product as store-stock line.
+4. RevisionWorkspaceProductLineMapper reads current product name.
+5. Product name is copied into selected_label.
+6. Product-only or service-with-store-stock mapper includes selected_label in oldItems.
+7. Workspace view embeds oldItems into JSON script block.
+8. Raw json_encode with JSON_UNESCAPED_SLASHES leaves </script> dangerous.
+9. Victim opens note edit workspace.
+10. Injected script executes same-origin.
+
+### Files Mentioned By Report
+
+Product input:
+
+app/Adapters/In/Http/Requests/ProductCatalog/CreateProductRequest.php
+
+Product label mapping:
+
+app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceProductLineMapper.php
+app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceProductOnlyMapper.php
+app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceServiceStoreStockMapper.php
+
+Unsafe sink:
+
+resources/views/cashier/notes/workspace/create.blade.php
+
+Product route surface:
+
+routes/web/product_catalog.php
+
+### Patch Summary
+
+Patch applied to:
+
+resources/views/cashier/notes/workspace/create.blade.php
+
+Change:
+
+- replaced raw `{!! json_encode(...) !!}` output with Blade `@json(...)`
+- removed unsafe JSON_UNESCAPED_SLASHES usage from the script block
+- preserved existing config payload structure and keys
+
+Reported commit message:
+
+Fix workspace config JSON embedding to prevent script breakout
+
+Reported testing:
+
+- php -l resources/views/cashier/notes/workspace/create.blade.php
+- git status --short
+- git add resources/views/cashier/notes/workspace/create.blade.php && git commit -m "Fix workspace config JSON embedding to prevent script breakout"
+
+### Verification Gap
+
+Only syntax validation was reported.
+
+Missing proof:
+
+- product name containing </script><script> no longer appears literally in rendered workspace config
+- oldItems selected_label is safely escaped
+- note/service field XSS flow from earlier #007 remains fixed
+- admin and cashier edit workspace both use the safe rendering
+- no other `{!! json_encode(...) !!}` script sinks remain in workspace views
+
+### Important Merge Note
+
+Earlier #007 patch used JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, and JSON_HEX_QUOT on json_encode.
+
+This update reports a patch using Blade @json.
+
+Both approaches aim to fix the same sink. Final branch should use one safe approach consistently and must not reintroduce:
+
+JSON_UNESCAPED_SLASHES
+
+inside script blocks containing user-controlled data.
+
+### Recommended Follow-up
+
+Run focused XSS rendering tests for both data sources:
+
+1. note/customer/service field payload:
+   </script><script>alert(1)</script>
+
+2. product name selected_label payload:
+   </script><script>alert(1)</script>
+
+Expected result:
+
+- raw breakout string is not present
+- safe escaped form is present
+- no extra executable script element is created
+
+Recommended audit command:
+
+grep -R "{!! json_encode" -n resources/views
+grep -R "JSON_UNESCAPED_SLASHES" -n resources/views
+grep -R "type=\"application/json\"" -n resources/views
+
+### Conclusion
+
+This update strengthens #007 by confirming the same unsafe workspace JSON sink was reachable from product catalog labels, not only note/service fields.
+
+The root problem remains unsafe JSON embedding in an HTML script context. The correct fix is safe JSON rendering via @json, Js::from, or JSON_HEX_* flags, plus regression tests proving literal </script> cannot appear in rendered workspace config.

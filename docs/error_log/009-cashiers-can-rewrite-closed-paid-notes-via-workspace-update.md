@@ -296,3 +296,24 @@ This is not the same root cause as #009.
 - #011 is about CreateNoteRevisionHandler missing EditableWorkspaceNoteGuard, allowing mutation of payment-derived settled notes whose stored note_state is still open.
 
 Both findings must be considered together. Cashier workspace revision requires both route-level mutation guard and application-level editability guard.
+
+## Related Refunded-Note Edit Visibility Finding From Error Log 015
+
+### Related Error Log
+
+- 015-refunded-notes-expose-edit-workspace.md
+
+### Update
+
+Update 4.
+
+### Reason
+
+A later audit report found a separate issue in the note workspace editability surface.
+
+This is not the same root cause as #009.
+
+- #009 is about server-side cashier workspace update authorization for closed notes.
+- #015 is about UI rendering an Edit button for refunded notes because can_edit_workspace was not checked.
+
+Both findings must be considered together. UI visibility should match editability flags, but server-side mutation guards remain mandatory.
