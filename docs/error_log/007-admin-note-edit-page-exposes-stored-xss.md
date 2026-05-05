@@ -476,3 +476,85 @@ The root problem remains unsafe JSON embedding in an HTML script context. The co
 ## Related #025 - Reflected javascript URL in product return link
 
 #025 is related to the broader XSS/output-context cluster. #007 covers stored XSS through workspace JSON config, while #025 covers reflected click-triggered XSS through an untrusted `href` URL.
+
+## Update - Script-breaking XSS in cashier workspace config JSON
+
+This report is classified as an update to #007, not a new error-log file.
+
+## Update Status
+
+Patched.
+
+## Summary
+
+The same workspace JSON script sink was reported again with additional cashier workspace evidence.
+
+`resources/views/cashier/notes/workspace/create.blade.php` rendered `cashier-note-workspace-config` inside:
+
+`<script type="application/json">`
+
+using raw Blade output and `json_encode(...)` with:
+
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
+
+Because `JSON_UNESCAPED_SLASHES` keeps `</script>` literal, attacker-controlled values can terminate the JSON script block and inject executable JavaScript.
+
+## Additional Data Sources
+
+The affected config includes:
+
+- `oldNote`
+- `oldInlinePayment`
+- `oldItems`
+- `defaultCustomerName`
+- other workspace config values
+
+Reported attacker-controlled paths:
+
+- `old('note')`
+- `old('inline_payment')`
+- stored note fields from edit workspace, including `customer_name` and `customer_phone`
+
+## Additional Vulnerable Path
+
+Authenticated cashier submits script-breaking payload
+-> payload stored in note/customer fields or returned through old input
+-> workspace page renders `oldNote` / `oldInlinePayment`
+-> raw JSON script block preserves `</script>`
+-> browser closes JSON script early
+-> injected script executes in another cashier/admin browser session
+-> same-origin cashier/admin actions become possible with victim session
+
+## Patch Variant
+
+The reported fix changes the JSON flags in:
+
+`resources/views/cashier/notes/workspace/create.blade.php`
+
+from:
+
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
+
+to:
+
+`JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`
+
+This keeps Unicode behavior while making the JSON safe for script context.
+
+## Verification
+
+Reported successful check:
+
+`php -l resources/views/cashier/notes/workspace/create.blade.php`
+
+Reported commit:
+
+`2dc1e2b`
+
+## Merge Safety Note
+
+Final branch must keep script-safe JSON encoding for every workspace JSON block.
+
+Do not reintroduce `JSON_UNESCAPED_SLASHES` inside `<script>` context unless combined with the required `JSON_HEX_*` flags or replaced with a framework helper that is safe for this context.
+
+No progress increase because this is the same root cause and same workspace JSON sink cluster as #007.
