@@ -558,3 +558,82 @@ Final branch must keep script-safe JSON encoding for every workspace JSON block.
 Do not reintroduce `JSON_UNESCAPED_SLASHES` inside `<script>` context unless combined with the required `JSON_HEX_*` flags or replaced with a framework helper that is safe for this context.
 
 No progress increase because this is the same root cause and same workspace JSON sink cluster as #007.
+
+## Update - Stored XSS via new cashier note edit route
+
+This report is classified as an update to #007, not a new error-log file.
+
+## Update Status
+
+Patched.
+
+## Summary
+
+A later report confirmed another reachable path into the same workspace JSON script sink.
+
+The new cashier edit route made `EditTransactionWorkspacePageController` reachable for authenticated cashier-area users. That controller renders the shared workspace view with data from `EditTransactionWorkspacePageDataBuilder`.
+
+The builder copied persisted note and work-item strings into `workspaceConfigJson`, then encoded the config with:
+
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
+
+The view rendered that value with raw Blade output inside:
+
+`<script type="application/json">`
+
+Because `JSON_UNESCAPED_SLASHES` keeps `</script>` literal and the sink used raw output, stored values could terminate the JSON script block and execute JavaScript.
+
+## Additional Data Sources
+
+Reported stored fields that can reach the sink:
+
+- `note.customer_name`
+- `items.*.service.name`
+- `items.*.external_purchase_lines.0.label`
+
+These values were validated as strings, but not encoded for script context before entering the JSON sink.
+
+## Additional Vulnerable Path
+
+Authenticated cashier stores script-breaking text
+-> value persists in note/work-item fields
+-> another cashier or admin opens `/cashier/notes/{noteId}/workspace/edit`
+-> edit route reaches `EditTransactionWorkspacePageController`
+-> `EditTransactionWorkspacePageDataBuilder` builds `workspaceConfigJson`
+-> raw JSON script block preserves `</script>`
+-> browser creates executable script element
+-> injected JavaScript runs with victim session and same-origin access
+
+## Patch Variant
+
+The reported fix changes `json_encode` flags in:
+
+`app/Application/Note/Services/EditTransactionWorkspacePageDataBuilder.php`
+
+from:
+
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
+
+to:
+
+`JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`
+
+This prevents `</script>` style breakout while preserving the existing config structure for frontend parsing.
+
+## Verification
+
+Reported successful check:
+
+`php -l app/Application/Note/Services/EditTransactionWorkspacePageDataBuilder.php`
+
+Reported commit:
+
+`Fix workspace JSON script escaping for edit page`
+
+## Merge Safety Note
+
+Final branch must keep script-safe JSON encoding for every workspace JSON sink.
+
+Do not emit `workspaceConfigJson` or equivalent config through raw Blade output unless the JSON was encoded with script-safe flags or a framework helper safe for this context.
+
+No progress increase because this is the same root cause and same stored XSS workspace JSON sink cluster as #007.
