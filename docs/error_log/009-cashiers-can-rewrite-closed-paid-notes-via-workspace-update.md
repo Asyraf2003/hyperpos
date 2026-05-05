@@ -342,3 +342,7 @@ Both findings show cashier mutation guards must deny all terminal note states, n
 ## Related #019 - Cashiers can list historical closed notes by date
 
 #019 is an indirect cashier access-boundary relation. #009 concerns unauthorized mutation through workspace update, while #019 concerns read-only disclosure of historical closed notes through the cashier table endpoint using a client-controlled date anchor and `openOnly=false`.
+
+## Related #020 - Admin note actions bypass transaction capability
+
+#020 is related through note mutation authorization. #009 covers cashier workspace mutation bypass for closed paid notes, while #020 covers admin payment/refund/row/workspace mutation routes missing the transaction-entry capability gate.

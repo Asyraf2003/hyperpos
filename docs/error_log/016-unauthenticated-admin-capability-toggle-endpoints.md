@@ -286,3 +286,7 @@ Laporan #016 valid sebagai High severity identity/access authorization issue.
 Bug sebelumnya membuat privileged admin transaction capability toggle endpoint reachable tanpa auth/admin authorization dan mempercayai performed_by_actor_id dari client. Ini merusak capability state dan audit integrity.
 
 Patch minimal sudah tepat untuk root cause langsung: route dilindungi auth + admin.page, dan performer audit diambil dari authenticated session. Namun test belum terbukti pass karena dependency environment belum tersedia, jadi status tetap patched with verification gap.
+
+## Related #020 - Admin note actions bypass transaction capability
+
+#020 is directly related to the identity/access capability authorization cluster. #016 covers unauthenticated capability toggle endpoints, while #020 covers admin note mutation routes that bypass the `transaction.entry` / `EnsureTransactionEntryAllowed` gate after an admin is authenticated.
