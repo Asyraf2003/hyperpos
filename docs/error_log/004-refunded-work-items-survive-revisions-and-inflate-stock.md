@@ -250,3 +250,45 @@ Laporan #004 valid sebagai High severity inventory/financial integrity issue.
 Patch minimal di ReverseIssuedInventoryOperation tepat untuk menghentikan repeated inventory/costing inflation dari duplicate reversal. Namun patch ini belum sepenuhnya membuktikan penyelesaian terhadap akar workflow yang lebih luas: refund-referenced work_items masih dapat survive deletion dan mungkin tetap terlihat sebagai active note rows.
 
 Jadi status terbaik untuk saat ini adalah patched for duplicate reversal, not fully closed for stale work item lifecycle.
+
+## Related Note Revision Finding From Error Log 005
+
+### Related Error Log
+
+- 005-note-revision-silently-drops-overpaid-allocations.md
+
+### Update
+
+Update 2.
+
+### Reason
+
+A later audit report found a separate issue in the note revision lifecycle.
+
+This is not the same root cause as #004.
+
+- #004 is about stale refunded work_items surviving revision deletion and causing duplicate inventory reversal.
+- #005 is about payment allocation replay silently dropping overpaid excess during downward note revision.
+
+Both should be considered when auditing note revision because one affects inventory integrity and the other affects financial/payment integrity.
+
+## Related Store-Stock Revision Finding From Error Log 006
+
+### Related Error Log
+
+- 006-client-controlled-price-basis-bypasses-minimum-price-checks.md
+
+### Update
+
+Update 3.
+
+### Reason
+
+A later audit report found a separate issue affecting store-stock lines during note revision.
+
+This is not the same root cause as #004.
+
+- #004 is about duplicate inventory reversal caused by stale refunded work_items.
+- #006 is about underpriced store-stock line creation caused by client-controlled price_basis bypassing minimum price checks.
+
+Both affect store-stock/inventory integrity during note revision and should be considered together in future revision-flow audits.

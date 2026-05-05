@@ -412,3 +412,24 @@ This is not the same root cause as #003.
 - #004 is an inventory integrity issue caused by refund-referenced work_items surviving revision deletion and being processed repeatedly by inventory reversal.
 
 Both findings should be considered together when changing note revision, refund preservation, payment allocation replay, or inventory reversal logic.
+
+## Related Payment Replay Finding From Error Log 005
+
+### Related Error Log
+
+- 005-note-revision-silently-drops-overpaid-allocations.md
+
+### Update
+
+Update 4.
+
+### Reason
+
+A later audit report found a separate High severity issue in the same NoteReplacementPaymentAllocationReconciler / note revision payment replay area.
+
+This is not the same root cause as #003.
+
+- #003 is about revised notes with historical refunds being misclassified as underpaid because refund can be subtracted twice.
+- #005 is about downward note revisions silently truncating captured payment replay and hiding overpaid excess from allocation-based refund/reporting paths.
+
+Future changes to NoteReplacementPaymentAllocationReconciler must account for both cases.
