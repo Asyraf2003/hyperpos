@@ -18,12 +18,8 @@ final class DatabasePaymentAllocationReaderAdapter implements PaymentAllocationR
             ->where('note_id', $normalizedNoteId)
             ->sum('allocated_amount_rupiah');
 
-        $componentRefundTotal = (int) DB::table('refund_component_allocations')
-            ->where('note_id', $normalizedNoteId)
-            ->sum('refunded_amount_rupiah');
-
-        if ($componentTotal > 0 || $componentRefundTotal > 0) {
-            return Money::fromInt($componentTotal + $componentRefundTotal);
+        if ($componentTotal > 0) {
+            return Money::fromInt($componentTotal);
         }
 
         $legacyTotal = (int) DB::table('payment_allocations')
