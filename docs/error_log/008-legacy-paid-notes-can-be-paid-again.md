@@ -412,3 +412,96 @@ Future verification must include a regression test for:
 - combined legacy + component allocated total must never exceed note total unless an explicit overpayment workflow exists
 
 No progress increase because this is the same root cause cluster as #008.
+
+## Update - Mixed payment allocations enable overpayment
+
+This report is classified as an update to #008, not a new error-log file.
+
+## Update Status
+
+Patched, with verification gap.
+
+## Summary
+
+A later report confirmed the same payment-allocation source-of-truth problem in a broader form.
+
+The system partially migrated payment recording from legacy `payment_allocations` to `payment_component_allocations`, but not all writers, readers, and reports were updated consistently.
+
+Affected behavior:
+
+- `CreateTransactionWorkspaceInlinePaymentRecorder` still writes legacy `payment_allocations`.
+- `RecordAndAllocateNotePaymentHandler` validates against and writes `payment_component_allocations`.
+- `DatabasePaymentComponentAllocationReaderAdapter` previously read component totals only.
+- `DatabasePaymentAllocationReaderAdapter` previously returned component total when component total was greater than zero, hiding legacy allocation totals.
+- transaction summary reporting still read legacy `payment_allocations` only.
+- cash ledger reporting still read legacy `payment_allocations` only.
+
+This allowed a note already paid through the legacy inline path to receive another payment through the component-allocation path.
+
+## Vulnerable Path
+
+Legacy inline payment is recorded
+-> row exists in `payment_allocations`
+-> selected/manual payment is submitted later
+-> `RecordAndAllocateNotePaymentHandler` checks component allocations only
+-> legacy payment is ignored
+-> new `payment_component_allocations` are written
+-> combined legacy + component allocations can exceed note total
+-> compatibility reader and reports may hide one side of the data
+-> financial records, outstanding display, reconciliation, and reports become inconsistent
+
+## Patch Summary
+
+The reported patch unifies note-level allocation totals across legacy and component tables.
+
+Changed files:
+
+- `app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php`
+- `app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php`
+- `app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php`
+- `app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php`
+
+Patch behavior:
+
+- component allocation reader now includes legacy `payment_allocations` in note-level allocated totals.
+- compatibility allocation reader now returns `componentTotal + legacyTotal`.
+- transaction summary cash-payment totals now include both legacy and component allocation rows.
+- cash ledger payment rows now union component allocation payment events with legacy allocation payment events.
+
+Reported commit:
+
+`73c7fa9 - Fix mixed payment allocation totals across readers and reports`
+
+## Verification
+
+Reported successful syntax checks:
+
+- `php -l app/Adapters/Out/Payment/DatabasePaymentComponentAllocationReaderAdapter.php`
+- `php -l app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php`
+- `php -l app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php`
+- `php -l app/Adapters/Out/Reporting/Queries/TransactionCashLedgerPaymentRowsQuery.php`
+
+## Verification Gap
+
+No end-to-end Laravel feature test result was included.
+
+Future verification must prove:
+
+- note total Rp100,000
+- legacy inline payment Rp40,000
+- component payment attempt Rp100,000 is rejected
+- component payment attempt Rp60,000 is accepted only when outstanding is Rp60,000
+- compatibility reader returns legacy + component totals
+- transaction summary includes component-only payments
+- cash ledger includes component-only payment rows
+- no report double-counts the same payment when both allocation tables contain rows for the same note
+
+## Residual Risk
+
+This patch intentionally sums legacy and component tables. That is safe only if the two tables represent distinct allocation records.
+
+If a future migration backfills component allocations from legacy rows without marking migrated legacy rows or preventing duplicate semantic rows, summing both tables can double-count migrated payments.
+
+Any migration must define a clear cutover or idempotent compatibility strategy.
+
+No progress increase because this is the same root cause cluster as #008.

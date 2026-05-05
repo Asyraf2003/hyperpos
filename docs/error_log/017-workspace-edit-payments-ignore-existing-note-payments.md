@@ -270,3 +270,7 @@ Patch minimal sudah tepat: amount resolver dan recorder sekarang membaca existin
 ## Related #008 update - Legacy inline payments ignored in row settlement
 
 This update is related to #017 through the existing-payment visibility problem. #017 covers workspace edit payments ignoring existing note payments, while the #008 update covers selected-row row settlement and payment allocation paths ignoring legacy inline `payment_allocations` when only component allocation readers are used.
+
+## Related #008 update - Mixed payment allocations enable overpayment
+
+This update is related to #017 through existing-payment visibility. #017 covers workspace edit payments ignoring existing note payments. The #008 mixed-allocation update covers the broader allocation source-of-truth split where legacy `payment_allocations` and component `payment_component_allocations` were not consistently summed across validation, readers, and reports.
