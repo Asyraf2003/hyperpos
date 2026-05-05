@@ -82,3 +82,45 @@ Directly related to #016 as part of the identity/access capability authorization
 #020 covers admin note mutation routes bypassing the transaction-entry capability gate.
 
 Related to #009, #011, and #017 because those reports also involve note mutation paths where authorization and settlement safety must be enforced before executing payment/revision/workspace changes.
+
+## Update - Duplicate report from commit a78999d
+
+This report is classified as an update to #020, not a new error-log file.
+
+The root cause is identical: four state-changing admin note routes were exposed under `admin/notes` without `EnsureTransactionEntryAllowed` / `transaction.entry`.
+
+Affected routes:
+
+- `admin.notes.refunds.store`
+- `admin.notes.payments.store`
+- `admin.notes.rows.store`
+- `admin.notes.workspace.update`
+
+Additional evidence in this report confirms the impact through the reached controllers/use cases:
+
+- `RecordNotePaymentController` records and allocates note payments once reached.
+- `RecordClosedNoteRefundController` records customer refunds once reached.
+- `AddNoteRowsController` mutates note rows once reached.
+- `UpdateTransactionWorkspaceHandler` changes note header, items, and totals once reached.
+
+Additional policy evidence:
+
+- `AdminPageAccessPolicy` only checks whether the actor is an admin.
+- `TransactionEntryPolicy` separately denies inactive admin transaction capability.
+- Because the vulnerable admin routes skipped the transaction-entry gate, that denial policy was not reached.
+
+Patch variant:
+
+The reported fix wraps only the four admin mutation routes in:
+
+`Route::middleware(EnsureTransactionEntryAllowed::class)->group(...)`
+
+Admin read-only routes remain outside that middleware group.
+
+Reported verification:
+
+- `php -l routes/web/note.php`
+- `git status --short`
+- `git commit -m "Protect admin note mutation routes with transaction-entry middleware"`
+
+No progress increase because this is the same root cause and same target file as #020.
