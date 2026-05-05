@@ -284,3 +284,7 @@ This is not the same root cause as #014.
 - #018 is about preventing refunded notes from being mutated after full refund.
 
 Both are required for safe refund lifecycle enforcement.
+
+## Related #021 - Refunds can be recorded on open notes
+
+#021 is a direct follow-up in the refund endpoint policy cluster. #014 covers selected rows that are open/unpaid being accepted by refund validation. #021 covers selected rows that are close but belong to a parent `Nota` that is still open. The safe invariant is that refund mutation requires whole-note close status, not only selected-row close status.

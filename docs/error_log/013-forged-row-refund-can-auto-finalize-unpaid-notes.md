@@ -314,3 +314,7 @@ This is not the same root cause as #013.
 - #018 is about already-refunded notes bypassing cashier closed-note guards and becoming mutable.
 
 Together, refund lifecycle must be safe both when entering refunded state and after the note is in refunded state.
+
+## Related #021 - Refunds can be recorded on open notes
+
+#021 is related through refund lifecycle integrity. #013 covers invalid selected-row refund behavior that can affect note finalization, while #021 covers refund mutation being allowed before the parent `Nota` is operationally close.

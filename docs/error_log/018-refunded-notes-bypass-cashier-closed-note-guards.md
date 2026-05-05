@@ -282,3 +282,7 @@ Patch minimal sudah tepat: refunded sekarang ditolak oleh cashier mutation guard
 ## Related #019 - Cashiers can list historical closed notes by date
 
 #019 is related through cashier access-boundary enforcement. #018 covers refunded terminal-state mutation/addability guards, while #019 covers historical closed-note disclosure through the cashier history table when a client-controlled date anchor is accepted.
+
+## Related #021 - Refunds can be recorded on open notes
+
+#021 is related through refund lifecycle state boundaries. #018 covers refunded terminal notes becoming mutable again, while #021 covers refunds being recorded before the parent `Nota` reaches operational close status.
