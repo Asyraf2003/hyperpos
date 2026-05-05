@@ -346,3 +346,24 @@ This is not the same root cause as #011.
 - #017 is about inline payments during workspace edit ignoring existing note payments.
 
 Both findings show workspace edit must account for existing financial state before mutation.
+
+## Related Refunded-State Terminal Guard Finding From Error Log 018
+
+### Related Error Log
+
+- 018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+### Update
+
+Update 5.
+
+### Reason
+
+A later audit report found another note editability guard issue.
+
+This is not the same root cause as #011.
+
+- #011 is about payment-derived settled notes mutating because CreateNoteRevisionHandler missed EditableWorkspaceNoteGuard.
+- #018 is about refunded notes mutating because route/addability guards did not treat refunded as terminal.
+
+Both findings require note editability policy to account for both settlement-derived and explicit lifecycle terminal states.

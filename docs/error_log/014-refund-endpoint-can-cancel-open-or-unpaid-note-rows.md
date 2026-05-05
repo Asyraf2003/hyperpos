@@ -263,3 +263,24 @@ Laporan #014 valid sebagai High severity financial/work-item integrity issue.
 Bug sebelumnya membuat refund endpoint menerima open/unpaid rows dan membatalkannya, sehingga active note total bisa turun tanpa refund yang valid. Patch #013 hanya menahan auto-finalization, tetapi belum menutup akar validasi row refund.
 
 Patch #014 mengarah benar karena mengembalikan invariant: hanya row operationally close yang boleh masuk selected-row refund flow. Namun test belum terbukti pass karena dependency environment belum tersedia.
+
+## Related Refunded-State Terminal Guard Finding From Error Log 018
+
+### Related Error Log
+
+- 018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+### Update
+
+Update 2.
+
+### Reason
+
+A later audit report found a separate issue in refunded-note lifecycle enforcement.
+
+This is not the same root cause as #014.
+
+- #014 is about preventing open/unpaid rows from entering refund/cancel flow.
+- #018 is about preventing refunded notes from being mutated after full refund.
+
+Both are required for safe refund lifecycle enforcement.

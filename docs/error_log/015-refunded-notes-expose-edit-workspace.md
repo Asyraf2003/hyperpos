@@ -254,3 +254,24 @@ grep -R "can_edit_workspace" -n app resources/views
 Laporan #015 valid sebagai High severity UI exposure issue only if paired with reachable edit/mutation behavior.
 
 Patch minimal sudah benar untuk UI root cause: Edit button kembali dibungkus can_edit_workspace. Namun keamanan final tidak boleh bergantung pada tombol yang disembunyikan. Server-side guards dari #009 dan #011 tetap wajib menjadi sumber proteksi sebenarnya.
+
+## Related Server-Side Refunded Guard Finding From Error Log 018
+
+### Related Error Log
+
+- 018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+### Update
+
+Update 2.
+
+### Reason
+
+A later audit report found a directly related but separate refunded-note editability issue.
+
+This is not the same root cause as #015.
+
+- #015 is about UI exposing the Edit button for refunded notes.
+- #018 is about server-side cashier mutation guard and addability policy failing to treat refunded notes as terminal.
+
+Both fixes are required. UI must hide edit navigation, and server-side guards must reject direct mutation requests.

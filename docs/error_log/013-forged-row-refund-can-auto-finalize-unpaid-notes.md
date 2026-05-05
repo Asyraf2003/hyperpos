@@ -293,3 +293,24 @@ This is not the same root cause as #013.
 - #015 is about refunded notes exposing the workspace Edit button through normal UI navigation.
 
 Both should be considered when auditing refunded note state transitions and editability.
+
+## Related Refunded-State Terminal Guard Finding From Error Log 018
+
+### Related Error Log
+
+- 018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+### Update
+
+Update 4.
+
+### Reason
+
+A later audit report found a separate issue after notes enter refunded lifecycle state.
+
+This is not the same root cause as #013.
+
+- #013 is about auto-finalizing notes as refunded without recorded refund allocations.
+- #018 is about already-refunded notes bypassing cashier closed-note guards and becoming mutable.
+
+Together, refund lifecycle must be safe both when entering refunded state and after the note is in refunded state.

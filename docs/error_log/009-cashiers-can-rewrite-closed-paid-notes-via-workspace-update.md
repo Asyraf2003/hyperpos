@@ -317,3 +317,24 @@ This is not the same root cause as #009.
 - #015 is about UI rendering an Edit button for refunded notes because can_edit_workspace was not checked.
 
 Both findings must be considered together. UI visibility should match editability flags, but server-side mutation guards remain mandatory.
+
+## Related Refunded-State Guard Finding From Error Log 018
+
+### Related Error Log
+
+- 018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+### Update
+
+Update 5.
+
+### Reason
+
+A later audit report found a separate High severity issue in cashier note mutation guards.
+
+This is not the same root cause as #009.
+
+- #009 is about closed notes being mutable because workspace.update was routed through view-only access.
+- #018 is about refunded notes being mutable because guard logic only rejected isClosed() and did not reject isRefunded().
+
+Both findings show cashier mutation guards must deny all terminal note states, not only one route/state combination.
