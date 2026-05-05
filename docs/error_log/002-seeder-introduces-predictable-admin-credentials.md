@@ -302,3 +302,48 @@ Deployment proof is still required to determine real-world exposure:
 - whether login throttling, MFA, or account disablement exists outside the inspected source
 
 No progress increase because this is the same root cause and same target file as #002.
+
+## Related report: Seeder now resets admin credentials to a known password
+
+Classification: update existing #002, not a new unique error-log file.
+
+Severity: High.
+
+Introduced commit: fbfabf9.
+
+Patch report commit: e3a685e.
+
+Summary:
+The default seeded credential issue already existed, but this report documents a worse repeatable credential-reset behavior. `UserSeeder` used `updateOrCreate()` for `admin@gmail.com` and `kasir@gmail.com`, so rerunning the seeder overwrote existing account passwords with the hardcoded value `12345678`.
+
+Because `DatabaseSeeder` invokes `UserSeeder` by default, any operator running `php artisan db:seed` for ordinary setup, deployment, or unrelated seed data could unintentionally reset privileged account credentials. The same seeder also upserts role/access state for the seeded users, including admin role, cashier role, and admin cashier-area access.
+
+Impact:
+After a production-like seed run, an unauthenticated attacker who knows or guesses the seeded email/password pair could authenticate through the normal login flow as admin or cashier. This creates high-impact account takeover risk for POS/back-office data and workflow integrity.
+
+Attack path:
+Operator runs `DatabaseSeeder` or `UserSeeder` against a production-like database -> `UserSeeder` resets existing seeded account password hashes to known value -> role/access rows are upserted -> public login accepts known credentials -> authenticated admin/cashier session is created -> protected application areas become reachable through normal role/capability middleware.
+
+Affected files:
+- `database/seeders/DatabaseSeeder.php`
+- `database/seeders/UserSeeder.php`
+
+Controls present:
+- Login uses Laravel web/session authentication.
+- Admin/cashier routes still require authenticated role/capability middleware.
+- The attacker cannot trigger the seeder directly through the reviewed HTTP surface.
+
+Controls missing:
+- No production-environment guard around default credential seeding.
+- No separation between local/dev seeders and production-safe seeders.
+- No prevention of default seeded credentials in production-like databases before the reported patch.
+- No observed login throttling in the report context.
+
+Patch status from report:
+A patch was reported under commit `e3a685e` changing both seeded user creation calls from `updateOrCreate()` to `firstOrCreate()`. This preserves initial seed creation behavior while preventing repeat seed runs from overwriting existing admin/cashier passwords.
+
+Residual risk:
+The patch prevents repeat credential reset for existing accounts, but initial creation of known default credentials remains an operational risk if local/dev seeders are run against production-like environments. Production seed workflows should avoid hardcoded privileged credentials entirely, or require explicit non-production guards.
+
+Verification gap:
+This session has not independently verified the local repository diff or runtime behavior. Treat patch status as report-derived until `git status --short`, `git diff`, and relevant test output are provided.
