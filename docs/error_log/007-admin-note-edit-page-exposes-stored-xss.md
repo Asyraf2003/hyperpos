@@ -4,7 +4,7 @@
 
 Patched, with verification gap.
 
-Patch supplied and regression test added, but the focused test could not run in the patch environment because vendor/autoload.php was missing.
+Patch disediakan dan regression test ditambahkan, tetapi focused test tidak dapat berjalan di environment patch karena vendor/autoload.php tidak ada.
 
 ## Severity
 
@@ -231,9 +231,9 @@ missing vendor/autoload.php
 
 ## Verification Gap
 
-Regression test exists but did not pass in the patch environment.
+Regression test sudah ada, tetapi belum pass di environment patch.
 
-Therefore this patch should be treated as source-fixed but not fully behavior-verified until the test runs successfully.
+Karena itu, patch ini harus diperlakukan sebagai source-fixed tetapi belum terverifikasi penuh secara behavior sampai test berhasil dijalankan.
 
 Missing proof:
 
@@ -257,7 +257,7 @@ Search for other raw JSON script sinks:
 grep -R "{!! json_encode" -n resources/views
 grep -R "type=\"application/json\"" -n resources/views
 
-Any raw JSON script sink that includes user-controlled data should use Js::from or JSON_HEX_* flags.
+Setiap raw JSON script sink yang memuat data user-controlled harus memakai Js::from atau flag JSON_HEX_*.
 
 ## Kesimpulan
 
@@ -281,7 +281,7 @@ Update 2.
 
 A later audit report found a separate High severity issue in the note workspace surface.
 
-This is not the same root cause as #007.
+Ini bukan root cause yang sama dengan #007.
 
 - #007 is about stored XSS in the admin workspace rendering path.
 - #009 is about cashier closed-note mutation through workspace update authorization regression.
@@ -302,7 +302,7 @@ Update 3.
 
 A later audit report found a separate issue involving the note edit workspace surface.
 
-This is not the same root cause as #007.
+Ini bukan root cause yang sama dengan #007.
 
 - #007 is about stored XSS in workspace JSON rendering.
 - #015 is about Edit button visibility for refunded notes.
@@ -319,9 +319,9 @@ Stored XSS via product labels in note edit config
 
 ### Relationship Classification
 
-Same sink / same root cause / additional data source.
+Sink sama / root cause sama / sumber data tambahan.
 
-This is not a new error log because it uses the same vulnerable workspace bootstrap sink already documented in #007:
+Ini bukan error log baru karena memakai workspace bootstrap sink vulnerable yang sama dan sudah didokumentasikan di #007:
 
 resources/views/cashier/notes/workspace/create.blade.php
 
@@ -335,7 +335,7 @@ This update adds another confirmed data source:
 - oldItems
 - cashier note workspace JSON config
 
-Both flows end in the same unsafe raw JSON script block.
+Kedua flow berakhir di raw JSON script block yang sama-sama tidak aman.
 
 ### Summary
 
@@ -360,7 +360,7 @@ Before the patch, it used raw:
 
 {!! json_encode(..., JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
 
-Because literal </script> is not escaped, the browser can terminate the JSON script block and execute attacker-controlled JavaScript in the victim's same-origin session.
+Karena literal </script> tidak di-escape, browser dapat menutup JSON script block dan menjalankan JavaScript yang dikendalikan attacker di sesi same-origin korban.
 
 ### Affected Data Flow
 
@@ -433,9 +433,9 @@ Missing proof:
 
 Earlier #007 patch used JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, and JSON_HEX_QUOT on json_encode.
 
-This update reports a patch using Blade @json.
+Update ini melaporkan patch yang memakai Blade @json.
 
-Both approaches aim to fix the same sink. Final branch should use one safe approach consistently and must not reintroduce:
+Kedua pendekatan bertujuan memperbaiki sink yang sama. Final branch harus memakai satu pendekatan aman secara konsisten dan tidak boleh mengembalikan:
 
 JSON_UNESCAPED_SLASHES
 
@@ -463,11 +463,11 @@ grep -R "{!! json_encode" -n resources/views
 grep -R "JSON_UNESCAPED_SLASHES" -n resources/views
 grep -R "type=\"application/json\"" -n resources/views
 
-### Conclusion
+### Kesimpulan
 
-This update strengthens #007 by confirming the same unsafe workspace JSON sink was reachable from product catalog labels, not only note/service fields.
+Update ini memperkuat #007 dengan mengonfirmasi bahwa titik output JSON workspace yang sama juga dapat dijangkau dari label product catalog, bukan hanya dari field note/service.
 
-The root problem remains unsafe JSON embedding in an HTML script context. The correct fix is safe JSON rendering via @json, Js::from, or JSON_HEX_* flags, plus regression tests proving literal </script> cannot appear in rendered workspace config.
+Akar masalahnya tetap sama: JSON yang tidak aman dimasukkan ke konteks HTML script. Fix yang benar adalah render JSON secara aman memakai @json, Js::from, atau flag JSON_HEX_*, ditambah regression test yang membuktikan literal </script> tidak dapat muncul di konfigurasi workspace yang dirender.
 
 ## Related #024 - Reflected XSS in expense create JSON config
 
@@ -479,7 +479,7 @@ The root problem remains unsafe JSON embedding in an HTML script context. The co
 
 ## Update - Script-breaking XSS in cashier workspace config JSON
 
-This report is classified as an update to #007, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #007, bukan file error-log baru.
 
 ## Update Status
 
@@ -487,7 +487,7 @@ Patched.
 
 ## Summary
 
-The same workspace JSON script sink was reported again with additional cashier workspace evidence.
+Workspace JSON script sink yang sama dilaporkan lagi dengan bukti tambahan dari cashier workspace.
 
 `resources/views/cashier/notes/workspace/create.blade.php` rendered `cashier-note-workspace-config` inside:
 
@@ -527,7 +527,7 @@ Authenticated cashier submits script-breaking payload
 
 ## Patch Variant
 
-The reported fix changes the JSON flags in:
+Fix yang dilaporkan mengubah flag JSON di:
 
 `resources/views/cashier/notes/workspace/create.blade.php`
 
@@ -539,7 +539,7 @@ to:
 
 `JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`
 
-This keeps Unicode behavior while making the JSON safe for script context.
+Ini mempertahankan perilaku Unicode sambil membuat JSON aman untuk konteks script.
 
 ## Verification
 
@@ -555,13 +555,13 @@ Reported commit:
 
 Final branch must keep script-safe JSON encoding for every workspace JSON block.
 
-Do not reintroduce `JSON_UNESCAPED_SLASHES` inside `<script>` context unless combined with the required `JSON_HEX_*` flags or replaced with a framework helper that is safe for this context.
+Jangan mengembalikan `JSON_UNESCAPED_SLASHES` di dalam konteks `<script>` kecuali digabung dengan flag `JSON_HEX_*` yang wajib, atau diganti dengan framework helper yang aman untuk konteks ini.
 
-No progress increase because this is the same root cause and same workspace JSON sink cluster as #007.
+Tidak ada kenaikan progress karena ini root cause yang sama dan cluster workspace JSON sink yang sama dengan #007.
 
 ## Update - Stored XSS via new cashier note edit route
 
-This report is classified as an update to #007, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #007, bukan file error-log baru.
 
 ## Update Status
 
@@ -569,29 +569,29 @@ Patched.
 
 ## Summary
 
-A later report confirmed another reachable path into the same workspace JSON script sink.
+Laporan lanjutan mengonfirmasi jalur reachable lain menuju workspace JSON script sink yang sama.
 
-The new cashier edit route made `EditTransactionWorkspacePageController` reachable for authenticated cashier-area users. That controller renders the shared workspace view with data from `EditTransactionWorkspacePageDataBuilder`.
+Route edit kasir baru membuat `EditTransactionWorkspacePageController` reachable untuk user terautentikasi dengan akses cashier-area. Controller tersebut merender shared workspace view dengan data dari `EditTransactionWorkspacePageDataBuilder`.
 
-The builder copied persisted note and work-item strings into `workspaceConfigJson`, then encoded the config with:
+Builder menyalin string note dan work-item yang tersimpan ke `workspaceConfigJson`, lalu meng-encode config dengan:
 
 `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
 
-The view rendered that value with raw Blade output inside:
+View merender nilai tersebut memakai raw Blade output di dalam:
 
 `<script type="application/json">`
 
-Because `JSON_UNESCAPED_SLASHES` keeps `</script>` literal and the sink used raw output, stored values could terminate the JSON script block and execute JavaScript.
+Karena `JSON_UNESCAPED_SLASHES` mempertahankan literal `</script>` dan sink memakai raw output, nilai tersimpan dapat menutup JSON script block dan menjalankan JavaScript.
 
 ## Additional Data Sources
 
-Reported stored fields that can reach the sink:
+Field tersimpan yang dilaporkan dapat mencapai sink:
 
 - `note.customer_name`
 - `items.*.service.name`
 - `items.*.external_purchase_lines.0.label`
 
-These values were validated as strings, but not encoded for script context before entering the JSON sink.
+Nilai-nilai ini divalidasi sebagai string, tetapi tidak di-encode untuk konteks script sebelum masuk ke JSON sink.
 
 ## Additional Vulnerable Path
 
@@ -618,7 +618,7 @@ to:
 
 `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`
 
-This prevents `</script>` style breakout while preserving the existing config structure for frontend parsing.
+Ini mencegah breakout bergaya `</script>` sambil mempertahankan struktur config existing untuk parsing frontend.
 
 ## Verification
 
@@ -634,6 +634,6 @@ Reported commit:
 
 Final branch must keep script-safe JSON encoding for every workspace JSON sink.
 
-Do not emit `workspaceConfigJson` or equivalent config through raw Blade output unless the JSON was encoded with script-safe flags or a framework helper safe for this context.
+Jangan emit `workspaceConfigJson` atau config sejenis melalui raw Blade output kecuali JSON sudah di-encode dengan flag script-safe atau framework helper yang aman untuk konteks ini.
 
-No progress increase because this is the same root cause and same stored XSS workspace JSON sink cluster as #007.
+Tidak ada kenaikan progress karena ini root cause yang sama dan cluster stored XSS workspace JSON sink yang sama dengan #007.

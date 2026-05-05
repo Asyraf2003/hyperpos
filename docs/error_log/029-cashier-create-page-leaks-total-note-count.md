@@ -1,28 +1,28 @@
-# 029 - Cashier create page leaks total note count
+# 029 - Halaman create kasir membocorkan total jumlah nota
 
-Status: reported
-Severity: Medium
-Classification: new unique error-log file
-Introduced commit: 69cf998
-Patch status: not provided in this report
+Status: dilaporkan
+Keparahan: Medium
+Klasifikasi: file error-log unik baru
+Commit introduksi: 69cf998
+Status patch: belum disediakan pada laporan ini
 
-## Summary
+## Ringkasan
 
-The cashier create transaction workspace page leaks the global total note count through the generated default customer name.
+Halaman create transaction workspace kasir membocorkan total jumlah nota global melalui default customer name yang dihasilkan.
 
-`CreateTransactionWorkspacePageController` calls `CreateTransactionWorkspacePageDataBuilder::build()` and reads `defaultCustomerName`. The builder derives that value as `Pelanggan no ` plus `NoteReaderPort::countAll() + 1`.
+`CreateTransactionWorkspacePageController` memanggil `CreateTransactionWorkspacePageDataBuilder::build()` dan membaca `defaultCustomerName`. Builder membuat nilai tersebut sebagai `Pelanggan no ` ditambah `NoteReaderPort::countAll() + 1`.
 
-The production note reader adapter implements `countAll()` as an unrestricted count over the entire `notes` table. That value is then rendered to the cashier-visible create workspace page as the default customer name or placeholder, and is also available through page configuration data.
+Adapter note reader produksi mengimplementasikan `countAll()` sebagai hitung tanpa scope atas seluruh tabel `notes`. Nilai itu kemudian dirender ke halaman create workspace yang terlihat oleh kasir sebagai default customer name atau placeholder, dan juga tersedia melalui data konfigurasi halaman.
 
-Cashier note browsing is otherwise date-windowed, so exposing the unrestricted global note count crosses the intended cashier visibility boundary and leaks business-volume metadata.
+Browsing nota kasir di tempat lain dibatasi oleh window tanggal. Karena itu, mengekspos total jumlah nota global melewati batas visibilitas kasir yang seharusnya dan membocorkan metadata volume bisnis.
 
-## Why this is new
+## Kenapa ini file baru
 
-This is not the same issue as the historical closed note disclosure report. That issue exposes historical note rows through cashier-accessible browsing behavior.
+Ini bukan masalah yang sama dengan laporan historical closed note disclosure. Laporan tersebut mengekspos baris nota historis melalui perilaku browsing yang dapat diakses kasir.
 
-This issue exposes aggregate global note volume through the cashier create page default customer label. The leaked value is not a note row, but it still reveals business-volume metadata outside the cashier's normal date-windowed visibility.
+Masalah ini mengekspos volume nota global berbentuk aggregate melalui default customer label di halaman create kasir. Nilai yang bocor bukan baris nota, tetapi tetap membocorkan metadata volume bisnis di luar visibilitas date-windowed normal kasir.
 
-## Affected files
+## File terdampak
 
 - `app/Adapters/In/Http/Controllers/Cashier/Note/CreateTransactionWorkspacePageController.php`
 - `app/Application/Note/Services/CreateTransactionWorkspacePageDataBuilder.php`
@@ -30,69 +30,68 @@ This issue exposes aggregate global note volume through the cashier create page 
 - `app/Adapters/Out/Note/Queries/CashierNoteHistoryBaseQuery.php`
 - `resources/views/cashier/notes/workspace/partials/info-card.blade.php`
 
-## Evidence
+## Bukti
 
-`CreateTransactionWorkspacePageController` calls the page data builder and uses `defaultCustomerName` when there is no old input or draft customer name override.
+`CreateTransactionWorkspacePageController` memanggil page data builder dan memakai `defaultCustomerName` ketika tidak ada old input atau draft customer name yang menimpa nilai default.
 
-`CreateTransactionWorkspacePageDataBuilder::build()` creates:
+`CreateTransactionWorkspacePageDataBuilder::build()` membuat:
 
-- `defaultCustomerName` = `Pelanggan no ` plus `NoteReaderPort::countAll() + 1`
+- `defaultCustomerName` = `Pelanggan no ` ditambah `NoteReaderPort::countAll() + 1`
 
-`DatabaseNoteReaderAdapter::countAll()` performs an unrestricted `notes` table count.
+`DatabaseNoteReaderAdapter::countAll()` menjalankan count tanpa scope atas seluruh tabel `notes`.
 
-`CashierNoteHistoryBaseQuery` restricts cashier history visibility to a selected date window, showing that unrestricted lifetime note count is broader than ordinary cashier note visibility.
+`CashierNoteHistoryBaseQuery` membatasi visibilitas history kasir ke window tanggal terpilih, sehingga count lifetime tanpa scope lebih luas daripada visibilitas nota kasir biasa.
 
-The Blade workspace info card renders the derived default customer name into the cashier-visible create page.
+Blade workspace info card merender default customer name yang berasal dari count tersebut ke halaman create yang terlihat oleh kasir.
 
-## Attack path
+## Jalur serangan
 
-Authenticated cashier session -> open create transaction workspace -> controller calls page data builder -> builder calls unrestricted note count -> database adapter counts all notes -> page renders `Pelanggan no {global_count + 1}` -> cashier infers global lifetime note count or business volume metadata.
+Sesi kasir terautentikasi -> buka create transaction workspace -> controller memanggil page data builder -> builder memanggil count nota tanpa scope -> adapter database menghitung semua nota -> halaman merender `Pelanggan no {global_count + 1}` -> kasir dapat menyimpulkan total lifetime nota atau metadata volume bisnis.
 
-## Impact
+## Dampak
 
-A cashier can infer the global number of notes or transactions, including records outside the normal cashier date window.
+Kasir dapat menyimpulkan jumlah global nota atau transaksi, termasuk record di luar window tanggal normal kasir.
 
-The impact is medium because this leaks aggregate business-volume metadata but does not expose full note contents, customer PII, credentials, payment details, inventory data, or write capability.
+Dampaknya medium karena ini membocorkan metadata aggregate volume bisnis, tetapi tidak membocorkan isi lengkap nota, PII pelanggan, kredensial, detail pembayaran, data inventory, atau kemampuan write.
 
-## Preconditions
+## Prasyarat
 
-- The Laravel web application serves the cashier note workspace route.
-- The actor has an authenticated cashier-capable session.
-- The actor can access the create transaction workspace.
-- No old input or draft customer name overrides the generated default value.
-- Global note count is considered business-sensitive metadata not intended for cashier-wide visibility.
+- Aplikasi web Laravel menyajikan route cashier note workspace.
+- Actor memiliki sesi terautentikasi dengan akses kasir.
+- Actor dapat mengakses create transaction workspace.
+- Tidak ada old input atau draft customer name yang menimpa nilai default.
+- Total jumlah nota global dianggap metadata bisnis sensitif yang tidak dimaksudkan terlihat oleh semua kasir.
 
-## Controls present
+## Kontrol yang sudah ada
 
-- Route requires Laravel session authentication.
-- Cashier area access middleware applies.
-- Transaction entry middleware applies.
-- Cashier history queries are date-windowed.
-- Blade output escaping reduces script injection risk but does not prevent metadata disclosure.
+- Route membutuhkan autentikasi session Laravel.
+- Middleware cashier area access berlaku.
+- Middleware transaction entry berlaku.
+- Query history kasir dibatasi window tanggal.
+- Escaping output Blade mengurangi risiko script injection, tetapi tidak mencegah disclosure metadata.
 
-## Controls missing
+## Kontrol yang hilang
 
-- `countAll()` is unrestricted and not scoped to cashier visibility.
-- Default customer naming depends on global note table volume.
-- The create page exposes a global aggregate that is broader than cashier history scope.
-- No separate non-sensitive sequence source is used for cashier-facing placeholder labels.
+- `countAll()` tidak memiliki scope sesuai visibilitas kasir.
+- Default customer name bergantung pada volume tabel nota global.
+- Halaman create mengekspos aggregate global yang lebih luas daripada scope history kasir.
+- Tidak ada sumber sequence non-sensitif terpisah untuk placeholder label yang terlihat oleh kasir.
 
-## Recommended fix
+## Rekomendasi fix
 
-Do not derive cashier-facing default customer names from unrestricted global note count.
+Jangan menurunkan default customer name yang terlihat oleh kasir dari total jumlah nota global tanpa scope.
 
-Use one of these safer approaches:
+Gunakan salah satu pendekatan yang lebih aman:
 
-1. Use a neutral placeholder such as `Pelanggan baru`.
-2. Use a per-session or per-draft temporary label that is not tied to persistent global count.
-3. Use a cashier-scoped/day-scoped counter if operationally required.
-4. Generate the final note number only after creation, and show it only to actors allowed to view that note.
+1. Pakai placeholder netral seperti `Pelanggan baru`.
+2. Pakai label sementara berbasis sesi atau draft yang tidak terkait dengan count global persistent.
+3. Pakai counter yang di-scope per kasir atau per hari jika memang dibutuhkan operasional.
+4. Generate nomor nota final hanya setelah nota dibuat, dan tampilkan hanya kepada actor yang memang boleh melihat nota tersebut.
 
-If a count is required, expose only a scoped count aligned with the cashier's authorized visibility window.
+Jika count memang dibutuhkan, expose hanya count yang sesuai dengan scope visibilitas kasir yang diizinkan.
 
-## Verification gap
+## Gap verifikasi
 
-This session has not independently verified the local repository diff or runtime behavior. Treat this entry as report-derived until `git status --short`, `git diff`, and relevant test output are provided.
+Sesi ini belum memverifikasi diff repository lokal atau perilaku runtime secara independen. Perlakukan entry ini sebagai berbasis laporan sampai `git status --short`, `git diff`, dan output test relevan disediakan.
 
-The report states that full Laravel HTTP execution was not performed because dependencies/vendor were unavailable. That means runtime HTTP coverage is not proven in this session.
-
+Laporan menyatakan full Laravel HTTP execution tidak dilakukan karena dependencies/vendor tidak tersedia. Artinya runtime HTTP coverage belum terbukti pada sesi ini.

@@ -54,7 +54,7 @@ Reported test attempt:
 
 Result:
 
-Failed because `vendor/autoload.php` was not present in the environment.
+Gagal karena `vendor/autoload.php` tidak tersedia di environment.
 
 ## Verification gap
 
@@ -75,8 +75,8 @@ Direct follow-up to #021.
 
 #022 covers missing cashier note-access guard on the refund route.
 
-Related to #019 because #019 covers cashier historical closed note disclosure through the table route, while #022 covers unauthorized refund mutation against closed/historical notes if identifiers are known.
+Terkait dengan #019 karena #019 membahas disclosure closed note historis melalui route tabel kasir, sedangkan #022 membahas mutasi refund unauthorized terhadap nota closed/historis jika identifier diketahui.
 
-Related to #014 because both issues are in the refund endpoint policy cluster.
+Terkait dengan #014 karena kedua masalah berada di cluster policy endpoint refund.
 
 Related to #018 because refund lifecycle state must remain protected by cashier closed-note and terminal-state guards.

@@ -160,7 +160,7 @@ Create a characterization test for:
 - expected outstanding = 10.000
 - expected note is not treated as fully paid after active refund
 
-This test should lock the settlement behavior so the same bug does not return later wearing a different hat, as bugs annoyingly enjoy doing.
+Test ini harus mengunci perilaku settlement agar bug yang sama tidak kembali lagi dengan bentuk berbeda, karena bug memang punya hobi menyebalkan seperti itu.
 
 ## Related Follow-up Discovered Later
 
@@ -176,9 +176,9 @@ Update 2.
 
 A later audit report found a directly related but non-identical edge case in the same settlement area.
 
-The patch for #001 removed refund_component_allocations from note-level allocated total to prevent active refunds from being counted as paid. Report #003 shows that this behavior can undercount revised notes where NoteReplacementPaymentAllocationReconciler has already rebuilt payment_component_allocations net-of-refund while historical refund_component_allocations remain.
+Patch untuk #001 menghapus refund_component_allocations dari allocated total level nota agar active refund tidak ikut dihitung sebagai paid. Laporan #003 menunjukkan bahwa perilaku ini dapat meng-under-count revised notes ketika NoteReplacementPaymentAllocationReconciler sudah membangun ulang payment_component_allocations net-of-refund sementara historical refund_component_allocations masih tersisa.
 
-This means #001 and #003 must be considered together before future settlement changes. A valid fix must preserve correct behavior for both:
+Artinya #001 dan #003 harus dipertimbangkan bersama sebelum perubahan settlement berikutnya. Fix yang valid harus mempertahankan behavior yang benar untuk keduanya:
 
 1. active refund normal notes
 2. revised notes with historical refunds already consumed during replacement/reconciliation
@@ -199,11 +199,11 @@ Update 3.
 
 A later patch for #003 re-added refund_component_allocations into DatabasePaymentAllocationReaderAdapter::getTotalAllocatedAmountByNoteId() to restore gross allocation basis for revised notes with historical refunds.
 
-This is directly relevant to #001 because #001 was originally caused by active refunds being added into allocated totals and then subtracted again, making active refunds ineffective.
+Ini relevan langsung dengan #001 karena #001 awalnya disebabkan active refund ikut ditambahkan ke allocated totals lalu dikurangi lagi, sehingga active refund menjadi tidak efektif.
 
 Future verification must prove both:
 
 1. active refunds on normal notes reduce net paid/outstanding correctly
 2. historical refunds on revised notes are not double-subtracted
 
-If both are not tested, the fix may only move the settlement bug between #001 and #003.
+Jika keduanya tidak dites, fix hanya mungkin memindahkan bug settlement antara #001 dan #003.

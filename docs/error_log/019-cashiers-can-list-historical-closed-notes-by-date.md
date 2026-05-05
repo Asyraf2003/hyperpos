@@ -10,9 +10,9 @@ High.
 
 ## Summary
 
-The cashier note history table accepted a client-controlled `date` query parameter and used it as the anchor date for the two-day cashier history window. Because `/cashier/notes/table` was protected only by cashier-area and transaction-entry middleware, and was not inside the `EnsureCashierNoteAccess` per-note date-window guard, an authenticated cashier could query arbitrary historical windows.
+Tabel cashier note history menerima query parameter `date` yang dikendalikan client dan memakainya sebagai anchor date untuk window history dua hari. Karena `/cashier/notes/table` hanya dilindungi middleware cashier-area dan transaction-entry, serta tidak berada di dalam guard per-nota `EnsureCashierNoteAccess`, kasir terautentikasi dapat melakukan query ke window historis arbitrary.
 
-The issue became higher impact after the cashier history query changed from `openOnly=true` to `openOnly=false`. With `openOnly=false`, the shared note history rows query no longer filtered `notes.note_state = open`, so closed historical notes were returned.
+Dampak masalah ini meningkat setelah query cashier history berubah dari `openOnly=true` menjadi `openOnly=false`. Dengan `openOnly=false`, shared note history rows query tidak lagi memfilter `notes.note_state = open`, sehingga nota historis yang sudah closed ikut dikembalikan.
 
 The JSON table response disclosed sensitive cashier-facing note data, including note IDs, transaction dates, customer labels/names/phones, grand totals, paid totals, outstanding totals, line summary counts, payment labels, work labels, and action URLs.
 
@@ -33,13 +33,13 @@ Authenticated cashier session
 
 The table endpoint treated a client-supplied date as a trusted anchor for cashier history retrieval.
 
-The endpoint also relied on broad cashier/transaction middleware instead of enforcing the intended cashier today/yesterday access boundary at the query level.
+Endpoint ini juga bergantung pada middleware cashier/transaction yang terlalu luas, bukan menegakkan batas akses kasir today/yesterday langsung di level query.
 
-The change from `openOnly=true` to `openOnly=false` expanded the leak from open historical notes to closed historical notes.
+Perubahan dari `openOnly=true` ke `openOnly=false` memperluas leak dari nota historis open menjadi nota historis closed.
 
 ## Patch Summary
 
-`app/Adapters/Out/Note/Queries/CashierNoteHistoryCriteria.php` was changed so the cashier history anchor date always uses the server's current date.
+`app/Adapters/Out/Note/Queries/CashierNoteHistoryCriteria.php` diubah agar anchor date cashier history selalu memakai tanggal saat ini dari server.
 
 Client-supplied `date` input is no longer used to choose the query window.
 
@@ -47,7 +47,7 @@ A regression test was added in:
 
 `tests/Feature/Note/CashierNoteHistoryTableClosurePolicyFeatureTest.php`
 
-The test passes an arbitrary historical date (`2025-01-15`) and asserts that the query still returns only today/yesterday notes while excluding older notes.
+Test mengirim tanggal historis arbitrary (`2025-01-15`) dan memastikan query tetap hanya mengembalikan nota today/yesterday sambil mengecualikan nota yang lebih lama.
 
 ## Verification
 
@@ -57,13 +57,13 @@ Attempted:
 
 Result:
 
-Failed in the reported environment because `vendor/autoload.php` is missing and dependencies are not installed.
+Gagal di environment yang dilaporkan karena `vendor/autoload.php` tidak ada dan dependencies belum terpasang.
 
 ## Verification Gap
 
-The patch is source-level reviewed from the submitted report and patch summary, but the regression test is not proven passing in this environment.
+Patch sudah direview pada level source dari laporan dan patch summary yang dikirim, tetapi regression test belum terbukti pass di environment ini.
 
-A future verification run must install dependencies or run in the project environment, then execute:
+Verifikasi berikutnya harus memasang dependencies atau dijalankan di environment project, lalu menjalankan:
 
 `php artisan test --filter=CashierNoteHistoryTableClosurePolicyFeatureTest`
 
@@ -77,7 +77,7 @@ to confirm route middleware ordering and guard placement.
 
 Related to #009, #011, #015, and #018 as part of the cashier access-boundary cluster.
 
-Different from those reports because this issue is read-only historical data disclosure through the cashier table endpoint, not mutation/edit/refund workspace authorization.
+Berbeda dari laporan tersebut karena masalah ini adalah disclosure data historis read-only melalui endpoint tabel kasir, bukan authorization untuk mutation/edit/refund workspace.
 
 Related to #018 because both involve cashier access logic around closed/refunded note boundaries, but #019 specifically concerns date-window enumeration and closed historical note listing.
 

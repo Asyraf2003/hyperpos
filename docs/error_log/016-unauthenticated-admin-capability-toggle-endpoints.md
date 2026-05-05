@@ -235,7 +235,7 @@ Failed due to missing vendor/autoload.php / dependencies not installed.
 
 ## Verification Gap
 
-Tests were updated but did not pass in the patch environment.
+Test sudah diupdate, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -301,7 +301,7 @@ The #002 update remains indirectly related to the identity/access cluster. #002 
 
 ## Related report: Unauthenticated admin capability toggle routes
 
-Classification: update existing #016, not a new unique error-log file.
+Klasifikasi: update existing #016, bukan file error-log unik baru.
 
 Severity: High.
 

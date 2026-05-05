@@ -226,7 +226,7 @@ Warning/failure because vendor/autoload.php not present.
 
 ## Verification Gap
 
-Regression test was added but did not pass in the patch environment.
+Regression test sudah ditambahkan, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -284,7 +284,7 @@ Update 2.
 
 A later audit report found a separate High severity payment allocation issue.
 
-This is not the same root cause as #008.
+Ini bukan root cause yang sama dengan #008.
 
 - #008 is about selected-row payment validation ignoring legacy payment_allocations.
 - #010 is about lost updates between concurrent payment recording and note revision allocation rebuild.
@@ -305,7 +305,7 @@ Update 3.
 
 A later audit report found a separate High severity issue in selected-row payment allocation.
 
-This is not the same root cause as #008.
+Ini bukan root cause yang sama dengan #008.
 
 - #008 is about selected-row payment validation ignoring legacy payment_allocations.
 - #012 is about selected-row payment selection accepting canceled work item components.
@@ -326,7 +326,7 @@ Update 4.
 
 A later audit report found a separate High severity issue where a payment flow ignored existing note payments.
 
-This is not the same root cause as #008.
+Ini bukan root cause yang sama dengan #008.
 
 - #008 is about selected-row payment validation ignoring legacy payment_allocations.
 - #017 is about workspace edit inline payment treating existing allocated totals as zero and resolving pay_full to the full note total.
@@ -335,7 +335,7 @@ Both findings show that all payment entry paths must validate against existing a
 
 ## Update - Legacy inline payments ignored in row settlement
 
-This report is classified as an update to #008, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #008, bukan file error-log baru.
 
 ## Update Status
 
@@ -415,7 +415,7 @@ No progress increase because this is the same root cause cluster as #008.
 
 ## Update - Mixed payment allocations enable overpayment
 
-This report is classified as an update to #008, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #008, bukan file error-log baru.
 
 ## Update Status
 
@@ -452,7 +452,7 @@ Legacy inline payment is recorded
 
 ## Patch Summary
 
-The reported patch unifies note-level allocation totals across legacy and component tables.
+Patch yang dilaporkan menyatukan total allocation level nota di tabel legacy dan component.
 
 Changed files:
 

@@ -241,7 +241,7 @@ Failed because vendor/autoload.php not present.
 
 ## Verification Gap
 
-Tests were added but did not pass in the patch environment.
+Test sudah ditambahkan, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -294,7 +294,7 @@ Update 2.
 
 A later audit report found a separate High severity issue in selected-row refund/cancellation behavior.
 
-This is not the same root cause as #012.
+Ini bukan root cause yang sama dengan #012.
 
 - #012 is about canceled work_items re-entering payment and status correction flows.
 - #013 is about open/unpaid selected rows entering refund flow, being canceled, and triggering note refund finalization when active total reaches zero.
@@ -315,7 +315,7 @@ Update 3.
 
 A later audit report found a separate row-state validation issue.
 
-This is not the same root cause as #012.
+Ini bukan root cause yang sama dengan #012.
 
 - #012 is about canceled rows re-entering payment/status flows.
 - #014 is about open/unpaid rows entering selected-row refund/cancel flow.

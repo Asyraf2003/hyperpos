@@ -194,7 +194,7 @@ Reported diff size:
 
 ## Verification Gap
 
-Only PHP syntax validation and commit flow were reported.
+Hanya validasi syntax PHP dan alur commit yang dilaporkan.
 
 Missing proof:
 
@@ -264,7 +264,7 @@ Update 2.
 
 A later audit report fixed the residual validation weakness noted in #013.
 
-This is not the same root cause as #013, but it is a direct follow-up.
+Ini bukan root cause yang sama dengan #013, tetapi merupakan follow-up langsung.
 
 - #013 fixed the auto-finalization consequence by requiring allocation_count > 0 before finalization.
 - #014 fixes the earlier resolver precondition by rejecting open/unpaid rows before they enter refund/cancel flow.
@@ -287,7 +287,7 @@ Update 3.
 
 A later audit report found a separate issue involving refunded-note lifecycle.
 
-This is not the same root cause as #013.
+Ini bukan root cause yang sama dengan #013.
 
 - #013 is about refund finalization being triggered without recorded refund allocations.
 - #015 is about refunded notes exposing the workspace Edit button through normal UI navigation.
@@ -308,7 +308,7 @@ Update 4.
 
 A later audit report found a separate issue after notes enter refunded lifecycle state.
 
-This is not the same root cause as #013.
+Ini bukan root cause yang sama dengan #013.
 
 - #013 is about auto-finalizing notes as refunded without recorded refund allocations.
 - #018 is about already-refunded notes bypassing cashier closed-note guards and becoming mutable.

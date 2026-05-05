@@ -220,7 +220,7 @@ Reported diff size:
 
 ## Verification Gap
 
-The patch is source-level plausible, but concurrency behavior is not fully proven by passing tests.
+Patch ini masuk akal pada level source, tetapi behavior concurrency belum terbukti lewat test yang pass.
 
 Missing proof:
 
@@ -295,7 +295,7 @@ Update 2.
 
 A later audit report patched the same CreateNoteRevisionHandler file for a separate issue.
 
-This is not the same root cause as #010.
+Ini bukan root cause yang sama dengan #010.
 
 - #010 is about missing serialization between note revision and payment recording, fixed by getByIdForUpdate().
 - #011 is about missing payment-derived editability guard, fixed by EditableWorkspaceNoteGuard::assertEditable().

@@ -99,4 +99,4 @@ Related to #016 as part of identity/access capability authorization.
 
 #016 covers unauthenticated admin capability toggle endpoints, while #027 covers a privileged business mutation route missing the capability gate.
 
-Related to #023 only indirectly through procurement proof/storage surfaces, but the root cause is different. #027 is authorization on supplier invoice mutation, not public storage exposure.
+Terkait dengan #023 hanya secara tidak langsung melalui surface procurement proof/storage, tetapi root cause berbeda. #027 adalah authorization pada mutasi supplier invoice, bukan exposure public storage.

@@ -4,7 +4,7 @@
 
 Patched, with verification gap.
 
-Patch supplied and syntax check passed, but no focused feature/regression test was reported as passing.
+Patch disediakan dan syntax check pass, tetapi tidak ada focused feature/regression test yang dilaporkan pass.
 
 ## Severity
 
@@ -213,7 +213,7 @@ No passing feature/regression test was reported for:
 - refund option still accurate after failed revision
 - reporting not undercounting committed payment data
 
-Therefore this patch should be treated as source-fixed but not fully behavior-verified.
+Karena itu, patch ini harus diperlakukan sebagai source-fixed tetapi belum terverifikasi penuh secara behavior.
 
 ## Recommended Follow-up
 
@@ -235,7 +235,7 @@ Recommended command later:
 
 php artisan test --filter=NoteReplacementPaymentAllocationReconciler
 
-If no test exists, add one before treating this class as safe.
+Jika test belum ada, tambahkan test sebelum class ini dianggap aman.
 
 ## Kesimpulan
 
@@ -257,14 +257,14 @@ Update 2.
 
 ### Reason
 
-A later audit report found a separate High severity issue in the same note workspace revision flow.
+Laporan audit lanjutan menemukan issue terpisah dengan severity High pada note workspace revision flow yang sama.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about payment allocation replay silently dropping overpaid excess during downward revision.
 - #006 is about client-controlled price_basis bypassing MinSellingPricePolicy during store-stock line materialization.
 
-Future changes to note revision must verify both payment replay integrity and price floor enforcement.
+Perubahan berikutnya pada note revision harus memverifikasi payment replay integrity dan price floor enforcement sekaligus.
 
 ## Related Payment Allocation Finding From Error Log 008
 
@@ -278,14 +278,14 @@ Update 3.
 
 ### Reason
 
-A later audit report found a separate High severity payment allocation issue.
+Laporan audit lanjutan menemukan issue payment allocation terpisah dengan severity High.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about note revision replay silently truncating captured payments and hiding overpaid excess.
 - #008 is about selected-row payment validation ignoring legacy payment_allocations and allowing duplicate payment for legacy-paid notes.
 
-Both findings show that payment validation must use the correct settlement basis and must not silently ignore existing payment state.
+Kedua temuan menunjukkan bahwa payment validation harus memakai settlement basis yang benar dan tidak boleh diam-diam mengabaikan existing payment state.
 
 ## Related Closed-Note Authorization Finding From Error Log 009
 
@@ -299,14 +299,14 @@ Update 4.
 
 ### Reason
 
-A later audit report found a separate High severity authorization issue in the note revision flow.
+Laporan audit lanjutan menemukan issue authorization terpisah dengan severity High pada note revision flow.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about payment replay silently dropping overpaid allocation during downward revision.
 - #009 is about cashier access control allowing closed-note workspace PATCH mutation.
 
-Both findings show that note revision must be guarded both financially and authorization-wise.
+Kedua temuan menunjukkan bahwa note revision harus dijaga baik secara financial maupun authorization.
 
 ## Related Concurrency Finding From Error Log 010
 
@@ -320,14 +320,14 @@ Update 5.
 
 ### Reason
 
-A later audit report found a separate High severity issue in the note revision payment allocation area.
+Laporan audit lanjutan menemukan issue terpisah dengan severity High pada area note revision payment allocation.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about downward revision replay truncating payment amounts and hiding overpaid excess.
 - #010 is about concurrent payment allocation being lost during revision capture/delete/rebuild due to missing serialization.
 
-Both findings affect payment allocation rebuild during note revision and should be considered together before changing NoteReplacementPaymentAllocationReconciler or active replacement flow.
+Kedua temuan memengaruhi payment allocation rebuild selama note revision dan harus dipertimbangkan bersama sebelum mengubah NoteReplacementPaymentAllocationReconciler atau active replacement flow.
 
 ## Related Settled-Note Revision Guard Finding From Error Log 011
 
@@ -341,14 +341,14 @@ Update 6.
 
 ### Reason
 
-A later audit report found a separate High severity issue in the note revision financial mutation path.
+Laporan audit lanjutan menemukan issue terpisah dengan severity High pada jalur financial mutation note revision.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about payment allocation replay silently dropping overpaid excess during downward revision.
 - #011 is about missing payment-derived editability guard before revision mutates settled note state.
 
-Both findings show that note revision must be protected by both correct payment replay semantics and strict editability policy.
+Kedua temuan menunjukkan bahwa note revision harus dilindungi oleh payment replay semantics yang benar dan editability policy yang ketat.
 
 ## Related Workspace Inline Payment Finding From Error Log 017
 
@@ -362,9 +362,9 @@ Update 7.
 
 ### Reason
 
-A later audit report found a separate payment allocation issue in workspace edit inline payment.
+Laporan audit lanjutan menemukan issue payment allocation terpisah pada workspace edit inline payment.
 
-This is not the same root cause as #005.
+Ini bukan root cause yang sama dengan #005.
 
 - #005 is about note revision replay silently dropping overpaid allocation during downward revision.
 - #017 is about workspace edit inline payment ignoring existing allocations and over-recording payment against the full note total.

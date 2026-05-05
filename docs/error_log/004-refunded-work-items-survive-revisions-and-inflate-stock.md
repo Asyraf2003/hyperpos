@@ -6,7 +6,7 @@ Patched, with residual risk and verification gap.
 
 Patch supplied for duplicate inventory reversal prevention.
 
-The reported test could not run in the patch environment because vendor/autoload.php was missing.
+Test yang dilaporkan tidak dapat berjalan di environment patch karena vendor/autoload.php tidak ada.
 
 ## Severity
 
@@ -205,7 +205,7 @@ vendor/autoload.php is missing / dependencies are not installed.
 
 Important note:
 
-The test being added is useful, but it has not been proven passing from the supplied patch environment.
+Test yang ditambahkan berguna, tetapi belum terbukti pass dari environment patch yang disediakan.
 
 ## Files Changed By Patch
 
@@ -263,14 +263,14 @@ Update 2.
 
 ### Reason
 
-A later audit report found a separate issue in the note revision lifecycle.
+Laporan audit lanjutan menemukan issue terpisah di lifecycle note revision.
 
-This is not the same root cause as #004.
+Ini bukan root cause yang sama dengan #004.
 
 - #004 is about stale refunded work_items surviving revision deletion and causing duplicate inventory reversal.
 - #005 is about payment allocation replay silently dropping overpaid excess during downward note revision.
 
-Both should be considered when auditing note revision because one affects inventory integrity and the other affects financial/payment integrity.
+Keduanya harus dipertimbangkan ketika mengaudit note revision karena satu memengaruhi inventory integrity dan yang lain memengaruhi financial/payment integrity.
 
 ## Related Store-Stock Revision Finding From Error Log 006
 
@@ -284,14 +284,14 @@ Update 3.
 
 ### Reason
 
-A later audit report found a separate issue affecting store-stock lines during note revision.
+Laporan audit lanjutan menemukan issue terpisah yang memengaruhi store-stock lines selama note revision.
 
-This is not the same root cause as #004.
+Ini bukan root cause yang sama dengan #004.
 
 - #004 is about duplicate inventory reversal caused by stale refunded work_items.
 - #006 is about underpriced store-stock line creation caused by client-controlled price_basis bypassing minimum price checks.
 
-Both affect store-stock/inventory integrity during note revision and should be considered together in future revision-flow audits.
+Keduanya memengaruhi store-stock/inventory integrity selama note revision dan harus dipertimbangkan bersama dalam audit revision-flow berikutnya.
 
 ## Related Closed-Note Authorization Finding From Error Log 009
 
@@ -305,9 +305,9 @@ Update 4.
 
 ### Reason
 
-A later audit report found a separate High severity authorization issue in the note workspace revision route.
+Laporan audit lanjutan menemukan issue authorization terpisah dengan severity High pada route note workspace revision.
 
-This is not the same root cause as #004.
+Ini bukan root cause yang sama dengan #004.
 
 - #004 is about stale refunded work_items causing duplicate inventory reversal.
 - #009 is about cashier PATCH workspace update being allowed for closed notes because the route used view-only access instead of mutation guard.
@@ -326,14 +326,14 @@ Update 5.
 
 ### Reason
 
-A later audit report found a separate issue caused by inactive rows re-entering operational flows.
+Laporan audit lanjutan menemukan issue terpisah yang disebabkan inactive rows masuk kembali ke operational flows.
 
-This is not the same root cause as #004.
+Ini bukan root cause yang sama dengan #004.
 
 - #004 is about refunded/stale work_items surviving revision deletion and causing duplicate inventory reversal.
 - #012 is about canceled work_items being rehydrated into note->workItems() and entering payment/status correction flows.
 
-Both findings show that historical/inactive rows must not be treated as active operational rows without explicit filtering.
+Kedua temuan menunjukkan bahwa historical/inactive rows tidak boleh diperlakukan sebagai active operational rows tanpa filtering eksplisit.
 
 ## Related Refund Row Finalization Finding From Error Log 013
 
@@ -347,11 +347,11 @@ Update 6.
 
 ### Reason
 
-A later audit report found a separate issue in refund/cancellation flow that can affect financial and potentially inventory consistency.
+Laporan audit lanjutan menemukan issue terpisah pada refund/cancellation flow yang dapat memengaruhi konsistensi financial dan berpotensi inventory.
 
-This is not the same root cause as #004.
+Ini bukan root cause yang sama dengan #004.
 
 - #004 is about refunded/stale work_items surviving revision deletion and causing duplicate inventory reversal.
 - #013 is about forged selected-row refund canceling unpaid rows and auto-finalizing a zero-total note as refunded without recorded refund allocations.
 
-Both should be considered when auditing refund-related row lifecycle and inventory/accounting side effects.
+Keduanya harus dipertimbangkan ketika mengaudit lifecycle row terkait refund dan side effect inventory/accounting.

@@ -232,7 +232,7 @@ Failed due to missing vendor/autoload.php / dependencies not installed.
 
 ## Verification Gap
 
-Tests were added but did not pass in the patch environment.
+Test sudah ditambahkan, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -253,7 +253,7 @@ php artisan test tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeature
 
 Recommended additional audit:
 
-Search mutation paths that still check only isClosed():
+Cari jalur mutasi yang masih hanya memeriksa isClosed():
 
 grep -R "isClosed()" -n app/Application app/Adapters app/Core | grep -v vendor
 

@@ -21,7 +21,7 @@ The affected admin routes were:
 
 The admin route group was protected by authentication, admin-page access, and app shell middleware, but did not require `EnsureTransactionEntryAllowed`.
 
-Because admin note detail UI supplied admin payment/refund action URLs and rendered payment/refund forms, an authenticated admin whose transaction-entry capability was inactive could still submit normal admin note mutation forms and change financial records.
+Karena UI detail nota admin menyediakan URL action payment/refund admin dan merender form payment/refund, admin terautentikasi yang capability transaction-entry-nya inactive tetap dapat submit form mutasi nota admin normal dan mengubah record finansial.
 
 ## Vulnerable Path
 
@@ -38,7 +38,7 @@ Authenticated admin session
 
 The transaction-entry capability boundary existed but was not applied to admin note mutation routes.
 
-The admin page-access gate only proves the actor can access admin pages. It does not prove the actor is allowed to input or mutate transactions.
+Gate akses halaman admin hanya membuktikan actor boleh mengakses halaman admin. Gate itu tidak membuktikan actor boleh input atau memutasi transaksi.
 
 ## Patch Summary
 
@@ -81,13 +81,13 @@ Directly related to #016 as part of the identity/access capability authorization
 
 #020 covers admin note mutation routes bypassing the transaction-entry capability gate.
 
-Related to #009, #011, and #017 because those reports also involve note mutation paths where authorization and settlement safety must be enforced before executing payment/revision/workspace changes.
+Terkait dengan #009, #011, dan #017 karena laporan tersebut juga melibatkan jalur mutasi nota yang harus menegakkan authorization dan settlement safety sebelum menjalankan perubahan payment/revision/workspace.
 
 ## Update - Duplicate report from commit a78999d
 
-This report is classified as an update to #020, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #020, bukan file error-log baru.
 
-The root cause is identical: four state-changing admin note routes were exposed under `admin/notes` without `EnsureTransactionEntryAllowed` / `transaction.entry`.
+Root cause identik: empat route admin note yang mengubah state terekspos di bawah `admin/notes` tanpa `EnsureTransactionEntryAllowed` / `transaction.entry`.
 
 Affected routes:
 
@@ -96,7 +96,7 @@ Affected routes:
 - `admin.notes.rows.store`
 - `admin.notes.workspace.update`
 
-Additional evidence in this report confirms the impact through the reached controllers/use cases:
+Bukti tambahan pada laporan ini mengonfirmasi dampak melalui controller/use case yang tercapai:
 
 - `RecordNotePaymentController` records and allocates note payments once reached.
 - `RecordClosedNoteRefundController` records customer refunds once reached.
@@ -111,7 +111,7 @@ Additional policy evidence:
 
 Patch variant:
 
-The reported fix wraps only the four admin mutation routes in:
+Fix yang dilaporkan hanya membungkus empat route mutasi admin dengan:
 
 `Route::middleware(EnsureTransactionEntryAllowed::class)->group(...)`
 

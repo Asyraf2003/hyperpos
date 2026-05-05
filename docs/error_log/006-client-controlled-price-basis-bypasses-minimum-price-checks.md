@@ -4,7 +4,7 @@
 
 Patched, with verification gap.
 
-Patch supplied and syntax/status/commit were reported, but no focused behavior test was reported as passing.
+Patch disediakan dan syntax/status/commit dilaporkan, tetapi tidak ada focused behavior test yang dilaporkan pass.
 
 ## Severity
 
@@ -192,7 +192,7 @@ Reported diff size:
 
 ## Verification Gap
 
-Only syntax validation and commit flow were reported.
+Hanya validasi syntax dan alur commit yang dilaporkan.
 
 No passing behavior test was reported for:
 
@@ -202,7 +202,7 @@ No passing behavior test was reported for:
 - inventory is not issued when minimum price policy rejects the line
 - transaction rolls back on rejected revision
 
-Therefore this patch should be treated as source-fixed but not fully behavior-verified.
+Karena itu, patch ini harus diperlakukan sebagai source-fixed tetapi belum terverifikasi penuh secara behavior.
 
 ## Recommended Follow-up
 
@@ -236,7 +236,7 @@ Recommended command later:
 
 php artisan test --filter=WorkItemFactory
 
-If no test exists, add focused coverage before treating this invariant as locked.
+Jika test belum ada, tambahkan coverage terfokus sebelum invariant ini dianggap locked.
 
 ## Kesimpulan
 
@@ -258,14 +258,14 @@ Update 2.
 
 ### Reason
 
-A later audit report found a separate High severity issue in the shared note workspace surface.
+Laporan audit lanjutan menemukan issue terpisah dengan severity High pada shared note workspace surface.
 
-This is not the same root cause as #006.
+Ini bukan root cause yang sama dengan #006.
 
 - #006 is about server-side price floor bypass through client-controlled price_basis.
 - #007 is about stored XSS caused by raw JSON embedding of cashier-controlled note fields into the admin edit workspace.
 
-Both findings involve note workspace/revision input crossing trust boundaries, so future workspace changes must verify both server-side financial invariants and safe client-side rendering.
+Kedua temuan melibatkan input note workspace/revision yang melewati trust boundary, sehingga perubahan workspace berikutnya harus memverifikasi server-side financial invariants dan safe client-side rendering sekaligus.
 
 ## Related Closed-Note Authorization Finding From Error Log 009
 
@@ -279,11 +279,11 @@ Update 3.
 
 ### Reason
 
-A later audit report found a separate issue in the cashier note workspace update route.
+Laporan audit lanjutan menemukan issue terpisah pada route cashier note workspace update.
 
-This is not the same root cause as #006.
+Ini bukan root cause yang sama dengan #006.
 
 - #006 is about price floor bypass through client-controlled price_basis.
 - #009 is about cashier authorization bypass for closed-note workspace PATCH.
 
-Both involve note workspace update, so future changes must verify server-side invariants and route-level mutation guards.
+Keduanya melibatkan note workspace update, sehingga perubahan berikutnya harus memverifikasi server-side invariants dan route-level mutation guards.

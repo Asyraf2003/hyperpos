@@ -76,7 +76,7 @@ Related to #007.
 
 #024 covers unsafe expense-create JSON config causing reflected XSS from query-string input.
 
-Both share the same script-context JSON encoding hazard, but they affect different pages, different data sources, and different exploit classes.
+Keduanya berbagi hazard encoding JSON pada konteks script yang sama, tetapi memengaruhi halaman berbeda, sumber data berbeda, dan kelas exploit berbeda.
 
 ## Related #025 - Reflected javascript URL in product return link
 

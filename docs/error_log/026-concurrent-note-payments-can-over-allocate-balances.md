@@ -89,4 +89,4 @@ Related to #010.
 
 #026 covers payment/payment concurrency where two concurrent payment requests can over-allocate the same note.
 
-Related to #008 because both issues break the payment allocation invariant and can allow overpayment or incorrect outstanding/payment totals, but #008 is caused by mixed legacy/component allocation sources while #026 is caused by non-serialized concurrent writes.
+Terkait dengan #008 karena kedua masalah merusak invariant payment allocation dan dapat memungkinkan overpayment atau total outstanding/payment yang salah, tetapi #008 disebabkan campuran sumber allocation legacy/component sedangkan #026 disebabkan concurrent writes yang tidak diserialisasi.

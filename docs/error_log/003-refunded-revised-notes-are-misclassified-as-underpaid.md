@@ -6,7 +6,7 @@ Patched, with verification gap.
 
 Patch supplied later under report title: Refunded revisions undercount paid totals.
 
-The focused feature test was added, but php artisan test could not run in the patch environment because vendor/autoload.php was missing.
+Focused feature test sudah ditambahkan, tetapi php artisan test tidak dapat berjalan di environment patch karena vendor/autoload.php tidak ada.
 
 ## Severity
 
@@ -195,9 +195,9 @@ No patch was supplied.
 
 Do not patch blindly by reverting #001 or by re-adding all refund_component_allocations into getTotalAllocatedAmountByNoteId().
 
-That would risk restoring bug #001, where active refunds are counted as paid and then subtracted, making active refunds ineffective.
+Itu berisiko mengembalikan bug #001, ketika active refund dihitung sebagai paid lalu dikurangi lagi, sehingga active refund menjadi tidak efektif.
 
-The safer technical direction is to introduce or use explicit settlement semantics that can distinguish current active refunds from historical refunds already consumed during note replacement/revision replay.
+Arah teknis yang lebih aman adalah memperkenalkan atau memakai settlement semantics eksplisit yang dapat membedakan current active refunds dari historical refunds yang sudah dikonsumsi selama note replacement/revision replay.
 
 ## Recommended Follow-up
 
@@ -223,7 +223,7 @@ Minimum test matrix:
    - expected net paid 200.000
    - expected paid status true
 
-A valid fix must pass both tests. Passing only one means the code merely moved the bug from one side of the settlement model to the other, which is not engineering, just rearranging broken furniture.
+Fix yang valid harus pass kedua test. Jika hanya satu yang pass, berarti code hanya memindahkan bug dari satu sisi settlement model ke sisi lain; itu bukan engineering, hanya menyusun ulang perabot yang sudah rusak.
 
 ## Kesimpulan
 
@@ -243,9 +243,9 @@ Refunded revisions undercount paid totals
 
 ### Relationship Classification
 
-Identical issue / same root cause as this file.
+Issue identik / root cause sama dengan file ini.
 
-This update is not a new error log because it covers the same failure mode:
+Update ini bukan error log baru karena membahas failure mode yang sama:
 
 - revised note has historical refund_component_allocations
 - NoteReplacementPaymentAllocationReconciler rebuilds payment_component_allocations on a net-of-refund basis
@@ -254,7 +254,7 @@ This update is not a new error log because it covers the same failure mode:
 
 ### Reason For Update
 
-The original #003 entry had no patch. This update records the later patch and test addition.
+Entry #003 awal belum memiliki patch. Update ini mencatat patch lanjutan dan penambahan test.
 
 ### Patch Summary
 
@@ -291,7 +291,7 @@ This allows downstream allocated-minus-refunded logic to compute:
 - refunded: 100.000
 - net paid: 200.000
 
-That matches the revised note total and prevents the note from being misclassified as underpaid/open.
+Itu sesuai dengan revised note total dan mencegah nota salah diklasifikasikan sebagai underpaid/open.
 
 ### Testing Reported
 
@@ -301,7 +301,7 @@ php artisan test tests/Feature/Payment/DatabasePaymentAllocationReaderAdapterFea
 
 Result:
 
-Failed in the patch environment because dependencies were not installed.
+Gagal di environment patch karena dependencies belum terpasang.
 
 Failure reason:
 
@@ -309,19 +309,19 @@ missing vendor/autoload.php
 
 ### Verification Status
 
-Patch is recorded, but full test verification is not proven from this environment.
+Patch sudah dicatat, tetapi verifikasi test penuh belum terbukti dari environment ini.
 
-This is important: the presence of a test file is not proof that the test passed. Humanity keeps confusing intention with evidence, and software punishes that hobby.
+Ini penting: keberadaan file test bukan bukti bahwa test sudah pass. Manusia terus menyamakan niat dengan evidence, dan software menghukum hobi itu tanpa ampun.
 
 ### Regression Risk Against #001
 
-This patch intentionally re-adds refund_component_allocations to the note-level allocated total.
+Patch ini secara sengaja menambahkan kembali refund_component_allocations ke allocated total level nota.
 
-That is the opposite movement from the patch recorded in:
+Itu adalah arah berlawanan dari patch yang dicatat di:
 
 001-refunds-counted-as-paid-in-note-totals.md
 
-Therefore, this patch must be verified against both scenarios:
+Karena itu, patch ini harus diverifikasi terhadap kedua skenario:
 
 1. Active refund normal note
 
@@ -347,7 +347,7 @@ Expected behavior:
 - net paid after subtract refund: 200.000
 - note should be paid/closed
 
-A valid final fix must pass both. If only scenario #003 passes, #001 may be reopened.
+Fix final yang valid harus pass keduanya. Jika hanya skenario #003 yang pass, #001 dapat terbuka kembali.
 
 ### Files Changed By Patch
 
@@ -382,15 +382,15 @@ Minimum commands expected later:
 composer install
 php artisan test tests/Feature/Payment/DatabasePaymentAllocationReaderAdapterFeatureTest.php
 
-If a #001 regression test exists, run it too. If it does not exist, add it before trusting this settlement patch.
+Jika regression test #001 sudah ada, jalankan juga. Jika belum ada, tambahkan sebelum mempercayai patch settlement ini.
 
 ### Kesimpulan Update
 
-This update patches the #003 double-subtraction issue for revised notes by restoring a gross allocation basis at the note-level reader.
+Update ini mempatch issue double-subtraction #003 untuk revised notes dengan mengembalikan gross allocation basis pada note-level reader.
 
-However, because #001 was caused by refund_component_allocations being added too broadly for active refunds, this patch must be treated as settlement-risky until both active-refund and revised-historical-refund scenarios are locked by tests.
+Namun, karena #001 disebabkan refund_component_allocations ditambahkan terlalu luas untuk active refunds, patch ini harus diperlakukan sebagai settlement-risky sampai skenario active-refund dan revised-historical-refund sama-sama dikunci oleh test.
 
-The technical direction may still need explicit settlement semantics later so active refunds and historical consumed refunds are not forced through the same generic aggregate.
+Arah teknis mungkin tetap membutuhkan settlement semantics eksplisit nanti, agar active refunds dan historical consumed refunds tidak dipaksa melewati aggregate generik yang sama.
 
 ## Related Workflow Finding From Error Log 004
 
@@ -406,12 +406,12 @@ Update 3.
 
 A later audit report found a separate High severity issue in the same refund + note revision lifecycle.
 
-This is not the same root cause as #003.
+Ini bukan root cause yang sama dengan #003.
 
 - #003 is a settlement classification issue caused by mixed net/gross refund accounting after revised-note allocation replay.
 - #004 is an inventory integrity issue caused by refund-referenced work_items surviving revision deletion and being processed repeatedly by inventory reversal.
 
-Both findings should be considered together when changing note revision, refund preservation, payment allocation replay, or inventory reversal logic.
+Kedua temuan harus dipertimbangkan bersama ketika mengubah note revision, refund preservation, payment allocation replay, atau inventory reversal logic.
 
 ## Related Payment Replay Finding From Error Log 005
 
@@ -427,12 +427,12 @@ Update 4.
 
 A later audit report found a separate High severity issue in the same NoteReplacementPaymentAllocationReconciler / note revision payment replay area.
 
-This is not the same root cause as #003.
+Ini bukan root cause yang sama dengan #003.
 
 - #003 is about revised notes with historical refunds being misclassified as underpaid because refund can be subtracted twice.
 - #005 is about downward note revisions silently truncating captured payment replay and hiding overpaid excess from allocation-based refund/reporting paths.
 
-Future changes to NoteReplacementPaymentAllocationReconciler must account for both cases.
+Perubahan berikutnya pada NoteReplacementPaymentAllocationReconciler harus memperhitungkan kedua kasus.
 
 ## Related Settlement Basis Finding From Error Log 008
 
@@ -448,9 +448,9 @@ Update 5.
 
 A later audit report found a separate issue caused by inconsistent settlement basis.
 
-This is not the same root cause as #003.
+Ini bukan root cause yang sama dengan #003.
 
 - #003 is about component refund/history semantics during revised-note settlement.
 - #008 is about component-only billing projection ignoring legacy payment_allocations during selected-row payment validation.
 
-Both should be considered when changing settlement readers/projections, because component-only calculations are unsafe when the note can still have legacy payment state.
+Keduanya harus dipertimbangkan ketika mengubah settlement readers/projections, karena kalkulasi component-only tidak aman ketika nota masih dapat memiliki legacy payment state.

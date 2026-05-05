@@ -220,7 +220,7 @@ vendor/autoload.php is missing; dependencies are not installed.
 
 ## Verification Gap
 
-Regression test was updated but did not pass in the patch environment.
+Regression test sudah diupdate, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -269,7 +269,7 @@ Update 2.
 
 A later audit report found a separate High severity issue in the note workspace revision path.
 
-This is not the same root cause as #009.
+Ini bukan root cause yang sama dengan #009.
 
 - #009 is about cashier authorization allowing closed-note workspace PATCH mutation.
 - #010 is about concurrent payment allocation being lost during legitimate revision/payment interleaving.
@@ -290,7 +290,7 @@ Update 3.
 
 A later audit report found a separate High severity authorization issue in the cashier workspace revision path.
 
-This is not the same root cause as #009.
+Ini bukan root cause yang sama dengan #009.
 
 - #009 is about cashier.notes.workspace.update being routed through view-only access, allowing mutation of stored closed notes.
 - #011 is about CreateNoteRevisionHandler missing EditableWorkspaceNoteGuard, allowing mutation of payment-derived settled notes whose stored note_state is still open.
@@ -311,7 +311,7 @@ Update 4.
 
 A later audit report found a separate issue in the note workspace editability surface.
 
-This is not the same root cause as #009.
+Ini bukan root cause yang sama dengan #009.
 
 - #009 is about server-side cashier workspace update authorization for closed notes.
 - #015 is about UI rendering an Edit button for refunded notes because can_edit_workspace was not checked.
@@ -332,7 +332,7 @@ Update 5.
 
 A later audit report found a separate High severity issue in cashier note mutation guards.
 
-This is not the same root cause as #009.
+Ini bukan root cause yang sama dengan #009.
 
 - #009 is about closed notes being mutable because workspace.update was routed through view-only access.
 - #018 is about refunded notes being mutable because guard logic only rejected isClosed() and did not reject isRefunded().

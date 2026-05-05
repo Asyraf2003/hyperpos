@@ -272,7 +272,7 @@ Recommended merge check:
 grep -R "getByIdForUpdate" -n app/Application/Note/UseCases/CreateNoteRevisionHandler.php
 grep -R "assertEditable" -n app/Application/Note/UseCases/CreateNoteRevisionHandler.php
 
-Both must exist in final branch if #010 and #011 are both accepted.
+Keduanya harus ada di final branch jika #010 dan #011 sama-sama diterima.
 
 ## Kesimpulan
 
@@ -296,7 +296,7 @@ Update 2.
 
 A later audit report found a separate High severity note-state mutation issue.
 
-This is not the same root cause as #011.
+Ini bukan root cause yang sama dengan #011.
 
 - #011 is about cashier revision mutating payment-derived settled notes because CreateNoteRevisionHandler missed EditableWorkspaceNoteGuard.
 - #013 is about selected-row refund auto-finalizing unpaid zero-total notes as refunded without recorded refund allocations.
@@ -317,7 +317,7 @@ Update 3.
 
 A later audit report found a separate editability issue.
 
-This is not the same root cause as #011.
+Ini bukan root cause yang sama dengan #011.
 
 - #011 is about missing application-level EditableWorkspaceNoteGuard in CreateNoteRevisionHandler.
 - #015 is about the shared note detail view exposing an Edit button despite can_edit_workspace being false.
@@ -340,7 +340,7 @@ Update 4.
 
 A later audit report found a separate issue in workspace edit/payment behavior.
 
-This is not the same root cause as #011.
+Ini bukan root cause yang sama dengan #011.
 
 - #011 is about missing payment-derived editability guard before cashier revision mutates settled note state.
 - #017 is about inline payments during workspace edit ignoring existing note payments.
@@ -361,7 +361,7 @@ Update 5.
 
 A later audit report found another note editability guard issue.
 
-This is not the same root cause as #011.
+Ini bukan root cause yang sama dengan #011.
 
 - #011 is about payment-derived settled notes mutating because CreateNoteRevisionHandler missed EditableWorkspaceNoteGuard.
 - #018 is about refunded notes mutating because route/addability guards did not treat refunded as terminal.

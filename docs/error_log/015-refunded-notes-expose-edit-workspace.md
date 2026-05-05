@@ -195,7 +195,7 @@ Reported diff size:
 
 ## Verification Gap
 
-Only Blade/PHP syntax validation and commit were reported.
+Hanya validasi syntax Blade/PHP dan commit yang dilaporkan.
 
 Missing proof:
 
@@ -269,9 +269,9 @@ Update 2.
 
 A later audit report found a directly related but separate refunded-note editability issue.
 
-This is not the same root cause as #015.
+Ini bukan root cause yang sama dengan #015.
 
 - #015 is about UI exposing the Edit button for refunded notes.
 - #018 is about server-side cashier mutation guard and addability policy failing to treat refunded notes as terminal.
 
-Both fixes are required. UI must hide edit navigation, and server-side guards must reject direct mutation requests.
+Kedua fix wajib ada. UI harus menyembunyikan navigasi edit, dan guard server-side harus menolak request mutasi langsung.

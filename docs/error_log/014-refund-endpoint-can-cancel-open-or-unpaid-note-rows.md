@@ -217,7 +217,7 @@ vendor/autoload.php / dependencies not installed.
 
 ## Verification Gap
 
-Tests were updated but did not pass in the patch environment.
+Test sudah diupdate, tetapi belum pass di environment patch.
 
 Missing proof:
 
@@ -278,7 +278,7 @@ Update 2.
 
 A later audit report found a separate issue in refunded-note lifecycle enforcement.
 
-This is not the same root cause as #014.
+Ini bukan root cause yang sama dengan #014.
 
 - #014 is about preventing open/unpaid rows from entering refund/cancel flow.
 - #018 is about preventing refunded notes from being mutated after full refund.

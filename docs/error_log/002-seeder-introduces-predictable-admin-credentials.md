@@ -221,16 +221,16 @@ Update 2.
 
 A later audit report found a separate High severity identity/access issue.
 
-This is not the same root cause as #002.
+Ini bukan root cause yang sama dengan #002.
 
 - #002 is about predictable seeded admin credentials.
 - #016 is about unauthenticated admin transaction capability toggle endpoints and client-spoofed performed_by_actor_id.
 
-Both findings affect admin/identity access risk, but #002 is credential/bootstrap risk while #016 is route authorization and audit integrity risk.
+Kedua temuan memengaruhi risiko admin/identity access, tetapi #002 adalah risiko credential/bootstrap sedangkan #016 adalah risiko route authorization dan audit integrity.
 
 ## Update - Predictable seeded admin credentials introduced
 
-This report is classified as an update to #002, not a new error-log file.
+Laporan ini diklasifikasikan sebagai update #002, bukan file error-log baru.
 
 ## Update Status
 
@@ -238,21 +238,21 @@ Patched.
 
 ## Summary
 
-The same seeded-admin credential vulnerability was reported again with additional evidence.
+Vulnerability seeded-admin credential yang sama dilaporkan lagi dengan bukti tambahan.
 
 `UserSeeder` previously used `updateOrCreate` for `admin@gmail.com` and set the password to:
 
 `Hash::make('12345678')`
 
-Because `updateOrCreate` updates an existing row, rerunning the seeder could reset an existing admin password back to the predictable public value.
+Karena `updateOrCreate` mengupdate row existing, menjalankan ulang seeder dapat mereset password admin existing kembali ke nilai publik yang predictable.
 
-The default seeding path also grants the seeded account privileged access:
+Jalur seeding default juga memberi akun seeded akses privileged:
 
 - admin role through `actor_accesses`
 - active admin cashier-area access
 - active admin transaction capability
 
-If the seeder is run in production or an important deployed environment, this can create or reset a highly privileged admin account with known credentials.
+Jika seeder dijalankan di production atau environment deployed yang penting, ini dapat membuat atau mereset akun admin highly privileged dengan credential yang diketahui.
 
 ## Additional Evidence
 
@@ -261,7 +261,7 @@ Reported files:
 - `database/seeders/DatabaseSeeder.php`
 - `database/seeders/UserSeeder.php`
 
-The report confirms that `DatabaseSeeder` calls `UserSeeder`, and `UserSeeder` assigns privileged role/capability state to the seeded admin account.
+Laporan mengonfirmasi bahwa `DatabaseSeeder` memanggil `UserSeeder`, dan `UserSeeder` menetapkan role/capability privileged ke akun admin seeded.
 
 ## Patch Variant
 
@@ -279,7 +279,7 @@ and replaces the hardcoded admin password:
 
 with a generated UUID-derived value before hashing.
 
-This prevents rerunning the seeder from resetting an existing admin password to a predictable default.
+Ini mencegah seeder yang dijalankan ulang mereset password admin existing ke default yang predictable.
 
 ## Verification
 
@@ -291,7 +291,7 @@ Reported successful checks:
 
 ## Residual Deployment Check
 
-Repository proof confirms the source-level vulnerability and patch.
+Proof repository mengonfirmasi vulnerability dan patch pada level source.
 
 Deployment proof is still required to determine real-world exposure:
 
@@ -301,11 +301,11 @@ Deployment proof is still required to determine real-world exposure:
 - whether the account password was reset after seeding
 - whether login throttling, MFA, or account disablement exists outside the inspected source
 
-No progress increase because this is the same root cause and same target file as #002.
+Tidak ada kenaikan progress karena ini root cause yang sama dan target file yang sama dengan #002.
 
 ## Related report: Seeder now resets admin credentials to a known password
 
-Classification: update existing #002, not a new unique error-log file.
+Klasifikasi: update existing #002, bukan file error-log unik baru.
 
 Severity: High.
 
@@ -313,10 +313,10 @@ Introduced commit: fbfabf9.
 
 Patch report commit: e3a685e.
 
-Summary:
-The default seeded credential issue already existed, but this report documents a worse repeatable credential-reset behavior. `UserSeeder` used `updateOrCreate()` for `admin@gmail.com` and `kasir@gmail.com`, so rerunning the seeder overwrote existing account passwords with the hardcoded value `12345678`.
+Ringkasan:
+Masalah default seeded credential sudah ada sebelumnya, tetapi laporan ini mendokumentasikan perilaku credential reset berulang yang lebih buruk. `UserSeeder` memakai `updateOrCreate()` untuk `admin@gmail.com` dan `kasir@gmail.com`, sehingga menjalankan ulang seeder menimpa password akun existing dengan nilai hardcoded `12345678`.
 
-Because `DatabaseSeeder` invokes `UserSeeder` by default, any operator running `php artisan db:seed` for ordinary setup, deployment, or unrelated seed data could unintentionally reset privileged account credentials. The same seeder also upserts role/access state for the seeded users, including admin role, cashier role, and admin cashier-area access.
+Karena `DatabaseSeeder` memanggil `UserSeeder` secara default, operator yang menjalankan `php artisan db:seed` untuk setup biasa, deployment, atau seed data lain dapat tanpa sadar mereset credential akun privileged. Seeder yang sama juga melakukan upsert state role/access untuk user seeded, termasuk role admin, role cashier, dan akses admin cashier-area.
 
 Impact:
 After a production-like seed run, an unauthenticated attacker who knows or guesses the seeded email/password pair could authenticate through the normal login flow as admin or cashier. This creates high-impact account takeover risk for POS/back-office data and workflow integrity.
@@ -339,11 +339,11 @@ Controls missing:
 - No prevention of default seeded credentials in production-like databases before the reported patch.
 - No observed login throttling in the report context.
 
-Patch status from report:
-A patch was reported under commit `e3a685e` changing both seeded user creation calls from `updateOrCreate()` to `firstOrCreate()`. This preserves initial seed creation behavior while preventing repeat seed runs from overwriting existing admin/cashier passwords.
+Status patch dari laporan:
+Patch dilaporkan pada commit `e3a685e` yang mengubah kedua pemanggilan pembuatan seeded user dari `updateOrCreate()` menjadi `firstOrCreate()`. Ini mempertahankan behavior pembuatan awal seed sambil mencegah seed run berulang menimpa password admin/cashier existing.
 
 Residual risk:
-The patch prevents repeat credential reset for existing accounts, but initial creation of known default credentials remains an operational risk if local/dev seeders are run against production-like environments. Production seed workflows should avoid hardcoded privileged credentials entirely, or require explicit non-production guards.
+Patch mencegah credential reset berulang untuk akun existing, tetapi pembuatan awal known default credentials tetap menjadi risiko operasional jika local/dev seeders dijalankan terhadap environment production-like. Workflow seed production harus menghindari hardcoded privileged credentials sepenuhnya, atau mewajibkan guard non-production yang eksplisit.
 
-Verification gap:
-This session has not independently verified the local repository diff or runtime behavior. Treat patch status as report-derived until `git status --short`, `git diff`, and relevant test output are provided.
+Gap verifikasi:
+Sesi ini belum memverifikasi diff repository lokal atau behavior runtime secara independen. Perlakukan status patch sebagai berbasis laporan sampai `git status --short`, `git diff`, dan output test relevan disediakan.

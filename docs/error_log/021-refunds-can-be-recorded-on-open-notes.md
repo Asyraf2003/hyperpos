@@ -12,11 +12,11 @@ High.
 
 The refund endpoint allowed refunds on an open parent `Nota` when selected rows were already `close`.
 
-Before the vulnerable change, `RecordClosedNoteRefundController` rejected refunds unless the whole note was operationally closed. The changed flow moved validation to selected rows only. `SelectedNoteRowsRefundAmountResolver` checked whether selected rows were close and capped refund amount by selected line net paid, but did not check whether the parent `Nota` itself was closed.
+Sebelum perubahan vulnerable, `RecordClosedNoteRefundController` menolak refund kecuali seluruh nota sudah closed secara operasional. Flow yang berubah memindahkan validasi hanya ke selected rows. `SelectedNoteRowsRefundAmountResolver` memeriksa apakah selected rows berstatus close dan membatasi nominal refund berdasarkan net paid line terpilih, tetapi tidak memeriksa apakah parent `Nota` itu sendiri sudah closed.
 
-Because the cashier refund route is registered before the `EnsureCashierNoteAccess` group, the controller is the effective server-side state-policy enforcement point for this route.
+Karena cashier refund route diregistrasikan sebelum group `EnsureCashierNoteAccess`, controller menjadi titik enforcement state-policy server-side yang efektif untuk route ini.
 
-The UI also exposed the refund form whenever any close line existed, even when the parent note still had open lines.
+UI juga mengekspos form refund setiap kali ada line close, bahkan ketika parent note masih memiliki line open.
 
 ## Vulnerable Path
 
@@ -34,11 +34,11 @@ Authenticated cashier session
 
 The refund policy was narrowed from whole-note closed validation to selected-row closed validation.
 
-Selected-row validation is not enough for this business rule because the refund endpoint is named and intended as closed-note refund behavior. A line can be close while the parent note is still open.
+Validasi selected-row tidak cukup untuk business rule ini karena endpoint refund tersebut dinamai dan dimaksudkan sebagai perilaku closed-note refund. Sebuah line bisa close sementara parent note masih open.
 
 ## Patch Summary
 
-`app/Adapters/In/Http/Controllers/Note/RecordClosedNoteRefundController.php` was changed to enforce the whole-note closed invariant before resolving or recording refunds.
+`app/Adapters/In/Http/Controllers/Note/RecordClosedNoteRefundController.php` diubah untuk menegakkan invariant whole-note closed sebelum resolver atau pencatatan refund dijalankan.
 
 The controller now:
 
@@ -86,7 +86,7 @@ Related to #013 because forged or invalid refund flows can produce incorrect ref
 
 Related to #018 because refund lifecycle state affects whether notes remain mutable or terminal.
 
-Related to #009 and #011 because mutation routes must enforce state guards before executing note/payment/refund changes.
+Terkait dengan #009 dan #011 karena route mutasi harus menegakkan state guard sebelum menjalankan perubahan note/payment/refund.
 
 ## Related #022 - Cashier refund route bypasses note access guard
 
