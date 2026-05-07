@@ -4,37 +4,41 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
-use App\Ports\Out\Note\NoteReaderPort;
+use App\Application\Note\Services\CurrentRevision\CurrentRevisionDetailRowMapper;
+use App\Application\Note\Services\CurrentRevision\CurrentRevisionRowSettlementProjector;
 
 final class NoteWorkspacePanelDataBuilder
 {
     public function __construct(
-        private readonly NoteReaderPort $notes,
-        private readonly NoteOperationalRowSettlementProjector $rootSettlements,
-        private readonly NoteDetailRowMapper $rootRows,
+        private readonly NoteCurrentRevisionResolver $currentRevision,
+        private readonly CurrentRevisionRowSettlementProjector $settlements,
+        private readonly CurrentRevisionDetailRowMapper $rows,
         private readonly NoteWorkspacePanelPayloadFactory $payloads,
     ) {
     }
 
     public function build(string $noteId): ?array
     {
-        $note = $this->notes->getById(trim($noteId));
+        $normalized = trim($noteId);
 
-        if ($note === null) {
+        if ($normalized === '') {
             return null;
         }
 
-        $rows = $this->rootRows->map(
-            $note->workItems(),
-            $this->rootSettlements->build($note->id(), $note->workItems()),
+        $revision = $this->currentRevision->resolveOrFail($normalized);
+        $lines = $revision->lines();
+
+        $rows = $this->rows->map(
+            $lines,
+            $this->settlements->build($revision->noteRootId(), $lines),
         );
 
         return $this->payloads->build(
-            $note->id(),
-            $note->customerName(),
-            $note->customerPhone(),
-            $note->transactionDate()->format('Y-m-d'),
-            $note->totalRupiah()->amount(),
+            $revision->noteRootId(),
+            $revision->customerName(),
+            $revision->customerPhone(),
+            $revision->transactionDate()->format('Y-m-d'),
+            $revision->grandTotalRupiah(),
             $rows,
         );
     }
