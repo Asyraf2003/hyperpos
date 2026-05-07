@@ -10,5 +10,7 @@ interface CustomerRefundReaderPort
 {
     public function getTotalRefundedAmountByNoteId(string $noteId): Money;
 
+    public function getTotalCurrentRefundedAmountByNoteId(string $noteId): Money;
+
     public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money;
 }

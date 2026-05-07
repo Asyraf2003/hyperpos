@@ -34,6 +34,11 @@ final class NotePaidStatusPolicyTest extends TestCase
                     return Money::zero();
                 }
 
+                public function getTotalCurrentRefundedAmountByNoteId(string $noteId): Money
+                {
+                    return Money::zero();
+                }
+
                 public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money
                 {
                     return Money::zero();
@@ -53,7 +58,7 @@ final class NotePaidStatusPolicyTest extends TestCase
         $this->assertFalse($policy->isPaid($note));
     }
 
-    public function test_it_treats_note_as_paid_when_net_settlement_reaches_total(): void
+    public function test_it_treats_note_as_paid_when_current_net_settlement_reaches_total(): void
     {
         $policy = new NotePaidStatusPolicy(
             new class () implements PaymentAllocationReaderPort {
@@ -69,6 +74,11 @@ final class NotePaidStatusPolicyTest extends TestCase
             },
             new class () implements CustomerRefundReaderPort {
                 public function getTotalRefundedAmountByNoteId(string $noteId): Money
+                {
+                    return Money::fromInt(20000);
+                }
+
+                public function getTotalCurrentRefundedAmountByNoteId(string $noteId): Money
                 {
                     return Money::fromInt(20000);
                 }
@@ -92,7 +102,7 @@ final class NotePaidStatusPolicyTest extends TestCase
         $this->assertTrue($policy->isPaid($note));
     }
 
-    public function test_it_treats_note_as_not_paid_when_refund_reduces_net_settlement_below_total(): void
+    public function test_it_treats_note_as_not_paid_when_current_refund_reduces_settlement_below_total(): void
     {
         $policy = new NotePaidStatusPolicy(
             new class () implements PaymentAllocationReaderPort {
@@ -108,6 +118,11 @@ final class NotePaidStatusPolicyTest extends TestCase
             },
             new class () implements CustomerRefundReaderPort {
                 public function getTotalRefundedAmountByNoteId(string $noteId): Money
+                {
+                    return Money::fromInt(20000);
+                }
+
+                public function getTotalCurrentRefundedAmountByNoteId(string $noteId): Money
                 {
                     return Money::fromInt(20000);
                 }
@@ -149,6 +164,11 @@ final class NotePaidStatusPolicyTest extends TestCase
                 public function getTotalRefundedAmountByNoteId(string $noteId): Money
                 {
                     return Money::fromInt(100000);
+                }
+
+                public function getTotalCurrentRefundedAmountByNoteId(string $noteId): Money
+                {
+                    return Money::zero();
                 }
 
                 public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money
