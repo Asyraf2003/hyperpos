@@ -15,7 +15,7 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_cashier_product_replacement_keeps_snapshot_price_reconciles_stock_and_caps_old_payment(): void
+    public function test_cashier_product_replacement_rejects_downward_overpaid_replay_instead_of_capping_old_payment(): void
     {
         $user = $this->loginAsAuthorizedAdmin();
         $oldDate = date('Y-m-d', strtotime('-4 days'));
@@ -77,72 +77,71 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
             ],
         );
 
-        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
+        $response->assertSessionHasErrors();
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'customer_name' => 'Budi Revised Product',
-            'transaction_date' => $today,
-            'total_rupiah' => 200000,
-            'latest_revision_number' => 2,
+            'customer_name' => 'Budi Product Lama',
+            'transaction_date' => $oldDate,
+            'total_rupiah' => 300000,
         ]);
 
-        $this->assertDatabaseHas('note_revisions', [
+        $this->assertDatabaseMissing('note_revisions', [
             'note_root_id' => 'note-1',
             'revision_number' => 2,
-            'grand_total_rupiah' => 200000,
         ]);
 
-        $this->assertDatabaseMissing('work_items', [
+        $this->assertDatabaseHas('work_items', [
             'id' => 'wi-old-1',
+            'note_id' => 'note-1',
+            'transaction_type' => WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+            'subtotal_rupiah' => 300000,
         ]);
 
-        $newWorkItem = DB::table('work_items')
-            ->where('note_id', 'note-1')
-            ->where('transaction_type', WorkItem::TYPE_STORE_STOCK_SALE_ONLY)
-            ->first();
-
-        $this->assertNotNull($newWorkItem);
-
-        $newStoreLine = DB::table('work_item_store_stock_lines')
-            ->where('work_item_id', (string) $newWorkItem->id)
-            ->where('product_id', 'product-1')
-            ->first();
-
-        $this->assertNotNull($newStoreLine);
-        $this->assertSame(2, (int) $newStoreLine->qty);
-        $this->assertSame(200000, (int) $newStoreLine->line_total_rupiah);
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'id' => 'ssl-old-1',
+            'work_item_id' => 'wi-old-1',
+            'product_id' => 'product-1',
+            'qty' => 3,
+            'line_total_rupiah' => 300000,
+        ]);
 
         $this->assertDatabaseHas('inventory_movements', [
+            'id' => 'move-old-1',
             'product_id' => 'product-1',
+            'movement_type' => 'stock_out',
+            'source_type' => 'work_item_store_stock_line',
+            'source_id' => 'ssl-old-1',
+            'tanggal_mutasi' => $oldDate,
+            'qty_delta' => -3,
+        ]);
+
+        $this->assertDatabaseMissing('inventory_movements', [
             'movement_type' => 'stock_in',
             'source_type' => 'transaction_workspace_updated',
             'source_id' => 'ssl-old-1',
             'tanggal_mutasi' => $today,
-            'qty_delta' => 3,
-        ]);
-
-        $this->assertDatabaseHas('inventory_movements', [
-            'product_id' => 'product-1',
-            'movement_type' => 'stock_out',
-            'source_type' => 'work_item_store_stock_line',
-            'source_id' => (string) $newStoreLine->id,
-            'tanggal_mutasi' => $today,
-            'qty_delta' => -2,
         ]);
 
         $this->assertDatabaseHas('product_inventory', [
             'product_id' => 'product-1',
-            'qty_on_hand' => 8,
+            'qty_on_hand' => 7,
         ]);
 
         $this->assertSame(
-            200000,
+            300000,
             (int) DB::table('payment_component_allocations')
                 ->where('note_id', 'note-1')
+                ->where('customer_payment_id', 'payment-1')
                 ->sum('allocated_amount_rupiah')
         );
+
+        $this->assertDatabaseMissing('payment_component_allocations', [
+            'note_id' => 'note-1',
+            'customer_payment_id' => 'payment-1',
+            'allocated_amount_rupiah' => 200000,
+        ]);
 
         $this->assertDatabaseHas('customer_payments', [
             'id' => 'payment-1',
