@@ -454,6 +454,7 @@ Ini bukan root cause yang sama dengan #003.
 - #008 is about component-only billing projection ignoring legacy payment_allocations during selected-row payment validation.
 
 Keduanya harus dipertimbangkan ketika mengubah settlement readers/projections, karena kalkulasi component-only tidak aman ketika nota masih dapat memiliki legacy payment state.
+
 ## Verified Fix Update
 
 ### Update 6
