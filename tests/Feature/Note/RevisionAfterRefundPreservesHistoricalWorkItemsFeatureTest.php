@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
+use App\Application\Note\Services\NoteWorkspacePanelDataBuilder;
+use App\Application\Note\Services\SelectedNoteRowsRefundPlanResolver;
 use App\Core\Note\WorkItem\WorkItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -98,6 +100,43 @@ final class RevisionAfterRefundPreservesHistoricalWorkItemsFeatureTest extends T
         $this->assertNotNull($newStoreLine);
         $this->assertSame(2, (int) $newStoreLine->qty);
         $this->assertSame(200000, (int) $newStoreLine->line_total_rupiah);
+
+        $workspacePanel = app(NoteWorkspacePanelDataBuilder::class)->build('note-refund-revision-1');
+
+        $this->assertNotNull($workspacePanel);
+
+        $currentRowIds = array_values(array_map(
+            static fn (array $row): string => (string) ($row['id'] ?? ''),
+            $workspacePanel['rows'] ?? [],
+        ));
+
+        $this->assertContains(
+            (string) $newWorkItem->id,
+            $currentRowIds,
+            'Replacement work item must be visible in current operational rows.'
+        );
+
+        $this->assertNotContains(
+            'wi-refund-revision-old-1',
+            $currentRowIds,
+            'Historical refunded work item must not be visible in current operational rows after revision.'
+        );
+
+        $oldRowRefundPlan = app(SelectedNoteRowsRefundPlanResolver::class)
+            ->resolve('note-refund-revision-1', ['wi-refund-revision-old-1']);
+
+        $this->assertTrue(
+            $oldRowRefundPlan->isFailure(),
+            'Historical refunded work item must not be accepted for a new operational refund after revision.'
+        );
+
+        $newRowRefundPlan = app(SelectedNoteRowsRefundPlanResolver::class)
+            ->resolve('note-refund-revision-1', [(string) $newWorkItem->id]);
+
+        $this->assertTrue(
+            $newRowRefundPlan->isSuccess(),
+            'Replacement work item must remain eligible for current operational refund planning.'
+        );
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-refund-revision-1',
