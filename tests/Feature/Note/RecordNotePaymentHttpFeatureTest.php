@@ -55,8 +55,16 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
             'id' => 'note-1-r001',
             'note_root_id' => 'note-1',
             'revision_number' => 1,
+            'parent_revision_id' => null,
+            'created_by_actor_id' => null,
+            'reason' => 'selected row payment fixture',
+            'customer_name' => 'Budi',
+            'customer_phone' => null,
+            'transaction_date' => $today,
             'grand_total_rupiah' => 150000,
             'line_count' => 2,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         DB::table('note_revision_lines')->insert([
