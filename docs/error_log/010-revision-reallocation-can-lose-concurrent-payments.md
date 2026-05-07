@@ -2,9 +2,9 @@
 
 ## Status
 
-Patched, with concurrency verification gap.
+Fixed and locally verified for minimum revision/payment same-note serialization control.
 
-Patch supplied and PHP syntax checks passed, but the focused PHPUnit command could not run because vendor/bin/phpunit was not available in the patch environment.
+Revision and payment mutation paths now use the same note-level lock protocol before payment allocation capture/read/write. Focused #010 tests and wider Note + Payment feature suites passed locally. True parallel two-connection concurrency stress testing remains out of scope for this closure.
 
 ## Severity
 
@@ -132,108 +132,79 @@ Masalah teknis spesifik:
 
 ## Patch Summary
 
-Patch menerapkan minimal serialization fix, bukan mengubah business allocation logic.
+Patch applies the minimum ADR-0022 same-note serialization control for revision/payment contention.
 
-Changed files:
+Source finding before this closure:
 
-app/Ports/Out/Note/NoteReaderPort.php
-app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php
-app/Application/Note/UseCases/CreateNoteRevisionHandler.php
-app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php
+- Payment path already used `getByIdForUpdate()` from the #026 payment serialization fix.
+- Revision path still used non-locking `getById()` in `CreateNoteRevisionHandler`.
+- That meant payment and revision did not consistently share the same note-level lock protocol.
 
-Perubahan utama:
+Production file changed in this closure:
 
-1. NoteReaderPort ditambah method:
+- `app/Application/Note/UseCases/CreateNoteRevisionHandler.php`
 
-getByIdForUpdate(string $id): ?Note
+Related lock support already present from #026 source fix:
 
-2. DatabaseNoteReaderAdapter ditambah internal loader:
+- `app/Ports/Out/Note/NoteReaderPort.php`
+- `app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php`
+- `app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php`
 
-getByIdInternal(string $id, bool $forUpdate): ?Note
+Patch behavior:
 
-3. Jika forUpdate = true:
+- `CreateNoteRevisionHandler` still opens a transaction before applying the revision.
+- Inside that transaction, it now reads the root note with `getByIdForUpdate()`.
+- `ApplyNoteRevisionAsActiveReplacement` then runs allocation capture, delete, work item persistence, allocation rebuild, and projection sync after the note lock is acquired.
+- `RecordAndAllocateNotePaymentOperation` already reads the same target note through `getByIdForUpdate()` before allocated-total read and allocation write.
+- Revision and payment mutation paths now serialize through the same target `notes` row lock.
 
-- notes query memakai lockForUpdate()
-- related work_items query juga memakai lockForUpdate()
+This patch does not redesign capture/delete/rebuild allocation behavior. It only ensures same-note revision/payment mutation cannot interleave without passing the shared note lock.
 
-4. CreateNoteRevisionHandler sekarang membaca root note dengan:
+## Verification Proof
 
-getByIdForUpdate()
+Syntax check passed:
 
-5. RecordAndAllocateNotePaymentOperation sekarang membaca target note dengan:
+- `php -l app/Application/Note/UseCases/CreateNoteRevisionHandler.php`
 
-getByIdForUpdate()
+Source lock anchors verified:
 
-Efek patch:
+- `CreateNoteRevisionHandler` begins a transaction before calling `getByIdForUpdate()`.
+- `CreateNoteRevisionHandler` calls `getByIdForUpdate()` before revision apply.
+- `ApplyNoteRevisionAsActiveReplacement` performs `captureAllocatedAmounts()`, `deleteExisting()`, and `rebuild()` after the locked root note read.
+- `RecordAndAllocateNotePaymentOperation` calls `getByIdForUpdate()` before `getTotalAllocatedAmountByNoteId()`.
+- `RecordAndAllocateNotePaymentHandler` wraps payment operation, audit, projection sync, and commit/rollback in a transaction.
 
-- revision flow dan payment flow untuk note yang sama sama-sama mengambil note row lock
-- concurrent mutation pada note yang sama harus serialize
-- payment insert tidak boleh interleave secara unsafe dengan revision delete/rebuild
-- business allocation behavior tetap dipertahankan
+Focused #010 tests passed:
 
-## Scope In
+- `php artisan test tests/Feature/Note/UpdateTransactionWorkspaceFeatureTest.php tests/Feature/Note/NoteReplacementOverpaidAllocationReplayFeatureTest.php tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php tests/Feature/Note/CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest.php tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php`
+- PASS: 11 passed, 93 assertions
 
-- Same-note serialization between revision and payment recording.
-- Note row lock introduction.
-- Work item row lock during locked note load.
-- Lost-update prevention for payment_component_allocations.
-- Transactional mutation paths:
-  - CreateNoteRevisionHandler
-  - RecordAndAllocateNotePaymentOperation
+Wider Note + Payment tests passed:
 
-## Scope Out
+- `php artisan test tests/Feature/Note tests/Feature/Payment`
+- PASS: 162 passed, 955 assertions
 
-- Redesign of capture/delete/rebuild allocation model.
-- DB-level unique constraint or advisory lock.
-- Full HTTP concurrency E2E test.
-- Locking every possible note mutation route.
-- Legacy payment issue from #008.
-- Downward revision overpaid issue from #005.
-- Closed-note authorization issue from #009.
-- Production DB isolation verification.
+## Verification Gaps / Out of Scope
 
-## Proof Dari Patch Session
+Not performed in this closure:
 
-User reported syntax checks passed:
+- true parallel revision/payment two-connection concurrency stress test
+- database-engine-specific lock wait/timeout assertion
+- full global suite
+- browser/manual UI QA
+- idempotency token for duplicate form submission
+- complete audit of every possible same-note mutation route
+- #001 final global verification claim
 
-- php -l app/Ports/Out/Note/NoteReaderPort.php
-- php -l app/Adapters/Out/Note/DatabaseNoteReaderAdapter.php
-- php -l app/Application/Note/UseCases/CreateNoteRevisionHandler.php
-- php -l app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php
+The implemented control is source-level minimum serialization under ADR-0022: target note row lock before revision allocation capture/delete/rebuild, and target note row lock before payment allocated-total read/write.
 
-Testing attempted:
+## Residual Risk
 
-./vendor/bin/phpunit --filter RecordAndAllocateNotePayment --testsuite Unit
+`lockForUpdate()` only protects #010 while competing same-note mutation paths consistently follow the same note-level lock protocol inside an active database transaction.
 
-Result:
+If a future revision/payment/refund/note mutation path bypasses `getByIdForUpdate()` or performs finance mutation outside an equivalent transaction boundary, this race class can reappear.
 
-Warning/failure because ./vendor/bin/phpunit is not available in the environment.
-
-Commit reported:
-
-639cb0c - Serialize note revision/payment flows with row locks
-
-Reported diff size:
-
-+29
--5
-
-## Verification Gap
-
-Patch ini masuk akal pada level source, tetapi behavior concurrency belum terbukti lewat test yang pass.
-
-Missing proof:
-
-- concurrent payment and revision serialize correctly
-- payment request cannot insert allocation between revision capture and delete
-- payment row and allocation row remain consistent after contention
-- lockForUpdate is always called inside an active transaction
-- all competing same-note mutation paths use the same note lock
-- no deadlock or unacceptable lock ordering issue appears under concurrent traffic
-
-Important caveat:
-
-Row lock on notes works only if every competing mutation path follows the same locking protocol. If another payment/allocation/note mutation path bypasses getByIdForUpdate(), this race class can reappear wearing a fake mustache, because bugs apparently enjoy cosplay.
+Idempotency keys and database-specific lock wait tests remain valid defense-in-depth work, but they are not part of this minimum closure.
 
 ## Recommended Follow-up
 
@@ -277,7 +248,7 @@ Search for other same-note mutation paths that must use getByIdForUpdate():
 
 Laporan #010 valid sebagai High severity financial-integrity race condition.
 
-Bug sebelumnya memungkinkan revision allocation rebuild menghapus allocation dari concurrent payment karena memakai stale non-locked snapshot dan broad delete by note_id. Payment row bisa tetap ada, sementara allocation row hilang.
+Bug sebelumnya memungkinkan revision allocation rebuild menghapus allocation dari concurrent payment karena revision path memakai stale non-locked snapshot dan broad delete by note_id. Minimum closure now serializes revision/payment mutation through the same target note row lock before allocation capture/read/write.
 
 Patch mengarah benar secara minimal: serialize competing same-note payment/revision flows menggunakan row lock pada note. Namun status tetap verification gap sampai concurrency test atau minimal focused test berhasil dijalankan dan sampai semua competing mutation paths terbukti memakai locking protocol yang sama.
 
