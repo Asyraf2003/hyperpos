@@ -232,4 +232,140 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
         $this->assertSame(0, DB::table('payment_component_allocations')->count());
     }
 
+    public function test_selected_row_payment_uses_combined_legacy_and_component_allocations(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Mixed Allocation',
+            'email' => 'cashier-mixed-allocation@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        $today = date('Y-m-d');
+
+        DB::table('notes')->insert([
+            'id' => 'note-mixed-allocation-1',
+            'current_revision_id' => 'note-mixed-allocation-1-r001',
+            'latest_revision_number' => 1,
+            'customer_name' => 'Budi Mixed',
+            'transaction_date' => $today,
+            'note_state' => 'open',
+            'total_rupiah' => 100000,
+        ]);
+
+        DB::table('work_items')->insert([
+            'id' => 'wi-mixed-allocation-1',
+            'note_id' => 'note-mixed-allocation-1',
+            'line_no' => 1,
+            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
+            'status' => WorkItem::STATUS_OPEN,
+            'subtotal_rupiah' => 100000,
+        ]);
+
+        DB::table('work_item_service_details')->insert([
+            'work_item_id' => 'wi-mixed-allocation-1',
+            'service_name' => 'Servis Mixed Allocation',
+            'service_price_rupiah' => 100000,
+            'part_source' => ServiceDetail::PART_SOURCE_NONE,
+        ]);
+
+        DB::table('note_revisions')->insert([
+            'id' => 'note-mixed-allocation-1-r001',
+            'note_root_id' => 'note-mixed-allocation-1',
+            'revision_number' => 1,
+            'parent_revision_id' => null,
+            'created_by_actor_id' => null,
+            'reason' => 'mixed allocation selected row characterization',
+            'customer_name' => 'Budi Mixed',
+            'customer_phone' => null,
+            'transaction_date' => $today,
+            'grand_total_rupiah' => 100000,
+            'line_count' => 1,
+            'created_at' => now()->format('Y-m-d H:i:s'),
+            'updated_at' => null,
+        ]);
+
+        DB::table('note_revision_lines')->insert([
+            'id' => 'note-mixed-allocation-1-r001-l001',
+            'note_revision_id' => 'note-mixed-allocation-1-r001',
+            'work_item_root_id' => 'wi-mixed-allocation-1',
+            'line_no' => 1,
+            'transaction_type' => WorkItem::TYPE_SERVICE_ONLY,
+            'status' => WorkItem::STATUS_OPEN,
+            'service_label' => 'Servis Mixed Allocation',
+            'service_price_rupiah' => 100000,
+            'subtotal_rupiah' => 100000,
+            'payload' => null,
+            'created_at' => now()->format('Y-m-d H:i:s'),
+            'updated_at' => null,
+        ]);
+
+        DB::table('customer_payments')->insert([
+            [
+                'id' => 'legacy-payment-mixed-1',
+                'amount_rupiah' => 40000,
+                'paid_at' => $today,
+            ],
+            [
+                'id' => 'component-payment-mixed-1',
+                'amount_rupiah' => 10000,
+                'paid_at' => $today,
+            ],
+        ]);
+
+        DB::table('payment_allocations')->insert([
+            'id' => 'legacy-allocation-mixed-1',
+            'customer_payment_id' => 'legacy-payment-mixed-1',
+            'note_id' => 'note-mixed-allocation-1',
+            'amount_rupiah' => 40000,
+        ]);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'component-allocation-mixed-1',
+            'customer_payment_id' => 'component-payment-mixed-1',
+            'note_id' => 'note-mixed-allocation-1',
+            'work_item_id' => 'wi-mixed-allocation-1',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-mixed-allocation-1',
+            'component_amount_rupiah_snapshot' => 100000,
+            'allocated_amount_rupiah' => 10000,
+            'allocation_priority' => 1,
+        ]);
+
+        $response = $this->actingAs($user)->post('/cashier/notes/note-mixed-allocation-1/payments', [
+            'selected_row_ids' => ['wi-mixed-allocation-1'],
+            'payment_method' => 'cash',
+            'paid_at' => $today,
+            'amount_received' => 90000,
+        ]);
+
+        $response->assertSessionHasNoErrors();
+
+        $newPayment = DB::table('customer_payments')
+            ->whereNotIn('id', ['legacy-payment-mixed-1', 'component-payment-mixed-1'])
+            ->first();
+
+        $this->assertNotNull($newPayment);
+        $this->assertSame(50000, (int) $newPayment->amount_rupiah);
+
+        $componentTotal = (int) DB::table('payment_component_allocations')
+            ->where('note_id', 'note-mixed-allocation-1')
+            ->sum('allocated_amount_rupiah');
+
+        $legacyTotal = (int) DB::table('payment_allocations')
+            ->where('note_id', 'note-mixed-allocation-1')
+            ->sum('amount_rupiah');
+
+        $this->assertSame(60000, $componentTotal);
+        $this->assertSame(40000, $legacyTotal);
+        $this->assertSame(100000, $legacyTotal + $componentTotal);
+    }
+
+
 }
