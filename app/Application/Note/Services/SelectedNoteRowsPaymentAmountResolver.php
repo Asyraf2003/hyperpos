@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Shared\DTO\Result;
+use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\Note\NoteReaderPort;
 
 final class SelectedNoteRowsPaymentAmountResolver
 {
     public function __construct(
         private readonly NoteReaderPort $notes,
+        private readonly NoteWorkspacePanelDataBuilder $workspacePanels,
         private readonly NoteBillingProjectionBuilder $billingProjection,
         private readonly SelectedNoteRowsPaymentSelectionExpander $selectionExpander,
     ) {
@@ -27,7 +29,23 @@ final class SelectedNoteRowsPaymentAmountResolver
             return Result::failure('Nota tidak ditemukan.', ['payment' => ['PAYMENT_INVALID_TARGET']]);
         }
 
-        $billingRows = $this->billingProjection->build($note->id()) ?? [];
+        try {
+            $workspace = $this->workspacePanels->build($note->id());
+        } catch (DomainException) {
+            return Result::failure('Nota tidak memiliki workspace pembayaran yang valid.', ['payment' => ['PAYMENT_INVALID_TARGET']]);
+        }
+
+        if (! is_array($workspace)) {
+            return Result::failure('Nota tidak memiliki workspace pembayaran yang valid.', ['payment' => ['PAYMENT_INVALID_TARGET']]);
+        }
+
+        $workspaceRows = $workspace['rows'] ?? null;
+
+        if (! is_array($workspaceRows)) {
+            return Result::failure('Nota tidak memiliki billing row pembayaran yang valid.', ['payment' => ['PAYMENT_INVALID_TARGET']]);
+        }
+
+        $billingRows = $this->billingProjection->buildFromWorkspaceRows($workspaceRows);
         $selectedIds = array_values(array_unique(array_filter(
             $selectedRowIds,
             static fn (string $id): bool => trim($id) !== ''
