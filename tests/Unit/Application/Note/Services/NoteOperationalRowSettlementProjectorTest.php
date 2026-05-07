@@ -56,6 +56,14 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
 
         $componentRefunds->method('listByNoteId')->with('note-1')->willReturn([]);
 
+        $legacyPayments->method('getTotalAllocatedAmountByNoteId')
+            ->with('note-1')
+            ->willReturn(Money::fromInt(25000));
+
+        $legacyRefunds->method('getTotalRefundedAmountByNoteId')
+            ->with('note-1')
+            ->willReturn(Money::fromInt(0));
+
         $projector = $this->makeProjector(
             $componentPayments,
             $componentRefunds,
@@ -132,6 +140,14 @@ final class NoteOperationalRowSettlementProjectorTest extends TestCase
                 1,
             ),
         ]);
+
+        $legacyPayments->method('getTotalAllocatedAmountByNoteId')
+            ->with('note-1')
+            ->willReturn(Money::fromInt(20000));
+
+        $legacyRefunds->method('getTotalRefundedAmountByNoteId')
+            ->with('note-1')
+            ->willReturn(Money::fromInt(5000));
 
         $projector = $this->makeProjector(
             $componentPayments,
