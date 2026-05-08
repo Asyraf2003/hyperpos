@@ -19,7 +19,7 @@ final class ServeSupplierPaymentProofAttachmentFeatureTest extends TestCase
     public function test_admin_can_preview_supplier_payment_proof_attachment_inline(): void
     {
         Storage::fake('local');
-        Storage::disk('local')->put('supplier-payment-proofs/payment-1/proof.pdf', 'dummy-pdf');
+        $this->storePdfFixture('supplier-payment-proofs/payment-1/proof.pdf');
 
         $this->seedPaymentFixture('payment-1');
         $this->seedAttachment(
@@ -43,7 +43,7 @@ final class ServeSupplierPaymentProofAttachmentFeatureTest extends TestCase
     public function test_admin_can_download_supplier_payment_proof_attachment(): void
     {
         Storage::fake('local');
-        Storage::disk('local')->put('supplier-payment-proofs/payment-1/proof.jpg', 'dummy-image');
+        $this->storeJpegFixture('supplier-payment-proofs/payment-1/proof.jpg');
 
         $this->seedPaymentFixture('payment-1');
         $this->seedAttachment(
