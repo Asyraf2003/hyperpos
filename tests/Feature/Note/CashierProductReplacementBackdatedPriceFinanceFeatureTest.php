@@ -259,6 +259,198 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
     }
 
 
+
+    public function test_product_replacement_rejects_underpriced_current_catalog_store_stock_line(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-4 days'));
+        $today = date('Y-m-d');
+
+        $this->seedPaidProductOnlyNote($oldDate);
+
+        $response = $this->patchProductReplacement(
+            $user,
+            $today,
+            1,
+            1,
+            'current_catalog',
+            'Budi Underpriced Current Catalog'
+        );
+
+        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
+        $response->assertSessionHasErrors([
+            'revision' => 'Harga jual pada store stock line tidak boleh di bawah harga jual minimum.',
+        ]);
+
+        $this->assertRejectedProductReplacementRolledBack($oldDate);
+    }
+
+    public function test_product_replacement_rejects_underpriced_revision_snapshot_store_stock_line_before_inventory_issue(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-4 days'));
+        $today = date('Y-m-d');
+
+        $this->seedPaidProductOnlyNote($oldDate);
+
+        $response = $this->patchProductReplacement(
+            $user,
+            $today,
+            1,
+            1,
+            'revision_snapshot',
+            'Budi Underpriced Revision Snapshot'
+        );
+
+        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
+        $response->assertSessionHasErrors([
+            'revision' => 'Harga jual pada store stock line tidak boleh di bawah harga jual minimum.',
+        ]);
+
+        $this->assertRejectedProductReplacementRolledBack($oldDate);
+    }
+
+    public function test_product_replacement_accepts_valid_revision_snapshot_store_stock_line(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-4 days'));
+        $today = date('Y-m-d');
+
+        $this->seedPaidProductOnlyNote($oldDate);
+
+        $response = $this->patchProductReplacement(
+            $user,
+            $today,
+            3,
+            100000,
+            'revision_snapshot',
+            'Budi Valid Revision Snapshot'
+        );
+
+        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-1']));
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('note_revisions', [
+            'note_root_id' => 'note-1',
+            'revision_number' => 2,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'customer_name' => 'Budi Valid Revision Snapshot',
+            'transaction_date' => $today,
+            'total_rupiah' => 300000,
+        ]);
+    }
+
+    private function patchProductReplacement(
+        mixed $user,
+        string $today,
+        int $qty,
+        int $unitPriceRupiah,
+        string $priceBasis,
+        string $customerName
+    ): \Illuminate\Testing\TestResponse {
+        return $this->actingAs($user)->patch(
+            route('admin.notes.workspace.update', ['noteId' => 'note-1']),
+            [
+                'note' => [
+                    'customer_name' => $customerName,
+                    'customer_phone' => '08123456789',
+                    'transaction_date' => $today,
+                ],
+                'items' => [
+                    [
+                        'entry_mode' => 'product',
+                        'description' => null,
+                        'part_source' => 'store_stock',
+                        'service' => [
+                            'name' => null,
+                            'price_rupiah' => null,
+                            'notes' => null,
+                        ],
+                        'product_lines' => [
+                            [
+                                'product_id' => 'product-1',
+                                'qty' => $qty,
+                                'unit_price_rupiah' => $unitPriceRupiah,
+                                'price_basis' => $priceBasis,
+                            ],
+                        ],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => null,
+                    'amount_paid_rupiah' => null,
+                    'amount_received_rupiah' => null,
+                ],
+            ],
+        );
+    }
+
+    private function assertRejectedProductReplacementRolledBack(string $oldDate): void
+    {
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'customer_name' => 'Budi Product Lama',
+            'transaction_date' => $oldDate,
+            'total_rupiah' => 300000,
+        ]);
+
+        $this->assertDatabaseMissing('note_revisions', [
+            'note_root_id' => 'note-1',
+            'revision_number' => 2,
+        ]);
+
+        $this->assertSame(
+            1,
+            DB::table('work_items')
+                ->where('note_id', 'note-1')
+                ->count()
+        );
+
+        $this->assertSame(
+            1,
+            DB::table('work_item_store_stock_lines')
+                ->where('product_id', 'product-1')
+                ->count()
+        );
+
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'id' => 'ssl-old-1',
+            'work_item_id' => 'wi-old-1',
+            'product_id' => 'product-1',
+            'qty' => 3,
+            'line_total_rupiah' => 300000,
+        ]);
+
+        $this->assertSame(
+            1,
+            DB::table('inventory_movements')
+                ->where('product_id', 'product-1')
+                ->count()
+        );
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'id' => 'move-old-1',
+            'product_id' => 'product-1',
+            'movement_type' => 'stock_out',
+            'source_type' => 'work_item_store_stock_line',
+            'source_id' => 'ssl-old-1',
+            'tanggal_mutasi' => $oldDate,
+            'qty_delta' => -3,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-1',
+            'qty_on_hand' => 7,
+        ]);
+    }
+
+
     private function seedPaidProductOnlyNote(string $oldDate): void
     {
         $this->seedNoteBase('note-1', 'Budi Product Lama', $oldDate, 300000, 'closed');
