@@ -65,6 +65,76 @@ final class CashierNoteRevisionSubmitFeatureTest extends TestCase
         ]);
     }
 
+    public function test_workspace_update_route_rejects_open_note_that_is_already_settled(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedOpenServiceOnlyNote();
+        $this->seedCustomerPaymentBase('payment-1', 50000, date('Y-m-d'));
+        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 50000);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.edit', ['noteId' => 'note-1']))
+            ->patch(route('cashier.notes.workspace.update', ['noteId' => 'note-1']), [
+                'note' => [
+                    'customer_name' => 'Budi Settled Rewrite',
+                    'customer_phone' => '08123',
+                    'transaction_date' => date('Y-m-d'),
+                ],
+                'items' => [
+                    [
+                        'entry_mode' => 'service',
+                        'description' => null,
+                        'part_source' => 'none',
+                        'service' => [
+                            'name' => 'Servis Settled Rewrite',
+                            'price_rupiah' => '75000',
+                            'notes' => null,
+                        ],
+                        'product_lines' => [],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.workspace.edit', ['noteId' => 'note-1']));
+        $response->assertSessionHasErrors([
+            'revision' => 'Nota close tidak boleh diedit lewat workspace.',
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'customer_name' => 'Budi',
+            'note_state' => 'open',
+            'total_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'wi-1',
+            'note_id' => 'note-1',
+            'subtotal_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseHas('work_item_service_details', [
+            'work_item_id' => 'wi-1',
+            'service_name' => 'Servis Lama',
+            'service_price_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseHas('payment_allocations', [
+            'id' => 'allocation-1',
+            'customer_payment_id' => 'payment-1',
+            'note_id' => 'note-1',
+            'amount_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseMissing('note_revisions', [
+            'id' => 'note-1-r002',
+        ]);
+    }
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();
