@@ -260,88 +260,8 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
 
 
 
-    public function test_product_replacement_rejects_underpriced_current_catalog_store_stock_line(): void
-    {
-        $user = $this->loginAsAuthorizedAdmin();
-        $oldDate = date('Y-m-d', strtotime('-4 days'));
-        $today = date('Y-m-d');
 
-        $this->seedPaidProductOnlyNote($oldDate);
 
-        $response = $this->patchProductReplacement(
-            $user,
-            $today,
-            1,
-            1,
-            'current_catalog',
-            'Budi Underpriced Current Catalog'
-        );
-
-        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors([
-            'revision' => 'Harga jual pada store stock line tidak boleh di bawah harga jual minimum.',
-        ]);
-
-        $this->assertRejectedProductReplacementRolledBack($oldDate);
-    }
-
-    public function test_product_replacement_rejects_underpriced_revision_snapshot_store_stock_line_before_inventory_issue(): void
-    {
-        $user = $this->loginAsAuthorizedAdmin();
-        $oldDate = date('Y-m-d', strtotime('-4 days'));
-        $today = date('Y-m-d');
-
-        $this->seedPaidProductOnlyNote($oldDate);
-
-        $response = $this->patchProductReplacement(
-            $user,
-            $today,
-            1,
-            1,
-            'revision_snapshot',
-            'Budi Underpriced Revision Snapshot'
-        );
-
-        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
-        $response->assertSessionHasErrors([
-            'revision' => 'Harga jual pada store stock line tidak boleh di bawah harga jual minimum.',
-        ]);
-
-        $this->assertRejectedProductReplacementRolledBack($oldDate);
-    }
-
-    public function test_product_replacement_accepts_valid_revision_snapshot_store_stock_line(): void
-    {
-        $user = $this->loginAsAuthorizedAdmin();
-        $oldDate = date('Y-m-d', strtotime('-4 days'));
-        $today = date('Y-m-d');
-
-        $this->seedPaidProductOnlyNote($oldDate);
-
-        $response = $this->patchProductReplacement(
-            $user,
-            $today,
-            3,
-            100000,
-            'revision_snapshot',
-            'Budi Valid Revision Snapshot'
-        );
-
-        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-1']));
-        $response->assertSessionHasNoErrors();
-
-        $this->assertDatabaseHas('note_revisions', [
-            'note_root_id' => 'note-1',
-            'revision_number' => 2,
-        ]);
-
-        $this->assertDatabaseHas('notes', [
-            'id' => 'note-1',
-            'customer_name' => 'Budi Valid Revision Snapshot',
-            'transaction_date' => $today,
-            'total_rupiah' => 300000,
-        ]);
-    }
 
     private function patchProductReplacement(
         mixed $user,

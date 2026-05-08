@@ -81,6 +81,29 @@ final class WorkItemFactoryTest extends TestCase
         $this->assertSame(100000, $item->subtotalRupiah()->amount());
     }
 
+
+    public function test_store_stock_server_trusted_revision_snapshot_accepts_historical_price_below_current_minimum(): void
+    {
+        $factory = $this->factoryWithProductHargaJual(110000);
+
+        $item = $factory->build(
+            'note-1',
+            1,
+            WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+            [],
+            [],
+            [[
+                'product_id' => 'product-1',
+                'qty' => 3,
+                'line_total_rupiah' => 300000,
+                'price_basis' => 'revision_snapshot',
+                '_server_trusted_revision_snapshot' => true,
+            ]]
+        );
+
+        $this->assertSame(300000, $item->subtotalRupiah()->amount());
+    }
+
     private function factoryWithProductHargaJual(int $hargaJual): WorkItemFactory
     {
         $product = Product::create(
