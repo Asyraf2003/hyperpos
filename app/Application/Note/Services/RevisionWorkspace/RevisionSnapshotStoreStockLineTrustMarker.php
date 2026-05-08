@@ -9,6 +9,12 @@ use App\Core\Note\WorkItem\WorkItem;
 
 final class RevisionSnapshotStoreStockLineTrustMarker
 {
+    public function __construct(
+        private readonly RevisionSnapshotStoreStockLineTrustInventory $inventory,
+        private readonly RevisionSnapshotStoreStockLineKeyer $keyer,
+    ) {
+    }
+
     /**
      * @param list<array<string, mixed>> $items
      * @param list<WorkItem> $currentWorkItems
@@ -16,39 +22,19 @@ final class RevisionSnapshotStoreStockLineTrustMarker
      */
     public function mark(array $items, ?NoteRevision $currentRevision, array $currentWorkItems = []): array
     {
-        $available = $this->snapshotCounts($currentRevision);
-        $available = $this->addWorkItemCounts($available, $currentWorkItems);
+        $available = $this->inventory->countAvailable($currentRevision, $currentWorkItems);
 
         foreach ($items as $itemIndex => $item) {
             if (! is_array($item)) {
                 continue;
             }
 
-            $lines = $item['product_lines'] ?? null;
-
-            if (! is_array($lines) || ! isset($lines[0]) || ! is_array($lines[0])) {
+            $line = $this->firstProductLine($item);
+            if ($line === null) {
                 continue;
             }
 
-            $line = $lines[0];
-            $line['_server_trusted_revision_snapshot'] = false;
-
-            if (($line['price_basis'] ?? null) !== 'revision_snapshot') {
-                $items[$itemIndex]['product_lines'][0] = $line;
-
-                continue;
-            }
-
-            $qty = (int) ($line['qty'] ?? 0);
-            $unitPrice = (int) ($line['unit_price_rupiah'] ?? 0);
-            $lineTotal = $qty * $unitPrice;
-            $key = $this->key((string) ($line['product_id'] ?? ''), $qty, $lineTotal);
-
-            if (($available[$key] ?? 0) > 0) {
-                $line['_server_trusted_revision_snapshot'] = true;
-                $available[$key]--;
-            }
-
+            $line = $this->markLine($line, $available);
             $items[$itemIndex]['product_lines'][0] = $line;
         }
 
@@ -56,66 +42,44 @@ final class RevisionSnapshotStoreStockLineTrustMarker
     }
 
     /**
-     * @return array<string, int>
+     * @param array<string, mixed> $item
+     * @return array<string, mixed>|null
      */
-    private function snapshotCounts(?NoteRevision $revision): array
+    private function firstProductLine(array $item): ?array
     {
-        if ($revision === null) {
-            return [];
+        $lines = $item['product_lines'] ?? null;
+
+        if (! is_array($lines) || ! isset($lines[0]) || ! is_array($lines[0])) {
+            return null;
         }
 
-        $counts = [];
-
-        foreach ($revision->lines() as $line) {
-            $payload = $line->payload();
-            $storeLines = $payload['store_stock_lines'] ?? [];
-
-            if (! is_array($storeLines)) {
-                continue;
-            }
-
-            foreach ($storeLines as $storeLine) {
-                if (! is_array($storeLine)) {
-                    continue;
-                }
-
-                $key = $this->key(
-                    (string) ($storeLine['product_id'] ?? ''),
-                    (int) ($storeLine['qty'] ?? 0),
-                    (int) ($storeLine['line_total_rupiah'] ?? 0)
-                );
-
-                $counts[$key] = ($counts[$key] ?? 0) + 1;
-            }
-        }
-
-        return $counts;
+        return $lines[0];
     }
 
     /**
-     * @param array<string, int> $counts
-     * @param list<WorkItem> $workItems
-     * @return array<string, int>
+     * @param array<string, mixed> $line
+     * @param array<string, int> $available
+     * @return array<string, mixed>
      */
-    private function addWorkItemCounts(array $counts, array $workItems): array
+    private function markLine(array $line, array &$available): array
     {
-        foreach ($workItems as $workItem) {
-            foreach ($workItem->storeStockLines() as $line) {
-                $key = $this->key(
-                    $line->productId(),
-                    $line->qty(),
-                    $line->lineTotalRupiah()->amount()
-                );
+        $line['_server_trusted_revision_snapshot'] = false;
 
-                $counts[$key] = ($counts[$key] ?? 0) + 1;
-            }
+        if (($line['price_basis'] ?? null) !== 'revision_snapshot') {
+            return $line;
         }
 
-        return $counts;
-    }
+        $key = $this->keyer->fromParts(
+            (string) ($line['product_id'] ?? ''),
+            (int) ($line['qty'] ?? 0),
+            (int) ($line['qty'] ?? 0) * (int) ($line['unit_price_rupiah'] ?? 0),
+        );
 
-    private function key(string $productId, int $qty, int $lineTotalRupiah): string
-    {
-        return trim($productId) . '|' . $qty . '|' . $lineTotalRupiah;
+        if (($available[$key] ?? 0) > 0) {
+            $line['_server_trusted_revision_snapshot'] = true;
+            $available[$key]--;
+        }
+
+        return $line;
     }
 }
