@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
+use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineTrustMarker;
 use App\Core\Note\Note\Note;
 use App\Ports\Out\Note\NoteWriterPort;
 
@@ -14,6 +15,7 @@ final class ApplyNoteRevisionAsActiveReplacement
         private readonly UpdateTransactionWorkspaceWorkItemPersister $workItems,
         private readonly NoteReplacementPaymentAllocationReconciler $payments,
         private readonly NoteHistoryProjectionService $projection,
+        private readonly RevisionSnapshotStoreStockLineTrustMarker $snapshotTrust,
     ) {
     }
 
@@ -30,9 +32,15 @@ final class ApplyNoteRevisionAsActiveReplacement
             $replacement->transactionDate(),
         );
 
+        $trustedItems = $this->snapshotTrust->mark(
+            is_array($items) ? array_values($items) : [],
+            null,
+            $root->workItems(),
+        );
+
         $this->notes->updateHeader($root);
         $this->payments->deleteExisting($root->id());
-        $this->workItems->persist($root, $items, $root->transactionDate());
+        $this->workItems->persist($root, $trustedItems, $root->transactionDate());
         $this->notes->updateTotal($root);
         $this->payments->rebuild($root, $paymentAmounts);
         $this->projection->syncNote($root->id());
