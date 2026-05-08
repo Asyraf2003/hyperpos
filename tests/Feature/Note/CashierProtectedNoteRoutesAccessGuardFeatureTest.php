@@ -47,6 +47,35 @@ final class CashierProtectedNoteRoutesAccessGuardFeatureTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_cashier_cannot_post_rows_to_refunded_note(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedServiceOnlyNote('note-refunded', date('Y-m-d'), 'refunded');
+
+        $this->actingAs($user)
+            ->post(route('cashier.notes.rows.store', ['noteId' => 'note-refunded']), [
+                'rows' => [[
+                    'line_type' => 'service',
+                    'service_name' => 'Servis Tambahan',
+                    'service_price_rupiah' => 30000,
+                    'service_notes' => 'Attempt refunded mutation',
+                ]],
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('work_items', [
+            'note_id' => 'note-refunded',
+            'line_no' => 2,
+            'subtotal_rupiah' => 30000,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-refunded',
+            'note_state' => 'refunded',
+            'total_rupiah' => 50000,
+        ]);
+    }
+
     public function test_cashier_cannot_post_payment_for_open_note_older_than_two_days(): void
     {
         $user = $this->seedKasir();

@@ -21,8 +21,8 @@ final class CashierNoteAccessGuard
     {
         $this->assertCanView($note, $today);
 
-        if ($note->isClosed()) {
-            throw new DomainException('Kasir tidak boleh memproses note yang sudah ditutup lewat route ini.');
+        if ($note->isClosed() || $note->isRefunded()) {
+            throw new DomainException('Kasir tidak boleh memproses note yang sudah ditutup atau refund lewat route ini.');
         }
     }
 

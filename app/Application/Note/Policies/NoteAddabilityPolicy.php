@@ -20,6 +20,10 @@ final class NoteAddabilityPolicy
             return;
         }
 
+        if ($note->isRefunded()) {
+            throw new DomainException('Item baru tidak boleh ditambahkan ke note yang sudah refund.');
+        }
+
         if ($this->paidStatus->isPaid($note)) {
             throw new DomainException('Item baru tidak boleh ditambahkan ke note yang sudah lunas.');
         }

@@ -51,6 +51,40 @@ final class AddWorkItemToPaidNoteFeatureTest extends TestCase
         ]);
     }
 
+    public function test_add_work_item_handler_rejects_new_item_when_note_is_refunded(): void
+    {
+        $this->loginAsKasir();
+        $this->seedNote('note-1', 'Budi Santoso', '2026-03-14', 50000, 'refunded');
+
+        $handler = app(AddWorkItemHandler::class);
+
+        $result = $handler->handle(
+            'note-1',
+            1,
+            WorkItem::TYPE_SERVICE_ONLY,
+            [
+                'service_name' => 'Servis Karburator',
+                'service_price_rupiah' => 30000,
+                'part_source' => ServiceDetail::PART_SOURCE_NONE,
+            ],
+        );
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertTrue($result->isFailure());
+        $this->assertSame(
+            ['note' => ['NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_REFUNDED']],
+            $result->errors(),
+        );
+
+        $this->assertDatabaseCount('work_items', 0);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'note_state' => 'refunded',
+            'total_rupiah' => 50000,
+        ]);
+    }
+
     public function test_add_work_item_handler_allows_new_item_for_zero_total_note(): void
     {
         $this->loginAsKasir();
@@ -93,11 +127,13 @@ final class AddWorkItemToPaidNoteFeatureTest extends TestCase
         string $customerName,
         string $transactionDate,
         int $totalRupiah,
+        string $noteState = 'open',
     ): void {
         DB::table('notes')->insert([
             'id' => $id,
             'customer_name' => $customerName,
             'transaction_date' => $transactionDate,
+            'note_state' => $noteState,
             'total_rupiah' => $totalRupiah,
         ]);
     }

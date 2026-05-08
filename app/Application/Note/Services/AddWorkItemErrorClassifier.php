@@ -21,6 +21,9 @@ final class AddWorkItemErrorClassifier
         } elseif (str_contains($msg, 'harga jual minimum')) {
             $code = 'PRICING_BELOW_MINIMUM_SELLING_PRICE';
             $key = 'pricing';
+        } elseif (str_contains($msg, 'note yang sudah refund')) {
+            $code = 'NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_REFUNDED';
+            $key = 'note';
         } elseif (str_contains($msg, 'note yang sudah lunas')) {
             $code = 'NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_PAID';
             $key = 'note';
