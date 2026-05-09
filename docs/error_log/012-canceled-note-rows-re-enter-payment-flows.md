@@ -2,7 +2,7 @@
 
 ## Status
 
-Patched, with verification gap and residual audit note.
+Fixed with focused proof and explicit residual global/browser gaps.
 
 Patch supplied and unit tests added/updated, but tests could not run in the patch environment because phpunit/vendor dependencies were missing.
 
@@ -238,6 +238,120 @@ php artisan test tests/Unit/Application/Payment/Services/ResolveNotePayableCompo
 Result:
 
 Failed because vendor/autoload.php not present.
+
+## Update 2026-05-09 - Focused closure after source contradiction
+
+Current local source/test proof contradicted the previous `Patched` document status. The earlier document implied the #012 patch existed but still had verification gaps. Source inspection showed a narrower reality:
+
+- `ResolveNotePayableComponents::fromNote()` already skipped canceled rows before this remediation session.
+- `ResolveNotePayableComponentsSelectedRows.php` still accepted selected canceled row IDs before this remediation session.
+- `WorkItemStatusTransitionService.php` still allowed an already canceled work item to transition into another status before this remediation session.
+
+Therefore #012 was not only a verification-gap item. Two operational paths were still unsafe:
+
+1. selected-row payment resolution for canceled work item IDs;
+2. canceled work item status resurrection through status transition.
+
+Production files covered by the focused fix:
+
+- `app/Application/Payment/Services/ResolveNotePayableComponentsSelectedRows.php`
+- `app/Application/Note/Services/WorkItemStatusTransitionService.php`
+
+Test files added/updated for the focused fix:
+
+- `tests/Unit/Application/Payment/Services/ResolveNotePayableComponentsTest.php`
+- `tests/Unit/Application/Note/Services/WorkItemStatusTransitionServiceTest.php`
+- `tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php`
+- `tests/Feature/Note/CashierDetailRenderedBillingRowsPaymentFeatureTest.php`
+
+Focused behavior now covered:
+
+- selected canceled row IDs are rejected as invalid payment selections;
+- direct HTTP payment submission with selected canceled row ID redirects with payment error;
+- rejected selected canceled row payment creates no `customer_payments`;
+- rejected selected canceled row payment creates no `payment_allocations`;
+- rejected selected canceled row payment creates no `payment_component_allocations`;
+- canceled rows are not rendered as payable cashier billing rows;
+- active rows remain rendered as payable cashier billing rows;
+- already canceled work items cannot transition to `done`.
+
+RED proof before patch:
+
+Command:
+
+~~~bash
+php artisan test tests/Unit/Application/Payment/Services/ResolveNotePayableComponentsTest.php tests/Unit/Application/Note/Services/WorkItemStatusTransitionServiceTest.php
+
+Result:
+
+2 failed
+2 passed
+10 assertions
+
+Expected RED failures:
+
+selected canceled row expected DomainException, but none was thrown;
+canceled work item transition expected DomainException, but none was thrown.
+
+Targeted GREEN proof after patch:
+
+Command:
+
+php artisan test tests/Unit/Application/Payment/Services/ResolveNotePayableComponentsTest.php tests/Unit/Application/Note/Services/WorkItemStatusTransitionServiceTest.php
+
+Result:
+
+4 passed
+12 assertions
+
+HTTP/UI regression proof:
+
+Command:
+
+php artisan test tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php tests/Feature/Note/CashierDetailRenderedBillingRowsPaymentFeatureTest.php
+
+Result:
+
+6 passed
+33 assertions
+
+Focused/blast-radius proof after HTTP/UI additions:
+
+Command:
+
+php artisan test tests/Feature/Payment/RecordSelectedRowsNotePaymentFeatureTest.php tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php tests/Feature/Note/CorrectPaidWorkItemStatusFeatureTest.php tests/Feature/Note/CorrectPaidWorkItemStatusHttpFeatureTest.php tests/Unit/Application/Note/Services/NoteOperationalRowSettlementProjectorTest.php tests/Feature/Note/RevisionAfterRefundPreservesHistoricalWorkItemsFeatureTest.php
+
+Result:
+
+15 passed
+119 assertions
+
+UI/Blade decision:
+
+The cashier rendered detail page now has proof that the active row billing ID remains rendered while the canceled row billing ID is not rendered as payable. This is product/UI behavior proof only. UI hiding is not a security boundary.
+
+Native JS decision:
+
+No native JavaScript file was changed. The authoritative guard remains server-side selected-row validation and backend payment mutation rejection.
+
+Security decision:
+
+Direct POST with a selected canceled row ID is rejected by the backend payment flow. The regression proof confirms the attempted invalid payment creates no payment records and no allocation records.
+
+Audit/log/redaction decision:
+
+The patch scope does not add a new audit writer or logging path. The rejected invalid selected-row payment leaves payment/allocation tables unchanged, so there is no new successful financial mutation to audit in this path. No new sensitive logging surface was identified in the focused #012 patch.
+
+Residual gaps:
+
+Wider Note + Payment full suite was not rerun after the #012 HTTP/UI additions.
+Full global suite was not run for this #012 closure.
+Browser/manual QA was not run.
+No push proof is recorded here.
+#004 upstream guard was represented in focused proof through RevisionAfterRefundPreservesHistoricalWorkItemsFeatureTest, but full #004 closure/global reporting is not reopened by this #012 patch.
+Direct reporting over work_items remains outside this #012 patch unless separately proven.
+Seeder remediation remains future scope, not this workflow closure.
+
 
 ## Verification Gap
 
