@@ -2,7 +2,7 @@
 
 ## Status
 
-Patched and locally verified for backend payment allocation/projection scope.
+Fixed and locally verified for backend allocation/projection scope, with explicit migration/global/browser gaps.
 
 Root characterization was strengthened to use a valid current-revision workspace row, then verified locally. The later mixed legacy/component allocation regression was reproduced with a failing feature test, then fixed so selected-row payment uses combined legacy and component allocation totals for outstanding/guard behavior. Targeted, focused, and wider Note + Payment suites passed locally.
 
