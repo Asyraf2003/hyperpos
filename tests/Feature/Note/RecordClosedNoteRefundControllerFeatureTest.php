@@ -90,7 +90,7 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
     }
 
 
-    public function test_cashier_can_record_refund_for_open_note(): void
+    public function test_cashier_cannot_record_refund_for_open_partially_paid_row(): void
     {
         $user = $this->seedKasir();
         $this->seedOpenPartialPaidServiceOnlyNote();
@@ -103,23 +103,25 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
                 'reason' => 'Batalkan line open',
             ])
             ->assertRedirect(route('cashier.notes.index'))
-            ->assertSessionHas('success');
+            ->assertSessionHasErrors(['refund']);
 
-        $this->assertDatabaseHas('customer_refunds', [
-            'customer_payment_id' => 'payment-1',
-            'note_id' => 'note-1',
-            'amount_rupiah' => 20000,
-            'reason' => 'Batalkan line open',
-        ]);
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
 
         $this->assertDatabaseHas('work_items', [
             'id' => 'wi-1',
-            'status' => WorkItem::STATUS_CANCELED,
+            'status' => WorkItem::STATUS_OPEN,
         ]);
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'total_rupiah' => 0,
+            'note_state' => 'open',
+            'total_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseMissing('note_mutation_events', [
+            'note_id' => 'note-1',
+            'mutation_type' => 'note_rows_canceled_via_refund',
         ]);
     }
 
@@ -251,7 +253,6 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $this->seedServiceDetailBase('wi-1', 'Servis A', 50000, ServiceDetail::PART_SOURCE_NONE);
 
         $this->seedCustomerPaymentBase('payment-1', 20000, $today);
-        $this->seedPaymentAllocationBase('allocation-1', 'payment-1', 'note-1', 20000);
 
         DB::table('payment_component_allocations')->insert([
             'id' => 'pca-1',
