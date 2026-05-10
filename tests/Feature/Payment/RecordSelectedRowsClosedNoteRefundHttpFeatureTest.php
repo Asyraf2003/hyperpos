@@ -104,6 +104,41 @@ final class RecordSelectedRowsClosedNoteRefundHttpFeatureTest extends TestCase
         ]);
     }
 
+    public function test_unpaid_selected_row_refund_is_rejected_without_canceling_row_or_changing_note_total(): void
+    {
+        $user = $this->seedKasir();
+        $today = date('Y-m-d');
+
+        $this->seedNoteBase('note-unpaid-row-reject', 'Unpaid Row Reject', $today, 50000, Note::STATE_OPEN);
+        $this->seedWorkItemBase('wi-unpaid-row-reject-1', 'note-unpaid-row-reject', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('wi-unpaid-row-reject-1', 'Servis Unpaid Reject', 50000, ServiceDetail::PART_SOURCE_NONE);
+
+        $this->actingAs($user)->post(route('cashier.notes.refunds.store', ['noteId' => 'note-unpaid-row-reject']), [
+            'selected_row_ids' => ['wi-unpaid-row-reject-1'],
+            'refunded_at' => $today,
+            'reason' => 'Forged refund unpaid row must not cancel row',
+        ]);
+
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'wi-unpaid-row-reject-1',
+            'status' => WorkItem::STATUS_OPEN,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-unpaid-row-reject',
+            'note_state' => Note::STATE_OPEN,
+            'total_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseMissing('note_mutation_events', [
+            'note_id' => 'note-unpaid-row-reject',
+            'mutation_type' => 'note_rows_canceled_via_refund',
+        ]);
+    }
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();
