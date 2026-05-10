@@ -139,6 +139,38 @@ final class RecordSelectedRowsClosedNoteRefundHttpFeatureTest extends TestCase
         ]);
     }
 
+    public function test_close_selected_row_refund_is_rejected_when_parent_note_is_open(): void
+    {
+        $user = $this->seedKasir();
+        $today = date('Y-m-d');
+        $this->seedOpenNoteWithOnePaidLine($today);
+
+        $this->actingAs($user)->post(route('cashier.notes.refunds.store', ['noteId' => 'note-1']), [
+            'selected_row_ids' => ['wi-1'],
+            'refunded_at' => $today,
+            'reason' => 'Forged refund close row on open parent note',
+        ]);
+
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'wi-1',
+            'status' => WorkItem::STATUS_OPEN,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-1',
+            'note_state' => Note::STATE_OPEN,
+            'total_rupiah' => 100000,
+        ]);
+
+        $this->assertDatabaseMissing('note_mutation_events', [
+            'note_id' => 'note-1',
+            'mutation_type' => 'note_rows_canceled_via_refund',
+        ]);
+    }
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();
