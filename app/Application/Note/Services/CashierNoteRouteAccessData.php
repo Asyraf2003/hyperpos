@@ -30,6 +30,23 @@ final readonly class CashierNoteRouteAccessData
         return true;
     }
 
+    public function ensureCanOpenWorkspaceEdit(string $noteId): bool
+    {
+        $note = $this->notes->getById($noteId);
+
+        if ($note === null) {
+            return false;
+        }
+
+        $this->guard->assertCanView($note, $this->clock->now());
+
+        if ($note->isRefunded()) {
+            throw new \App\Core\Shared\Exceptions\DomainException('Kasir tidak boleh membuka workspace edit untuk note refund.');
+        }
+
+        return true;
+    }
+
     public function ensureCanMutateOpenNote(string $noteId): bool
     {
         $note = $this->notes->getById($noteId);
