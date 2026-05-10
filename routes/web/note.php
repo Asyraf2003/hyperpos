@@ -47,10 +47,12 @@ Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
         Route::get('/{noteId}/workspace/edit', EditTransactionWorkspacePageController::class)->name('workspace.edit');
         Route::get('/{noteId}', AdminNoteDetailPageController::class)->name('show');
 
-        Route::post('/{noteId}/refunds', RecordClosedNoteRefundController::class)->name('refunds.store');
-        Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
-        Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
-        Route::patch('/{noteId}/workspace', StoreNoteRevisionController::class)->name('workspace.update');
+        Route::middleware(EnsureTransactionEntryAllowed::class)->group(function (): void {
+            Route::post('/{noteId}/refunds', RecordClosedNoteRefundController::class)->name('refunds.store');
+            Route::post('/{noteId}/payments', RecordNotePaymentController::class)->name('payments.store');
+            Route::post('/{noteId}/rows', AddNoteRowsController::class)->name('rows.store');
+            Route::patch('/{noteId}/workspace', StoreNoteRevisionController::class)->name('workspace.update');
+        });
 
         Route::post('/{noteId}/reopen', AdminReopenClosedNoteController::class)->name('reopen');
     });
