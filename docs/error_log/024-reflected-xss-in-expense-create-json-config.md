@@ -2,7 +2,153 @@
 
 ## Status
 
-Patched, with verification gap.
+Status: Strict Fixed
+
+Strict-Fixed-Scope: local reflected XSS protection for admin expense create JSON config rendered from query-string category_id.
+
+## Update Log
+
+### Update 2 - 2026-05-10 strict local verification
+
+Status changed from Patched, with verification gap to Status: Strict Fixed for the local #024 admin expense create JSON config scope.
+
+Current source/test reality:
+
+- The previous document status was stale because current local source still rendered expense create config JSON with raw Blade output and only:
+  - JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+- RED proof reproduced reflected script-breakout from query-string category_id.
+- The production sink was patched at:
+  - resources/views/admin/expenses/create.blade.php
+- The final sink now uses:
+  - JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+- The regression test file is:
+  - tests/Feature/Expense/CreateExpensePageFeatureTest.php
+
+### Strict Closure Packet
+
+Status: Strict Fixed
+
+Strict-Fixed-Scope: local reflected XSS protection for admin expense create JSON config where selectedCategoryId is derived from query-string category_id and rendered inside script type application/json.
+
+#### Root Cause
+
+CreateExpensePageController accepted category_id from the query string and passed it to selectedCategoryId.
+
+The admin expense create Blade view rendered selectedCategoryId inside a JSON blob embedded in an HTML script tag using raw Blade output and json_encode with JSON_UNESCAPED_SLASHES. That allowed a payload containing closing script text to remain literal in the HTML response, letting the browser HTML parser terminate the JSON script block and execute attacker-controlled JavaScript.
+
+#### Source Reality
+
+- app/Adapters/In/Http/Controllers/Admin/Expense/CreateExpensePageController.php: reads category_id from the query string and passes selectedCategoryId to the view.
+- resources/views/admin/expenses/create.blade.php: renders expense-create-config with JSON_HEX script-safe flags.
+- tests/Feature/Expense/CreateExpensePageFeatureTest.php: contains regression coverage for script-breaking category_id payload.
+
+#### UI Blade Impact
+
+Impact: yes.
+
+View path:
+
+- resources/views/admin/expenses/create.blade.php
+
+UI invariant:
+
+- selectedCategoryId may be reflected into the JSON config, but it must not appear as literal script-breaking HTML.
+- the response must not contain literal script-breakout text from attacker-controlled query input.
+- the escaped form must remain present as JSON-safe text.
+
+#### Server Boundary
+
+This issue is an output-context/rendering vulnerability, not a mutation authorization boundary.
+
+- Direct GET: admin expense create route was used to render the vulnerable response.
+- Direct mutation request: not applicable for #024 closure scope.
+- No mutation proof: not applicable for this XSS rendering closure.
+- Admin boundary: admin create expense page rendering path covered by feature tests.
+- Kasir boundary: existing create page test confirms kasir is redirected back to cashier dashboard and cannot access the admin page.
+
+#### ADR / Rule Compatibility
+
+- docs/adr/0020-public-surface-output-storage-attachment-security.md: requires safe JavaScript config encoding, context-aware output, no raw user-controlled HTML, and no final fixed claim from patch existence alone.
+- Conflict: none found for this #024 local closure scope.
+
+#### RED Proof
+
+Command:
+
+    php artisan test tests/Feature/Expense/CreateExpensePageFeatureTest.php --filter=script_breaking
+
+Observed failure before production patch:
+
+- FAIL Tests\Feature\Expense\CreateExpensePageFeatureTest
+- 1 failed / 3 assertions
+- failure at tests/Feature/Expense/CreateExpensePageFeatureTest.php:73
+- rendered response still contained:
+  - </script><script>alert(24)</script>
+
+#### GREEN Proof
+
+Command:
+
+    php artisan test tests/Feature/Expense/CreateExpensePageFeatureTest.php --filter=script_breaking
+
+Observed pass after Blade JSON_HEX patch:
+
+- PASS Tests\Feature\Expense\CreateExpensePageFeatureTest
+- 1 passed / 6 assertions
+
+#### Focused Blast-Radius Proof
+
+Command:
+
+    php artisan test \
+      tests/Feature/Expense/CreateExpensePageFeatureTest.php \
+      tests/Feature/Expense/StoreExpenseHttpFeatureTest.php \
+      tests/Feature/Expense/CreateExpenseCategoryPageFeatureTest.php \
+      tests/Feature/Expense/StoreExpenseCategoryHttpFeatureTest.php \
+      tests/Feature/Expense/ExpenseIndexPageFeatureTest.php \
+      tests/Feature/Expense/ExpenseCategoryIndexPageFeatureTest.php
+
+Observed pass:
+
+- PASS
+- 15 passed / 82 assertions
+
+#### Negative Search
+
+Local negative search for the expense slice found:
+
+- resources/views/admin/expenses/create.blade.php:
+  - expense-create-config still uses raw Blade JSON output, but now with JSON_HEX script-safe flags.
+- resources/views/admin/expenses/index.blade.php:
+  - expense table config uses @json.
+- resources/views/admin/expenses/categories/index.blade.php:
+  - expense category config uses @json.
+
+Classification:
+
+- admin expense create raw JSON hit is the #024 sink and is now script-safe through JSON_HEX flags.
+- other checked expense configs use framework-safe @json output.
+- broader project-wide raw output findings remain outside this #024 local closure scope.
+
+#### Remaining Gaps
+
+- Browser/manual QA was not run.
+- Full global make verify was not run for this #024 closure step.
+- Full project-wide Blade/JS output audit remains broader Slice 7 / final verification scope.
+- #025 remains a separate Slice 7 issue.
+- Commit/push proof for this docs update is not claimed here.
+
+#### Strict Closure Decision
+
+#024 is locally strict-fixed for the tested admin expense create JSON script-context sink because:
+
+- source behavior matches the root-cause fix
+- RED proof reproduced the reflected script-breakout vulnerability
+- targeted GREEN proof passed
+- focused expense blast-radius proof passed
+- UI/server boundary is correctly scoped as output rendering, not mutation authorization
+- ADR-0020 compatibility was checked
+- remaining gaps are explicit and outside this local strict closure scope
 
 ## Severity
 
