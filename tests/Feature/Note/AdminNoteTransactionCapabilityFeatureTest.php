@@ -30,21 +30,20 @@ final class AdminNoteTransactionCapabilityFeatureTest extends TestCase
     {
         $admin = $this->adminWithoutTransactionCapability();
 
-        $statuses = [];
-
         foreach ($this->adminMutationRequests() as $request) {
             $response = $this->actingAs($admin)
                 ->{$request['method']}($request['route'], $request['payload']);
 
-            $statuses[$request['name']] = $response->getStatusCode();
+            $response->assertStatus(403);
+            $response->assertJson([
+                'success' => false,
+                'data' => null,
+                'message' => 'Admin belum diizinkan input transaksi.',
+                'errors' => [
+                    'capability' => ['ADMIN_TRANSACTION_CAPABILITY_DISABLED'],
+                ],
+            ]);
         }
-
-        $this->assertSame([
-            'payment' => 403,
-            'refund' => 403,
-            'rows' => 403,
-            'workspace' => 403,
-        ], $statuses);
     }
 
     /**
