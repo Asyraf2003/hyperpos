@@ -77,5 +77,6 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
         ->name('admin.procurement.supplier-invoices.update');
 
     Route::post('/admin/procurement/supplier-invoices', StoreSupplierInvoiceController::class)
+        ->middleware('transaction.entry')
         ->name('admin.procurement.supplier-invoices.store');
 });
