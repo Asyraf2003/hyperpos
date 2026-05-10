@@ -2,7 +2,9 @@
 
 ## Status
 
-Patched, with verification gap.
+Status: Strict Fixed
+
+Strict-Fixed-Scope: local workspace JSON script-context escaping for stored note/service fields and product selected_label data rendered through the shared note workspace config sink.
 
 Patch disediakan dan regression test ditambahkan, tetapi focused test tidak dapat berjalan di environment patch karena vendor/autoload.php tidak ada.
 
@@ -38,6 +40,161 @@ Keduanya menyentuh note workspace, tetapi #007 adalah browser/client-side inject
 Karena root cause, sink, dampak, dan patch berbeda, laporan #007 dicatat sebagai file baru.
 
 ## Update Log
+
+### Update 5 - 2026-05-10 strict local verification
+
+Status changed from `Patched, with verification gap` to `Status: Strict Fixed` for the local #007 workspace JSON script-context scope.
+
+Current source/test reality:
+
+- The previous document status was stale because current local source initially still rendered the workspace config JSON with raw Blade output and only:
+  - `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES`
+- RED proof reproduced the script-breakout vulnerability in the admin note workspace edit response.
+- The production sink was patched at:
+  - `resources/views/cashier/notes/workspace/create.blade.php`
+- The final sink now uses:
+  - `JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT`
+- The regression test file is:
+  - `tests/Feature/Note/AdminNoteWorkspaceReplacementFeatureTest.php`
+
+#### Strict Closure Packet
+
+Status: Strict Fixed
+
+Strict-Fixed-Scope: local rendered workspace JSON config escaping for #007 stored XSS sources that reach `oldNote`, `oldItems`, and `selected_label` in the shared note workspace config script block.
+
+#### Root Cause
+
+Stored user-controlled values from note/customer/service fields and product labels reached a JSON blob embedded inside an HTML `<script type="application/json">` block.
+
+The old sink used raw Blade output and `json_encode(...)` with `JSON_UNESCAPED_SLASHES`, so `</script>` could remain literal in the HTML response. The browser HTML parser could close the JSON script block and execute attacker-controlled JavaScript in the victim admin/cashier same-origin session.
+
+#### Source Reality
+
+- `resources/views/cashier/notes/workspace/create.blade.php`: renders `cashier-note-workspace-config` with JSON_HEX script-safe flags.
+- `app/Application/Note/Services/EditTransactionWorkspacePageDataBuilder.php`: still contains a stale `workspaceConfigJson` field using `JSON_UNESCAPED_SLASHES`, but current source grep found only this builder reference and the shown Blade view does not render that variable. It is recorded as a source smell, not a proven rendered sink in this closure.
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceProductLineMapper.php`: product `namaBarang()` can flow into `selected_label`.
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceProductOnlyMapper.php`: product-only revision rows copy `selected_label` into `oldItems`.
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceServiceStoreStockMapper.php`: service-with-store-stock revision rows copy `selected_label` into `oldItems`.
+
+#### UI Blade Impact
+
+Impact: yes.
+
+View path:
+
+- `resources/views/cashier/notes/workspace/create.blade.php`
+
+UI invariant:
+
+- user-controlled text may appear in workspace config data, but it must not appear as literal script-breaking HTML.
+- the response must not contain literal `</script><script>` from attacker-controlled values.
+- the escaped form must be present as JSON-safe text.
+
+#### Server Boundary
+
+This issue is an output-context/rendering vulnerability, not a server-side authorization or mutation boundary.
+
+- Direct GET: admin workspace edit route was used to render the vulnerable response.
+- Direct mutation request: not applicable for #007 closure scope.
+- No mutation proof: not applicable for this XSS rendering closure.
+- Admin boundary: admin edit workspace rendering path covered by feature tests.
+- Cashier boundary: shared cashier workspace view sink is patched; focused workspace tests covered cashier edit/create workspace rendering compatibility.
+
+#### ADR / Rule Compatibility
+
+- `docs/adr/0020-public-surface-output-storage-attachment-security.md`: requires context-aware output, safe JavaScript config encoding, no raw user-controlled HTML, and no final fixed claim from patch existence alone.
+- Conflict: none found for this #007 local closure scope.
+
+#### RED Proof
+
+Command:
+
+    php artisan test tests/Feature/Note/AdminNoteWorkspaceReplacementFeatureTest.php --filter=script_breaking
+
+Observed failure before production patch:
+
+- `FAIL Tests\Feature\Note\AdminNoteWorkspaceReplacementFeatureTest`
+- `1 failed / 3 assertions`
+- failure at `tests/Feature/Note/AdminNoteWorkspaceReplacementFeatureTest.php:162`
+- rendered response still contained:
+  - `</script><script>alert(1)</script>`
+
+#### GREEN Proof
+
+Command:
+
+    php artisan test tests/Feature/Note/AdminNoteWorkspaceReplacementFeatureTest.php --filter=script_breaking
+
+Observed pass after Blade JSON_HEX patch and product-label characterization:
+
+- `PASS Tests\Feature\Note\AdminNoteWorkspaceReplacementFeatureTest`
+- `2 passed / 10 assertions`
+
+Covered payload sources:
+
+- stored note/customer/service fields with `alert(1)`
+- product `namaBarang()` flowing through `selected_label` with `alert(2)`
+
+Product-label proof note:
+
+- Product-label RED-before-patch was not available in this later local step because the shared Blade JSON sink had already been fixed in current HEAD.
+- The product-label test is therefore post-patch characterization for the same sink and documented data flow.
+
+#### Focused Blast-Radius Proof
+
+Command:
+
+    php artisan test \
+      tests/Feature/Note/AdminNoteWorkspaceReplacementFeatureTest.php \
+      tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php \
+      tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php \
+      tests/Feature/Note/CashierClosedNoteWorkspaceReplacementFeatureTest.php
+
+Observed pass:
+
+- `PASS`
+- `7 passed / 48 assertions`
+
+#### Negative Search
+
+Search result before docs closure found:
+
+- `RAW_JSON_HITS`
+  - `resources/views/cashier/notes/workspace/create.blade.php`
+- `SCRIPT_CONFIG_HITS`
+  - includes workspace, expense, dashboard, note index, alerts, and other application/json blocks
+- `RAW_BLADE_HITS`
+  - `resources/views/cashier/notes/workspace/create.blade.php`
+  - `resources/views/admin/expenses/create.blade.php`
+  - `resources/views/layouts/partials/alerts.blade.php`
+
+Classification:
+
+- workspace create raw JSON hit is the #007 sink and is now script-safe through JSON_HEX flags.
+- `resources/views/admin/expenses/create.blade.php` belongs to #024 and remains separate Slice 7 scope.
+- `resources/views/layouts/partials/alerts.blade.php` is not closed by this #007 proof and remains a later classification/audit candidate if it handles user-controlled raw output.
+
+#### Remaining Gaps
+
+- Browser/manual QA was not run.
+- Full global `make verify` was not run for this #007 closure step.
+- Full project-wide Blade/JS output audit remains broader Slice 7 / final verification scope.
+- The stale `workspaceConfigJson` builder field still uses unsafe flags but has no rendered usage found by current grep; it should not be described as an active rendered sink without new proof.
+- #024 and #025 remain separate Slice 7 issues.
+- Commit/push proof for this docs/test update is not claimed here.
+
+#### Strict Closure Decision
+
+#007 is locally strict-fixed for the tested workspace JSON script-context sink because:
+
+- source behavior matches the root-cause fix
+- RED proof reproduced the stored script-breakout vulnerability
+- targeted GREEN proof passed for stored note/service fields and product selected_label source
+- focused workspace blast-radius proof passed
+- UI/server boundary is correctly scoped as output rendering, not authorization
+- ADR-0020 compatibility was checked
+- remaining gaps are explicit and outside this local strict closure scope
 
 ### Update 1
 
