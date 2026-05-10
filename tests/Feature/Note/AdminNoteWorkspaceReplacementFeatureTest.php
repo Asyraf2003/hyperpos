@@ -128,4 +128,40 @@ final class AdminNoteWorkspaceReplacementFeatureTest extends TestCase
             'allocated_amount_rupiah' => 50000,
         ]);
     }
+    public function test_admin_workspace_config_json_escapes_script_breaking_sequences_from_stored_fields(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-14 days'));
+        $payload = '</script><script>alert(1)</script>';
+
+        $this->seedNoteBase('note-admin-xss-1', $payload, $oldDate, 50000, 'closed');
+        $this->seedWorkItemBase('wi-admin-xss-1', 'note-admin-xss-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('wi-admin-xss-1', $payload, 50000, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedCustomerPaymentBase('pay-admin-xss-1', 50000, $oldDate);
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-admin-xss-1',
+            'customer_payment_id' => 'pay-admin-xss-1',
+            'note_id' => 'note-admin-xss-1',
+            'work_item_id' => 'wi-admin-xss-1',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-admin-xss-1',
+            'component_amount_rupiah_snapshot' => 50000,
+            'allocated_amount_rupiah' => 50000,
+            'allocation_priority' => 20,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-admin-xss-1']));
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        $this->assertIsString($html);
+        $this->assertStringNotContainsString($payload, $html);
+        $this->assertStringNotContainsString('</script><script>', $html);
+        $this->assertStringContainsString('\u003C/script\u003E\u003Cscript\u003Ealert(1)\u003C/script\u003E', $html);
+    }
+
 }
