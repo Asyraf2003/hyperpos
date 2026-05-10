@@ -164,4 +164,63 @@ final class AdminNoteWorkspaceReplacementFeatureTest extends TestCase
         $this->assertStringContainsString('\u003C/script\u003E\u003Cscript\u003Ealert(1)\u003C/script\u003E', $html);
     }
 
+    public function test_admin_workspace_config_json_escapes_script_breaking_sequences_from_product_label(): void
+    {
+        $user = $this->loginAsAuthorizedAdmin();
+        $oldDate = date('Y-m-d', strtotime('-14 days'));
+        $payload = '</script><script>alert(2)</script>';
+
+        $this->seedNoteBase('note-admin-product-xss-1', 'Budi Product XSS', $oldDate, 150000, 'closed');
+        $this->seedNotePaymentProduct('product-xss-1', 'PRD-XSS-1', $payload, 'Merek XSS', 100, 100000);
+        $this->seedWorkItemBase(
+            'wi-admin-product-xss-1',
+            'note-admin-product-xss-1',
+            1,
+            WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART,
+            WorkItem::STATUS_OPEN,
+            150000
+        );
+        $this->seedServiceDetailBase('wi-admin-product-xss-1', 'Servis Product XSS', 50000, 'store_stock');
+        $this->seedStoreStockLineBase('ssl-admin-product-xss-1', 'wi-admin-product-xss-1', 'product-xss-1', 1, 100000);
+        $this->seedCustomerPaymentBase('pay-admin-product-xss-1', 150000, $oldDate);
+        $this->seedServiceWithStoreStockCurrentRevision(
+            'note-admin-product-xss-1',
+            'note-admin-product-xss-1-r001',
+            'wi-admin-product-xss-1',
+            'Budi Product XSS',
+            $oldDate,
+            150000,
+            'Servis Product XSS',
+            50000,
+            'ssl-admin-product-xss-1',
+            'product-xss-1',
+            1,
+            100000
+        );
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-admin-product-xss-1',
+            'customer_payment_id' => 'pay-admin-product-xss-1',
+            'note_id' => 'note-admin-product-xss-1',
+            'work_item_id' => 'wi-admin-product-xss-1',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-admin-product-xss-1',
+            'component_amount_rupiah_snapshot' => 150000,
+            'allocated_amount_rupiah' => 150000,
+            'allocation_priority' => 20,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-admin-product-xss-1']));
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        $this->assertIsString($html);
+        $this->assertStringNotContainsString($payload, $html);
+        $this->assertStringNotContainsString('</script><script>', $html);
+        $this->assertStringContainsString('\u003C/script\u003E\u003Cscript\u003Ealert(2)\u003C/script\u003E', $html);
+    }
+
 }
