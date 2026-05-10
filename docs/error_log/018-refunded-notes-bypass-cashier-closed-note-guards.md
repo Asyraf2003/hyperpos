@@ -188,6 +188,70 @@ full make verify not claimed because audit-lines is deferred by owner decision
 #022 refund route access guard remains separate
 admin correction/reopen flow is not verified by this slice
 
+### Update 3
+
+Current Slice 5 re-verification found and fixed a scoped server-side workspace-edit guard regression.
+
+Reason:
+
+- Broad #022 route/guard rerun exposed an adjacent #018 failure:
+  - `cashier cannot open workspace edit for refunded note`
+  - expected 403
+  - actual 200
+- Initial attempt moved `cashier.notes.workspace.edit` to the generic mutate-open guard.
+- That correctly blocked refunded notes, but also regressed the existing closed-note workspace edit contract:
+  - `cashier can open workspace edit for closed note`
+  - expected 200
+  - actual 403
+- Refined patch added a dedicated workspace-edit access path:
+  - closed notes remain allowed for GET workspace edit
+  - refunded notes are denied for GET workspace edit
+
+Production files changed:
+
+- app/Application/Note/Services/CashierNoteRouteAccessData.php
+- app/Adapters/In/Http/Middleware/Note/EnsureCashierNoteAccess.php
+
+Patch summary:
+
+- `CashierNoteRouteAccessData::ensureCanOpenWorkspaceEdit(string $noteId): bool` was added.
+- The new method:
+  - loads the note
+  - applies normal cashier view/date-window access through `assertCanView`
+  - rejects refunded notes directly with a DomainException
+- `EnsureCashierNoteAccess` now routes:
+  - `cashier.notes.workspace.edit` to `ensureCanOpenWorkspaceEdit`
+  - `cashier.notes.show`, `cashier.notes.payments.store`, and `cashier.notes.refunds.store` to `ensureCanView`
+  - remaining mutation routes to `ensureCanMutateOpenNote`
+
+Targeted proof:
+
+- `php artisan test tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php --filter=test_cashier_can_open_workspace_edit_for_closed_note`
+  - 1 passed, 2 assertions
+- `php artisan test tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php --filter=test_cashier_cannot_open_workspace_edit_for_refunded_note`
+  - 1 passed, 1 assertion
+- `php artisan test tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php`
+  - 7 passed, 11 assertions
+
+Focused server-side guard proof:
+
+- Command:
+  - `php artisan test tests/Feature/Note/CashierProtectedNoteRoutesAccessGuardFeatureTest.php tests/Feature/Note/AddWorkItemToPaidNoteFeatureTest.php tests/Feature/Note/CashierRefundedNoteDetailViewFeatureTest.php tests/Feature/Note/EditableWorkspaceNoteGuardFeatureTest.php tests/Feature/Note/CashierClosedNoteWorkspaceReplacementSubmitFeatureTest.php tests/Feature/Note/CashierNoteRevisionSubmitFeatureTest.php tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php tests/Feature/Note/CashierRefundRejectsOpenLineFeatureTest.php`
+- Result:
+  - 25 passed, 99 assertions
+
+Diff check:
+
+- `git diff --check` passed for:
+  - app/Application/Note/Services/CashierNoteRouteAccessData.php
+  - app/Adapters/In/Http/Middleware/Note/EnsureCashierNoteAccess.php
+  - docs/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
+
+Remaining scope boundary:
+
+- #015 UI `Edit` button visibility remains separate.
+- This update fixes server-side GET workspace edit access for refunded notes.
+
 ## Ringkasan Indonesia
 
 Bug terjadi setelah lifecycle baru memperkenalkan state refunded.
@@ -362,17 +426,26 @@ Failed due to missing vendor/autoload.php / dependencies not installed.
 
 ## Verification Gap
 
-Test sudah ditambahkan, tetapi belum pass di environment patch.
+Closed by previous proof:
 
-Missing proof:
-
-- cashier cannot open workspace edit for refunded note
-- cashier cannot post rows/payments/corrections against refunded note
+- cashier cannot post rows to refunded note
 - AddWorkItemHandler rejects refunded note
-- admin correction/reopen route remains the only intended path if mutation is needed
-- refunded note detail view remains accessible if intended
-- all mutation routes consistently treat refunded as terminal
-- no direct URL bypass remains
+- cashier cannot patch workspace update for refunded note
+- refunded detail view remains accessible when intended
+
+Closed by current Slice 5 proof:
+
+- cashier can still open workspace edit for closed note
+- cashier cannot open workspace edit for refunded note
+- dedicated workspace-edit guard allows closed notes while denying refunded notes
+- focused server-side guard suite passed: 25 tests, 99 assertions
+
+Remaining gaps:
+
+- #015 UI `Edit` button visibility remains separate
+- browser/manual QA not run
+- full global `make verify` not run in this step
+- admin correction/reopen flow is not verified by this slice
 
 ## Recommended Follow-up
 
