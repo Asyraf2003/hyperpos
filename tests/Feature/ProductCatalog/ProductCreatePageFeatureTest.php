@@ -105,6 +105,27 @@ final class ProductCreatePageFeatureTest extends TestCase
         $this->assertDatabaseCount('products', 1);
     }
 
+    public function test_admin_product_create_page_rejects_javascript_return_url(): void
+    {
+        $user = $this->createUserWithRole('admin-product-return-url-xss@example.test', 'admin');
+        $payload = 'javascript:alert(25)';
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('admin.products.create', [
+                'return_to' => $payload,
+                'return_label' => 'Kembali',
+            ]));
+
+        $response->assertOk();
+
+        $html = $response->getContent();
+
+        $this->assertIsString($html);
+        $this->assertStringNotContainsString('href="' . $payload . '"', $html);
+        $this->assertStringContainsString('href="' . route('admin.products.index') . '"', $html);
+    }
+
     private function createUserWithRole(string $email, string $role): User
     {
         $user = User::query()->create([
