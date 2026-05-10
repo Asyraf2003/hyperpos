@@ -46,10 +46,18 @@ final class RecordSelectedRowsRefundPlanTransaction
                 throw new DomainException($canceled->message() ?? 'Gagal membatalkan line refund.');
             }
 
-            $finalized = $this->finalizeRefunded->execute($plan->noteId(), $actorId, $actorRole, $reason);
+            $finalized = Result::success([
+                'note_id' => $plan->noteId(),
+                'note_state' => null,
+                'finalized' => false,
+            ]);
 
-            if ($finalized->isFailure()) {
-                throw new DomainException($finalized->message() ?? 'Gagal finalisasi note refund.');
+            if ((int) $processed['allocation_count'] > 0) {
+                $finalized = $this->finalizeRefunded->execute($plan->noteId(), $actorId, $actorRole, $reason);
+
+                if ($finalized->isFailure()) {
+                    throw new DomainException($finalized->message() ?? 'Gagal finalisasi note refund.');
+                }
             }
 
             $this->projection->syncNote($plan->noteId());
