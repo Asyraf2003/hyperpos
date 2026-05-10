@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Payment;
 
+use App\Core\Note\Note\Note;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Models\User;
@@ -67,6 +68,40 @@ final class RecordSelectedRowsClosedNoteRefundHttpFeatureTest extends TestCase
             ->assertSee('Refund / Batalkan Line')
             ->assertDontSee('Refund Line Close Terpilih')
             ->assertDontSee('Panel Refund');
+    }
+
+    public function test_forged_unpaid_selected_row_refund_does_not_auto_finalize_open_unpaid_note(): void
+    {
+        $user = $this->seedKasir();
+        $today = date('Y-m-d');
+
+        $this->seedNoteBase('note-unpaid-refund', 'Unpaid Forged Refund', $today, 50000, Note::STATE_OPEN);
+        $this->seedWorkItemBase('wi-unpaid-refund-1', 'note-unpaid-refund', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
+        $this->seedServiceDetailBase('wi-unpaid-refund-1', 'Servis Unpaid', 50000, ServiceDetail::PART_SOURCE_NONE);
+
+        $this->actingAs($user)->post(route('cashier.notes.refunds.store', ['noteId' => 'note-unpaid-refund']), [
+            'selected_row_ids' => ['wi-unpaid-refund-1'],
+            'refunded_at' => $today,
+            'reason' => 'Forged refund unpaid row',
+        ]);
+
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-unpaid-refund',
+            'note_state' => Note::STATE_OPEN,
+        ]);
+
+        $this->assertDatabaseMissing('notes', [
+            'id' => 'note-unpaid-refund',
+            'note_state' => Note::STATE_REFUNDED,
+        ]);
+
+        $this->assertDatabaseMissing('note_mutation_events', [
+            'note_id' => 'note-unpaid-refund',
+            'mutation_type' => 'note_refunded_after_selected_rows_refund',
+        ]);
     }
 
     private function seedKasir(): User
