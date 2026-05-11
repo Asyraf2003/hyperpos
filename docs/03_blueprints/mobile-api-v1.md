@@ -1,6 +1,6 @@
 # HyperPOS Mobile API v1 Blueprint
 
-Status: Draft 2 - owner decisions locked; Mobile API auth foundation and cashier product search implemented and locally verified
+Status: Draft 3 - owner decisions locked; Mobile API auth, cashier product search, and admin supplier invoice read API implemented and locally verified
 Scope: Companion mobile app for cashier product lookup and admin supplier invoice/payment proof workflow
 Date: 2026-05-12
 
@@ -712,7 +712,6 @@ Decision: A
 Reason: simplest controlled internal production path for early rollout.
 ## 14. Current Gaps
 
-- Supplier invoice search/detail API is not implemented yet.
 - Supplier payment proof upload/view API is not implemented yet.
 - Due invoice list API is not implemented yet.
 - Kotlin Android project is not created yet.
@@ -727,12 +726,12 @@ Reason: simplest controlled internal production path for early rollout.
 
 Next active implementation step:
 
-1. Implement admin supplier invoice search/detail API under `/api/v1`.
-2. Keep admin-only access for supplier invoice mobile endpoints.
-3. Match search term behavior to Q5: invoice number + supplier name.
-4. Match payment status values to existing backend locked terms per Q6.
-5. Preserve Laravel as source of truth for supplier invoice, payment status, proof attachment, audit, and permission decisions.
-6. After the supplier invoice read API is locally verified, choose between payment proof upload/view API or Kotlin skeleton in `/home/asyraf/Code/laravel/bengkel2/kotlin`.
+1. Choose one next branch of work:
+   - Payment proof upload/view API, or
+   - Kotlin Android skeleton in `/home/asyraf/Code/laravel/bengkel2/kotlin`.
+2. If choosing payment proof upload/view API, keep admin-only access and upload-proof-only scope.
+3. If choosing Kotlin skeleton, keep Kotlin files outside Laravel app at `/home/asyraf/Code/laravel/bengkel2/kotlin`.
+4. Preserve Laravel as source of truth for auth, role, supplier invoice, payment status, proof attachment, audit, and permission decisions.
 
 ## 16. Implementation Proof Log
 
@@ -818,5 +817,42 @@ Not verified in this proof:
 - API sanity curl against a running local server.
 - Supplier invoice API.
 - Payment proof upload/view API.
+- Kotlin Android client.
+- Browser/manual QA.
+
+### 2026-05-12 - Mobile API Admin Supplier Invoice Read API
+
+Status: Implemented and locally verified.
+
+Implemented route proof:
+
+- `GET|HEAD api/v1/supplier-invoices`
+- `GET|HEAD api/v1/supplier-invoices/{supplierInvoiceId}`
+
+Verification proof:
+
+- Syntax checks passed for supplier invoice Mobile API controllers and route file in the implementation step.
+- Targeted supplier invoice Mobile API test after route/controller patch: `4 passed (11 assertions)`.
+- Targeted supplier invoice Mobile API test after success-path fixture: `6 passed (17 assertions)`.
+- Focused Mobile API auth + product + procurement tests: `17 passed (53 assertions)`.
+- `git diff --check` produced no output.
+- Route proof showed 6 `/api/v1` routes.
+
+Verified scope:
+
+- Supplier invoice list requires bearer token.
+- Cashier mobile token is rejected from supplier invoice list.
+- Admin can read empty supplier invoice list using backend `payment_status=outstanding`.
+- Admin supplier invoice detail not-found returns safe JSON with `SUPPLIER_INVOICE_NOT_FOUND`.
+- Admin can read real supplier invoice list row from `supplier_invoice_list_projection`.
+- Admin can read supplier invoice detail summary and current lines.
+- Mobile supplier invoice API reuses existing procurement read-side handlers/ports/adapters.
+
+Not verified in this proof:
+
+- Full global Laravel test suite.
+- API sanity curl against a running local server.
+- Supplier payment proof upload/view API.
+- Due invoice list API.
 - Kotlin Android client.
 - Browser/manual QA.
