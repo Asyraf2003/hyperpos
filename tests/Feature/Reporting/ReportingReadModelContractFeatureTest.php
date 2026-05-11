@@ -10,7 +10,7 @@ final class ReportingReadModelContractFeatureTest extends TestCase
 {
     public function test_reporting_adr_locks_reporting_as_read_model_boundary(): void
     {
-        $path = base_path('docs/adr/0009-reporting-as-read-model.md');
+        $path = base_path('docs/02_architecture/adr/0009-reporting-as-read-model.md');
 
         $this->assertFileExists($path);
 
@@ -29,7 +29,7 @@ final class ReportingReadModelContractFeatureTest extends TestCase
 
     public function test_reporting_adr_includes_expense_entries_as_domain_final_source(): void
     {
-        $path = base_path('docs/adr/0009-reporting-as-read-model.md');
+        $path = base_path('docs/02_architecture/adr/0009-reporting-as-read-model.md');
 
         $this->assertFileExists($path);
 
@@ -48,7 +48,7 @@ final class ReportingReadModelContractFeatureTest extends TestCase
 
     public function test_workflow_places_reporting_read_models_in_step_12(): void
     {
-        $path = base_path('docs/workflow/workflow_v1.md');
+        $path = base_path('docs/03_blueprints/workflow_v1.md');
 
         $this->assertFileExists($path);
 
