@@ -1,6 +1,6 @@
 # HyperPOS Mobile API v1 Blueprint
 
-Status: Draft 3 - owner decisions locked; Mobile API auth, cashier product search, and admin supplier invoice read API implemented and locally verified
+Status: Draft 4 - owner decisions locked; Mobile API auth, cashier product search, admin supplier invoice read API, and supplier payment proof upload/view API implemented and locally verified
 Scope: Companion mobile app for cashier product lookup and admin supplier invoice/payment proof workflow
 Date: 2026-05-12
 
@@ -712,7 +712,6 @@ Decision: A
 Reason: simplest controlled internal production path for early rollout.
 ## 14. Current Gaps
 
-- Supplier payment proof upload/view API is not implemented yet.
 - Due invoice list API is not implemented yet.
 - Kotlin Android project is not created yet.
 - Android encrypted token storage is not implemented yet.
@@ -726,12 +725,19 @@ Reason: simplest controlled internal production path for early rollout.
 
 Next active implementation step:
 
-1. Choose one next branch of work:
-   - Payment proof upload/view API, or
-   - Kotlin Android skeleton in `/home/asyraf/Code/laravel/bengkel2/kotlin`.
-2. If choosing payment proof upload/view API, keep admin-only access and upload-proof-only scope.
-3. If choosing Kotlin skeleton, keep Kotlin files outside Laravel app at `/home/asyraf/Code/laravel/bengkel2/kotlin`.
-4. Preserve Laravel as source of truth for auth, role, supplier invoice, payment status, proof attachment, audit, and permission decisions.
+1. Start Kotlin Android skeleton in `/home/asyraf/Code/laravel/bengkel2/kotlin`.
+2. Keep Kotlin files outside Laravel app.
+3. Use locked Kotlin decisions:
+   - XML/ViewBinding
+   - OkHttp only
+   - custom encrypted token storage from v1
+   - first production install manual signed APK via USB/file
+4. First Kotlin scope should stay small:
+   - project skeleton
+   - package boundary
+   - build/install proof on physical Redmi 12
+   - no feature UI until skeleton proof is green.
+5. Due invoice list API remains backend follow-up after Kotlin skeleton or before admin due UI, whichever becomes safer from proof.
 
 ## 16. Implementation Proof Log
 
@@ -853,6 +859,44 @@ Not verified in this proof:
 - Full global Laravel test suite.
 - API sanity curl against a running local server.
 - Supplier payment proof upload/view API.
+- Due invoice list API.
+- Kotlin Android client.
+- Browser/manual QA.
+
+### 2026-05-12 - Mobile API Supplier Payment Proof Upload and View
+
+Status: Implemented and locally verified.
+
+Implemented route proof:
+
+- `POST api/v1/supplier-payments/{supplierPaymentId}/proofs`
+- `GET|HEAD api/v1/supplier-payment-proof-attachments/{attachmentId}`
+
+Verification proof:
+
+- Syntax checks passed for supplier payment proof Mobile API controllers and route file in the implementation step.
+- RED targeted payment proof Mobile API test before route/controller patch: `6 failed`, all from missing route `404`.
+- Targeted payment proof Mobile API test after actor ID fix: `6 passed (22 assertions)`.
+- Focused Mobile API auth + product + procurement + payment proof tests: `23 passed (75 assertions)`.
+- `git diff --check` produced no output.
+- Route proof showed 8 `/api/v1` routes.
+
+Verified scope:
+
+- Supplier payment proof upload requires bearer token.
+- Cashier mobile token is rejected from supplier payment proof upload.
+- Admin can upload supplier payment proof to an existing supplier payment.
+- Supplier payment proof attachment view requires bearer token.
+- Cashier mobile token is rejected from supplier payment proof attachment view.
+- Admin can view supplier payment proof attachment with safe headers.
+- Attachment response keeps `X-Content-Type-Options: nosniff`.
+- Mobile supplier payment proof upload reuses existing `AttachSupplierPaymentProofHandler`.
+- Mobile supplier payment proof view reuses existing `GetSupplierPaymentProofAttachmentFileHandler`.
+
+Not verified in this proof:
+
+- Full global Laravel test suite.
+- API sanity curl against a running local server.
 - Due invoice list API.
 - Kotlin Android client.
 - Browser/manual QA.
