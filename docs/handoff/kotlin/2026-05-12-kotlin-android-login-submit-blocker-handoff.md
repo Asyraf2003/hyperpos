@@ -564,3 +564,53 @@ Current session decision:
 - Android `/api/v1/me` using stored token is proven.
 - Login integration unblock scope is closed.
 - Product search Android flow is still not started.
+
+## Android product search API stored-token proof
+
+Status: Fixed and locally verified for Android Product Search API stored-token runtime proof.
+
+Proof date: 2026-05-12.
+
+Kotlin files changed for proof:
+
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/main/java/id/hyperpos/mobile/domain/product/MobileProductSearchRow.kt`
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/main/java/id/hyperpos/mobile/application/product/ProductSearchResult.kt`
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/main/java/id/hyperpos/mobile/application/product/SearchProductsUseCase.kt`
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/main/java/id/hyperpos/mobile/application/ports/ProductSearchApiPort.kt`
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/main/java/id/hyperpos/mobile/adapters/http/OkHttpProductSearchApiClient.kt`
+- `/home/asyraf/Code/laravel/bengkel2/kotlin/app/src/androidTest/java/id/hyperpos/mobile/adapters/http/OkHttpProductSearchApiClientInstrumentedTest.kt`
+
+Runtime proof:
+
+- Android test class: `id.hyperpos.mobile.adapters.http.OkHttpProductSearchApiClientInstrumentedTest`
+- Test device: `23053RN02A - 15`
+- Test count: 1 test
+- Compile proof: `:app:assembleDebugAndroidTest` returned `BUILD SUCCESSFUL in 4s`
+- Runtime proof: `:app:connectedDebugAndroidTest` returned `BUILD SUCCESSFUL in 33s`
+
+Verified behavior:
+
+- Android login uses `mobile-android-smoke@example.test`.
+- Android login stores the backend token through `AndroidKeystoreSessionTokenStore`.
+- Android product search uses the stored token.
+- Android calls `GET /api/v1/products/search?q=ban`.
+- Product search response is parsed into Kotlin product search model.
+- Search result query is `ban`.
+- Search result limit is `20`.
+- Search result rows are not empty.
+- At least one returned label contains `Ban`.
+- Returned stock values are non-negative.
+- Returned default prices are positive.
+- Returned minimum prices match current backend floor price.
+
+Security note:
+
+- No raw backend API token was printed.
+- Product search proof validates the stored-token authenticated API path without exposing token value.
+
+Current session decision:
+
+- Login integration unblock scope is closed.
+- Android `/api/v1/me` using stored token is proven.
+- Android Product Search API layer using stored token is proven.
+- Product Search UI flow is still not started.
