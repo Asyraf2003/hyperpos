@@ -6,6 +6,8 @@ use App\Adapters\In\Http\Controllers\Api\V1\Auth\LoginMobileApiController;
 use App\Adapters\In\Http\Controllers\Api\V1\Auth\LogoutMobileApiController;
 use App\Adapters\In\Http\Controllers\Api\V1\Auth\MeMobileApiController;
 use App\Adapters\In\Http\Controllers\Api\V1\Product\SearchMobileApiProductsController;
+use App\Adapters\In\Http\Controllers\Api\V1\Procurement\ShowMobileApiSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Api\V1\Procurement\ListMobileApiSupplierInvoicesController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -21,5 +23,11 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/products/search', SearchMobileApiProductsController::class)
             ->name('api.v1.products.search');
+
+        Route::get('/supplier-invoices', ListMobileApiSupplierInvoicesController::class)
+            ->name('api.v1.supplier-invoices.index');
+
+        Route::get('/supplier-invoices/{supplierInvoiceId}', ShowMobileApiSupplierInvoiceController::class)
+            ->name('api.v1.supplier-invoices.show');
     });
 });
