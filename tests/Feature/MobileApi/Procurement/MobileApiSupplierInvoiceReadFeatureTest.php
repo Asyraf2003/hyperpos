@@ -241,6 +241,17 @@ final class MobileApiSupplierInvoiceReadFeatureTest extends TestCase
             'last_revision_no' => 1,
         ]);
 
+        DB::table('products')->insert([
+            'id' => 'product-mobile-supplier-001',
+            'kode_barang' => 'SP-MOB-001',
+            'nama_barang' => 'Sparepart Mobile',
+            'nama_barang_normalized' => 'sparepart mobile',
+            'merek' => 'Federal',
+            'merek_normalized' => 'federal',
+            'ukuran' => 80,
+            'harga_jual' => 15000,
+        ]);
+
         DB::table('supplier_invoice_lines')->insert([
             'id' => 'supplier-invoice-line-mobile-001',
             'supplier_invoice_id' => 'supplier-invoice-mobile-001',
