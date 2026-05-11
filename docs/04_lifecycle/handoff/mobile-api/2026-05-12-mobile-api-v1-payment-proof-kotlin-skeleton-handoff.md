@@ -400,3 +400,33 @@ First active step only:
 Verify repo/workspace state and then start Kotlin Android skeleton under `/home/asyraf/Code/laravel/bengkel2/kotlin`, not inside Laravel app.
 
 Do not implement feature UI yet. First Kotlin goal is project skeleton + package boundary + build/install proof.
+
+## Update - Kotlin Android Skeleton Build and Device Install Proof
+
+Local proof after this handoff:
+
+- Kotlin Android skeleton was created under /home/asyraf/Code/laravel/bengkel2/kotlin.
+- It was not created inside /home/asyraf/Code/laravel/bengkel2/app.
+- local.properties points to /opt/android-sdk.
+- buildToolsVersion is pinned to 35.0.0 because /opt/android-sdk already has build-tools/35.0.0 and is not writable for normal user package auto-install.
+- gradle.properties enables AndroidX and sets org.gradle.java.home to /usr/lib/jvm/java-17-openjdk.
+- JDK 17 was installed locally and javac 17.0.19 is available.
+- ./gradlew clean assembleDebug passed.
+- app/build/outputs/apk/debug/app-debug.apk was created at 3.9M.
+- adb detected device 52344d4a7d7c.
+- ./gradlew installDebug installed app-debug.apk on 23053RN02A - 15.
+- Follow-up ./gradlew assembleDebug smoke build passed in 2s.
+- Kotlin workspace is not inside the Laravel app git repo and is not a git repo by itself yet.
+
+Remaining gaps:
+
+- Manual app launch/UI confirmation is not proven.
+- Signed release APK is not proven.
+- Encrypted token storage is not implemented.
+- Login/API integration is not implemented.
+- Kotlin project tracking/repository strategy is not decided.
+
+Next safest step:
+
+- Decide Kotlin tracking strategy without moving Kotlin files into the Laravel app repo.
+- Then start encrypted token storage blueprint before login API integration.

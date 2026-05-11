@@ -1,6 +1,6 @@
 # HyperPOS Mobile API v1 Blueprint
 
-Status: Draft 4 - owner decisions locked; Mobile API auth, cashier product search, admin supplier invoice read API, and supplier payment proof upload/view API implemented and locally verified
+Status: Draft 5 - owner decisions locked; Mobile API auth, cashier product search, admin supplier invoice read API, supplier payment proof upload/view API, and Kotlin Android skeleton build/install baseline locally verified
 Scope: Companion mobile app for cashier product lookup and admin supplier invoice/payment proof workflow
 Date: 2026-05-12
 
@@ -713,7 +713,7 @@ Reason: simplest controlled internal production path for early rollout.
 ## 14. Current Gaps
 
 - Due invoice list API is not implemented yet.
-- Kotlin Android project is not created yet.
+- Kotlin Android skeleton is created outside the Laravel app repo and locally build/install verified; feature UI, API integration, and encrypted token storage are not implemented yet.
 - Android encrypted token storage is not implemented yet.
 - Full global Laravel test suite has not been run for the Mobile API auth and product search foundation.
 - Browser/manual QA has not been run for the Mobile API auth and product search foundation.
@@ -725,7 +725,7 @@ Reason: simplest controlled internal production path for early rollout.
 
 Next active implementation step:
 
-1. Start Kotlin Android skeleton in `/home/asyraf/Code/laravel/bengkel2/kotlin`.
+1. Record Kotlin Android skeleton build/install proof, then start encrypted token storage blueprint before login API integration.
 2. Keep Kotlin files outside Laravel app.
 3. Use locked Kotlin decisions:
    - XML/ViewBinding
@@ -900,3 +900,33 @@ Not verified in this proof:
 - Due invoice list API.
 - Kotlin Android client.
 - Browser/manual QA.
+
+### 2026-05-12 - Kotlin Android Skeleton Build and Device Install
+
+Status: Implemented and locally verified.
+
+Scope:
+
+- Kotlin Android skeleton created under /home/asyraf/Code/laravel/bengkel2/kotlin.
+- Laravel app repo remains separate at /home/asyraf/Code/laravel/bengkel2/app.
+- Kotlin app is client-only.
+- XML and ViewBinding are enabled.
+- OkHttp dependency is present.
+- Package boundary placeholders are present for domain, application ports, HTTP adapter, storage adapter, file adapter, feature packages, and shared code.
+
+Proof:
+
+- Gradle uses /usr/lib/jvm/java-17-openjdk through org.gradle.java.home.
+- ./gradlew clean assembleDebug: BUILD SUCCESSFUL, 37 actionable tasks.
+- Debug APK created at app/build/outputs/apk/debug/app-debug.apk, 3.9M.
+- adb detected device 52344d4a7d7c.
+- ./gradlew installDebug installed app-debug.apk on 23053RN02A - 15.
+- Follow-up smoke build: ./gradlew assembleDebug BUILD SUCCESSFUL in 2s.
+
+Remaining gaps:
+
+- Manual app launch/UI confirmation is not proven.
+- Signed release APK is not proven.
+- Encrypted token storage is not implemented.
+- Login/API integration is not implemented.
+- Kotlin workspace is not inside the Laravel app git repo and is not a git repo by itself yet.
