@@ -7,6 +7,8 @@ use App\Adapters\In\Http\Controllers\Api\V1\Auth\LogoutMobileApiController;
 use App\Adapters\In\Http\Controllers\Api\V1\Auth\MeMobileApiController;
 use App\Adapters\In\Http\Controllers\Api\V1\Product\SearchMobileApiProductsController;
 use App\Adapters\In\Http\Controllers\Api\V1\Procurement\ShowMobileApiSupplierInvoiceController;
+use App\Adapters\In\Http\Controllers\Api\V1\Procurement\UploadMobileApiSupplierPaymentProofController;
+use App\Adapters\In\Http\Controllers\Api\V1\Procurement\ShowMobileApiSupplierPaymentProofAttachmentController;
 use App\Adapters\In\Http\Controllers\Api\V1\Procurement\ListMobileApiSupplierInvoicesController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,5 +31,11 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/supplier-invoices/{supplierInvoiceId}', ShowMobileApiSupplierInvoiceController::class)
             ->name('api.v1.supplier-invoices.show');
+
+        Route::post('/supplier-payments/{supplierPaymentId}/proofs', UploadMobileApiSupplierPaymentProofController::class)
+            ->name('api.v1.supplier-payments.proofs.store');
+
+        Route::get('/supplier-payment-proof-attachments/{attachmentId}', ShowMobileApiSupplierPaymentProofAttachmentController::class)
+            ->name('api.v1.supplier-payment-proof-attachments.show');
     });
 });
