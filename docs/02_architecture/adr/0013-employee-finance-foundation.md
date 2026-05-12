@@ -1,4 +1,4 @@
-# ADR-013: Employee Finance Foundation
+# ADR-0013 — Employee Finance Foundation
 
 ## Status
 Accepted

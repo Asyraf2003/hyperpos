@@ -1,4 +1,4 @@
-# ADR 0021 — Note Detail Hybrid Model: Versioning + Billing Projection + Simple Refund
+# ADR-0021 — Note Detail Hybrid Model: Versioning + Billing Projection + Simple Refund
 
 ## Status
 ACCEPTED
