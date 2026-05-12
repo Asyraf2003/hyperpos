@@ -43,7 +43,7 @@ Checklist ini adalah target pemeriksaan. Jangan klaim semua file ada kecuali sud
 - File historical diberi status historical atau notice yang jelas.
 - File specialized DoD atau legacy reference diberi status yang jelas.
 - File specialized DoD tidak boleh dibaca sebagai proof implementasi selesai.
-- Tidak ada active stale path menuju docs/AI_RULES atau docs/AI_USAGE_GUIDE.md.
+- Tidak ada active stale path menuju legacy standards root atau legacy usage guide location.
 - Rename atau move file hanya boleh dilakukan setelah backlink audit dan owner decision.
 
 ## Rule Penutupan
