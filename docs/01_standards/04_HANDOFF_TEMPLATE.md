@@ -21,41 +21,41 @@ Tuliskan target spesifik halaman kerja atau target slice yang dikerjakan.
 ## Fakta terkunci
 Tuliskan hanya fakta yang benar-benar terbukti.
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Scope yang dipakai
 ### SCOPE-IN
-- 
-- 
-- 
+-
+-
+-
 
 ### SCOPE-OUT
-- 
-- 
-- 
+-
+-
+-
 
 ## GAP
 Tuliskan gap yang benar-benar masih ada.
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Keputusan yang dikunci
 Tuliskan keputusan nyata yang sudah diambil.
 
-- 
-- 
-- 
+-
+-
+-
 
 ## File yang dibuat/diubah
 ### File baru
-- 
+-
 
 ### File diubah
-- 
+-
 
 ## Bukti verifikasi
 - command:
@@ -69,9 +69,9 @@ Tuliskan keputusan nyata yang sudah diambil.
   - arti:
 
 ## Risiko / catatan lanjutan
-- 
-- 
-- 
+-
+-
+-
 
 ## Next step
 Tuliskan satu step aktif berikutnya yang paling sah menurut workflow.

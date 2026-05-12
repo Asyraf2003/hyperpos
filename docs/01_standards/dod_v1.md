@@ -1,4 +1,8 @@
-# 3) DoD Induk v1
+# DoD Induk v1
+
+## Status
+Legacy baseline DoD reference.
+This file defines broad completion criteria and is not proof that any current implementation is complete.
 
 Di bawah ini DoD induk, termasuk make target, data testing, batas gagal, dan catatan proyek.
 

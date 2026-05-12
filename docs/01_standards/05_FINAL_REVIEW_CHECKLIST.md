@@ -37,5 +37,14 @@ Checklist ini adalah target pemeriksaan. Jangan klaim semua file ada kecuali sud
 - GPT lain bisa membuka sesi dengan docs/01_standards/03_SESSION_START_PROTOCOL.md
 - GPT lain bisa menutup slice dengan docs/01_standards/04_HANDOFF_TEMPLATE.md
 
+## Checklist Isi Folder
+- Setiap file Markdown punya tepat satu heading H1.
+- File canonical standards aktif punya tujuan dan aturan yang jelas.
+- File historical diberi status historical atau notice yang jelas.
+- File specialized DoD atau legacy reference diberi status yang jelas.
+- File specialized DoD tidak boleh dibaca sebagai proof implementasi selesai.
+- Tidak ada active stale path menuju docs/AI_RULES atau docs/AI_USAGE_GUIDE.md.
+- Rename atau move file hanya boleh dilakukan setelah backlink audit dan owner decision.
+
 ## Rule Penutupan
 Jika checklist di atas terpenuhi berdasarkan proof lokal, paket AI_RULES di docs/01_standards dapat dianggap siap pakai secara operasional.

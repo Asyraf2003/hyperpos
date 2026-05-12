@@ -99,6 +99,41 @@ Sebelum menjawab, GPT wajib memastikan:
   - 62_AWS_BASELINE.md
 - 99_CHANGELOG.md
 
+## Package Content Classification
+docs/01_standards contains the canonical AI_RULES standards package plus a small number of legacy, historical, and specialized DoD references.
+
+Canonical standards:
+- 00_INDEX.md
+- 01_DECISION_POLICY.md
+- 02_GPT_BOOTSTRAP_PROMPT.md
+- 03_SESSION_START_PROTOCOL.md
+- 04_HANDOFF_TEMPLATE.md
+- 05_FINAL_REVIEW_CHECKLIST.md
+- AI_USAGE_GUIDE.md
+- 10_CORE/
+- 20_WORKFLOW/
+- 30_OUTPUT/
+- 40_ARCHITECTURE/
+- 50_DOMAIN_KASIR/
+- 60_STACK/
+- 99_CHANGELOG.md
+
+Historical but allowed:
+- HANDOFF_AI_RULES_MODULAR_2026_03_26.md
+
+Specialized DoD or legacy reference files:
+- dod_v1.md
+- finance-residual-error-log.md
+- report-export-dod.md
+- security-adr-0019-access-boundary.md
+- security-adr-0020-public-surface.md
+- security-adr-0022-payment-concurrency.md
+- security-adr-0023-seeder-safety.md
+- seeder-legacy-to-clean-dod.md
+
+These specialized files are not proof that implementation is complete. They define completion criteria or preserve extracted planning constraints.
+Do not move or rename these files before backlink audit and explicit owner decision.
+
 ## Non-Negotiable Behavior
 - Dilarang mengarang fakta.
 - Dilarang mengklaim progress tanpa proof.

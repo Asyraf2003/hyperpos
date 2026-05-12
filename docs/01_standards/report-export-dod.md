@@ -1,16 +1,21 @@
-Definition of Done - Report and Dashboard Export
+# Report and Dashboard Export Definition of Done
 
-Status: Draft
-Date: 2026-05-01
-Scope: PDF and Excel export for reports and dashboard
+## Status
+Draft.
+This file defines completion criteria for report and dashboard exports.
+It is not proof that export implementation is complete.
 
-Purpose
+## Metadata
+- Date: 2026-05-01
+- Scope: PDF and Excel export for reports and dashboard
+
+## Purpose
 
 Mengunci syarat selesai untuk export PDF dan Excel agar fitur tidak dianggap selesai hanya karena tombol download muncul.
 
 Tombol download tanpa parity adalah dekorasi berbahaya. Cantik, bisa diklik, dan diam-diam menusuk laporan.
 
-Global DoD
+## Global DoD
 
 Export baru boleh dianggap selesai jika semua poin berikut terpenuhi:
 
@@ -30,7 +35,7 @@ export tidak memperlambat page load normal
 targeted tests pass
 relevant existing report tests pass
 audit/performance proof dicatat bila scope menyentuh area itu
-Source Contract DoD
+## Source Contract DoD
 
 Wajib ada proof untuk:
 
@@ -59,7 +64,7 @@ styling final PDF
 optional chart rendering
 optional audit event for export
 queued export
-PDF DoD
+## PDF DoD
 
 PDF export selesai jika:
 
@@ -77,20 +82,20 @@ filename aman dan jelas
 tidak ada error internal bocor
 access unauthorized ditolak
 
-PDF validation:
+### PDF validation
 
 range lebih dari 1 bulan ditolak
 invalid date/month ditolak
 user tanpa akses ditolak
 
-PDF proof:
+### PDF proof
 
 test generate PDF 1 bulan
 test invalid range
 test unauthorized
 test content metadata/summary
 manual open/download jika memungkinkan
-Excel DoD
+## Excel DoD
 
 Excel export selesai jika:
 
@@ -109,13 +114,13 @@ file dapat dibuka
 filename aman dan jelas
 access unauthorized ditolak
 
-Excel validation:
+### Excel validation
 
 range lebih dari 1 tahun ditolak
 invalid date/year/month ditolak
 user tanpa akses ditolak
 
-Excel proof:
+### Excel proof
 
 test generate Excel 1 tahun
 test invalid range
@@ -123,7 +128,7 @@ test unauthorized
 test metadata sheet
 test numeric rupiah
 test summary/detail parity
-Screen/PDF/Excel Parity DoD
+## Screen PDF Excel Parity DoD
 
 Wajib lulus:
 
@@ -136,13 +141,13 @@ period boundary parity
 empty state parity
 refund/payment/outstanding parity untuk Laporan Transaksi
 
-Mismatch rule:
+### Mismatch rule
 
 selisih 1 rupiah = fail
 selisih 1 qty = fail
 missing row = fail
 wrong period inclusion = fail
-Dashboard Export DoD
+## Dashboard Export DoD
 
 Dashboard PDF selesai jika:
 
@@ -164,7 +169,7 @@ metric sheets tersedia
 value numeric
 dashboard summary reconcile dengan source report/dashboard dataset
 tidak memakai chart/DOM sebagai source data
-Performance DoD
+## Performance DoD
 
 Minimum:
 
@@ -174,7 +179,7 @@ query count tidak menunjukkan N+1 brutal
 PDF 1 bulan selesai dalam threshold yang disepakati
 Excel 1 tahun selesai dalam threshold yang disepakati atau ditandai sebagai queued candidate
 
-GAP:
+### GAP
 
 threshold angka final belum dikunci.
 threshold harus diputuskan setelah audit dataset/report pertama.
