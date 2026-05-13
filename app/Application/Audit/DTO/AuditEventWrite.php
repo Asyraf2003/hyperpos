@@ -35,96 +35,49 @@ final class AuditEventWrite
         array $metadata = [],
         array $snapshots = [],
     ) {
-        foreach ([
+        $this->assertRequiredIdentity();
+        $this->metadata = $metadata;
+        $this->snapshots = (new AuditEventWriteSnapshotValidator())->validate($snapshots);
+    }
+
+    public function id(): string { return trim($this->id); }
+    public function boundedContext(): string { return trim($this->boundedContext); }
+    public function aggregateType(): string { return trim($this->aggregateType); }
+    public function aggregateId(): string { return trim($this->aggregateId); }
+    public function eventName(): string { return trim($this->eventName); }
+    public function actorId(): ?string { return $this->nullableTrim($this->actorId); }
+    public function actorRole(): ?string { return $this->nullableTrim($this->actorRole); }
+    public function reason(): ?string { return $this->nullableTrim($this->reason); }
+    public function sourceChannel(): ?string { return $this->nullableTrim($this->sourceChannel); }
+    public function requestId(): ?string { return $this->nullableTrim($this->requestId); }
+    public function correlationId(): ?string { return $this->nullableTrim($this->correlationId); }
+    public function occurredAt(): DateTimeInterface { return $this->occurredAt; }
+
+    /** @return array<string, mixed> */
+    public function metadata(): array { return $this->metadata; }
+
+    /** @return list<AuditEventSnapshotWrite> */
+    public function snapshots(): array { return $this->snapshots; }
+
+    private function assertRequiredIdentity(): void
+    {
+        foreach ($this->requiredIdentityFields() as $field => $value) {
+            if (trim($value) === '') {
+                throw new InvalidArgumentException($field . ' is required.');
+            }
+        }
+    }
+
+    /** @return array<string, string> */
+    private function requiredIdentityFields(): array
+    {
+        return [
             'id' => $this->id,
             'bounded_context' => $this->boundedContext,
             'aggregate_type' => $this->aggregateType,
             'aggregate_id' => $this->aggregateId,
             'event_name' => $this->eventName,
-        ] as $field => $value) {
-            if (trim($value) === '') {
-                throw new InvalidArgumentException($field . ' is required.');
-            }
-        }
-
-        $this->metadata = $metadata;
-        $this->snapshots = $this->validatedSnapshots($snapshots);
-    }
-
-    public function id(): string
-    {
-        return trim($this->id);
-    }
-
-    public function boundedContext(): string
-    {
-        return trim($this->boundedContext);
-    }
-
-    public function aggregateType(): string
-    {
-        return trim($this->aggregateType);
-    }
-
-    public function aggregateId(): string
-    {
-        return trim($this->aggregateId);
-    }
-
-    public function eventName(): string
-    {
-        return trim($this->eventName);
-    }
-
-    public function actorId(): ?string
-    {
-        return $this->nullableTrim($this->actorId);
-    }
-
-    public function actorRole(): ?string
-    {
-        return $this->nullableTrim($this->actorRole);
-    }
-
-    public function reason(): ?string
-    {
-        return $this->nullableTrim($this->reason);
-    }
-
-    public function sourceChannel(): ?string
-    {
-        return $this->nullableTrim($this->sourceChannel);
-    }
-
-    public function requestId(): ?string
-    {
-        return $this->nullableTrim($this->requestId);
-    }
-
-    public function correlationId(): ?string
-    {
-        return $this->nullableTrim($this->correlationId);
-    }
-
-    public function occurredAt(): DateTimeInterface
-    {
-        return $this->occurredAt;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function metadata(): array
-    {
-        return $this->metadata;
-    }
-
-    /**
-     * @return list<AuditEventSnapshotWrite>
-     */
-    public function snapshots(): array
-    {
-        return $this->snapshots;
+        ];
     }
 
     private function nullableTrim(?string $value): ?string
@@ -136,30 +89,5 @@ final class AuditEventWrite
         $trimmed = trim($value);
 
         return $trimmed === '' ? null : $trimmed;
-    }
-
-    /**
-     * @param list<AuditEventSnapshotWrite> $snapshots
-     * @return list<AuditEventSnapshotWrite>
-     */
-    private function validatedSnapshots(array $snapshots): array
-    {
-        $seen = [];
-
-        foreach ($snapshots as $snapshot) {
-            if (! $snapshot instanceof AuditEventSnapshotWrite) {
-                throw new InvalidArgumentException('snapshots must contain AuditEventSnapshotWrite only.');
-            }
-
-            $kind = $snapshot->kind();
-
-            if (isset($seen[$kind])) {
-                throw new InvalidArgumentException('duplicate snapshot_kind: ' . $kind);
-            }
-
-            $seen[$kind] = true;
-        }
-
-        return array_values($snapshots);
     }
 }
