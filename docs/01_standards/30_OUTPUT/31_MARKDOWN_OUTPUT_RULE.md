@@ -1,21 +1,23 @@
-# P2 - Markdown Output Rule
+# P2 - Markdown Output Rule (Revised)
 
 ## Tujuan
-Mengunci format khusus saat AI menulis file markdown agar konsisten dengan preferensi user.
+Mengunci format khusus saat AI menulis file markdown agar konsisten dengan preferensi user dan memastikan kebersihan kode tanpa karakter yang tidak perlu.
 
-## Mandatory Rule for `.md`
+## Mandatory Rule for .md
 Jika AI menulis file markdown:
-- output harus berupa FULL contents dari path file
-- output harus menggunakan satu code block saja
-- outer fence wajib menggunakan `text`
-- tidak boleh ada teks di luar code block
-- jika ada code fence di dalam markdown, gunakan `~~~`, bukan triple backticks
+- Output harus berupa FULL contents dari path file.
+- Output harus menggunakan SATU code block saja sebagai kontainer utama.
+- Outer fence (pembungkus paling luar) wajib menggunakan triple backticks dengan bahasa text.
+- Triple backticks (```) HANYA boleh muncul di baris pertama dan baris terakhir dari seluruh pesan sebagai pembungkus copy-paste.
+- Tidak boleh ada teks, penjelasan, atau salam pembuka/penutup di luar code block tersebut.
+- Jika ada kebutuhan untuk menampilkan blok kode di dalam isi markdown, gunakan alternatif format seperti indentasi 4 spasi atau blok kutipan, untuk menghindari penggunaan triple backticks atau tilde (~~~) yang dapat merusak struktur kontainer luar.
 
 ## Scope of Rule
-- Aturan ini berlaku khusus saat menulis file `.md`
-- Aturan ini tidak otomatis berlaku untuk chat biasa atau file non-markdown
+- Aturan ini berlaku khusus saat menulis atau menyajikan file .md untuk disalin user.
+- Aturan ini tidak berlaku untuk percakapan diskusi biasa.
 
 ## Forbidden Behavior
-- Jangan menulis penjelasan di luar code block ketika deliver file markdown.
-- Jangan memakai triple backticks di dalam isi markdown yang sedang dikirim sebagai file final.
-- Jangan memberi isi markdown parsial jika user meminta file final.
+- DILARANG menyertakan karakter ASCII dekoratif atau simbol non-standar.
+- DILARANG menyertakan blok kode Bash (shell script) di dalam konten. Jika harus ada instruksi perintah, gunakan teks biasa tanpa dekorasi kode.
+- DILARANG keras menulis penjelasan di luar code block utama saat mengirimkan file markdown.
+- DILARANG menggunakan triple backticks di dalam konten markdown; cari metode formatting alternatif agar tidak terjadi breaking pada container luar.

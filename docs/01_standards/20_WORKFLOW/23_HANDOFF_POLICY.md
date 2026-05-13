@@ -32,8 +32,6 @@ The handoff must include the latest capacity footer:
 ~~~text
 Kapasitas sesi:
 - Kemampuan menalar: xx%
-- Jendela konteks: xx%
-- Kemampuan sisa: xx%
 - Status: ganti halaman baru
 ~~~
 
