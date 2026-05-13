@@ -50,6 +50,7 @@ use App\Adapters\Out\Note\DatabaseNoteHistoryProjectionSourceReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteHistoryProjectionWriterAdapter;
 use App\Adapters\Out\Note\DatabaseNoteMutationEventWriterAdapter;
 use App\Adapters\Out\Note\DatabaseNoteMutationSnapshotWriterAdapter;
+use App\Adapters\Out\Note\DatabaseNoteRevisionSettlementAdapter;
 use App\Adapters\Out\Note\DatabaseNoteReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteWriterAdapter;
 use App\Adapters\Out\Note\DatabaseTransactionWorkspaceDraftDeleterAdapter;
@@ -184,6 +185,8 @@ use App\Ports\Out\Note\NoteHistoryProjectionSourceReaderPort;
 use App\Ports\Out\Note\NoteHistoryProjectionWriterPort;
 use App\Ports\Out\Note\NoteMutationEventWriterPort;
 use App\Ports\Out\Note\NoteMutationSnapshotWriterPort;
+use App\Ports\Out\Note\NoteRevisionSettlementReaderPort;
+use App\Ports\Out\Note\NoteRevisionSettlementWriterPort;
 use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\Note\TransactionWorkspaceDraftDeleterPort;
@@ -369,6 +372,8 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(NoteCorrectionHistoryReaderPort::class, DatabaseNoteCorrectionHistoryReaderAdapter::class);
         $this->app->singleton(NoteHistoryProjectionSourceReaderPort::class, DatabaseNoteHistoryProjectionSourceReaderAdapter::class);
         $this->app->singleton(NoteHistoryProjectionWriterPort::class, DatabaseNoteHistoryProjectionWriterAdapter::class);
+        $this->app->singleton(NoteRevisionSettlementWriterPort::class, DatabaseNoteRevisionSettlementAdapter::class);
+        $this->app->singleton(NoteRevisionSettlementReaderPort::class, DatabaseNoteRevisionSettlementAdapter::class);
         $this->app->singleton(CashierNoteHistoryTableReaderPort::class, CashierNoteHistoryTableQuery::class);
         $this->app->singleton(AdminNoteHistoryTableReaderPort::class, AdminNoteHistoryTableQuery::class);
 
