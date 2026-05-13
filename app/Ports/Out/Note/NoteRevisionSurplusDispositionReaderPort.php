@@ -9,4 +9,7 @@ use App\Application\Note\DTO\NoteRevisionSurplusPending;
 interface NoteRevisionSurplusDispositionReaderPort
 {
     public function findPendingBySettlementId(string $settlementId): ?NoteRevisionSurplusPending;
+
+    /** @return list<NoteRevisionSurplusPending> */
+    public function findPendingByNoteRootId(string $noteRootId): array;
 }

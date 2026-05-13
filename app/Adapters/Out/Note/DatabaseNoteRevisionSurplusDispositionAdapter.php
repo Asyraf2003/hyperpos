@@ -64,4 +64,33 @@ final class DatabaseNoteRevisionSurplusDispositionAdapter implements
             $activeDispositionRupiah,
         );
     }
+
+    /** @return list<NoteRevisionSurplusPending> */
+    public function findPendingByNoteRootId(string $noteRootId): array
+    {
+        $noteRootId = trim($noteRootId);
+
+        if ($noteRootId === '') {
+            return [];
+        }
+
+        $settlements = DB::table('note_revision_settlements')
+            ->where('note_root_id', $noteRootId)
+            ->where('settlement_status', NoteRevisionSettlement::STATUS_OVERPAID_PENDING)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        $pending = [];
+
+        foreach ($settlements as $settlement) {
+            $item = $this->findPendingBySettlementId((string) $settlement->id);
+
+            if ($item !== null && $item->unresolvedPendingRupiah > 0) {
+                $pending[] = $item;
+            }
+        }
+
+        return $pending;
+    }
 }

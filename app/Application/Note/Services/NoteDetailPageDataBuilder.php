@@ -18,6 +18,7 @@ final class NoteDetailPageDataBuilder
         private readonly NoteWorkspacePanelDataBuilder $workspacePanel,
         private readonly NoteBillingProjectionBuilder $billingProjection,
         private readonly NoteDetailRevisionViewDataBuilder $revisionView,
+        private readonly NoteRevisionSurplusDispositionActionViewDataBuilder $surplusDispositions,
         private readonly NoteDetailNotePayloadBuilder $notePayloads,
     ) {
     }
@@ -35,6 +36,7 @@ final class NoteDetailPageDataBuilder
         $history = $this->history->build($note->id());
         $refundOptions = $this->refundPaymentOptions->build($note->id());
         $revisionView = $this->revisionView->build($note);
+        $surplusDisposition = $this->surplusDispositions->build($note->id());
 
         $refundRows = array_values(array_filter(
             $workspacePanel['rows'],
@@ -67,6 +69,7 @@ final class NoteDetailPageDataBuilder
                 $refundRows,
                 $billingRows,
                 $revisionView['revision_timeline'],
+                $surplusDisposition,
                 $history,
                 $note->isOpen(),
                 $note->isClosed(),

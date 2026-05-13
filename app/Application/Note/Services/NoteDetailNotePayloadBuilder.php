@@ -14,6 +14,7 @@ final class NoteDetailNotePayloadBuilder
         array $refundRows,
         array $billingRows,
         array $revisionTimeline,
+        array $surplusDisposition,
         array $history,
         bool $isOpen,
         bool $isClosed,
@@ -60,6 +61,7 @@ final class NoteDetailNotePayloadBuilder
             'refund_rows' => $refundRows,
             'billing_rows' => $billingRows,
             'revision_timeline' => $revisionTimeline,
+            'surplus_disposition' => $surplusDisposition,
             'correction_history' => $history,
         ];
     }
