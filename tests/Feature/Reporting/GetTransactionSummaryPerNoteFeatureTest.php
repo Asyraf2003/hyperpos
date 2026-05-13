@@ -52,8 +52,6 @@ final class GetTransactionSummaryPerNoteFeatureTest extends TestCase
                 'payment_status_label' => 'Ada Refund',
             'surplus_refund_paid_rupiah' => 0,
             'remaining_refund_due_rupiah' => 0,
-                'surplus_refund_paid_rupiah' => 0,
-                'remaining_refund_due_rupiah' => 0,
             ],
             [
                 'note_id' => 'note-2',
