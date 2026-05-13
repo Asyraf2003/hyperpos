@@ -1,14 +1,17 @@
-Workflow - Report and Dashboard Export V1
+# Report and Dashboard Export V1 Workflow
 
-Status: Draft
-Date: 2026-05-01
-Scope: PDF and Excel export workflow
+## Status
+Draft.
 
-Goal
+## Metadata
+- Date: 2026-05-01
+- Scope: PDF and Excel export workflow
+
+## Goal
 
 Memberikan urutan kerja implementasi export PDF dan Excel agar tidak merusak reporting, dashboard, performa, atau auditability.
 
-Global Rules
+## Global Rules
 Satu sesi hanya boleh punya satu active report/export target.
 Jangan implementasi PDF dan Excel untuk semua report sekaligus.
 Jangan mulai dari dashboard export.
@@ -19,7 +22,7 @@ PDF dibuat setelah dataset dan Excel parity jelas.
 Dashboard export terakhir.
 Tidak boleh klaim selesai tanpa test/proof.
 Tidak boleh menaikkan progress hanya karena blueprint sudah ada.
-Phase 0 - Documentation Lock
+## Phase 0 - Documentation Lock
 
 Goal:
 
@@ -39,7 +42,7 @@ Exit condition:
 
 dokumen disetujui
 active implementation target belum dibuka
-Phase 1 - Audit Existing Report Screen
+## Phase 1 - Audit Existing Report Screen
 
 Goal:
 
@@ -81,7 +84,7 @@ Exit condition:
 source mapping terbukti dari repo
 screen contract tertulis
 GAP minimum ditutup atau diberi explicit blocker
-Phase 2 - Export Dataset Contract
+## Phase 2 - Export Dataset Contract
 
 Goal:
 
@@ -108,7 +111,7 @@ Exit condition:
 
 unit/feature test dataset contract lulus
 screen behavior tidak berubah
-Phase 3 - Excel Export First
+## Phase 3 - Excel Export First
 
 Goal:
 
@@ -148,7 +151,7 @@ Exit condition:
 targeted tests pass
 no formula mismatch
 normal screen test still pass
-Phase 4 - PDF Export Second
+## Phase 4 - PDF Export Second
 
 Goal:
 
@@ -182,7 +185,7 @@ Exit condition:
 targeted PDF tests pass
 no screen regression
 no route/middleware regression
-Phase 5 - Parity Tests
+## Phase 5 - Parity Tests
 
 Goal:
 
@@ -203,7 +206,7 @@ Exit condition:
 
 parity tests pass
 mismatch 1 rupiah fails
-Phase 6 - Performance Sanity
+## Phase 6 - Performance Sanity
 
 Goal:
 
@@ -220,7 +223,7 @@ Exit condition:
 
 performance proof recorded
 if slow, do not silently accept; decide optimization or queued export backlog
-Phase 7 - Replicate to Other Reports
+## Phase 7 - Replicate to Other Reports
 
 Order:
 
@@ -239,7 +242,7 @@ each report gets its own audit/source mapping
 do not copy blindly
 each report must have parity tests
 dashboard waits until source reports stable
-Phase 8 - Dashboard Export
+## Phase 8 - Dashboard Export
 
 Goal:
 

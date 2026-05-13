@@ -10,12 +10,12 @@ This document does not mark any seeder, error log, or make seed level as fixed.
 
 ## Source Of Truth
 
-- docs/AI_RULES/00_INDEX.md
-- docs/AI_RULES/01_DECISION_POLICY.md
-- docs/AI_RULES/10_CORE/10_SCOPE_AND_FACTS.md
-- docs/AI_RULES/10_CORE/11_BLUEPRINT_FIRST.md
-- docs/AI_RULES/10_CORE/12_STEP_BY_STEP_EXECUTION.md
-- docs/AI_RULES/10_CORE/13_PROOF_AND_PROGRESS.md
+- docs/01_standards/00_INDEX.md
+- docs/01_standards/01_DECISION_POLICY.md
+- docs/01_standards/10_CORE/10_SCOPE_AND_FACTS.md
+- docs/01_standards/10_CORE/11_BLUEPRINT_FIRST.md
+- docs/01_standards/10_CORE/12_STEP_BY_STEP_EXECUTION.md
+- docs/01_standards/10_CORE/13_PROOF_AND_PROGRESS.md
 - docs/adr/0023-seeder-credential-and-environment-safety.md
 - docs/blueprint/security/2026-05-06-seeder-credential-and-environment-safety-blueprint.md
 - docs/handoff/v2/seedernew/2026-04-26-seedernew-finance-blueprint-adr.md

@@ -1,9 +1,11 @@
+# Note Revision Refund Ledger Workflow
 
-Note Revision Refund Ledger Workflow
+## Status
+Draft locked for design review.
 
-Status: Draft locked for design review
-Date: 2026-05-12
-Scope: workflow for serious note edit, revision, refund, settlement, inventory, reporting version mode, UI, and future API
+## Metadata
+- Date: 2026-05-12
+- Scope: workflow for serious note edit, revision, refund, settlement, inventory, reporting version mode, UI, and future API
 
 1. Purpose
 

@@ -1,11 +1,14 @@
-Blueprint - PDF and Excel Export for Reports and Dashboard
+# PDF and Excel Export for Reports and Dashboard Blueprint
 
-Status: Draft
-Date: 2026-05-01
-Scope: Reporting, Dashboard, PDF Export, Excel Export
-Project: Hyperpos
+## Status
+Draft.
 
-Goal
+## Metadata
+- Date: 2026-05-01
+- Scope: Reporting, Dashboard, PDF Export, Excel Export
+- Project: Hyperpos
+
+## Goal
 
 Membangun export PDF dan Excel untuk laporan dan dashboard tanpa mismatch angka terhadap screen.
 
@@ -21,7 +24,7 @@ laporan tetap membaca domain final
 export tidak memperlambat page load dashboard/report
 PDF aman untuk cetak bulanan
 Excel aman untuk analisis maksimal satu tahun
-Background
+## Background
 
 Reporting V2 sudah mengunci bahwa export hanya boleh dibuat setelah screen/report stabil.
 
@@ -35,7 +38,7 @@ dashboard chart memakai angka yang tidak reconcile dengan report
 PDF mencetak range terlalu besar dan tidak berguna dibaca
 Excel menyimpan rupiah sebagai string sehingga sulit dianalisis
 export membuat dashboard/report normal menjadi lambat
-Source of Truth Rule
+## Source of Truth Rule
 
 Report dan dashboard export harus memakai dataset/use case yang sama dengan screen.
 
@@ -59,8 +62,8 @@ export dari DOM
 export dari chart rendered data
 export dengan filter yang berbeda dari screen
 formatting mengubah nilai numeric
-Export Types
-Report PDF
+## Export Types
+### Report PDF
 
 Tujuan:
 
@@ -77,7 +80,7 @@ layout harus readable saat dicetak
 summary tampil di awal
 detail table boleh dipaginasi
 angka harus sama dengan screen
-Report Excel
+### Report Excel
 
 Tujuan:
 
@@ -97,7 +100,7 @@ wajib punya metadata sheet
 wajib punya summary sheet
 wajib punya detail sheet
 boleh punya reconciliation sheet bila report kompleks
-Dashboard PDF
+### Dashboard PDF
 
 Tujuan:
 
@@ -112,7 +115,7 @@ bukan pengganti laporan detail
 berisi summary, indikator utama, dan konteks dashboard
 chart boleh tampil sebagai visual, tetapi angka chart bukan source of truth
 dashboard PDF harus mencantumkan report source/period metadata
-Dashboard Excel
+### Dashboard Excel
 
 Tujuan:
 

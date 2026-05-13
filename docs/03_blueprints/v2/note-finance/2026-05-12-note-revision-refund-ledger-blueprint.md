@@ -1,9 +1,11 @@
+# Note Revision Refund Ledger Blueprint
 
-Note Revision Refund Ledger Blueprint
+## Status
+Draft locked for design review.
 
-Status: Draft locked for design review
-Date: 2026-05-12
-Scope: HyperPOS note edit, note revision, refund, settlement carry forward, customer balance, inventory reversal, reporting version mode, UI and future API boundary
+## Metadata
+- Date: 2026-05-12
+- Scope: HyperPOS note edit, note revision, refund, settlement carry forward, customer balance, inventory reversal, reporting version mode, UI and future API boundary
 
 1. Purpose
 

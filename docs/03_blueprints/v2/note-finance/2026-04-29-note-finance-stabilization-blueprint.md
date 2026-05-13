@@ -7,10 +7,10 @@
 - Status: ACTIVE BLUEPRINT
 - Pemilik keputusan: project owner / engineer
 - Sumber aturan kerja:
-  - docs/AI_RULES/00_INDEX.md
-  - docs/AI_RULES/01_DECISION_POLICY.md
-  - docs/AI_RULES/40_ARCHITECTURE/
-  - docs/AI_RULES/50_DOMAIN_KASIR/
+  - docs/01_standards/00_INDEX.md
+  - docs/01_standards/01_DECISION_POLICY.md
+  - docs/01_standards/40_ARCHITECTURE/
+  - docs/01_standards/50_DOMAIN_KASIR/
 - Scope besar:
   - note revision
   - payment allocation
@@ -440,8 +440,8 @@ Manual test minimal:
 
 Saat membuka sesi baru untuk scope ini, AI wajib membaca:
 
-1. docs/AI_RULES/00_INDEX.md
-2. docs/AI_RULES/01_DECISION_POLICY.md
+1. docs/01_standards/00_INDEX.md
+2. docs/01_standards/01_DECISION_POLICY.md
 3. docs/blueprint/v2/note-finance/2026-04-29-note-finance-stabilization-blueprint.md
 4. handoff terakhir yang relevan
 5. command output lokal terbaru dari user

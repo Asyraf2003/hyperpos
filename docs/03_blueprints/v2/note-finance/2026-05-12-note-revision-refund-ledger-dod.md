@@ -1,9 +1,11 @@
+# Note Revision Refund Ledger Definition of Done
 
-Note Revision Refund Ledger Definition of Done
+## Status
+Draft locked for design review.
 
-Status: Draft locked for design review
-Date: 2026-05-12
-Scope: DoD for note edit, revision, refund, settlement carry forward, customer balance, inventory, reporting version mode, UI, and future API
+## Metadata
+- Date: 2026-05-12
+- Scope: DoD for note edit, revision, refund, settlement carry forward, customer balance, inventory, reporting version mode, UI, and future API
 
 1. Global DoD
 
