@@ -65,9 +65,41 @@ The goal was to stop treating downward revision surplus as hidden money or UI-on
 
 No implementation assumption accepted.
 
-Safe operational assumption:
+## Baseline Proof Policy Correction
 
-- Owner-reported clean make verify and latest git update are accepted as proof for handoff continuity.
+The following is FACT for future sessions, not GAP and not ASSUMPTION:
+
+- Owner keeps local and repo identical after each action, except ignored files.
+- Owner manually handles commit and push.
+- Owner runs make verify at end-of-session or final safe-state proof.
+- If owner states clean, pushed, latest, or make verify clean, that statement is accepted as baseline proof.
+- Do not ask for git status, git log, git diff, or make verify as session-entry ritual.
+- Do not write "no local proof" as a GAP when owner already provided the baseline statement.
+- Do not write "I assume local and repo are identical" as an ASSUMPTION. Write it as FACT under this policy.
+- Use GitHub main/current repo source as current source when owner says latest/pushed, unless newer local command output contradicts it.
+- If newer local command output contradicts GitHub or docs, local command output wins.
+
+Valid GAP examples for future sessions:
+
+- a specific source file for the active slice has not been read
+- a RED test has not been created yet
+- a domain decision has not been locked
+- a consumer behavior has not been proven
+- source and docs conflict
+- test output shows a new failure
+
+Invalid GAP examples for future sessions:
+
+- baseline make verify proof missing
+- baseline git status missing
+- local and repo identity unproven
+- GitHub source is only an assumption
+- owner push workflow needs re-verification as ceremony
+
+Operational fact:
+
+- Owner-reported clean make verify and latest git update are accepted as baseline proof for handoff continuity.
+- This must not be repeated as a GAP or ASSUMPTION in future sessions.
 
 Critical assumptions explicitly rejected:
 
