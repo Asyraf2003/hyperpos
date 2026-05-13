@@ -61,7 +61,7 @@ Do not put here:
 
 docs/01-standards is the canonical standards root for AI_RULES, not the diary.
 
-## Layer 4: docs/adr
+## Layer 4: docs/02-architecture/adr
 
 Use for permanent accepted decisions.
 
@@ -75,7 +75,7 @@ Do not put here:
 
 If a decision changes, create a new ADR or mark the old ADR as superseded.
 
-## Layer 5: docs/blueprint
+## Layer 5: docs/03-blueprints
 
 Use for active or recent scope design.
 
@@ -149,8 +149,8 @@ Do not paste the entire docs tree unless the task is docs audit.
 | Personal response preference         | ChatGPT memory or personalization                |
 | Project-level operating default      | Project custom instructions                      |
 | Mandatory AI rule                    | docs/01-standards                                    |
-| Permanent decision                   | docs/adr                                         |
-| Active scope design                  | docs/blueprint                                  |
+| Permanent decision                   | docs/02-architecture/adr                                         |
+| Active scope design                  | docs/03-blueprints                                  |
 | Daily work recovery                  | handoff                                          |
 | Feature status ledger                | docs/03-blueprints/v2/feature-continuation or dedicated doc    |
 | Test output                          | handoff or proof note                            |

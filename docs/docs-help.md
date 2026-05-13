@@ -25,22 +25,22 @@ Doc categories:
   Mandatory repo rules for all AI sessions.
   Contains decision policy, workflow policy, output policy, architecture rules, domain map, stack rules, and handoff template.
 
-- docs/adr
+- docs/02-architecture/adr
   Permanent accepted decisions.
   Use for long-lived architecture, domain, lifecycle, and reporting decisions.
 
-- docs/blueprint
+- docs/03-blueprints
   Active or recent design contracts for a scope.
   Use before implementation.
 
-- docs/workflow
+- docs/04-lifecycle
   Roadmap and process flow.
   Some tests still reference this folder, so do not rename it casually.
 
-- docs/dod
+- docs/03-blueprints (topic-name-dod.md)
   Definition of done.
 
-- docs/handoff
+- docs/04-lifecycle/handoff
   Historical session logs and recovery notes.
   Do not treat old handoffs as permanent decisions unless promoted into ADR or active blueprint.
 

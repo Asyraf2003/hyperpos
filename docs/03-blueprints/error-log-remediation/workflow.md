@@ -42,10 +42,10 @@
 - ADR terbaru menang atas ADR lama jika konflik
 - jika ADR lama dan baru konflik, tulis konflik, path dokumen, dan keputusan yang dipakai
 - jika ada dokumen lebih spesifik daripada ADR umum, dokumen spesifik dapat menang untuk slice itu
-- docs/workflow/
+- docs/03-blueprints/
 **workflow baru harus selaras dengan:**
-- docs/workflow/error-log-strict-closure-protocol.md
-- docs/workflow/finance-residual-error-log.md
+- docs/03-blueprints/error-log-remediation/strict-closure-protocol.md
+- docs/03-blueprints/finance/finance-residual-workflow.md
 - workflow ADR/security yang relevan
 - source dan local command output tetap menang atas workflow lama jika ada konflik
 ## Evidence Labels

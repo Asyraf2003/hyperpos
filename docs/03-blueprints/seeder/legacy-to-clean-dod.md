@@ -15,7 +15,7 @@ This document does not claim the current Makefile already satisfies this DoD.
 - database/seeders/README.md
 - docs/03-blueprints/seeder/2026-05-11-legacy-to-clean-seeder-blueprint.md
 - docs/03-blueprints/seeder/2026-05-11-legacy-seeder-manifest.md
-- docs/workflow/seeder-legacy-to-clean-workflow.md
+- docs/03-blueprints/seeder/legacy-to-clean-workflow.md
 - docs/02-architecture/adr/0023-seeder-credential-and-environment-safety.md
 - docs/03-blueprints/security/adr-0023-seeder-safety.md
 - docs/99-archive/handoff/v2/seedernew/2026-04-26-seedernew-finance-blueprint-adr.md
@@ -359,8 +359,8 @@ Seeder migration is not done until these docs are updated:
 - database/seeders/README.md
 - docs/03-blueprints/seeder/2026-05-11-legacy-to-clean-seeder-blueprint.md
 - docs/03-blueprints/seeder/2026-05-11-legacy-seeder-manifest.md
-- docs/workflow/seeder-legacy-to-clean-workflow.md
-- docs/dod/seeder-legacy-to-clean-dod.md
+- docs/03-blueprints/seeder/legacy-to-clean-workflow.md
+- docs/03-blueprints/seeder/legacy-to-clean-dod.md
 - scenario matrix docs
 - relevant error_log docs if a security/finance issue is fixed
 
