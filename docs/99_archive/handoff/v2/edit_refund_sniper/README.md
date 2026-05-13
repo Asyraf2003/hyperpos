@@ -12,6 +12,12 @@ Tujuan folder ini:
 
 Folder ini tidak mengganti ADR, blueprint, workflow, atau DoD.
 
+## Stable Contract Files
+
+- docs/99_archive/handoff/v2/edit_refund_sniper/SESSION_CONTRACT.md
+- docs/99_archive/handoff/v2/edit_refund_sniper/PROMPT_TEMPLATE.md
+- docs/99_archive/handoff/v2/edit_refund_sniper/HANDOFF_TEMPLATE.md
+
 ## Latest Handoff
 
 Baca file terbaru di folder ini setelah AI_RULES:
