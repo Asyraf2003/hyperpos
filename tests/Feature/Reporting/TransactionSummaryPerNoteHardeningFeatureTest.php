@@ -118,6 +118,8 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
             'net_cash_collected_rupiah' => 90999,
             'outstanding_rupiah' => 9001,
             'payment_status_label' => 'Ada Refund',
+            'surplus_refund_paid_rupiah' => 0,
+            'remaining_refund_due_rupiah' => 0,
         ], $rows[0]);
     }
 

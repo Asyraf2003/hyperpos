@@ -81,6 +81,8 @@ final class RefundedNoteCashReportingFallbackFeatureTest extends TestCase
             'allocated_payment_rupiah' => 710800,
             'refunded_rupiah' => 710800,
             'refund_due_rupiah' => 0,
+            'surplus_refund_paid_rupiah' => 0,
+            'remaining_refund_due_rupiah' => 0,
             'net_cash_collected_rupiah' => 0,
             'outstanding_rupiah' => 0,
             'settled_rows' => 1,
