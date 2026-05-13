@@ -242,17 +242,17 @@ final class GetTransactionReportDatasetFeatureTest extends TestCase
         DB::table('note_revisions')->insert([
             'id' => $revisionId,
             'note_root_id' => $noteId,
-            'revision_no' => 1,
-            'status' => 'active',
+            'revision_number' => 1,
+            'parent_revision_id' => null,
+            'created_by_actor_id' => null,
+            'reason' => 'Report refund due fixture',
             'customer_name' => 'Reporting Customer',
             'customer_phone' => null,
             'transaction_date' => '2030-01-07',
             'grand_total_rupiah' => 100000,
-            'reason' => 'Report refund due fixture',
-            'created_by_user_id' => null,
+            'line_count' => 0,
             'created_at' => '2030-01-07 09:00:00',
-            'activated_at' => '2030-01-07 09:00:00',
-            'replaced_at' => null,
+            'updated_at' => null,
         ]);
 
         DB::table('note_revision_settlements')->insert([
