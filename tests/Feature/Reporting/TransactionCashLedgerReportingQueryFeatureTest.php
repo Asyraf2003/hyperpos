@@ -355,4 +355,4 @@ final class TransactionCashLedgerReportingQueryFeatureTest extends TestCase
         ]);
     }
 
-}\n
+}

@@ -378,4 +378,4 @@ final class GetTransactionReportDatasetFeatureTest extends TestCase
         ]);
     }
 
-}\n
+}
