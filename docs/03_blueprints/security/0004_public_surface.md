@@ -21,12 +21,12 @@ This is not a prototype, demo, or reduced-scope system.
 - docs/03_blueprints/security/adr-0019-access-boundary.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
-- docs/04_lifecycle/error_log/007-admin-note-edit-page-exposes-stored-xss.md
-- docs/04_lifecycle/error_log/023-public-helper-can-expose-private-storage.md
-- docs/04_lifecycle/error_log/024-reflected-xss-in-expense-create-json-config.md
-- docs/04_lifecycle/error_log/025-reflected-javascript-url-in-product-return-link.md
-- docs/04_lifecycle/error_log/028-di-fix-exposes-unsafe-proof-attachment-content-type.md
-- docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+- docs/04_lifecycle/error_log/0007_admin_note_edit_page_exposes_stored_xss.md
+- docs/04_lifecycle/error_log/0023_public_helper_can_expose_private_storage.md
+- docs/04_lifecycle/error_log/0024_reflected_xss_in_expense_create_json_config.md
+- docs/04_lifecycle/error_log/0025_reflected_javascript_url_in_product_return_link.md
+- docs/04_lifecycle/error_log/0028_di_fix_exposes_unsafe_proof_attachment_content_type.md
+- docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 - User owner decisions in planning session
 - User command output from local repository
 - Current source code at execution time

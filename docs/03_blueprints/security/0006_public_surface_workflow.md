@@ -163,7 +163,7 @@ The safest order:
 9. Run targeted test again.
 10. Run relevant blast-radius tests.
 11. Show `git diff --stat` and focused diff.
-12. Update `docs/error_log` only after proof.
+12. Update `docs/04_lifecycle/error_log` only after proof.
 13. Commit only after owner reviews diff and proof.
 14. Move to next slice.
 
@@ -218,12 +218,12 @@ Run before selecting a slice:
 
 Run before selecting ADR-0020 slice:
 
-    sed -n '1,220p' docs/04_lifecycle/error_log/007-admin-note-edit-page-exposes-stored-xss.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/023-public-helper-can-expose-private-storage.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/024-reflected-xss-in-expense-create-json-config.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/025-reflected-javascript-url-in-product-return-link.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/028-di-fix-exposes-unsafe-proof-attachment-content-type.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0007_admin_note_edit_page_exposes_stored_xss.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0023_public_helper_can_expose_private_storage.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0024_reflected_xss_in_expense_create_json_config.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0025_reflected_javascript_url_in_product_return_link.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0028_di_fix_exposes_unsafe_proof_attachment_content_type.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 
 ### Surface Discovery
 
@@ -261,12 +261,12 @@ Only run broad suites when affected by the slice and local environment can handl
 
 ### Final Diff Snapshot
 
-Before docs/error_log update or commit:
+Before docs/04_lifecycle/error_log update or commit:
 
     git status --short
     git diff --stat
     git diff -- docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md docs/03_blueprints/security/adr-0020-public-surface.md
-    git diff -- app routes resources tests docs/error_log
+    git diff -- app routes resources tests docs/04_lifecycle/error_log
 
 ## Handoff Rule
 

@@ -62,7 +62,7 @@ Implementation is complete only when all relevant conditions for the selected sl
 
 ### Documentation
 
-- docs/error_log finding is updated only after proof
+- docs/04_lifecycle/error_log finding is updated only after proof
 - proof quality is stated explicitly
 - ADR is not rewritten casually during implementation
 - any new domain decision gets ADR/addendum
@@ -102,7 +102,7 @@ Suggested final proof should include:
 - relevant reporting suite if touched
 - make/audit command if project rules require it
 - final git diff stat
-- final docs/error_log updates
+- final docs/04_lifecycle/error_log updates
 - owner acceptance
 
 ## Error Log Update Rule

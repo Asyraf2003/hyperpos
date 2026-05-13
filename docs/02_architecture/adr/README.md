@@ -76,7 +76,7 @@ This file is accepted, but its filename does not follow the numbered ADR convent
 Backlink audit result:
 
 - docs/02_architecture/adr/README.md
-- docs/03_blueprints/v2/note_finance/2026-04-29-note-finance-current-projection-addendum.md
+- docs/03_blueprints/finance/0002_note_finance_stabilization_addendum.md
 - docs/99_archive/handoff/v2/note_finance/2026-04-29-current-projection-refund-edit-handoff.md
 
 Decision:

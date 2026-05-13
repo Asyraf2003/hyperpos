@@ -142,7 +142,7 @@ The safest order:
 15. Patch cashier create page or data provider
 16. Run targeted tests for Slice 5
 17. Run ADR-0019 blast-radius test suite
-18. Update docs/error_log only after proof
+18. Update docs/04_lifecycle/error_log only after proof
 19. Commit only after owner reviews diff and proof
 
 ## CLI Workflow
@@ -160,7 +160,7 @@ However, these rules are fixed:
 7. Run the targeted test again.
 8. Run local blast-radius tests for affected cluster.
 9. Show git diff.
-10. Update docs/error_log only with proof.
+10. Update docs/04_lifecycle/error_log only with proof.
 11. Commit only after owner approval.
 
 ## Required Commands For Execution Sessions
@@ -184,15 +184,15 @@ Run when route behavior is involved:
 Run before selecting a slice:
 
     sed -n '1,260p' docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/009-cashiers-can-rewrite-closed-paid-notes-via-workspace-update.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/015-refunded-notes-expose-edit-workspace.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/016-unauthenticated-admin-capability-toggle-endpoints.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/019-cashiers-can-list-historical-closed-notes-by-date.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/020-admin-note-actions-bypass-transaction-capability.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/022-cashier-refund-route-bypasses-note-access-guard.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/027-admin-invoice-creation-bypasses-transaction-entry-gate.md
-    sed -n '1,220p' docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0009_cashiers_can_rewrite_closed_paid_notes_via_workspace_update.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0015_refunded_notes_expose_edit_workspace.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0016_unauthenticated_admin_capability_toggle_endpoints.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0018_refunded_notes_bypass_cashier_closed_note_guards.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0019_cashiers_can_list_historical_closed_notes_by_date.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0020_admin_note_actions_bypass_transaction_capability.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0027_admin_invoice_creation_bypasses_transaction_entry_gate.md
+    sed -n '1,220p' docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 
 ### Exact Class Discovery
 

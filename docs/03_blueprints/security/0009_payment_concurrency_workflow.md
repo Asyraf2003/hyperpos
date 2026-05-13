@@ -44,8 +44,8 @@ Run route discovery:
 Run document snapshot:
 
     sed -n '1,260p' docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
-    sed -n '1,260p' docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
-    sed -n '1,260p' docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 
 ## Characterization Test Matrix
 
@@ -172,7 +172,7 @@ The safest order:
 12. Run targeted test again.
 13. Run relevant payment/revision/refund blast-radius tests.
 14. Show diff.
-15. Update docs/error_log only after proof.
+15. Update docs/04_lifecycle/error_log only after proof.
 16. Commit only after owner reviews diff and proof.
 17. Move to next slice.
 
@@ -184,7 +184,7 @@ Recommended slice order:
 4. Slice 5 auto-close settlement consistency
 5. Slice 3 partial payment race
 6. Slice 6 lock protocol coverage
-7. final docs/error_log update and handoff
+7. final docs/04_lifecycle/error_log update and handoff
 
 Reason:
 
@@ -226,8 +226,8 @@ Rules:
 
 ### Error Log Snapshot
 
-    sed -n '1,260p' docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
-    sed -n '1,260p' docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 
 ### Source Discovery
 
@@ -257,7 +257,7 @@ Run only the relevant blast-radius suites for the slice.
     git status --short --untracked-files=all
     git diff --stat
     git diff -- docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md docs/03_blueprints/security/adr-0022-payment-concurrency.md
-    git diff -- app routes tests docs/error_log
+    git diff -- app routes tests docs/04_lifecycle/error_log
 
 ## Handoff Rule
 

@@ -64,7 +64,7 @@ Implementation is complete only when all relevant conditions for the selected sl
 
 ### Documentation
 
-- docs/error_log 002 is updated only after proof
+- docs/04_lifecycle/error_log 002 is updated only after proof
 - proof quality is stated explicitly
 - runbook/handoff documents safe seeder behavior if changed
 - ADR is not rewritten casually during implementation
@@ -95,7 +95,7 @@ Suggested final proof should include:
 - targeted seeder credential tests
 - relevant auth/identity tests if touched
 - final git diff stat
-- final docs/error_log update
+- final docs/04_lifecycle/error_log update
 - owner acceptance
 
 ## Error Log Update Rule

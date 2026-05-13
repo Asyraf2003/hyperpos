@@ -40,7 +40,7 @@ Run artisan seed references:
 Run document snapshot:
 
     sed -n '1,260p' docs/02_architecture/adr/0023-seeder-credential-and-environment-safety.md
-    sed -n '1,260p' docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 
 ## Characterization Test Matrix
 
@@ -125,7 +125,7 @@ Goal:
 
 Required checks:
 
-1. docs/error_log 002 updated only after proof
+1. docs/04_lifecycle/error_log 002 updated only after proof
 2. runbook/handoff mentions local/testing credential boundary
 3. production-like bootstrap requirements documented if implemented
 4. residual gaps documented
@@ -147,7 +147,7 @@ The safest order:
 11. Add local/testing allowance test if local workflow is kept.
 12. Run relevant seeder/auth tests.
 13. Show diff.
-14. Update docs/error_log only after proof.
+14. Update docs/04_lifecycle/error_log only after proof.
 15. Commit only after owner reviews diff and proof.
 16. Move to future seed-level refactor only after immediate safety proof.
 
@@ -198,7 +198,7 @@ Rules:
 
 ### Error Log Snapshot
 
-    sed -n '1,260p' docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md
+    sed -n '1,260p' docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 
 ### Source Discovery
 
@@ -232,7 +232,7 @@ Run only relevant suites for the slice.
     git status --short --untracked-files=all
     git diff --stat
     git diff -- docs/02_architecture/adr/0023-seeder-credential-and-environment-safety.md docs/03_blueprints/security/adr-0023-seeder-safety.md
-    git diff -- database app config tests docs/error_log docs
+    git diff -- database app config tests docs/04_lifecycle/error_log docs
 
 ## Handoff Rule
 

@@ -17,8 +17,8 @@ This is not a prototype, demo, or reduced-scope system.
 ## Source Of Truth
 
 - docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
-- docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
-- docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+- docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
+- docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md

@@ -65,7 +65,7 @@ Implementation is complete only when all relevant conditions for the selected sl
 
 ### Documentation
 
-- docs/error_log 010 or 026 is updated only after proof
+- docs/04_lifecycle/error_log 010 or 026 is updated only after proof
 - proof quality is stated explicitly
 - verification gap remains visible if concurrency proof is incomplete
 - ADR is not rewritten casually during implementation
@@ -101,7 +101,7 @@ Suggested final proof should include:
 - relevant note revision suite
 - relevant refund suite if touched
 - final git diff stat
-- final docs/error_log updates
+- final docs/04_lifecycle/error_log updates
 - owner acceptance
 
 ## Error Log Update Rule

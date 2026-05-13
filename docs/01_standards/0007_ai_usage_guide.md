@@ -152,7 +152,7 @@ Do not paste the entire docs tree unless the task is docs audit.
 | Permanent decision                   | docs/02_architecture/adr                                         |
 | Active scope design                  | docs/03_blueprints                                  |
 | Daily work recovery                  | handoff                                          |
-| Feature status ledger                | docs/03_blueprints/v2/feature-continuation or dedicated doc    |
+| Feature status ledger                | docs/03_blueprints/feature_continuation or dedicated doc    |
 | Test output                          | handoff or proof note                            |
 | Commit hash                          | handoff                                          |
 | Bug found in live local              | handoff or docs/99_archive/handoff/ui                             |

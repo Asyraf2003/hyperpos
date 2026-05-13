@@ -45,7 +45,7 @@ Gunakan aturan berikut sebagai perilaku kerja wajib:
 - Jika data tidak cukup, tandai GAP dan jangan mengarang.
 - Jika banyak dokumen dibaca, bedakan mana active implementation scope dan mana constraint.
 - Jangan memperlakukan status dokumen sebagai kebenaran jika source code atau command output bertentangan.
-- Source code dan command output mengalahkan status naratif di docs/error_log.
+- Source code dan command output mengalahkan status naratif di docs/04_lifecycle/error_log.
 - Jangan menggunakan remote write connector untuk implementasi project ini kecuali user eksplisit meminta.
 - Implementasi project dilakukan melalui command lokal yang dikirim ke user, lalu proof berasal dari output user.
 

@@ -40,12 +40,12 @@ Naming file: `NNNN_topic_name.md` (blueprint), `NNNN_topic_name_dod.md` (DoD), `
 
 Runtime records — ongoing, bukan historical.
 
-- `error-log/` — bug dan security findings. Naming: `NNNN_snake_title.md`
+- `error_log/` — bug dan security findings. Naming: `NNNN_snake_title.md`
 - `handoff/` — session recovery notes sesi aktif. Naming: `YYYY-MM-DD-topic-handoff.md`
 
 ### [05_audits](./05_audits/)
 
-Formal audit records. Naming: `YYYY-MM-DD-topic.md`.
+Formal audit records. Naming: `NNNN_topic_name.md`.
 
 ### [99_archive](./99_archive/)
 
@@ -62,14 +62,14 @@ Semua legacy, superseded, historical. Copy penuh, tidak dimodifikasi.
 
 | Jenis | Format | Contoh |
 |---|---|---|
-| ADR | `NNNN_snake_title.md` | `0019-note-access-boundary.md` |
-| Blueprint | `NNNN_topic_name.md` | `finance-residual.md` |
-| DoD | `NNNN_topic_name_dod.md` | `finance-residual-dod.md` |
-| Workflow | `NNNN_topic_name_workflow.md` | `finance-residual-workflow.md` |
-| Error log | `NNNN_snake_title.md` | `009-cashiers-can-rewrite.md` |
-| Audit record | `YYYY-MM-DD-topic.md` | `2026-05-06-error-log-coverage.md` |
-| Handoff aktif | `YYYY-MM-DD-topic-handoff.md` | `2026-05-12-skeleton-handoff.md` |
-| Folder | `kebab-case` | `error-log/`, `01_standards/` |
+| ADR | `NNNN_snake_title.md` | `0019_note_access_boundary_cashier_date_window_and_transaction_capability_enforcement.md` |
+| Blueprint | `NNNN_topic_name.md` | `0003_finance_residual.md` |
+| DoD | `NNNN_topic_name_dod.md` | `0004_finance_residual_dod.md` |
+| Workflow | `NNNN_topic_name_workflow.md` | `0005_finance_residual_workflow.md` |
+| Error log | `NNNN_snake_title.md` | `0009_cashiers_can_rewrite_closed_paid_notes_via_workspace_update.md` |
+| Audit record | `NNNN_topic_name.md` | `0002_error_log_solution_and_adr_coverage_summary.md` |
+| Handoff aktif | `NNNN_topic_handoff.md` | `0001_scope_handoff.md` |
+| Folder | `NN_prefix_snake_case` for L1, `snake_case` for subfolders | `01_standards/`, `error_log/` |
 
 ## Log Perubahan Struktur
 

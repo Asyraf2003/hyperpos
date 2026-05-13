@@ -442,7 +442,7 @@ Saat membuka sesi baru untuk scope ini, AI wajib membaca:
 
 1. docs/01_standards/0001_index.md
 2. docs/01_standards/0002_decision_policy.md
-3. docs/03_blueprints/v2/note_finance/2026-04-29-note-finance-stabilization-blueprint.md
+3. docs/03_blueprints/finance/0001_note_finance_stabilization.md
 4. handoff terakhir yang relevan
 5. command output lokal terbaru dari user
 

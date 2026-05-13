@@ -15,15 +15,15 @@ This document exists to make ADR-0019 execution rigid enough for CLI-based imple
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
-- docs/04_lifecycle/error_log/009-cashiers-can-rewrite-closed-paid-notes-via-workspace-update.md
-- docs/04_lifecycle/error_log/015-refunded-notes-expose-edit-workspace.md
-- docs/04_lifecycle/error_log/016-unauthenticated-admin-capability-toggle-endpoints.md
-- docs/04_lifecycle/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
-- docs/04_lifecycle/error_log/019-cashiers-can-list-historical-closed-notes-by-date.md
-- docs/04_lifecycle/error_log/020-admin-note-actions-bypass-transaction-capability.md
-- docs/04_lifecycle/error_log/022-cashier-refund-route-bypasses-note-access-guard.md
-- docs/04_lifecycle/error_log/027-admin-invoice-creation-bypasses-transaction-entry-gate.md
-- docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+- docs/04_lifecycle/error_log/0009_cashiers_can_rewrite_closed_paid_notes_via_workspace_update.md
+- docs/04_lifecycle/error_log/0015_refunded_notes_expose_edit_workspace.md
+- docs/04_lifecycle/error_log/0016_unauthenticated_admin_capability_toggle_endpoints.md
+- docs/04_lifecycle/error_log/0018_refunded_notes_bypass_cashier_closed_note_guards.md
+- docs/04_lifecycle/error_log/0019_cashiers_can_list_historical_closed_notes_by_date.md
+- docs/04_lifecycle/error_log/0020_admin_note_actions_bypass_transaction_capability.md
+- docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
+- docs/04_lifecycle/error_log/0027_admin_invoice_creation_bypasses_transaction_entry_gate.md
+- docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 - User owner decisions in planning session
 - User command output from local repository
 - Current source code at execution time
@@ -56,7 +56,7 @@ Route proof confirms ADR-0019 affects at least these route groups:
 - Do not solve output encoding, unsafe URL, public helper, MIME, or attachment content-type here.
 - Do not solve payment allocation race conditions here.
 - Do not modify finance settlement semantics here unless an ADR-0019 access test proves the boundary cannot work without reading domain eligibility.
-- Do not mark any docs/error_log finding as fixed without test proof and owner acceptance.
+- Do not mark any docs/04_lifecycle/error_log finding as fixed without test proof and owner acceptance.
 
 ## Explicit Scope
 

@@ -245,7 +245,7 @@ Diff check:
 - `git diff --check` passed for:
   - app/Application/Note/Services/CashierNoteRouteAccessData.php
   - app/Adapters/In/Http/Middleware/Note/EnsureCashierNoteAccess.php
-  - docs/04_lifecycle/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
+  - docs/04_lifecycle/error_log/0018_refunded_notes_bypass_cashier_closed_note_guards.md
 
 Remaining scope boundary:
 

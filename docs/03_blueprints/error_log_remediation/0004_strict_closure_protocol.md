@@ -13,7 +13,7 @@ Local source and local command output always override older docs.
 1. Local command output.
 2. Current repo source.
 3. ADR / workflow / rules docs.
-4. docs/error_log.
+4. docs/04_lifecycle/error_log.
 5. Handoff / memory.
 6. General model knowledge.
 

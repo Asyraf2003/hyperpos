@@ -30,7 +30,7 @@ A seeder that works safely in local can become a security issue if it can run in
 
 ADR-0023 covers:
 
-- `docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md`
+- `docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md`
 
 ## Problem Statement
 
@@ -436,11 +436,11 @@ Implementation proof must include:
 - no hardcoded privileged password used outside local/testing
 - no fallback local password in production-like environment
 - relevant seeder command/test passes
-- docs/error_log updated only after proof
+- docs/04_lifecycle/error_log updated only after proof
 
 ## Documentation Rule
 
-`docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md` may be updated only after proof exists.
+`docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md` may be updated only after proof exists.
 
 The update must include:
 
@@ -471,7 +471,7 @@ Stop immediately if:
 
 ## Related Documents
 
-- docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md
+- docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
 - docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md

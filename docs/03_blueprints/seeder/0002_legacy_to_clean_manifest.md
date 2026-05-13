@@ -345,7 +345,7 @@ Scope:
 
 - `database/seeders/UserSeeder.php`
 - `tests/Feature/Seeder/UserSeederCredentialBoundaryFeatureTest.php`
-- `docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md`
+- `docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md`
 - `docs/03_blueprints/seeder/2026-05-11-legacy-seeder-manifest.md`
 
 Status:

@@ -71,7 +71,7 @@ Implementation is complete only when all relevant conditions for the selected sl
 
 ### Documentation
 
-- docs/error_log finding is updated only after proof
+- docs/04_lifecycle/error_log finding is updated only after proof
 - ADR is not rewritten casually during implementation
 - any deviation from ADR-0020 is recorded with reason
 - any deviation from this blueprint is recorded with reason
@@ -106,7 +106,7 @@ Minimum final proof should include:
 - relevant feature suite pass
 - static or grep audit for raw output/public helper patterns
 - final git diff stat
-- final docs/error_log updates
+- final docs/04_lifecycle/error_log updates
 - owner acceptance
 
 ## Error Log Update Rule

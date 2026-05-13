@@ -411,7 +411,7 @@ This ADR does not choose the final table names for:
 - current projection
 - revision events
 
-This ADR does not resolve all security findings in `docs/error_log`.
+This ADR does not resolve all security findings in `docs/04_lifecycle/error_log`.
 
 Seeder/default credential findings are deferred bootstrap hygiene and not part of the active edit/refund implementation scope.
 

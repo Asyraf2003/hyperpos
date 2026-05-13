@@ -120,7 +120,7 @@ Jika user meminta lanjut:
 - jangan membuka dua step aktif sekaligus
 - jangan melewati validation gate
 - jangan menukar cluster tanpa owner decision
-- jangan update docs/error_log sebelum patch dan test proof
+- jangan update docs/04_lifecycle/error_log sebelum patch dan test proof
 
 ## Source Of Truth Order
 

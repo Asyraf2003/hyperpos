@@ -438,15 +438,15 @@
 - source/test proof yang menang
 - keputusan workflow
 **Known conflict yang harus dijaga:**
-- docs/04_lifecycle/error_log/001-refunds-counted-as-paid-in-note-totals.md vs docs/04_lifecycle/error_log/003-refunded-revised-notes-are-misclassified-as-underpaid.md
+- docs/04_lifecycle/error_log/0001_refunds_counted_as_paid_in_note_totals.md vs docs/04_lifecycle/error_log/0003_refunded_revised_notes_are_misclassified_as_underpaid.md
 - #001 butuh active refund mengurangi settlement
 - #003 butuh historical refund tidak double-subtracted
 - fix valid harus membuktikan keduanya
-- docs/04_lifecycle/error_log/021-refunds-can-be-recorded-on-open-notes.md vs docs/04_lifecycle/error_log/022-cashier-refund-route-bypasses-note-access-guard.md
+- docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md vs docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
 - #021 mengklaim controller menolak parent note open
 - #022 menyatakan open-note refund behavior tidak berubah dan current test masih membolehkan open-note refund
 - source/test proof saat eksekusi harus menang
-- docs/04_lifecycle/error_log/011-cashier-revision-path-mutates-settled-note-state.md
+- docs/04_lifecycle/error_log/0011_cashier_revision_path_mutates_settled_note_state.md
 - guard cashier settled-note harus tetap aktif
 - admin official correction/revision route tidak boleh diblokir global
 - route-scoped decision terbaru harus menang

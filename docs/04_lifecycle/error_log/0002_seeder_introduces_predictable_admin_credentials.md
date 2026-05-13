@@ -365,7 +365,7 @@ Runtime files changed in the implementation slice:
 
 Docs files changed in the closure slice:
 
-- `docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md`
+- `docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md`
 - `docs/03_blueprints/seeder/2026-05-11-legacy-seeder-manifest.md`
 
 Runtime behavior now documented for this slice:

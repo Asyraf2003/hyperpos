@@ -52,8 +52,8 @@
 ### Slice 1 - Current vs Historical Operational Row Foundation
 
 - Issues:
-- docs/04_lifecycle/error_log/004-refunded-work-items-survive-revisions-and-inflate-stock.md
-- docs/04_lifecycle/error_log/012-canceled-note-rows-re-enter-payment-flows.md
+- docs/04_lifecycle/error_log/0004_refunded_work_items_survive_revisions_and_inflate_stock.md
+- docs/04_lifecycle/error_log/0012_canceled_note_rows_re_enter_payment_flows.md
 - Alasan urutan:
 - current vs historical row boundary menentukan payment selection, refund selection, inventory reversal, workspace projection, dan reporting.
 - Jika row boundary salah, settlement/refund tests bisa hijau pada data yang salah.
@@ -72,7 +72,7 @@
 - inventory reversal idempotency proof tidak rusak
 #### Issue Card 004
 
-- error_log path: docs/04_lifecycle/error_log/004-refunded-work-items-survive-revisions-and-inflate-stock.md
+- error_log path: docs/04_lifecycle/error_log/0004_refunded_work_items_survive_revisions_and_inflate_stock.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted untuk Note/Payment/current operational flow; weak untuk reporting direct work_items
 - root cause sementara: refunded historical work_items tetap attached sebagai active row dan duplicate inventory reversal bisa inflate stock
@@ -87,7 +87,7 @@
 - handoff note template: "004 current/historical row boundary: source=<paths>, red=<command>, green=<command>, wider=<command>, residual_reporting=<yes/no>"
 #### Issue Card 012
 
-- error_log path: docs/04_lifecycle/error_log/012-canceled-note-rows-re-enter-payment-flows.md
+- error_log path: docs/04_lifecycle/error_log/0012_canceled_note_rows_re_enter_payment_flows.md
 - status dokumen saat ini: Patched, with verification gap and residual audit note
 - status kepercayaan: weak
 - root cause sementara: canceled rows masuk note->workItems() tetapi payment/status consumers masih menganggap semua rows active
@@ -103,11 +103,11 @@
 ### Slice 2 - Settlement and Payment Basis Foundation
 
 - Issues:
-- docs/04_lifecycle/error_log/001-refunds-counted-as-paid-in-note-totals.md
-- docs/04_lifecycle/error_log/003-refunded-revised-notes-are-misclassified-as-underpaid.md
-- docs/04_lifecycle/error_log/005-note-revision-silently-drops-overpaid-allocations.md
-- docs/04_lifecycle/error_log/008-legacy-paid-notes-can-be-paid-again.md
-- docs/04_lifecycle/error_log/017-workspace-edit-payments-ignore-existing-note-payments.md
+- docs/04_lifecycle/error_log/0001_refunds_counted_as_paid_in_note_totals.md
+- docs/04_lifecycle/error_log/0003_refunded_revised_notes_are_misclassified_as_underpaid.md
+- docs/04_lifecycle/error_log/0005_note_revision_silently_drops_overpaid_allocations.md
+- docs/04_lifecycle/error_log/0008_legacy_paid_notes_can_be_paid_again.md
+- docs/04_lifecycle/error_log/0017_workspace_edit_payments_ignore_existing_note_payments.md
 - Alasan urutan:
 - payment/refund arithmetic adalah foundation untuk paid status, outstanding, editability, refund eligibility, and concurrency.
 - #001 dan #003 punya conflict settlement semantics, jadi harus diverifikasi bersama.
@@ -130,7 +130,7 @@
 - downward overpaid revision reject+rollback atau explicit domain model tersedia
 #### Issue Card 001
 
-- error_log path: docs/04_lifecycle/error_log/001-refunds-counted-as-paid-in-note-totals.md
+- error_log path: docs/04_lifecycle/error_log/0001_refunds_counted_as_paid_in_note_totals.md
 - status dokumen saat ini: Patched
 - status kepercayaan: contradicted
 - root cause sementara: active refund ikut dihitung allocated lalu dikurangi lagi sehingga refund netral; later #003 mengubah settlement basis
@@ -145,7 +145,7 @@
 - handoff note template: "001 conflict with 003: active_refund=<proof>, revised_historical=<proof>, selected_patch_boundary=<path>"
 #### Issue Card 003
 
-- error_log path: docs/04_lifecycle/error_log/003-refunded-revised-notes-are-misclassified-as-underpaid.md
+- error_log path: docs/04_lifecycle/error_log/0003_refunded_revised_notes_are_misclassified_as_underpaid.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted
 - root cause sementara: historical refund after revision was subtracted again from carry-forward settlement
@@ -160,7 +160,7 @@
 - handoff note template: "003 current refund boundary: source=<paths>, red=<output>, green=<output>, regression_001=<output>"
 #### Issue Card 005
 
-- error_log path: docs/04_lifecycle/error_log/005-note-revision-silently-drops-overpaid-allocations.md
+- error_log path: docs/04_lifecycle/error_log/0005_note_revision_silently_drops_overpaid_allocations.md
 - status dokumen saat ini: Fixed and verified
 - status kepercayaan: trusted
 - root cause sementara: revision payment replay silently capped old allocation and hid overpaid excess
@@ -175,7 +175,7 @@
 - handoff note template: "005 overpaid replay: behavior=reject_rollback, tests=<commands>, future_overpaid_model=<deferred>"
 #### Issue Card 008
 
-- error_log path: docs/04_lifecycle/error_log/008-legacy-paid-notes-can-be-paid-again.md
+- error_log path: docs/04_lifecycle/error_log/0008_legacy_paid_notes_can_be_paid_again.md
 - status dokumen saat ini: Patched and locally verified for backend payment allocation/projection scope
 - status kepercayaan: trusted untuk backend scope
 - root cause sementara: selected-row payment ignored legacy allocation and later mixed legacy/component totals
@@ -190,7 +190,7 @@
 - handoff note template: "008 compatibility allocation: legacy=<proof>, mixed=<proof>, migration_risk=<noted>"
 #### Issue Card 017
 
-- error_log path: docs/04_lifecycle/error_log/017-workspace-edit-payments-ignore-existing-note-payments.md
+- error_log path: docs/04_lifecycle/error_log/0017_workspace_edit_payments_ignore_existing_note_payments.md
 - status dokumen saat ini: Fixed and verified
 - status kepercayaan: trusted
 - root cause sementara: inline payment pay_full and policy ignored existing allocated total
@@ -206,8 +206,8 @@
 ### Slice 3 - Payment and Revision Concurrency Serialization
 
 - Issues:
-- docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
-- docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+- docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
+- docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 - Alasan urutan:
 - concurrency harus mengunci invariant settlement yang sudah benar dari Slice 2.
 - Lock atas math yang salah hanya membuat bug berjalan antre, bukan hilang. Dunia tidak butuh race condition yang lebih sopan.
@@ -226,7 +226,7 @@
 - true concurrency stress gap dicatat jika belum dilakukan
 #### Issue Card 010
 
-- error_log path: docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
+- error_log path: docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
 - status dokumen saat ini: Fixed and locally verified for minimum revision/payment same-note serialization control
 - status kepercayaan: trusted untuk source-level serialization; weak untuk true parallel stress
 - root cause sementara: revision capture/delete/rebuild could delete concurrent payment allocation
@@ -241,7 +241,7 @@
 - handoff note template: "010 revision/payment lock: root_lock=<path>, payment_lock=<path>, stress_gap=<yes/no>"
 #### Issue Card 026
 
-- error_log path: docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+- error_log path: docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 - status dokumen saat ini: Fixed and locally verified for minimum note-level payment serialization control
 - status kepercayaan: trusted untuk minimum lock; weak untuk true parallel stress
 - root cause sementara: concurrent payment requests read stale allocated total then both committed
@@ -257,13 +257,13 @@
 ### Slice 4 - Access, Capability, Date Window, and Disclosure Boundary
 
 - Issues:
-- docs/04_lifecycle/error_log/009-cashiers-can-rewrite-closed-paid-notes-via-workspace-update.md
-- docs/04_lifecycle/error_log/011-cashier-revision-path-mutates-settled-note-state.md
-- docs/04_lifecycle/error_log/016-unauthenticated-admin-capability-toggle-endpoints.md
-- docs/04_lifecycle/error_log/019-cashiers-can-list-historical-closed-notes-by-date.md
-- docs/04_lifecycle/error_log/020-admin-note-actions-bypass-transaction-capability.md
-- docs/04_lifecycle/error_log/027-admin-invoice-creation-bypasses-transaction-entry-gate.md
-- docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+- docs/04_lifecycle/error_log/0009_cashiers_can_rewrite_closed_paid_notes_via_workspace_update.md
+- docs/04_lifecycle/error_log/0011_cashier_revision_path_mutates_settled_note_state.md
+- docs/04_lifecycle/error_log/0016_unauthenticated_admin_capability_toggle_endpoints.md
+- docs/04_lifecycle/error_log/0019_cashiers_can_list_historical_closed_notes_by_date.md
+- docs/04_lifecycle/error_log/0020_admin_note_actions_bypass_transaction_capability.md
+- docs/04_lifecycle/error_log/0027_admin_invoice_creation_bypasses_transaction_entry_gate.md
+- docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 - Alasan urutan:
 - setelah settlement/status foundation cukup, access boundary bisa memakai status yang benar.
 - route/capability/date-window harus kuat sebelum refund/procurement/output closure final.
@@ -285,7 +285,7 @@
 - cashier global count removed or scoped
 #### Issue Card 009
 
-- error_log path: docs/04_lifecycle/error_log/009-cashiers-can-rewrite-closed-paid-notes-via-workspace-update.md
+- error_log path: docs/04_lifecycle/error_log/0009_cashiers_can_rewrite_closed_paid_notes_via_workspace_update.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted
 - root cause sementara: cashier workspace PATCH route classified as view-only access
@@ -300,7 +300,7 @@
 - handoff note template: "009 cashier workspace guard: route=<name>, red=<output>, green=<output>, no_mutation=<proof>"
 #### Issue Card 011
 
-- error_log path: docs/04_lifecycle/error_log/011-cashier-revision-path-mutates-settled-note-state.md
+- error_log path: docs/04_lifecycle/error_log/0011_cashier_revision_path_mutates_settled_note_state.md
 - status dokumen saat ini: Fixed with proof plus route-scoped admin compatibility follow-up
 - status kepercayaan: trusted
 - root cause sementara: cashier revision missed editability guard; later admin correction required route-scoped guard
@@ -315,7 +315,7 @@
 - handoff note template: "011 editability: cashier_guard=<proof>, admin_route_scope=<proof>, lock_preserved=<proof>"
 #### Issue Card 016
 
-- error_log path: docs/04_lifecycle/error_log/016-unauthenticated-admin-capability-toggle-endpoints.md
+- error_log path: docs/04_lifecycle/error_log/0016_unauthenticated_admin_capability_toggle_endpoints.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: capability toggle endpoint lacked auth/admin middleware and trusted performed_by_actor_id from client
@@ -330,7 +330,7 @@
 - handoff note template: "016 capability toggle: guest=<proof>, kasir=<proof>, admin=<proof>, audit=<proof>"
 #### Issue Card 019
 
-- error_log path: docs/04_lifecycle/error_log/019-cashiers-can-list-historical-closed-notes-by-date.md
+- error_log path: docs/04_lifecycle/error_log/0019_cashiers_can_list_historical_closed_notes_by_date.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: cashier table trusted client date and used openOnly=false, leaking historical closed notes
@@ -345,7 +345,7 @@
 - handoff note template: "019 cashier table: historical_date=<proof>, current_window=<proof>, route_middleware=<proof>"
 #### Issue Card 020
 
-- error_log path: docs/04_lifecycle/error_log/020-admin-note-actions-bypass-transaction-capability.md
+- error_log path: docs/04_lifecycle/error_log/0020_admin_note_actions_bypass_transaction_capability.md
 - status dokumen saat ini: Patched
 - status kepercayaan: weak
 - root cause sementara: admin note mutation routes lacked transaction-entry gate
@@ -360,7 +360,7 @@
 - handoff note template: "020 admin note gate: routes=<proof>, inactive_admin_denied=<proof>, read_allowed=<proof>"
 #### Issue Card 027
 
-- error_log path: docs/04_lifecycle/error_log/027-admin-invoice-creation-bypasses-transaction-entry-gate.md
+- error_log path: docs/04_lifecycle/error_log/0027_admin_invoice_creation_bypasses_transaction_entry_gate.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: supplier invoice creation route lacked transaction.entry
@@ -375,7 +375,7 @@
 - handoff note template: "027 supplier invoice gate: inactive_denied=<proof>, active_allowed=<proof>, no_mutation=<proof>"
 #### Issue Card 029
 
-- error_log path: docs/04_lifecycle/error_log/029-cashier-create-page-leaks-total-note-count.md
+- error_log path: docs/04_lifecycle/error_log/0029_cashier_create_page_leaks_total_note_count.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted untuk create-page disclosure; weak untuk full global verify
 - root cause sementara: cashier create default customer name used global countAll()+1
@@ -391,12 +391,12 @@
 ### Slice 5 - Refund Lifecycle, Parent Note Eligibility, Terminal State, and UI Entry
 
 - Issues:
-- docs/04_lifecycle/error_log/013-forged-row-refund-can-auto-finalize-unpaid-notes.md
-- docs/04_lifecycle/error_log/014-refund-endpoint-can-cancel-open-or-unpaid-note-rows.md
-- docs/04_lifecycle/error_log/021-refunds-can-be-recorded-on-open-notes.md
-- docs/04_lifecycle/error_log/022-cashier-refund-route-bypasses-note-access-guard.md
-- docs/04_lifecycle/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
-- docs/04_lifecycle/error_log/015-refunded-notes-expose-edit-workspace.md
+- docs/04_lifecycle/error_log/0013_forged_row_refund_can_auto_finalize_unpaid_notes.md
+- docs/04_lifecycle/error_log/0014_refund_endpoint_can_cancel_open_or_unpaid_note_rows.md
+- docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md
+- docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
+- docs/04_lifecycle/error_log/0018_refunded_notes_bypass_cashier_closed_note_guards.md
+- docs/04_lifecycle/error_log/0015_refunded_notes_expose_edit_workspace.md
 - Alasan urutan:
 - refund flow perlu settlement, current rows, and access boundary yang sudah stabil.
 - #021 dan #022 punya conflict, jadi refund slice harus berhenti sampai source/test membuktikan policy final.
@@ -420,7 +420,7 @@
 - UI edit button aligns but backend remains boundary
 #### Issue Card 013
 
-- error_log path: docs/04_lifecycle/error_log/013-forged-row-refund-can-auto-finalize-unpaid-notes.md
+- error_log path: docs/04_lifecycle/error_log/0013_forged_row_refund_can_auto_finalize_unpaid_notes.md
 - status dokumen saat ini: Patched for auto-finalization, with verification gap and residual validation risk
 - status kepercayaan: weak
 - root cause sementara: zero-allocation selected-row refund could cancel rows and finalize unpaid note as refunded
@@ -435,7 +435,7 @@
 - handoff note template: "013 refund finalizer: zero_alloc=<proof>, legitimate_refund=<proof>, audit=<proof>"
 #### Issue Card 014
 
-- error_log path: docs/04_lifecycle/error_log/014-refund-endpoint-can-cancel-open-or-unpaid-note-rows.md
+- error_log path: docs/04_lifecycle/error_log/0014_refund_endpoint_can_cancel_open_or_unpaid_note_rows.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: selected-row refund resolver accepted open/unpaid rows and cancelled them
@@ -450,7 +450,7 @@
 - handoff note template: "014 row eligibility: unpaid=<proof>, partial_open=<proof>, valid_close=<proof>"
 #### Issue Card 021
 
-- error_log path: docs/04_lifecycle/error_log/021-refunds-can-be-recorded-on-open-notes.md
+- error_log path: docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: contradicted
 - root cause sementara: selected rows could be close while parent note remained open; whole-note close invariant unclear
@@ -465,7 +465,7 @@
 - handoff note template: "021 parent note refund conflict: source=<proof>, docs_conflict=<paths>, decision=<policy>, tests=<commands>"
 #### Issue Card 022
 
-- error_log path: docs/04_lifecycle/error_log/022-cashier-refund-route-bypasses-note-access-guard.md
+- error_log path: docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
 - status dokumen saat ini: Fixed and locally verified for cashier refund route note-access enforcement
 - status kepercayaan: trusted for route access/date-window; separate from #021 parent close policy
 - root cause sementara: cashier refund route was outside EnsureCashierNoteAccess
@@ -480,7 +480,7 @@
 - handoff note template: "022 refund route guard: historical=<proof>, valid_refund=<proof>, route_context=<proof>"
 #### Issue Card 018
 
-- error_log path: docs/04_lifecycle/error_log/018-refunded-notes-bypass-cashier-closed-note-guards.md
+- error_log path: docs/04_lifecycle/error_log/0018_refunded_notes_bypass_cashier_closed_note_guards.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted
 - root cause sementara: refunded state not treated terminal by cashier mutation guard and addability policy
@@ -495,7 +495,7 @@
 - handoff note template: "018 refunded terminal: route_guard=<proof>, addability=<proof>, focused=<proof>"
 #### Issue Card 015
 
-- error_log path: docs/04_lifecycle/error_log/015-refunded-notes-expose-edit-workspace.md
+- error_log path: docs/04_lifecycle/error_log/0015_refunded_notes_expose_edit_workspace.md
 - status dokumen saat ini: Patched, with server-side authorization verification gap
 - status kepercayaan: weak
 - root cause sementara: shared note detail rendered Edit button without can_edit_workspace
@@ -511,7 +511,7 @@
 ### Slice 6 - Server-Side Price Basis Authority
 
 - Issue:
-- docs/04_lifecycle/error_log/006-client-controlled-price-basis-bypasses-minimum-price-checks.md
+- docs/04_lifecycle/error_log/0006_client_controlled_price_basis_bypasses_minimum_price_checks.md
 - Alasan urutan:
 - price basis is a financial invariant in workspace revision, but it is isolated enough to run after settlement/access foundations.
 - Native JS and hidden fields must be reviewed, but final authority is server-side.
@@ -530,7 +530,7 @@
 - native JS/Blade hidden field is not authority
 #### Issue Card 006
 
-- error_log path: docs/04_lifecycle/error_log/006-client-controlled-price-basis-bypasses-minimum-price-checks.md
+- error_log path: docs/04_lifecycle/error_log/0006_client_controlled_price_basis_bypasses_minimum_price_checks.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted for technical source/test scope; weak for docs commit/global/browser closure
 - root cause sementara: client-controlled price_basis bypassed minimum selling price policy
@@ -546,9 +546,9 @@
 ### Slice 7 - Output Context, Blade, Native JS, and Unsafe URL
 
 - Issues:
-- docs/04_lifecycle/error_log/007-admin-note-edit-page-exposes-stored-xss.md
-- docs/04_lifecycle/error_log/024-reflected-xss-in-expense-create-json-config.md
-- docs/04_lifecycle/error_log/025-reflected-javascript-url-in-product-return-link.md
+- docs/04_lifecycle/error_log/0007_admin_note_edit_page_exposes_stored_xss.md
+- docs/04_lifecycle/error_log/0024_reflected_xss_in_expense_create_json_config.md
+- docs/04_lifecycle/error_log/0025_reflected_javascript_url_in_product_return_link.md
 - Alasan urutan:
 - after finance/access boundaries, public surface output must be verified across Blade and JS contexts.
 - #007 and #024 share JSON-in-script hazard; #025 is URL context hazard.
@@ -568,7 +568,7 @@
 - native JS does not turn escaped payload into HTML/script
 #### Issue Card 007
 
-- error_log path: docs/04_lifecycle/error_log/007-admin-note-edit-page-exposes-stored-xss.md
+- error_log path: docs/04_lifecycle/error_log/0007_admin_note_edit_page_exposes_stored_xss.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: workspace config JSON rendered into script context without HTML-safe JSON encoding; multiple stored data sources reach same sink
@@ -583,7 +583,7 @@
 - handoff note template: "007 workspace XSS: sinks=<paths>, payloads=<proof>, negative_search=<proof>"
 #### Issue Card 024
 
-- error_log path: docs/04_lifecycle/error_log/024-reflected-xss-in-expense-create-json-config.md
+- error_log path: docs/04_lifecycle/error_log/0024_reflected_xss_in_expense_create_json_config.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: query category_id reflected into expense create JSON config script with unsafe raw encoding
@@ -598,7 +598,7 @@
 - handoff note template: "024 expense JSON: payload=<proof>, response_negative=<proof>, parseable=<proof>"
 #### Issue Card 025
 
-- error_log path: docs/04_lifecycle/error_log/025-reflected-javascript-url-in-product-return-link.md
+- error_log path: docs/04_lifecycle/error_log/0025_reflected_javascript_url_in_product_return_link.md
 - status dokumen saat ini: Patched, with verification gap
 - status kepercayaan: weak
 - root cause sementara: query return_to rendered as href; HTML escaping did not block javascript:
@@ -614,8 +614,8 @@
 ### Slice 8 - Storage, Public Helper, and Attachment Proof Security
 
 - Issues:
-- docs/04_lifecycle/error_log/023-public-helper-can-expose-private-storage.md
-- docs/04_lifecycle/error_log/028-di-fix-exposes-unsafe-proof-attachment-content-type.md
+- docs/04_lifecycle/error_log/0023_public_helper_can_expose_private_storage.md
+- docs/04_lifecycle/error_log/0028_di_fix_exposes_unsafe_proof_attachment_content_type.md
 - Alasan urutan:
 - public/private storage and proof attachment security must be verified after access/procurement route gates are stable.
 - #023 is public helper exposure; #028 is authenticated controller response MIME/content-disposition.
@@ -636,7 +636,7 @@
 - filename safe
 #### Issue Card 023
 
-- error_log path: docs/04_lifecycle/error_log/023-public-helper-can-expose-private-storage.md
+- error_log path: docs/04_lifecycle/error_log/0023_public_helper_can_expose_private_storage.md
 - status dokumen saat ini: Patched
 - status kepercayaan: weak for deployment; source deletion likely sufficient for repo endpoint
 - root cause sementara: public a.php helper outside Laravel middleware could create symlink exposing private storage
@@ -651,7 +651,7 @@
 - handoff note template: "023 public helper: repo_absent=<proof>, public_symlink=<proof>, deployment=<done/deferred>"
 #### Issue Card 028
 
-- error_log path: docs/04_lifecycle/error_log/028-di-fix-exposes-unsafe-proof-attachment-content-type.md
+- error_log path: docs/04_lifecycle/error_log/0028_di_fix_exposes_unsafe_proof_attachment_content_type.md
 - status dokumen saat ini: Fixed with proof
 - status kepercayaan: trusted for attachment MIME/content-disposition scope
 - root cause sementara: stored/client MIME and inline response let proof attachment be served as HTML same-origin
@@ -667,7 +667,7 @@
 ### Slice 9 - Seeder Credential Safety Future Scope
 
 - Issue:
-- docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md
+- docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 - Alasan urutan:
 - user explicitly forbids making seeder now.
 - seeder remains outside active remediation workflow.
@@ -686,7 +686,7 @@
 - do not claim seeder fixed globally
 #### Issue Card 002
 
-- error_log path: docs/04_lifecycle/error_log/002-seeder-introduces-predictable-admin-credentials.md
+- error_log path: docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 - status dokumen saat ini: Patched
 - status kepercayaan: weak
 - root cause sementara: seeded predictable admin credential and reseed overwrite risk; residual deployment rotation and kasir/default credential questions

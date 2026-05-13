@@ -39,8 +39,8 @@ The final solution must be enforced in application/database transaction boundari
 
 ADR-0022 covers:
 
-- `docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md`
-- `docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md`
+- `docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md`
+- `docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md`
 
 ADR-0022 may influence future implementation checks around:
 
@@ -256,7 +256,7 @@ Final fixed requires:
 - targeted test passes after patch
 - relevant payment/revision/refund blast-radius tests pass
 - no stale unlocked competing path remains in approved scope
-- docs/error_log is updated only after proof
+- docs/04_lifecycle/error_log is updated only after proof
 - owner reviews and accepts proof
 
 If true concurrent test is not feasible in local environment, status must remain:
@@ -690,7 +690,7 @@ Implementation proof must include relevant checks for:
 - existing partial payment behavior still works
 - existing full payment behavior still works
 - existing refund/revision tests still pass when affected
-- no docs/error_log fixed status without proof
+- no docs/04_lifecycle/error_log fixed status without proof
 
 ## Documentation Rule
 
@@ -730,8 +730,8 @@ Stop immediately if:
 
 ## Related Documents
 
-- docs/04_lifecycle/error_log/010-revision-reallocation-can-lose-concurrent-payments.md
-- docs/04_lifecycle/error_log/026-concurrent-note-payments-can-over-allocate-balances.md
+- docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
+- docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md

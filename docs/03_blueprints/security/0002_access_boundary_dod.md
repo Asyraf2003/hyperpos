@@ -59,7 +59,7 @@ Implementation is complete only when all relevant conditions are proven:
 
 ### Documentation
 
-- docs/error_log finding is updated only after proof
+- docs/04_lifecycle/error_log finding is updated only after proof
 - ADR is not rewritten casually during implementation
 - any deviation from this blueprint is recorded with reason
 - seeder legacy backlog remains untouched unless owner explicitly opens seeder scope

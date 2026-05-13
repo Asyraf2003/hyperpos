@@ -18,22 +18,22 @@ This is not a prototype, demo, or reduced-scope system.
 
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
 - docs/02_architecture/adr/0025-note-revision-carry-forward-settlement.md
-- docs/03_blueprints/v2/note_finance/2026-04-29-note-finance-stabilization-blueprint.md
-- docs/03_blueprints/v2/note_finance/2026-04-29-note-finance-current-projection-addendum.md
+- docs/03_blueprints/finance/0001_note_finance_stabilization.md
+- docs/03_blueprints/finance/0002_note_finance_stabilization_addendum.md
 - docs/99_archive/handoff/v2/note_finance/2026-04-30-adr-0016-completion-handoff.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
-- docs/04_lifecycle/error_log/001-refunds-counted-as-paid-in-note-totals.md
-- docs/04_lifecycle/error_log/003-refunded-revised-notes-are-misclassified-as-underpaid.md
-- docs/04_lifecycle/error_log/004-refunded-work-items-survive-revisions-and-inflate-stock.md
-- docs/04_lifecycle/error_log/005-note-revision-silently-drops-overpaid-allocations.md
-- docs/04_lifecycle/error_log/006-client-controlled-price-basis-bypasses-minimum-price-checks.md
-- docs/04_lifecycle/error_log/008-legacy-paid-notes-can-be-paid-again.md
-- docs/04_lifecycle/error_log/011-cashier-revision-path-mutates-settled-note-state.md
-- docs/04_lifecycle/error_log/012-canceled-note-rows-re-enter-payment-flows.md
-- docs/04_lifecycle/error_log/013-forged-row-refund-can-auto-finalize-unpaid-notes.md
-- docs/04_lifecycle/error_log/014-refund-endpoint-can-cancel-open-or-unpaid-note-rows.md
-- docs/04_lifecycle/error_log/017-workspace-edit-payments-ignore-existing-note-payments.md
-- docs/04_lifecycle/error_log/021-refunds-can-be-recorded-on-open-notes.md
+- docs/04_lifecycle/error_log/0001_refunds_counted_as_paid_in_note_totals.md
+- docs/04_lifecycle/error_log/0003_refunded_revised_notes_are_misclassified_as_underpaid.md
+- docs/04_lifecycle/error_log/0004_refunded_work_items_survive_revisions_and_inflate_stock.md
+- docs/04_lifecycle/error_log/0005_note_revision_silently_drops_overpaid_allocations.md
+- docs/04_lifecycle/error_log/0006_client_controlled_price_basis_bypasses_minimum_price_checks.md
+- docs/04_lifecycle/error_log/0008_legacy_paid_notes_can_be_paid_again.md
+- docs/04_lifecycle/error_log/0011_cashier_revision_path_mutates_settled_note_state.md
+- docs/04_lifecycle/error_log/0012_canceled_note_rows_re_enter_payment_flows.md
+- docs/04_lifecycle/error_log/0013_forged_row_refund_can_auto_finalize_unpaid_notes.md
+- docs/04_lifecycle/error_log/0014_refund_endpoint_can_cancel_open_or_unpaid_note_rows.md
+- docs/04_lifecycle/error_log/0017_workspace_edit_payments_ignore_existing_note_payments.md
+- docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
 - docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
 - User owner decisions in planning sessions
