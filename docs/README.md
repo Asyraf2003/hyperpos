@@ -10,8 +10,8 @@ Tujuan index ini: memudahkan manusia atau AI agent menemukan dokumen yang tepat 
 
 Baca dalam urutan ini:
 
-    docs/01_standards/ai-usage-guide.md
-    docs/01_standards/00-index.md
+    docs/01_standards/0007_ai_usage_guide.md
+    docs/01_standards/0001_index.md
     Blueprint aktif untuk scope saat ini
     Output lokal terbaru dari operator
 

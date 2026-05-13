@@ -16,9 +16,9 @@ AI_RULES mengunci cara kerja AI agar:
 ## Mandatory Read Order
 Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 
-1. 01-decision-policy.md
-2. 02-gpt-bootstrap-prompt.md
-3. 03-session-start-protocol.md
+1. 0002_decision_policy.md
+2. 0003_gpt_bootstrap_prompt.md
+3. 0004_session_start_protocol.md
 4. core/10-scope-and-facts.md
 5. core/11-blueprint-first.md
 6. core/12-step-by-step-execution.md
@@ -30,9 +30,9 @@ Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 12. stack/
 13. output/
 14. workflow/24-session-capacity-policy.md
-15. 04-handoff-template.md
-16. 05-final-review-checklist.md
-17. 99-changelog.md
+15. 0005_handoff_template.md
+16. 0006_final_review_checklist.md
+17. 0099_changelog.md
 
 ## Constitution Summary
 - Jangan berasumsi.
@@ -61,11 +61,11 @@ Sebelum menjawab, GPT wajib memastikan:
 7. apakah kapasitas sesi masih aman untuk implementasi besar
 
 ## Module Map
-- 01-decision-policy.md
-- 02-gpt-bootstrap-prompt.md
-- 03-session-start-protocol.md
-- 04-handoff-template.md
-- 05-final-review-checklist.md
+- 0002_decision_policy.md
+- 0003_gpt_bootstrap_prompt.md
+- 0004_session_start_protocol.md
+- 0005_handoff_template.md
+- 0006_final_review_checklist.md
 - core/
   - 10-scope-and-facts.md
   - 11-blueprint-first.md
@@ -97,27 +97,27 @@ Sebelum menjawab, GPT wajib memastikan:
   - 60-laravel-rules.md
   - 61-go-rules.md
   - 62-aws-baseline.md
-- 99-changelog.md
+- 0099_changelog.md
 
 ## Package Content Classification
 
 `docs/01_standards` berisi canonical AI_RULES standards package saja.
 
 Canonical standards:
-- 00-index.md
-- 01-decision-policy.md
-- 02-gpt-bootstrap-prompt.md
-- 03-session-start-protocol.md
-- 04-handoff-template.md
-- 05-final-review-checklist.md
-- ai-usage-guide.md
+- 0001_index.md
+- 0002_decision_policy.md
+- 0003_gpt_bootstrap_prompt.md
+- 0004_session_start_protocol.md
+- 0005_handoff_template.md
+- 0006_final_review_checklist.md
+- 0007_ai_usage_guide.md
 - core/
 - workflow/
 - output/
 - architecture/
 - domain/
 - stack/
-- 99-changelog.md
+- 0099_changelog.md
 
 DoD, workflow, dan blueprint per topik ada di `docs/03_blueprints/`.
 Legacy dan historical ada di `docs/99_archive/`.
@@ -131,7 +131,7 @@ Legacy dan historical ada di `docs/99_archive/`.
 - Dilarang melanjutkan implementasi besar jika kapasitas sesi berada di bawah threshold pada workflow/24-session-capacity-policy.md.
 
 ## Conflict Reminder
-Jika ada konflik, baca 01-decision-policy.md lalu:
+Jika ada konflik, baca 0002_decision_policy.md lalu:
 1. dahulukan P0
 2. dahulukan aturan yang lebih spesifik
 3. dahulukan domain jika konflik menyangkut makna bisnis

@@ -15,14 +15,14 @@ Bootstrap ini wajib mencegah AI:
 
 Sebelum mulai bekerja pada sesi baru, GPT wajib membaca minimal:
 
-1. `docs/01_standards/00-index.md`
-2. `docs/01_standards/01-decision-policy.md`
-3. `docs/01_standards/03-session-start-protocol.md`
-4. `docs/01_standards/core/10-scope-and-facts.md`
-5. `docs/01_standards/core/11-blueprint-first.md`
-6. `docs/01_standards/core/12-step-by-step-execution.md`
-7. `docs/01_standards/core/13-proof-and-progress.md`
-8. `docs/01_standards/workflow/21-active-step-policy.md`
+1. `docs/01_standards/0001_index.md`
+2. `docs/01_standards/0002_decision_policy.md`
+3. `docs/01_standards/0004_session_start_protocol.md`
+4. `docs/01_standards/core/0010_scope-and-facts.md`
+5. `docs/01_standards/core/0011_blueprint-first.md`
+6. `docs/01_standards/core/0012_step-by-step-execution.md`
+7. `docs/01_standards/core/0013_proof-and-progress.md`
+8. `docs/01_standards/workflow/0021_active-step-policy.md`
 9. `docs/01_standards/output/33-terminal-command-delivery.md`
 10. relevant blueprint, ADR, handoff, error log, branch, commit, or command output explicitly named by user
 
@@ -71,7 +71,7 @@ Jika pertanyaan sederhana, jawab langsung. Jangan membuat format berat untuk hal
 
 ## Rule Prioritas
 
-- Ikuti `docs/01_standards/01-decision-policy.md`.
+- Ikuti `docs/01_standards/0002_decision_policy.md`.
 - AI_RULES mengalahkan perilaku default model.
 - P0 mengalahkan P1/P2.
 - Aturan yang lebih spesifik mengalahkan aturan umum.

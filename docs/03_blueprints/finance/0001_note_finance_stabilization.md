@@ -7,8 +7,8 @@
 - Status: ACTIVE BLUEPRINT
 - Pemilik keputusan: project owner / engineer
 - Sumber aturan kerja:
-  - docs/01_standards/00-index.md
-  - docs/01_standards/01-decision-policy.md
+  - docs/01_standards/0001_index.md
+  - docs/01_standards/0002_decision_policy.md
   - docs/01_standards/architecture/
   - docs/01_standards/domain/
 - Scope besar:
@@ -440,8 +440,8 @@ Manual test minimal:
 
 Saat membuka sesi baru untuk scope ini, AI wajib membaca:
 
-1. docs/01_standards/00-index.md
-2. docs/01_standards/01-decision-policy.md
+1. docs/01_standards/0001_index.md
+2. docs/01_standards/0002_decision_policy.md
 3. docs/03_blueprints/v2/note_finance/2026-04-29-note-finance-stabilization-blueprint.md
 4. handoff terakhir yang relevan
 5. command output lokal terbaru dari user

@@ -6,14 +6,14 @@ Aturan wajib untuk semua sesi kerja AI di repo ini. Semua file di sini bersifat 
 
 | File / Folder | Isi |
 |---|---|
-| `00-index.md` | Entry point. Mandatory read order dan module map. |
-| `01-decision-policy.md` | Hierarki keputusan dan prioritas rule. |
-| `02-gpt-bootstrap-prompt.md` | Prompt bootstrap untuk sesi AI baru. |
-| `03-session-start-protocol.md` | Protokol pembuka sesi kerja. |
-| `04-handoff-template.md` | Template canonical untuk membuat handoff baru. |
-| `05-final-review-checklist.md` | Checklist sebelum menutup sesi besar. |
-| `ai-usage-guide.md` | Panduan layer mana untuk informasi apa. |
-| `99-changelog.md` | Log perubahan paket AI_RULES. |
+| `0001_index.md` | Entry point. Mandatory read order dan module map. |
+| `0002_decision_policy.md` | Hierarki keputusan dan prioritas rule. |
+| `0003_gpt_bootstrap_prompt.md` | Prompt bootstrap untuk sesi AI baru. |
+| `0004_session_start_protocol.md` | Protokol pembuka sesi kerja. |
+| `0005_handoff_template.md` | Template canonical untuk membuat handoff baru. |
+| `0006_final_review_checklist.md` | Checklist sebelum menutup sesi besar. |
+| `0007_ai_usage_guide.md` | Panduan layer mana untuk informasi apa. |
+| `0099_changelog.md` | Log perubahan paket AI_RULES. |
 | `core/` | Prinsip inti: scope, blueprint-first, step-by-step, proof. |
 | `workflow/` | Aturan workflow: response, active step, handoff, capacity. |
 | `output/` | Aturan format output: file, markdown, blade, terminal. |

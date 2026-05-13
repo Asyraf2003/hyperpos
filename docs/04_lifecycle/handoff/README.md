@@ -9,7 +9,7 @@ Folder ini menyimpan session recovery notes untuk sesi aktif atau terbaru.
 - Setelah sesi selesai dan tidak relevan lagi, pindah ke `docs/99_archive/handoff/`.
 - Jangan simpan keputusan permanen hanya di sini — promote ke `docs/02_architecture/adr`.
 - Jangan simpan blueprint aktif di sini — promote ke `docs/03_blueprints`.
-- Canonical handoff template: `docs/01_standards/04-handoff-template.md`
+- Canonical handoff template: `docs/01_standards/0005_handoff_template.md`
 
 ## Source of Truth Priority
 

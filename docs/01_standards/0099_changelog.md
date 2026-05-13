@@ -26,8 +26,8 @@
 - Jika perubahan dipicu ADR atau handoff, cantumkan referensinya pada update berikutnya.
 
 ## 2026-03-26 - harden entrypoint and core P0
-- Menguatkan `00-index.md` menjadi entrypoint enforcement.
-- Menguatkan `01-decision-policy.md` dengan mandatory decision sequence, gap rule, forbidden shortcuts, dan stop conditions.
+- Menguatkan `0001_index.md` menjadi entrypoint enforcement.
+- Menguatkan `0002_decision_policy.md` dengan mandatory decision sequence, gap rule, forbidden shortcuts, dan stop conditions.
 - Menguatkan `10-scope-and-facts.md` dengan classification dan inference rule.
 - Menguatkan `11-blueprint-first.md` dengan implementation gate.
 
@@ -54,12 +54,12 @@
 - Menguatkan `33-terminal-command-delivery.md` agar delivery command terminal dibagi batch bila perlu dan selalu punya konteks eksekusi serta verifikasi.
 
 ## 2026-03-26 - add bootstrap and handoff support
-- Menambahkan `02-gpt-bootstrap-prompt.md` sebagai bootstrap operasional untuk GPT lain.
-- Menambahkan `03-session-start-protocol.md` untuk standardisasi pembukaan sesi kerja.
-- Menambahkan `04-handoff-template.md` untuk penutupan slice yang bisa diteruskan tanpa asumsi.
-- Memperbarui `00-index.md` agar file bootstrap dan handoff masuk ke mandatory read order dan module map.
+- Menambahkan `0003_gpt_bootstrap_prompt.md` sebagai bootstrap operasional untuk GPT lain.
+- Menambahkan `0004_session_start_protocol.md` untuk standardisasi pembukaan sesi kerja.
+- Menambahkan `0005_handoff_template.md` untuk penutupan slice yang bisa diteruskan tanpa asumsi.
+- Memperbarui `0001_index.md` agar file bootstrap dan handoff masuk ke mandatory read order dan module map.
 
 ## 2026-03-26 - add final review support
-- Menambahkan `05-final-review-checklist.md` untuk pemeriksaan akhir paket AI_RULES.
+- Menambahkan `0006_final_review_checklist.md` untuk pemeriksaan akhir paket AI_RULES.
 - Menambahkan `scripts/audit_ai_rules.sh` sebagai helper audit ringan untuk memeriksa struktur file dan keyword penting.
-- Memperbarui `00-index.md` agar final review checklist masuk ke mandatory read order dan module map.
+- Memperbarui `0001_index.md` agar final review checklist masuk ke mandatory read order dan module map.

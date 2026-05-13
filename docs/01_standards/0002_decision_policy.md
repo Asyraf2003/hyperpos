@@ -20,7 +20,7 @@ Menetapkan cara mengambil keputusan saat:
 7. Bukti nyata mengalahkan dugaan.
 
 ## P0 Modules
-- `01-decision-policy.md`
+- `0002_decision_policy.md`
 - `core/10-scope-and-facts.md`
 - `core/11-blueprint-first.md`
 - `core/12-step-by-step-execution.md`

@@ -120,9 +120,9 @@ Use to start a new AI session. A good session prompt should include only pointer
     Kita lanjut repo Laravel kasir/bengkel.
 
     Wajib baca:
-    1. docs/01_standards/00-index.md
-    2. docs/01_standards/01-decision-policy.md
-    3. docs/01_standards/ai-usage-guide.md
+    1. docs/01_standards/0001_index.md
+    2. docs/01_standards/0002_decision_policy.md
+    3. docs/01_standards/0007_ai_usage_guide.md
     4. path blueprint aktif
     5. path handoff terakhir
 

@@ -12,8 +12,8 @@ Use ADRs when you need to know the accepted decision behind a domain or architec
 
 Start with:
 
-1. docs/01_standards/00-index.md
-2. docs/01_standards/01-decision-policy.md
+1. docs/01_standards/0001_index.md
+2. docs/01_standards/0002_decision_policy.md
 3. docs/02_architecture/adr/README.md
 4. the ADR relevant to the current scope
 
