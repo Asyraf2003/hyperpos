@@ -25,6 +25,8 @@ final class TransactionPeriodBreakdownBuilder
                     'allocated_payment_rupiah' => 0,
                     'refunded_rupiah' => 0,
                     'refund_due_rupiah' => 0,
+                    'surplus_refund_paid_rupiah' => 0,
+                    'remaining_refund_due_rupiah' => 0,
                     'net_cash_collected_rupiah' => 0,
                     'outstanding_rupiah' => 0,
                 ];
@@ -35,6 +37,8 @@ final class TransactionPeriodBreakdownBuilder
             $periods[$date]['allocated_payment_rupiah'] += (int) ($row['allocated_payment_rupiah'] ?? 0);
             $periods[$date]['refunded_rupiah'] += (int) ($row['refunded_rupiah'] ?? 0);
             $periods[$date]['refund_due_rupiah'] += (int) ($row['refund_due_rupiah'] ?? 0);
+            $periods[$date]['surplus_refund_paid_rupiah'] += (int) ($row['surplus_refund_paid_rupiah'] ?? 0);
+            $periods[$date]['remaining_refund_due_rupiah'] += (int) ($row['remaining_refund_due_rupiah'] ?? 0);
             $periods[$date]['net_cash_collected_rupiah'] += (int) ($row['net_cash_collected_rupiah'] ?? 0);
             $periods[$date]['outstanding_rupiah'] += (int) ($row['outstanding_rupiah'] ?? 0);
         }

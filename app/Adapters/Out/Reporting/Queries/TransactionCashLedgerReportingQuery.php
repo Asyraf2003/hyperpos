@@ -9,6 +9,7 @@ final class TransactionCashLedgerReportingQuery
     public function __construct(
         private readonly TransactionCashLedgerPaymentRowsQuery $paymentRows,
         private readonly TransactionCashLedgerRefundRowsQuery $refundRows,
+        private readonly TransactionCashLedgerSurplusRefundPaidRowsQuery $surplusRefundPaidRows,
     ) {
     }
 
@@ -16,6 +17,7 @@ final class TransactionCashLedgerReportingQuery
     {
         return $this->paymentRows->rows($fromEventDate, $toEventDate)
             ->concat($this->refundRows->rows($fromEventDate, $toEventDate))
+            ->concat($this->surplusRefundPaidRows->rows($fromEventDate, $toEventDate))
             ->sortBy([['event_date', 'asc'], ['event_type', 'asc'], ['note_id', 'asc']])
             ->values()
             ->all();

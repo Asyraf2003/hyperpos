@@ -28,6 +28,8 @@ final class TransactionReportSummaryBuilder
             'allocated_payment_rupiah' => array_sum(array_column($rows, 'allocated_payment_rupiah')),
             'refunded_rupiah' => array_sum(array_column($rows, 'refunded_rupiah')),
             'refund_due_rupiah' => array_sum(array_column($rows, 'refund_due_rupiah')),
+            'surplus_refund_paid_rupiah' => array_sum(array_column($rows, 'surplus_refund_paid_rupiah')),
+            'remaining_refund_due_rupiah' => array_sum(array_column($rows, 'remaining_refund_due_rupiah')),
             'net_cash_collected_rupiah' => array_sum(array_column($rows, 'net_cash_collected_rupiah')),
             'outstanding_rupiah' => array_sum(array_column($rows, 'outstanding_rupiah')),
             'settled_rows' => $settledRows,

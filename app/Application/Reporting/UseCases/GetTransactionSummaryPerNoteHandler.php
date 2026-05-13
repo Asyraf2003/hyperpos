@@ -33,10 +33,7 @@ final class GetTransactionSummaryPerNoteHandler
         );
 
         return Result::success([
-            'rows' => array_map(
-                static fn ($row): array => $row->toArray(),
-                $rows,
-            ),
+            'rows' => $this->payloadRows($rows, $rawRows),
         ]);
     }
 
@@ -56,5 +53,26 @@ final class GetTransactionSummaryPerNoteHandler
         }
 
         return $expected;
+    }
+
+    private function payloadRows(array $rows, array $rawRows): array
+    {
+        return array_map(
+            static function ($row, int $index) use ($rawRows): array {
+                $payload = $row->toArray();
+                $raw = $rawRows[$index] ?? [];
+
+                $surplusPaid = (int) ($raw['surplus_refund_paid_rupiah'] ?? 0);
+                $remainingDue = (int) ($raw['remaining_refund_due_rupiah'] ?? 0);
+
+                $payload['surplus_refund_paid_rupiah'] = $surplusPaid;
+                $payload['remaining_refund_due_rupiah'] = $remainingDue;
+                $payload['net_cash_collected_rupiah'] -= $surplusPaid;
+
+                return $payload;
+            },
+            $rows,
+            array_keys($rows),
+        );
     }
 }

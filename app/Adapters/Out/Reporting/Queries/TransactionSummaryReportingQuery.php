@@ -10,6 +10,7 @@ final class TransactionSummaryReportingQuery
 {
     public function __construct(
         private readonly TransactionSummaryRefundDueTotalsQuery $refundDueTotals,
+        private readonly TransactionSummarySurplusRefundPaymentTotalsQuery $surplusRefundPaymentTotals,
     ) {
     }
 
@@ -20,11 +21,13 @@ final class TransactionSummaryReportingQuery
             ->selectRaw('note_id, SUM(amount_rupiah) as refunded_rupiah')
             ->groupBy('note_id');
         $refundDueTotals = $this->refundDueTotals->query();
+        $surplusRefundPaymentTotals = $this->surplusRefundPaymentTotals->query();
 
         return DB::table('notes')
             ->leftJoinSub($cashPaymentTotals, 'cash_payment_totals', fn ($join) => $join->on('cash_payment_totals.note_id', '=', 'notes.id'))
             ->leftJoinSub($cashRefundTotals, 'cash_refund_totals', fn ($join) => $join->on('cash_refund_totals.note_id', '=', 'notes.id'))
             ->leftJoinSub($refundDueTotals, 'refund_due_totals', fn ($join) => $join->on('refund_due_totals.note_id', '=', 'notes.id'))
+            ->leftJoinSub($surplusRefundPaymentTotals, 'surplus_refund_payment_totals', fn ($join) => $join->on('surplus_refund_payment_totals.note_id', '=', 'notes.id'))
             ->whereBetween('notes.transaction_date', [$fromTransactionDate, $toTransactionDate])
             ->orderBy('notes.transaction_date')
             ->orderBy('notes.id')
@@ -36,6 +39,8 @@ final class TransactionSummaryReportingQuery
                 DB::raw('COALESCE(cash_payment_totals.allocated_payment_rupiah, 0) as allocated_payment_rupiah'),
                 DB::raw('COALESCE(cash_refund_totals.refunded_rupiah, 0) as refunded_rupiah'),
                 DB::raw('COALESCE(refund_due_totals.refund_due_rupiah, 0) as refund_due_rupiah'),
+                DB::raw('COALESCE(surplus_refund_payment_totals.surplus_refund_paid_rupiah, 0) as surplus_refund_paid_rupiah'),
+                DB::raw('GREATEST(COALESCE(refund_due_totals.refund_due_rupiah, 0) - COALESCE(surplus_refund_payment_totals.surplus_refund_paid_rupiah, 0), 0) as remaining_refund_due_rupiah'),
             ])
             ->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
@@ -45,6 +50,8 @@ final class TransactionSummaryReportingQuery
                 'allocated_payment_rupiah' => (int) $row->allocated_payment_rupiah,
                 'refunded_rupiah' => (int) $row->refunded_rupiah,
                 'refund_due_rupiah' => (int) $row->refund_due_rupiah,
+                'surplus_refund_paid_rupiah' => (int) $row->surplus_refund_paid_rupiah,
+                'remaining_refund_due_rupiah' => (int) $row->remaining_refund_due_rupiah,
             ])
             ->all();
     }
@@ -59,6 +66,8 @@ final class TransactionSummaryReportingQuery
             'allocated_payment_rupiah' => array_sum(array_column($rows, 'allocated_payment_rupiah')),
             'refunded_rupiah' => array_sum(array_column($rows, 'refunded_rupiah')),
             'refund_due_rupiah' => array_sum(array_column($rows, 'refund_due_rupiah')),
+            'surplus_refund_paid_rupiah' => array_sum(array_column($rows, 'surplus_refund_paid_rupiah')),
+            'remaining_refund_due_rupiah' => array_sum(array_column($rows, 'remaining_refund_due_rupiah')),
         ];
     }
 

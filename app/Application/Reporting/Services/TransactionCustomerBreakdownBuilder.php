@@ -25,6 +25,8 @@ final class TransactionCustomerBreakdownBuilder
                     'allocated_payment_rupiah' => 0,
                     'refunded_rupiah' => 0,
                     'refund_due_rupiah' => 0,
+                    'surplus_refund_paid_rupiah' => 0,
+                    'remaining_refund_due_rupiah' => 0,
                     'net_cash_collected_rupiah' => 0,
                     'outstanding_rupiah' => 0,
                 ];
@@ -35,6 +37,8 @@ final class TransactionCustomerBreakdownBuilder
             $customers[$customerName]['allocated_payment_rupiah'] += (int) ($row['allocated_payment_rupiah'] ?? 0);
             $customers[$customerName]['refunded_rupiah'] += (int) ($row['refunded_rupiah'] ?? 0);
             $customers[$customerName]['refund_due_rupiah'] += (int) ($row['refund_due_rupiah'] ?? 0);
+            $customers[$customerName]['surplus_refund_paid_rupiah'] += (int) ($row['surplus_refund_paid_rupiah'] ?? 0);
+            $customers[$customerName]['remaining_refund_due_rupiah'] += (int) ($row['remaining_refund_due_rupiah'] ?? 0);
             $customers[$customerName]['net_cash_collected_rupiah'] += (int) ($row['net_cash_collected_rupiah'] ?? 0);
             $customers[$customerName]['outstanding_rupiah'] += (int) ($row['outstanding_rupiah'] ?? 0);
         }
