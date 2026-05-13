@@ -1,3 +1,0 @@
-docs/0001_docs_help.md
-docs/0006_change_tree.md
-docs/README.md

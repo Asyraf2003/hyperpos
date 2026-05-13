@@ -1,6 +1,0 @@
-docs/01_standards
-docs/02_architecture
-docs/03_blueprints
-docs/04_lifecycle
-docs/05_audits
-docs/99_archive
