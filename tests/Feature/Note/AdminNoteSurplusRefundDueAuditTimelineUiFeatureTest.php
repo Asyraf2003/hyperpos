@@ -60,6 +60,65 @@ final class AdminNoteSurplusRefundDueAuditTimelineUiFeatureTest extends TestCase
         $response->assertDontSee('customer_credit');
     }
 
+    public function test_admin_detail_renders_refund_paid_audit_timeline(): void
+{
+    $admin = $this->loginAsAuthorizedAdmin();
+
+    $this->seedClosedPaidCurrentRevisionNote(
+        noteId: 'note-surplus-paid-audit-ui-001',
+        revisionId: 'note-surplus-paid-audit-ui-001-r001',
+        workItemId: 'wi-surplus-paid-audit-ui-001',
+    );
+
+    $this->seedPendingSurplusSettlement(
+        settlementId: 'settlement-surplus-paid-audit-ui-001',
+        noteId: 'note-surplus-paid-audit-ui-001',
+        revisionId: 'note-surplus-paid-audit-ui-001-r001',
+        surplusRupiah: 122000,
+    );
+
+    $this->seedRefundDueAuditTimeline(
+        dispositionId: 'disp-surplus-paid-audit-ui-001',
+        auditEventId: 'audit-surplus-paid-due-ui-001',
+        settlementId: 'settlement-surplus-paid-audit-ui-001',
+        noteId: 'note-surplus-paid-audit-ui-001',
+        revisionId: 'note-surplus-paid-audit-ui-001-r001',
+        amountRupiah: 122000,
+        beforePendingRupiah: 122000,
+        afterPendingRupiah: 0,
+        reason: 'Customer minta refund due sebelum kas keluar.',
+    );
+
+    $this->seedRefundPaidAuditTimeline(
+        paymentId: 'surplus-refund-payment-audit-ui-001',
+        dispositionId: 'disp-surplus-paid-audit-ui-001',
+        auditEventId: 'audit-surplus-paid-ui-001',
+        settlementId: 'settlement-surplus-paid-audit-ui-001',
+        noteId: 'note-surplus-paid-audit-ui-001',
+        revisionId: 'note-surplus-paid-audit-ui-001-r001',
+        amountRupiah: 50000,
+        refundDueRupiah: 122000,
+        activeRefundPaidBeforeRupiah: 0,
+        activeRefundPaidAfterRupiah: 50000,
+        remainingBeforeRupiah: 122000,
+        remainingAfterRupiah: 72000,
+        reason: 'Refund paid dibayar tunai sebagian.',
+    );
+
+    $response = $this->actingAs($admin)
+        ->get(route('admin.notes.show', ['noteId' => 'note-surplus-paid-audit-ui-001']));
+
+    $response->assertOk();
+    $response->assertSee('Timeline Audit Surplus');
+    $response->assertSee('Refund Due Ditandai');
+    $response->assertSee('Refund Paid Dicatat');
+    $response->assertSee('Amount 50.000');
+    $response->assertSee('Sisa refund due 72.000');
+    $response->assertSee('Refund paid dibayar tunai sebagian.');
+    $response->assertSee('admin');
+    $response->assertDontSee('customer_credit');
+}
+
     public function test_admin_detail_does_not_render_refund_due_audit_timeline_without_audit_event(): void
     {
         $admin = $this->loginAsAuthorizedAdmin();
