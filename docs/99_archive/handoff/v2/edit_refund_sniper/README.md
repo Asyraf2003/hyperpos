@@ -22,7 +22,7 @@ Folder ini tidak mengganti ADR, blueprint, workflow, atau DoD.
 
 Baca file terbaru di folder ini setelah AI_RULES:
 
-- docs/99_archive/handoff/v2/edit_refund_sniper/0001_verify_baseline_and_next_session_handoff.md
+- docs/99_archive/handoff/v2/edit_refund_sniper/0002_revision_settlement_foundation_handoff.md
 
 Jika ada handoff baru, tambahkan file bernomor berikutnya:
 
@@ -84,7 +84,7 @@ Sesi berikutnya wajib baca minimal:
 - docs/01_standards/0001_index.md
 - docs/01_standards/0002_decision_policy.md
 - docs/99_archive/handoff/v2/edit_refund_sniper/README.md
-- docs/99_archive/handoff/v2/edit_refund_sniper/0001_verify_baseline_and_next_session_handoff.md
+- docs/99_archive/handoff/v2/edit_refund_sniper/0002_revision_settlement_foundation_handoff.md
 - docs/99_archive/handoff/v2/note_finance/0003_note_revision_refund_ledger_ai_reading_map.md
 - docs/03_blueprints/finance/0006_note_revision_refund_ledger.md
 - docs/03_blueprints/finance/0007_note_revision_refund_ledger_dod.md
