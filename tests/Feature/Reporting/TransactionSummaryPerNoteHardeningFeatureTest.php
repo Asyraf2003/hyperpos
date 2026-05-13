@@ -82,6 +82,7 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
             'gross_transaction_rupiah' => 150000,
             'allocated_payment_rupiah' => 149999,
             'refunded_rupiah' => 9000,
+            'refund_due_rupiah' => 0,
             'net_cash_collected_rupiah' => 140999,
             'outstanding_rupiah' => 9001,
         ], $weekly);
@@ -91,6 +92,7 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
             'gross_transaction_rupiah' => 150000,
             'allocated_payment_rupiah' => 149999,
             'refunded_rupiah' => 9000,
+            'refund_due_rupiah' => 0,
             'net_cash_collected_rupiah' => 140999,
             'outstanding_rupiah' => 9001,
         ], $monthly);
@@ -135,6 +137,7 @@ final class TransactionSummaryPerNoteHardeningFeatureTest extends TestCase
             'gross_transaction_rupiah' => array_sum(array_column($rows, 'gross_transaction_rupiah')),
             'allocated_payment_rupiah' => array_sum(array_column($rows, 'allocated_payment_rupiah')),
             'refunded_rupiah' => array_sum(array_column($rows, 'refunded_rupiah')),
+            'refund_due_rupiah' => array_sum(array_column($rows, 'refund_due_rupiah')),
             'net_cash_collected_rupiah' => array_sum(array_column($rows, 'net_cash_collected_rupiah')),
             'outstanding_rupiah' => array_sum(array_column($rows, 'outstanding_rupiah')),
         ];
