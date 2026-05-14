@@ -274,3 +274,43 @@ Do not:
 - touch seeders as primary bug source.
 - ignore UI-to-logic boundary.
 - manage git push/sync here.
+
+- app/Application/Note/UseCases/CreateNoteRevisionSurplusRefundDueGuard.php
+- app/Adapters/Out/Note/DatabaseNoteRevisionSurplusDispositionAdapter.php
+- migration for note_revision_surplus_dispositions
+- tests/Feature/Note/CreateNoteRevisionSurplusRefundDueControllerFeatureTest.php
+
+Before any patch:
+- produce minimal RED/invariant test plan.
+- do not accept AI Pro finding as confirmed without local RED or invariant proof.
+- do not patch concurrency/idempotency risk directly.
+- do not run broad repo audit.
+- do not use seeders as primary bug source.
+- include UI-to-logic boundary only if rendered action, route, payload, hidden input, idempotency_key, amount/default/max, status label, or role/status conditional rendering affects business logic.
+
+## Next Session Opening Prompt
+
+Lanjutkan HyperPOS edit_refund_sniper.
+
+Current state:
+- HP-AUTH-001 is Fixed GREEN with owner command proof.
+- docs 0024 exists and records AI Pro audit triage.
+- Owner handles commit/push/manual sync.
+- Do not start with git status/log/diff.
+- Do not broad repo audit.
+- Do not patch before RED/invariant proof.
+
+Next active target:
+- HP-SURPLUS-001 — refund_due race/idempotency.
+
+Read only:
+- app/Application/Note/UseCases/CreateNoteRevisionSurplusRefundDueHandler.php
+- app/Application/Note/UseCases/CreateNoteRevisionSurplusRefundDueGuard.php
+- app/Adapters/Out/Note/DatabaseNoteRevisionSurplusDispositionAdapter.php
+- migration for note_revision_surplus_dispositions
+- tests/Feature/Note/CreateNoteRevisionSurplusRefundDueControllerFeatureTest.php
+
+First required output:
+- FACT / GAP / ASSUMPTION / DECISION
+- minimal RED/invariant test plan
+- no patch yet
