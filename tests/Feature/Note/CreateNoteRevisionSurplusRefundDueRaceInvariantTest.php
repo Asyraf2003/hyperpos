@@ -82,12 +82,12 @@ final class LockAwarePendingRefundDueReaderFake implements NoteRevisionSurplusDi
     ) {
     }
 
-    public function findPendingBySettlementId(string $settlementId): ?NoteRevisionSurplusPending
+    public function findPendingBySettlementId(string $settlementId): NoteRevisionSurplusPending
     {
         return $this->pendingWithActiveDisposition(0);
     }
 
-    public function findPendingBySettlementIdForUpdate(string $settlementId): ?NoteRevisionSurplusPending
+    public function findPendingBySettlementIdForUpdate(string $settlementId): NoteRevisionSurplusPending
     {
         return $this->pendingWithActiveDisposition($this->writer->activeTotalRupiah());
     }
