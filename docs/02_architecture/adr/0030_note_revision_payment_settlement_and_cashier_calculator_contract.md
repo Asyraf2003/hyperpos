@@ -262,3 +262,10 @@ After owner accepts this ADR, add RED tests for the route/use-case boundary befo
 
 Start with validator or HTTP proof for edit payment payable.
 
+## Route Boundary Anchor
+
+StoreNoteRevisionRequest currently forces inline_payment to skip for revision submit.
+
+This preserves the route/application boundary between note revision submit and payment settlement until a later ADR explicitly decides to merge those flows.
+
+Payment after edit or revision must be settlement-preview-driven by backend payable/settlement logic. Blade and JavaScript may display or assist only, and request validators may validate payload shape only. Final accepted payment amount must not be derived from UI calculator state or raw grand total assumptions.
