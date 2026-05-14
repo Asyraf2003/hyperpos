@@ -71,6 +71,20 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
+            <div class="text-muted small">Surplus Refund Paid</div>
+            <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['surplus_refund_paid_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-2">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Sisa Refund Due</div>
+            <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-2">
+        <div class="card"><div class="card-body">
             <div class="text-muted small">Sisa Tagihan</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
@@ -106,6 +120,8 @@
                                 <th>Tanggal</th>
                                 <th class="text-end">Nota</th>
                                 <th class="text-end">Gross</th>
+                                <th class="text-end">Surplus Refund Paid</th>
+                                <th class="text-end">Sisa Refund Due</th>
                                 <th class="text-end">Sisa Tagihan</th>
                             </tr>
                         </thead>
@@ -115,11 +131,13 @@
                                     <td>{{ $row['period_label'] }}</td>
                                     <td class="text-end">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['gross_transaction_rupiah'], 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['surplus_refund_paid_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">Belum ada transaksi pada periode ini.</td>
+                                    <td colspan="6" class="text-center text-muted">Belum ada transaksi pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -141,6 +159,8 @@
                                 <th>Customer</th>
                                 <th class="text-end">Nota</th>
                                 <th class="text-end">Gross</th>
+                                <th class="text-end">Surplus Refund Paid</th>
+                                <th class="text-end">Sisa Refund Due</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,10 +169,12 @@
                                     <td>{{ $row['customer_name'] }}</td>
                                     <td class="text-end">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['gross_transaction_rupiah'], 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['surplus_refund_paid_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada customer pada periode ini.</td>
+                                    <td colspan="5" class="text-center text-muted">Belum ada customer pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -181,6 +203,8 @@
                                 <th class="text-end">Gross</th>
                                 <th class="text-end">Kas Bersih</th>
                                 <th class="text-end">Refund Due</th>
+                                <th class="text-end">Surplus Refund Paid</th>
+                                <th class="text-end">Sisa Refund Due</th>
                                 <th class="text-end">Sisa Tagihan</th>
                             </tr>
                         </thead>
@@ -196,11 +220,13 @@
                                     <td class="text-end">Rp {{ number_format($row['gross_transaction_rupiah'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['net_cash_collected_rupiah'], 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['refund_due_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['surplus_refund_paid_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($row['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</td>
                                     <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted">Belum ada transaksi pada periode ini.</td>
+                                    <td colspan="9" class="text-center text-muted">Belum ada transaksi pada periode ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
