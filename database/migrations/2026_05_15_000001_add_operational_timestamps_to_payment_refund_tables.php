@@ -24,35 +24,28 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable();
         });
 
+        $migrationTimestamp = now()->format('Y-m-d H:i:s');
+
         DB::table('customer_payments')
             ->whereNull('created_at')
             ->update([
-                'created_at' => DB::raw('paid_at'),
-                'updated_at' => DB::raw('paid_at'),
+                'created_at' => $migrationTimestamp,
+                'updated_at' => $migrationTimestamp,
             ]);
 
         DB::table('customer_refunds')
             ->whereNull('created_at')
             ->update([
-                'created_at' => DB::raw('refunded_at'),
-                'updated_at' => DB::raw('refunded_at'),
+                'created_at' => $migrationTimestamp,
+                'updated_at' => $migrationTimestamp,
             ]);
 
-        DB::statement(<<<'SQL'
-UPDATE customer_payment_cash_details
-SET
-    created_at = (
-        SELECT customer_payments.paid_at
-        FROM customer_payments
-        WHERE customer_payments.id = customer_payment_cash_details.customer_payment_id
-    ),
-    updated_at = (
-        SELECT customer_payments.paid_at
-        FROM customer_payments
-        WHERE customer_payments.id = customer_payment_cash_details.customer_payment_id
-    )
-WHERE created_at IS NULL
-SQL);
+        DB::table('customer_payment_cash_details')
+            ->whereNull('created_at')
+            ->update([
+                'created_at' => $migrationTimestamp,
+                'updated_at' => $migrationTimestamp,
+            ]);
     }
 
     public function down(): void
