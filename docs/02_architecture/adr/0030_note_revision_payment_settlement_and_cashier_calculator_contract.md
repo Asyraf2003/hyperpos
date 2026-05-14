@@ -266,6 +266,14 @@ Start with validator or HTTP proof for edit payment payable.
 
 StoreNoteRevisionRequest currently forces inline_payment to skip for revision submit.
 
+## Backend Payment Settlement Preview Boundary
+
+Backend application/service must provide payable amount and explanation.
+
+Blade/JS may display and assist only.
+
+Request validator may validate payload shape only. Final accepted payment amount must come from backend payable/settlement logic, not UI calculator state and not raw grand total assumptions.
+
 This preserves the route/application boundary between note revision submit and payment settlement until a later ADR explicitly decides to merge those flows.
 
 Payment after edit or revision must be settlement-preview-driven by backend payable/settlement logic. Blade and JavaScript may display or assist only, and request validators may validate payload shape only. Final accepted payment amount must not be derived from UI calculator state or raw grand total assumptions.

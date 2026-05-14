@@ -80,5 +80,15 @@ final class NoteOutstandingPaymentAmountResolverFeatureTest extends TestCase
         self::assertSame(40000, $result->data()['net_paid_rupiah']);
         self::assertSame(10000, $result->data()['outstanding_rupiah']);
         self::assertSame(10000, $result->data()['amount_rupiah']);
+
+        self::assertArrayHasKey('explanation', $result->data());
+
+        $explanation = $result->data()['explanation'];
+
+        self::assertIsArray($explanation);
+        self::assertSame('backend_outstanding_settlement', $explanation['basis']);
+        self::assertSame(50000, $explanation['gross_total_rupiah']);
+        self::assertSame(40000, $explanation['net_paid_rupiah']);
+        self::assertSame(10000, $explanation['outstanding_rupiah']);
     }
 }

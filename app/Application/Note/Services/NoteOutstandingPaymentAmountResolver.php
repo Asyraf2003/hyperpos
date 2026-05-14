@@ -41,6 +41,7 @@ final class NoteOutstandingPaymentAmountResolver
             'grand_total_rupiah' => $grandTotal,
             'net_paid_rupiah' => $netPaid,
             'outstanding_rupiah' => $outstanding,
+            'explanation' => $this->explanation($grandTotal, $netPaid, $outstanding),
         ]);
     }
 
@@ -62,11 +63,28 @@ final class NoteOutstandingPaymentAmountResolver
             return Result::failure('Nominal pembayaran sebagian harus lebih kecil dari sisa tagihan.', ['payment' => ['INVALID_PARTIAL_AMOUNT']]);
         }
 
+        $grandTotal = (int) ($full->data()['grand_total_rupiah'] ?? 0);
+        $netPaid = (int) ($full->data()['net_paid_rupiah'] ?? 0);
+
         return Result::success([
             'amount_rupiah' => $amountRupiah,
-            'grand_total_rupiah' => (int) ($full->data()['grand_total_rupiah'] ?? 0),
-            'net_paid_rupiah' => (int) ($full->data()['net_paid_rupiah'] ?? 0),
+            'grand_total_rupiah' => $grandTotal,
+            'net_paid_rupiah' => $netPaid,
             'outstanding_rupiah' => $outstanding,
+            'explanation' => $this->explanation($grandTotal, $netPaid, $outstanding),
         ]);
+    }
+
+    /**
+     * @return array{basis:string,gross_total_rupiah:int,net_paid_rupiah:int,outstanding_rupiah:int}
+     */
+    private function explanation(int $grandTotal, int $netPaid, int $outstanding): array
+    {
+        return [
+            'basis' => 'backend_outstanding_settlement',
+            'gross_total_rupiah' => $grandTotal,
+            'net_paid_rupiah' => $netPaid,
+            'outstanding_rupiah' => $outstanding,
+        ];
     }
 }
