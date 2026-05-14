@@ -12,6 +12,8 @@ final class DatabaseCustomerRefundWriterAdapter implements CustomerRefundWriterP
 {
     public function create(CustomerRefund $customerRefund): void
     {
+        $now = now()->format('Y-m-d H:i:s');
+
         DB::table('customer_refunds')->insert([
             'id' => $customerRefund->id(),
             'customer_payment_id' => $customerRefund->customerPaymentId(),
@@ -19,6 +21,8 @@ final class DatabaseCustomerRefundWriterAdapter implements CustomerRefundWriterP
             'amount_rupiah' => $customerRefund->amountRupiah()->amount(),
             'refunded_at' => $customerRefund->refundedAt()->format('Y-m-d'),
             'reason' => $customerRefund->reason(),
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
     }
 }
