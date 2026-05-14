@@ -51,6 +51,8 @@ final class NoteDetailSurplusDispositionPayloadFeatureTest extends TestCase
         self::assertSame(122000, $item['amount_default_rupiah']);
         self::assertTrue($item['reason_required']);
         self::assertArrayNotHasKey('action_url', $item);
+        self::assertFalse($surplus['has_pending_refund_paid_action']);
+        self::assertSame([], $surplus['refund_paid_items']);
     }
 
     public function test_detail_payload_has_empty_surplus_action_when_no_pending_surplus_exists(): void
@@ -71,6 +73,8 @@ final class NoteDetailSurplusDispositionPayloadFeatureTest extends TestCase
         self::assertSame([
             'has_pending_refund_due_action' => false,
             'pending_items' => [],
+            'has_pending_refund_paid_action' => false,
+            'refund_paid_items' => [],
         ], $surplus);
     }
 

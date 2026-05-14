@@ -11,4 +11,7 @@ interface NoteRevisionSurplusRefundDueSourceReaderPort
     public function findActiveRefundDueByDispositionIdForUpdate(
         string $dispositionId,
     ): ?NoteRevisionSurplusRefundDueSource;
+
+    /** @return list<NoteRevisionSurplusRefundDueSource> */
+    public function findActiveRefundDueByNoteRootId(string $noteRootId): array;
 }

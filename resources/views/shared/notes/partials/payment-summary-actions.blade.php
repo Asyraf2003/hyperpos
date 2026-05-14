@@ -100,6 +100,97 @@
       </div>
     @endif
 
+    @if (($note['surplus_disposition']['has_pending_refund_paid_action'] ?? false) && ! empty($note['surplus_disposition']['refund_paid_items'] ?? []))
+      <div class="border rounded p-3 bg-body mb-3">
+        <div class="small text-muted mb-1">Surplus Nota</div>
+        <div class="fw-semibold text-body mb-2">Catat Refund Paid</div>
+        <p class="small text-muted mb-3">
+          Refund Paid berarti uang surplus benar-benar sudah keluar dari kas.
+        </p>
+
+        <div class="d-grid gap-3">
+          @foreach (($note['surplus_disposition']['refund_paid_items'] ?? []) as $refundPaidItem)
+            <form
+              method="POST"
+              action="{{ route('admin.notes.revision-surplus-dispositions.refund-paid.store', ['dispositionId' => $refundPaidItem['note_revision_surplus_disposition_id']]) }}"
+              class="border rounded p-3"
+              data-refund-paid-form
+              data-refund-paid-max-rupiah="{{ (int) ($refundPaidItem['remaining_refund_due_rupiah'] ?? 0) }}"
+            >
+              @csrf
+
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Sisa Refund Due</span>
+                <strong class="text-body">
+                  {{ number_format((int) ($refundPaidItem['remaining_refund_due_rupiah'] ?? 0), 0, ',', '.') }}
+                </strong>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted" for="refund-paid-amount-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}">
+                  Nominal Refund Paid
+                </label>
+                <input
+                  id="refund-paid-amount-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}"
+                  type="number"
+                  min="1"
+                  max="{{ (int) ($refundPaidItem['remaining_refund_due_rupiah'] ?? 0) }}"
+                  step="1"
+                  name="amount_rupiah"
+                  value="{{ (int) ($refundPaidItem['amount_default_rupiah'] ?? 0) }}"
+                  class="form-control"
+                  data-refund-paid-amount
+                  required
+                >
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted" for="refund-paid-effective-date-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}">
+                  Tanggal Refund Paid
+                </label>
+                <input
+                  id="refund-paid-effective-date-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}"
+                  type="date"
+                  name="effective_date"
+                  value="{{ date('Y-m-d') }}"
+                  class="form-control"
+                  required
+                >
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted" for="refund-paid-reason-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}">
+                  Alasan
+                </label>
+                <textarea
+                  id="refund-paid-reason-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}"
+                  name="reason"
+                  class="form-control"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+
+              <input
+                type="hidden"
+                name="idempotency_key"
+                value="refund-paid-{{ $refundPaidItem['note_revision_surplus_disposition_id'] }}-{{ (int) ($refundPaidItem['remaining_refund_due_rupiah'] ?? 0) }}"
+              >
+
+              <button
+                type="submit"
+                class="btn btn-outline-danger w-100"
+                data-refund-paid-submit
+                data-loading-text="Menyimpan Refund Paid..."
+              >
+                Catat Refund Paid
+              </button>
+            </form>
+          @endforeach
+        </div>
+      </div>
+    @endif
+
 
     @if (! empty($note['surplus_disposition_audit_timeline'] ?? []))
       <div class="border rounded p-3 bg-body mb-3">

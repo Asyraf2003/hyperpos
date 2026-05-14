@@ -16,14 +16,8 @@ final class DatabaseNoteRevisionSurplusRefundDueSourceReaderAdapter implements
     public function findActiveRefundDueByDispositionIdForUpdate(
         string $dispositionId,
     ): ?NoteRevisionSurplusRefundDueSource {
-        $dispositionId = trim($dispositionId);
-
-        if ($dispositionId === '') {
-            return null;
-        }
-
         $disposition = DB::table('note_revision_surplus_dispositions')
-            ->where('id', $dispositionId)
+            ->where('id', trim($dispositionId))
             ->where('disposition_type', NoteRevisionSurplusDisposition::TYPE_REFUND_DUE)
             ->where('status', NoteRevisionSurplusDisposition::STATUS_ACTIVE)
             ->lockForUpdate()
@@ -33,8 +27,39 @@ final class DatabaseNoteRevisionSurplusRefundDueSourceReaderAdapter implements
             return null;
         }
 
+        return $this->mapSource($disposition);
+    }
+
+    /** @return list<NoteRevisionSurplusRefundDueSource> */
+    public function findActiveRefundDueByNoteRootId(string $noteRootId): array
+    {
+        $rows = DB::table('note_revision_surplus_dispositions')
+            ->where('note_root_id', trim($noteRootId))
+            ->where('disposition_type', NoteRevisionSurplusDisposition::TYPE_REFUND_DUE)
+            ->where('status', NoteRevisionSurplusDisposition::STATUS_ACTIVE)
+            ->orderBy('occurred_at')
+            ->orderBy('id')
+            ->get();
+
+        $sources = [];
+
+        foreach ($rows as $row) {
+            $source = $this->mapSource($row);
+
+            if ($source->remainingRefundDueRupiah <= 0) {
+                continue;
+            }
+
+            $sources[] = $source;
+        }
+
+        return $sources;
+    }
+
+    private function mapSource(object $disposition): NoteRevisionSurplusRefundDueSource
+    {
         $activeRefundPaidRupiah = (int) DB::table('note_revision_surplus_refund_payments')
-            ->where('note_revision_surplus_disposition_id', $dispositionId)
+            ->where('note_revision_surplus_disposition_id', (string) $disposition->id)
             ->where('status', NoteRevisionSurplusRefundPayment::STATUS_ACTIVE)
             ->sum('amount_rupiah');
 
