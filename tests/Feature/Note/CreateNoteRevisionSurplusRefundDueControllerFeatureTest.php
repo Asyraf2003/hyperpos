@@ -176,7 +176,6 @@ final class CreateNoteRevisionSurplusRefundDueControllerFeatureTest extends Test
             'request_id' => 'request-existing-active-refund-due-001',
             'correlation_id' => 'correlation-existing-active-refund-due-001',
             'occurred_at' => '2026-05-13 09:45:00',
-            'created_at' => '2026-05-13 09:45:00',
         ]);
 
         DB::table('note_revision_surplus_dispositions')->insert([
