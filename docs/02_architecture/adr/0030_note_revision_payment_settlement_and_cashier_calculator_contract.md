@@ -269,3 +269,57 @@ StoreNoteRevisionRequest currently forces inline_payment to skip for revision su
 This preserves the route/application boundary between note revision submit and payment settlement until a later ADR explicitly decides to merge those flows.
 
 Payment after edit or revision must be settlement-preview-driven by backend payable/settlement logic. Blade and JavaScript may display or assist only, and request validators may validate payload shape only. Final accepted payment amount must not be derived from UI calculator state or raw grand total assumptions.
+
+## Implementation Verification
+
+### Update 1 - Request validator pay_full cash boundary
+
+Status: Fixed and locally verified for the request-validator boundary.
+
+Scope:
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspacePaymentValidator.php`
+- `tests/Unit/Adapters/In/Http/Requests/Note/StoreTransactionWorkspacePaymentValidatorTest.php`
+
+Problem proven:
+- `pay_full` cash validation used payload grand total as the cash target.
+- Existing paid allocations / backend settlement payable were not considered at request-validator level.
+- A payment after edit could be rejected before backend settlement/payable logic had authority to determine the accepted amount.
+
+RED proof:
+- Scenario: payload grand total `100000`, backend payable intent represented by cash received `60000`.
+- Test: `StoreTransactionWorkspacePaymentValidatorTest::test_pay_full_cash_received_is_not_validated_against_payload_grand_total`
+- Result: failed with `inline_payment.amount_received_rupiah`.
+- Error: `Uang masuk cash tidak boleh kurang dari total yang dibayar.`
+- Proof: `1 failed / 1 assertions`.
+
+Patch:
+- `pay_full` cash no longer compares `amount_received_rupiah` against payload grand total.
+- `pay_partial` cash still compares `amount_received_rupiah` against explicit `amount_paid_rupiah`.
+- Request validator remains shape/boundary validation only.
+- Backend settlement/payable logic remains responsible for the accepted payable amount.
+
+GREEN proof:
+- Targeted validator proof: `1 passed / 1 assertions`.
+- Validator regression proof: `2 passed / 2 assertions`.
+- Focused validator + workspace update adjacency: `4 passed / 18 assertions`.
+
+Regression locked:
+- `pay_partial` cash with `amount_paid_rupiah = 60000` and `amount_received_rupiah = 50000` still fails on `inline_payment.amount_received_rupiah`.
+
+Out of scope:
+- Revision submit + payment merge.
+- Customer credit.
+- Customer balance entries.
+- `customer_refunds` for surplus `refund_paid`.
+- `refund_component_allocations` for surplus `refund_paid`.
+- Refunded lifecycle trigger for surplus `refund_paid`.
+- Inventory reversal for surplus `refund_paid`.
+- JS/Blade cashier calculator changes.
+- Report/export changes.
+- PostgreSQL.
+- Go API.
+- Dashboard.
+
+Verification gaps:
+- Full `make verify` after this ADR 0030 slice has not been rerun.
+- Browser/manual cashier edit-payment QA has not been run.
