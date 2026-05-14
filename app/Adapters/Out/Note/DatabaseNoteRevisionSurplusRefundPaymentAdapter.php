@@ -68,6 +68,20 @@ final class DatabaseNoteRevisionSurplusRefundPaymentAdapter implements
             ->sum('amount_rupiah');
     }
 
+    public function sumActiveAmountByNoteRootId(string $noteRootId): int
+    {
+        $noteRootId = trim($noteRootId);
+
+        if ($noteRootId === '') {
+            return 0;
+        }
+
+        return (int) DB::table('note_revision_surplus_refund_payments')
+            ->where('note_root_id', $noteRootId)
+            ->where('status', NoteRevisionSurplusRefundPayment::STATUS_ACTIVE)
+            ->sum('amount_rupiah');
+    }
+
     private function mapRow(stdClass $row): NoteRevisionSurplusRefundPayment
     {
         return NoteRevisionSurplusRefundPayment::create(

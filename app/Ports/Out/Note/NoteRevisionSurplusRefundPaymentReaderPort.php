@@ -14,4 +14,6 @@ interface NoteRevisionSurplusRefundPaymentReaderPort
     ): ?NoteRevisionSurplusRefundPayment;
 
     public function sumActiveAmountByDispositionId(string $dispositionId): int;
+
+    public function sumActiveAmountByNoteRootId(string $noteRootId): int;
 }

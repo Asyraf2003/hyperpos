@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Note\DTO\NoteRevisionSettlement;
+use App\Ports\Out\Note\NoteRevisionSurplusRefundPaymentReaderPort;
 use App\Ports\Out\Payment\CustomerRefundReaderPort;
 use App\Ports\Out\Payment\PaymentAllocationReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
@@ -18,6 +19,7 @@ final class BuildCreateNoteRevisionSettlement
         private readonly PaymentAllocationReaderPort $legacyPayments,
         private readonly RefundComponentAllocationReaderPort $componentRefunds,
         private readonly CustomerRefundReaderPort $legacyRefunds,
+        private readonly NoteRevisionSurplusRefundPaymentReaderPort $surplusRefundPayments,
         private readonly BuildNoteRevisionSettlement $builder,
     ) {
     }
@@ -43,9 +45,14 @@ final class BuildCreateNoteRevisionSettlement
             ? $componentPaid
             : $this->legacyPayments->getTotalAllocatedAmountByNoteId($noteRootId)->amount();
 
-        $carryForwardRefunded = $hasComponentSettlement
+        $ordinaryRefunded = $hasComponentSettlement
             ? $componentRefunded
             : $this->legacyRefunds->getTotalRefundedAmountByNoteId($noteRootId)->amount();
+
+        $surplusRefundPaid = $this->surplusRefundPayments
+            ->sumActiveAmountByNoteRootId($noteRootId);
+
+        $carryForwardRefunded = $ordinaryRefunded + $surplusRefundPaid;
 
         return $this->builder->build(
             $id,
