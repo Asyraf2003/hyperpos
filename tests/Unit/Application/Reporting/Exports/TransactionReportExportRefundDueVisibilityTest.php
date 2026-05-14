@@ -159,6 +159,29 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         $this->assertSame('Rp 4.000', $viewData['rows'][0]['remaining_refund_due']);
     }
 
+
+    public function test_pdf_export_blade_renders_surplus_refund_paid_and_remaining_refund_due(): void
+    {
+        $builder = new TransactionReportPdfViewDataBuilder(new class implements ClockPort {
+            public function now(): DateTimeImmutable
+            {
+                return new DateTimeImmutable('2030-01-31 10:00:00');
+            }
+        });
+
+        $viewData = $builder->build($this->datasetWithSurplusRefundPaid(), [
+            'date_from' => '2030-01-01',
+            'date_to' => '2030-01-31',
+        ]);
+
+        $html = view('admin.reporting.transaction_summary.export_pdf', $viewData)->render();
+
+        $this->assertStringContainsString('Surplus Refund Paid', $html);
+        $this->assertStringContainsString('Sisa Refund Due', $html);
+        $this->assertStringContainsString('Rp 3.000', $html);
+        $this->assertStringContainsString('Rp 4.000', $html);
+    }
+
     private function dataset(): array
     {
         return [
