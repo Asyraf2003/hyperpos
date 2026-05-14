@@ -331,3 +331,79 @@ Out of scope:
 Verification gaps:
 - Full `make verify` after this ADR 0030 slice has not been rerun.
 - Browser/manual cashier edit-payment QA has not been run.
+
+### Update 3 - Cashier edit calculator consumes backend payable context
+
+Status: Fixed and locally verified for cashier edit payment calculator backend-payable consumption contract.
+
+Scope:
+- `app/Application/Note/Services/EditTransactionWorkspacePageDataBuilder.php`
+- `resources/views/cashier/notes/workspace/partials/payment-modal.blade.php`
+- `resources/views/cashier/notes/workspace/partials/payment-modal-right.blade.php`
+- `public/assets/static/js/pages/cashier-note-workspace/payment-flow.js`
+- `tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php`
+- `tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php`
+
+Problem proven:
+- The cashier edit workspace page did not render backend payment settlement explanation.
+- The edit payment modal did not expose backend payable amount to the calculator surface.
+- `payment-flow.js` did not consume the backend payable dataset exposed by the modal.
+- The calculator path could keep deriving payable from visible workspace rows instead of backend outstanding settlement context.
+
+RED proof 1 - backend explanation render:
+- Test: `EditTransactionWorkspacePageFeatureTest::test_cashier_edit_workspace_renders_backend_payment_settlement_explanation_for_partially_paid_note`
+- Scenario: existing note total `100000`, existing paid allocation `40000`, backend payable `60000`.
+- Failure: rendered edit workspace did not contain `Settlement pembayaran backend`.
+- Proof: `1 failed / 3 assertions`.
+
+GREEN proof 1:
+- Targeted proof: `1 passed / 6 assertions`.
+- Focused edit workspace proof: `3 passed / 19 assertions`.
+
+Patch 1:
+- `EditTransactionWorkspacePageDataBuilder` now resolves backend payment settlement data for edit workspace.
+- Edit payment modal UI now renders backend settlement explanation:
+  - gross total
+  - net paid
+  - payable now
+
+RED proof 2 - modal backend payable DOM contract:
+- Test: `EditTransactionWorkspacePageFeatureTest::test_cashier_edit_workspace_exposes_backend_payable_amount_to_payment_calculator`
+- Scenario: existing note total `100000`, existing paid allocation `40000`, backend payable `60000`.
+- Failure: rendered modal did not contain `data-backend-payable-rupiah="60000"`.
+- Proof: `1 failed / 3 assertions`.
+
+GREEN proof 2:
+- Targeted proof: `1 passed / 4 assertions`.
+- Focused edit workspace proof after DOM patch: `4 passed / 23 assertions`.
+
+Patch 2:
+- `#workspace-payment-modal` now exposes:
+  - `data-backend-payable-rupiah`
+  - `data-backend-payment-basis`
+- The data is derived from backend settlement resolver output, not JavaScript row totals.
+
+RED proof 3 - JavaScript backend payable consumption:
+- Test: `CashierWorkspacePaymentFlowJavascriptContractTest::test_payment_flow_consumes_backend_payable_dataset_for_edit_calculator`
+- Failure: `payment-flow.js` did not contain `dataset.backendPayableRupiah`.
+- Proof: `1 failed / 1 assertions`.
+
+GREEN proof 3:
+- Targeted JS contract proof: `1 passed / 3 assertions`.
+- Combined edit workspace + JS contract proof: `5 passed / 26 assertions`.
+
+Patch 3:
+- `payment-flow.js` now reads backend payable dataset from the payment modal.
+- It trusts backend payable only when `data-backend-payment-basis` is `backend_outstanding_settlement`.
+- For edit/full mode, backend payable becomes the calculator payable target.
+- Create mode remains compatible because no backend payable dataset is required.
+
+Focused adjacency proof after JS patch:
+- `CashierDetailRenderedBillingRowsPaymentFeatureTest`: `2 passed`.
+- `CashierHybridPaymentSettleIntentFeatureTest`: `1 passed`.
+- Combined adjacency proof: `3 passed / 14 assertions`.
+
+Verification gaps:
+- Full `make verify` has not been rerun after this cashier calculator consumption slice.
+- Browser/manual cashier modal QA has not been run.
+- Runtime JavaScript behavior is protected by static JS contract and focused PHP render tests, not by a browser-executed test.
