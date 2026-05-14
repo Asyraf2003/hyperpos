@@ -37,7 +37,7 @@ final class CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest extends T
                         'part_source' => 'none',
                         'service' => [
                             'name' => 'Servis Later Revision',
-                            'price_rupiah' => '230000',
+                            'price_rupiah' => 230000,
                             'notes' => null,
                         ],
                         'product_lines' => [],
