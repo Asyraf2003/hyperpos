@@ -435,17 +435,61 @@ Remaining verification gaps:
 
 ### HP-REPORT-001 — operational profit may omit surplus_refund_paid
 
-Status: Needs narrowing.
+Status: Confirmed RED, fixed GREEN, focused verified.
 
-Reason:
-Do not claim all transaction reporting omits surplus_refund_paid.
-Existing transaction report / cash ledger paths may already include surplus_refund_paid.
-The remaining question should be narrowed to operational profit/dashboard calculation only.
+Original AI Pro claim:
+- Operational profit/dashboard cash-profit calculation could omit `surplus_refund_paid` outflows.
 
-Required proof:
-- identify exact report query.
-- seed surplus_refund_paid.
-- compare cash ledger vs operational profit output.
+Narrowed scope:
+- Do not claim all transaction reporting omitted `surplus_refund_paid`.
+- Transaction report and transaction cash ledger paths already had dedicated `surplus_refund_paid` handling.
+- The confirmed gap was narrowed to operational profit calculation.
+
+Local source-risk proof:
+- `app/Adapters/Out/Reporting/Queries/OperationalProfit/CashFlowMetricQuery.php::refund(...)` previously summed only `customer_refunds.amount_rupiah` by `refunded_at`.
+- `app/Adapters/Out/Reporting/Queries/TransactionCashLedgerSurplusRefundPaidRowsQuery.php` already read active `note_revision_surplus_refund_payments` by `effective_date` as separate `surplus_refund_paid` cash outflow.
+- `app/Adapters/Out/Reporting/Queries/OperationalProfitMetricsQuery.php` computes `cash_operational_profit_rupiah` as cash in minus refund outflow, product costs, operational expenses, payroll, and employee debt cash out. Therefore omitted surplus refund paid overstated operational profit.
+
+RED proof:
+- Added `tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php::test_operational_profit_summary_includes_surplus_refund_paid_cash_outflow`.
+- The test seeded active `note_revision_surplus_refund_payments.amount_rupiah = 3000`.
+- Cash ledger reconciliation passed and proved the same fixture was valid as cash outflow:
+  - `total_in_rupiah = 0`
+  - `total_out_rupiah = 3000`
+- Pre-patch operational profit failed:
+  - expected `refunded_rupiah = 3000`
+  - actual `refunded_rupiah = 0`.
+
+Source/test fix:
+- Updated `app/Adapters/Out/Reporting/Queries/OperationalProfit/CashFlowMetricQuery.php::refund(...)`.
+- The method now returns customer refunds plus active surplus refund paid:
+  - `customer_refunds.amount_rupiah` by `refunded_at`
+  - `note_revision_surplus_refund_payments.amount_rupiah` by `effective_date` where `status = active`.
+- Added/kept targeted regression test in `tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php`.
+
+GREEN proof:
+- Syntax passed:
+  - `app/Adapters/Out/Reporting/Queries/OperationalProfit/CashFlowMetricQuery.php`
+  - `tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php`
+- Targeted GREEN:
+  - `tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php --filter=test_operational_profit_summary_includes_surplus_refund_paid_cash_outflow`
+  - Result: `1 passed / 8 assertions`.
+- Focused blast-radius GREEN:
+  - `tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php`
+  - `tests/Feature/Reporting/OperationalProfitSummaryHardeningFeatureTest.php`
+  - `tests/Feature/Reporting/OperationalProfitReportPageFeatureTest.php`
+  - `tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php`
+  - `tests/Feature/Reporting/GetTransactionReportDatasetFeatureTest.php`
+  - `tests/Feature/Reporting/TransactionReportPageFeatureTest.php`
+  - `tests/Feature/ReportingExports/OperationalProfitReportPdfExportFeatureTest.php`
+  - `tests/Feature/ReportingExports/OperationalProfitReportExcelExportFeatureTest.php`
+  - Result: `27 passed / 190 assertions`.
+
+Remaining verification gaps:
+- Full `make verify` not claimed in this HP-REPORT step.
+- No browser/manual QA.
+- Dashboard operational performance query was not patched in this step unless later proof shows it has the same omission. This HP-REPORT fix is scoped to operational profit report calculation.
+
 
 ### HP-IDEMP-001 — refund_paid deterministic idempotency key
 
