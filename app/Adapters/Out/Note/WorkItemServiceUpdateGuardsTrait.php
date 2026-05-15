@@ -13,14 +13,18 @@ trait WorkItemServiceUpdateGuardsTrait
 {
     private function updateSubtotalAndServiceDetail(WorkItem $workItem, ServiceDetail $serviceDetail): void
     {
+        $now = now();
+
         DB::table('work_items')->where('id', $workItem->id())->update([
             'subtotal_rupiah' => $workItem->subtotalRupiah()->amount(),
+            'updated_at' => $now,
         ]);
 
         DB::table('work_item_service_details')->where('work_item_id', $workItem->id())->update([
             'service_name' => $serviceDetail->serviceName(),
             'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
             'part_source' => $serviceDetail->partSource(),
+            'updated_at' => $now,
         ]);
     }
 

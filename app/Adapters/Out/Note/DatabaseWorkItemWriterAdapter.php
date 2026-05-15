@@ -16,6 +16,8 @@ final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
 
     public function create(WorkItem $workItem): void
     {
+        $now = now();
+
         DB::table('work_items')->insert([
             'id' => $workItem->id(),
             'note_id' => $workItem->noteId(),
@@ -23,6 +25,8 @@ final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
             'transaction_type' => $workItem->transactionType(),
             'status' => $workItem->status(),
             'subtotal_rupiah' => $workItem->subtotalRupiah()->amount(),
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
 
         $serviceDetail = $workItem->serviceDetail();
@@ -33,17 +37,20 @@ final class DatabaseWorkItemWriterAdapter implements WorkItemWriterPort
                 'service_name' => $serviceDetail->serviceName(),
                 'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
                 'part_source' => $serviceDetail->partSource(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
 
-        $this->insertExternalPurchaseLines($workItem);
-        $this->insertStoreStockLines($workItem);
+        $this->insertExternalPurchaseLines($workItem, $now);
+        $this->insertStoreStockLines($workItem, $now);
     }
 
     public function updateStatus(WorkItem $workItem): void
     {
         DB::table('work_items')->where('id', $workItem->id())->update([
             'status' => $workItem->status(),
+            'updated_at' => now(),
         ]);
     }
 
