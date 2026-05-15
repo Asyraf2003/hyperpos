@@ -1,6 +1,6 @@
 # DB Blueprint 0009 - Inventory Movement Timestamp Readiness Hardening Patch Blueprint
 
-Status: Patch Blueprinted
+Status: Focused Verified
 Scope: `inventory_movements` row timestamp/readiness hardening
 Owner: HyperPOS
 
@@ -299,3 +299,116 @@ Do not claim:
 - browser/manual QA
 - PostgreSQL runtime migration
 - full DB hardening completion
+
+## 14. Patch Implementation Summary
+
+Status: Focused Verified.
+
+Implemented production changes:
+
+- Added `database/migrations/2026_05_15_000004_add_operational_timestamps_to_inventory_movements.php`.
+- Added nullable `inventory_movements.created_at`.
+- Added nullable `inventory_movements.updated_at`.
+- Backfilled existing rows with migration execution time.
+- Updated `app/Adapters/Out/Inventory/DatabaseInventoryMovementWriterAdapter.php` to write `created_at` and `updated_at` on movement creation.
+
+Implemented tests:
+
+- Added `tests/Feature/Database/InventoryMovementTimestampSchemaTest.php`.
+- Added `tests/Feature/Inventory/InventoryMovementWriterTimestampFeatureTest.php`.
+
+Preserved semantics:
+
+- `tanggal_mutasi` remains stock movement/business/report date.
+- `created_at` and `updated_at` are system row timestamps only.
+- Inventory quantity math is unchanged.
+- Average cost math is unchanged.
+- COGS/profit report semantics are unchanged.
+- Reversal behavior is unchanged.
+- Source type/source id semantics are unchanged.
+- FK/delete semantics are unchanged.
+- No timestamp index was added.
+
+## 15. Captured Proof
+
+RED schema proof:
+
+- Command: `php artisan test tests/Feature/Database/InventoryMovementTimestampSchemaTest.php`
+- Result: `1 failed / 1 assertion`
+- Failure: `Missing inventory_movements.created_at`
+
+RED writer proof:
+
+- Command: `php artisan test tests/Feature/Inventory/InventoryMovementWriterTimestampFeatureTest.php`
+- Result: `1 failed / 2 assertions`
+- Failure: `Missing inventory_movements.created_at on writer-created row`
+
+GREEN schema proof:
+
+- Command: `php artisan test tests/Feature/Database/InventoryMovementTimestampSchemaTest.php`
+- Result: `1 passed / 2 assertions`
+
+GREEN writer proof:
+
+- Command: `php artisan test tests/Feature/Inventory/InventoryMovementWriterTimestampFeatureTest.php`
+- Result: `1 passed / 13 assertions`
+- Proven:
+  - writer-created movement row has `created_at`
+  - writer-created movement row has `updated_at`
+  - writer preserves `product_id`
+  - writer preserves `movement_type`
+  - writer preserves `source_type`
+  - writer preserves `source_id`
+  - writer preserves `tanggal_mutasi`
+  - writer preserves `qty_delta`
+  - writer preserves `unit_cost_rupiah`
+  - writer preserves `total_cost_rupiah`
+
+Focused blast-radius proof:
+
+- Command: focused inventory/reporting test set
+- Result: `36 passed / 192 assertions`
+- Covered:
+  - inventory movement timestamp schema
+  - inventory movement writer timestamp persistence
+  - issue inventory
+  - reverse issued inventory
+  - reverse note store-stock inventory
+  - rebuild inventory projection
+  - rebuild inventory costing projection
+  - rebuild inventory costing projection with stock out
+  - inventory movement summary hardening
+  - inventory movement summary dataset
+  - inventory movement bucket split
+  - inventory stock value report page
+  - inventory stock value report dataset
+  - operational profit summary hardening
+  - operational profit summary dataset
+  - dashboard operational performance dataset
+  - dashboard top selling product query
+
+Patch anchors:
+
+- Migration adds nullable `created_at` and `updated_at`.
+- Migration backfills null `created_at` and `updated_at` using migration execution time.
+- Writer writes `created_at` and `updated_at` using one system timestamp per create-many call.
+- Writer continues writing `tanggal_mutasi`, `qty_delta`, `unit_cost_rupiah`, and `total_cost_rupiah`.
+
+## 16. Remaining Gaps
+
+Not claimed in this slice:
+
+- full `make verify`
+- browser/manual QA
+- PostgreSQL runtime migration
+- full DB hardening completion
+- timestamp indexes
+- `product_inventory` timestamp semantics
+- `product_inventory_costing` timestamp semantics
+- inventory projection timestamp policy
+
+Adjacent projection gap:
+
+- `product_inventory` and `product_inventory_costing` remain known inventory projection tables.
+- They are not patched in this slice because projection timestamp semantics need a separate decision.
+- Their `created_at` would otherwise risk meaning projection rebuild time rather than original stock state creation time.
