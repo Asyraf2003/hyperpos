@@ -15,6 +15,8 @@ final class DatabaseRefundComponentAllocationWriterAdapter implements RefundComp
             return;
         }
 
+        $now = now()->format('Y-m-d H:i:s');
+
         DB::table('refund_component_allocations')->insert(array_map(
             static fn ($allocation): array => [
                 'id' => $allocation->id(),
@@ -26,6 +28,8 @@ final class DatabaseRefundComponentAllocationWriterAdapter implements RefundComp
                 'component_ref_id' => $allocation->componentRefId(),
                 'refunded_amount_rupiah' => $allocation->refundedAmountRupiah()->amount(),
                 'refund_priority' => $allocation->refundPriority(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             $allocations
         ));

@@ -12,11 +12,15 @@ final class DatabasePaymentAllocationWriterAdapter implements PaymentAllocationW
 {
     public function create(PaymentAllocation $paymentAllocation): void
     {
+        $now = now()->format('Y-m-d H:i:s');
+
         DB::table('payment_allocations')->insert([
             'id' => $paymentAllocation->id(),
             'customer_payment_id' => $paymentAllocation->customerPaymentId(),
             'note_id' => $paymentAllocation->noteId(),
             'amount_rupiah' => $paymentAllocation->amountRupiah()->amount(),
+            'created_at' => $now,
+            'updated_at' => $now,
         ]);
     }
 }

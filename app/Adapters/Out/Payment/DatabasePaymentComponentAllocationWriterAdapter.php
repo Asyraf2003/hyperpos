@@ -15,6 +15,8 @@ final class DatabasePaymentComponentAllocationWriterAdapter implements PaymentCo
             return;
         }
 
+        $now = now()->format('Y-m-d H:i:s');
+
         DB::table('payment_component_allocations')->insert(array_map(
             static fn ($allocation): array => [
                 'id' => $allocation->id(),
@@ -26,6 +28,8 @@ final class DatabasePaymentComponentAllocationWriterAdapter implements PaymentCo
                 'component_amount_rupiah_snapshot' => $allocation->componentAmountRupiahSnapshot()->amount(),
                 'allocated_amount_rupiah' => $allocation->allocatedAmountRupiah()->amount(),
                 'allocation_priority' => $allocation->allocationPriority(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             $allocations
         ));
