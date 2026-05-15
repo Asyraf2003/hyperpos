@@ -19,4 +19,6 @@ interface WorkItemWriterPort
     public function updateServiceWithExternalPurchaseServiceFeeOnly(WorkItem $workItem): void;
 
     public function deleteByNoteId(string $noteId): void;
+
+    public function nextLineNoByNoteId(string $noteId): int;
 }

@@ -21,13 +21,14 @@ final class CreateTransactionWorkspaceWorkItemPersister
     /**
      * @param mixed $items
      */
-    public function persist(Note $note, mixed $items): int
+    public function persist(Note $note, mixed $items, int $startLineNo = 1): int
     {
         if (! is_array($items)) {
             return 0;
         }
 
-        $lineNo = 1;
+        $lineNo = max(1, $startLineNo);
+        $created = 0;
 
         foreach ($items as $item) {
             if (! is_array($item)) {
@@ -51,8 +52,9 @@ final class CreateTransactionWorkspaceWorkItemPersister
             }
 
             $lineNo++;
+            $created++;
         }
 
-        return $lineNo - 1;
+        return $created;
     }
 }

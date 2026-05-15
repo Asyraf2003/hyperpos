@@ -24,9 +24,10 @@ final class UpdateTransactionWorkspaceWorkItemPersister
     {
         $this->reverseIssuedInventoryByNote->execute($note, $date);
         $this->workItems->deleteByNoteId($note->id());
+        $nextLineNo = $this->workItems->nextLineNoByNoteId($note->id());
 
         $note->replaceWorkItems([]);
 
-        return $this->createPersister->persist($note, $items);
+        return $this->createPersister->persist($note, $items, $nextLineNo);
     }
 }

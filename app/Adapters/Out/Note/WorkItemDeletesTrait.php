@@ -9,6 +9,21 @@ use Illuminate\Support\Facades\DB;
 
 trait WorkItemDeletesTrait
 {
+    public function nextLineNoByNoteId(string $noteId): int
+    {
+        $normalized = trim($noteId);
+
+        if ($normalized === '') {
+            throw new DomainException('Note id pada pencarian nomor baris work item wajib ada.');
+        }
+
+        $maxLineNo = DB::table('work_items')
+            ->where('note_id', $normalized)
+            ->max('line_no');
+
+        return ((int) ($maxLineNo ?? 0)) + 1;
+    }
+
     public function deleteByNoteId(string $noteId): void
     {
         $normalized = trim($noteId);

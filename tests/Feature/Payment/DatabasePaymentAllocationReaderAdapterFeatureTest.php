@@ -33,7 +33,7 @@ final class DatabasePaymentAllocationReaderAdapterFeatureTest extends TestCase
         $this->seedWorkItemBase(
             'wi-new-1',
             'note-1',
-            1,
+            2,
             WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
             WorkItem::STATUS_OPEN,
             143000,
@@ -98,7 +98,7 @@ final class DatabasePaymentAllocationReaderAdapterFeatureTest extends TestCase
         $this->seedWorkItemBase(
             'wi-new-1',
             'note-1',
-            1,
+            2,
             WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
             WorkItem::STATUS_CANCELED,
             143000,
