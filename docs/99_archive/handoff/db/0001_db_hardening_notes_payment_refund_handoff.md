@@ -349,3 +349,151 @@ php artisan test tests/Feature/Payment/RecordCustomerPaymentFeatureTest.php test
 ## 12. Opening Prompt For Next Session
 
 Lanjut HyperPOS DB hardening dari docs/03_blueprints/db/. notes timestamp slice sudah Focused Verified dengan RED missing notes.created_at, targeted GREEN, focused 31/186, docs aligned, diff check clean. Jangan reopen notes kecuali ada regression proof. Current active group: customer_payments + customer_refunds. Payment/refund audit already collected: migrations show paid_at/refunded_at but no system timestamps, writers do not write timestamps, domain objects do not expose timestamps, baseline payment/refund tests pass 13/45, and customer_payment_cash_details has cascadeOnDelete risk that must be audited. Next safest step: update 0004_db_audit_matrix.md rows for customer_payments and customer_refunds to Audited, no schema patch yet.
+
+## 0011 Work Item Timestamp Readiness Closure - 2026-05-15
+
+Status: Focused Verified.
+
+Scope:
+- `work_items`
+- `work_item_service_details`
+- `work_item_external_purchase_lines`
+- `work_item_store_stock_lines`
+
+Production files changed:
+- `database/migrations/2026_05_15_000005_add_operational_timestamps_to_work_item_tables.php`
+- `app/Adapters/Out/Note/DatabaseWorkItemWriterAdapter.php`
+- `app/Adapters/Out/Note/WorkItemLineInsertsTrait.php`
+- `app/Adapters/Out/Note/WorkItemServiceUpdateGuardsTrait.php`
+
+Test files changed:
+- `tests/Feature/Database/WorkItemTimestampSchemaTest.php`
+- `tests/Feature/Note/WorkItemWriterTimestampFeatureTest.php`
+
+Docs changed:
+- `docs/03_blueprints/db/0011_work_item_timestamp_readiness_hardening_patch_blueprint.md`
+- `docs/03_blueprints/db/0004_db_audit_matrix.md`
+- `docs/99_archive/handoff/db/0001_db_hardening_notes_payment_refund_handoff.md`
+
+Proof:
+- RED schema proof: `WorkItemTimestampSchemaTest` failed with `Missing work_items.created_at`.
+- RED writer proof: `WorkItemWriterTimestampFeatureTest` failed with SQL `Unknown column 'created_at'`.
+- GREEN targeted proof: `4 passed / 36 assertions`.
+- Focused blast-radius proof: `45 passed / 321 assertions`.
+- Docs closure proof: `0011_work_item_timestamp_readiness_hardening_patch_blueprint.md` shows `Status: Focused Verified`.
+- Matrix closure proof: `work_items`, `work_item_service_details`, `work_item_external_purchase_lines`, and `work_item_store_stock_lines` rows show `Focused Verified`.
+- Docs hygiene proof: `git diff --check` clean for 0011 docs closure.
+- User reported `make push` and `make verify` are safe/passing; exact local command output was not pasted in this chat, so local terminal output remains the stronger proof if needed.
+
+Locked decisions:
+- `created_at` and `updated_at` are system row timestamps only.
+- Do not use work item timestamps as business/report dates.
+- Do not change payment/refund allocation math.
+- Do not change inventory movement/reversal semantics.
+- Do not change note revision semantics.
+- Do not change FK/delete semantics.
+- Do not add timestamp indexes without read-path proof.
+- PostgreSQL runtime migration remains not executed.
+
+Remaining gaps:
+- Browser/manual QA not run.
+- PostgreSQL runtime migration not executed.
+- Timestamp read-path/index hardening not approved because no read path currently proves filtering/sorting by work item `created_at` / `updated_at`.
+
+Next safe step:
+- Do not re-audit completed `Focused Verified` rows unless local command output/source conflict appears.
+- Do not patch `product_inventory` or `product_inventory_costing` with generic timestamps; both are projection/snapshot tables and remain deferred until projection materialization semantics are selected.
+- Select the next unresolved DB hardening target from `docs/03_blueprints/db/0004_db_audit_matrix.md`.
+- If no P0 temporal timestamp target remains except deferred projections, move to the next matrix-backed category only after a narrow blueprint: reversal/adjustment tables, actor/reason/audit linkage, FK/delete hardening, or CRUD/read-path hardening.
+- First action in the next session should inspect only unresolved/non-verified rows and propose one active table group. No patch first.
+
+## Prompt For Next Session - DB Hardening Continuation
+
+Use this prompt in the next session:
+
+Lanjut HyperPOS DB hardening.
+
+Do not re-audit completed 0005 through 0011 rows unless local command output or source code contradicts the docs.
+
+Workflow wajib:
+- command output lokal adalah source of truth utama
+- pakai FACT/GAP/DECISION/PROOF/NEXT
+- satu active step per respons
+- jangan klaim aman/verified tanpa proof
+- user handles commit/push manually
+- jangan fokus ke git sync/push/status kecuali diminta
+- jangan mulai dengan make verify
+- jangan gunakan created_at/updated_at sebagai business/report date
+- jangan ubah allocation math, refund math, report semantics, UI, API/mobile, supplier payable math, receipt stock movement logic, proof attachment semantics, reversal semantics, FK/delete semantics, timestamp indexes, Go API, atau PostgreSQL runtime kecuali scope baru eksplisit
+
+Current project:
+HyperPOS.
+
+Active broader scope:
+DB hardening.
+
+Source docs:
+- `docs/03_blueprints/db/0003_db_hardening_workflow.md`
+- `docs/03_blueprints/db/0004_db_audit_matrix.md`
+- `docs/99_archive/handoff/db/0001_db_hardening_notes_payment_refund_handoff.md`
+
+Completed and locked:
+- 0005 `notes` timestamp slice: Focused Verified
+- 0006 `customer_payments`, `customer_refunds`, `customer_payment_cash_details`: Focused Verified
+- 0007 allocation timestamp/immutability slice: Focused Verified
+- 0008 supplier/procurement root timestamp slice: Focused Verified
+- 0009 `inventory_movements` timestamp/readiness slice: Focused Verified
+- 0010 `product_inventory` and `product_inventory_costing` projection timestamp policy: Audited/deferred, no generic timestamps
+- 0011 work item timestamp/readiness slice: Focused Verified
+
+0011 closure facts:
+- Tables:
+  - `work_items`
+  - `work_item_service_details`
+  - `work_item_external_purchase_lines`
+  - `work_item_store_stock_lines`
+- Production files changed:
+  - `database/migrations/2026_05_15_000005_add_operational_timestamps_to_work_item_tables.php`
+  - `app/Adapters/Out/Note/DatabaseWorkItemWriterAdapter.php`
+  - `app/Adapters/Out/Note/WorkItemLineInsertsTrait.php`
+  - `app/Adapters/Out/Note/WorkItemServiceUpdateGuardsTrait.php`
+- Test files changed:
+  - `tests/Feature/Database/WorkItemTimestampSchemaTest.php`
+  - `tests/Feature/Note/WorkItemWriterTimestampFeatureTest.php`
+- RED schema proof:
+  - `WorkItemTimestampSchemaTest` failed with `Missing work_items.created_at`
+- RED writer proof:
+  - `WorkItemWriterTimestampFeatureTest` failed with SQL `Unknown column 'created_at'`
+- GREEN targeted proof:
+  - `4 passed / 36 assertions`
+- Focused proof:
+  - `45 passed / 321 assertions`
+- Docs proof:
+  - 0011 blueprint `Status: Focused Verified`
+  - four matrix work item rows `Focused Verified`
+  - `git diff --check` clean for docs closure
+- User reported `make push` and `make verify` are safe/passing; if exact output is needed, ask for the local terminal summary.
+
+Locked 0011 decisions:
+- `created_at` / `updated_at` are system row timestamps only
+- do not use work item timestamps as business/report dates
+- do not change payment/refund allocation math
+- do not change inventory movement/reversal semantics
+- do not change note revision semantics
+- do not change FK/delete semantics
+- do not add timestamp indexes without read-path proof
+- PostgreSQL runtime migration remains not executed
+
+Active task:
+Find the next unresolved DB hardening target from `docs/03_blueprints/db/0004_db_audit_matrix.md`.
+
+Rules for first response:
+1. Inspect only unresolved/non-verified rows.
+2. Do not analyze completed `Focused Verified` rows again.
+3. Treat `product_inventory` and `product_inventory_costing` as deferred/audited projections unless owner explicitly selects projection materialization policy.
+4. Pick one active next table group only.
+5. Produce the minimum command needed to inspect that next group.
+6. Do not patch anything yet.
+
+Suggested first local command:
+`awk -F'|' '/^\| `/ && $17 !~ /Focused Verified/ {print NR ":" $0}' docs/03_blueprints/db/0004_db_audit_matrix.md`
