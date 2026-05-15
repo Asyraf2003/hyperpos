@@ -466,4 +466,3 @@ Focused blast-radius proof:
 ## 17. Next Table Group
 
 Next safe DB hardening step should select the next matrix row with `Reported`, `Audited`, or `Patch Blueprinted` status after confirming no dirty source/doc gap remains for 0011.
-

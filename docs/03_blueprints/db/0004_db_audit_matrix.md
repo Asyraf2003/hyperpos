@@ -1,8 +1,8 @@
 # DB Blueprint 0004 - DB Audit Matrix
 
-Status: Active audit matrix  
-Scope: P0 database hardening matrix for temporal audit, PostgreSQL readiness, CRUD/read path readiness  
-Owner: HyperPOS  
+Status: Active audit matrix
+Scope: P0 database hardening matrix for temporal audit, PostgreSQL readiness, CRUD/read path readiness
+Owner: HyperPOS
 
 ## 1. Purpose
 
