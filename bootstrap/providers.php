@@ -13,5 +13,6 @@ return [
     App\Providers\EmployeeFinanceServiceProvider::class,
     App\Providers\InventoryServiceProvider::class,
     App\Providers\ProcurementServiceProvider::class,
+    App\Providers\PaymentServiceProvider::class,
     App\Providers\HexagonalServiceProvider::class,
 ];
