@@ -23,10 +23,14 @@ final class DatabaseSupplierReceiptWriterAdapter implements SupplierReceiptWrite
      */
     private function toReceiptRecord(SupplierReceipt $supplierReceipt): array
     {
+        $timestamp = now()->toDateTimeString();
+
         return [
             'id' => $supplierReceipt->id(),
             'supplier_invoice_id' => $supplierReceipt->supplierInvoiceId(),
             'tanggal_terima' => $supplierReceipt->tanggalTerima()->format('Y-m-d'),
+            'created_at' => $timestamp,
+            'updated_at' => $timestamp,
         ];
     }
 

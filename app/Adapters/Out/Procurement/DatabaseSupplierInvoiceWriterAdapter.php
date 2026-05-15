@@ -13,7 +13,7 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
 {
     public function create(SupplierInvoice $supplierInvoice): void
     {
-        DB::table('supplier_invoices')->insert($this->toInvoiceRecord($supplierInvoice));
+        DB::table('supplier_invoices')->insert($this->toInvoiceRecord($supplierInvoice, true));
 
         DB::table('supplier_invoice_lines')->insert($this->toLineRecords($supplierInvoice));
     }
@@ -22,7 +22,7 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
     {
         DB::table('supplier_invoices')
             ->where('id', $supplierInvoice->id())
-            ->update($this->toInvoiceRecord($supplierInvoice));
+            ->update($this->toInvoiceRecord($supplierInvoice, false));
 
         DB::table('supplier_invoice_lines')
             ->where('supplier_invoice_id', $supplierInvoice->id())
@@ -34,9 +34,11 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
     /**
      * @return array<string, string|int|null>
      */
-    private function toInvoiceRecord(SupplierInvoice $supplierInvoice): array
+    private function toInvoiceRecord(SupplierInvoice $supplierInvoice, bool $includeCreatedAt): array
     {
-        return [
+        $timestamp = now()->toDateTimeString();
+
+        $record = [
             'id' => $supplierInvoice->id(),
             'supplier_id' => $supplierInvoice->supplierId(),
             'supplier_nama_pt_pengirim_snapshot' => $supplierInvoice->supplierNamaPtPengirimSnapshot(),
@@ -49,7 +51,14 @@ final class DatabaseSupplierInvoiceWriterAdapter implements SupplierInvoiceWrite
             'tanggal_pengiriman' => $supplierInvoice->tanggalPengiriman()->format('Y-m-d'),
             'jatuh_tempo' => $supplierInvoice->jatuhTempo()->format('Y-m-d'),
             'grand_total_rupiah' => $supplierInvoice->grandTotalRupiah()->amount(),
+            'updated_at' => $timestamp,
         ];
+
+        if ($includeCreatedAt) {
+            $record['created_at'] = $timestamp;
+        }
+
+        return $record;
     }
 
     /**
