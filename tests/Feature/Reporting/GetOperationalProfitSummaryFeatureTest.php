@@ -566,4 +566,120 @@ final class GetOperationalProfitSummaryFeatureTest extends TestCase
             'delete_reason' => null,
         ]);
     }
+    public function test_operational_profit_summary_includes_surplus_refund_paid_cash_outflow(): void
+    {
+        DB::table('notes')->insert([
+            'id' => 'note-op-profit-surplus-paid',
+            'customer_name' => 'Budi Operational Profit Surplus',
+            'transaction_date' => '2030-03-10',
+            'total_rupiah' => 100000,
+        ]);
+
+        DB::table('note_revisions')->insert([
+            'id' => 'rev-op-profit-surplus-paid',
+            'note_root_id' => 'note-op-profit-surplus-paid',
+            'revision_number' => 1,
+            'parent_revision_id' => null,
+            'created_by_actor_id' => null,
+            'reason' => 'Operational profit surplus refund paid fixture',
+            'customer_name' => 'Budi Operational Profit Surplus',
+            'customer_phone' => null,
+            'transaction_date' => '2030-03-10',
+            'grand_total_rupiah' => 100000,
+            'line_count' => 0,
+            'created_at' => '2030-03-10 09:00:00',
+            'updated_at' => null,
+        ]);
+
+        DB::table('note_revision_settlements')->insert([
+            'id' => 'settlement-op-profit-surplus-paid',
+            'note_revision_id' => 'rev-op-profit-surplus-paid',
+            'note_root_id' => 'note-op-profit-surplus-paid',
+            'gross_total_rupiah' => 100000,
+            'carry_forward_paid_rupiah' => 107000,
+            'carry_forward_refunded_rupiah' => 0,
+            'net_paid_rupiah' => 107000,
+            'outstanding_rupiah' => 0,
+            'surplus_rupiah' => 7000,
+            'settlement_status' => 'overpaid_pending',
+            'created_at' => '2030-03-10 09:00:00',
+            'updated_at' => null,
+        ]);
+
+        DB::table('audit_events')->insert([
+            'id' => 'audit-disp-op-profit-surplus-paid',
+            'bounded_context' => 'note',
+            'aggregate_type' => 'note_revision_surplus_disposition',
+            'aggregate_id' => 'disp-op-profit-surplus-paid',
+            'event_name' => 'note_revision_surplus_refund_due_created',
+            'actor_id' => 'admin-1',
+            'actor_role' => 'admin',
+            'reason' => 'Operational profit refund due fixture',
+            'source_channel' => 'test',
+            'request_id' => null,
+            'correlation_id' => null,
+            'occurred_at' => '2030-03-10 09:30:00',
+            'metadata_json' => null,
+        ]);
+
+        DB::table('note_revision_surplus_dispositions')->insert([
+            'id' => 'disp-op-profit-surplus-paid',
+            'note_revision_settlement_id' => 'settlement-op-profit-surplus-paid',
+            'note_root_id' => 'note-op-profit-surplus-paid',
+            'note_revision_id' => 'rev-op-profit-surplus-paid',
+            'disposition_type' => 'refund_due',
+            'amount_rupiah' => 7000,
+            'before_pending_rupiah' => 7000,
+            'after_pending_rupiah' => 0,
+            'status' => 'active',
+            'occurred_at' => '2030-03-10 09:30:00',
+            'created_at' => '2030-03-10 09:30:00',
+            'updated_at' => null,
+            'audit_event_id' => 'audit-disp-op-profit-surplus-paid',
+        ]);
+
+        DB::table('audit_events')->insert([
+            'id' => 'audit-payment-op-profit-surplus-paid',
+            'bounded_context' => 'note',
+            'aggregate_type' => 'note_revision_surplus_refund_payment',
+            'aggregate_id' => 'surplus-payment-op-profit',
+            'event_name' => 'note_revision_surplus_refund_paid_recorded',
+            'actor_id' => 'admin-1',
+            'actor_role' => 'admin',
+            'reason' => 'Operational profit surplus refund paid fixture',
+            'source_channel' => 'test',
+            'request_id' => null,
+            'correlation_id' => null,
+            'occurred_at' => '2030-03-11 10:00:00',
+            'metadata_json' => null,
+        ]);
+
+        DB::table('note_revision_surplus_refund_payments')->insert([
+            'id' => 'surplus-payment-op-profit',
+            'note_revision_surplus_disposition_id' => 'disp-op-profit-surplus-paid',
+            'note_revision_settlement_id' => 'settlement-op-profit-surplus-paid',
+            'note_root_id' => 'note-op-profit-surplus-paid',
+            'note_revision_id' => 'rev-op-profit-surplus-paid',
+            'amount_rupiah' => 3000,
+            'effective_date' => '2030-03-11',
+            'occurred_at' => '2030-03-11 10:00:00',
+            'status' => 'active',
+            'idempotency_key' => 'idem-surplus-payment-op-profit',
+            'audit_event_id' => 'audit-payment-op-profit-surplus-paid',
+            'created_at' => '2030-03-11 10:00:00',
+            'updated_at' => null,
+        ]);
+
+        $cashLedger = app(\App\Adapters\Out\Reporting\Queries\TransactionCashLedgerReportingQuery::class)
+            ->reconciliation('2030-03-01', '2030-03-31');
+
+        $this->assertSame(0, $cashLedger['total_in_rupiah']);
+        $this->assertSame(3000, $cashLedger['total_out_rupiah']);
+
+        $row = $this->profitRow('2030-03-01', '2030-03-31');
+
+        $this->assertSame(3000, $row['refunded_rupiah']);
+        $this->assertSame(-3000, $row['cash_operational_profit_rupiah']);
+    }
+
 }
