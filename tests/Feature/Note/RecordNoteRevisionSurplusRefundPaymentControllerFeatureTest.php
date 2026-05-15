@@ -117,6 +117,95 @@ final class RecordNoteRevisionSurplusRefundPaymentControllerFeatureTest extends 
         ]);
     }
 
+    public function test_repeated_refund_paid_submit_with_same_idempotency_key_and_same_payload_reuses_existing_payment(): void
+    {
+        $admin = $this->seedActor('admin-refund-paid-idem-same@example.test', 'admin');
+        $this->seedRefundDueDisposition();
+        $this->bindDeterministicPorts();
+
+        $payload = [
+            'amount_rupiah' => 50000,
+            'effective_date' => '2026-05-13',
+            'reason' => 'Customer received surplus refund paid from stale form retry.',
+            'idempotency_key' => 'refund-paid-surplus-disposition-paid-http-001-122000',
+        ];
+
+        $first = $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']))
+            ->post('/admin/notes/revision-surplus-dispositions/surplus-disposition-paid-http-001/refund-paid', $payload);
+
+        $second = $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']))
+            ->post('/admin/notes/revision-surplus-dispositions/surplus-disposition-paid-http-001/refund-paid', $payload);
+
+        $first->assertRedirect(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']));
+        $first->assertSessionHas('success');
+
+        $second->assertRedirect(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']));
+        $second->assertSessionHas('success');
+
+        self::assertSame(1, DB::table('note_revision_surplus_refund_payments')->count());
+        self::assertSame(1, DB::table('audit_events')
+            ->where('event_name', 'note_revision_surplus_refund_paid_recorded')
+            ->count());
+
+        $this->assertDatabaseHas('note_revision_surplus_refund_payments', [
+            'note_revision_surplus_disposition_id' => 'surplus-disposition-paid-http-001',
+            'amount_rupiah' => 50000,
+            'status' => 'active',
+            'idempotency_key' => 'refund-paid-surplus-disposition-paid-http-001-122000',
+        ]);
+    }
+
+    public function test_repeated_refund_paid_submit_with_same_idempotency_key_and_different_payload_is_rejected(): void
+    {
+        $admin = $this->seedActor('admin-refund-paid-idem-different@example.test', 'admin');
+        $this->seedRefundDueDisposition();
+        $this->bindDeterministicPorts();
+
+        $first = $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']))
+            ->post('/admin/notes/revision-surplus-dispositions/surplus-disposition-paid-http-001/refund-paid', [
+                'amount_rupiah' => 50000,
+                'effective_date' => '2026-05-13',
+                'reason' => 'Customer received first surplus refund paid.',
+                'idempotency_key' => 'refund-paid-surplus-disposition-paid-http-001-122000',
+            ]);
+
+        $second = $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']))
+            ->post('/admin/notes/revision-surplus-dispositions/surplus-disposition-paid-http-001/refund-paid', [
+                'amount_rupiah' => 60000,
+                'effective_date' => '2026-05-13',
+                'reason' => 'Customer received changed surplus refund paid from stale form.',
+                'idempotency_key' => 'refund-paid-surplus-disposition-paid-http-001-122000',
+            ]);
+
+        $first->assertRedirect(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']));
+        $first->assertSessionHas('success');
+
+        $second->assertRedirect(route('admin.notes.show', ['noteId' => 'note-root-paid-http-001']));
+        $second->assertSessionHasErrors(['refund_paid']);
+
+        self::assertSame(1, DB::table('note_revision_surplus_refund_payments')->count());
+        self::assertSame(1, DB::table('audit_events')
+            ->where('event_name', 'note_revision_surplus_refund_paid_recorded')
+            ->count());
+
+        $this->assertDatabaseHas('note_revision_surplus_refund_payments', [
+            'note_revision_surplus_disposition_id' => 'surplus-disposition-paid-http-001',
+            'amount_rupiah' => 50000,
+            'status' => 'active',
+            'idempotency_key' => 'refund-paid-surplus-disposition-paid-http-001-122000',
+        ]);
+
+        $this->assertDatabaseMissing('note_revision_surplus_refund_payments', [
+            'note_revision_surplus_disposition_id' => 'surplus-disposition-paid-http-001',
+            'amount_rupiah' => 60000,
+            'status' => 'active',
+        ]);
+    }
+
     public function test_cashier_cannot_access_admin_refund_paid_route(): void
     {
         $cashier = $this->seedActor('cashier-refund-paid@example.test', 'kasir');
