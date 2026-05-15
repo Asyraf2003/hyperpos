@@ -1,6 +1,6 @@
 # DB Blueprint 0010 - Inventory Projection Timestamp Policy Blueprint
 
-Status: Audited
+Status: Deferred with owner acceptance
 Scope: `product_inventory` and `product_inventory_costing` projection timestamp policy
 Owner: HyperPOS
 
@@ -195,3 +195,31 @@ This policy slice can be considered docs-aligned when:
 - Both rows document projection semantics.
 - Both rows explicitly defer timestamp patch until projection materialization semantics are selected.
 - No schema/source patch is applied.
+
+## 11. Deferred Closure
+
+Status: Deferred with owner acceptance.
+
+Decision:
+
+- Do not add `created_at` or `updated_at` to `product_inventory`.
+- Do not add `created_at` or `updated_at` to `product_inventory_costing`.
+- Keep both tables as derived inventory projection/snapshot tables.
+- Keep business/report date truth on `inventory_movements.tanggal_mutasi`.
+- Keep system row persistence timestamp truth on source ledger rows, not projection rows.
+- Require a future explicit materialization policy before any projection timestamp patch.
+
+Owner acceptance:
+
+- This slice is intentionally closed without schema/source patch.
+- Projection materialization timestamps remain deferred until `projected_at`, `rebuilt_at`, generic timestamps, or metadata-table semantics are explicitly selected.
+- Current rebuild audit events are accepted as sufficient for this DB hardening sequence.
+- PostgreSQL runtime migration remains not executed in this slice.
+
+Closure proof basis:
+
+- Matrix rows exist for `product_inventory` and `product_inventory_costing`.
+- Both rows document projection semantics.
+- Both rows explicitly defer timestamp patch until projection materialization semantics are selected.
+- Source inspection confirms normal `updateOrInsert` writers and full `delete()` then `insert()` rebuild writers.
+- No schema/source patch is applied in this policy slice.
