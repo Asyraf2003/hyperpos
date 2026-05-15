@@ -1,6 +1,6 @@
 # DB Blueprint 0008 - Supplier Procurement Timestamp Hardening Patch Blueprint
 
-Status: Patch Blueprinted
+Status: Focused Verified
 Scope: `supplier_invoices`, `supplier_receipts`, and `supplier_payments` row timestamp hardening
 Owner: HyperPOS
 
@@ -330,43 +330,73 @@ Stop or defer if:
 
 ## 15. Current Decision
 
-Patch is blueprint-approved only.
+Patch is implemented and focused verified.
 
-Decision:
+Implemented behavior:
 
-- Add nullable `created_at` and `updated_at` to supplier/procurement root tables.
-- Backfill pre-patch rows with migration execution time as approximate system timestamp.
-- Writers must set explicit timestamps for new rows.
-- Update-capable writers must update `updated_at` only on update paths.
-- Do not add timestamp indexes.
-- Do not change FK/delete semantics.
-- Do not change business/report dates.
-- Do not change supplier payable, receipt, payment, proof, void, reversal, inventory, or reporting semantics.
+- Added nullable `created_at` and `updated_at` columns to `supplier_invoices`.
+- Added nullable `created_at` and `updated_at` columns to `supplier_receipts`.
+- Added nullable `created_at` and `updated_at` columns to `supplier_payments`.
+- Historical/pre-patch rows are backfilled with migration execution time as approximate system timestamp.
+- New supplier invoice rows write `created_at` and `updated_at`.
+- Supplier invoice update path preserves `created_at` and updates `updated_at`.
+- New supplier receipt rows write `created_at` and `updated_at`.
+- New supplier payment rows write `created_at` and `updated_at`.
+- Supplier payment update path preserves `created_at` and updates `updated_at`.
+- Initial `updated_at` equals `created_at` for insert rows.
+
+Preserved decisions:
+
+- Supplier/procurement timestamps are not business/report dates.
+- No timestamp index was added.
+- FK/delete semantics were not changed.
+- Supplier payable math, receipt stock movement logic, supplier payment proof semantics, void policy, reversal logic, inventory logic, UI, API/mobile, Go API, and PostgreSQL runtime implementation were not touched.
+
+Focused proof captured:
+
+- RED schema proof: `SupplierProcurementTimestampSchemaTest` failed at `supplier_invoices.created_at`, 1 assertion.
+- GREEN schema proof: `SupplierProcurementTimestampSchemaTest` passed, 1 test / 1 assertion.
+- RED writer proof: supplier invoice, receipt, and payment writer-created rows had null `created_at`, 3 failed / 6 assertions.
+- GREEN writer proof: supplier invoice, receipt, and payment create paths write timestamps; supplier invoice and payment update paths preserve `created_at` and update `updated_at`, 5 tests / 15 assertions.
+- Focused blast-radius proof: supplier schema, supplier writer, supplier payable report page, and seeder finance invariant tests passed, 13 tests / 58 assertions.
+- Syntax proof passed for changed migration, writer adapters, and focused tests.
+
+Remaining gaps:
+
+- Full `make verify` was not rerun after this supplier/procurement timestamp slice unless owner runs it separately.
+- Browser/manual QA was not run.
+- PostgreSQL runtime migration was not run.
+- Wider full-suite regression proof remains deferred unless separately requested.
 
 ## 16. Focused Verification Result
 
 Status after implementation:
 
-- Pending.
+- Focused Verified.
 
-Production files expected:
+Production files changed:
 
-- pending
+- `database/migrations/2026_05_15_000003_add_operational_timestamps_to_supplier_procurement_tables.php`
+- `app/Adapters/Out/Procurement/DatabaseSupplierInvoiceWriterAdapter.php`
+- `app/Adapters/Out/Procurement/DatabaseSupplierReceiptWriterAdapter.php`
+- `app/Adapters/Out/Procurement/DatabaseSupplierPaymentWriterAdapter.php`
 
-Test files expected:
+Test files changed:
 
-- pending
+- `tests/Feature/Database/SupplierProcurementTimestampSchemaTest.php`
+- `tests/Feature/Procurement/SupplierProcurementWriterTimestampFeatureTest.php`
 
 Verification proof:
 
-- pending
+- RED schema: 1 failed / 1 assertion at `supplier_invoices.created_at`.
+- GREEN schema: 1 passed / 1 assertion.
+- RED writer: 3 failed / 6 assertions because writer-created rows had null `created_at`.
+- GREEN writer: 5 passed / 15 assertions.
+- Focused blast-radius: 13 passed / 58 assertions.
 
-Remaining gaps:
+Remaining verification gaps:
 
-- RED schema proof not yet captured.
-- GREEN schema proof not yet captured.
-- Writer timestamp proof not yet captured.
-- Focused supplier/procurement/reporting baseline not yet captured.
-- Full `make verify` not run.
-- Browser/manual QA not run.
-- PostgreSQL runtime migration not run.
+- Full `make verify`.
+- Browser/manual QA.
+- PostgreSQL runtime migration.
+- Wider full-suite regression proof.
