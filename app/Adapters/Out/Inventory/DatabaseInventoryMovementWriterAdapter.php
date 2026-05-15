@@ -19,6 +19,8 @@ final class DatabaseInventoryMovementWriterAdapter implements InventoryMovementW
             return;
         }
 
+        $now = now()->toDateTimeString();
+
         DB::table('inventory_movements')->insert(
             array_map(
                 static fn (InventoryMovement $movement): array => [
@@ -31,6 +33,8 @@ final class DatabaseInventoryMovementWriterAdapter implements InventoryMovementW
                     'qty_delta' => $movement->qtyDelta(),
                     'unit_cost_rupiah' => $movement->unitCostRupiah()->amount(),
                     'total_cost_rupiah' => $movement->totalCostRupiah()->amount(),
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ],
                 $movements,
             )
