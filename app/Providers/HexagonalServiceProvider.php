@@ -6,14 +6,6 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Adapters\Out\Inventory\DatabaseInventoryMovementReaderAdapter;
-use App\Adapters\Out\Inventory\DatabaseInventoryMovementWriterAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingProjectionWriterAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingReaderAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryCostingWriterAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryProjectionWriterAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryReaderAdapter;
-use App\Adapters\Out\Inventory\DatabaseProductInventoryWriterAdapter;
 use App\Adapters\Out\Note\DatabaseDueNoteReminderReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteCorrectionHistoryReaderAdapter;
 use App\Adapters\Out\Note\DatabaseNoteHistoryProjectionSourceReaderAdapter;
@@ -71,11 +63,6 @@ use App\Adapters\Out\Procurement\DatabaseSupplierReceiptWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierWriterAdapter;
 use App\Adapters\Out\Procurement\DatabaseProcurementInvoiceTableReaderAdapter;
 use App\Adapters\Out\Procurement\DatabaseSupplierTableReaderAdapter;
-use App\Application\Inventory\Policies\DefaultNegativeStockPolicy;
-use App\Application\Inventory\Services\InventoryCostingProjectionBuilder;
-use App\Application\Inventory\Services\InventoryProjectionBuilder;
-use App\Application\Inventory\Services\InventoryProjectionService;
-use App\Application\Inventory\Services\IssueInventoryOperation;
 use App\Application\Note\Policies\NoteAddabilityPolicy;
 use App\Application\Note\Policies\CashierNoteAccessGuard;
 use App\Application\Note\Policies\NotePaidStatusPolicy;
@@ -99,15 +86,6 @@ use App\Application\Procurement\Services\SupplierInvoiceListProjectionService;
 use App\Application\Procurement\Services\SupplierListProjectionService;
 use App\Application\Procurement\Services\SupplierReceiptFactory;
 use App\Application\Procurement\Services\SupplierService;
-use App\Core\Inventory\Policies\NegativeStockPolicy;
-use App\Ports\Out\Inventory\InventoryMovementReaderPort;
-use App\Ports\Out\Inventory\InventoryMovementWriterPort;
-use App\Ports\Out\Inventory\ProductInventoryCostingProjectionWriterPort;
-use App\Ports\Out\Inventory\ProductInventoryCostingReaderPort;
-use App\Ports\Out\Inventory\ProductInventoryCostingWriterPort;
-use App\Ports\Out\Inventory\ProductInventoryProjectionWriterPort;
-use App\Ports\Out\Inventory\ProductInventoryReaderPort;
-use App\Ports\Out\Inventory\ProductInventoryWriterPort;
 use App\Ports\Out\Note\AdminNoteHistoryTableReaderPort;
 use App\Ports\Out\Note\CashierNoteHistoryTableReaderPort;
 use App\Ports\Out\Note\DueNoteReminderReaderPort;
@@ -173,15 +151,10 @@ class HexagonalServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(NegativeStockPolicy::class, DefaultNegativeStockPolicy::class);
         $this->app->singleton(NotePaidStatusPolicy::class);
         $this->app->singleton(NoteAddabilityPolicy::class);
         $this->app->singleton(CashierNoteAccessGuard::class);
 
-        $this->app->singleton(InventoryProjectionService::class);
-        $this->app->singleton(IssueInventoryOperation::class);
-        $this->app->singleton(InventoryCostingProjectionBuilder::class);
-        $this->app->singleton(InventoryProjectionBuilder::class);
         $this->app->singleton(WorkItemFactory::class);
         $this->app->singleton(WorkItemStatusTransitionService::class);
         $this->app->singleton(AddWorkItemErrorClassifier::class);
@@ -230,15 +203,6 @@ class HexagonalServiceProvider extends ServiceProvider
         $this->app->singleton(SupplierPaymentProofAttachmentWriterPort::class, DatabaseSupplierPaymentProofAttachmentWriterAdapter::class);
         $this->app->singleton(SupplierPaymentProofAttachmentReaderPort::class, DatabaseSupplierPaymentProofAttachmentReaderAdapter::class);
         $this->app->singleton(SupplierPaymentProofFileStoragePort::class, LaravelSupplierPaymentProofFileStorageAdapter::class);
-
-        $this->app->singleton(InventoryMovementReaderPort::class, DatabaseInventoryMovementReaderAdapter::class);
-        $this->app->singleton(InventoryMovementWriterPort::class, DatabaseInventoryMovementWriterAdapter::class);
-        $this->app->singleton(ProductInventoryReaderPort::class, DatabaseProductInventoryReaderAdapter::class);
-        $this->app->singleton(ProductInventoryWriterPort::class, DatabaseProductInventoryWriterAdapter::class);
-        $this->app->singleton(ProductInventoryProjectionWriterPort::class, DatabaseProductInventoryProjectionWriterAdapter::class);
-        $this->app->singleton(ProductInventoryCostingReaderPort::class, DatabaseProductInventoryCostingReaderAdapter::class);
-        $this->app->singleton(ProductInventoryCostingWriterPort::class, DatabaseProductInventoryCostingWriterAdapter::class);
-        $this->app->singleton(ProductInventoryCostingProjectionWriterPort::class, DatabaseProductInventoryCostingProjectionWriterAdapter::class);
 
         $this->app->singleton(NoteReaderPort::class, DatabaseNoteReaderAdapter::class);
         $this->app->singleton(NoteWriterPort::class, DatabaseNoteWriterAdapter::class);
