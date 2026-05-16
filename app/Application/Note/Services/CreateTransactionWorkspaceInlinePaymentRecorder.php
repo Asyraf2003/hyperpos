@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
+use App\Application\Payment\Services\BuildCustomerPaymentCashDetail;
 use App\Application\Payment\Services\PaymentDateParser;
 use App\Application\Payment\Services\ResolveNotePayableComponents;
 use App\Core\Note\Note\Note;
@@ -30,6 +31,7 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         private readonly ResolveNotePayableComponents $components,
         private readonly AllocatePaymentAcrossComponents $allocator,
         private readonly AutoCloseNoteWhenFullyPaid $autoClose,
+        private readonly BuildCustomerPaymentCashDetail $cashDetails,
     ) {
     }
 
@@ -54,6 +56,15 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
             $this->uuid->generate(),
             $money,
             PaymentDateParser::parseYmd($payment['paid_at'], 'Tanggal bayar wajib valid dengan format Y-m-d.'),
+            $payment['method'],
+        );
+
+        $cashDetail = $this->cashDetails->execute(
+            $customerPayment,
+            $money,
+            $payment['method'] === CustomerPayment::METHOD_CASH
+                ? $payment['amount_received_rupiah']
+                : null,
         );
 
         $existingAllocated = $this->paymentAllocations->getTotalAllocatedAmountByNoteId($note->id());
@@ -73,7 +84,7 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
             $this->components->fromNote($note),
         );
 
-        $this->payments->create($customerPayment);
+        $this->payments->create($customerPayment, $cashDetail);
         $this->componentAllocations->createMany($allocations);
         $this->autoClose->closeIfEligible($note, $customerPayment->id());
 
@@ -81,6 +92,13 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
             'payment_id' => $customerPayment->id(),
             'note_id' => $note->id(),
             'amount' => $payment['amount_paid_rupiah'],
+            'payment_method' => $customerPayment->paymentMethod(),
+            'amount_received' => $payment['method'] === CustomerPayment::METHOD_CASH
+                ? $payment['amount_received_rupiah']
+                : null,
+            'change' => $payment['method'] === CustomerPayment::METHOD_CASH
+                ? $payment['change_rupiah']
+                : null,
             'allocation_count' => count($allocations),
             'source' => 'transaction_workspace',
             'decision' => $payment['decision'],
