@@ -6,7 +6,7 @@ Date: 2026-05-16
 
 ## Purpose
 
-This document records the current create transaction flow risks before expanding the system into stronger separated domains:
+This document records create-transaction risk points before expanding the system into separated domains:
 
 - finance settlement domain
 - cash/transfer payment domain
@@ -20,26 +20,26 @@ The goal is to make sure create transaction is mature enough to become a safe fo
 
 ## Current proof
 
-Local proof shows create transaction baseline is green.
+Local migration proof shows these create-transaction related migrations have run:
 
-Migration proof:
+- inventory_movements
+- product_inventory
+- product_inventory_costing
+- notes
+- work_items
+- work_item_service_details
+- work_item_external_purchase_lines
+- work_item_store_stock_lines
+- customer_payments
+- payment_component_allocations
+- payment method and cash detail migration
+- operational/system timestamp hardening
+- unique work item note line number
 
-- notes table migration ran
-- work_items table migration ran
-- work_item_service_details table migration ran
-- work_item_external_purchase_lines table migration ran
-- work_item_store_stock_lines table migration ran
-- customer_payments table migration ran
-- payment_component_allocations table migration ran
-- inventory tables ran
-- payment method and cash detail migration ran
-- operational/system timestamp hardening ran
-- unique work item note line number migration ran
+Route proof confirms:
 
-Route proof:
-
-- GET cashier/notes/workspace/create exists
-- POST notes/workspace/store exists
+- GET cashier/notes/workspace/create
+- POST notes/workspace/store
 
 Focused test proof:
 
@@ -53,9 +53,9 @@ Focused full cash test proof:
 
 ## Important interpretation
 
-The green tests prove the basic create transaction flow works.
+The current green tests prove the basic create transaction flow works.
 
-They do not prove create transaction data is complete for financial audit.
+They do not prove create transaction data is complete for finance-grade audit.
 
 Current full cash test only proves:
 
@@ -135,7 +135,7 @@ Create transaction must not absorb all of these responsibilities.
 
 Create transaction only needs to produce correct initial facts so those domains can work later.
 
-## Create transaction current flow summary
+## Current create flow summary
 
 Current create workspace flow is:
 

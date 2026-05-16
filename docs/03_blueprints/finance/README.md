@@ -14,6 +14,7 @@ Blueprint, DoD, dan Workflow untuk domain finance.
 | `note-revision-refund-ledger.md` | Blueprint | Revision, refund, dan ledger lifecycle post-settlement |
 | `note-revision-refund-ledger-dod.md` | DoD | Kriteria selesai revision-refund-ledger |
 | `note-revision-refund-ledger-workflow.md` | Workflow | Workflow eksekusi revision-refund-ledger |
+| `0009_create_transaction_domain_risk_handoff.md` | Handoff | Risiko create transaction sebelum pemisahan finance, payment method, cash calculator, edit, dan refund domain |
 
 ## ADR Terkait
 
