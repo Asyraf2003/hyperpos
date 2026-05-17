@@ -35,4 +35,28 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertSee('name="items[__INDEX__][part_source]" value="store_stock"', false);
         $response->assertSee('name="items[__INDEX__][part_source]" value="external_purchase"', false);
     }
+
+    public function test_workspace_create_page_embeds_service_store_stock_package_pricing_contract(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Package Contract',
+            'email' => 'package-contract@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('cashier.notes.workspace.create'));
+
+        $response->assertOk();
+        $response->assertSee('name="items[__INDEX__][pricing_mode]"', false);
+        $response->assertSee('value="package_auto_split"', false);
+        $response->assertSee('name="items[__INDEX__][package_total_rupiah]"', false);
+        $response->assertSee('Total Paket', false);
+    }
 }
