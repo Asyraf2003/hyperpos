@@ -649,3 +649,78 @@ Remaining gaps:
 - No external purchase package pricing support.
 - No explicit package allocation audit table/event beyond current persisted service/store-stock facts.
 
+
+## Final package pricing proof closure - 2026-05-17
+
+Status: Focused implementation GREEN, owner-reported `make verify` PASS with exact final count not pasted.
+
+Scope closed in this proof section:
+
+- Create transaction only.
+- Service + store-stock package pricing only.
+- Backend input contract accepts `pricing_mode=package_auto_split`.
+- Backend input contract accepts `package_total_rupiah`.
+- Payment seam remains untouched.
+- External purchase package pricing remains intentionally out of scope.
+
+Locked split rule:
+
+- `sparepart_total = product.harga_jual * qty`
+- `service_price = package_total - sparepart_total`
+- minimum package total is `sparepart_total`
+- package total may equal `sparepart_total`
+- service price may be `0`
+- package total below `sparepart_total` must be rejected without side effect
+
+Files changed in the focused implementation:
+
+Request / validation:
+
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceRules.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceItemNormalizer.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceMeaningfulItemDetector.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceServiceItemValidator.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceServicePriceValidator.php`
+
+Application / domain:
+
+- `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceWorkItemPayloadMapper.php`
+- `app/Core/Note/WorkItem/ServiceDetail.php`
+
+Audit-lines refactor:
+
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentAuditPayloadBuilder.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentSummaryBuilder.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentRecorder.php`
+
+Tests:
+
+- `tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php`
+- `tests/Feature/Note/CreateTransactionWorkspacePartialCashFeatureTest.php`
+- `tests/Unit/Application/Note/UseCases/CreateNoteRevisionPayloadNoteBuilderTest.php`
+- `tests/Unit/Core/Note/WorkItem/ServiceDetailTest.php`
+
+Owner-provided local proof:
+
+- partial cash targeted: PASS, 1 test / 8 assertions
+- create payment matrix: PASS, 5 tests / 33 assertions
+- service + store-stock and service + external purchase baseline: PASS, 2 tests / 15 assertions
+- service + store-stock package target: PASS, 4 tests / 30 assertions
+- focused create transaction blast-radius: PASS, 10 tests / 71 assertions
+- final `make verify`: owner-reported PASS after stale `ServiceDetailTest` was updated
+
+Verification caveat:
+
+- Exact final `make verify` pass count/assertion count was not pasted.
+- Do not invent the exact count.
+- If exact final count is required, rerun `make verify` locally and paste the final output.
+
+Remaining gaps after this closure:
+
+- No browser/manual QA.
+- No UI `package_total` input rendering/submission proof beyond backend payload contract.
+- No explicit package allocation audit table/event beyond persisted service/store-stock facts.
+- No edit/revision/refund package recalculation support.
+- No external purchase package pricing support.
+- No pecahan/cash denomination work.

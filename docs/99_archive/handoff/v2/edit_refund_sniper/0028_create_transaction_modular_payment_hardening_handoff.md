@@ -497,3 +497,68 @@ Remaining gaps:
 - External purchase package pricing is intentionally not implemented.
 - Edit/revision/refund package behavior is intentionally not implemented.
 
+
+## Final package pricing proof closure - 2026-05-17
+
+Status: Focused implementation GREEN, owner-reported `make verify` PASS with exact final count not pasted.
+
+This section supersedes the earlier Step 6 gap that said there was no `make verify` proof.
+
+Scope closed:
+
+- Create transaction service + store-stock package pricing.
+- Backend input contract: `pricing_mode=package_auto_split`.
+- Backend input contract: `package_total_rupiah`.
+- Payment seam remains untouched.
+- External purchase package pricing remains intentionally out of scope.
+
+Locked behavior:
+
+- sparepart allocation uses `product.harga_jual * qty`
+- service allocation uses package residual
+- package total above sparepart minimum is accepted
+- package total equal sparepart minimum is accepted
+- zero service price is accepted for package auto split
+- package total below sparepart minimum is rejected without note/work item/inventory/payment side effect
+
+Owner-provided local proof:
+
+- partial cash targeted: PASS, 1 test / 8 assertions
+- create payment matrix: PASS, 5 tests / 33 assertions
+- service + store-stock and service + external purchase baseline: PASS, 2 tests / 15 assertions
+- service + store-stock package target: PASS, 4 tests / 30 assertions
+- focused create transaction blast-radius: PASS, 10 tests / 71 assertions
+- final `make verify`: owner-reported PASS after stale `ServiceDetailTest` was updated
+
+Files included in final focused scope:
+
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceRules.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceItemNormalizer.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceMeaningfulItemDetector.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceServiceItemValidator.php`
+- `app/Adapters/In/Http/Requests/Note/StoreTransactionWorkspaceServicePriceValidator.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceWorkItemPayloadMapper.php`
+- `app/Core/Note/WorkItem/ServiceDetail.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentAuditPayloadBuilder.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentSummaryBuilder.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentRecorder.php`
+- `tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php`
+- `tests/Feature/Note/CreateTransactionWorkspacePartialCashFeatureTest.php`
+- `tests/Unit/Application/Note/UseCases/CreateNoteRevisionPayloadNoteBuilderTest.php`
+- `tests/Unit/Core/Note/WorkItem/ServiceDetailTest.php`
+
+Verification caveat:
+
+- Exact final `make verify` pass count/assertion count was not pasted.
+- Do not invent the exact count.
+- If exact final count is required, rerun `make verify` locally and paste the final output.
+
+Remaining gaps:
+
+- No browser/manual QA.
+- No UI `package_total` input rendering/submission proof beyond backend payload contract.
+- No explicit package allocation audit table/event beyond persisted service/store-stock facts.
+- No edit/revision/refund package recalculation support.
+- No external purchase package pricing support.
+- No pecahan/cash denomination work.
