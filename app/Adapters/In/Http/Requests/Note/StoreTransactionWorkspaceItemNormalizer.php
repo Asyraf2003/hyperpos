@@ -27,6 +27,8 @@ final class StoreTransactionWorkspaceItemNormalizer
                 'entry_mode' => self::trimOrNull($item['entry_mode'] ?? null),
                 'description' => self::trimOrNull($item['description'] ?? null),
                 'part_source' => self::trimOrNull($item['part_source'] ?? null),
+                'pricing_mode' => self::trimOrNull($item['pricing_mode'] ?? null),
+                'package_total_rupiah' => self::intOrNull($item['package_total_rupiah'] ?? null),
                 'service' => StoreTransactionWorkspaceServiceNormalizer::normalize($item['service'] ?? []),
                 'product_lines' => [StoreTransactionWorkspaceProductLineNormalizer::normalize($item['product_lines'] ?? [])],
                 'external_purchase_lines' => [StoreTransactionWorkspaceExternalPurchaseLineNormalizer::normalize($item['external_purchase_lines'] ?? [])],
@@ -54,6 +56,14 @@ final class StoreTransactionWorkspaceItemNormalizer
         }
 
         if (($item['part_source'] ?? null) !== null) {
+            return true;
+        }
+
+        if (($item['pricing_mode'] ?? null) !== null) {
+            return true;
+        }
+
+        if (($item['package_total_rupiah'] ?? null) !== null) {
             return true;
         }
 
@@ -90,5 +100,10 @@ final class StoreTransactionWorkspaceItemNormalizer
         $trimmed = trim($value);
 
         return $trimmed === '' ? null : $trimmed;
+    }
+
+    private static function intOrNull(mixed $value): ?int
+    {
+        return is_int($value) ? $value : null;
     }
 }
