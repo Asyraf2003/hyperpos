@@ -62,11 +62,39 @@ final class CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest extends
         ]);
 
         $response->assertRedirect(route('cashier.notes.index'));
+
+        $noteId = (string) DB::table('notes')->value('id');
+        $workItemId = (string) DB::table('work_items')->value('id');
+
         $this->assertDatabaseHas('notes', [
+            'id' => $noteId,
             'customer_name' => 'Budi',
             'total_rupiah' => 200000,
         ]);
-        $this->assertDatabaseCount('work_item_service_details', 1);
-        $this->assertDatabaseCount('work_item_external_purchase_lines', 1);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => $workItemId,
+            'note_id' => $noteId,
+            'transaction_type' => 'service_with_external_purchase',
+            'subtotal_rupiah' => 200000,
+        ]);
+
+        $this->assertDatabaseHas('work_item_service_details', [
+            'work_item_id' => $workItemId,
+            'service_name' => 'Servis Bearing',
+            'service_price_rupiah' => 80000,
+            'part_source' => 'none',
+        ]);
+
+        $this->assertDatabaseHas('work_item_external_purchase_lines', [
+            'work_item_id' => $workItemId,
+            'cost_description' => 'Bearing NTN',
+            'qty' => 1,
+            'unit_cost_rupiah' => 120000,
+            'line_total_rupiah' => 120000,
+        ]);
+
+        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
     }
 }
