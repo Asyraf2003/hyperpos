@@ -32,6 +32,8 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         private readonly AllocatePaymentAcrossComponents $allocator,
         private readonly AutoCloseNoteWhenFullyPaid $autoClose,
         private readonly BuildCustomerPaymentCashDetail $cashDetails,
+        private readonly CreateTransactionWorkspaceInlinePaymentAuditPayloadBuilder $auditPayloads,
+        private readonly CreateTransactionWorkspaceInlinePaymentSummaryBuilder $summaries,
     ) {
     }
 
@@ -44,11 +46,7 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         $payment = $this->context->resolve($note, $payload);
 
         if ($payment['decision'] === 'skip') {
-            return [
-                'decision' => 'skip',
-                'amount_paid_rupiah' => 0,
-                'change_rupiah' => 0,
-            ];
+            return $this->summaries->skipped();
         }
 
         $money = Money::fromInt($payment['amount_paid_rupiah']);
@@ -88,26 +86,11 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         $this->componentAllocations->createMany($allocations);
         $this->autoClose->closeIfEligible($note, $customerPayment->id());
 
-        $this->audit->record('payment_allocated', [
-            'payment_id' => $customerPayment->id(),
-            'note_id' => $note->id(),
-            'amount' => $payment['amount_paid_rupiah'],
-            'payment_method' => $customerPayment->paymentMethod(),
-            'amount_received' => $payment['method'] === CustomerPayment::METHOD_CASH
-                ? $payment['amount_received_rupiah']
-                : null,
-            'change' => $payment['method'] === CustomerPayment::METHOD_CASH
-                ? $payment['change_rupiah']
-                : null,
-            'allocation_count' => count($allocations),
-            'source' => 'transaction_workspace',
-            'decision' => $payment['decision'],
-        ]);
+        $this->audit->record(
+            'payment_allocated',
+            $this->auditPayloads->build($note, $customerPayment, $payment, $allocations)
+        );
 
-        return [
-            'decision' => $payment['decision'],
-            'amount_paid_rupiah' => $payment['amount_paid_rupiah'],
-            'change_rupiah' => $payment['change_rupiah'],
-        ];
+        return $this->summaries->paid($payment);
     }
 }
