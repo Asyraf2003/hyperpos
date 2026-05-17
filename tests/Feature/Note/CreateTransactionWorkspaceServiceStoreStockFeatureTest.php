@@ -330,4 +330,90 @@ final class CreateTransactionWorkspaceServiceStoreStockFeatureTest extends TestC
         ]);
     }
 
+    public function test_cashier_cannot_store_workspace_service_store_stock_package_total_below_sparepart_minimum(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Package Below Minimum',
+            'email' => 'service-store-stock-package-below-min@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('products')->insert([
+            'id' => 'product-package-below-min-1',
+            'kode_barang' => 'KB-PKG-BELOW-MIN-001',
+            'nama_barang' => 'Busi Racing',
+            'merek' => 'NGK',
+            'ukuran' => null,
+            'harga_jual' => 40000,
+        ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-package-below-min-1',
+            'qty_on_hand' => 10,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-package-below-min-1',
+            'avg_cost_rupiah' => 25000,
+            'inventory_value_rupiah' => 250000,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.create'))
+            ->post(route('notes.workspace.store'), [
+                'note' => [
+                    'customer_name' => 'Budi',
+                    'customer_phone' => '08123',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [[
+                    'entry_mode' => 'service',
+                    'part_source' => 'none',
+                    'pricing_mode' => 'package_auto_split',
+                    'package_total_rupiah' => 30000,
+                    'pay_now' => 0,
+                    'service' => [
+                        'name' => 'Servis Busi Racing',
+                        'price_rupiah' => 0,
+                        'notes' => '',
+                    ],
+                    'product_lines' => [[
+                        'product_id' => 'product-package-below-min-1',
+                        'qty' => 1,
+                        'unit_price_rupiah' => 40000,
+                    ]],
+                    'external_purchase_lines' => [[
+                        'label' => '',
+                        'qty' => '',
+                        'unit_cost_rupiah' => '',
+                    ]],
+                ]],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => '2026-03-15',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.workspace.create'));
+        $response->assertSessionHasErrors([
+            'workspace' => 'Harga paket tidak boleh lebih kecil dari total harga sparepart.',
+        ]);
+
+        $this->assertDatabaseCount('notes', 0);
+        $this->assertDatabaseCount('work_items', 0);
+        $this->assertDatabaseCount('work_item_service_details', 0);
+        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('customer_payments', 0);
+        $this->assertDatabaseCount('payment_component_allocations', 0);
+    }
+
 }
