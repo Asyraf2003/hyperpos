@@ -15,6 +15,29 @@
         <div class="row">
             <div class="col-12 col-lg-6">
                 <div class="form-group mb-3">
+                    <label class="form-label">Mode Harga</label>
+                    <select name="items[__INDEX__][pricing_mode]" class="form-select" data-pricing-mode>
+                        <option value="manual_split" selected>Input servis dan sparepart terpisah</option>
+                        <option value="package_auto_split">Total Paket (auto split)</option>
+                    </select>
+                    <small class="text-muted d-block mt-1">
+                        Total Paket menghitung harga servis dari sisa setelah harga minimum sparepart.
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="form-group mb-3" data-money-input-group>
+                    <label class="form-label">Total Paket (Rupiah)</label>
+                    <input type="hidden" name="items[__INDEX__][package_total_rupiah]" value="" data-money-raw>
+                    <input type="text" inputmode="numeric" value="" class="form-control" placeholder="Contoh: 150.000" data-money-display data-package-total-input>
+                    <small class="text-muted d-block mt-1">
+                        Isi hanya jika memakai mode Total Paket.
+                    </small>
+                </div>
+            </div>
+            <div class="col-12 col-lg-6">
+                <div class="form-group mb-3">
                     <label class="form-label">Nama Servis</label>
                     <input type="text" name="items[__INDEX__][service][name]" value="" class="form-control" placeholder="Contoh: Ganti Kampas Rem">
                 </div>
