@@ -4,6 +4,9 @@ include mk/hexagonal.mk
 push:
 	@$(MAKE) git-push
 
+pushc: push
+	@clear
+
 # >>> seed targets >>>
 .PHONY: seed seed-1 seed-2 seed-3 1 2 3
 
