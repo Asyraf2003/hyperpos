@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('employee_versions', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('employee_id');
-            $table->unsignedInteger('revision_no');
+            $table->integer('revision_no');
             $table->string('event_name');
             $table->string('changed_by_actor_id')->nullable();
             $table->text('change_reason')->nullable();

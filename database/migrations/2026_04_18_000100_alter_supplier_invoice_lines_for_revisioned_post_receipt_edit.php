@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('supplier_invoice_lines', function (Blueprint $table): void {
             if (! Schema::hasColumn('supplier_invoice_lines', 'revision_no')) {
-                $table->unsignedInteger('revision_no')->default(1)->after('supplier_invoice_id');
+                $table->integer('revision_no')->default(1)->after('supplier_invoice_id');
             }
 
             if (! Schema::hasColumn('supplier_invoice_lines', 'is_current')) {

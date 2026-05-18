@@ -21,14 +21,14 @@ return new class extends Migration
             $table->integer('grand_total_rupiah');
             $table->integer('total_paid_rupiah')->default(0);
             $table->integer('outstanding_rupiah')->default(0);
-            $table->unsignedInteger('payment_count')->default(0);
-            $table->unsignedInteger('receipt_count')->default(0);
+            $table->integer('payment_count')->default(0);
+            $table->integer('receipt_count')->default(0);
             $table->integer('total_received_qty')->default(0);
-            $table->unsignedInteger('proof_attachment_count')->default(0);
+            $table->integer('proof_attachment_count')->default(0);
             $table->string('lifecycle_status')->default('active');
             $table->string('payment_status')->default('outstanding');
             $table->timestamp('voided_at')->nullable();
-            $table->unsignedInteger('last_revision_no')->default(0);
+            $table->integer('last_revision_no')->default(0);
             $table->timestamp('projected_at');
 
             $table->index('supplier_id', 'silp_supplier_id_idx');

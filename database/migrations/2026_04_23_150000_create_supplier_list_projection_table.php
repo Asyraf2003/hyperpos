@@ -13,9 +13,9 @@ return new class extends Migration
         Schema::create('supplier_list_projection', function (Blueprint $table): void {
             $table->string('supplier_id')->primary();
             $table->string('nama_pt_pengirim');
-            $table->unsignedInteger('invoice_count')->default(0);
+            $table->integer('invoice_count')->default(0);
             $table->bigInteger('outstanding_rupiah')->default(0);
-            $table->unsignedInteger('invoice_unpaid_count')->default(0);
+            $table->integer('invoice_unpaid_count')->default(0);
             $table->date('last_shipment_date')->nullable();
             $table->timestamp('projected_at');
 

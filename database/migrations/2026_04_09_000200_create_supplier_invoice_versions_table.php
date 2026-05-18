@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('supplier_invoice_versions', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('supplier_invoice_id');
-            $table->unsignedInteger('revision_no');
+            $table->integer('revision_no');
             $table->string('event_name');
             $table->string('changed_by_actor_id')->nullable();
             $table->text('change_reason')->nullable();

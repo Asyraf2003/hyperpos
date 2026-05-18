@@ -15,13 +15,13 @@ return new class extends Migration
             $table->string('note_revision_id');
             $table->string('work_item_root_id')->nullable();
 
-            $table->unsignedInteger('line_no');
+            $table->integer('line_no');
             $table->string('transaction_type');
             $table->string('status');
 
             $table->string('service_label')->nullable();
-            $table->unsignedBigInteger('service_price_rupiah')->nullable();
-            $table->unsignedBigInteger('subtotal_rupiah')->default(0);
+            $table->bigInteger('service_price_rupiah')->nullable();
+            $table->bigInteger('subtotal_rupiah')->default(0);
 
             $table->json('payload')->nullable();
 

@@ -26,7 +26,7 @@ return new class extends Migration
             $table->integer('grand_total_rupiah');
             $table->timestamp('voided_at')->nullable();
             $table->text('void_reason')->nullable();
-            $table->unsignedInteger('last_revision_no')->default(0);
+            $table->integer('last_revision_no')->default(0);
 
             $table->index('supplier_id');
             $table->index('tanggal_pengiriman');

@@ -22,9 +22,9 @@ return new class extends Migration
             $table->integer('refunded_rupiah')->default(0);
             $table->integer('net_paid_rupiah')->default(0);
             $table->integer('outstanding_rupiah')->default(0);
-            $table->unsignedInteger('line_open_count')->default(0);
-            $table->unsignedInteger('line_close_count')->default(0);
-            $table->unsignedInteger('line_refund_count')->default(0);
+            $table->integer('line_open_count')->default(0);
+            $table->integer('line_close_count')->default(0);
+            $table->integer('line_refund_count')->default(0);
             $table->boolean('has_open_lines')->default(false);
             $table->boolean('has_close_lines')->default(false);
             $table->boolean('has_refund_lines')->default(false);

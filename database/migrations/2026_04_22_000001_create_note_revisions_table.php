@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('note_revisions', function (Blueprint $table): void {
             $table->string('id')->primary();
             $table->string('note_root_id');
-            $table->unsignedInteger('revision_number');
+            $table->integer('revision_number');
             $table->string('parent_revision_id')->nullable();
             $table->string('created_by_actor_id')->nullable();
             $table->text('reason')->nullable();
@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('customer_phone')->nullable();
             $table->date('transaction_date');
 
-            $table->unsignedBigInteger('grand_total_rupiah')->default(0);
-            $table->unsignedInteger('line_count')->default(0);
+            $table->bigInteger('grand_total_rupiah')->default(0);
+            $table->integer('line_count')->default(0);
 
             $table->timestamp('created_at');
             $table->timestamp('updated_at')->nullable();

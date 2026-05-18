@@ -16,7 +16,7 @@ return new class extends Migration
             }
 
             if (! Schema::hasColumn('notes', 'latest_revision_number')) {
-                $table->unsignedInteger('latest_revision_number')->default(0)->after('current_revision_id');
+                $table->integer('latest_revision_number')->default(0)->after('current_revision_id');
             }
         });
     }

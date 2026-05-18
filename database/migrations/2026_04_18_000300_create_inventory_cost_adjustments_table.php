@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('product_id');
             $table->string('source_type');
             $table->string('source_id');
-            $table->unsignedInteger('source_revision_no');
+            $table->integer('source_revision_no');
             $table->date('tanggal_penyesuaian');
             $table->integer('amount_delta_rupiah');
             $table->text('reason');
