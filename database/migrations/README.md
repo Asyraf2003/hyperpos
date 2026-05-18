@@ -397,3 +397,87 @@ The MySQL migration structure is being hardened toward a PostgreSQL-aligned targ
 Forbidden claim:
 
 The live system is already PostgreSQL-ready for production cutover.
+
+## Research Schema To Live Transition Model
+
+Status: Active working model
+
+This repository migration work is treated as a schema research and target-shape hardening track.
+
+The live system currently runs on MySQL.
+
+The purpose of editing and hardening these migrations is to make the target schema mature first, while keeping a physical record of before/after decisions.
+
+## Why Historical Migrations Are Being Edited Here
+
+In this research track, historical migrations may be edited to define the clean target schema.
+
+This is acceptable only because this work is not directly mutating the live MySQL database.
+
+The live database will not automatically receive these changes just because old migration files are edited.
+
+Live transition must be done later through explicit forward migration scripts, SQL transform scripts, or controlled export/import mapping.
+
+## Live Transition Strategy
+
+Allowed future transition path:
+
+1. keep live MySQL operational
+2. mature the target schema in this research codebase
+3. prove fresh schema rebuild
+4. prove seed/test compatibility
+5. create live transition SQL or migration scripts
+6. run dry-run migration against copied MySQL data
+7. import transformed data into PostgreSQL
+8. compare row counts by table
+9. reconcile all rupiah totals by finance domain
+10. rebuild projections from source tables
+11. run application tests against PostgreSQL
+12. prepare cutover and rollback runbook
+
+Forbidden live behavior:
+
+- running `migrate:fresh` on live
+- assuming edited historical migrations mutate live tables
+- dropping finance tables without backup and parity proof
+- migrating data without money reconciliation
+- treating projection tables as canonical financial truth
+- cutting over without rollback path
+
+## Data Preservation Rule
+
+Old live data must be preserved.
+
+Schema changes must be handled through mapping, not data loss.
+
+Examples:
+
+- MySQL unsigned integer values can map to PostgreSQL signed integer values when non-negative.
+- MySQL integer rupiah values remain integer rupiah values.
+- String domain IDs remain string IDs.
+- UUID domain IDs remain UUID-compatible string values.
+- JSON/text payloads must be classified before conversion.
+- Projection tables may be rebuilt from source if source tables are complete.
+
+## Current Research Proof
+
+Current fresh MySQL testing proof exists for the unsigned cleanup slice:
+
+- fresh migration completed
+- database feature tests passed
+- result: 26 tests / 241 assertions
+
+This proof validates the research target schema on fresh MySQL testing.
+
+It does not yet validate PostgreSQL runtime or live data migration.
+
+## Current Next Research Target
+
+Continue with PostgreSQL compatibility classification in this order:
+
+1. remaining unsigned fields
+2. MySQL layout helpers
+3. JSON/text payload fields
+4. timestamp/date semantics
+5. source/projection rebuild policy
+6. live SQL transition mapping
