@@ -27,11 +27,7 @@ return new class extends Migration
             'employment_status' => DB::raw('status'),
         ]);
 
-        Schema::table('employees', function (Blueprint $table): void {
-            $table->string('employee_name')->nullable(false)->change();
-            $table->string('salary_basis_type', 20)->nullable(false)->change();
-            $table->string('employment_status', 20)->nullable(false)->change();
-        });
+        $this->setEmployeeMasterColumnsNotNullable();
 
         Schema::table('employees', function (Blueprint $table): void {
             $table->dropColumn([
@@ -64,12 +60,7 @@ return new class extends Migration
             'status' => DB::raw('employment_status'),
         ]);
 
-        Schema::table('employees', function (Blueprint $table): void {
-            $table->string('name')->nullable(false)->change();
-            $table->bigInteger('base_salary')->nullable(false)->change();
-            $table->string('pay_period', 20)->nullable(false)->change();
-            $table->string('status', 20)->nullable(false)->change();
-        });
+        $this->setLegacyEmployeeColumnsNotNullable();
 
         Schema::table('employees', function (Blueprint $table): void {
             $table->dropColumn([
@@ -82,4 +73,60 @@ return new class extends Migration
             ]);
         });
     }
+    private function setEmployeeMasterColumnsNotNullable(): void
+    {
+        $this->setColumnsNotNullable('employees', [
+            'employee_name' => '`employee_name` varchar(255) NOT NULL',
+            'salary_basis_type' => '`salary_basis_type` varchar(20) NOT NULL',
+            'employment_status' => '`employment_status` varchar(20) NOT NULL',
+        ]);
+    }
+
+    private function setLegacyEmployeeColumnsNotNullable(): void
+    {
+        $this->setColumnsNotNullable('employees', [
+            'name' => '`name` varchar(255) NOT NULL',
+            'base_salary' => '`base_salary` bigint NOT NULL',
+            'pay_period' => '`pay_period` varchar(20) NOT NULL',
+            'status' => '`status` varchar(20) NOT NULL',
+        ]);
+    }
+
+    /**
+     * @param array<string, string> $mysqlDefinitions
+     */
+    private function setColumnsNotNullable(string $table, array $mysqlDefinitions): void
+    {
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            foreach (array_keys($mysqlDefinitions) as $column) {
+                DB::statement(sprintf(
+                    'ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL',
+                    $table,
+                    $column
+                ));
+            }
+
+            return;
+        }
+
+        if ($driver === 'mysql' || $driver === 'mariadb') {
+            foreach ($mysqlDefinitions as $definition) {
+                DB::statement(sprintf(
+                    'ALTER TABLE `%s` MODIFY %s',
+                    $table,
+                    $definition
+                ));
+            }
+
+            return;
+        }
+
+        throw new RuntimeException(sprintf(
+            'Unsupported database driver for employee nullability migration: %s',
+            $driver
+        ));
+    }
+
 };
