@@ -182,3 +182,141 @@ First technical target after this README:
   - migration rewrite candidate
 
 Do not start seeder rewrite before this classification is done.
+
+## Current Migration Compatibility Scan - unsigned/layout/text
+
+Status: Active classification target  
+Source command:
+
+    rg -n -- "unsignedInteger|unsignedBigInteger|->after\\(|->change\\(|mediumText|longText|enum" database/migrations
+
+## Scan Result Classification
+
+### 1. Framework-owned tables
+
+These are Laravel/framework tables. They are not domain financial truth and should not be patched in the first domain migration hardening slice.
+
+- `0001_01_01_000000_create_users_table.php`
+  - `longText('payload')`
+- `0001_01_01_000001_create_cache_table.php`
+  - `mediumText('value')`
+- `0001_01_01_000002_create_jobs_table.php`
+  - `longText('payload')`
+  - `longText('failed_job_ids')`
+  - `mediumText('options')`
+  - `longText('exception')`
+  - unsigned framework queue timestamps/counters
+
+Decision:
+
+- Keep for now.
+- Do not mix framework table cleanup with domain PostgreSQL-readiness work.
+
+### 2. MySQL layout helpers
+
+These are mostly column-order helpers. They are PostgreSQL-hostile as migration syntax style, but not domain truth by themselves.
+
+Detected patterns:
+
+- `->after(...)`
+- `->change()`
+
+Affected examples:
+
+- product/supplier soft-delete foundation
+- product search normalization
+- supplier invoice revision line additions
+- supplier receipt line snapshots
+- employee master v2 alteration
+- payment method/cash detail addition
+- current revision pointer on notes
+- operational timestamp additions
+
+Decision:
+
+- Do not mass-remove blindly.
+- Prefer removing or rewriting only when touching the same migration group.
+- `->change()` is higher risk than `->after()` because it can require DBAL/platform-specific behavior.
+
+### 3. Domain unsigned counters/revision numbers
+
+These represent non-negative counters or revision numbers.
+
+Affected fields include:
+
+- `supplier_invoices.last_revision_no`
+- `inventory_cost_adjustments.source_revision_no`
+- `supplier_invoice_lines.revision_no`
+- `employee_versions.revision_no`
+- `supplier_invoice_versions.revision_no`
+- `product_versions.revision_no`
+- `supplier_versions.revision_no`
+- `notes.latest_revision_number`
+- `note_revisions.revision_number`
+- `note_revisions.line_count`
+- `note_revision_lines.line_no`
+- projection counters such as line/payment/receipt/proof counts
+
+Decision:
+
+- PostgreSQL has no native unsigned type.
+- Future target should use signed integer/bigInteger plus explicit non-negative invariant.
+- Do not weaken current MySQL DB protection until replacement invariant is planned.
+- First patch candidate should classify each field as:
+  - counter
+  - revision number
+  - file size
+  - money
+  - projection count
+
+### 4. Domain unsigned money
+
+These are more sensitive than counters.
+
+Affected fields include:
+
+- `note_revisions.grand_total_rupiah`
+- `note_revision_lines.service_price_rupiah`
+- `note_revision_lines.subtotal_rupiah`
+
+Decision:
+
+- Money must stay integer rupiah.
+- Do not rely on unsigned as the only non-negative invariant.
+- Patch requires test proof that negative values are rejected in domain/application or DB constraint.
+- Do not patch together with counters unless proof scope stays small.
+
+### 5. Domain JSON/text payload
+
+Detected domain payload text:
+
+- `transaction_workspace_drafts.payload_json` as `longText`
+- `note_mutation_snapshots.payload_json` as `longText`
+
+Detected native JSON:
+
+- version snapshots
+- audit metadata
+- audit snapshots
+- note revision line payload
+
+Decision:
+
+- Keep text only when payload is opaque and not queried.
+- Prefer native JSON/JSONB direction when future PostgreSQL query/validation matters.
+- Do not convert without read/write compatibility tests.
+
+## First Safe Migration Refactor Order
+
+1. Counters/revision numbers classification.
+2. Domain unsigned money invariant proof.
+3. JSON/text payload classification.
+4. MySQL layout helper cleanup by touched group.
+5. Projection timestamp/materialization policy.
+6. Seeder adjustment only after migration contract is locked.
+
+## Current Goal Statement
+
+The goal is not to move to PostgreSQL now.
+
+The goal is to make the current MySQL schema mature, explicit, and PostgreSQL-aligned so a future PostgreSQL transition is significantly easier and less risky.
