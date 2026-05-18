@@ -320,3 +320,80 @@ Decision:
 The goal is not to move to PostgreSQL now.
 
 The goal is to make the current MySQL schema mature, explicit, and PostgreSQL-aligned so a future PostgreSQL transition is significantly easier and less risky.
+
+## Live MySQL Transition Note
+
+Status: Live-system safety note
+
+This project currently has a live MySQL database.
+
+Editing historical migration files does not change an already-migrated live MySQL database.
+
+These migration edits define the intended clean/fresh schema direction and make future PostgreSQL transition easier, but they are not a live schema migration by themselves.
+
+## Live Database Rule
+
+For the live MySQL database:
+
+- do not run `migrate:fresh`
+- do not assume edited old migration files alter existing live columns
+- do not drop/recreate finance-sensitive tables casually
+- use explicit forward migration, dump/restore transform, or PostgreSQL import mapping for live transition
+- every live transition step must have backup, rollback, row-count proof, money reconciliation proof, and projection rebuild proof
+
+## Current Fresh-Schema Proof
+
+Current local proof after unsigned cleanup:
+
+- fresh testing migration completed successfully
+- database feature tests passed
+- result: 26 tests / 241 assertions
+
+This proves the fresh MySQL schema can be rebuilt after the current migration hardening slice.
+
+This does not prove PostgreSQL production cutover.
+
+## Meaning Of Current Migration Edits
+
+Current edits move the target fresh schema away from MySQL-only unsigned domain assumptions.
+
+Changed categories:
+
+- revision numbers
+- line counters
+- projection counters
+- domain money fields in note revision tables
+
+Remaining intentionally unpatched:
+
+- Laravel framework job-table unsigned fields
+- supplier payment proof `file_size_bytes`
+- PostgreSQL runtime migration
+- live MySQL data transformation
+- PostgreSQL import/parity proof
+
+## PostgreSQL Transition Requirement
+
+Before live PostgreSQL transition can be claimed safe, the project still needs:
+
+1. MySQL live backup proof.
+2. MySQL schema snapshot.
+3. PostgreSQL fresh migration proof.
+4. Data export/import mapping.
+5. Row-count parity by table group.
+6. Integer rupiah reconciliation by finance domain.
+7. Payment/refund/allocation reconciliation.
+8. Inventory movement and projection reconciliation.
+9. Audit/version/projection rebuild proof.
+10. Application test suite against PostgreSQL.
+11. Cutover and rollback runbook.
+
+## Current Claim Allowed
+
+Allowed claim:
+
+The MySQL migration structure is being hardened toward a PostgreSQL-aligned target schema, and the current unsigned cleanup slice is fresh-schema verified on MySQL testing.
+
+Forbidden claim:
+
+The live system is already PostgreSQL-ready for production cutover.
