@@ -243,7 +243,7 @@ Current expected residual scan categories:
 - Rupiah reconciliation proof across live data does not exist yet.
 - Projection rebuild proof for migrated data does not exist yet.
 - change() cleanup is Focused Verified for employee master v2 migration.
-- payload_json longText classification is not handled yet.
+- payload_json JSON alignment is Focused Verified for note mutation snapshots and transaction workspace drafts.
 - file_size_bytes unsigned metadata decision is not handled yet.
 - Full PostgreSQL application test suite does not exist yet.
 - Cutover and rollback runbook does not exist yet.
@@ -348,7 +348,7 @@ Latest completed:
 Current residuals:
 
 - change() cleanup verified; clean scan has no remaining `->change()` in `database/migrations`.
-- payload_json longText remains in transaction workspace drafts and note mutation snapshots.
+- payload_json JSON alignment is Focused Verified for transaction workspace drafts and note mutation snapshots.
 - framework longText/mediumText remains skipped.
 - framework jobs unsigned remains skipped.
 - supplier_payment_proof_attachments.file_size_bytes remains metadata unsigned.
@@ -396,6 +396,34 @@ PROOF:
 - `php artisan migrate:fresh --env=testing` passed.
 - Clean migration scan found no remaining `->change()` in `database/migrations`.
 - `make verify` passed: 1063 tests / 5769 assertions.
+
+BOUNDARY:
+- This is research/target-schema readiness work.
+- This does not modify the live MySQL database by itself.
+- This does not claim production PostgreSQL cutover readiness.
+- Live transition still requires explicit forward migration, SQL transform, or export/import mapping.
+
+## Slice 4 - JSON payload column alignment
+
+Status: Focused Verified.
+
+FACT:
+- `database/migrations/2026_04_02_001100_create_note_mutation_snapshots_table.php` now declares `payload_json` with `$table->json('payload_json')`.
+- `database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php` now declares `payload_json` with `$table->json('payload_json')`.
+- MariaDB 12.2.2 reports these JSON columns physically as `longtext`, but the testing schema now includes `JSON_VALID(payload_json)` checks.
+- Explicit MariaDB check constraints are present:
+  - `nms_payload_json_valid_chk`
+  - `twd_payload_json_valid_chk`
+- `tests/Feature/Database/JsonPayloadSchemaTest.php` verifies JSON-native type or validated JSON alias storage.
+- Seeder work remains intentionally out of scope until migration/system readiness is mature.
+
+PROOF:
+- Syntax check passed for both target migrations and `JsonPayloadSchemaTest`.
+- `php artisan migrate:fresh --env=testing` passed.
+- Testing DB metadata proof used `php artisan --env=testing tinker`.
+- Testing DB is `bengkelhex_test` on MariaDB `12.2.2-MariaDB`.
+- `JsonPayloadSchemaTest` passed: 1 test / 6 assertions.
+- `make verify` passed: 1064 tests / 5775 assertions.
 
 BOUNDARY:
 - This is research/target-schema readiness work.
