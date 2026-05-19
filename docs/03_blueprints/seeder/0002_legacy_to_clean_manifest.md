@@ -506,3 +506,60 @@ Next candidate after docs closure:
 
 Inspect and characterize `ProductScenarioActiveBasicSeeder` rerun noisy behavior
 with a RED test before any runtime patch.
+
+## Source Inspection Update 4 - ProductScenarioActiveBasicSeeder Idempotency Verification
+
+Date: 2026-05-19.
+
+Scope:
+
+- `database/seeders/Product/ProductScenarioActiveBasicSeeder.php`
+- `tests/Feature/Seeder/ProductSeederIdempotencyFeatureTest.php`
+
+Status:
+
+`ProductScenarioActiveBasicSeeder` is locally verified for rerun warning and
+state stability.
+
+No runtime patch was required in this slice.
+
+Current source behavior:
+
+- reads the deterministic `active_basic` catalog;
+- trims each product code;
+- skips creation when `productCodeAlreadySeeded($code)` returns true;
+- creates rows through `CreateProductHandler`;
+- logs warning only when handler creation fails.
+
+Verification proof:
+
+- syntax proof: `php -l database/seeders/Product/ProductScenarioActiveBasicSeeder.php` passed.
+- syntax proof: `php -l tests/Feature/Seeder/ProductSeederIdempotencyFeatureTest.php` passed.
+- targeted active-basic proof passed:
+  - `1 passed / 127 assertions`
+- focused product seeder proof passed:
+  - `2 passed / 190 assertions`
+
+Classification impact:
+
+- `database/seeders/Product/ProductScenarioActiveBasicSeeder.php`
+  remains `LEGACY_COMPATIBILITY`;
+- target remains `CLEAN_SCENARIO_SEED`;
+- risk remains `MEDIUM` at migration level because the full product seeder
+  contract is not clean yet;
+- the active-basic scenario rerun warning/state-growth behavior is locally
+  verified as stable.
+
+Explicit scope limit:
+
+- does not claim full `ProductSeeder` clean contract;
+- does not claim all product scenario seeders are clean;
+- does not claim make 2 or make 3 full idempotency;
+- does not replace legacy seeder entrypoints;
+- does not rename seeders;
+- does not rename Makefile targets.
+
+Next candidate after docs closure:
+
+Inspect `ProductScenarioEditedSeeder` for rerun warning, lifecycle stability,
+and scenario matrix coverage before any runtime patch.
