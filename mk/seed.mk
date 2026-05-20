@@ -36,3 +36,6 @@ inventory: seed-inventory
 .PHONY: seed-create-default
 seed-create-default:
 	php artisan db:seed --class='Database\Seeders\DatabaseSeeder'
+
+procurement:
+	php artisan db:seed --class="Database\Seeders\CreateOnly\CreateSupplierProcurementSeeder"
