@@ -26,6 +26,13 @@ seed-create-year:
 .PHONY: product-year
 product-year: seed-create-year
 
+.PHONY: seed-inventory
+seed-inventory:
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateInventorySeeder'
+
+.PHONY: inventory
+inventory: seed-inventory
+
 .PHONY: seed-create-default
 seed-create-default:
 	php artisan db:seed --class='Database\Seeders\DatabaseSeeder'
