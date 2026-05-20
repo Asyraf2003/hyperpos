@@ -33,9 +33,10 @@ abstract class CreateOnlyMasterSeeder extends Seeder
     {
         for ($i = 1; $i <= $count; $i++) {
             $name = sprintf('Supplier Demo %s %03d', strtoupper($prefix), $i);
+            $id = $this->id('sup', $prefix, $i);
 
-            $this->createOnly('suppliers', 'id', $this->id('sup', $prefix, $i), [
-                'id' => $this->id('sup', $prefix, $i),
+            $this->createOnly('suppliers', 'id', $id, [
+                'id' => $id,
                 'nama_pt_pengirim' => $name,
                 'nama_pt_pengirim_normalized' => $this->normalize($name),
                 'deleted_at' => null,
@@ -48,13 +49,14 @@ abstract class CreateOnlyMasterSeeder extends Seeder
     protected function seedProducts(string $prefix, int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
+            $id = $this->id('prod', $prefix, $i);
             $name = sprintf('Barang Demo %s %03d', strtoupper($prefix), $i);
-            $brand = sprintf('Merek %02d', (($i - 1) % 20) + 1);
+            $brand = sprintf('Merek %s %02d', strtoupper($prefix), (($i - 1) % 20) + 1);
             $size = (($i - 1) % 10) + 1;
             $price = 15000 + ($i * 2500);
 
-            $this->createOnly('products', 'id', $this->id('prod', $prefix, $i), [
-                'id' => $this->id('prod', $prefix, $i),
+            $this->createOnly('products', 'id', $id, [
+                'id' => $id,
                 'kode_barang' => sprintf('%s-P%04d', strtoupper($prefix), $i),
                 'nama_barang' => $name,
                 'merek' => $brand,
@@ -74,13 +76,28 @@ abstract class CreateOnlyMasterSeeder extends Seeder
     protected function seedEmployees(string $prefix, int $count): void
     {
         for ($i = 1; $i <= $count; $i++) {
-            $this->createOnly('employees', 'id', $this->employeeId($prefix, $i), [
-                'id' => $this->employeeId($prefix, $i),
-                'name' => sprintf('Karyawan Demo %s %03d', strtoupper($prefix), $i),
+            $id = $this->employeeId($prefix, $i);
+            $name = sprintf('Karyawan Demo %s %03d', strtoupper($prefix), $i);
+
+            $this->createOnly('employees', 'id', $id, [
+                'id' => $id,
+
+                // Final employee master v2 columns.
+                'employee_name' => $name,
+                'salary_basis_type' => 'monthly',
+                'default_salary_amount' => 2500000 + ($i * 50000),
+                'employment_status' => 'active',
+                'started_at' => now()->toDateString(),
+                'ended_at' => null,
+
+                // Legacy columns are included only for pre-v2 migrated local DBs.
+                // filterExistingColumns() removes them when final schema already dropped them.
+                'name' => $name,
                 'phone' => sprintf('0800%08d', $i),
                 'base_salary' => 2500000 + ($i * 50000),
                 'pay_period' => 'monthly',
                 'status' => 'active',
+
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
