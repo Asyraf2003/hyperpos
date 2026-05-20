@@ -19,13 +19,13 @@ final class CreateUserSeeder extends Seeder
 
         $adminId = $this->createUserOnly(
             name: 'Admin Demo',
-            email: 'admin@hyperpos.local',
+            email: 'admin@@gmail.com',
             password: self::DEFAULT_LOCAL_PASSWORD,
         );
 
         $userId = $this->createUserOnly(
             name: 'User Demo',
-            email: 'user@hyperpos.local',
+            email: 'kasir@gmail.com',
             password: self::DEFAULT_LOCAL_PASSWORD,
         );
 
@@ -37,7 +37,7 @@ final class CreateUserSeeder extends Seeder
     private function assertLocalOrTesting(): void
     {
         if (! app()->environment(['local', 'testing'])) {
-            throw new RuntimeException(self::class . ' is only allowed in local/testing environments.');
+            throw new RuntimeException(self::class.' is only allowed in local/testing environments.');
         }
     }
 

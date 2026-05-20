@@ -164,7 +164,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
         });
 
         foreach ($created as $table => $count) {
-            $this->command?->info($table . ' created=' . $count);
+            $this->command?->info($table.' created='.$count);
         }
     }
 
@@ -176,7 +176,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param  array<string, mixed>  $values
      */
     private function insertIfMissing(string $table, string $id, array $values): bool
     {
@@ -190,7 +190,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
     }
 
     /**
-     * @param array<string, mixed> $values
+     * @param  array<string, mixed>  $values
      * @return array<string, mixed>
      */
     private function filterExistingColumns(string $table, array $values): array
@@ -201,7 +201,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
     }
 
     /**
-     * @param list<string> $columns
+     * @param  list<string>  $columns
      */
     private function stringFromRow(object $row, array $columns, string $fallback): string
     {
@@ -221,7 +221,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
     }
 
     /**
-     * @param list<string> $columns
+     * @param  list<string>  $columns
      */
     private function nullableStringFromRow(object $row, array $columns): ?string
     {
@@ -241,7 +241,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
     }
 
     /**
-     * @param list<string> $columns
+     * @param  list<string>  $columns
      */
     private function nullableIntFromRow(object $row, array $columns): ?int
     {
