@@ -13,3 +13,5 @@ pushc: push
 docs-help:
 	@cat docs/DOCS_HELP.md
 # <<< docs targets <<<
+
+include mk/seed.mk
