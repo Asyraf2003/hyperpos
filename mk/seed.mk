@@ -1,6 +1,6 @@
 .PHONY: seed-user
 seed-user:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateUserSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateUserSeeder'
 
 .PHONY: user
 user: seed-user
@@ -8,14 +8,14 @@ user: seed-user
 
 .PHONY: seed-audit-baseline
 seed-audit-baseline:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateAuditBaselineSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateAuditBaselineSeeder'
 
 .PHONY: audit-baseline
 audit-baseline: seed-audit-baseline
 
 .PHONY: seed-create-basic
 seed-create-basic:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateMasterBasicSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateMasterBasicSeeder'
 
 .PHONY: product-1
 product-1: seed-create-basic
@@ -23,7 +23,7 @@ product-1: seed-create-basic
 
 .PHONY: seed-create-week
 seed-create-week:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateMasterDenseWeekSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateMasterDenseWeekSeeder'
 
 .PHONY: product-2
 product-2: seed-create-week
@@ -31,7 +31,7 @@ product-2: seed-create-week
 
 .PHONY: seed-create-year
 seed-create-year:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateMasterDenseYearSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateMasterDenseYearSeeder'
 
 .PHONY: product-year
 product-year: seed-create-year
@@ -39,7 +39,7 @@ product-year: seed-create-year
 
 .PHONY: seed-inventory
 seed-inventory:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateInventorySeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateInventorySeeder'
 
 .PHONY: inventory
 inventory: seed-inventory
@@ -47,11 +47,11 @@ inventory: seed-inventory
 
 .PHONY: seed-create-default
 seed-create-default:
-	php artisan db:seed --class='Database\\Seeders\\DatabaseSeeder'
+	php artisan db:seed --class='Database\Seeders\DatabaseSeeder'
 
 .PHONY: seed-procurement
 seed-procurement:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateSupplierProcurementSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateSupplierProcurementSeeder'
 
 .PHONY: procurement
 procurement: seed-procurement
@@ -59,7 +59,7 @@ procurement: seed-procurement
 
 .PHONY: seed-supplier-payment
 seed-supplier-payment:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateSupplierPaymentSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateSupplierPaymentSeeder'
 
 .PHONY: supplier-payment
 supplier-payment: seed-supplier-payment
@@ -67,7 +67,7 @@ supplier-payment: seed-supplier-payment
 
 .PHONY: seed-expense
 seed-expense:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateOperationalExpenseSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateOperationalExpenseSeeder'
 
 .PHONY: expense
 expense: seed-expense
@@ -75,7 +75,7 @@ expense: seed-expense
 
 .PHONY: seed-admin-cashier-area-access
 seed-admin-cashier-area-access:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateAdminCashierAreaAccessSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateAdminCashierAreaAccessSeeder'
 
 .PHONY: admin-cashier-area-access
 admin-cashier-area-access: seed-admin-cashier-area-access
@@ -83,7 +83,7 @@ admin-cashier-area-access: seed-admin-cashier-area-access
 
 .PHONY: seed-employee-debt
 seed-employee-debt:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateEmployeeDebtSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateEmployeeDebtSeeder'
 
 .PHONY: employee-debt
 employee-debt: seed-employee-debt
@@ -91,7 +91,7 @@ employee-debt: seed-employee-debt
 
 .PHONY: seed-employee-debt-payment
 seed-employee-debt-payment:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateEmployeeDebtPaymentSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateEmployeeDebtPaymentSeeder'
 
 .PHONY: employee-debt-payment
 employee-debt-payment: seed-employee-debt-payment
@@ -99,7 +99,7 @@ employee-debt-payment: seed-employee-debt-payment
 
 .PHONY: seed-employee-debt-adjustment
 seed-employee-debt-adjustment:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreateEmployeeDebtAdjustmentSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateEmployeeDebtAdjustmentSeeder'
 
 .PHONY: employee-debt-adjustment
 employee-debt-adjustment: seed-employee-debt-adjustment
@@ -107,7 +107,7 @@ employee-debt-adjustment: seed-employee-debt-adjustment
 
 .PHONY: seed-payroll-disbursement
 seed-payroll-disbursement:
-	php artisan db:seed --class='Database\\Seeders\\CreateOnly\\CreatePayrollDisbursementSeeder'
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreatePayrollDisbursementSeeder'
 
 .PHONY: payroll-disbursement
 payroll-disbursement: seed-payroll-disbursement
