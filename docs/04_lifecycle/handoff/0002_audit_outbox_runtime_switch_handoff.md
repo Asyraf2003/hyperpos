@@ -3,9 +3,9 @@
 ## Metadata
 - Date: 2026-05-23
 - Slice / topic: Audit outbox runtime switch
-- Workflow step: handoff after global binding switch proof found test expectation gaps
-- Status: continue in next session
-- Progress: audit outbox foundation, processor, pilot binding, and global binding attempt completed; test expectation fix pending
+- Workflow step: handoff after global binding switch test expectation fix proof
+- Status: Phase 4 selected regression proven; monitoring remains separate future step
+- Progress: audit outbox foundation, processor, pilot binding, global binding, and old-expectation test patch completed/proven
 
 ## Target Work Page
 
@@ -13,10 +13,15 @@ Continue audit runtime work under:
 
 - `docs/03_blueprints/audit/0001_transactional_outbox_audit_runtime.md`
 - `docs/03_blueprints/audit/0002_audit_write_path_matrix.md`
+- `tests/Feature/AuditLog/DatabaseAuditEventWriterAdapterTest.php`
+- `tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php`
+- `tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php`
+- `tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php`
+- `docs/03_blueprints/audit/0002_audit_write_path_matrix.md`
 
 Current next target:
 
-- fix tests after global `AuditEventWriterPort` binding switch to `DatabaseAuditOutboxWriterAdapter`
+- choose one new explicit step after Phase 4 proof; monitoring remains unimplemented and must not start without a new active step
 
 ## References Used
 
@@ -32,8 +37,9 @@ Current next target:
   - `docs/03_blueprints/audit/0001_transactional_outbox_audit_runtime.md`
   - `docs/03_blueprints/audit/0002_audit_write_path_matrix.md`
 - Latest operator output:
-  - global binding switch selected regression produced 17 passed, 4 failed, 105 assertions
-  - failure cause: tests still expected immediate `audit_events` after global outbox binding
+  - old-expectation tests after global binding switch were patched to staged outbox semantics
+  - `php -l` passed for all four touched tests
+  - selected audit/expense regression passed with 21 tests and 138 assertions
 
 ## Locked Facts
 
@@ -48,7 +54,8 @@ Current next target:
 - Broader test-only expense category outbox binding regression passed.
 - Global binding switch was attempted in `app/Providers/InfrastructureServiceProvider.php`.
 - After global binding switch, actual `AuditEventWriterPort` resolves to `DatabaseAuditOutboxWriterAdapter`.
-- After global binding switch, selected regression produced 4 failing old-expectation tests.
+- After global binding switch, old-expectation tests were patched to staged outbox semantics.
+- After the patch, selected audit/expense regression passed with 21 tests and 138 assertions.
 
 ## Scope Used
 
@@ -59,6 +66,7 @@ Current next target:
 - Test-only outbox binding pilot.
 - Global binding switch attempt.
 - Focused audit/expense regression.
+- Old-expectation test patch for selected audit/expense regression.
 
 ### SCOPE-OUT
 - Payment/refund/allocation/stock/transaction-heavy flows.
@@ -70,20 +78,15 @@ Current next target:
 
 ## GAP
 
-- `DatabaseAuditEventWriterAdapterTest` still resolves `AuditEventWriterPort`; after global binding switch this no longer tests direct materializer.
-- `UpdateExpenseCategoryFeatureTest` still expects immediate canonical `audit_events`.
-- `ActivateExpenseCategoryFeatureTest` still expects immediate canonical `audit_events`.
-- `DeactivateExpenseCategoryFeatureTest` still expects immediate canonical `audit_events`.
-- Expense feature tests must be updated to assert outbox staging then processor materialization.
-- Blueprint/matrix progress has not yet been updated after the global binding attempt.
 - Minimal pending/failed monitoring is not implemented.
 - `make verify` still has unrelated PHPStan seeder class errors from product seeder tests.
+- Full-suite verification beyond the selected audit/expense regression has not been provided in this handoff.
 
 ## Locked Decisions
 
 - Do not rollback global binding unless new proof shows the outbox design is invalid.
 - Do not switch to payment/refund/stock/transaction-heavy flows yet.
-- Do not add monitoring before fixing current failing test expectations.
+- Do not add monitoring without opening a new explicit step after Phase 4 proof.
 - Direct materializer tests should instantiate or resolve `DatabaseAuditEventWriterAdapter` concrete directly.
 - Runtime feature tests should reflect outbox semantics after global binding:
   - audit is staged in `audit_outbox`;
@@ -149,28 +152,38 @@ Current next target:
   - result: 17 passed, 4 failed, 105 assertions
   - meaning: global binding switch worked for new outbox tests, but old tests still expected direct canonical audit writes
 
+- command:
+  - `php -l tests/Feature/AuditLog/DatabaseAuditEventWriterAdapterTest.php`
+  - `php -l tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php`
+  - `php -l tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php`
+  - `php -l tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php`
+  - result: no syntax errors detected for all four touched tests
+  - meaning: old-expectation test patch has valid PHP syntax
+
+- command:
+  - `wc -l tests/Feature/AuditLog/DatabaseAuditEventWriterAdapterTest.php tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php`
+  - result: 98, 96, 80, and 80 lines
+  - meaning: all touched tests satisfy the <= 100 lines rule
+
+- command:
+  - selected audit/expense regression after old-expectation test patch
+  - result: 21 passed, 138 assertions
+  - meaning: Phase 4 global outbox binding is proven for the selected audit/expense regression scope
+
 ## Risks / Follow-up Notes
 
-- Failing tests are expected after binding switch because their expectations still target immediate `audit_events`.
-- Updating tests is safer than rolling back binding because the new runtime contract is staged audit plus processor materialization.
-- `DatabaseAuditEventWriterAdapterTest` should not use `AuditEventWriterPort` after global binding switch.
-- Expense category feature tests should prove outbox runtime behavior, not direct writer behavior.
+- Phase 4 selected regression is proven, but this does not prove full application regression.
+- Minimal pending/failed audit outbox monitoring remains unimplemented.
 - `make verify` failure from product seeder PHPStan is unrelated to audit outbox runtime and should be handled in a separate step.
-- Keep all new/changed code and tests at or below 100 lines per file.
+- Payment/refund/allocation/stock/transaction-heavy flows remain excluded.
+- Further runtime audit expansion must start from a new explicit active step with source and test proof.
 
 ## Next Step
 
-Patch only the failing tests after global outbox binding:
+Choose one new active step only:
 
-- `tests/Feature/AuditLog/DatabaseAuditEventWriterAdapterTest.php`
-- `tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php`
-- `tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php`
-- `tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php`
+- close/update docs and handoff after current proof;
+- implement minimal pending/failed audit outbox monitoring;
+- remediate unrelated `make verify` product seeder PHPStan issue.
 
-Expected behavior after patch:
-
-- direct materializer test uses concrete `DatabaseAuditEventWriterAdapter`;
-- expense feature tests assert `audit_outbox` pending before processor;
-- expense feature tests run `audit:outbox:process`;
-- expense feature tests assert canonical `audit_events` and snapshots after processor;
-- selected audit/expense regression passes.
+Do not start payment/refund/allocation/stock/transaction-heavy audit migration from this handoff.

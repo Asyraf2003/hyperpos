@@ -2,11 +2,11 @@
 
 ## Status
 
-Draft analysis + blueprint.
+Blueprint plus implementation progress tracker for the current audit outbox runtime slice.
 
-This document is not an implementation proof.
+This document records the intended design and the latest operator-proven progress.
 
-This document does not modify runtime behavior.
+Local command output remains the proof; this document is not a substitute for running verification.
 
 This document does not authorize broad transaction-flow refactor.
 
@@ -83,7 +83,7 @@ Latest proven progress from local operator output:
 - Phase 1 migration and adapter: implemented and focused tests passed.
 - Phase 2 processor: implemented and focused tests passed.
 - Phase 3 pilot binding in test: implemented and focused tests passed.
-- Phase 4 global runtime binding switch: attempted and partially proven.
+- Phase 4 global runtime binding switch: completed and selected regression passed after test expectation patch.
 - Phase 5 monitoring: not implemented.
 
 Current Phase 4 status:
@@ -91,28 +91,23 @@ Current Phase 4 status:
 - `AuditEventWriterPort` runtime binding was changed to `DatabaseAuditOutboxWriterAdapter`.
 - Runtime binding test passed.
 - Expense category HTTP update staged audit to `audit_outbox` and processor materialized canonical audit in focused proof.
-- Selected regression still has old-expectation failures because some tests expect immediate writes to `audit_events`.
-- Next required work is to update those tests to the staged audit runtime contract.
+- Old-expectation tests were patched to follow staged audit runtime semantics.
+- Selected audit/expense regression passed with 21 tests and 138 assertions.
+- Phase 4 is proven for the selected audit/expense regression scope.
 
 ## GAP
 
-Runtime proof has not been executed in this document.
-
 No local benchmark exists yet for current synchronous audit overhead.
 
-No complete audit writer usage map exists yet.
+No complete audit writer usage map exists beyond the active matrix slice.
 
-No mutation-by-mutation audit mode matrix exists yet.
+No retry dead-letter or pending/failed audit monitoring has been implemented yet.
 
-No outbox schema exists yet.
-
-No outbox processor command exists yet.
-
-No retry, dead-letter, or pending audit monitoring exists yet.
-
-No PostgreSQL parity test exists yet for the proposed outbox table.
+No PostgreSQL parity test exists yet for the outbox table.
 
 No API response contract has been defined for audit processing state.
+
+Full `make verify` proof is still blocked by unrelated product seeder PHPStan issues noted in handoff.
 
 ## Current Behavior Analysis
 

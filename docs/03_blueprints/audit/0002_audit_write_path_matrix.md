@@ -2,13 +2,13 @@
 
 ## Status
 
-Draft readiness matrix.
+Readiness matrix plus proven outbox pilot/global-binding progress notes.
 
-This document is not implementation proof.
+This document is not a replacement for local command proof.
 
-This document does not authorize audit outbox implementation.
+Audit outbox implementation and global binding switch were authorized and proven later by operator output and handoff.
 
-This document does not authorize switching `AuditEventWriterPort` binding to an outbox writer.
+Transaction-heavy flows remain excluded from this slice.
 
 ## Source Snapshot
 
@@ -20,22 +20,25 @@ Local proof provided by owner:
 
 ## Purpose
 
-Map the current HyperPOS audit write paths before changing audit runtime behavior.
+Map the current HyperPOS audit write paths while migrating audit runtime behavior in controlled slices.
 
-The immediate goal is to prevent unsafe migration from legacy `AuditLogPort` writes to canonical `AuditEventWriterPort` or future audit outbox without knowing which mutation flows are affected.
+The immediate goal is to prevent unsafe expansion from the proven expense category outbox slice into legacy audit or transaction-heavy flows without source and test proof.
 
 ## Binding Facts
 
-Current binding from source inventory:
+Current binding from latest active handoff and operator proof:
 
-- `AuditEventWriterPort` is bound to `DatabaseAuditEventWriterAdapter`.
-- `AuditLogPort` is bound to `DatabaseAuditLogAdapter`.
+- `AuditEventWriterPort` is bound globally to `DatabaseAuditOutboxWriterAdapter`.
+- `DatabaseAuditEventWriterAdapter` remains the concrete canonical materializer used by the outbox processor and direct adapter test.
+- `AuditLogPort` remains bound to `DatabaseAuditLogAdapter`.
 
-Current runtime implication:
+Current runtime implication for proven canonical expense category flows:
 
-- canonical audit events are written directly to `audit_events` and `audit_event_snapshots`;
-- legacy audit events are written to `audit_logs`;
-- no runtime `audit_outbox` file was found in `app`, `database`, or `tests` during local file check.
+- canonical audit writes are staged to `audit_outbox`;
+- `audit_events` and `audit_event_snapshots` remain empty before processor execution;
+- `audit:outbox:process` materializes canonical audit records;
+- processed outbox rows are marked `processed`;
+- legacy `audit_logs` remains untouched for these canonical expense category tests.
 
 ## Canonical Audit Path
 
@@ -124,7 +127,11 @@ Possible later pilot candidates after source and test proof:
 - identity access capability enable / disable
 - identity access capability used audit
 
-These are only candidates, not decisions.
+Expense category update / activate / deactivate are no longer only candidates for this slice.
+
+They are the proven canonical audit outbox pilot group for the current selected regression scope.
+
+Identity access remains only a possible later candidate.
 
 ## Pilot Progress
 
@@ -133,20 +140,24 @@ These are only candidates, not decisions.
 | Update expense category canonical audit | `1d608443` | `php -l` for handler/test; `php artisan test tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php tests/Feature/Expense/UpdateExpenseCategoryHttpFeatureTest.php tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php` passed with 6 tests and 35 assertions | completed |
 | Activate expense category canonical audit | `b5ed69a6` | `php -l` for handler/test; `php artisan test tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php` passed with 5 tests and 35 assertions | completed |
 | Deactivate expense category canonical audit | `1b62d18a` | `php -l` for handler/test; `php artisan test tests/Feature/Expense/DeactivateExpenseCategoryFeatureTest.php tests/Feature/Expense/DeactivateExpenseCategoryHttpFeatureTest.php tests/Feature/Expense/ActivateExpenseCategoryFeatureTest.php tests/Feature/Expense/ActivateExpenseCategoryHttpFeatureTest.php tests/Feature/Expense/UpdateExpenseCategoryFeatureTest.php` passed with 6 tests and 50 assertions | completed |
+| Audit outbox Phase 1 migration and writer | local operator proof | migration syntax passed; `DatabaseAuditOutboxWriterAdapterTest` passed | completed |
+| Audit outbox Phase 2 processor | local operator proof | materialization, duplicate-run, and failure command tests passed | completed |
+| Expense category outbox pilot binding | local operator proof | pilot staged audit to `audit_outbox` and processor materialized canonical audit | completed |
+| Global `AuditEventWriterPort` outbox binding | local operator proof | selected audit/expense regression passed with 21 tests and 138 assertions after old-expectation tests were patched | completed |
 
-## Required Proof Before Any Outbox Implementation
+## Required Proof Before Further Outbox Expansion
 
-Before implementing `audit_outbox`, provide:
+Before expanding beyond the proven expense category slice, provide:
 
-1. owner approval of first pilot flow;
-2. source inspection for the selected pilot;
+1. owner approval of the next flow;
+2. source inspection for the selected flow;
 3. red/green or characterization test for existing audit behavior;
-4. proof of current legacy audit payload;
-5. migration design for `audit_outbox`;
-6. adapter test for outbox writer;
-7. processor test for canonical materialization;
-8. retry/failure behavior proof;
-9. duplicate processor run proof;
+4. proof of current audit payload shape;
+5. proof that the flow is not payment/refund/allocation/stock/transaction-heavy;
+6. focused outbox staging proof;
+7. processor canonical materialization proof;
+8. retry/failure behavior proof when relevant;
+9. duplicate processor run proof when relevant;
 10. proof that canonical `audit_events` and `audit_event_snapshots` are materialized correctly.
 
 ## Stop Conditions
@@ -163,14 +174,12 @@ Stop before implementation if:
 
 ## Next Active Step
 
-Read source and tests for one candidate group before choosing a pilot.
+Do not expand runtime audit coverage from this matrix without a new explicit active step.
 
-Recommended candidate group for inspection:
+Safe next candidates are separate decisions:
 
-- expense category update / activate / deactivate
+- docs/handoff closure for the proven Phase 4 selected regression;
+- minimal pending/failed audit outbox monitoring;
+- unrelated `make verify` seeder PHPStan remediation.
 
-Reason:
-
-- non-transaction category maintenance is likely lower risk than payment, refund, stock, procurement, or employee finance;
-- source snippets show before/after payload for update;
-- still requires source and test proof before decision.
+Payment/refund/allocation/stock/transaction-heavy flows remain excluded.
