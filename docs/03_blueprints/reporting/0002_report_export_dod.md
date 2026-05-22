@@ -1,357 +1,230 @@
 # Report and Dashboard Export Definition of Done
 
 ## Status
+
 Draft.
-This file defines completion criteria for report and dashboard exports.
-It is not proof that export implementation is complete.
+This file defines the completion criteria for report and dashboard exports.
+It is not proof that the export implementation is complete.
 
 ## Metadata
+
 - Date: 2026-05-01
 - Scope: PDF and Excel export for reports and dashboard
 
 ## Purpose
 
-Mengunci syarat selesai untuk export PDF dan Excel agar fitur tidak dianggap selesai hanya karena tombol download muncul.
+Lock the completion criteria for PDF and Excel export so the feature is not treated as done just because a download button exists.
 
-Tombol download tanpa parity adalah dekorasi berbahaya. Cantik, bisa diklik, dan diam-diam menusuk laporan.
+A download button without parity is a dangerous decoration. It looks nice, it can be clicked, and it can quietly stab the report.
 
 ## Global DoD
 
-Export baru boleh dianggap selesai jika semua poin berikut terpenuhi:
+An export may only be considered complete if all of the following are true:
 
-source screen terbukti
-dataset export memakai source yang sama dengan screen
-PDF tidak memakai query bisnis sendiri
-Excel tidak memakai query bisnis sendiri
-filter screen = filter export
-summary screen = summary export
-detail sum = summary
-PDF maksimal 1 bulan
-Excel maksimal 1 tahun
-access control sama dengan screen
-rupiah Excel numeric
-PDF readable untuk cetak
-export tidak memperlambat page load normal
-targeted tests pass
-relevant existing report tests pass
-audit/performance proof dicatat bila scope menyentuh area itu
+- screen source is proven
+- export dataset uses the same source as the screen
+- PDF does not use its own business query
+- Excel does not use its own business query
+- screen filter = export filter
+- screen summary = export summary
+- detail sum = summary
+- PDF maximum = 1 month
+- Excel maximum = 1 year
+- access control matches the screen
+- Excel rupiah values are numeric
+- PDF is readable for printing
+- export does not slow down the normal page load
+- targeted tests pass
+- relevant existing report tests pass
+- audit / performance proof is recorded if the scope touches that area
+
 ## Source Contract DoD
 
-Wajib ada proof untuk:
+Proof is required for:
 
-route screen
-route export PDF
-route export Excel
-controller
-use case
-read model/query
-Blade/screen columns
-filter inputs
-date basis
-status inclusion
-total fields
+- screen route
+- PDF export route
+- Excel export route
+- controller
+- use case
+- read model / query
+- Blade / screen columns
+- filter inputs
+- date basis
+- status inclusion
+- total fields
 
-Tidak boleh ada GAP pada:
+There may be no GAP in:
 
-source nominal utama
-source tanggal utama
-source status inclusion
-source total utama
+- the main source of nominal amounts
+- the main source of dates
+- the main source of status inclusion
+- the main source of totals
 
-GAP yang masih boleh sementara:
+The only gaps that may remain temporarily are:
 
-styling final PDF
-optional chart rendering
-optional audit event for export
-queued export
+- final PDF styling
+- optional chart rendering
+- optional export audit event
+- queued export
+
 ## PDF DoD
 
-PDF export selesai jika:
+PDF export is complete if:
 
-hanya menerima range maksimal 1 bulan
-metadata tampil
-periode tampil
-basis tanggal tampil
-generated_at tampil
-generated_by tampil jika actor tersedia
-summary tampil
-detail tampil atau empty state tampil
-total sama dengan dataset
-file dapat dibuka
-filename aman dan jelas
-tidak ada error internal bocor
-access unauthorized ditolak
+- it accepts only a maximum range of 1 month
+- metadata appears
+- period appears
+- basis date appears
+- `generated_at` appears
+- `generated_by` appears if an actor is available
+- summary appears
+- detail appears or an empty state appears
+- the total matches the dataset
+- the file opens correctly
+- the filename is safe and clear
+- no internal error leaks out
+- unauthorized access is rejected
 
-### PDF validation
+### PDF Validation
 
-range lebih dari 1 bulan ditolak
-invalid date/month ditolak
-user tanpa akses ditolak
+- range greater than 1 month is rejected
+- invalid date / month is rejected
+- user without access is rejected
 
-### PDF proof
+### PDF Proof
 
-test generate PDF 1 bulan
-test invalid range
-test unauthorized
-test content metadata/summary
-manual open/download jika memungkinkan
+- test PDF generation for 1 month
+- test invalid range
+- test unauthorized access
+- test content metadata / summary
+- manually open / download when possible
+
 ## Excel DoD
 
-Excel export selesai jika:
+Excel export is complete if:
 
-maksimal range 1 tahun / 366 hari
-workbook punya Metadata sheet
-workbook punya Summary sheet
-workbook punya Details sheet
-Reconciliation sheet ada bila report kompleks
-rupiah numeric
-qty numeric
-date konsisten
-summary sama dengan dataset
-detail row count sama dengan dataset
-filter metadata sama dengan request
-file dapat dibuka
-filename aman dan jelas
-access unauthorized ditolak
+- it accepts a maximum range of 1 year / 366 days
+- the workbook has a Metadata sheet
+- the workbook has a Summary sheet
+- the workbook has a Details sheet
+- a Reconciliation sheet exists when the report is complex
+- rupiah is numeric
+- quantity is numeric
+- dates are consistent
+- summary matches the dataset
+- detail row count matches the dataset
+- filter metadata matches the request
+- the file opens correctly
+- the filename is safe and clear
+- unauthorized access is rejected
 
-### Excel validation
+### Excel Validation
 
-range lebih dari 1 tahun ditolak
-invalid date/year/month ditolak
-user tanpa akses ditolak
+- range greater than 1 year is rejected
+- invalid date / year / month is rejected
+- user without access is rejected
 
-### Excel proof
+### Excel Proof
 
-test generate Excel 1 tahun
-test invalid range
-test unauthorized
-test metadata sheet
-test numeric rupiah
-test summary/detail parity
+- test Excel generation for 1 year
+- test invalid range
+- test unauthorized access
+- test Metadata sheet
+- test numeric rupiah
+- test summary / detail parity
+
 ## Screen PDF Excel Parity DoD
 
-Wajib lulus:
+The following must pass:
 
-screen summary = dataset summary
-PDF summary = dataset summary
-Excel summary = dataset summary
-detail sum = summary
-filter parity
-period boundary parity
-empty state parity
-refund/payment/outstanding parity untuk Laporan Transaksi
+- screen summary = dataset summary
+- PDF summary = dataset summary
+- Excel summary = dataset summary
+- detail sum = summary
+- filter parity
+- period boundary parity
+- empty state parity
+- refund / payment / outstanding parity for the Transaction Report
 
-### Mismatch rule
+### Mismatch Rule
 
-selisih 1 rupiah = fail
-selisih 1 qty = fail
-missing row = fail
-wrong period inclusion = fail
+- 1 rupiah difference = fail
+- 1 quantity difference = fail
+- missing row = fail
+- wrong period inclusion = fail
+
 ## Dashboard Export DoD
 
-Dashboard PDF selesai jika:
+Dashboard PDF is complete if:
 
-snapshot 1 bulan
-tidak memakai JS/chart sebagai source data
-summary reconcile dengan dashboard payload
-metadata periode tampil
-generated_at tampil
-generated_by tampil jika tersedia
-PDF readable
-tidak memperlambat /admin/dashboard
+- it is a 1-month snapshot
+- it does not use JS / chart data as the source
+- summary reconciles with the dashboard payload
+- period metadata appears
+- `generated_at` appears
+- `generated_by` appears if available
+- PDF is readable
+- it does not slow down `/admin/dashboard`
 
-Dashboard Excel selesai jika:
+Dashboard Excel is complete if:
 
-maksimal 1 tahun
-workbook multi-sheet
-sheet summary tersedia
-metric sheets tersedia
-value numeric
-dashboard summary reconcile dengan source report/dashboard dataset
-tidak memakai chart/DOM sebagai source data
+- maximum range is 1 year
+- the workbook is multi-sheet
+- a summary sheet exists
+- metric sheets exist
+- values are numeric
+- the dashboard summary reconciles with the source report / dashboard dataset
+- chart / DOM is not used as the source data
+
 ## Performance DoD
 
 Minimum:
 
-normal screen page tidak mengeksekusi export generation
-export action hanya berjalan saat route export dipanggil
-query count tidak menunjukkan N+1 brutal
-PDF 1 bulan selesai dalam threshold yang disepakati
-Excel 1 tahun selesai dalam threshold yang disepakati atau ditandai sebagai queued candidate
+- the normal screen page does not run export generation
+- the export action only runs when the export route is called
+- query count does not show a brutal N+1
+- PDF for 1 month finishes within the agreed threshold
+- Excel for 1 year finishes within the agreed threshold or is marked as a queued candidate
 
 ### GAP
 
-threshold angka final belum dikunci.
-threshold harus diputuskan setelah audit dataset/report pertama.
+- the final threshold numbers have not been locked
+- the threshold must be decided after the first dataset / report audit
 
-Temporary threshold recommendation untuk local proof:
+Temporary threshold recommendation for local proof:
 
-PDF 1 bulan: target < 3 detik pada dataset realistis
-Excel 1 tahun: target < 10 detik pada dataset realistis
-dashboard/report page normal: tidak boleh naik signifikan akibat tombol export
-Security DoD
+- PDF for 1 month: target `< 3 seconds` on a realistic dataset
+- Excel for 1 year: target `< 10 seconds` on a realistic dataset
+- normal dashboard / report page: must not increase significantly because of the export button
 
-Wajib:
+## Security DoD
 
-route export pakai auth
-route export pakai middleware role/access yang sama dengan screen
-forbidden user tidak bisa export
-filename tidak mengandung data sensitif berlebihan
-error tidak leak SQL/internal stack
-export tidak membuka public temporary URL tanpa kontrol akses
+Required:
 
-Optional, dibahas di sesi audit:
+- export route uses auth
+- export route uses the same role / access middleware as the screen
+- forbidden users cannot export
+- filenames do not contain excessive sensitive data
+- errors do not leak SQL / internal stack traces
+- the export does not open a public temporary URL without access control
 
-audit event saat export
-export row_count metadata
-export checksum metadata
-export history
-Auditability DoD
+Optional, to be discussed in an audit session:
 
-Untuk setiap export implementation handoff, wajib tulis:
+- export audit event
+- export row-count metadata
+- export checksum metadata
+- export history
 
-report key
-format export
-actor/access rule
-period rule
-source dataset
-tests run
-proof output
-remaining GAP
+## Auditability DoD
 
-Jika export action diaudit:
+For every export implementation handoff, write:
 
-audit tidak menyimpan isi file penuh
-audit menyimpan actor
-audit menyimpan report_key
-audit menyimpan format
-audit menyimpan period/filter
-audit menyimpan generated_at
-audit menyimpan row_count jika tersedia
-Documentation DoD
-
-Wajib update:
-
-blueprint jika ada keputusan desain berubah
-workflow jika urutan berubah
-DoD jika syarat selesai berubah
-handoff setelah implementasi session
-ADR hanya jika keputusan permanen lintas sistem dikunci
-Final Review Checklist
-
-Sebelum merge/commit final export report:
-
-git diff --check
-targeted tests export
-targeted tests report source
-auth/access tests
-parity tests
-performance sanity
-file length audit jika repo mewajibkan
-no query duplication
-no JS business calculation
-no formatting value mutation
-manual download/open proof bila memungkinkan
-Diskusi Tampilan yang Dikunci Dulu
-PDF
-
-DECISION:
-
-PDF harus ringkas, bukan tempat menumpahkan seluruh database. Untuk report detail, PDF satu bulan sudah tepat.
-
-Default tampilan:
-
-header berisi nama report
-subheader berisi periode dan basis tanggal
-metadata kecil di kanan/kiri: generated_at, generated_by
-summary cards/table di halaman pertama
-detail table setelah summary
-footer berisi page number dan report key
-empty state tetap printable
-landscape untuk tabel yang lebar
-
-Untuk dashboard PDF:
-
-jangan terlalu banyak detail
-fokus ke summary owner
-tampilkan konteks periode
-chart boleh ada kalau mudah, tapi angka tetap dari dataset
-kalau chart membuat PDF rumit, tunda chart; angka dulu, seni rupa nanti
-Excel
-
-DECISION:
-
-Excel harus data-first.
-
-Workbook minimal:
-
-Metadata
-Summary
-Details
-
-Untuk dashboard:
-
-Metadata
-Dashboard Summary
-Cashflow
-Operational Performance
-Inventory
-Top Selling
-Supplier Payable
-Reconciliation Notes
-
-Rules tampilan:
-
-header row bold boleh
-freeze header boleh
-autofilter boleh
-no merged cells untuk data table
-rupiah numeric
-tanggal konsisten
-summary jangan menggantikan detail
-detail jangan kehilangan row karena pagination screen
-Tombol UI
-
-Di screen report:
-
-tombol Cetak PDF
-tombol Export Excel
-tampilkan hint:
-PDF: maksimal 1 bulan
-Excel: maksimal 1 tahun
-
-Jika filter melebihi limit:
-
-disable tombol PDF atau validasi saat klik
-tampilkan pesan jelas: PDF hanya dapat dicetak untuk periode maksimal 1 bulan. Gunakan Excel untuk analisis periode lebih panjang.
-
-Untuk dashboard:
-
-Cetak Snapshot PDF
-Export Dashboard Excel
-Scope Split untuk Sesi Berikutnya
-Sesi Audit
-
-Tujuan:
-
-baca repo
-mapping route/controller/usecase/query/view untuk Laporan Transaksi
-cek apakah dataset reusable
-cek filter dan columns screen
-cek test yang sudah ada
-cek akses route
-hasilnya berupa audit report + GAP
-
-Tidak implementasi.
-
-Sesi Eksekusi
-
-Tujuan:
-
-tambah file docs dulu jika belum
-implement Excel Laporan Transaksi
-implement PDF Laporan Transaksi
-test parity
-handoff proof
-
-Tidak menyentuh semua report sekaligus. Kita bukan sedang melempar granat ke codebase.
+- report key
+- export format
+- actor / access rule
+- period rule
+- source dataset
+- tests run
+- proof output
+- remaining GAP

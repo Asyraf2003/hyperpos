@@ -1,296 +1,230 @@
 # Report and Dashboard Export V1 Workflow
 
 ## Status
+
 Draft.
 
 ## Metadata
+
 - Date: 2026-05-01
 - Scope: PDF and Excel export workflow
 
 ## Goal
 
-Memberikan urutan kerja implementasi export PDF dan Excel agar tidak merusak reporting, dashboard, performa, atau auditability.
+Provide an implementation order for PDF and Excel export that does not damage reporting, dashboard behavior, performance, or auditability.
 
 ## Global Rules
-Satu sesi hanya boleh punya satu active report/export target.
-Jangan implementasi PDF dan Excel untuk semua report sekaligus.
-Jangan mulai dari dashboard export.
-Jangan mulai dari tampilan PDF.
-Mulai dari dataset contract.
-Excel dibuat sebelum PDF untuk membuktikan angka.
-PDF dibuat setelah dataset dan Excel parity jelas.
-Dashboard export terakhir.
-Tidak boleh klaim selesai tanpa test/proof.
-Tidak boleh menaikkan progress hanya karena blueprint sudah ada.
+
+- A single session may only have one active report / export target.
+- Do not implement PDF and Excel for every report at once.
+- Do not start with dashboard export.
+- Do not start with the PDF layout.
+- Start with the dataset contract.
+- Build Excel before PDF so the numbers can be proven first.
+- Build PDF only after dataset and Excel parity are clear.
+- Dashboard export is last.
+- Do not claim completion without tests / proof.
+- Do not increase progress just because the blueprint exists.
+
 ## Phase 0 - Documentation Lock
 
 Goal:
 
-blueprint export dibuat
-workflow export dibuat
-DoD export dibuat
-scope audit dan eksekusi dipisah
+- create the export blueprint
+- create the export workflow
+- create the export DoD
+- separate audit scope from execution scope
 
 Output:
 
-blueprint path jelas
-workflow path jelas
-DoD path jelas
-tidak ada kode export dibuat
+- blueprint path is clear
+- workflow path is clear
+- DoD path is clear
+- no export code is created
 
 Exit condition:
 
-dokumen disetujui
-active implementation target belum dibuka
+- the documents are approved
+- the active implementation target is not yet opened
+
 ## Phase 1 - Audit Existing Report Screen
 
 Goal:
 
-Membuktikan source screen sebelum export dibuat.
+Prove the source of the screen before export is created.
 
-Active target pertama:
+Active first target:
 
-Laporan Transaksi
+- Transaction Report
 
 Audit checklist:
 
-route screen
-controller
-use case
-query/read model
-Blade table columns
-filter inputs
-summary cards
-total fields
-date basis
-status inclusion
-dashboard dependency
-existing tests
+- screen route
+- controller
+- use case
+- query / read model
+- Blade table columns
+- filter inputs
+- summary cards
+- total fields
+- date basis
+- status inclusion
+- dashboard dependency
+- existing tests
 
 Output:
 
-source mapping report
-GAP list
-decision apakah dataset sudah reusable atau perlu adapter dataset kecil
+- report source map
+- GAP list
+- a decision on whether the dataset is reusable or needs a small dataset adapter
 
 Forbidden:
 
-membuat export route
-menambah dependency PDF/Excel
-mengubah formula report
+- creating an export route
+- adding PDF / Excel dependencies
+- changing the report formula
 
 Exit condition:
 
-source mapping terbukti dari repo
-screen contract tertulis
-GAP minimum ditutup atau diberi explicit blocker
+- the source map is proven from the repo
+- the screen contract is written down
+- the minimum GAP is closed or given an explicit blocker
+
 ## Phase 2 - Export Dataset Contract
 
 Goal:
 
-Membuat contract dataset yang akan dipakai screen/PDF/Excel.
+Create the dataset contract that will be used by the screen, PDF, and Excel.
 
 Output contract:
 
-metadata
-filters
-summary rows
-detail rows
-totals
-reconciliation rows optional
-filename base
+- metadata
+- filters
+- summary rows
+- detail rows
+- totals
+- reconciliation rows optional
+- filename base
 
 Rules:
 
-dataset tidak boleh mengubah formula
-dataset boleh membungkus hasil report existing
-dataset harus cukup untuk PDF dan Excel
-dataset harus testable tanpa render PDF/Excel
+- the dataset may not change formulas
+- the dataset may wrap the existing report result
+- the dataset must be enough for both PDF and Excel
+- the dataset must be testable without rendering PDF / Excel
 
 Exit condition:
 
-unit/feature test dataset contract lulus
-screen behavior tidak berubah
+- unit / feature tests for the dataset contract pass
+- screen behavior does not change
+
 ## Phase 3 - Excel Export First
 
 Goal:
 
-Membuat Excel dari dataset yang sama.
+Create Excel from the same dataset.
 
 Why Excel first:
 
-angka lebih mudah diverifikasi
-numeric type bisa diuji
-detail row bisa dibandingkan dengan dataset
-layout lebih sederhana daripada PDF
+- numbers are easier to verify
+- numeric types can be tested
+- detail rows can be compared to the dataset
+- the layout is simpler than PDF
 
 Implementation checklist:
 
-route export Excel
-controller transport-only
-Excel writer adapter
-metadata sheet
-summary sheet
-detail sheet
-filename policy
-max range 1 tahun validation
-role/middleware sama dengan screen
+- export route for Excel
+- controller is transport-only
+- Excel writer adapter
+- metadata sheet
+- summary sheet
+- detail sheet
+- filename policy
+- maximum range validation of 1 year
+- role / middleware must match the screen
 
 Test checklist:
 
-authorized user can export
-unauthorized user cannot export
-invalid range rejected
-summary value equals dataset
-detail row count equals dataset
-numeric rupiah not string
-filter parity
+- authorized user can export
+- unauthorized user cannot export
+- invalid range is rejected
+- summary value equals dataset
+- detail row count equals dataset
+- rupiah is numeric, not a string
+- filter parity
 
 Exit condition:
 
-targeted tests pass
-no formula mismatch
-normal screen test still pass
+- targeted tests pass
+- no formula mismatch
+- the normal screen tests still pass
+
 ## Phase 4 - PDF Export Second
 
 Goal:
 
-Membuat PDF dari dataset yang sama.
+Create PDF from the same dataset.
 
 Implementation checklist:
 
-route export PDF
-controller transport-only
-PDF writer adapter
-monthly range validation
-PDF view/template
-metadata header
-summary section
-detail table
-footer/page number if supported
-filename policy
+- export route for PDF
+- controller is transport-only
+- PDF writer adapter
+- monthly range validation
+- PDF view / template
+- metadata header
+- summary section
+- detail table
+- footer / page number if supported
+- filename policy
 
 Test checklist:
 
-authorized user can export
-unauthorized user cannot export
-invalid range rejected
-PDF generated for 1 month
-PDF content contains key metadata
-PDF content contains summary total
-PDF uses same dataset as screen/export contract
+- authorized user can export
+- unauthorized user cannot export
+- invalid range is rejected
+- PDF is generated for 1 month
+- PDF content contains the key metadata
+- PDF content contains the summary total
+- PDF uses the same dataset as the screen / export contract
 
 Exit condition:
 
-targeted PDF tests pass
-no screen regression
-no route/middleware regression
+- targeted PDF tests pass
+- no screen regression
+- no route / middleware regression
+
 ## Phase 5 - Parity Tests
 
 Goal:
 
-Membuktikan screen/PDF/Excel parity.
+Prove screen / PDF / Excel parity.
 
-Test minimum:
+Minimum tests:
 
-screen dataset total = export dataset total
-Excel total = export dataset total
-PDF visible total = export dataset total
-detail sum = summary
-filter parity
-boundary date
-empty state
-refund/payment/outstanding exactness for transaction report
+- screen dataset total = export dataset total
+- Excel total = export dataset total
+- PDF visible total = export dataset total
+- detail sum = summary
+- filter parity
+- boundary date
+- empty state
+- refund / payment / outstanding exactness for the Transaction Report
 
 Exit condition:
 
-parity tests pass
-mismatch 1 rupiah fails
+- parity tests pass
+- 1 rupiah mismatch fails
+
 ## Phase 6 - Performance Sanity
 
 Goal:
 
-Membuktikan export tidak merusak page load.
+Prove export does not damage page load.
 
 Checks:
 
-normal report page load tidak menghitung export
-export route query count bounded
-PDF 1 month under acceptable local threshold
-Excel 1 year under acceptable local threshold or marked queued-export candidate
-
-Exit condition:
-
-performance proof recorded
-if slow, do not silently accept; decide optimization or queued export backlog
-## Phase 7 - Replicate to Other Reports
-
-Order:
-
-Laporan Transaksi
-Arus Kas Transaksi
-Biaya Operasional
-Hutang Karyawan
-Laba Kas Operasional
-Hutang Supplier
-Stok dan Nilai Persediaan
-Dashboard
-
-Rules:
-
-each report gets its own audit/source mapping
-do not copy blindly
-each report must have parity tests
-dashboard waits until source reports stable
-## Phase 8 - Dashboard Export
-
-Goal:
-
-Export dashboard as snapshot/analysis workbook.
-
-Dashboard PDF:
-
-monthly snapshot
-summary-first
-no detail overload
-generated metadata
-chart optional visual only
-
-Dashboard Excel:
-
-max 1 year
-multi-sheet workbook
-data-first
-sheets reconcile to dashboard/report source
-
-Exit condition:
-
-dashboard PDF/Excel generated from dashboard/report dataset
-no JS/chart source dependency
-no added load to dashboard page
-dashboard export tests pass
-Stop Conditions
-
-Stop implementation if:
-
-source report contract unclear
-screen itself has mismatch
-report formula is unstable
-export needs new query not shared with screen
-period policy conflicts with existing filter behavior
-role/access boundary unclear
-export performance is unbounded
-audit requirement conflicts with current audit design
-Handoff Rule
-
-Every export implementation session must record:
-
-active report
-files changed
-source dataset
-route names
-period policy
-tests run
-proof output
-remaining GAP
-next active step
+- normal report page load does not compute export
+- export route query count is bounded
+- PDF for 1 month stays within the acceptable local threshold
+- Excel for 1 year stays within the acceptable local threshold or is marked as a queued-export candidate

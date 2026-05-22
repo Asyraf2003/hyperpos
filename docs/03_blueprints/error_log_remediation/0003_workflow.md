@@ -1,486 +1,233 @@
 # Error Log Remediation Workflow
 
 - **Status:** Planning workflow.
-- **Scope:** workflow eksekusi perbaikan docs/04_lifecycle/error_log/.
-- **Non-goal:** dokumen ini bukan patch source, bukan klaim fix, dan bukan instruksi membuat seeder.
-## Tujuan
+- **Scope:** execution workflow for fixes in `docs/04_lifecycle/error_log/`.
+- **Non-goal:** this document is not a source patch, not a fix claim, and not an instruction to create a seeder.
 
-- Workflow ini menjadi prosedur rigid untuk memproses seluruh masalah di docs/04_lifecycle/error_log/ sebagai satu rangkaian masalah yang saling bergantung, bukan daftar issue independen.
-**Tujuan utamanya:**
-- memastikan setiap klaim berbasis dokumen, source, dan command proof
-- memisahkan status dokumen dari status sebenarnya di source
-- mencegah patch yang hanya memindahkan bug antar flow
-- menjaga perbaikan dari domain, application, infrastructure, HTTP/controller, Blade, native JS, security, audit, sampai dokumentasi
-- menghentikan closure ketika proof tidak cukup
+## Purpose
+
+- This workflow is a rigid procedure for processing every issue in `docs/04_lifecycle/error_log/` as one dependent chain, not as a list of independent issues.
+- Its main goals are:
+  - make every claim based on documents, source, and command proof
+  - separate document status from actual source status
+  - prevent patches that only move bugs from one flow to another
+  - keep fixes aligned across domain, application, infrastructure, HTTP/controller, Blade, native JS, security, audit, and documentation
+  - stop closure when proof is insufficient
+
 ## Non-Goals
 
-**Sesi ini tidak boleh:**
-- mengimplementasikan bugfix
-- membuat atau mengubah seeder
-- menjalankan perubahan production source
-- menganggap status Patched, Fixed, atau Fixed with proof sebagai benar tanpa verifikasi silang
-- mengklaim semua docs/04_lifecycle/error_log/ selesai
-- melakukan commit atau push
-- memakai UI hiding sebagai security boundary
-- menutup issue tanpa RED proof, focused proof, dan docs alignment yang sesuai scope
-- Seeder berada di luar workflow utama sesi ini. Seeder hanya boleh disebut sebagai dependency, residual risk, atau future scope.
+- This session must not:
+  - implement bug fixes
+  - create or change seeder code
+  - run production source changes
+  - treat `Patched`, `Fixed`, or `Fixed with proof` as true without cross-verification
+  - claim all `docs/04_lifecycle/error_log/` issues are done
+  - commit or push
+  - use UI hiding as a security boundary
+  - close an issue without RED proof, focused proof, and the required docs alignment
+- Seeder is outside the main workflow for this session. Seeder may only be mentioned as a dependency, residual risk, or future scope.
+
 ## Source Priority
 
-**Keputusan harus mengikuti urutan prioritas ini:**
-- docs/04_lifecycle/error_log/
-- sumber utama daftar masalah
-- petakan issue, status, scope, proof, gap, risiko, dan relasi
-- status dokumen tidak otomatis dipercaya
-- docs/03_blueprints/security/
-- batasan security, auditability, redaction, authorization, upload/proof, access control, hardening
-- blueprint 2026-05-06 ADR-0019 dipakai untuk access boundary
-- blueprint 2026-05-06 ADR-0020 dipakai untuk output, URL, storage, attachment, dan disclosure
-- Dokumen bertanggal 2026-05-05 dan 2026-05-06
-- cari patch notes, workflow, owner decision, dan blueprint yang relevan
-- dokumen tanggal baru punya bobot lebih kuat bila lebih spesifik
-- docs/02_architecture/adr/
-- ADR terbaru menang atas ADR lama jika konflik
-- jika ADR lama dan baru konflik, tulis konflik, path dokumen, dan keputusan yang dipakai
-- jika ada dokumen lebih spesifik daripada ADR umum, dokumen spesifik dapat menang untuk slice itu
-- docs/03_blueprints/
-**workflow baru harus selaras dengan:**
-- docs/03_blueprints/error_log_remediation/strict-closure-protocol.md
-- docs/03_blueprints/finance/finance-residual-workflow.md
-- workflow ADR/security yang relevan
-- source dan local command output tetap menang atas workflow lama jika ada konflik
+- Decisions must follow this priority:
+  - `docs/04_lifecycle/error_log/`
+  - the primary source of issue listings
+  - map issue, status, scope, proof, gap, risk, and relation
+  - document status is not trusted automatically
+  - `docs/03_blueprints/security/`
+  - security, auditability, redaction, authorization, upload/proof, access control, hardening boundaries
+  - blueprint dated `2026-05-06` for ADR-0019 as the access boundary
+  - blueprint dated `2026-05-06` for ADR-0020 as output, URL, storage, attachment, and disclosure
+  - documents dated `2026-05-05` and `2026-05-06`
+  - search for relevant patch notes, workflow, owner decisions, and blueprints
+  - newer documents have more weight when they are more specific
+  - `docs/02_architecture/adr/`
+  - newer ADRs win over older ADRs if they conflict
+  - if an older and newer ADR conflict, record the conflict, the document paths, and the decision used
+  - if a more specific document exists than a general ADR, the specific document can win for that slice
+  - `docs/03_blueprints/`
+  - the new workflow must align with:
+    - `docs/03_blueprints/error_log_remediation/strict-closure-protocol.md`
+    - `docs/03_blueprints/finance/finance-residual-workflow.md`
+    - relevant ADR / security workflows
+  - source and local command output still win over the old workflow if there is a conflict
+
 ## Evidence Labels
 
-**Gunakan label ini secara konsisten:**
-- **FACT:** terbukti dari dokumen, source, atau command output
-- **GAP:** belum terbukti, proof kurang, test belum jalan, source belum dicek, atau scope belum jelas
-- **RISK:** potensi bug, security issue, regression, data corruption, leakage, atau audit failure
-- **DECISION:** keputusan workflow yang direkomendasikan untuk eksekusi
-- **DOD:** syarat selesai yang bisa diverifikasi
-## Trust Status Untuk Error Log
+- Use these labels consistently:
+  - **FACT:** proven by a document, source, or command output
+  - **GAP:** not proven yet, proof is missing, the test has not run, the source has not been checked, or the scope is not clear
+  - **RISK:** possible bug, security issue, regression, data corruption, leakage, or audit failure
+  - **DECISION:** a workflow decision recommended for execution
+  - **DOD:** a completion condition that can be verified
 
-**Setiap error log harus diberi status kepercayaan kerja:**
-- **trusted:** dokumen punya root cause, source map, RED/GREEN atau targeted/focused proof yang cukup untuk scope yang diklaim
-- **weak:** ada patch atau klaim fixed, tetapi proof kurang, test gagal, hanya syntax check, atau ada residual besar
-- **contradicted:** dokumen bertentangan dengan dokumen lain, source, atau test proof
-- **unknown:** dokumen/source belum cukup dibaca
-- Status kepercayaan tidak sama dengan status dokumen.
-## Prinsip Utama
+## Trust Status for Error Logs
 
-- Satu active slice saja.
-- Tidak pindah slice sebelum proof slice aktif lengkap.
-- Source dan test proof menang atas status dokumen.
-- ADR terbaru menang atas ADR lama, kecuali dokumen yang lebih spesifik memberi aturan lebih tepat.
-- RED proof harus ada sebelum patch, kecuali mustahil dan alasan mustahil dicatat.
-- Patch harus minimal dan berada pada boundary yang benar.
-- UI Blade dan native JS wajib direview bila issue punya dampak layar, form, link, config, atau action.
-- Security boundary selalu server-side.
-- Audit/log/redaction harus diverifikasi untuk mutation, payment, refund, proof attachment, capability, dan sensitive read.
-- Closure dokumen hanya setelah source, test, UI/security review, dan residual gap dicatat.
+- Every error log must receive a work-confidence status:
+  - **trusted:** the document has a root cause, source map, and enough RED/GREEN or targeted/focused proof for the claimed scope
+  - **weak:** there is a patch or a claim, but proof is missing, the test failed, only syntax checks exist, or the residual is still large
+  - **contradicted:** the document conflicts with another document, the source, or test proof
+  - **unknown:** the document/source has not been read enough yet
+- Trust status is not the same as document status.
+
+## Main Principles
+
+- Only one active slice at a time.
+- Do not move to the next slice before the active slice has complete proof.
+- Source and test proof win over document status.
+- Newer ADRs win over older ADRs, unless a more specific document gives a more precise rule.
+- RED proof must exist before a patch, unless it is impossible and the reason is recorded.
+- The patch must be minimal and stay on the correct boundary.
+- UI Blade and native JS must be reviewed whenever the issue affects screen, form, link, config, or action behavior.
+- Security boundaries are always server-side.
+- Audit / log / redaction must be verified for mutation, payment, refund, proof attachment, capability, and sensitive read.
+- A closure document is only allowed after source, tests, UI / security review, and residual gaps are recorded.
+
 ## Step-by-Step Workflow
 
 ### Step 0 - Baseline Intake
 
-**FACT yang harus dikumpulkan:**
-- branch dan HEAD saat eksekusi
-- git status --short --untracked-files=all
-- daftar seluruh docs/04_lifecycle/error_log/*.md
-- jumlah error log aktual
-- daftar dokumen blueprint/security/ADR/workflow relevan
-- status dokumen per issue
-- proof yang diklaim per issue
-- issue yang punya konflik atau residual gap
-**Gate:**
-- semua error log sudah terpetakan
-- semua issue diberi trust status awal
-- semua relasi antar issue dicatat
-- tidak ada source patch
-**Stop condition:**
-- jumlah error log tidak cocok dengan dokumen audit tanpa penjelasan
-- ada file error_log yang tidak terbaca
-- ada dokumen yang mengklaim fixed tetapi proof tidak bisa dilacak
-### Step 1 - Cluster dan Dependency Mapping
+- Collect:
+  - branch and HEAD at the time of execution
+  - `git status --short --untracked-files=all`
+  - all `docs/04_lifecycle/error_log/*.md`
+  - the actual number of error logs
+  - relevant blueprint / security / ADR / workflow documents
+  - the status of each issue document
+  - proof claimed by each issue
+  - issues with conflicts or residual gaps
+- Gate:
+  - all error logs are mapped
+  - all issues have an initial trust status
+  - all relationships between issues are recorded
+  - no source patch has been made
+- Stop condition:
+  - the number of error logs does not match the audit document without explanation
+  - an error_log file cannot be read
+  - a document claims `fixed` but the proof cannot be traced
 
-- Kelompokkan issue berdasarkan dependency dan domain impact, bukan nomor file.
-**Minimal cluster:**
-- current vs historical operational rows
-- settlement/payment basis
-- revision and payment concurrency
-- access/capability/date-window boundary
-- refund lifecycle and terminal state
-- price basis authority
-- output context, Blade, JS, unsafe URL
-- storage/public helper/attachment proof
-- seeder credential safety as future scope
-- final global verification
-**Gate:**
-- setiap issue punya upstream dan downstream dependency
-- issue yang boleh digabung dalam satu slice sudah jelas
-- issue yang harus dipisah sudah jelas
-- issue yang tidak boleh dikerjakan dulu karena proof/source map/dependency belum jelas sudah ditandai
-**Stop condition:**
-- ada issue finance/refund/access yang diperlakukan independen padahal bergantung pada settlement, current projection, atau access boundary
-- ada issue UI yang dikerjakan sebelum server-side guard jelas
-- ada seeder masuk active workflow tanpa instruksi eksplisit
+### Step 1 - Cluster and Dependency Mapping
+
+- Group issues by dependency and domain impact, not by file number.
+- Minimum clusters:
+  - current vs historical operational rows
+  - settlement / payment basis
+  - revision and payment concurrency
+  - access / capability / date-window boundary
+  - refund lifecycle and terminal state
+  - price basis authority
+  - output context, Blade, JS, unsafe URL
+  - storage / public helper / attachment proof
+  - seeder credential safety as future scope
+  - final global verification
+- Gate:
+  - every issue has upstream and downstream dependencies
+  - issues that may be combined in one slice are clearly identified
+  - issues that must be split are clearly identified
+  - issues that must not be worked on yet because proof / source map / dependency is unclear are marked
+- Stop condition:
+  - a finance / refund / access issue is treated independently even though it depends on settlement, current projection, or access boundary
+  - a UI issue is worked on before the server-side guard is clear
+  - seeder enters the active workflow without explicit instruction
+
 ### Step 2 - Source Inspection
 
-- Untuk active slice, baca source sekarang, bukan hanya dokumen.
-**Wajib cari:**
-- file produksi terkait
-- route/controller/middleware
-- policy/use case/service
-- adapter/repository/query
-- Blade/view partial
-- native JS/config sink
-- audit/logging/redaction path
-- existing tests
-**Gate:**
-- root cause sementara cocok dengan source sekarang
-- source map lengkap sampai layer terdampak
-- jika source berbeda dari dokumen, konflik dicatat
-**Stop condition:**
-- source tidak menunjukkan root cause yang sama dengan dokumen
-- patch lama diklaim ada tetapi source sekarang tidak memilikinya
-- source conflict menyentuh ADR dan belum ada keputusan
+- For the active slice, read the current source, not only the documents.
+- Must find:
+  - production files
+  - route / controller / middleware
+  - policy / use case / service
+  - adapter / repository / query
+  - Blade / view partial
+  - native JS / config sink
+  - audit / logging / redaction path
+  - existing tests
+- Gate:
+  - the provisional root cause matches the current source
+  - the source map is complete up to the affected layer
+  - if the source differs from the document, the conflict is recorded
+- Stop condition:
+  - the source does not show the same root cause as the document
+  - a patch is claimed to exist, but the current source does not contain it
+  - a source conflict touches an ADR and no decision has been made yet
+
 ### Step 3 - RED Proof
 
-- Buat atau jalankan characterization test yang membuktikan bug di source sekarang.
-**RED proof harus menunjukkan:**
-- command
-- failure yang relevan
-- assertion atau output penting
-- alasan failure sesuai root cause, bukan fixture error
-**Untuk issue yang sudah diklaim fixed:**
-- jika proof kuat, re-run targeted/focused proof
-- jika proof lemah, masukkan ke verification slice
-- jika source/test bertentangan, treat as contradicted
-**Gate:**
-- RED valid atau alasan RED mustahil dicatat
-- fixture tidak palsu
-- failure bukan karena dependency environment, missing vendor, atau setup yang tidak relevan
-**Stop condition:**
-- test gagal karena alasan yang tidak dipahami
-- test hanya membuktikan syntax
-- test mengunci behavior yang bertentangan dengan ADR/domain decision
+- Create or run a characterization test that proves the bug in the current source.
+- RED proof must show:
+  - the command
+  - the relevant failure
+  - the important assertion or output
+  - why the failure matches the root cause, not a fixture error
+- For issues already claimed fixed:
+  - if the proof is strong, re-run targeted / focused proof
+  - if the proof is weak, move it into a verification slice
+  - if source and tests conflict, treat it as contradicted
+- Gate:
+  - RED is valid or the reason RED is impossible is recorded
+  - the fixture is real
+  - the failure is not caused by environment dependency, missing vendor, or irrelevant setup
+- Stop condition:
+  - the test fails for an unknown reason
+  - the test only proves syntax
+  - the test locks in behavior that conflicts with the ADR / domain decision
+
 ### Step 4 - Minimal Production Patch Boundary
 
-- Patch hanya boleh dimulai setelah RED proof valid.
-**Aturan patch:**
-- patch boundary harus sesuai root cause
-- jangan patch reader generik jika consumer semantics belum jelas
-- jangan patch Blade/JS untuk menutup authorization server-side
-- jangan patch UI untuk menutupi data corruption
-- jangan refactor luas tanpa source map dan proof
-- jangan ubah seeder dalam workflow utama
-**Gate:**
-- patch file sesuai active slice
-- tidak ada file luar scope
-- patch tidak melemahkan test existing
-- patch tidak menghapus audit/history tanpa keputusan domain
-**Stop condition:**
-- patch perlu redesign domain besar tanpa owner decision
-- patch memerlukan ADR baru atau konflik ADR
-- patch membuat admin read access rusak saat memperbaiki mutation
-- patch memblokir global cashier edit/refund tanpa policy
+- A patch may begin only after valid RED proof.
+- Patch rules:
+  - the patch boundary must match the root cause
+  - do not patch a generic reader if consumer semantics are still unclear
+  - do not patch Blade / JS to cover up server-side authorization
+  - do not patch UI to hide data corruption
+  - do not refactor broadly without source map and proof
+  - do not change seeder inside the main workflow
+- Gate:
+  - patch files match the active slice
+  - no file outside the scope is changed
+  - the patch does not weaken existing tests
+  - the patch does not remove audit/history without a domain decision
+- Stop condition:
+  - the patch requires a large domain redesign without an owner decision
+  - the patch requires a new ADR or an ADR conflict resolution
+  - the patch breaks admin read access while fixing a mutation
+  - the patch blocks global cashier edit / refund without policy
+
 ### Step 5 - UI Blade Impact Check
 
-**Wajib dilakukan jika issue menyentuh:**
-- tombol/link/action
-- form
-- workspace
-- note detail
-- refund/payment UI
-- JSON config di Blade
-- data yang dirender ke HTML/attribute/script
-- public/sensitive attachment link
-- count/stat yang terlihat user
-**Checklist:**
-- action tidak dirender ketika backend policy menolak
-- backend tetap menolak direct request
-- tidak ada raw user-controlled HTML
-- JSON in script context memakai safe encoding
-- URL-like attribute tidak menerima unsafe scheme
-- can_edit_workspace atau flag UI selaras dengan server policy
-- tidak ada hidden input yang menjadi authority domain/security
-**Gate:**
-- view path dicatat
-- rendered response dites bila relevan
-- negative search dilakukan untuk unsafe string/action/link
-- UI tidak menjadi satu-satunya guard
-**Stop condition:**
-- direct route tetap bisa mutasi meski tombol disembunyikan
-- raw JSON/HTML sink masih ada
-- JS config bisa breakout dengan </script>
+- Required if the issue touches:
+  - button / link / action
+  - form
+  - workspace
+  - note detail
+  - refund / payment UI
+  - JSON config in Blade
+  - data rendered to HTML / attribute / script
+  - public / sensitive attachment link
+  - count / stat visible to the user
+- Checklist:
+  - the action is not rendered when backend policy rejects it
+  - backend still rejects direct requests
+  - no raw user-controlled HTML exists
+  - JSON in script context uses safe encoding
+  - URL-like attributes do not accept unsafe schemes
+  - `can_edit_workspace` or similar flags match server policy
+  - no hidden input is treated as domain / security authority
+- Gate:
+  - view paths are recorded
+  - rendered response is tested when relevant
+  - negative search is done for unsafe strings / actions / links
+  - UI is not the only guard
+- Stop condition:
+  - a direct route still mutates even though the button is hidden
+  - raw JSON / HTML sink still exists
+  - JS config can breakout with `</script>`
+
 ### Step 6 - Native JS Impact Check
 
-**Wajib dilakukan jika issue menyentuh:**
-- workspace JS
-- selected row behavior
-- inline payment/refund
-- page config JSON
-- return/back URL
-- form submission enhancement
-- dynamic action buttons
-**Checklist:**
-- JS hanya progressive enhancement
-- server tetap source of truth
-- JS tidak mempercayai hidden field untuk authorization, price basis, row state, MIME, URL, atau capability
-- config JSON aman untuk script context
-- tidak ada innerHTML dari untrusted data tanpa sanitizer yang disetujui ADR
-- no eval, string-to-code, atau dynamic script injection
-- fallback form submit tetap aman
-**Gate:**
-- JS file/sink dicatat
-- payload XSS/unsafe URL diuji bila relevan
-- server rejection diuji tanpa mengandalkan JS
-**Stop condition:**
-- perbaikan hanya ada di JS
-- server menerima payload bila JS dilewati
-- JS config tetap raw/unsafe
-### Step 7 - Security and Authorization Review
-
-**Gunakan ADR/security blueprint sesuai domain:**
-**ADR-0019 / access boundary:**
-- auth
-- role admin/kasir
-- transaction capability
-- cashier today/yesterday window
-- direct route request
-- route placement
-- server-side policy
-**ADR-0020 / public surface:**
-- output encoding
-- unsafe URL
-- storage boundary
-- attachment serving
-- MIME/content-disposition
-- count/stat disclosure
-**ADR-0022 / payment concurrency:**
-- same-note lock
-- allocation invariant
-- transaction boundary
-- idempotency gap
-**Gate:**
-- direct GET/POST/PATCH/DELETE behavior diuji bila relevan
-- unauthorized request tidak mutasi data
-- admin read vs mutation boundary tidak tercampur
-- cashier date-window tidak memakai client date sebagai truth
-- sensitive proof attachment tidak disajikan tanpa policy
-**Stop condition:**
-- route mutation lolos tanpa gate
-- unauth/authz proof tidak ada
-- audit performer berasal dari client input
-- attachment MIME/filename/path berasal dari client sebagai authority
-### Step 8 - Audit Trail, Logging, Redaction Check
-
-**Wajib untuk:**
-- payment
-- refund
-- note revision
-- row mutation
-- inventory movement
-- capability toggle
-- supplier invoice/payment/proof
-- private file serving
-- rejected sensitive attempt bila policy membutuhkan
-**Checklist:**
-- actor berasal dari authenticated session
-- target resource tercatat
-- before/after state tersedia bila relevan
-- manual reason tetap wajib untuk aksi domain yang membutuhkannya
-- no secret, token, private path, or raw proof metadata leaked in logs
-- redaction dilakukan untuk data sensitif
-**Gate:**
-- audit/log path dicatat
-- mutation sukses dan gagal punya expected audit behavior
-- performer spoof dari request body ditolak
-**Stop condition:**
-- audit actor/client performer spoofable
-- sensitive mutation tidak punya audit path
-- log mengandung secret/private path/token
-### Step 9 - Regression Test Selection
-
-- Pilih test berdasarkan blast radius, bukan asal banyak.
-**Jenis test:**
-- **focused test:** file test yang langsung membuktikan issue
-- **related test:** test pada service/route/projection terdekat
-- **wider test:** suite cluster seperti tests/Feature/Note, tests/Feature/Payment, tests/Feature/Procurement
-- **full verification:** global lint/static/test/audit sesuai project gate
-**Gate:**
-- test yang dipilih relevan dengan changed files
-- minimal focused proof ada
-- wider proof untuk sensitive domain/security ada
-- failing unrelated test tidak diabaikan tanpa catatan
-**Stop condition:**
-- hanya php -l dipakai sebagai proof fixed
-- test diubah untuk menutupi failure
-- wider regression gagal dan belum dianalisis
-### Step 10 - Focused Test
-
-- Run targeted/focused proof.
-**Gate:**
-- targeted test pass
-- assertion count dicatat
-- output command dicatat
-- behavior yang diuji cocok dengan root cause
-**Stop condition:**
-- targeted test tidak jalan
-- pass hanya karena test fixture tidak melewati vulnerable path
-- issue sensitive tapi tidak ada no-mutation/no-leak assertion
-### Step 11 - Wider Test
-
-- Run wider tests sesuai domain.
-**Contoh:**
-- **finance/payment:** tests/Feature/Note, tests/Feature/Payment
-- **procurement/proof:** tests/Feature/Procurement
-- **identity/access:** feature tests route/capability
-- **Blade/output:** relevant feature response tests plus grep/static audit
-- **attachment:** upload/serve/download matrix
-- **concurrency:** lock/source proof plus concurrency stress bila tersedia
-**Gate:**
-- suite relevan pass
-- jika gap seperti true concurrency/browser/manual/global suite belum dilakukan, gap dicatat eksplisit
-- tidak ada failure tersembunyi
-**Stop condition:**
-- wider suite gagal karena source slice
-- global blocker muncul dan belum punya owner decision
-- proof tidak cukup untuk klaim closure scope
-### Step 12 - Full Verification Gate
-
-- Full verification hanya boleh diklaim jika semua gate project lewat.
-**Minimal final global gate:**
-- source anchors untuk semua slice
-- targeted proof per issue
-- focused proof per sensitive cluster
-- wider test sesuai affected domain
-- static/grep negative search untuk Blade/JS/storage/URL
-- route-list check untuk access/capability
-- audit/log/redaction review
-- docs aligned
-- no unresolved contradiction
-- no active global blocker
-- Jika make verify, PHPStan, audit-lines, audit-blade, contract audit, atau full test gagal, jangan klaim full global verified.
-**Stop condition:**
-- ada issue dengan trust weak/contradicted yang belum deferred dengan owner acceptance
-- ada conflict source vs docs
-- global verify gagal
-- final docs menghapus gap tanpa proof
-### Step 13 - Documentation Update Gate
-
-- Update docs/04_lifecycle/error_log/ hanya setelah proof.
-**Error log closure harus mencatat:**
-- status baru dengan format konsisten
-- root cause final
-- source reality
-- patch scope
-- RED proof
-- GREEN proof
-- focused blast-radius proof
-- UI Blade impact
-- native JS impact
-- security/authorization impact
-- audit/log/redaction impact
-- residual gaps
-- conflict resolution
-- closure decision
-**Gate:**
-- dokumen tidak mengklaim lebih dari proof
-- residual out-of-scope tetap terlihat
-- jika issue fixed tetapi proof lemah, status tetap verification gap atau masuk verification slice
-**Stop condition:**
-- dokumen diklaim fixed dari patch existence saja
-- docs closure dilakukan sebelum tests
-- status free-form mengaburkan gap
-### Step 14 - Closure Criteria
-
-**Issue boleh ditutup hanya jika:**
-- root cause terbukti dan final
-- source file production terkait sudah dipetakan
-- RED proof ada atau alasan mustahil dicatat
-- targeted GREEN proof pass
-- focused blast-radius pass untuk sensitive issue
-- UI Blade check selesai bila ada impact
-- native JS check selesai bila ada impact
-- security/auth check selesai bila ada impact
-- audit/log/redaction check selesai bila ada impact
-- docs updated with proof
-- residual gap eksplisit dan tidak memblokir scope
-- source/test proof tidak konflik dengan ADR
-- active slice handoff lengkap
-## Handling Untuk Issue Status Patched/Fixed Tapi Proof Lemah
-
-**Jika error log berstatus Patched, Fixed, Fixed with proof, atau sejenisnya:**
-- Jangan percaya status mentah.
-- Cek root cause.
-- Cek source file production.
-- Cek test proof.
-- Cek UI/Blade/JS impact.
-- Cek security/auth/audit impact.
-- Cek wider regression.
-- Cek conflict dengan issue lain.
-**Jika proof kuat:**
-- masukkan ke trusted verification list
-- re-run targeted/focused proof saat slice aktif
-- jangan reopen tanpa bukti baru
-**Jika proof lemah:**
-- masukkan ke verification slice
-- status kepercayaan weak
-- closure dilarang sampai proof tersedia
-**Jika source/test bertentangan:**
-- status kepercayaan contradicted
-- source/test proof menang
-- buat conflict note sebelum patch
-## Conflict Handling
-
-**Wajib tulis:**
-- path dokumen A
-- path dokumen B
-- isi konflik
-- source/test proof yang menang
-- keputusan workflow
-**Known conflict yang harus dijaga:**
-- docs/04_lifecycle/error_log/0001_refunds_counted_as_paid_in_note_totals.md vs docs/04_lifecycle/error_log/0003_refunded_revised_notes_are_misclassified_as_underpaid.md
-- #001 butuh active refund mengurangi settlement
-- #003 butuh historical refund tidak double-subtracted
-- fix valid harus membuktikan keduanya
-- docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md vs docs/04_lifecycle/error_log/0022_cashier_refund_route_bypasses_note_access_guard.md
-- #021 mengklaim controller menolak parent note open
-- #022 menyatakan open-note refund behavior tidak berubah dan current test masih membolehkan open-note refund
-- source/test proof saat eksekusi harus menang
-- docs/04_lifecycle/error_log/0011_cashier_revision_path_mutates_settled_note_state.md
-- guard cashier settled-note harus tetap aktif
-- admin official correction/revision route tidak boleh diblokir global
-- route-scoped decision terbaru harus menang
-## Documentation Closure Rules
-
-**Allowed closure language:**
-- Reported
-- Characterized RED
-- Patched Unverified
-- Targeted Verified
-- Focused Verified
-- Docs Aligned
-- Strict Fixed
-- Deferred with owner acceptance
-**Forbidden behavior:**
-- mengklaim fixed dari commit message
-- mengklaim secure dari UI hiding
-- mengklaim verified dari php -l
-- menghapus residual gap tanpa proof
-- mengklaim full global suite bila global gate gagal
-- mengklaim source clean jika git status belum dicek
-## Final Global Verification
-
-**Final global verification baru boleh ditulis jika:**
-- semua active slices selesai
-- semua issue weak/contradicted sudah resolved atau deferred dengan owner acceptance
-- all targeted tests per issue pass
-- all focused cluster tests pass
-- wider domain suites pass
-- access route-list proof tersedia
-- Blade/JS negative search tersedia
-- storage/attachment serving proof tersedia
-- audit/log/redaction proof tersedia
-- docs updated
-- no seeder work diklaim selesai
-- no unresolved source/docs contradiction
-- Jika ada blocker, final status harus menyebut blocker itu secara eksplisit.
+- Required if the issue touches:
+  - workspace JS
+  - selected-row behavior
+  - inline payment / refund
+  - page config JSON
+  - return / back URL

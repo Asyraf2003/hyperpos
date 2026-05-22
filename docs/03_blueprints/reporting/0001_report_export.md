@@ -1,521 +1,276 @@
 # PDF and Excel Export for Reports and Dashboard Blueprint
 
 ## Status
+
 Draft.
 
 ## Metadata
+
 - Date: 2026-05-01
 - Scope: Reporting, Dashboard, PDF Export, Excel Export
 - Project: Hyperpos
 
 ## Goal
 
-Membangun export PDF dan Excel untuk laporan dan dashboard tanpa mismatch angka terhadap screen.
+Build PDF and Excel exports for reports and dashboards without mismatching the numbers shown on screen.
 
-Export harus menjadi adapter output dari dataset laporan/dashboard yang sudah stabil, bukan query baru, bukan hitung ulang di Blade, bukan hitung ulang di JavaScript, dan bukan scrape DOM.
+The export must be an output adapter from an already stable report/dashboard dataset, not a new query, not a re-calculation in Blade, not a re-calculation in JavaScript, and not a DOM scrape.
 
-Target utama:
+Primary targets:
 
-screen = PDF = Excel untuk angka utama
-filter screen = filter export
-summary = detail reconciliation
-dashboard export tidak menjadi source of truth
-laporan tetap membaca domain final
-export tidak memperlambat page load dashboard/report
-PDF aman untuk cetak bulanan
-Excel aman untuk analisis maksimal satu tahun
+- screen = PDF = Excel for the main numbers
+- screen filter = export filter
+- summary = detail reconciliation
+- dashboard export is not a source of truth
+- reports still read the final domain
+- export must not slow down the dashboard/report page load
+- PDF must be safe for monthly printing
+- Excel must be safe for analysis up to one year
+
 ## Background
 
-Reporting V2 sudah mengunci bahwa export hanya boleh dibuat setelah screen/report stabil.
+Reporting V2 already locked in that exports may only be built after the screen/report is stable.
 
-Export tidak boleh dimulai sebelum kontrak data jelas karena risiko utamanya bukan layout, melainkan mismatch angka.
+Export must not start before the data contract is clear because the main risk is not layout; it is number mismatch.
 
-Risiko yang harus dicegah:
+Risks to prevent:
 
-screen menampilkan angka benar, PDF angka lain
-Excel memakai query sendiri lalu total berbeda
-dashboard chart memakai angka yang tidak reconcile dengan report
-PDF mencetak range terlalu besar dan tidak berguna dibaca
-Excel menyimpan rupiah sebagai string sehingga sulit dianalisis
-export membuat dashboard/report normal menjadi lambat
+- screen shows the correct number, PDF shows a different one
+- Excel uses a separate query and the total is different
+- dashboard chart uses numbers that do not reconcile with the report
+- PDF prints too large a range and becomes unreadable
+- Excel stores rupiah as a string and becomes hard to analyze
+- export makes the normal dashboard/report slower
+
 ## Source of Truth Rule
 
-Report dan dashboard export harus memakai dataset/use case yang sama dengan screen.
+Report and dashboard exports must use the same dataset / use case as the screen.
 
-Flow resmi:
+Official flow:
 
 Request filter
 → Controller
 → Application use case
-→ Reporting reader/query
+→ Reporting reader / query
 → Report dataset / dashboard payload
 → Screen renderer
 → PDF renderer
 → Excel renderer
 
-Larangan:
+Forbidden:
 
-query export terpisah dari query screen
-hitung ulang angka bisnis di Blade
-hitung ulang angka bisnis di JavaScript
-export dari DOM
-export dari chart rendered data
-export dengan filter yang berbeda dari screen
-formatting mengubah nilai numeric
+- export query separate from the screen query
+- re-calculate business numbers in Blade
+- re-calculate business numbers in JavaScript
+- export from the DOM
+- export from rendered chart data
+- export with a different filter from the screen
+- formatting that changes numeric values
+
 ## Export Types
+
 ### Report PDF
 
-Tujuan:
+Purpose:
 
-cetak bulanan
-arsip manusia
-diskusi owner/admin
-bukti ringkas laporan periode
+- monthly printing
+- human archive
+- owner / admin discussion
+- compact period evidence
 
 Policy:
 
-basis periode: 1 bulan
-maksimal range: 1 bulan kalender
-layout harus readable saat dicetak
-summary tampil di awal
-detail table boleh dipaginasi
-angka harus sama dengan screen
+- period basis: 1 month
+- maximum range: 1 calendar month
+- layout must be readable when printed
+- summary appears first
+- detail table may be paginated
+- numbers must match the screen
+
 ### Report Excel
 
-Tujuan:
+Purpose:
 
-analisis
-rekonsiliasi
-filter manual
-pivot akuntansi
-audit operasional
+- analysis
+- reconciliation
+- manual filtering
+- accounting pivots
+- operational audit
 
 Policy:
 
-maksimal range: 1 tahun / 366 hari
-value rupiah harus numeric integer
-formatting rupiah hanya visual Excel number format
-data table utama tidak boleh memakai merged cells
-wajib punya metadata sheet
-wajib punya summary sheet
-wajib punya detail sheet
-boleh punya reconciliation sheet bila report kompleks
+- maximum range: 1 year / 366 days
+- rupiah values must be numeric integers
+- rupiah formatting is only a visual Excel number format
+- the main data table may not use merged cells
+- a metadata sheet is required
+- a summary sheet is required
+- a detail sheet is required
+- a reconciliation sheet is allowed when the report is complex
+
 ### Dashboard PDF
 
-Tujuan:
+Purpose:
 
-snapshot bulanan dashboard untuk owner
-ringkasan posisi bisnis periode berjalan/bulan tertentu
-cetak satu paket ringkas
+- monthly dashboard snapshot for the owner
+- a short summary of the current business position for a selected period
+- a single compact printable package
 
 Policy:
 
-basis periode: 1 bulan
-bukan pengganti laporan detail
-berisi summary, indikator utama, dan konteks dashboard
-chart boleh tampil sebagai visual, tetapi angka chart bukan source of truth
-dashboard PDF harus mencantumkan report source/period metadata
+- period basis: 1 month
+- not a replacement for the detailed report
+- contains summary, main indicators, and dashboard context
+- charts may appear as visuals, but chart numbers are not the source of truth
+- dashboard PDF must include report source / period metadata
+
 ### Dashboard Excel
 
-Tujuan:
+Purpose:
 
-workbook analisis dari dashboard
-breakdown data dashboard dalam sheet terpisah
-validasi lintas metric
+- analysis workbook from the dashboard
+- dashboard data breakdown in separate sheets
+- cross-metric validation
 
 Policy:
 
-maksimal range: 1 tahun
-workbook multi-sheet
-setiap sheet mewakili metric/section
-summary dashboard harus reconcile ke report source
-tidak boleh memakai chart/JS sebagai sumber data
-Period Policy
-PDF
+- maximum range: 1 year
+- multi-sheet workbook
+- each sheet represents a metric / section
+- dashboard summary must reconcile to the report source
+- chart / JS may not be used as the data source
 
-PDF memakai basis cetak bulanan.
+## Period Policy
 
-Aturan:
+### PDF
 
-input utama: month=YYYY-MM
-date_from = awal bulan
-date_to = akhir bulan atau today untuk bulan aktif bila policy screen sudah seperti itu
-custom date range hanya boleh jika tidak melebihi 1 bulan dan tidak melanggar screen contract
-jika range lebih dari 1 bulan, request PDF harus ditolak dengan pesan validasi yang jelas
+PDF uses a monthly print basis.
 
-Reason:
+Rules:
 
-PDF untuk dibaca manusia. PDF tahunan untuk report detail biasanya berubah jadi novel akuntansi yang tidak ingin dibaca siapa pun, termasuk orang yang mencetaknya.
-
-Excel
-
-Excel memakai basis analisis.
-
-Aturan:
-
-input boleh month, year, atau custom date range
-maksimal 366 hari
-jika lebih dari 366 hari, request ditolak
-export lebih dari 1 tahun harus dipisah per tahun atau nanti masuk queued export bila terbukti perlu
+- main input: `month=YYYY-MM`
+- `date_from` = first day of the month
+- `date_to` = last day of the month or `today` for the current month if the screen policy already works that way
+- a custom date range is only allowed if it does not exceed 1 month and does not violate the screen contract
+- if the range is more than 1 month, the PDF request must be rejected with a clear validation message
 
 Reason:
 
-Excel dipakai untuk analisis dan rekonsiliasi, sehingga range lebih besar masih masuk akal.
+PDF is for human reading. A yearly detail PDF usually turns into an accounting novel nobody wants to read, including the person who printed it.
 
-Data Contract
+### Excel
 
-Setiap export wajib punya contract berikut:
+Excel uses an analysis basis.
 
-report_key
-report_title
-period_label
-date_from
-date_to
-basis_date_label
-generated_at
-generated_by
-filter_payload
-summary_rows
-detail_rows
-totals
-reconciliation_rows optional
-source_dataset_name
-source_screen_route
-source_export_route
-Metadata Contract
+Rules:
 
-Setiap PDF/Excel wajib menampilkan metadata:
+- input may be `month`, `year`, or a custom date range
+- maximum range: 366 days
+- if the range is more than 366 days, the request is rejected
+- exports over 1 year must be split by year or later moved to queued export if that proves necessary
 
-nama report/dashboard
-periode
-basis tanggal
-waktu generate
-actor/generator
-filter aktif
-source dataset/use case
-note bahwa export memakai source yang sama dengan screen
-halaman / page number untuk PDF
-app/report version jika tersedia
+Reason:
+
+Excel is for analysis and reconciliation, so a larger range is still reasonable.
+
+## Data Contract
+
+Every export must include:
+
+- `report_key`
+- `report_title`
+- `period_label`
+- `date_from`
+- `date_to`
+- `basis_date_label`
+- `generated_at`
+- `generated_by`
+- `filter_payload`
+- `summary_rows`
+- `detail_rows`
+- `totals`
+- `reconciliation_rows` optional
+- `source_dataset_name`
+- `source_screen_route`
+- `source_export_route`
+
+## Metadata Contract
+
+Every PDF / Excel export must display:
+
+- report / dashboard name
+- period
+- basis date
+- generation time
+- actor / generator
+- active filter
+- source dataset / use case
+- a note that the export uses the same source as the screen
+- page / page number for PDF
+- app / report version if available
 
 GAP:
 
-sumber resmi nama perusahaan/header belum dibuktikan.
-sumber resmi timezone aplikasi belum dibuktikan.
-source app version/export version belum dibuktikan.
+- the official company / header source has not yet been proven
+- the official application timezone source has not yet been proven
+- the app version / export version source has not yet been proven
 
-Selama GAP belum ditutup, gunakan metadata minimal yang sudah tersedia dari request/session/config yang terbukti.
+Until those gaps are closed, use the minimal metadata that is already proven by request / session / config.
 
-Formatting Contract
-Rupiah
+## Formatting Contract
 
-Rules:
-
-internal value tetap integer rupiah
-PDF boleh tampil Rp 15.000
-Excel cell value harus numeric 15000
-Excel number format boleh menampilkan Rp #,##0
-tidak boleh menyimpan Rp 15.000 sebagai string di cell data utama
-Date
+### Rupiah
 
 Rules:
 
-display Indonesia: dd-mm-yyyy
-metadata boleh punya ISO date tambahan jika perlu
-Excel cell date harus date-compatible jika library mendukung
-jangan campur yyyy-mm-dd di UI export kecuali untuk metadata teknis
-Quantity
+- the internal value remains integer rupiah
+- PDF may display `Rp 15.000`
+- Excel cell value must be numeric `15000`
+- Excel number format may show `Rp #,##0`
+- do not store `Rp 15.000` as a string in the main data cell
+
+### Date
 
 Rules:
 
-qty numeric
-decimal policy mengikuti source report
-jangan format qty menjadi string jika di Excel detail sheet
-PDF Display Contract
+- Indonesia display: `dd-mm-yyyy`
+- metadata may also include ISO dates when needed
+- Excel date cells must be date-compatible if the library supports it
+- do not mix `yyyy-mm-dd` into the UI export unless it is technical metadata
+
+### Quantity
+
+Rules:
+
+- quantity is numeric
+- decimal policy follows the source report
+- do not format quantity as a string in the Excel detail sheet
+
+## PDF Display Contract
 
 Default:
 
-ukuran: A4
-dashboard: portrait
-report summary: portrait
-report detail table yang lebar: landscape
-margin konsisten
-header muncul minimal di halaman pertama
-footer berisi page number, generated_at, dan report key
-table header repeat di halaman baru jika library mendukung
+- size: A4
+- dashboard: portrait
+- report summary: portrait
+- wide report detail table: landscape
+- consistent margins
+- header appears on at least the first page
+- footer contains page number, `generated_at`, and report key
+- table header repeats on new pages when the library supports it
 
 PDF section order:
 
-Header report
-Metadata periode/filter
-Summary cards/table
-Reconciliation note jika ada
-Detail table
-Footer
+1. Report header
+2. Period / filter metadata
+3. Summary cards / table
+4. Reconciliation note, if any
+5. Detail table
+6. Footer
 
 PDF empty state:
 
-jika tidak ada data, PDF tetap berhasil dibuat
-tampilkan pesan empty state yang sama maknanya dengan screen
-total harus nol
-metadata tetap tampil
-
-PDF forbidden:
-
-chart sebagai satu-satunya bukti angka
-table terlalu kecil sampai tidak terbaca
-export lebih dari 1 bulan
-angka hasil formatting yang tidak bisa ditelusuri ke dataset
-Excel Display Contract
-
-Workbook default sheets:
-
-Metadata
-Summary
-Details
-Reconciliation optional
-Dashboard_* sheets untuk dashboard export
-
-Sheet Metadata columns:
-
-key
-value
-
-Sheet Summary columns:
-
-metric
-value
-unit
-notes optional
-
-Sheet Details:
-
-satu row per detail record
-header frozen
-autofilter enabled jika library mendukung
-no merged cells
-no decorative blank rows di area data utama
-numeric columns tetap numeric
-date columns tetap date/string konsisten sesuai library
-
-Excel forbidden:
-
-merged cells pada table detail utama
-rupiah sebagai string
-formula tersembunyi untuk total utama jika total sudah dihitung server
-angka dihitung ulang oleh Excel sebagai source of truth
-styling mengorbankan data usability
-Report Coverage Plan
-
-Export akan diterapkan bertahap sesuai urutan Reporting V2.
-
-1. Laporan Transaksi
-
-Priority: pertama untuk template export.
-
-Reason:
-
-dekat dengan Nota
-memuat gross, payment, refund, outstanding
-penting untuk audit operasional
-cocok untuk membuktikan screen/PDF/Excel parity
-
-Expected data:
-
-note/order identity
-transaction date
-customer/name if available
-gross amount
-paid amount
-refund amount
-outstanding amount
-status
-payment/refund context if available
-
-GAP:
-
-nama class use case/query final harus diaudit dari repo sebelum implementasi.
-exact column screen harus diaudit dari Blade/controller.
-2. Arus Kas Transaksi
-
-Expected data:
-
-cash in
-refund out
-net cash
-payment method
-paid_at/refunded_at
-note reference
-actor/context if available
-3. Biaya Operasional
-
-Expected data:
-
-expense date
-category
-description
-amount
-status posted
-actor/context if available
-4. Hutang Karyawan
-
-Expected data:
-
-employee
-debt record
-payment history
-outstanding balance
-period activity
-5. Laba Kas Operasional
-
-Expected data:
-
-cash in
-operational expense
-debt cash out
-payroll disbursement
-stock COGS
-external purchase cost
-operational profit
-
-Special rule:
-
-report sintesis harus reconcile ke report sumber.
-tidak boleh mengarang komponen yang source-nya belum terbukti.
-6. Hutang Supplier
-
-Expected data:
-
-supplier
-invoice
-invoice date
-due date
-total invoice
-paid amount
-outstanding
-overdue status
-7. Stok dan Nilai Persediaan
-
-Expected data:
-
-product
-current stock snapshot
-movement period in/out
-avg cost/value
-basis movement date
-warning if snapshot and movement period punya makna berbeda
-
-Special rule:
-
-movement history tidak boleh dicampur dengan current snapshot secara menyesatkan.
-8. Dashboard
-
-Dashboard export dilakukan setelah report export stabil.
-
-Expected PDF sections:
-
-period summary
-cash summary
-operational profit summary
-inventory summary
-supplier payable summary
-top selling / ledger context
-generated metadata
-
-Expected Excel sheets:
-
-Metadata
-Dashboard Summary
-Cashflow
-Operational Performance
-Inventory
-Top Selling
-Supplier Payable
-Reconciliation Notes
-Security and Access
-
-Rules:
-
-export route wajib berada di balik auth dan role/middleware yang sama dengan screen
-user yang tidak bisa melihat report tidak boleh export report
-export tidak boleh membuka data lewat public URL
-filename tidak boleh mengandung data sensitif berlebihan
-generated_by harus masuk metadata jika actor tersedia
-
-Audit policy:
-
-export action boleh dicatat sebagai audit event ringan bila report berisi data sensitif
-audit export tidak boleh menyimpan isi file penuh
-audit cukup menyimpan actor, report_key, filter, format, generated_at, row_count jika tersedia
-
-GAP:
-
-keputusan apakah semua export wajib audit log belum dikunci.
-halaman audit akan membahas ini di scope terpisah.
-Performance Policy
-
-Rules:
-
-export tidak boleh dieksekusi saat page load normal
-page hanya menampilkan tombol/link export
-export dihitung saat user klik
-PDF 1 bulan boleh synchronous jika proof cepat
-Excel 1 tahun boleh synchronous hanya jika proof aman
-jika export berat, upgrade ke queued export di scope terpisah
-
-Performance proof minimum per report:
-
-export PDF 1 bulan tidak timeout
-export Excel 1 tahun tidak timeout pada dataset uji realistis
-normal page load tidak bertambah berat hanya karena tombol export
-query count bounded
-no N+1 brutal
-Error Handling
-
-Validation errors:
-
-PDF range lebih dari 1 bulan
-Excel range lebih dari 1 tahun
-invalid month/year/date
-user tidak punya akses
-report key tidak dikenal
-
-Response behavior:
-
-screen request: redirect back with clear error
-direct export request: show/download-safe error response sesuai existing app pattern
-jangan leak SQL/error internal
-Implementation Order
-Commit blueprint/workflow/DoD docs.
-Audit existing report screen contract.
-Pilih Laporan Transaksi sebagai template pertama.
-Lock export dataset contract untuk Laporan Transaksi.
-Implement Excel first.
-Implement PDF second.
-Add parity tests.
-Add route/controller tests.
-Add performance sanity test.
-Replicate pattern ke report lain.
-Implement dashboard export terakhir.
-Non-Goals
-
-Scope ini tidak langsung membangun:
-
-queued export
-archive export storage
-export scheduling
-email export
-import Excel
-import PDF
-audit log archive/purge
-chart image rendering sebagai source data
-redesign formula report
-Invariants
-Export tidak boleh mengubah state domain.
-Export tidak boleh menjadi source of truth.
-Export tidak boleh punya formula bisnis sendiri.
-Screen, PDF, dan Excel harus memakai dataset yang sama.
-PDF maksimal 1 bulan.
-Excel maksimal 1 tahun.
-Rupiah di Excel harus numeric.
-Dashboard export adalah snapshot/analysis output, bukan report source.
-Mismatch 1 rupiah atau 1 qty adalah failure.
+- if there is no data, the PDF must still be generated successfully
+- show an empty-state message with the same meaning as the screen
+- total must be zero
+- metadata must still appear

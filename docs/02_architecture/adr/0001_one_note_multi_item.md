@@ -1,4 +1,4 @@
-# ADR-0001 — One Note Multi-Item Model
+# ADR-0001 - One Note Multi-Item Model
 
 - Status: Accepted
 - Date: 2026-03-09
@@ -7,38 +7,38 @@
 
 ## Context
 
-Domain bengkel yang dibangun bukan model kasir retail biasa. Dalam operasional nyata, satu customer dapat datang dengan beberapa kebutuhan sekaligus dalam satu kunjungan, misalnya:
+The workshop domain being built is not a normal retail cashier model. In real operations, one customer may arrive with several needs in the same visit, for example:
 
-- 1 barang/service menggunakan sparepart toko
-- 1 barang/service menggunakan sparepart milik customer
-- 1 barang/service tanpa sparepart
-- 1 barang/service menggunakan sparepart yang dibeli dari luar
+- 1 product / service using store spare parts
+- 1 product / service using customer-owned spare parts
+- 1 product / service with no spare parts
+- 1 product / service using spare parts bought from outside
 
-Kebutuhan operasional yang sudah dikunci:
+The locked business requirements are:
 
-- admin/kasir tidak boleh dipaksa mengubah kebiasaan menjadi membuat beberapa nota terpisah hanya karena item atau status berbeda
-- user input harus tetap sederhana: 1 customer dapat dibuatkan 1 nota berisi berbagai list transaksi/kasus
-- status item di dalam nota dapat berbeda-beda
-- satu customer tetap boleh punya lebih dari satu nota aktif di waktu yang sama bila memang ada kasus lain
-- sistem harus tetap akurat untuk pembayaran parsial, audit, stok, dan laporan
+- admin / cashier must not be forced to change their habit into creating multiple separate notes just because the items or statuses are different
+- user input must remain simple: 1 customer can have 1 note containing various transaction / case lines
+- item statuses inside a note may be different
+- one customer may still have more than one active note at the same time if there really are other cases
+- the system must remain accurate for partial payments, audit, stock, and reports
 
-Jika sistem memaksa satu barang atau satu kasus menjadi satu nota terpisah, maka itu dianggap gagal menyelesaikan masalah operasional client.
+If the system forces one item or one case into a separate note, then it has failed to solve the client’s operational problem.
 
 ## Decision
 
-Sistem menggunakan model:
+The system uses the following model:
 
-- **1 Note sebagai aggregate root transaksi/customer-facing**
-- **1 Note dapat memiliki banyak Work Item**
-- **setiap Work Item dapat memiliki status, komponen biaya, dan sumber sparepart yang berbeda**
-- **payment tercatat pada level Note, dengan kemungkinan alokasi ke Work Item atau saldo total Note melalui policy/use case**
-- **audit dan koreksi tetap dilacak pada Note dan referensi item terkait**
+- **1 Note as the aggregate root for the transaction / customer-facing flow**
+- **1 Note may contain many Work Items**
+- **each Work Item may have different statuses, cost components, and spare-part sources**
+- **payment is recorded at the Note level, with possible allocation to Work Items or to the Note total balance through policy / use case**
+- **audit and correction are still tracked on the Note and the related item references**
 
 ## Decision Details
 
-### 1. Struktur konseptual
+### 1. Conceptual structure
 
-Satu Note minimal memuat:
+One Note must at minimum contain:
 
 - note number
 - customer reference
@@ -51,126 +51,129 @@ Satu Note minimal memuat:
 - audit references
 - totals
 
-Satu Work Item minimal memuat:
+One Work Item must at minimum contain:
 
 - item identifier
-- deskripsi unit/barang/objek servis
+- description of the unit / item / service object
 - item status
 - service lines
 - store-stock part lines
 - customer-owned part lines
 - external purchase cost lines
-- subtotal item
-- catatan item
+- item subtotal
+- item notes
 
-### 2. Sumber sparepart per item
+### 2. Spare-part source per item
 
-Setiap Work Item dapat memiliki line dengan source berikut:
+Every Work Item may contain lines with these sources:
 
 - `store_stock`
 - `customer_owned`
 - `external_purchase`
 
-Perbedaan source ini wajib ada di core karena mempengaruhi:
+The difference between these sources must exist in the core because it affects:
 
-- stok
-- biaya kasus
+- stock
+- case cost
 - margin
 - audit
-- laporan
+- reporting
 
 ### 3. Status
 
-Status Note dan status Work Item dipisahkan.
+Note status and Work Item status are separate.
 
-Alasan:
+Reason:
 
-- satu nota bisa memuat item dengan progres berbeda
-- satu item bisa selesai, item lain masih pending
-- user tetap melihat satu nota operasional, sementara sistem tetap dapat melacak granularitas proses
+- one note can contain items with different progress
+- one item may be complete while another is still pending
+- the user still sees one operational note, while the system can track process granularity
 
 ### 4. Payment model
 
-Payment dicatat terhadap Note karena pengalaman user operasional berpusat pada nota.
+Payment is recorded against the Note because the operational user experience is centered on the note.
 
-Namun desain harus membuka kemungkinan:
+However, the design must keep open the possibility that:
 
-- payment hanya mengurangi saldo total Note
-- payment dialokasikan ke item tertentu
-- payment parsial dilakukan bertahap
+- payment only reduces the Note’s total balance
+- payment is allocated to specific items
+- partial payment happens in stages
 
-Pilihan detail alokasi diputuskan di use case/policy, bukan dengan mengubah model dasar Note multi-item.
+The exact allocation policy is decided in the use case / policy, not by changing the basic Note multi-item model.
 
 ## Alternatives Considered
 
-### Alternative A — Satu barang/satu kasus = satu nota
-Ditolak.
+### Alternative A - One item / one case = one note
 
-Alasan penolakan:
+Rejected.
 
-- bertentangan dengan kebiasaan operasional client
-- memperumit admin/kasir
-- memaksa user mengubah cara kerja lapangan
-- memperbanyak nota tanpa nilai bisnis yang dibutuhkan
-- membuat pengalaman input tidak natural
+Reasons:
 
-### Alternative B — Sistem diam-diam membuat banyak nota di belakang layar
-Ditolak.
+- conflicts with the client’s operational habit
+- makes admin / cashier work harder
+- forces the user to change how the shop works
+- creates more notes without business value
+- makes the input experience unnatural
 
-Alasan penolakan:
+### Alternative B - The system silently creates many notes in the background
 
-- menambah kompleksitas sinkronisasi
-- berpotensi merusak ekspektasi user terhadap 1 nota
-- mempersulit audit, koreksi, dan pelacakan payment
-- meningkatkan risiko mismatch laporan
+Rejected.
 
-### Alternative C — Satu nota dengan satu daftar line datar tanpa konsep Work Item
-Ditolak.
+Reasons:
 
-Alasan penolakan:
+- increases synchronization complexity
+- may break the user’s expectation of one note
+- makes audit, correction, and payment tracking harder
+- increases the risk of report mismatch
 
-- tidak cukup kuat untuk memodelkan beberapa kasus/status berbeda dalam satu nota
-- sulit mengelola item-level status
-- sulit dibawa ke audit dan koreksi yang presisi
+### Alternative C - One note with one flat line list and no Work Item concept
+
+Rejected.
+
+Reasons:
+
+- not strong enough to model multiple cases / statuses in one note
+- hard to manage item-level status
+- hard to carry into precise audit and correction flows
 
 ## Consequences
 
 ### Positive
 
-- sesuai kebiasaan user lapangan
-- 1 nota tetap menjadi pusat interaksi customer-facing
-- status item dapat dipisahkan dengan rapi
-- cocok untuk payment parsial
-- cocok untuk audit dan correction
-- lebih fleksibel untuk laporan operasional bengkel
+- matches the user’s real-world habit
+- one note remains the center of the customer-facing interaction
+- item statuses can be separated cleanly
+- suitable for partial payments
+- suitable for audit and correction
+- more flexible for workshop operational reports
 
 ### Negative
 
-- model domain lebih kompleks dibanding POS retail biasa
-- perhitungan total dan status harus lebih disiplin
-- implementasi UI harus menjaga kesederhanaan walau model internal lebih kaya
-- payment allocation perlu dirancang hati-hati
+- the domain model is more complex than a normal retail POS
+- total and status calculations must be stricter
+- the UI must stay simple even though the internal model is richer
+- payment allocation must be designed carefully
 
 ## Invariants
 
-- satu Note dapat memiliki banyak Work Item
-- satu Work Item hanya milik satu Note
-- satu customer boleh memiliki lebih dari satu Note aktif
-- user tidak dipaksa membuat banyak nota untuk satu kunjungan hanya karena item/status berbeda
-- perubahan pada paid Note tidak boleh bebas dan harus melalui correction flow ter-audit
-- semua total uang dihitung dari line resmi dan disimpan dalam integer rupiah
+- one Note may contain many Work Items
+- one Work Item belongs to only one Note
+- one customer may have more than one active Note
+- the user is not forced to create many notes for one visit just because items or statuses differ
+- changes to a paid Note may not be free and must go through an audited correction flow
+- all money totals are calculated from official lines and stored in integer rupiah
 
 ## Implementation Notes
 
-- Note menjadi aggregate root utama untuk operasi create, add item, total calculation, payment recording, correction, dan audit reference
-- Work Item tidak boleh menjadi aggregate terpisah yang menyebabkan user experience berubah menjadi multi-note
-- status item dan status note harus dipisah sejak awal
-- laporan dapat membaca summary per Note dan per Work Item
-- adapter UI/HTTP/Telegram tidak boleh mengubah model dasar ini
+- Note is the main aggregate root for create, add item, total calculation, payment recording, correction, and audit reference operations
+- Work Item may not become a separate aggregate that turns the user experience into multi-note behavior
+- item status and note status must be separated from the beginning
+- reports may read summaries per Note and per Work Item
+- UI / HTTP / Telegram adapters may not change this base model
 
 ## Related Decisions
 
-- ADR-002 — Negative Stock Policy Default Off
-- ADR-003 — External Spare Part as Case Cost
-- ADR-005 — Paid Note Correction Requires Audit
-- ADR-009 — Reporting as Read Model
+- ADR-002 - Negative Stock Policy Default Off
+- ADR-003 - External Spare Part as Case Cost
+- ADR-005 - Paid Note Correction Requires Audit
+- ADR-009 - Reporting as Read Model

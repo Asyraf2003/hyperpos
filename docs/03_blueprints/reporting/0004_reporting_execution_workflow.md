@@ -1,533 +1,220 @@
 # Workflow Reporting V2 - Execution Order, Guard, and Test Discipline
 
-Tanggal: 2026-04-14
+Date: 2026-04-14
 
-## Tujuan
+## Purpose
 
-Dokumen ini menjabarkan alur kerja implementasi reporting v2 secara bertahap.
+This document describes the step-by-step workflow for implementing reporting v2.
 
-Workflow ini dibuat agar tim tidak:
+It is meant to keep the team from:
 
-- loncat ke dashboard dulu
-- membuat export dengan query terpisah
-- mencampur report, chart, dan logic domain
-- menoleransi mismatch kecil
-- menumpuk file besar yang sulit diaudit
+- jumping to the dashboard first
+- building export with a separate query
+- mixing report, chart, and domain logic
+- tolerating small mismatches
+- stacking large files that are hard to audit
 
-Dokumen ini adalah workflow pelaksanaan dari blueprint:
+This document is the execution workflow for the blueprint:
 
 - `docs/99_archive/handoff/v2/report/00-reporting-blueprint-handoff.md`
 
 ---
 
-## Aturan Global Workflow
+## Global Workflow Rules
 
-### 1. Kerjakan satu report aktif dalam satu halaman kerja
+### 1. Work on one active report in one work page
 
-Satu halaman kerja hanya boleh punya satu fokus aktif.
+A single work page may only have one active focus.
 
-Contoh aman:
+Safe examples:
 
-- halaman 1 hanya Arus Kas Transaksi
-- halaman 2 hanya Biaya Operasional
-- halaman 3 hanya Hutang Karyawan
+- page 1 only Transaction Cash Flow
+- page 2 only Operational Expense
+- page 3 only Employee Debt
 
-### 2. Jangan mulai dari dashboard
+### 2. Do not start from the dashboard
 
-Dashboard hanya boleh di-wire setelah report sumber stabil.
+The dashboard may only be wired after the source report is stable.
 
-### 3. Jangan mulai dari export
+### 3. Do not start from export
 
-PDF dan Excel hanya boleh dibuat setelah dataset screen stabil.
+PDF and Excel may only be created after the screen dataset is stable.
 
-### 4. Exactness lebih penting dari kosmetik
+### 4. Exactness matters more than cosmetics
 
-Jika harus memilih antara:
+If you must choose between:
 
-- tampilan cepat
-- angka benar
+- fast-looking UI
+- correct numbers
 
-pilih angka benar.
+choose correct numbers.
 
-### 5. File kecil
+### 5. Keep files small
 
-Target file code sekitar 100 baris.
+The target code file size is around 100 lines.
 
-Jika melewati sekitar 100 baris, pecah file berdasarkan peran.
+If a file grows beyond about 100 lines, split it by responsibility.
 
 ---
 
-## Urutan Eksekusi Resmi
+## Official Execution Order
 
-1. Arus Kas Transaksi
-2. Biaya Operasional
-3. Hutang Karyawan
-4. Laba Kas Operasional
-5. Hutang Supplier
-6. Stok dan Nilai Persediaan
-7. Laporan Transaksi
+1. Transaction Cash Flow
+2. Operational Expense
+3. Employee Debt
+4. Operational Cash Profit
+5. Supplier Debt
+6. Stock and Inventory Value
+7. Transaction Report
 8. Dashboard wiring
-9. PDF dan Excel parity
+9. PDF and Excel parity
 
 ---
 
-## Template Kerja Per Report
+## Work Template Per Report
 
-Setiap report harus melewati tahapan yang sama.
+Every report must pass the same stages.
 
-## Tahap A - Lock contract
+## Stage A - Lock the contract
 
-Wajib dikunci dulu:
+Lock first:
 
-- tujuan report
+- report goal
 - grain
-- basis tanggal
+- date basis
 - source domain
 - inclusion rule
 - summary cards
-- total utama
+- main total
 - dashboard consumer
 - export dependency
 
-### Output Tahap A
+### Stage A output
 
-- kontrak report tertulis
-- tidak ada istilah ambigu yang belum dikunci
+- report contract is written
+- no ambiguous term remains unlocked
 
 ---
 
-## Tahap B - Source mapping proof
+## Stage B - Source mapping proof
 
-Buktikan source domain yang dipakai memang ada dan sesuai repo.
+Prove that the source domain actually exists and matches the repo.
 
-Wajib dipetakan:
+Must map:
 
-- tabel
-- field tanggal
-- field nominal
+- table
+- date field
+- amount field
 - status inclusion
-- field relasi penting
+- important relation fields
 
-### Output Tahap B
+### Stage B output
 
-- daftar source final
-- daftar guard
-- gap yang tidak boleh diasumsikan
+- final source list
+- guard list
+- gaps that may not be assumed
 
 ---
 
-## Tahap C - Query dan builder
+## Stage C - Query and builder
 
-Bangun query dan builder sesuai kontrak.
+Build the query and builder according to the contract.
 
-Pisahkan file bila perlu:
+Split files if needed:
 
-- query raw
-- dto
+- raw query
+- DTO
 - builder
 - reconciliation service
 - use case handler
 
-### Guard Tahap C
+### Stage C guard
 
-- jangan gabung semua logic di satu query class besar
-- jangan campur query dengan formatting output
-- jangan campur export mapping dengan query inti
-
----
-
-## Tahap D - Reconciliation
-
-Sebelum controller dan dashboard, report wajib punya reconciliation.
-
-Jenis reconciliation minimum:
-
-- detail ke summary
-- harian ke mingguan
-- mingguan ke bulanan
-- report source ke report induk bila ada dependensi
+- do not put all logic in one large query class
+- do not mix query and output formatting
+- do not mix export mapping with the core query
 
 ---
 
-## Tahap E - Screen contract
+## Stage D - Reconciliation
 
-Baru setelah query dan reconciliation stabil, buka screen contract.
+Before controller and dashboard, the report must have reconciliation.
 
-Wajib dikunci:
+Minimum reconciliation types:
 
-- filter
+- detail to summary
+- daily to weekly
+- weekly to monthly
+- report source to parent report when there is a dependency
+
+---
+
+## Stage E - Screen contract
+
+Only after query and reconciliation are stable may the screen contract be opened.
+
+Must be locked:
+
+- filters
 - summary cards
 - table columns
-- sort default
+- default sort
 - empty state
 - no stale-zero behavior
 
 ---
 
-## Tahap F - Export contract
+## Stage F - Export contract
 
-Setelah screen stabil, baru buka export.
+After the screen is stable, open export.
 
-Wajib dikunci:
+Must be locked:
 
 - PDF source = screen source
 - Excel source = screen source
 - filter parity
 - total parity
-- formatting tidak mengubah nilai
+- formatting does not change values
 
 ---
 
-## Tahap G - Dashboard dependency
+## Stage G - Dashboard dependency
 
-Setelah report screen dan export stabil, baru hubungkan ke dashboard.
+After the report screen and export are stable, connect the dashboard.
 
-Wajib dikunci:
+Must be locked:
 
-- widget mana consume report ini
-- metric mana yang kritis
-- apakah widget perlu fallback ke live source
-- apakah chart boleh hybrid
-
----
-
-## Tahap H - Feature test monster
-
-Setelah semua kontrak di atas stabil, jalankan test monster.
+- which widget consumes this report
+- which metric is critical
+- whether the widget needs a fallback to live source
+- whether the chart can be hybrid
 
 ---
 
-## Jalur Test Wajib Per Report
+## Stage H - Feature test monster
+
+After all the contracts above are stable, run the feature test monster.
+
+---
+
+## Required Test Paths Per Report
 
 ## 1. Formula exactness
 
-Dataset kecil, angka dapat dihitung tangan.
+Use a small dataset that can be checked by hand.
 
-### Assert minimum
+### Minimum assertions
 
-- semua komponen benar
-- total akhir benar
-- integer rupiah
-- tidak ada pembulatan liar
+- every component is correct
+- the final total is correct
+- rupiah is integer
+- no uncontrolled rounding exists
 
 ## 2. Read-after-write
 
-Setelah mutation domain commit:
+After the domain mutation commits:
 
-- panggil report
-- angka baru harus langsung terlihat
+- call the report
+- the new number must appear immediately
 
 ## 3. Period parity
-
-- harian ke mingguan
-- harian ke bulanan
-- custom range ke detail
-
-## 4. Detail vs summary
-
-Total summary harus sama dengan total detail.
-
-## 5. Screen vs export
-
-- screen = PDF
-- screen = Excel
-
-## 6. Dashboard source parity
-
-Widget dashboard yang memakai report ini harus sama dengan summary report.
-
-## 7. Boundary test
-
-Event di batas hari, minggu, bulan harus masuk bucket yang benar.
-
-## 8. No stale-zero
-
-Jika source domain ada, angka nol palsu tidak boleh tampil.
-
----
-
-## Workflow Per Report
-
-## Step 1 - Arus Kas Transaksi
-
-### Fokus
-
-Menjadikan uang masuk dan cash out transaksi sebagai source resmi pertama.
-
-### Kenapa duluan
-
-Ini fondasi definisi client untuk laba kas.
-
-### Test prioritas
-
-- payment allocation masuk report
-- refund masuk report
-- daily = weekly = monthly
-- dashboard uang masuk reconcile
-
-### Exit condition
-
-Arus Kas Transaksi siap dipakai oleh Laba Kas Operasional dan dashboard.
-
----
-
-## Step 2 - Biaya Operasional
-
-### Fokus
-
-Menjadikan biaya posted sebagai source resmi pengurang kas operasional.
-
-### Test prioritas
-
-- hanya `posted`
-- total detail = total summary
-- period parity
-- dashboard biaya reconcile
-
-### Exit condition
-
-Biaya Operasional siap dipakai oleh Laba Kas Operasional dan dashboard.
-
----
-
-## Step 3 - Hutang Karyawan
-
-### Fokus
-
-Menjadikan posisi hutang karyawan dan payment history resmi.
-
-### Guard khusus
-
-Jangan campur payroll.
-
-### Test prioritas
-
-- debt record masuk report
-- payment history reconcile
-- saldo hutang benar
-- period parity
-
-### Exit condition
-
-Report Hutang Karyawan siap dipakai dashboard dan siap dijadikan source
-pembuktian cash-out debt untuk Laba Kas Operasional.
-
----
-
-## Step 4 - Laba Kas Operasional
-
-### Fokus
-
-Merakit report sintesis dari source yang sudah stabil.
-
-### Source dependency
-
-- Arus Kas Transaksi
-- Biaya Operasional
-- Hutang Karyawan
-- payroll disbursement
-- stock COGS
-- external purchase cost
-
-### Guard khusus
-
-`employee_debt_cash_out_rupiah` tidak boleh diasumsikan.
-
-Harus dibuktikan dari repo sebelum implementasi final.
-
-### Test prioritas
-
-- hari bisa minus
-- minggu bisa positif
-- bulan bisa sangat profit
-- semua komponen reconcile
-- selisih 1 rupiah = fail
-
-### Exit condition
-
-Laba Kas Operasional siap jadi kartu utama dan chart utama dashboard.
-
----
-
-## Step 5 - Hutang Supplier
-
-### Fokus
-
-Posisi hutang supplier dan jatuh tempo.
-
-### Test prioritas
-
-- outstanding benar
-- overdue bucket benar
-- reference date benar
-- dashboard supplier reconcile
-
-### Exit condition
-
-Hutang Supplier siap dipakai dashboard liability.
-
----
-
-## Step 6 - Stok dan Nilai Persediaan
-
-### Fokus
-
-Memisahkan mutasi stok dari current snapshot.
-
-### Struktur kerja
-
-- bagian A mutasi
-- bagian B snapshot
-
-### Test prioritas
-
-- histori memakai movement
-- snapshot memakai current state
-- tidak saling mengarang
-- dashboard persediaan reconcile
-
-### Exit condition
-
-Nilai Persediaan Saat Ini siap jadi kartu dashboard.
-
----
-
-## Step 7 - Laporan Transaksi
-
-### Fokus
-
-Ringkasan transaksi per note.
-
-### Test prioritas
-
-- gross
-- allocated payment
-- refund
-- outstanding
-- period parity
-
-### Exit condition
-
-Report transaksi siap dipakai untuk audit operasional dan summary transaksi.
-
----
-
-## Step 8 - Dashboard wiring
-
-### Fokus
-
-Mengganti angka hard-code dashboard dengan data nyata.
-
-### Urutan wiring
-
-1. cards kritis
-2. charts utama
-3. insight
-4. kesimpulan
-
-### Guard
-
-- widget kritis wajib fresh
-- chart boleh hybrid dengan fallback
-- nol palsu tidak boleh
-- JS tidak menghitung ulang angka bisnis
-
-### Test prioritas
-
-- no stale-zero
-- read-after-write
-- widget parity ke report source
-
-### Exit condition
-
-Dashboard memakai data nyata yang reconcile dengan report.
-
----
-
-## Step 9 - PDF dan Excel parity
-
-### Fokus
-
-Membuat export sebagai adapter output dari dataset yang sudah stabil.
-
-### Guard
-
-- jangan buat query export terpisah
-- jangan ubah total lewat formatting
-- filter parity wajib
-
-### Test prioritas
-
-- screen = PDF = Excel
-- filter sama
-- total sama
-
-### Exit condition
-
-Export aman untuk dipakai user tanpa risiko mismatch.
-
----
-
-## Checklist Wajib Sebelum Menutup Satu Report
-
-Satu report baru boleh dianggap selesai jika:
-
-- kontrak logic tertulis
-- source mapping terbukti
-- file code kecil dan terpecah
-- screen source stabil
-- period parity lulus
-- reconciliation lulus
-- dashboard dependency jelas
-- export parity lulus bila sudah dikerjakan
-- read-after-write lulus
-- no stale-zero lulus
-
----
-
-## Anti-Pattern yang Dilarang
-
-- mulai dari dashboard dulu
-- mulai dari PDF dulu
-- mulai dari Excel dulu
-- membuat query dashboard terpisah dari report
-- membuat query export terpisah dari screen
-- menghitung angka di JS
-- memakai current snapshot untuk mengarang histori
-- membiarkan file query besar menumpuk banyak peran
-- menoleransi selisih 1 rupiah
-
----
-
-## Definisi Selesai Tahap Reporting V2
-
-Reporting v2 baru dianggap sehat jika:
-
-- 7 report inti hidup
-- dashboard memakai data nyata
-- card kritis fresh setelah commit
-- chart tidak nol palsu
-- PDF dan Excel parity
-- period parity
-- cross-report reconciliation
-- exactness 1 rupiah terlindungi oleh test
-
----
-
-## Rekomendasi Halaman Kerja Berikutnya
-
-Gunakan workflow ini sebagai panduan halaman implementasi.
-
-Urutan halaman implementasi yang aman:
-
-1. Arus Kas Transaksi
-2. Biaya Operasional
-3. Hutang Karyawan
-4. Laba Kas Operasional
-5. Hutang Supplier
-6. Stok dan Nilai Persediaan
-7. Laporan Transaksi
-8. Dashboard wiring
-9. PDF dan Excel parity
-
-Satu halaman kerja hanya mengerjakan satu langkah aktif.

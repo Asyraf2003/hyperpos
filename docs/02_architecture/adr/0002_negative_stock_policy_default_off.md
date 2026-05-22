@@ -1,4 +1,4 @@
-# ADR-0002 — Negative Stock Policy Default Off
+# ADR-0002 - Negative Stock Policy Default Off
 
 - Status: Accepted
 - Date: 2026-03-09
@@ -7,142 +7,145 @@
 
 ## Context
 
-Sistem ini mengelola stok sparepart untuk operasional bengkel. Dari kebutuhan bisnis yang sudah dikunci:
+This system manages spare-part stock for workshop operations. From the locked business requirements:
 
-- stok negatif tidak sehat untuk operasional dan keuangan
-- stok negatif default harus dilarang
-- namun struktur hexagonal harus tetap memudahkan perubahan di masa depan bila suatu saat bisnis ingin mengizinkan behavior berbeda, misalnya model backorder atau kebijakan khusus lain
+- negative stock is not healthy for operations or finance
+- negative stock must be forbidden by default
+- however, the hexagonal structure must still make it easy to change later if the business ever wants a different behavior, such as backorder or a special policy
 
-Di sisi lain, sistem ini juga memiliki aturan lain:
+The system also has other locked rules:
 
-- stok bertambah normal hanya dari supplier receipt yang valid
-- stok berkurang karena penjualan sparepart, pemakaian sparepart untuk servis, atau adjustment resmi
-- supplier invoice tidak boleh menambah product baru bila master product belum ada
-- laporan dan keuangan tidak boleh selisih bahkan 1 rupiah
+- normal stock increases only come from valid supplier receipts
+- stock decreases because of spare-part sales, spare-part usage for service, or official adjustments
+- supplier invoices may not create a new product if the product master does not already exist
+- reports and finance may not differ by even 1 rupiah
 
-Jika stok negatif dibiarkan secara default, maka:
+If negative stock is allowed by default:
 
-- laporan persediaan menjadi tidak sehat
-- perhitungan biaya dan laba menjadi tidak dapat dipercaya
-- operasional berisiko mencatat penjualan/pemakaian barang yang sebenarnya tidak ada
+- the inventory report becomes unhealthy
+- cost and profit calculations become untrustworthy
+- the system may record sales or stock usage for items that do not actually exist
 
 ## Decision
 
-Sistem menetapkan kebijakan dasar:
+The system sets the default policy as follows:
 
-- **stok negatif dilarang secara default**
-- **validasi larangan stok negatif dijalankan di core domain inventory**
-- **aturan ini dibuat sebagai policy/strategy yang dapat diganti di masa depan tanpa membongkar struktur inti**
+- **negative stock is forbidden by default**
+- **the negative-stock rule is enforced in the core inventory domain**
+- **the rule is implemented as a policy / strategy that can be replaced later without changing the core structure**
 
 ## Decision Details
 
 ### 1. Default business rule
 
-Pada semua use case yang mengurangi stok store inventory, sistem harus menolak operasi jika quantity keluar menyebabkan saldo menjadi kurang dari nol.
+For every use case that reduces store inventory stock, the system must reject the operation if the outgoing quantity makes the balance drop below zero.
 
-Use case yang terdampak minimal:
+At minimum, the affected use cases are:
 
-- pemakaian sparepart toko untuk work item/note
-- penjualan sparepart langsung
-- stock adjustment minus
-- koreksi yang berdampak pada pengurangan stok
+- store spare-part usage for a work item / note
+- direct spare-part sales
+- negative stock adjustments
+- corrections that reduce stock
 
 ### 2. Domain location
 
-Larangan stok negatif wajib hidup di core domain/application policy, bukan di:
+The negative-stock rule must live in the core domain / application policy, not in:
 
 - UI
 - controller
-- query database mentah
-- validasi frontend
+- raw database query
+- frontend validation
 
-Alasan:
+Reason:
 
-- aturan ini adalah aturan bisnis inti
-- harus konsisten lintas adapter
-- harus tetap benar bila nanti ada HTTP, CLI, Telegram, atau adapter lain
+- this is a core business rule
+- it must be consistent across adapters
+- it must remain correct if the future entry point becomes HTTP, CLI, Telegram, or another adapter
 
 ### 3. Extensibility
 
-Walau default saat ini adalah larangan stok negatif, desain harus tetap membuka extension point seperti:
+Even though the default is negative stock forbidden, the design must still leave room for extension points such as:
 
 - `NegativeStockPolicy`
 - `InventoryAvailabilityPolicy`
 
-Dengan demikian, bila suatu hari bisnis berubah, implementasi dapat diganti tanpa mengubah arah arsitektur.
+That way, if the business changes later, the implementation can be replaced without changing the architecture direction.
 
-Namun selama belum ada ADR baru yang mengubahnya, perilaku resmi tetap:
+But until a new ADR changes it, the official behavior remains:
 
 - negative stock not allowed
 
 ## Alternatives Considered
 
-### Alternative A — Mengizinkan stok negatif sejak awal
-Ditolak.
+### Alternative A - Allow negative stock from the start
 
-Alasan penolakan:
+Rejected.
 
-- bertentangan langsung dengan kebutuhan bisnis
-- merusak kesehatan operasional dan laporan
-- menyulitkan kontrol stok nyata di bengkel
-- berisiko membuat keuangan tampak sehat padahal data persediaan salah
+Reasons:
 
-### Alternative B — Larangan stok negatif hanya di UI
-Ditolak.
+- directly conflicts with the business requirement
+- damages operational and report health
+- makes real stock control in the workshop difficult
+- risks making sales or usage look valid when the item is actually unavailable
 
-Alasan penolakan:
+### Alternative B - Enforce negative stock only in the UI
 
-- mudah ditembus oleh adapter lain
-- tidak menjamin konsistensi lintas entry point
-- bukan penempatan aturan yang benar untuk hexagonal architecture
+Rejected.
 
-### Alternative C — Larangan stok negatif hanya lewat database constraint
-Ditolak sebagai solusi utama.
+Reasons:
 
-Alasan penolakan:
+- easy to bypass through other adapters
+- does not guarantee consistency across entry points
+- is not the correct place for the rule in hexagonal architecture
 
-- constraint database berguna sebagai guard tambahan, tetapi tidak cukup untuk mengekspresikan keputusan bisnis
-- error yang keluar cenderung tidak ramah domain
-- sulit menjaga perilaku konsisten di level use case dan audit
+### Alternative C - Enforce negative stock only with a database constraint
+
+Rejected as the main solution.
+
+Reasons:
+
+- database constraints are useful as an extra guard, but are not enough to express the business decision
+- the resulting error is usually not domain-friendly
+- it is harder to keep the behavior consistent at the use-case and audit levels
 
 ## Consequences
 
 ### Positive
 
-- kontrol stok lebih sehat
-- laporan stok dan operasional lebih dapat dipercaya
-- membantu menjaga akurasi COGS dan margin
-- mencegah transaksi yang tidak didukung ketersediaan barang
-- sesuai dengan kebutuhan bisnis yang sudah dikunci
+- stock control stays healthier
+- stock and operational reports are more trustworthy
+- helps keep COGS and margin accurate
+- prevents transactions that are not backed by stock availability
+- matches the locked business requirement
 
 ### Negative
 
-- beberapa transaksi lapangan akan gagal lebih cepat dan butuh penanganan operasional yang benar
-- implementasi correction/reversal perlu hati-hati bila stok sudah terlanjur berubah
-- testing inventory menjadi lebih ketat
+- some field transactions will fail faster and need proper operational handling
+- correction / reversal logic must be handled carefully if stock already moved
+- inventory testing becomes stricter
 
 ## Invariants
 
-- stok store inventory tidak boleh kurang dari nol
-- semua pengurangan stok harus melalui movement resmi
-- semua penambahan stok normal harus berasal dari jalur yang sah
-- external purchase cost tidak boleh memakai jalur store inventory
-- customer-owned part tidak boleh memengaruhi store inventory
+- store inventory stock may not fall below zero
+- all stock decreases must go through official movements
+- all normal stock increases must come from a valid path
+- external purchase cost must not use the store inventory path
+- customer-owned parts must not affect store inventory
 
 ## Implementation Notes
 
-- perhitungan ketersediaan stok harus berbasis saldo yang dapat direkonstruksi dari movement resmi
-- validasi stok perlu dijalankan sebelum commit mutasi yang mengurangi stok
-- error domain yang direkomendasikan:
+- stock-availability calculation must be based on balances that can be reconstructed from official movements
+- stock validation must run before committing a mutating operation that reduces stock
+- recommended domain errors:
   - `INVENTORY_INSUFFICIENT_STOCK`
   - `INVENTORY_NEGATIVE_STOCK_NOT_ALLOWED`
-- database constraint boleh dipakai sebagai lapisan pertahanan tambahan, tetapi bukan sumber utama aturan bisnis
-- laporan harus dapat mengasumsikan bahwa saldo negatif tidak valid secara domain
+- the database constraint may be used as an extra guard, but not as the main source of the business rule
+- reports may assume that negative balances are invalid at the domain level
 
 ## Related Decisions
 
-- ADR-001 — One Note Multi-Item Model
-- ADR-003 — External Spare Part as Case Cost
-- ADR-006 — Costing Strategy Default Average, FIFO-ready
-- ADR-011 — Money Stored as Integer Rupiah
-- ADR-012 — Product Master Must Exist Before Supplier Receipt
+- ADR-001 - One Note Multi-Item Model
+- ADR-003 - External Spare Part as Case Cost
+- ADR-006 - Costing Strategy Default Average, FIFO-ready
+- ADR-011 - Money Stored as Integer Rupiah
+- ADR-012 - Product Master Must Exist Before Supplier Receipt

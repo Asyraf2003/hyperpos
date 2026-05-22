@@ -1,4 +1,4 @@
-# ADR-0003 — External Spare Part as Case Cost
+# ADR-0003 - External Spare Part as Case Cost
 
 - Status: Accepted
 - Date: 2026-03-09
@@ -7,149 +7,152 @@
 
 ## Context
 
-Dalam operasional bengkel ini terdapat kasus nyata ketika sparepart untuk pekerjaan customer tidak diambil dari stok toko, tetapi dibeli dari luar untuk memenuhi kebutuhan kasus tertentu.
+In this workshop, there are real cases where the spare part for a customer job is not taken from store inventory, but bought from outside to satisfy a specific case.
 
-Kebutuhan bisnis yang sudah dikunci:
+The locked business requirements are:
 
-- sparepart beli luar tidak masuk inventory produk toko
-- pencatatan paling sehat adalah menjadikannya biaya pada kasus
-- alasan utama: user perlu melihat dengan jelas kenapa hasil bersih suatu servis menjadi sekian
-- biaya part luar tidak boleh disamarkan menjadi jasa bersih karena itu berisiko membingungkan audit dan laporan
-- contoh domain nyata:
-  - charge ke customer: 90.000
-  - biaya beli part luar: 30.000
-  - hasil bersih operasional kasus: 60.000
+- externally bought spare parts do not enter store product inventory
+- the healthiest record is to treat them as case cost
+- the main reason: the user needs a clear view of why the net result of a service is a certain amount
+- external part cost may not be hidden as pure service profit because that would confuse audit and reports
+- a concrete domain example:
+  - charge to customer: 90,000
+  - outside part cost: 30,000
+  - operational case net result: 60,000
 
-Sistem juga sudah mengunci bahwa dalam satu note dapat ada beberapa work item dengan sumber sparepart berbeda-beda.
+The system already locks in that one note may contain several work items with different spare-part sources.
 
 ## Decision
 
-Sistem menetapkan:
+The system sets:
 
-- **sparepart yang dibeli dari luar dicatat sebagai biaya kasus/work item**
-- **sparepart beli luar tidak menambah stok inventory toko**
-- **sparepart beli luar tidak diperlakukan sebagai product inventory receipt**
-- **perhitungan margin/hasil bersih kasus harus dapat membaca pendapatan dan biaya eksternal ini secara terpisah**
+- **spare parts bought from outside are recorded as case / work-item cost**
+- **external spare parts do not add to store inventory stock**
+- **external spare parts are not treated as a product inventory receipt**
+- **margin / net result calculations must be able to read this external cost separately**
 
 ## Decision Details
 
 ### 1. Domain placement
 
-Biaya sparepart beli luar menjadi bagian dari domain Note/Work Item, bukan domain Inventory.
+External spare-part cost becomes part of the Note / Work Item domain, not the Inventory domain.
 
-Secara konseptual, line ini diperlakukan sebagai:
+Conceptually, this line is treated as:
 
 - `external_purchase_cost_line`
-- atau nama setara yang jelas menunjukkan bahwa ini biaya eksternal untuk menyelesaikan item/kasus
+- or another clear name that shows it is an external cost used to complete the item / case
 
 ### 2. Financial effect
 
-Saat line external purchase cost dicatat:
+When an external purchase cost line is recorded:
 
-- total tagihan ke customer tetap mengikuti line resmi yang ditagihkan
-- biaya eksternal tercatat sebagai komponen cost pada item/kasus
-- inventory store stock tidak berubah
-- laporan operasional dapat menghitung margin item/kasus dengan benar
+- the customer charge still follows the official billed lines
+- the external cost is recorded as a cost component for the item / case
+- store inventory does not change
+- operational reports can calculate the item / case margin correctly
 
 ### 3. Reporting effect
 
-Karena biaya part luar dicatat eksplisit, laporan dapat membedakan:
+Because the external cost is recorded explicitly, reports can distinguish:
 
-- pendapatan jasa dan/atau pendapatan item
-- biaya part luar
-- hasil bersih operasional kasus
+- service and / or item revenue
+- external part cost
+- operational net result for the case
 
-Ini penting agar tidak muncul pertanyaan operasional seperti:
+This matters so that people do not end up asking:
 
-- kenapa jasa tampak terlalu kecil
-- kenapa margin kasus tidak jelas
-- kenapa angka laporan tidak bisa ditelusuri
+- why does the service look too small
+- why is the case margin unclear
+- why can the report not be traced back to the source
 
 ### 4. Boundary with inventory
 
-External purchase cost tidak boleh dianggap sebagai:
+External purchase cost may not be treated as:
 
 - product receipt
-- purchase stock
+- stock purchase
 - on-hand inventory
 - store-stock part usage
 
-Jika suatu hari bisnis ingin memodelkan skenario lain, misalnya barang luar terlebih dahulu masuk inventory lalu dikeluarkan lagi, maka itu memerlukan keputusan baru. Sampai ada keputusan baru, model resmi tetap:
+If the business ever wants a different scenario, such as a part first entering inventory and then leaving again, that requires a new decision. Until then, the official model remains:
 
 - external purchase is case cost, not inventory
 
 ## Alternatives Considered
 
-### Alternative A — External purchase langsung dianggap bagian dari harga jasa bersih
-Ditolak.
+### Alternative A - External purchase is treated directly as part of pure service price
 
-Alasan penolakan:
+Rejected.
 
-- menyembunyikan biaya nyata
-- berisiko membingungkan user saat audit
-- membuat margin sulit dijelaskan
-- mempersulit laporan biaya dan analisis operasional
+Reasons:
 
-### Alternative B — External purchase dipaksa masuk inventory toko
-Ditolak untuk default domain ini.
+- hides the real cost
+- may confuse the user during audit
+- makes margin harder to explain
+- weakens cost and operational analysis
 
-Alasan penolakan:
+### Alternative B - External purchase is forced into store inventory
 
-- tidak sesuai kebutuhan bisnis yang sudah dikunci
-- menambah langkah operasional yang tidak perlu
-- memalsukan realitas proses ketika barang memang hanya dibeli untuk kasus tertentu
-- menambah noise di inventory movement
+Rejected for the default domain.
 
-### Alternative C — External purchase dicatat di luar Note saja
-Ditolak.
+Reasons:
 
-Alasan penolakan:
+- does not match the locked business need
+- adds unnecessary operational steps
+- misrepresents the reality when the item was only bought for a specific case
+- adds noise to inventory movement
 
-- memutus keterkaitan biaya dengan kasus sumbernya
-- mempersulit pelacakan margin per note/work item
-- membuat audit dan reporting menjadi lebih lemah
+### Alternative C - External purchase is recorded outside the Note entirely
+
+Rejected.
+
+Reasons:
+
+- breaks the connection between the cost and its source case
+- makes case-margin tracking harder
+- weakens audit and reporting
 
 ## Consequences
 
 ### Positive
 
-- biaya kasus tercatat eksplisit
-- margin/hasil bersih kasus lebih transparan
-- inventory tetap bersih dari item yang tidak pernah benar-benar menjadi stok toko
-- cocok dengan kebutuhan operasional lapangan
-- memudahkan audit dan analisis laporan
+- case cost is recorded explicitly
+- item / case margin becomes more transparent
+- inventory stays clean from items that never actually became store stock
+- matches the shop’s real-world process
+- helps with audit and reports
 
 ### Negative
 
-- model financial line di Note/Work Item menjadi lebih kaya
-- laporan perlu membedakan pendapatan dan external cost dengan disiplin
-- implementasi UI harus tetap sederhana walau struktur internal lebih detail
+- the financial line model in Note / Work Item becomes richer
+- reports must distinguish revenue and external cost carefully
+- the UI must still stay simple even though the internal structure is more detailed
 
 ## Invariants
 
-- external purchase cost tidak mengubah saldo inventory toko
-- external purchase cost harus terikat ke note/work item yang relevan
-- nilai biaya eksternal harus tercatat eksplisit
-- margin item/kasus harus dapat ditelusuri dari data mentah
-- line external purchase tidak boleh diproses oleh costing strategy inventory store stock
+- external purchase cost does not change store inventory balance
+- external purchase cost must be tied to the relevant note / work item
+- external cost values must be recorded explicitly
+- item / case margin must be traceable from raw data
+- the external purchase line may not be processed by the store-stock costing strategy
 
 ## Implementation Notes
 
-- work item perlu mendukung line khusus untuk biaya eksternal
-- penamaan line harus jelas dan tidak ambigu dengan service revenue atau store-stock part line
-- laporan minimal perlu mampu menampilkan:
-  - pendapatan note/item
-  - biaya external purchase
-  - hasil bersih operasional
-- error/guard yang perlu dijaga:
-  - line external purchase tidak boleh mengurangi stok
-  - line external purchase tidak boleh diperlakukan sebagai product receipt
-- bila nanti ada kebutuhan supplier payable untuk pembelian eksternal semacam ini, keputusan itu harus dibahas terpisah agar tidak mencampur jalur procurement stock dan case cost
+- the work item must support a special line for external cost
+- line naming must be clear and not ambiguous with service revenue or store-stock part lines
+- reports should at minimum be able to show:
+  - note / item revenue
+  - external purchase cost
+  - operational net result
+- important guards:
+  - external purchase line may not reduce stock
+  - external purchase line may not be treated as a product receipt
+- if a future supplier payable model is needed for this type of outside purchase, that decision must be discussed separately so procurement stock and case cost are not mixed
 
 ## Related Decisions
 
-- ADR-001 — One Note Multi-Item Model
-- ADR-002 — Negative Stock Policy Default Off
-- ADR-005 — Paid Note Correction Requires Audit
-- ADR-006 — Costing Strategy Default Average, FIFO-ready
-- ADR-009 — Reporting as Read Model
+- ADR-001 - One Note Multi-Item Model
+- ADR-002 - Negative Stock Policy Default Off
+- ADR-005 - Paid Note Correction Requires Audit
+- ADR-006 - Costing Strategy Default Average, FIFO-ready
+- ADR-009 - Reporting as Read Model

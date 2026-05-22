@@ -1,4 +1,4 @@
-# ADR-0005 — Paid Note Correction Requires Audit
+# ADR-0005 - Paid Note Correction Requires Audit
 
 - Status: SUPERSEDED IN PART by ADR-0016
 - Date: 2026-03-09
@@ -11,110 +11,110 @@ ADR-0005 is superseded in part by ADR-0016.
 
 Still valid from ADR-0005:
 
-- paid note mutation must not be silent overwrite
-- reason is required
-- actor is required
-- timestamp is required
-- before/after snapshot is required
+- a paid note mutation may not be a silent overwrite
+- a reason is required
+- an actor is required
+- a timestamp is required
+- a before / after snapshot is required
 - sensitive mutation must be auditable
-- reporting must be able to reconstruct change history
+- reporting must be able to reconstruct the change history
 
 Changed by ADR-0016:
 
-- closed/paid/refunded note is no longer treated as a terminal mutation lock
-- adding line after paid/refund can be valid when performed through audited revision/event flow
+- a closed / paid / refunded note is no longer treated as a terminal mutation lock
+- adding a line after paid / refund can be valid when it happens through an audited revision / event flow
 - refund can neutralize selected rows in the same note
-- refund/cancel of unpaid row can still reverse inventory and reduce outstanding
+- refund / cancel of an unpaid row can still reverse inventory and reduce outstanding
 - post-consequence note mutation is allowed if financial ledger, inventory ledger, audit timeline, and reporting projection remain consistent
 
 ## Context
 
-Domain transaksi pada sistem bengkel ini sangat sensitif karena:
+The transaction domain in this workshop system is highly sensitive because:
 
-- pembayaran dapat parsial
-- satu note dapat memuat banyak work item
-- laporan dan saldo tidak boleh selisih 1 rupiah
-- perubahan pada transaksi yang sudah dibayar penuh berpotensi merusak audit, laporan, dan jejak operasional
+- payments may be partial
+- one note may contain many work items
+- reports and balances may not differ by 1 rupiah
+- changes to a fully paid transaction can damage audit, reports, and the operational trace
 
-Kebutuhan bisnis yang sudah dikunci:
+The locked business requirements are:
 
-- transaksi/note yang sudah lunas **tidak boleh diubah bebas**
-- bila hanya ingin menambah item baru setelah transaksi selesai/lunas, sebaiknya dibuat transaksi/kasus baru
-- bila ada salah input, koreksi tetap **boleh**
-- user cukup mengisi **alasan**
-- sistem wajib otomatis mencatat:
-  - siapa
-  - kapan
-  - perubahan sebelum/sesudah
+- a fully paid note may **not** be freely changed
+- if the goal is only to add a new item after the transaction is done / paid, it is better to create a new transaction / case
+- if there is a wrong input, correction is still **allowed**
+- the user only needs to fill in a **reason**
+- the system must automatically record:
+  - who
+  - when
+  - what changed before / after
 
-Dengan demikian bisnis tidak memilih model immutable total, dan juga tidak memilih model editable bebas. Yang dipilih adalah:
+The business therefore does not choose a total immutable model, and it also does not choose a free-edit model. The choice is:
 
 - editable only through controlled correction with full audit
 
 ## Decision
 
-Sistem menetapkan:
+The system sets:
 
-- **paid Note tidak boleh diedit secara bebas**
-- **setiap perubahan pada paid Note hanya boleh melalui correction flow yang terkontrol**
-- **correction wajib memiliki alasan yang diisi user**
-- **sistem wajib otomatis menyimpan actor, timestamp, before snapshot, after snapshot, dan referensi perubahan**
-- **penambahan item baru setelah paid Note harus dibuat sebagai transaksi/kasus baru, bukan menambah line baru ke paid Note yang sama**
+- **a paid Note may not be freely edited**
+- **every change to a paid Note may only happen through a controlled correction flow**
+- **a correction must include a user-entered reason**
+- **the system must automatically store the actor, timestamp, before snapshot, after snapshot, and change reference**
+- **adding a new item after a paid Note must be created as a new transaction / case, not as a new line on the same paid Note**
 
 ## Decision Details
 
 ### 1. Boundary of “paid”
 
-Untuk kebutuhan domain ini, Note dianggap paid bila outstanding resmi yang dihitung domain sama dengan nol.
+For this domain, a Note is considered paid when the official outstanding amount calculated by the domain is zero.
 
-Status paid harus berasal dari:
+The paid status must come from:
 
-- total note
-- total payment sah
-- allocation/outstanding rule resmi
+- note total
+- valid payment total
+- official allocation / outstanding rule
 
-Bukan dari toggle manual UI.
+Not from a manual UI toggle.
 
 ### 2. Allowed behavior after paid
 
-Setelah Note berada dalam keadaan paid:
+After a Note is paid:
 
-- perubahan bebas dilarang
-- add new item ke Note yang sama dilarang
-- correction diperbolehkan hanya melalui use case resmi
-- refund atau adjustment dapat dipakai bila implementasi detail membutuhkannya
-- semua perubahan harus meninggalkan jejak audit penuh
+- free editing is forbidden
+- adding a new item to the same Note is forbidden
+- correction is allowed only through the official use case
+- refund or adjustment may be used if the detailed implementation needs it
+- every change must leave a full audit trail
 
 ### 3. Required user input
 
-User hanya wajib memasukkan:
+The user only needs to enter:
 
-- alasan correction
+- correction reason
 
-Data berikut tidak boleh dibebankan sebagai input manual user:
+The following data may not be required as manual input:
 
 - actor
 - timestamp
 - before snapshot
 - after snapshot
 
-Semua data tersebut harus dibangkitkan dan disimpan otomatis oleh sistem.
+All of those data must be generated and stored automatically by the system.
 
-### 4. Why new items must become new transaction
+### 4. Why a new item becomes a new transaction
 
-Bila setelah Note lunas user ternyata ingin menambah pekerjaan atau item baru, perilaku resmi bukan mengedit Note lama, tetapi:
+If after a Note is paid the user later wants to add more work or a new item, the official behavior is not to edit the old Note, but to:
 
-- buat transaksi/kasus baru
+- create a new transaction / case
 
-Alasan:
+Reasons:
 
-- menjaga arti historis transaksi yang sudah diselesaikan
-- menghindari campur aduk antara koreksi dan penambahan bisnis baru
-- menjaga laporan tetap dapat ditelusuri
+- preserve the history of the transaction that has already been completed
+- avoid mixing correction with new business work
+- keep reports traceable
 
 ### 5. Audit scope
 
-Audit correction minimal harus menangkap:
+The minimum correction audit must capture:
 
 - note reference
 - actor
@@ -123,83 +123,86 @@ Audit correction minimal harus menangkap:
 - before state
 - after state
 - affected fields or structured diff
-- relation to payment/refund/correction event bila ada
+- relation to payment / refund / correction event if any
 
 ## Alternatives Considered
 
-### Alternative A — Paid Note immutable total tanpa pengecualian
-Ditolak.
+### Alternative A - A paid note is fully immutable with no exceptions
 
-Alasan penolakan:
+Rejected.
 
-- tidak sesuai kebutuhan bisnis nyata
-- bisnis tetap membutuhkan kemampuan memperbaiki salah input
-- akan mendorong praktik operasional informal di luar sistem
+Reasons:
 
-### Alternative B — Paid Note boleh diedit bebas selama user hati-hati
-Ditolak.
+- not aligned with the real business need
+- the business still needs a way to fix wrong input
+- it would push people to work around the system outside of the official flow
 
-Alasan penolakan:
+### Alternative B - A paid note may be edited freely if the user is careful
 
-- bertentangan dengan kebutuhan bisnis
-- merusak audit trail
-- berisiko besar terhadap laporan dan rekonsiliasi
-- tidak sesuai dengan sensitivitas domain 1 rupiah exactness
+Rejected.
 
-### Alternative C — Paid Note boleh diedit bebas asalkan ada log teks sederhana
-Ditolak.
+Reasons:
 
-Alasan penolakan:
+- conflicts with the business requirement
+- destroys the audit trail
+- creates a high risk for reports and reconciliation
+- not suitable for a domain with 1-rupiah exactness sensitivity
 
-- tidak cukup kuat
-- tidak menjamin snapshot before/after
-- sulit untuk forensik perubahan
-- terlalu lemah untuk domain finansial sensitif
+### Alternative C - A paid note may be edited freely as long as there is a simple text log
+
+Rejected.
+
+Reasons:
+
+- not strong enough
+- does not guarantee before / after snapshots
+- hard to do forensics on the change
+- too weak for a sensitive finance domain
 
 ## Consequences
 
 ### Positive
 
-- salah input tetap dapat diperbaiki secara resmi
-- histori transaksi lunas tetap terjaga
-- audit lebih kuat
-- laporan lebih dapat dipercaya
-- perbedaan antara correction dan bisnis baru tetap jelas
+- wrong input can still be corrected officially
+- the history of paid transactions stays intact
+- audit becomes stronger
+- reports become more trustworthy
+- the difference between correction and new business work stays clear
 
 ### Negative
 
-- correction flow lebih kompleks dibanding edit biasa
-- implementasi snapshot/diff perlu disiplin
-- developer tidak bisa memakai update CRUD sederhana untuk paid Note
-- UI harus membedakan edit biasa dan correction
+- the correction flow is more complex than a simple edit
+- snapshot / diff implementation requires discipline
+- developers cannot use a plain CRUD update for a paid Note
+- the UI must distinguish normal edit from correction
 
 ## Invariants
 
-- paid Note tidak boleh menerima penambahan item baru
-- correction pada paid Note wajib memiliki reason
-- actor dan timestamp correction wajib otomatis tercatat
-- before/after snapshot wajib tersedia untuk perubahan sensitif
-- total/outstanding resmi harus tetap dapat direkonstruksi setelah correction event
-- perubahan paid Note di luar correction flow dianggap invalid secara domain
+- a paid Note may not accept a new item
+- correction on a paid Note must include a reason
+- the actor and timestamp of correction must be recorded automatically
+- before / after snapshots must exist for sensitive changes
+- the official total / outstanding must still be reconstructable after a correction event
+- a paid Note changed outside the correction flow is invalid at the domain level
 
 ## Implementation Notes
 
-- use case yang direkomendasikan:
+- recommended use cases:
   - `CorrectPaidNote`
   - `RecordRefund`
   - `RecordAdjustment`
-- error domain yang direkomendasikan:
+- recommended domain errors:
   - `NOTE_ALREADY_PAID`
   - `NOTE_NEW_ITEMS_NOT_ALLOWED_AFTER_PAID`
   - `AUDIT_REASON_REQUIRED`
-- correction flow tidak boleh digantikan dengan update repository langsung
-- reporting harus dapat mengenali bahwa perubahan berasal dari correction event resmi
-- desain audit dapat memakai snapshot penuh, structured diff, atau keduanya, selama before/after dapat dipertanggungjawabkan
+- the correction flow may not be replaced by a direct repository update
+- reporting must be able to recognize that the change came from an official correction event
+- the audit design may use full snapshots, structured diffs, or both, as long as the before / after state can be defended
 
 ## Related Decisions
 
-- ADR-001 — One Note Multi-Item Model
-- ADR-004 — Minimum Selling Price Guard
-- ADR-008 — Audit-First Sensitive Mutations
-- ADR-009 — Reporting as Read Model
-- ADR-011 — Money Stored as Integer Rupiah
+- ADR-001 - One Note Multi-Item Model
+- ADR-004 - Minimum Selling Price Guard
+- ADR-008 - Audit-First Sensitive Mutations
+- ADR-009 - Reporting as Read Model
+- ADR-011 - Money Stored as Integer Rupiah
