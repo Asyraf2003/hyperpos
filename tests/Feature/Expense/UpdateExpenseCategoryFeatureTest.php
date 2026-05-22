@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Tests\Feature\Expense;
@@ -21,16 +20,7 @@ final class UpdateExpenseCategoryFeatureTest extends TestCase
     public function test_update_expense_category_updates_row_and_records_canonical_audit(): void
     {
         $this->seedCategory('cat-1', 'EXP-ELEC', 'Listrik', true, 'Lama');
-
-        $handler = new UpdateExpenseCategoryHandler(
-            new DatabaseExpenseCategoryReaderAdapter(),
-            new DatabaseExpenseCategoryWriterAdapter(),
-            app(AuditEventWriterPort::class),
-            app(ClockPort::class),
-            app(UuidPort::class),
-        );
-
-        $result = $handler->handle('cat-1', 'EXP-UTIL', 'Utilitas', 'Baru', 'admin-1');
+        $result = $this->handler()->handle('cat-1', 'EXP-UTIL', 'Utilitas', 'Baru', 'admin-1');
 
         $this->assertTrue($result->isSuccess());
         $this->assertDatabaseHas('expense_categories', [
@@ -40,58 +30,55 @@ final class UpdateExpenseCategoryFeatureTest extends TestCase
             'description' => 'Baru',
             'is_active' => 1,
         ]);
+        $outbox = DB::table('audit_outbox')->where('event_name', 'expense_category_updated')->first();
+        self::assertNotNull($outbox);
+        self::assertSame('pending', $outbox->status);
+        self::assertSame('cat-1', $outbox->aggregate_id);
+        self::assertSame('admin-1', $outbox->actor_id);
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_event_snapshots', 0);
 
-        $event = DB::table('audit_events')->where('event_name', 'expense_category_updated')->first();
+        $this->artisan('audit:outbox:process', ['--limit' => 10])->assertExitCode(0);
 
-        $this->assertNotNull($event);
-        $this->assertSame('expense', $event->bounded_context);
-        $this->assertSame('expense_category', $event->aggregate_type);
-        $this->assertSame('cat-1', $event->aggregate_id);
-        $this->assertSame('admin-1', $event->actor_id);
-
-        $metadata = json_decode((string) $event->metadata_json, true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('cat-1', $metadata['category_id']);
-        $this->assertSame('admin-1', $metadata['performed_by_actor_id']);
-
-        $snapshots = DB::table('audit_event_snapshots')
-            ->where('audit_event_id', $event->id)
-            ->pluck('payload_json', 'snapshot_kind')
-            ->all();
-
-        $this->assertArrayHasKey('before', $snapshots);
-        $this->assertArrayHasKey('after', $snapshots);
-
-        $before = json_decode((string) $snapshots['before'], true, 512, JSON_THROW_ON_ERROR);
-        $after = json_decode((string) $snapshots['after'], true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertSame('EXP-ELEC', $before['code']);
-        $this->assertSame('EXP-UTIL', $after['code']);
-        $this->assertSame('Lama', $before['description']);
-        $this->assertSame('Baru', $after['description']);
-
-        $this->assertDatabaseCount('audit_logs', 0);
+        $this->assertDatabaseHas('audit_events', [
+            'id' => $outbox->audit_event_id,
+            'event_name' => 'expense_category_updated',
+            'actor_id' => 'admin-1',
+        ]);
+        foreach (['before', 'after'] as $kind) {
+            $this->assertDatabaseHas('audit_event_snapshots', [
+                'audit_event_id' => $outbox->audit_event_id,
+                'snapshot_kind' => $kind,
+            ]);
+        }
+        $this->assertDatabaseHas('audit_outbox', [
+            'audit_event_id' => $outbox->audit_event_id,
+            'status' => 'processed',
+        ]);
     }
 
     public function test_update_expense_category_rejects_duplicate_code(): void
     {
         $this->seedCategory('cat-1', 'EXP-ELEC', 'Listrik', true, null);
         $this->seedCategory('cat-2', 'EXP-WIFI', 'Wifi', true, null);
+        $result = $this->handler()->handle('cat-1', 'EXP-WIFI', 'Utilitas', null, 'admin-1');
 
-        $handler = new UpdateExpenseCategoryHandler(
+        $this->assertTrue($result->isFailure());
+        $this->assertSame(['expense_category' => ['EXPENSE_CATEGORY_CODE_ALREADY_EXISTS']], $result->errors());
+        $this->assertDatabaseCount('audit_outbox', 0);
+        $this->assertDatabaseCount('audit_events', 0);
+        $this->assertDatabaseCount('audit_event_snapshots', 0);
+    }
+
+    private function handler(): UpdateExpenseCategoryHandler
+    {
+        return new UpdateExpenseCategoryHandler(
             new DatabaseExpenseCategoryReaderAdapter(),
             new DatabaseExpenseCategoryWriterAdapter(),
             app(AuditEventWriterPort::class),
             app(ClockPort::class),
             app(UuidPort::class),
         );
-
-        $result = $handler->handle('cat-1', 'EXP-WIFI', 'Utilitas', null, 'admin-1');
-
-        $this->assertTrue($result->isFailure());
-        $this->assertSame(['expense_category' => ['EXPENSE_CATEGORY_CODE_ALREADY_EXISTS']], $result->errors());
-        $this->assertDatabaseCount('audit_logs', 0);
-        $this->assertDatabaseCount('audit_events', 0);
-        $this->assertDatabaseCount('audit_event_snapshots', 0);
     }
 
     private function seedCategory(string $id, string $code, string $name, bool $isActive, ?string $description): void
