@@ -19,7 +19,8 @@ Setiap GPT wajib membaca urutan ini sebelum memberi arahan kerja:
 1. 0002_decision_policy.md
 2. 0003_gpt_bootstrap_prompt.md
 3. 0004_session_start_protocol.md
-4. core/10-scope-and-facts.md
+4. 0008_ai_personalization_profile.md
+5. core/10-scope-and-facts.md
 5. core/11-blueprint-first.md
 6. core/12-step-by-step-execution.md
 7. core/13-proof-and-progress.md
@@ -111,6 +112,7 @@ Canonical standards:
 - 0005_handoff_template.md
 - 0006_final_review_checklist.md
 - 0007_ai_usage_guide.md
+- 0008_ai_personalization_profile.md
 - core/
 - workflow/
 - output/

@@ -18,7 +18,8 @@ Sebelum mulai bekerja pada sesi baru, GPT wajib membaca minimal:
 1. `docs/01_standards/0001_index.md`
 2. `docs/01_standards/0002_decision_policy.md`
 3. `docs/01_standards/0004_session_start_protocol.md`
-4. `docs/01_standards/core/0010_scope-and-facts.md`
+4. `docs/01_standards/0008_ai_personalization_profile.md`
+5. `docs/01_standards/core/0010_scope-and-facts.md`
 5. `docs/01_standards/core/0011_blueprint-first.md`
 6. `docs/01_standards/core/0012_step-by-step-execution.md`
 7. `docs/01_standards/core/0013_proof-and-progress.md`

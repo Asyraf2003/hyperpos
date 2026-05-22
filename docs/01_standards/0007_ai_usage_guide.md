@@ -49,6 +49,7 @@ Project instructions should point to the correct docs, not duplicate the docs.
 Use for mandatory rules that apply to all AI work in this repo.
 
 Put here:
+- owner-promoted AI personalization profile for this repo
 - decision hierarchy, zero assumption rule, blueprint-first rule
 - one active step rule, proof and progress rule, response structure
 - session capacity rule, output rules, hexagonal architecture rules
@@ -146,7 +147,7 @@ Do not paste the entire docs tree unless the task is docs audit.
 
 | Information                          | Correct Place                                    |
 |--------------------------------------|--------------------------------------------------|
-| Personal response preference         | ChatGPT memory or personalization                |
+| Personal response preference         | ChatGPT memory or personalization; promote stable repo-level subset to `docs/01_standards/0008_ai_personalization_profile.md` when owner decides |
 | Project-level operating default      | Project custom instructions                      |
 | Mandatory AI rule                    | docs/01_standards                                    |
 | Permanent decision                   | docs/02_architecture/adr                                         |
