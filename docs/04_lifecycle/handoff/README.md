@@ -5,11 +5,15 @@ Folder ini menyimpan session recovery notes untuk sesi aktif atau terbaru.
 ## Aturan
 
 - Satu file per sesi atau per topik sesi.
-- Naming: `YYYY-MM-DD-topic-handoff.md`
+- Naming: `NNNN_topic_handoff.md`
 - Setelah sesi selesai dan tidak relevan lagi, pindah ke `docs/99_archive/handoff/`.
 - Jangan simpan keputusan permanen hanya di sini — promote ke `docs/02_architecture/adr`.
 - Jangan simpan blueprint aktif di sini — promote ke `docs/03_blueprints`.
 - Canonical handoff template: `docs/01_standards/0005_handoff_template.md`
+
+## Catatan
+
+Folder ini hanya untuk handoff aktif atau terbaru. Jika sesi sudah ditutup, arsipkan ke `docs/99_archive/handoff/` agar riwayat tetap ada tetapi jalur kerja aktif tetap bersih.
 
 ## Source of Truth Priority
 
