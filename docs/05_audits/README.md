@@ -14,14 +14,14 @@ Formal audit records — proof of work yang berdiri sendiri.
 
 Audit records di folder ini mengikuti numbering berurutan agar mudah diselaraskan dengan lifecycle dan blueprint yang terkait.
 
-## Gunakan Untuk
+## Cocok Untuk
 
 - ringkasan audit yang berdiri sendiri
 - coverage summary
 - proof of work
 - rekomendasi atau gap yang ditemukan dari audit
 
-## Jangan Gunakan Untuk
+## Tidak Untuk
 
 - sesi kerja harian
 - blueprint aktif

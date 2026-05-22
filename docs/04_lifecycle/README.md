@@ -6,15 +6,15 @@ Runtime records — rekam jejak operasional sistem yang terus bertambah.
 
 | Folder | Isi |
 |---|---|
-| `error_log/` | 29 bug dan security findings individual. Tiap issue satu file. |
+| `error_log/` | Bug dan security finding individual. Tiap issue satu file. |
 | `handoff/` | Session recovery notes sesi aktif. Naming: `NNNN_topic_handoff.md`. |
 
-## Gunakan Untuk
+## Cocok Untuk
 
 - `error_log/` untuk bug atau security finding yang harus dilacak sampai tuntas
 - `handoff/` untuk progress sesi, proof, changed files, blocker, dan next step
 
-## Jangan Gunakan Untuk
+## Tidak Untuk
 
 - keputusan permanen
 - blueprint aktif

@@ -12,14 +12,14 @@ Setiap subfolder topik berisi tiga jenis file yang berdampingan:
 | `NNNN_topic_name_dod.md` | DoD | Kriteria selesai — planning dan implementation |
 | `NNNN_topic_name_workflow.md` | Workflow | Test matrix, implementation order, CLI workflow, commands |
 
-## Gunakan Untuk
+## Cocok Untuk
 
 - memetakan scope aktif sebelum implementasi
 - menyimpan desain yang masih bisa berubah
 - mendefinisikan urutan kerja dan proof yang dibutuhkan
 - mengikat DoD supaya selesai-nya jelas
 
-## Jangan Gunakan Untuk
+## Tidak Untuk
 
 - keputusan permanen yang harus jadi ADR
 - catatan sesi harian

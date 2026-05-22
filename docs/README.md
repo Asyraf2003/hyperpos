@@ -2,20 +2,20 @@
 
 ## Purpose
 
-Direktori ini berisi seluruh dokumentasi teknis sistem Hyperpos — aturan kerja AI, keputusan arsitektur, blueprint implementasi, lifecycle records, dan audit.
+Direktori ini berisi dokumentasi teknis Hyperpos: aturan kerja AI, keputusan arsitektur, blueprint implementasi, lifecycle records, dan audit.
 
-Tujuan index ini: memudahkan manusia atau AI agent menemukan dokumen yang tepat tanpa harus baca semua.
+Tujuan index ini adalah memberi jalur baca yang jelas supaya manusia atau AI agent bisa menemukan dokumen yang tepat tanpa menelusuri seluruh tree.
 
-## Fast Start
+## Urutan Baca Awal
 
 Baca dalam urutan ini:
 
     docs/01_standards/0007_ai_usage_guide.md
     docs/01_standards/0001_index.md
-    Blueprint aktif untuk scope saat ini
+    Blueprint aktif yang relevan
     Output lokal terbaru dari operator
 
-## Source Of Truth Priority
+## Prioritas Sumber Kebenaran
 
 Gunakan urutan ini ketika dokumen saling bertentangan:
 
@@ -27,28 +27,28 @@ Gunakan urutan ini ketika dokumen saling bertentangan:
 6. Archive di `docs/99_archive`
 7. General model knowledge (terendah)
 
-## Placement Guide
+## Panduan Penempatan
 
-Pakai aturan ini untuk menaruh dokumen di tempat yang benar:
+Gunakan peta ini untuk menaruh dokumen di tempat yang tepat:
 
 | Jenis dokumen | Tempat | Isi |
 |---|---|---|
-| Standards / aturan wajib | `docs/01_standards` | Rule global AI, decision policy, output rules, domain map, stack rules |
-| ADR / keputusan permanen | `docs/02_architecture/adr` | Keputusan arsitektur, domain, lifecycle, reporting, data representation |
-| Blueprint / desain aktif | `docs/03_blueprints` | Scope, design, DoD, workflow, test matrix, implementation order |
-| Error log / finding | `docs/04_lifecycle/error_log` | Bug, security finding, lifecycle issue, satu issue satu file |
-| Handoff aktif | `docs/04_lifecycle/handoff` | Progress terakhir, proof, changed files, blocker, next step |
-| Audit report | `docs/05_audits` | Laporan audit berdiri sendiri, ringkasan proof, coverage, temuan |
-| Legacy / historical | `docs/99_archive` | Handoff lama, blueprint lama, standards lama, dokumen superseded |
+| Standards / aturan wajib | `docs/01_standards` | Aturan global AI, decision policy, output rules, domain map, stack rules |
+| ADR / keputusan permanen | `docs/02_architecture/adr` | Keputusan arsitektur, domain, lifecycle, reporting, dan data representation |
+| Blueprint / desain aktif | `docs/03_blueprints` | Scope, design, DoD, workflow, test matrix, dan implementation order |
+| Error log / finding | `docs/04_lifecycle/error_log` | Bug, security finding, dan lifecycle issue; satu issue satu file |
+| Handoff aktif | `docs/04_lifecycle/handoff` | Progress terakhir, proof, changed files, blocker, dan next step |
+| Audit report | `docs/05_audits` | Laporan audit berdiri sendiri, ringkasan proof, coverage, dan temuan |
+| Legacy / historical | `docs/99_archive` | Handoff lama, blueprint lama, standards lama, dan dokumen superseded |
 
-Kalau ragu:
+Jika ragu, ikuti urutan berikut:
 
 1. Keputusan permanen masuk ADR.
 2. Desain yang masih dikerjakan masuk blueprint.
 3. Hasil kerja sesi masuk handoff aktif.
 4. Riwayat lama yang tidak lagi aktif masuk archive.
 
-## Directory Map
+## Peta Direktori
 
 ### `docs/01_standards`
 
@@ -71,7 +71,7 @@ Jika keputusan berubah: buat ADR baru yang supersede, jangan edit ADR lama.
 
 ### `docs/03_blueprints`
 
-Design blueprints + DoD + Workflow per topik. Hanya untuk scope aktif atau recent scope yang masih dikerjakan.
+Design blueprints, DoD, dan workflow per topik. Hanya untuk scope aktif atau scope terbaru yang masih dikerjakan.
 
 Isi yang cocok:
 
@@ -103,7 +103,7 @@ Naming: `NNNN_topic_name.md` (blueprint), `NNNN_topic_name_dod.md` (DoD), `NNNN_
 
 Runtime records.
 
-`error_log/` — individual bug/security findings, numbered `NNNN_snake_title.md`
+`error_log/` — bug dan security finding individual, numbered `NNNN_snake_title.md`
 
 `handoff/` — session recovery notes untuk sesi aktif/terbaru
 
@@ -138,16 +138,16 @@ Audit bukan pengganti handoff, dan bukan blueprint.
 
 ### `docs/99_archive`
 
-Semua dokumen legacy, superseded, dan historical. Copy penuh, tidak dimodifikasi.
+Semua dokumen legacy, superseded, dan historical. Salinan utuh, tidak dimodifikasi.
 
-Jangan simpan work aktif di sini. Kalau sesuatu masih harus dikerjakan, simpan di `docs/03_blueprints` atau `docs/04_lifecycle/handoff`.
+Jangan simpan pekerjaan aktif di sini. Jika sesuatu masih harus dikerjakan, simpan di `docs/03_blueprints` atau `docs/04_lifecycle/handoff`.
 
 - `standards/` — old standards docs
 - `blueprints/` — blueprint v1
 - `dod/` — dod v1
 - `handoff/` — semua handoff lama (step-based, ui, v2, kotlin, dll)
 
-## Naming Convention
+## Pola Nama
 
 | Jenis | Format | Contoh |
 |---|---|---|
@@ -160,7 +160,7 @@ Jangan simpan work aktif di sini. Kalau sesuatu masih harus dikerjakan, simpan d
 | Handoff aktif | `NNNN_topic_handoff.md` | `0001_scope_handoff.md` |
 | Folder | `NN_prefix_snake_case` for L1, `snake_case` for subfolders | `01_standards/`, `error_log/` |
 
-## Promotion Rule
+## Aturan Promosi
 
 Jika handoff mengandung keputusan yang harus permanen:
 

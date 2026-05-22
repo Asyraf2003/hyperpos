@@ -62,7 +62,7 @@ Do not put here:
 
 docs/01_standards is the canonical standards root for AI_RULES, not the diary.
 
-For exact repository document placement, use `docs/README.md` and its Placement Guide.
+For exact repository document placement, use `docs/README.md` and its Panduan Penempatan.
 
 ## Layer 4: docs/02_architecture/adr
 
