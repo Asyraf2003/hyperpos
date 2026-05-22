@@ -212,7 +212,7 @@ Required output:
 - electricity, water, meals, and similar expenses can be recorded
 - reports are affected
 
-## Step 12 - Reporting read models
+## Step 12 — Reporting read models
 
 Goal: prepare critical reports.
 
