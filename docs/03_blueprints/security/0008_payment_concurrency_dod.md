@@ -5,7 +5,7 @@ Canonical DoD.
 This file is not an implementation patch and does not mark any error log as fixed.
 
 ## Source
-- `docs/03_blueprints/security/adr-0022-payment-concurrency.md`
+- `docs/03_blueprints/security/0007_payment_concurrency.md`
 
 
 ## DoD For Planning
@@ -162,5 +162,5 @@ Stop immediately if any of these happen:
 
 ## Related Documents
 
-- Blueprint: docs/03_blueprints/security/adr-0022-payment-concurrency.md
-- Workflow: docs/03_blueprints/security/adr-0022-payment-concurrency-workflow.md
+- Blueprint: docs/03_blueprints/security/0007_payment_concurrency.md
+- Workflow: docs/03_blueprints/security/0009_payment_concurrency_workflow.md

@@ -16,15 +16,15 @@ This is not a prototype, demo, or reduced-scope system.
 
 ## Source Of Truth
 
-- docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
+- docs/02_architecture/adr/0022_payment_allocation_concurrency_and_over_allocation_protection.md
 - docs/04_lifecycle/error_log/0010_revision_reallocation_can_lose_concurrent_payments.md
 - docs/04_lifecycle/error_log/0026_concurrent_note_payments_can_over_allocate_balances.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
 - docs/02_architecture/adr/0018-note-revision-settlement-external-product-lifecycle.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
-- docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md
-- docs/03_blueprints/security/adr-0019-access-boundary.md
-- docs/03_blueprints/security/adr-0020-public-surface.md
+- docs/02_architecture/adr/0020_public_surface_output_storage_attachment_security.md
+- docs/03_blueprints/security/0001_access_boundary.md
+- docs/03_blueprints/security/0004_public_surface.md
 - User owner decisions in planning session
 - User command output from local repository
 - Current source code at execution time
@@ -37,7 +37,7 @@ Local proof from user command output:
 
 showed:
 
-    ?? docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
+    ?? docs/02_architecture/adr/0022_payment_allocation_concurrency_and_over_allocation_protection.md
 
 Meaning:
 
@@ -322,5 +322,5 @@ Forbidden protocol:
 
 ## Related Documents
 
-- DoD: docs/03_blueprints/security/adr-0022-payment-concurrency-dod.md
-- Workflow: docs/03_blueprints/security/adr-0022-payment-concurrency-workflow.md
+- DoD: docs/03_blueprints/security/0008_payment_concurrency_dod.md
+- Workflow: docs/03_blueprints/security/0009_payment_concurrency_workflow.md

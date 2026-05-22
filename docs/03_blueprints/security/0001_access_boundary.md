@@ -572,5 +572,5 @@ Examples:
 
 ## Related Documents
 
-- DoD: docs/03_blueprints/security/adr-0019-access-boundary-dod.md
-- Workflow: docs/03_blueprints/security/adr-0019-access-boundary-workflow.md
+- DoD: docs/03_blueprints/security/0002_access_boundary_dod.md
+- Workflow: docs/03_blueprints/security/0003_access_boundary_workflow.md

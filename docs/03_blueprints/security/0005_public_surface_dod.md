@@ -5,7 +5,7 @@ Canonical DoD.
 This file is not an implementation patch and does not mark any error log as fixed.
 
 ## Source
-- `docs/03_blueprints/security/adr-0020-public-surface.md`
+- `docs/03_blueprints/security/0004_public_surface.md`
 
 
 ## DoD For Planning
@@ -165,5 +165,5 @@ Stop immediately if any of these happen:
 
 ## Related Documents
 
-- Blueprint: docs/03_blueprints/security/adr-0020-public-surface.md
-- Workflow: docs/03_blueprints/security/adr-0020-public-surface-workflow.md
+- Blueprint: docs/03_blueprints/security/0004_public_surface.md
+- Workflow: docs/03_blueprints/security/0006_public_surface_workflow.md

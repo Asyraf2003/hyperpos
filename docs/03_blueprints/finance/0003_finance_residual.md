@@ -35,7 +35,7 @@ This is not a prototype, demo, or reduced-scope system.
 - docs/04_lifecycle/error_log/0017_workspace_edit_payments_ignore_existing_note_payments.md
 - docs/04_lifecycle/error_log/0021_refunds_can_be_recorded_on_open_notes.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
-- docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
+- docs/02_architecture/adr/0022_payment_allocation_concurrency_and_over_allocation_protection.md
 - User owner decisions in planning sessions
 - User command output from local repository
 - Current source code at execution time

@@ -474,8 +474,8 @@ Stop immediately if:
 - docs/04_lifecycle/error_log/0002_seeder_introduces_predictable_admin_credentials.md
 - docs/05_audits/codex_security/2026-05-06-error-log-solution-and-adr-coverage-summary.md
 - docs/02_architecture/adr/0019-note-access-boundary-cashier-date-window-and-transaction-capability-enforcement.md
-- docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md
-- docs/02_architecture/adr/0022-payment-allocation-concurrency-and-over-allocation-protection.md
+- docs/02_architecture/adr/0020_public_surface_output_storage_attachment_security.md
+- docs/02_architecture/adr/0022_payment_allocation_concurrency_and_over_allocation_protection.md
 
 ## Final Rule
 

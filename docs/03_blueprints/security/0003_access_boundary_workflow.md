@@ -5,7 +5,7 @@ Canonical Workflow.
 This file is not an implementation patch and does not mark any error log as fixed.
 
 ## Source
-- `docs/03_blueprints/security/adr-0019-access-boundary.md`
+- `docs/03_blueprints/security/0001_access_boundary.md`
 
 
 ## Characterization Test Matrix
@@ -220,5 +220,5 @@ After ADR-0019 blueprint is accepted, continue with:
 
 ## Related Documents
 
-- Blueprint: docs/03_blueprints/security/adr-0019-access-boundary.md
-- DoD: docs/03_blueprints/security/adr-0019-access-boundary-dod.md
+- Blueprint: docs/03_blueprints/security/0001_access_boundary.md
+- DoD: docs/03_blueprints/security/0002_access_boundary_dod.md

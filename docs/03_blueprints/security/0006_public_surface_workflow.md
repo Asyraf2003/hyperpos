@@ -5,7 +5,7 @@ Canonical Workflow.
 This file is not an implementation patch and does not mark any error log as fixed.
 
 ## Source
-- `docs/03_blueprints/security/adr-0020-public-surface.md`
+- `docs/03_blueprints/security/0004_public_surface.md`
 
 
 ## Characterization Test Matrix
@@ -211,8 +211,8 @@ Run before any implementation slice:
 
 Run before selecting a slice:
 
-    sed -n '1,260p' docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md
-    sed -n '1,320p' docs/03_blueprints/security/adr-0020-public-surface.md
+    sed -n '1,260p' docs/02_architecture/adr/0020_public_surface_output_storage_attachment_security.md
+    sed -n '1,320p' docs/03_blueprints/security/0004_public_surface.md
 
 ### Error Log Snapshot
 
@@ -265,7 +265,7 @@ Before docs/04_lifecycle/error_log update or commit:
 
     git status --short
     git diff --stat
-    git diff -- docs/02_architecture/adr/0020-public-surface-output-storage-attachment-security.md docs/03_blueprints/security/adr-0020-public-surface.md
+    git diff -- docs/02_architecture/adr/0020_public_surface_output_storage_attachment_security.md docs/03_blueprints/security/0004_public_surface.md
     git diff -- app routes resources tests docs/04_lifecycle/error_log
 
 ## Handoff Rule
@@ -306,5 +306,5 @@ Do not start with storage/attachment or disclosure until output context slice is
 
 ## Related Documents
 
-- Blueprint: docs/03_blueprints/security/adr-0020-public-surface.md
-- DoD: docs/03_blueprints/security/adr-0020-public-surface-dod.md
+- Blueprint: docs/03_blueprints/security/0004_public_surface.md
+- DoD: docs/03_blueprints/security/0005_public_surface_dod.md
