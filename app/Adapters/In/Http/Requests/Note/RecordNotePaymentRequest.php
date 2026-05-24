@@ -27,7 +27,7 @@ final class RecordNotePaymentRequest extends FormRequest
             'selected_row_ids' => ['nullable', 'array'],
             'selected_row_ids.*' => ['string', 'distinct'],
             'payment_scope' => ['nullable', 'string', 'in:partial'],
-            'payment_method' => ['required', 'string', 'in:cash,tf,transfer'],
+            'payment_method' => ['required', 'string', 'in:cash,transfer'],
             'paid_at' => ['required', 'date_format:Y-m-d'],
             'amount_paid' => ['nullable', 'integer', 'min:1'],
             'amount_received' => ['nullable', 'integer', 'min:1'],

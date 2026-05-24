@@ -9,14 +9,14 @@ use App\Core\Shared\Exceptions\DomainException;
 final class CustomerPaymentMethod
 {
     public const CASH = 'cash';
-    public const TRANSFER = 'tf';
+    public const TRANSFER = 'transfer';
     public const UNKNOWN = 'unknown';
 
     public static function normalize(string $paymentMethod): string
     {
         $normalized = trim($paymentMethod);
 
-        if ($normalized === 'transfer') {
+        if ($normalized === 'tf') {
             return self::TRANSFER;
         }
 

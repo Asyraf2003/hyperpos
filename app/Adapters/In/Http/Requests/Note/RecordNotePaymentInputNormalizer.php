@@ -64,8 +64,8 @@ final class RecordNotePaymentInputNormalizer
     {
         $method = self::normalizeString($value);
 
-        if ($method === 'transfer') {
-            return 'tf';
+        if ($method === 'tf') {
+            return 'transfer';
         }
 
         return $method;

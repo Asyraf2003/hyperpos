@@ -457,7 +457,7 @@ final class CreateTransactionWorkspaceInlinePaymentLifecycleFeatureTest extends 
 
         $this->assertNotNull($payment);
         $this->assertSame(85000, (int) $payment->amount_rupiah);
-        $this->assertSame('tf', (string) $payment->payment_method);
+        $this->assertSame('transfer', (string) $payment->payment_method);
         $this->assertSame('2026-05-24', (string) $payment->paid_at);
 
         $this->assertDatabaseCount('customer_payment_cash_details', 0);
@@ -584,7 +584,7 @@ final class CreateTransactionWorkspaceInlinePaymentLifecycleFeatureTest extends 
 
         $this->assertNotNull($payment);
         $this->assertSame(30000, (int) $payment->amount_rupiah);
-        $this->assertSame('tf', (string) $payment->payment_method);
+        $this->assertSame('transfer', (string) $payment->payment_method);
         $this->assertSame('2026-05-24', (string) $payment->paid_at);
 
         $this->assertDatabaseCount('customer_payment_cash_details', 0);
