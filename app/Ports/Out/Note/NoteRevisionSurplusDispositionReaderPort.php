@@ -14,4 +14,6 @@ interface NoteRevisionSurplusDispositionReaderPort
 
     /** @return list<NoteRevisionSurplusPending> */
     public function findPendingByNoteRootId(string $noteRootId): array;
+
+    public function sumActiveRefundDueAmountByNoteRootId(string $noteRootId): int;
 }

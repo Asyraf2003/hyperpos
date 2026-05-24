@@ -72,4 +72,19 @@ final class DatabaseNoteRevisionSurplusDispositionAdapter implements
 
         return $pending;
     }
+
+    public function sumActiveRefundDueAmountByNoteRootId(string $noteRootId): int
+    {
+        $noteRootId = trim($noteRootId);
+
+        if ($noteRootId === '') {
+            return 0;
+        }
+
+        return (int) DB::table('note_revision_surplus_dispositions')
+            ->where('note_root_id', $noteRootId)
+            ->where('disposition_type', NoteRevisionSurplusDisposition::TYPE_REFUND_DUE)
+            ->where('status', NoteRevisionSurplusDisposition::STATUS_ACTIVE)
+            ->sum('amount_rupiah');
+    }
 }
