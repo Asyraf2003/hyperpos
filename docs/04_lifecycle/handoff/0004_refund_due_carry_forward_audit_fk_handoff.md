@@ -275,3 +275,160 @@ Change domain schema away from audit_events FK, but only with ADR and migration 
 
 Do not choose before source-map proof.
 
+
+## Phase Map / System Maturity Direction
+
+### Goal inti produk
+
+Sistem diarahkan agar create transaction menjadi fondasi matang untuk:
+
+- edit / note revision
+- payment settlement
+- ordinary refund
+- surplus refund_due
+- surplus refund_paid
+- report/export
+- audit timeline
+- future API
+- future PostgreSQL
+- future Go extraction
+
+Prinsip utama:
+
+- create transaction harus menghasilkan financial truth yang stabil
+- edit/revision tidak boleh menghancurkan paid/refunded/surplus truth
+- refund harus memakai current financial state, bukan stale row
+- report harus membaca official records, bukan menambal mismatch
+- audit harus terasa semua aksi diawasi, tetapi user action tetap instan
+- seeder harus realistis agar lifecycle proof tidak menebak schema
+
+### Current maturity rough map
+
+Domain settlement/edit/refund core:
+
+- Status: partially mature
+- Progress: carry-forward paid, ordinary refund, refund_due, refund_paid behavior sudah mulai dikunci dengan characterization and unit tests
+- Blocker: full lifecycle proof belum lengkap
+
+Audit runtime:
+
+- Status: transitional / blocked
+- Progress: audit outbox runtime exists and is globally bound
+- Blocker: FK-bound refund_due/refund_paid tables still require audit_events row synchronously
+- Current issue: audit intent goes to audit_outbox, but domain rows reference audit_events.id
+
+Seeder / fixture maturity:
+
+- Status: partially mature
+- Progress: minimal note/payment fixture works for current characterization
+- Gap: realistic create-edit-refund-report-audit lifecycle seeder belum lengkap
+
+Report/export maturity:
+
+- Status: not complete
+- Gap: report/export after edit/refund/refund_due/refund_paid still needs proof
+- Rule: do not patch report to hide settlement/audit mismatch
+
+PostgreSQL readiness:
+
+- Status: not ready for claim
+- Required before claim:
+  - migration compatibility proof
+  - lockForUpdate proof
+  - JSON/date behavior proof
+  - FK/restrict behavior proof
+  - core lifecycle tests on PostgreSQL
+
+Go API readiness:
+
+- Status: contract preparation phase
+- Required before Go:
+  - stable command/query contracts
+  - OpenAPI or equivalent DTO contract
+  - idempotency model
+  - actor/auth model
+  - audit correlation model
+  - settlement preview contract
+  - lifecycle proof in Laravel first
+
+Performance 1 second target:
+
+- Status: GAP until measured
+- Required proof:
+  - p95 response/page load metric
+  - query count
+  - slow query evidence
+  - realistic seeded dataset
+  - no N+1 on target pages
+  - indexed report queries
+
+### Do not jump phases
+
+Do not jump to Go API before:
+
+1. make verify is GREEN
+2. audit FK/outbox mismatch is resolved
+3. create-edit-refund-report-audit lifecycle proof exists
+4. realistic seeder exists
+5. baseline performance measurement exists
+
+Do not jump to PostgreSQL before:
+
+1. lifecycle tests are stable on MySQL
+2. migration assumptions are source-mapped
+3. PostgreSQL compatibility test subset exists
+
+Do not optimize for 1 second by rewriting to Go first.
+
+First optimize by:
+
+- fixing source-of-truth correctness
+- reducing synchronous audit weight through valid outbox design
+- eliminating N+1
+- adding indexes
+- using projection/read models
+- measuring realistic dataset performance
+
+### Execution Protocol For Next Session
+
+The next session must work one active blocker at a time.
+
+Required loop:
+
+1. Read rules.
+2. Read this handoff.
+3. Identify current failing command.
+4. Source-map the failure.
+5. State FACT/GAP/ASSUMPTION/DECISION before patch.
+6. Patch only the narrowest files needed.
+7. Run targeted proof.
+8. Run adjacent proof.
+9. Run make verify.
+10. If another failure appears, treat it as next active blocker.
+11. Do not start a new feature while current blocker is RED.
+
+Current active blocker order:
+
+1. Fix PHPStan contract drift if not already fixed:
+   - tests/Feature/Note/CreateNoteRevisionSurplusRefundDueRaceInvariantTest.php
+   - LockAwarePendingRefundDueReaderFake must implement sumActiveRefundDueAmountByNoteRootId
+
+2. Fix or explicitly block audit FK/outbox mismatch:
+   - CreateNoteRevisionSurplusRefundDueControllerFeatureTest
+   - CreateNoteRevisionSurplusRefundDueHandlerTest
+   - RecordNoteRevisionSurplusRefundPaymentControllerFeatureTest
+   - RecordNoteRevisionSurplusRefundPaymentHandlerTest
+
+3. Re-run focused failing tests.
+
+4. Re-run settlement blast-radius tests.
+
+5. Re-run make verify.
+
+Decision checkpoint for audit FK/outbox mismatch:
+
+- Option A: direct canonical writer for FK-bound refund_due/refund_paid flows
+- Option B: hybrid writer for FK-bound flows
+- Option C: schema redesign away from audit_events FK, only with ADR/migration plan
+
+Do not choose without source-map proof.
