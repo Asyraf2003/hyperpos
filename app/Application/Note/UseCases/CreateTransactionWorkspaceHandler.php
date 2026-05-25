@@ -8,7 +8,7 @@ use App\Application\Note\Services\CreateTransactionWorkspaceAuditPayloadBuilder;
 use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorder;
 use App\Application\Note\Services\CreateTransactionWorkspaceIdempotencyService;
 use App\Application\Note\Services\CreateTransactionWorkspaceNoteFactory;
-use App\Application\Note\Services\CreateTransactionWorkspaceSuccessMessageBuilder;
+use App\Application\Note\Services\CreateTransactionWorkspaceResultBuilder;
 use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPersister;
 use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Shared\DTO\Result;
@@ -28,7 +28,7 @@ final class CreateTransactionWorkspaceHandler
         private readonly CreateTransactionWorkspaceWorkItemPersister $items,
         private readonly CreateTransactionWorkspaceInlinePaymentRecorder $payments,
         private readonly CreateTransactionWorkspaceAuditPayloadBuilder $auditPayloads,
-        private readonly CreateTransactionWorkspaceSuccessMessageBuilder $messages,
+        private readonly CreateTransactionWorkspaceResultBuilder $results,
         private readonly AuditLogPort $audit,
         private readonly NoteHistoryProjectionService $projection,
     ) {
@@ -74,18 +74,7 @@ final class CreateTransactionWorkspaceHandler
 
             $this->projection->syncNote($note->id());
 
-            $result = Result::success(
-                [
-                    'note' => [
-                        'id' => $note->id(),
-                        'customer_name' => $note->customerName(),
-                        'transaction_date' => $note->transactionDate()->format('Y-m-d'),
-                        'total_rupiah' => $note->totalRupiah()->amount(),
-                    ],
-                    'inline_payment' => $paymentSummary,
-                ],
-                $this->messages->build($paymentSummary)
-            );
+            $result = $this->results->build($note, $paymentSummary);
 
             $this->idempotency->succeed($payload, $result);
             $this->transactions->commit();
