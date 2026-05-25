@@ -94,6 +94,7 @@
                 <th>Nota</th>
                 <th>Jenis Kejadian</th>
                 <th>Arah</th>
+                <th>Metode Pembayaran</th>
                 <th>Pembayaran</th>
                 <th>Refund</th>
                 <th>Tabel Sumber</th>
@@ -110,6 +111,7 @@
                     <td>{{ $row['note_label'] }}</td>
                     <td>{{ $row['event_type'] }}</td>
                     <td>{{ $row['direction'] }}</td>
+                    <td>{{ $row['payment_method'] }}</td>
                     <td>{{ $row['payment_marker'] }}</td>
                     <td>{{ $row['refund_marker'] }}</td>
                     <td>{{ $row['source_table'] }}</td>
@@ -119,7 +121,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" class="muted">Belum ada kejadian kas pada periode ini.</td>
+                    <td colspan="12" class="muted">Belum ada kejadian kas pada periode ini.</td>
                 </tr>
             @endforelse
         </tbody>
