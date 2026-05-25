@@ -5,7 +5,7 @@
 - Slice / topic: Create transaction lifecycle cash ledger consumer, page, PDF export, Excel export, and verification closure for cash vs transfer split
 - Workflow step: Phase 1F-9 cash ledger consumer/page/export exposure and verify closure
 - Status: continue in next session
-- Progress: 94%
+- Progress: 95%
 
 ## Target Work Page
 Continue lifecycle maturity proof for create transaction cash/transfer reporting after cash ledger reader, handler, summary builder, period builder, admin page, PDF export, Excel export, and full verification were proven GREEN.
@@ -120,6 +120,7 @@ Current next target is admin cash ledger detail table payment method exposure ch
   - 88%: full make verify GREEN after cash ledger export split and audit-lines sequence.
   - 90%: admin cash ledger page detail table exposes payment_method and focused adjacent reporting suite remains GREEN.
   - 94%: create service-only transaction rollback after inline payment writes is proven GREEN with adjacent create/payment suite.
+  - 95%: create transaction duplicate submit behavior is characterized; current behavior creates duplicate notes without idempotency guard.
 - Use transfer as canonical customer payment money-in naming.
 - Keep legacy tf normalization where needed.
 - Do not patch UI/payment forms or expense naming unless selected as a separate active step.
@@ -131,6 +132,7 @@ Current next target is admin cash ledger detail table payment method exposure ch
 ## Files Created / Changed
 
 ### New files
+- tests/Feature/Note/CreateTransactionWorkspaceDuplicateSubmitFeatureTest.php
 - tests/Feature/Note/CreateTransactionWorkspaceRollbackFeatureTest.php
 - tests/Unit/Application/Reporting/Exports/TransactionCashLedgerPdfExportCashTransferSplitTest.php
 - tests/Unit/Application/Reporting/Exports/TransactionCashLedgerExcelSummaryCashTransferSplitTest.php
@@ -369,3 +371,42 @@ Recommended candidates:
 - Create transaction idempotency / duplicate submit characterization.
 - Store-stock/inventory create lifecycle characterization.
 - Full make verify after rollback test if operator wants suite-level confidence before next domain slice.
+
+<!-- phase-1f-10b-create-transaction-duplicate-submit-characterization -->
+## Phase 1F-10B - Create Transaction Duplicate Submit Characterization
+
+## FACT
+- Create workspace duplicate submit behavior is characterized.
+- Current behavior creates duplicate notes for duplicate create workspace submits.
+- Rollback and service-only create lifecycle adjacent tests remain GREEN.
+
+## Verification Proof
+- command:
+  - php artisan test tests/Feature/Note/CreateTransactionWorkspaceDuplicateSubmitFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceRollbackFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceInlinePaymentLifecycleFeatureTest.php
+  - result:
+    - Tests: 7 passed (114 assertions)
+    - Duration: 6.33s
+  - meaning:
+    - Duplicate submit currently creates duplicate transaction records, and adjacent rollback/create lifecycle tests remain GREEN.
+
+## GAP
+- Full make verify was not rerun after duplicate-submit characterization test was added.
+- Create transaction idempotency key contract is not defined.
+- Replay response policy is not defined.
+- Same-key different-payload rejection policy is not defined.
+- Production duplicate-submit prevention is not implemented.
+- Store-stock/inventory create lifecycle is not proven.
+
+## DECISION
+- Progress is now 95%.
+- Duplicate submit is a confirmed create transaction maturity blocker.
+- Do not claim create transaction is production-grade mature until idempotency is designed and proven.
+- Next active step should be idempotency blueprint, not blind production patch.
+
+## Next Step
+Phase 1F-10C - Create transaction idempotency contract blueprint.
+
+Expected scope:
+- Define idempotency target for create workspace.
+- Decide request key source, persistence location, replay response behavior, same-key different-payload rejection, TTL/retention, and rollback behavior.
+- Do not patch production before the contract is explicit.
