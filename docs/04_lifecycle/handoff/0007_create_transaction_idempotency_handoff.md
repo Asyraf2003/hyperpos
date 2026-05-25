@@ -550,3 +550,44 @@ Locked Closure Decision
 Phase 1 service-only create transaction maturity is closed at 100%.
 
 Next phase may start from Phase 2 edit transaction lifecycle maturity, starting with blueprint/readiness review before implementation.
+
+---
+
+# Phase 1F-10I UI Idempotency Wiring Reversal
+
+## Date
+
+2026-05-25
+
+## Status
+
+UI idempotency key wiring was removed by owner decision.
+
+## FACT
+
+- Backend create workspace idempotency remains implemented and proven by automated tests.
+- Browser form no longer sends `idempotency_key` by default.
+- Normal UI submits are expected not to create `idempotency_records`.
+- Manual browser idempotency proof from Phase 1F-10H is superseded for UI wiring only.
+
+## Locked Decision
+
+- Do not expose `idempotency_key` in create workspace Blade form.
+- Treat UI/browser idempotency as deferred.
+- Keep backend idempotency contract and tests intact.
+
+## Closure Meaning
+
+Phase 1 service-only create transaction maturity remains closed for backend/service lifecycle and manual A-E create flows.
+
+The following are explicitly deferred:
+
+- UI/browser idempotency key delivery
+- true same-key concurrency proof
+- store-stock/inventory create lifecycle characterization
+- store-stock/inventory rollback characterization
+- seeder cleanup
+
+## Next Step
+
+Phase 2 may start only with the above deferred gaps acknowledged.
