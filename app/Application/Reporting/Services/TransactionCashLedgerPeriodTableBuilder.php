@@ -21,7 +21,9 @@ final class TransactionCashLedgerPeriodTableBuilder
                 $groups[$date] = [
                     'period_label' => $date,
                     'total_events' => 0,
+                    'total_in_rupiah' => 0,
                     'cash_in_rupiah' => 0,
+                    'transfer_in_rupiah' => 0,
                     'cash_out_rupiah' => 0,
                     'net_amount_rupiah' => 0,
                 ];
@@ -31,7 +33,15 @@ final class TransactionCashLedgerPeriodTableBuilder
             $groups[$date]['total_events']++;
 
             if (($row['direction'] ?? null) === 'in') {
-                $groups[$date]['cash_in_rupiah'] += $amount;
+                $groups[$date]['total_in_rupiah'] += $amount;
+
+                if (($row['payment_method'] ?? null) === 'cash') {
+                    $groups[$date]['cash_in_rupiah'] += $amount;
+                }
+
+                if (($row['payment_method'] ?? null) === 'transfer') {
+                    $groups[$date]['transfer_in_rupiah'] += $amount;
+                }
             }
 
             if (($row['direction'] ?? null) === 'out') {
@@ -39,7 +49,7 @@ final class TransactionCashLedgerPeriodTableBuilder
             }
 
             $groups[$date]['net_amount_rupiah'] =
-                $groups[$date]['cash_in_rupiah'] - $groups[$date]['cash_out_rupiah'];
+                $groups[$date]['total_in_rupiah'] - $groups[$date]['cash_out_rupiah'];
         }
 
         ksort($groups);
