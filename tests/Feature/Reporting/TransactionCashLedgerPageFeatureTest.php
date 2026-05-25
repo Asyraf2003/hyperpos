@@ -72,6 +72,28 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('Rp 11.000');
     }
 
+    public function test_admin_can_see_cash_and_transfer_money_in_split_on_transaction_cash_ledger_page(): void
+    {
+        $this->seedCashInEvent('note-page-cash', 'wi-page-cash', 'pay-page-cash', '2026-04-02', 85000, 'Cash Page', 'cash');
+        $this->seedCashInEvent('note-page-transfer', 'wi-page-transfer', 'pay-page-transfer', '2026-04-02', 30000, 'Transfer Page', 'transfer');
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.transaction_cash_ledger.index', [
+                'period_mode' => 'daily',
+                'reference_date' => '2026-04-02',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('Kas Masuk');
+        $response->assertSee('Rp 115.000');
+        $response->assertSee('Tunai Masuk');
+        $response->assertSee('Rp 85.000');
+        $response->assertSee('Transfer Masuk');
+        $response->assertSee('Rp 30.000');
+    }
+
+
     public function test_daily_mode_uses_reference_date_only(): void
     {
         $this->seedCashInEvent('note-daily-1', 'wi-daily-1', 'pay-daily-1', '2026-04-02', 7000, 'Daily A');
@@ -219,16 +241,23 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         string $paymentId,
         string $paidAt,
         int $amountRupiah,
-        string $customerName
+        string $customerName,
+        ?string $paymentMethod = null,
     ): void {
         $this->seedNote($noteId, $customerName, $paidAt, $amountRupiah);
         $this->seedWorkItem($workItemId, $noteId, 1, $amountRupiah);
 
-        DB::table('customer_payments')->insert([
+        $paymentRow = [
             'id' => $paymentId,
             'amount_rupiah' => $amountRupiah,
             'paid_at' => $paidAt,
-        ]);
+        ];
+
+        if ($paymentMethod !== null) {
+            $paymentRow['payment_method'] = $paymentMethod;
+        }
+
+        DB::table('customer_payments')->insert($paymentRow);
 
         DB::table('payment_allocations')->insert([
             'id' => 'payment-allocation-' . $paymentId,
