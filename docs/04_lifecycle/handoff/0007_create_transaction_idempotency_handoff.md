@@ -489,3 +489,64 @@ Choose one next branch explicitly:
 3. Seeder cleanup foundation.
 4. Phase 2 - edit transaction lifecycle maturity, only if owner accepts the deferred Phase 1 gaps.
 
+
+---
+
+# Phase 1F-10H Manual Browser Idempotency Closure
+
+## Date
+
+2026-05-25
+
+## Status
+
+Phase 1 service-only create transaction maturity is CLOSED.
+
+## Manual QA Proof
+
+Manual browser QA completed for service-only create workspace:
+
+- no-payment / debt create flow: PASS
+- full cash payment create flow: PASS
+- partial cash payment create flow: PASS
+- full transfer payment create flow: PASS
+- partial transfer payment create flow: PASS
+- browser form idempotency key wiring: PASS
+
+Browser form proof:
+
+```html
+<input type="hidden" name="idempotency_key" value="dbe7a22f-62a8-4416-af49-7bc60e7c8983">
+
+Database proof after browser submit:
+
+idempotency_records: 1
+idempotency_succeeded: 1
+latest actor_id: 1
+latest operation: create_transaction_workspace
+latest idempotency_key: dbe7a22f-62a8-4416-af49-7bc60e7c8983
+latest status: succeeded
+latest response_type: redirect
+latest result_note_id: 9ead11c1-6336-4db3-8958-169c1beb17bc
+Automated Proof Already Locked
+focused create/idempotency/rollback suite:
+Tests: 10 passed (158 assertions)
+full make verify:
+PHPStan: no errors
+audit-lines: SUCCESS
+Blade PHP/directive audit: SUCCESS
+Contract audit: passed
+Pest: 2 skipped, 1102 passed (6077 assertions)
+Deferred Gaps
+
+These are explicitly deferred and do not block Phase 1 service-only create maturity closure:
+
+true same-key concurrency proof
+store-stock/inventory create lifecycle characterization
+store-stock/inventory rollback characterization
+seeder cleanup
+Locked Closure Decision
+
+Phase 1 service-only create transaction maturity is closed at 100%.
+
+Next phase may start from Phase 2 edit transaction lifecycle maturity, starting with blueprint/readiness review before implementation.
