@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Application\Note\Services;
 
 use App\Application\Shared\DTO\Result;
-use App\Core\Note\Domain\Entities\Note;
+use App\Core\Note\Note\Note;
 
 final class CreateTransactionWorkspaceResultBuilder
 {
