@@ -209,7 +209,7 @@ final class CreateTransactionWorkspaceDuplicateSubmitFeatureTest extends TestCas
         $changedPayload['note']['customer_name'] = 'Idempotent Conflict Customer Changed';
 
         $firstResponse = $this->actingAs($user)->post(route('notes.workspace.store'), $payload);
-        $secondResponse = $this->actingAs($user))
+        $secondResponse = $this->actingAs($user)
             ->from(route('notes.workspace.store'))
             ->post(route('notes.workspace.store'), $changedPayload);
 
