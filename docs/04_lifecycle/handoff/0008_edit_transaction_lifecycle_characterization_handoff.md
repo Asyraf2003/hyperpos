@@ -292,13 +292,60 @@ Use this prompt exactly.
     - Report/export proof after edit/refund/revision remains a gap.
     - Audit is still transitional.
 
-    Active next step:
-    Phase 2-06 - Consolidated Phase 2 focused verification.
+### Phase 2-06 - Consolidated Phase 2 focused verification
 
-    Do exactly one active step:
-    Run or ask operator to run the consolidated focused Phase 2 test suite listed in the handoff.
-    If focused suite is GREEN, then run make verify.
-    If focused suite or make verify is RED, stop and source-map the first failure only.
-    Do not patch production first.
-    Do not touch UI/report/API/dashboard/seeder/PostgreSQL/Go.
-    Do not patch UpdateTransactionWorkspaceHandler unless route proof or dead-path decision exists.
+    Status: GREEN / CLOSED
+
+    Proof command:
+
+    php artisan test \
+      tests/Feature/Note/NoteRevisionRollbackFeatureTest.php \
+      tests/Feature/Note/NoteRevisionStoreStockInventoryLifecycleFeatureTest.php \
+      tests/Feature/Note/NoteRevisionStoreStockRollbackFeatureTest.php \
+      tests/Feature/Note/RefundAfterRevisionCurrentRowBoundaryFeatureTest.php \
+      tests/Feature/Note/ClosedNoteRevisionPolicyFeatureTest.php \
+      tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php \
+      tests/Feature/Note/NoteRevisionRefundDueCarryForwardFeatureTest.php \
+      tests/Feature/Note/CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest.php \
+      tests/Feature/Note/NoteReplacementOverpaidAllocationReplayFeatureTest.php \
+      tests/Feature/Note/CashierServiceStoreStockReplacementBackdatedPriceFinanceFeatureTest.php \
+      tests/Feature/Note/CashierClosedNoteWorkspaceReplacementSubmitFeatureTest.php \
+      tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php \
+      tests/Feature/Inventory/ReverseIssuedInventoryOperationFeatureTest.php
+
+    Result:
+
+    Tests: 22 passed (166 assertions)
+    Duration: 8.30s
+
+    Full verification command:
+
+    make verify
+
+    Result:
+
+    phpstan:
+    [OK] No errors
+
+    Line limit audit:
+    SUCCESS: Semua file memenuhi standar limit baris (atau memiliki label bypass).
+
+    Blade PHP/directive audit:
+    SUCCESS: Tidak ditemukan PHP/directive PHP di Blade resources/views.
+
+    Contract audit:
+    Contract audit passed.
+
+    Pest:
+    Tests: 2 skipped, 1108 passed (6153 assertions)
+    Duration: 55.65s
+
+    Closure decision:
+
+    Phase 2 focused characterization verification is closed through operator proof.
+
+    Remaining gaps:
+
+    - Browser/manual QA is not done.
+    - Report/export proof after edit/refund/revision remains a gap.
+    - Audit is still transitional.
