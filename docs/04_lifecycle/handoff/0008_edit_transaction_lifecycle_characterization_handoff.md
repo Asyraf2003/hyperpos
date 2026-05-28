@@ -530,7 +530,7 @@ JS zero-payable backend settlement contract is closed by operator GREEN proof.
 
 ### Phase 2-10C - Payment after active revision delta HTTP proof
 
-Status: RED / OPEN
+Status: GREEN / CLOSED
 
 Goal:
 
@@ -660,3 +660,60 @@ Remaining gaps:
 - Browser/manual QA replacement is not closed.
 - Browser-only QA remains manual unless real browser automation is introduced.
 - Audit is still transitional.
+
+### Phase 2-10C closure update - Payment after active revision delta HTTP proof
+
+Status: GREEN / CLOSED
+
+Files changed in closure:
+- tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php
+- app/Adapters/Out/Payment/DatabasePaymentAllocationReaderAdapter.php
+- app/Application/Note/Services/CurrentRevision/CurrentRevisionRowSettlementProjector.php
+
+Closure summary:
+- Fixed note-level payment allocation reader so legacy allocations are not double-counted when component allocations exist for the same note_id + customer_payment_id pair.
+- Fixed current revision row settlement projection so valid legacy note-level remainder is merged into component row settlement without reintroducing same-payment double-counting.
+- Phase 2-10C target scenario is now proven:
+  - Original closed paid note total: 100000.
+  - Existing payment: 100000.
+  - Active revision changes total to 120000.
+  - Delta payment route accepts 20000.
+  - New allocation points to current replacement row.
+  - Projection becomes fully settled after delta payment.
+
+Focused proof:
+php artisan test \
+  tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php \
+  tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php \
+  tests/Feature/Note/CashierClosedReplacementOutstandingPaymentFeatureTest.php \
+  tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php \
+  tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php \
+  tests/Feature/Note/NoteRevisionRefundDueCarryForwardFeatureTest.php \
+  tests/Feature/Note/CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest.php \
+  tests/Feature/Note/TransactionCashLedgerAfterRevisionRefundFeatureTest.php
+
+Focused result:
+Tests: 12 passed (84 assertions)
+Duration: 7.72s
+
+Full verification proof:
+make verify
+
+Full verification result:
+Tests: 2 skipped, 1112 passed (6205 assertions)
+Duration: 49.31s
+
+Phase 2-10 automated QA replacement status:
+- Automated HTTP/render/static JS replacement scope is GREEN/CLOSED.
+- Browser-only manual QA remains manual unless Dusk/Playwright or equivalent browser runner is introduced.
+- Remaining browser-only checks:
+  - Browser availability.
+  - Console errors.
+  - Visual responsive behavior.
+  - Real modal focus.
+  - Real double-click timing.
+
+Remaining gaps:
+- Browser-only QA remains manual.
+- Audit is still transitional.
+
