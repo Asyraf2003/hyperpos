@@ -108,20 +108,28 @@
   const currentRows = () =>
     typeof NS.currentRows === "function" ? NS.currentRows() : [];
 
-  const backendPayableAmount = () => {
+  const backendSettlementContext = () => {
     const modal = modalEl();
 
     if (!modal || modal.dataset.backendPaymentBasis !== "backend_outstanding_settlement") {
-      return 0;
+      return null;
     }
 
-    return digits(modal.dataset.backendPayableRupiah || "");
+    return {
+      payable: digits(modal.dataset.backendPayableRupiah || ""),
+      netPaid: digits(modal.dataset.backendNetPaidRupiah || ""),
+      grossTotal: digits(modal.dataset.backendGrossTotalRupiah || ""),
+    };
   };
 
   const effectivePaymentTotal = (total) => {
-    const backendPayable = backendPayableAmount();
+    const context = backendSettlementContext();
 
-    return backendPayable > 0 ? backendPayable : total;
+    if (!context) {
+      return total;
+    }
+
+    return Math.max(total - context.netPaid, 0);
   };
 
   const grandTotal = () =>
