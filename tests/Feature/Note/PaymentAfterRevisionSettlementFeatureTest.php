@@ -53,7 +53,10 @@ final class PaymentAfterRevisionSettlementFeatureTest extends TestCase
             ->make(\App\Application\Note\Services\SelectedNoteBillingRowsProvider::class)
             ->provide('note-payment-after-revision-001');
 
-        self::assertTrue($billingRows->isSuccess(), $billingRows->message());
+        self::assertTrue(
+            $billingRows->isSuccess(),
+            $billingRows->message() ?? 'Billing rows provider failed without message.'
+        );
 
         dump([
             'current_work_item_id' => $currentWorkItemId,
