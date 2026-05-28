@@ -422,3 +422,241 @@ Remaining gaps:
 
 - Browser/manual QA is not done.
 - Audit is still transitional.
+
+### Phase 2-09 - Closed paid edit settlement preview
+
+Status: GREEN / CLOSED
+
+Goal:
+
+Fix manual QA bug where closed paid edit workspace rendered the Proses Nota/payment modal without backend settlement context. The UI must still show settlement context when current payable is zero, because closed/paid notes still need carry-forward context before revision/payment decisions.
+
+Files added/changed:
+
+- tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php
+- app/Application/Note/Services/NotePaymentSettlementPreviewResolver.php
+- app/Application/Note/Services/EditTransactionWorkspacePaymentSettlementDataBuilder.php
+- app/Application/Note/Services/NoteOutstandingPaymentAmountResolver.php
+- resources/views/cashier/notes/workspace/partials/payment-modal.blade.php
+- public/assets/static/js/pages/cashier-note-workspace/payment-flow.js
+- tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php
+
+Proof:
+
+Initial RED:
+
+php artisan test tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php
+
+Result:
+
+FAILED
+Expected response to contain: Settlement pembayaran backend
+
+Patch summary:
+
+- Added preview-only resolver for edit workspace settlement context.
+- Kept payment submit resolver semantics separate.
+- Exposed backend net paid/gross total dataset to payment modal.
+- Updated JS contract so backend settlement context is used even when initial payable is zero.
+
+Focused proof:
+
+php artisan test \
+  tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php \
+  tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php \
+  tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php \
+  tests/Feature/Note/ClosedNoteRevisionPolicyFeatureTest.php \
+  tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php \
+  tests/Feature/Note/NoteRevisionRefundDueCarryForwardFeatureTest.php \
+  tests/Feature/Note/CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest.php
+
+Result:
+
+Tests: 12 passed (57 assertions)
+Duration: 7.01s
+
+Full verification:
+
+make verify
+
+Result:
+
+Tests: 2 skipped, 1110 passed (6188 assertions)
+Duration: 57.56s
+
+Closure decision:
+
+Closed paid edit settlement preview is closed through RED proof, targeted fix, focused proof, and full make verify proof.
+
+### Phase 2-10 - Automated coverage replacement for manual QA
+
+Status: IN PROGRESS
+
+Goal:
+
+Convert Phase 2-08 manual QA checklist into automated coverage where possible. Browser-only checks remain manual unless a real browser runner exists.
+
+Coverage decisions:
+
+- Browser availability, console errors, visual responsive behavior, real modal focus, and real double-click timing remain browser/manual gaps unless Dusk/Playwright or equivalent is introduced.
+- HTTP/render/static JS contracts are acceptable automated coverage for server and render behavior.
+- Existing Phase 2 report/export/revision/refund tests remain part of the focused safety net.
+
+### Phase 2-10B - JS backend settlement zero-payable contract
+
+Status: GREEN / CLOSED
+
+Goal:
+
+Lock the JS contract that payment-flow uses backend settlement context even when initial payable is zero.
+
+Files changed:
+
+- tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php
+
+Proof:
+
+Operator reported targeted and focused tests GREEN after adding assertions for:
+
+- dataset.backendNetPaidRupiah
+- dataset.backendGrossTotalRupiah
+- backend_outstanding_settlement basis
+- Math.max(total - context.netPaid, 0)
+- absence of old fallback: return backendPayable > 0 ? backendPayable : total;
+
+Closure decision:
+
+JS zero-payable backend settlement contract is closed by operator GREEN proof.
+
+### Phase 2-10C - Payment after active revision delta HTTP proof
+
+Status: RED / OPEN
+
+Goal:
+
+Prove that after a closed paid note is revised upward, old money is carried forward and the payment route only accepts the upward delta.
+
+Target scenario:
+
+- Original closed paid note total: 100000
+- Existing payment: 100000
+- Active revision through CreateNoteRevisionHandler changes total to 120000
+- Expected outstanding delta: 20000
+- Expected payment route accepts 20000
+- Expected new allocation points to current replacement row
+- Expected note projection becomes fully settled after delta payment
+
+Files added/changed:
+
+- tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php
+- app/Application/Note/Services/CurrentRevision/CurrentRevisionRowSettlementProjector.php
+
+Important warning:
+
+The latest patch to CurrentRevisionRowSettlementProjector is NOT accepted as valid. It produced focused RED. Treat it as suspect state for the next session.
+
+RED proof 1:
+
+php artisan test tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php
+
+Initial result:
+
+FAILED
+
+Session error:
+
+Hanya billing row outstanding yang boleh dipilih untuk pembayaran.
+
+Source-map debug result:
+
+Financial core was correct before payment delta:
+
+- customer_payments.amount_rupiah: 100000
+- payment_allocations.amount_rupiah: 100000
+- payment_component_allocations.allocated_amount_rupiah: 100000
+- note_revision_settlements.outstanding_rupiah: 20000
+- note_history_projection.outstanding_rupiah: 20000
+
+But workspace/payment selection projection was wrong:
+
+- workspace_panel_rows.allocated_rupiah: 120000
+- workspace_panel_rows.outstanding_rupiah: 0
+- billing_rows.allocated_rupiah: 120000
+- billing_rows.outstanding_rupiah: 0
+- billing_rows.can_select_manually: false
+
+Diagnosis at that point:
+
+- selected row ID was correct
+- payment route was not the first source of the bug
+- payment_component_allocations table was correct
+- note_history_projection was correct
+- workspace panel/payment selection projection double-counted or over-merged settlement
+
+Patch attempted:
+
+Changed CurrentRevisionRowSettlementProjector to stop merging note-level remainders when component allocations/refunds exist.
+
+Focused command after patch:
+
+php artisan test \
+  tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php \
+  tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php \
+  tests/Feature/Note/CashierClosedReplacementOutstandingPaymentFeatureTest.php \
+  tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php \
+  tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php \
+  tests/Feature/Note/NoteRevisionRefundDueCarryForwardFeatureTest.php \
+  tests/Feature/Note/CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest.php \
+  tests/Feature/Note/TransactionCashLedgerAfterRevisionRefundFeatureTest.php
+
+Focused result after patch:
+
+FAILED
+
+First failure:
+
+Tests\Feature\Note\PaymentAfterRevisionSettlementFeatureTest
+test_admin_can_pay_only_upward_delta_after_active_closed_paid_revision
+
+Session error:
+
+Total alokasi pada note melebihi total note.
+
+Second failure:
+
+Tests\Feature\Note\RecordNotePaymentHttpFeatureTest
+test_selected_row_payment_uses_combined_legacy_and_component_allocations
+
+Session error:
+
+Amount alokasi payment melebihi outstanding note.
+
+Stop decision:
+
+Stop on RED. Do not run make verify. Do not close Phase 2-10C. Do not close manual QA replacement. Next session must source-map first failure only.
+
+Next recommended source-map:
+
+1. Inspect payment submit path after the projector patch:
+   - RecordNotePaymentController
+   - SelectedNoteRowsPaymentAmountResolver
+   - SelectedNoteRowsOutstandingTotalResolver
+   - payment allocation writer/guard that throws "Total alokasi pada note melebihi total note."
+
+2. Determine whether the projector patch made selected outstanding 20000 but payment allocation guard still sees total allocated as:
+   - legacy payment_allocations 100000
+   - component allocations 100000
+   - new delta 20000
+   - combined total 220000
+
+3. If so, the next likely issue is not workspace projection anymore, but payment guard/reader double-counting component + legacy allocations during allocation validation.
+
+4. Do not patch broadly. First source-map the first failure only:
+   - "Total alokasi pada note melebihi total note."
+
+Remaining gaps:
+
+- Phase 2-10C RED / OPEN.
+- Browser/manual QA replacement is not closed.
+- Browser-only QA remains manual unless real browser automation is introduced.
+- Audit is still transitional.
