@@ -30,7 +30,7 @@ final class StoreTransactionWorkspaceItemNormalizer
                 'pricing_mode' => self::trimOrNull($item['pricing_mode'] ?? null),
                 'package_total_rupiah' => self::intOrNull($item['package_total_rupiah'] ?? null),
                 'service' => StoreTransactionWorkspaceServiceNormalizer::normalize($item['service'] ?? []),
-                'product_lines' => [StoreTransactionWorkspaceProductLineNormalizer::normalize($item['product_lines'] ?? [])],
+                'product_lines' => StoreTransactionWorkspaceProductLineNormalizer::normalizeMany($item['product_lines'] ?? []),
                 'external_purchase_lines' => [StoreTransactionWorkspaceExternalPurchaseLineNormalizer::normalize($item['external_purchase_lines'] ?? [])],
             ];
 
