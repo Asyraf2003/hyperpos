@@ -717,3 +717,59 @@ Remaining gaps:
 - Browser-only QA remains manual.
 - Audit is still transitional.
 
+
+### Phase 2-11 - Create package auto split multi-part pricing research
+
+Status: RESEARCH / BLUEPRINT READY, NOT IMPLEMENTED
+
+Blueprint:
+- docs/03_blueprints/finance/0007_create_package_auto_split_multi_part_pricing.md
+
+Reason:
+- Workshop create flow needs cashier-friendly package pricing.
+- Cashier should enter total package charge and related products/parts.
+- System should split total into product/part total and service residual.
+- Store-stock package pricing existed, but current create path is effectively first-line only.
+- External purchase package pricing was previously out of scope and now needs a simplified create design.
+
+Locked user decisions:
+- Implement create first.
+- Keep edit/revision as future-readiness design only.
+- Default UX should be auto/package total.
+- Manual split remains available but hidden/advanced.
+- Service + store-stock must support multiple products in one service row.
+- Duplicate store-stock product in the same service row must be rejected with a clear reason and solution.
+- Service + external purchase first implementation should use a simple total external part amount.
+- External label is optional and can stay hidden initially for field observation.
+- External qty is optional.
+- External total_rupiah is required.
+- Package total below product/external total must be rejected.
+- Package total equal to product/external total is valid and service price may be 0.
+- Audit metadata is mandatory.
+- Report/export impact must be analyzed before deciding whether to patch report/export.
+
+Primary formula:
+- service_price_rupiah = package_total_rupiah - parts_total_rupiah
+
+Implementation status:
+- No production code changed in this research step.
+- No test added in this research step.
+- No verification command required beyond documentation presence proof.
+
+Known current repo limitation:
+- create product_lines and external_purchase_lines normalization/validation/mapping are effectively first-line only.
+- Multi store-stock product support is therefore a root create-flow change, not a small UI-only patch.
+
+Next recommended active step:
+- Add RED characterization test for service + store-stock package_auto_split with two different products in one service row.
+- Do not patch production before RED proof.
+- Do not start edit/revision implementation before create package semantics are GREEN.
+
+Remaining gaps:
+- Exact hidden/advanced UI layout is not finalized.
+- Exact note-level operational note storage is not finalized.
+- Suggestion/history storage is not finalized.
+- External purchase total_rupiah schema/input mapping needs inspection before implementation.
+- Report/export impact is not proven yet.
+- Edit/revision remains future-readiness only.
+
