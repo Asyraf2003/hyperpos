@@ -64,7 +64,7 @@
 ## STATUS MODEL
 - `FACT`: klaim didukung oleh source code atau command output lokal.
 - `GAP`: klaim belum bisa dibuktikan di environment ini, atau proof lokal bertentangan dengan baseline yang diminta.
-- `CONTRADICTED`: ada output lokal yang secara langsung menolak klaim.
+- `MISMATCHED`: ada output lokal yang secara langsung menolak klaim.
 - `REPORTED`: issue sudah teridentifikasi dan sedang dibaca sebagai temuan analitis.
 - `PATCHED WITH VERIFICATION GAP`: ada perubahan yang belum dibuktikan penuh oleh output yang sesuai.
 - `FIXED WITH PROOF`: ada proof targeted dan proof regresi yang cocok dengan root cause.
