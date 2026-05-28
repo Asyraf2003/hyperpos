@@ -9,6 +9,12 @@
     @isset($workspacePaymentSettlement['explanation']['basis'])
         data-backend-payment-basis="{{ $workspacePaymentSettlement['explanation']['basis'] }}"
     @endisset
+    @isset($workspacePaymentSettlement['explanation']['net_paid_rupiah'])
+        data-backend-net-paid-rupiah="{{ (int) $workspacePaymentSettlement['explanation']['net_paid_rupiah'] }}"
+    @endisset
+    @isset($workspacePaymentSettlement['explanation']['gross_total_rupiah'])
+        data-backend-gross-total-rupiah="{{ (int) $workspacePaymentSettlement['explanation']['gross_total_rupiah'] }}"
+    @endisset
 >
     <div class="modal-dialog modal-dialog-centered modal-xl" id="workspace-payment-modal-dialog">
         <div class="modal-content">
