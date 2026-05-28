@@ -53,9 +53,7 @@ final class CreateTransactionWorkspaceWorkItemPersister
                 );
             }
 
-            $allocation = $this->packageAudits->from($item, $workItem);
-
-            if ($allocation !== null) {
+            foreach ($this->packageAudits->from($item, $workItem) as $allocation) {
                 $packageAllocations[] = $allocation;
             }
 

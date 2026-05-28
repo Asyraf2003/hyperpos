@@ -10,7 +10,7 @@ final class CreateTransactionWorkspacePackageAllocationAuditMapper
 {
     /**
      * @param array<string, mixed> $item
-     * @return array{
+     * @return list<array{
      *     work_item_id:string,
      *     store_stock_line_id:string,
      *     pricing_mode:string,
@@ -20,34 +20,39 @@ final class CreateTransactionWorkspacePackageAllocationAuditMapper
      *     product_id:string,
      *     qty:int,
      *     product_unit_price_rupiah:int
-     * }|null
+     * }>
      */
-    public function from(array $item, WorkItem $workItem): ?array
+    public function from(array $item, WorkItem $workItem): array
     {
         if (($item['pricing_mode'] ?? null) !== 'package_auto_split') {
-            return null;
+            return [];
         }
 
         $serviceDetail = $workItem->serviceDetail();
-        $storeStockLine = $workItem->storeStockLines()[0] ?? null;
 
-        if ($serviceDetail === null || $storeStockLine === null) {
-            return null;
+        if ($serviceDetail === null) {
+            return [];
         }
 
-        $qty = $storeStockLine->qty();
-        $sparepartTotal = $storeStockLine->lineTotalRupiah()->amount();
+        $allocations = [];
 
-        return [
-            'work_item_id' => $workItem->id(),
-            'store_stock_line_id' => $storeStockLine->id(),
-            'pricing_mode' => 'package_auto_split',
-            'package_total_rupiah' => (int) ($item['package_total_rupiah'] ?? 0),
-            'sparepart_total_rupiah' => $sparepartTotal,
-            'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
-            'product_id' => $storeStockLine->productId(),
-            'qty' => $qty,
-            'product_unit_price_rupiah' => intdiv($sparepartTotal, max(1, $qty)),
-        ];
+        foreach ($workItem->storeStockLines() as $storeStockLine) {
+            $qty = $storeStockLine->qty();
+            $sparepartTotal = $storeStockLine->lineTotalRupiah()->amount();
+
+            $allocations[] = [
+                'work_item_id' => $workItem->id(),
+                'store_stock_line_id' => $storeStockLine->id(),
+                'pricing_mode' => 'package_auto_split',
+                'package_total_rupiah' => (int) ($item['package_total_rupiah'] ?? 0),
+                'sparepart_total_rupiah' => $sparepartTotal,
+                'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
+                'product_id' => $storeStockLine->productId(),
+                'qty' => $qty,
+                'product_unit_price_rupiah' => intdiv($sparepartTotal, max(1, $qty)),
+            ];
+        }
+
+        return $allocations;
     }
 }

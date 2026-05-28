@@ -51,7 +51,7 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
         }
 
         if ($this->variants->hasStoreStockLines($item)) {
-            return [WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, $service, [], [$this->storeStock->map($item)]];
+            return [WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART, $service, [], $this->storeStock->mapMany($item)];
         }
 
         return [WorkItem::TYPE_SERVICE_ONLY, $service, [], []];
