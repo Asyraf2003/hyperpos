@@ -39,6 +39,7 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
         }
 
         $item = $this->packagePricing->compose($item);
+        $item = (new CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer())->compose($item);
 
         $service = [
             'service_name' => $this->requiredString($item['service']['name'] ?? null, 'Nama servis wajib diisi.'),
