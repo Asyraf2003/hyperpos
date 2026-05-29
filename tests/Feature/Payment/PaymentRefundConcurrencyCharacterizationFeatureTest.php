@@ -98,14 +98,27 @@ final class PaymentRefundConcurrencyCharacterizationFeatureTest extends TestCase
             $results[$workerType] = $decoded;
         }
 
+        $snapshot = [
+            'results' => $results,
+            'customer_payments' => DB::table('customer_payments')->orderBy('id')->get()->map(static fn ($row): array => (array) $row)->all(),
+            'payment_component_allocations' => DB::table('payment_component_allocations')->orderBy('id')->get()->map(static fn ($row): array => (array) $row)->all(),
+            'customer_refunds' => DB::table('customer_refunds')->orderBy('id')->get()->map(static fn ($row): array => (array) $row)->all(),
+            'refund_component_allocations' => DB::table('refund_component_allocations')->orderBy('id')->get()->map(static fn ($row): array => (array) $row)->all(),
+        ];
+
+        file_put_contents(
+            storage_path('logs/payment-refund-concurrency-last.json'),
+            json_encode($snapshot, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
+        );
+
         self::assertTrue(
             (bool) ($results['payment']['success'] ?? false),
-            'Concurrent payment worker should succeed because the note has exactly 50000 outstanding before the new payment.'
+            'Concurrent payment worker should succeed. Worker payload: ' . json_encode($results['payment'] ?? null, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
         );
 
         self::assertTrue(
             (bool) ($results['refund']['success'] ?? false),
-            'Concurrent refund worker should succeed because the existing payment has exactly 50000 refundable allocation.'
+            'Concurrent refund worker should succeed. Worker payload: ' . json_encode($results['refund'] ?? null, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
         );
 
         $allocatedTotal = (int) DB::table('payment_component_allocations')
