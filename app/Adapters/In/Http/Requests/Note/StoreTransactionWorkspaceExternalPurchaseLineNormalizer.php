@@ -18,6 +18,7 @@ final class StoreTransactionWorkspaceExternalPurchaseLineNormalizer
             'label' => self::trimOrNull($line['label'] ?? null),
             'qty' => self::integerOrNull($line['qty'] ?? null),
             'unit_cost_rupiah' => self::integerOrNull($line['unit_cost_rupiah'] ?? null),
+            'total_rupiah' => self::integerOrNull($line['total_rupiah'] ?? null),
         ];
     }
 
