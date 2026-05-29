@@ -429,6 +429,99 @@ final class CreateTransactionWorkspaceServiceStoreStockFeatureTest extends TestC
         ], $context['package_allocations'] ?? null);
     }
 
+    public function test_cashier_cannot_store_workspace_service_store_stock_package_auto_split_with_duplicate_product_id(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Package Duplicate Product',
+            'email' => 'service-store-stock-package-duplicate@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('products')->insert([
+            'id' => 'product-package-duplicate-1',
+            'kode_barang' => 'KB-PKG-DUP-001',
+            'nama_barang' => 'Oli Paket Duplicate',
+            'merek' => 'Federal',
+            'ukuran' => null,
+            'harga_jual' => 50000,
+        ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-package-duplicate-1',
+            'qty_on_hand' => 10,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-package-duplicate-1',
+            'avg_cost_rupiah' => 35000,
+            'inventory_value_rupiah' => 350000,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.create'))
+            ->post(route('notes.workspace.store'), [
+                'note' => [
+                    'customer_name' => 'Budi Duplicate Package',
+                    'customer_phone' => '08123',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [[
+                    'entry_mode' => 'service',
+                    'part_source' => 'none',
+                    'pricing_mode' => 'package_auto_split',
+                    'package_total_rupiah' => 250000,
+                    'pay_now' => 0,
+                    'service' => [
+                        'name' => 'Servis Paket Duplicate Product',
+                        'price_rupiah' => 0,
+                        'notes' => '',
+                    ],
+                    'product_lines' => [
+                        [
+                            'product_id' => 'product-package-duplicate-1',
+                            'qty' => 1,
+                            'unit_price_rupiah' => 50000,
+                        ],
+                        [
+                            'product_id' => 'product-package-duplicate-1',
+                            'qty' => 2,
+                            'unit_price_rupiah' => 50000,
+                        ],
+                    ],
+                    'external_purchase_lines' => [[
+                        'label' => '',
+                        'qty' => '',
+                        'unit_cost_rupiah' => '',
+                    ]],
+                ]],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => '2026-03-15',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.workspace.create'));
+        $response->assertSessionHasErrors([
+            'workspace' => 'Produk yang sama tidak boleh diinput dua kali dalam satu baris servis. Aturan ini mencegah alokasi paket dan stok tercatat ganda. Naikkan qty pada baris produk yang sudah ada.',
+        ]);
+
+        $this->assertDatabaseCount('notes', 0);
+        $this->assertDatabaseCount('work_items', 0);
+        $this->assertDatabaseCount('work_item_service_details', 0);
+        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+        $this->assertDatabaseCount('customer_payments', 0);
+        $this->assertDatabaseCount('payment_component_allocations', 0);
+    }
+
     public function test_cashier_can_store_workspace_service_store_stock_package_total_equal_sparepart_minimum(): void
     {
         $this->loginAsKasir();
