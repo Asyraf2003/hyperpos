@@ -27,6 +27,71 @@
     };
   };
 
+  const legacyReloadFlag = 'hyperpos.legacy-service-worker-cleanup-reloaded';
+
+  const registrationScriptUrls = (registration) => [
+    registration.active?.scriptURL || '',
+    registration.waiting?.scriptURL || '',
+    registration.installing?.scriptURL || '',
+  ].filter((scriptURL) => scriptURL !== '');
+
+  const isLegacyServiceWorkerScript = (scriptURL) => {
+    try {
+      return new URL(scriptURL).pathname.endsWith('/sw.js');
+    } catch (_error) {
+      return false;
+    }
+  };
+
+  const clearCacheStorage = async () => {
+    if (!('caches' in window)) {
+      return 0;
+    }
+
+    const cacheNames = await caches.keys();
+
+    await Promise.all(cacheNames.map((name) => caches.delete(name)));
+
+    return cacheNames.length;
+  };
+
+  const cleanupLegacyServiceWorkers = async () => {
+    if (!('serviceWorker' in navigator)) {
+      return;
+    }
+
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    const legacyRegistrations = registrations.filter((registration) => (
+      registrationScriptUrls(registration).some(isLegacyServiceWorkerScript)
+    ));
+
+    if (legacyRegistrations.length === 0) {
+      try {
+        window.sessionStorage.removeItem(legacyReloadFlag);
+      } catch (_error) {
+        // ignore unavailable sessionStorage
+      }
+
+      return;
+    }
+
+    await Promise.all(legacyRegistrations.map((registration) => registration.unregister()));
+    await clearCacheStorage();
+
+    let shouldReload = true;
+
+    try {
+      shouldReload = window.sessionStorage.getItem(legacyReloadFlag) !== '1';
+      window.sessionStorage.setItem(legacyReloadFlag, '1');
+    } catch (_error) {
+      // reload once when sessionStorage is unavailable too
+    }
+
+    if (shouldReload) {
+      window.location.reload();
+    }
+  };
+
   const base64UrlToUint8Array = (base64Url) => {
     const padding = '='.repeat((4 - (base64Url.length % 4)) % 4);
     const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/');
