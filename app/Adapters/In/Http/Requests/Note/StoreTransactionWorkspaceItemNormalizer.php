@@ -55,6 +55,16 @@ final class StoreTransactionWorkspaceItemNormalizer
 
     private static function intOrNull(mixed $value): ?int
     {
-        return is_int($value) ? $value : null;
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $cleaned = preg_replace('/[^0-9]/', '', $value);
+
+        return is_string($cleaned) && $cleaned !== '' ? (int) $cleaned : null;
     }
 }
