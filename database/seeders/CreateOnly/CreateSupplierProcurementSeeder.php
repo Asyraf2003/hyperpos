@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders\CreateOnly;
 
-use Illuminate\Database\Seeder;
+use Database\Seeders\CreateOnly\Support\CreateOnlySeeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
-final class CreateSupplierProcurementSeeder extends Seeder
+final class CreateSupplierProcurementSeeder extends CreateOnlySeeder
 {
     public function run(): void
     {
@@ -96,7 +95,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
 
                 $grandTotalRupiah = array_sum(array_column($invoiceLines, 'line_total_rupiah'));
 
-                if ($this->insertIfMissing('supplier_invoices', $invoiceId, [
+                if ($this->createOnly('supplier_invoices', 'id', $invoiceId, [
                     'id' => $invoiceId,
                     'supplier_id' => (string) $supplier->id,
                     'supplier_nama_pt_pengirim_snapshot' => $this->stringFromRow(
@@ -123,12 +122,12 @@ final class CreateSupplierProcurementSeeder extends Seeder
                 }
 
                 foreach ($invoiceLines as $invoiceLine) {
-                    if ($this->insertIfMissing('supplier_invoice_lines', (string) $invoiceLine['id'], $invoiceLine)) {
+                    if ($this->createOnly('supplier_invoice_lines', 'id', (string) $invoiceLine['id'], $invoiceLine)) {
                         $created['supplier_invoice_lines']++;
                     }
                 }
 
-                if ($this->insertIfMissing('supplier_receipts', $receiptId, [
+                if ($this->createOnly('supplier_receipts', 'id', $receiptId, [
                     'id' => $receiptId,
                     'supplier_invoice_id' => $invoiceId,
                     'tanggal_terima' => $tanggalTerima,
@@ -145,7 +144,7 @@ final class CreateSupplierProcurementSeeder extends Seeder
                         (string) $invoiceLine['id']
                     );
 
-                    if ($this->insertIfMissing('supplier_receipt_lines', $receiptLineId, [
+                    if ($this->createOnly('supplier_receipt_lines', 'id', $receiptLineId, [
                         'id' => $receiptLineId,
                         'supplier_receipt_id' => $receiptId,
                         'supplier_invoice_line_id' => $invoiceLine['id'],
@@ -173,31 +172,6 @@ final class CreateSupplierProcurementSeeder extends Seeder
         if (! app()->environment(['local', 'testing'])) {
             throw new RuntimeException('Create-only seeders may only run in local or testing environments.');
         }
-    }
-
-    /**
-     * @param  array<string, mixed>  $values
-     */
-    private function insertIfMissing(string $table, string $id, array $values): bool
-    {
-        if (DB::table($table)->where('id', $id)->exists()) {
-            return false;
-        }
-
-        DB::table($table)->insert($this->filterExistingColumns($table, $values));
-
-        return true;
-    }
-
-    /**
-     * @param  array<string, mixed>  $values
-     * @return array<string, mixed>
-     */
-    private function filterExistingColumns(string $table, array $values): array
-    {
-        $columns = array_flip(Schema::getColumnListing($table));
-
-        return array_intersect_key($values, $columns);
     }
 
     /**
