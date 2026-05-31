@@ -605,3 +605,31 @@ BOUNDARY:
 - This does not claim production PostgreSQL cutover readiness.
 - PostgreSQL transition still requires explicit forward migration, SQL transform, or export/import mapping.
 - PostgreSQL runtime verification is a later track.
+
+## Slice 5 - Procurement projection raw index SQL cleanup
+
+Status: Pending focused verification
+
+FACT:
+- `database/migrations/2026_04_23_130000_add_desc_index_for_admin_procurement_default_load.php` previously used raw MySQL `CREATE INDEX ... DESC ... ASC` and `DROP INDEX ... ON ...` statements.
+- `database/migrations/2026_04_23_140000_add_invoice_search_index_for_procurement_projection.php` previously used raw MySQL `CREATE INDEX ... DESC ... ASC` and `DROP INDEX ... ON ...` statements.
+- This slice replaces those raw MySQL statements with Laravel schema builder `index()` and `dropIndex()` calls.
+- This keeps the composite index column coverage on `supplier_invoice_list_projection`.
+- This does not preserve explicit MySQL index sort direction syntax in the migration declaration.
+
+DECISION:
+- Treat these projection indexes as portability cleanup candidates because they are read-model performance indexes, not canonical financial truth.
+- Prefer Laravel schema builder for this slice to reduce avoidable MySQL-only migration syntax in the fresh target schema.
+- Do not claim exact query-plan or performance parity from this patch alone.
+
+BOUNDARY:
+- This is research/target-schema readiness work.
+- This does not modify the live MySQL database by itself.
+- This does not claim PostgreSQL production cutover readiness.
+- Live transition still requires explicit forward migration, SQL transform, export/import mapping, row-count proof, money reconciliation proof, projection rebuild proof, and rollback planning.
+
+REQUIRED PROOF:
+- Syntax/scan proof that raw `CREATE INDEX` and `DROP INDEX ... ON` statements are gone from the two target migrations.
+- Fresh MySQL migration proof.
+- Targeted procurement/index regression proof.
+- Full verification proof before closing this slice.
