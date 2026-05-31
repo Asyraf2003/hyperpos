@@ -60,6 +60,17 @@
                 >
             </div>
 
+            <div class="form-group mb-4">
+                <label for="note_operational_note" class="form-label">Keterangan Nota</label>
+                <textarea
+                    id="note_operational_note"
+                    name="note[operational_note]"
+                    rows="2"
+                    class="form-control"
+                    placeholder="Contoh: keluhan, instruksi, atau catatan umum nota"
+                >{{ $oldNote['operational_note'] ?? '' }}</textarea>
+            </div>
+
             <div class="border rounded p-3 mb-4">
                 <div class="small text-muted">Total Biaya Nota</div>
                 <div class="fs-4 fw-bold" id="workspace-note-total-text">0</div>

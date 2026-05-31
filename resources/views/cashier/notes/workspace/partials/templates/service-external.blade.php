@@ -11,6 +11,7 @@
         <input type="hidden" name="items[__INDEX__][entry_mode]" value="service">
         <input type="hidden" name="items[__INDEX__][part_source]" value="external_purchase">
         <input type="hidden" name="items[__INDEX__][pay_now]" value="0" data-pay-now>
+        <input type="hidden" name="items[__INDEX__][service][notes]" value="">
 
         <div class="row">
             <div class="col-12 col-lg-6">
@@ -54,13 +55,6 @@
                     <label class="form-label">Biaya Satuan (Rupiah)</label>
                     <input type="hidden" name="items[__INDEX__][external_purchase_lines][0][unit_cost_rupiah]" value="" data-money-raw>
                     <input type="text" inputmode="numeric" value="" class="form-control" placeholder="Contoh: 120.000" data-money-display>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <div class="form-group mb-0">
-                    <label class="form-label">Catatan Servis</label>
-                    <textarea name="items[__INDEX__][service][notes]" rows="2" class="form-control" placeholder="Catatan servis"></textarea>
                 </div>
             </div>
         </div>
