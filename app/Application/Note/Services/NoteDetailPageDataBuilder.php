@@ -59,6 +59,7 @@ final class NoteDetailPageDataBuilder
                     'customer_name' => $revisionView['customer_name'],
                     'customer_phone' => $revisionView['customer_phone'],
                     'transaction_date' => $revisionView['transaction_date'],
+                    'operational_note' => $note->operationalNote(),
                     'note_state' => $note->noteState(),
                     'payment_status' => $this->paymentStatuses->resolve(
                         (int) $operational['grand_total_rupiah'],
