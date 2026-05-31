@@ -710,4 +710,166 @@ final class CreateTransactionWorkspaceServiceStoreStockFeatureTest extends TestC
         $this->assertDatabaseCount('payment_component_allocations', 0);
     }
 
+
+    public function test_workspace_service_store_stock_package_auto_split_accepts_browser_form_strings_and_partial_payment(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Browser Contract Package',
+            'email' => 'service-store-stock-browser-contract@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('products')->insert([
+            'id' => 'product-browser-contract-1',
+            'kode_barang' => 'KB-BROWSER-001',
+            'nama_barang' => 'Kampas Rem Browser Contract',
+            'merek' => 'Federal',
+            'ukuran' => null,
+            'harga_jual' => 40000,
+        ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-browser-contract-1',
+            'qty_on_hand' => 10,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-browser-contract-1',
+            'avg_cost_rupiah' => 25000,
+            'inventory_value_rupiah' => 250000,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.create'))
+            ->post(route('notes.workspace.store'), [
+                'note' => [
+                    'customer_name' => 'Budi Browser Contract',
+                    'customer_phone' => '08123',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [[
+                    'entry_mode' => 'service',
+                    'part_source' => 'store_stock',
+                    'pricing_mode' => 'package_auto_split',
+                    'package_total_rupiah' => '250000',
+                    'pay_now' => '0',
+                    'service' => [
+                        'name' => 'Servis Rem Browser Contract',
+                        'price_rupiah' => '0',
+                        'notes' => '',
+                    ],
+                    'product_lines' => [[
+                        'product_id' => 'product-browser-contract-1',
+                        'qty' => '1',
+                        'unit_price_rupiah' => '40000',
+                        'price_basis' => 'current_catalog',
+                    ]],
+                    'external_purchase_lines' => [[
+                        'label' => '',
+                        'qty' => '',
+                        'unit_cost_rupiah' => '',
+                    ]],
+                ]],
+                'inline_payment' => [
+                    'decision' => 'pay_partial',
+                    'payment_method' => 'cash',
+                    'paid_at' => '2026-03-15',
+                    'amount_paid_rupiah' => '100000',
+                    'amount_received_rupiah' => '100000',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.index'));
+
+        $note = DB::table('notes')
+            ->where('customer_name', 'Budi Browser Contract')
+            ->first();
+
+        $this->assertNotNull($note);
+        $this->assertSame(250000, (int) $note->total_rupiah);
+        $this->assertSame('open', (string) $note->note_state);
+
+        $workItem = DB::table('work_items')
+            ->where('note_id', (string) $note->id)
+            ->first();
+
+        $this->assertNotNull($workItem);
+        $this->assertSame('service_with_store_stock_part', (string) $workItem->transaction_type);
+        $this->assertSame(250000, (int) $workItem->subtotal_rupiah);
+
+        $this->assertDatabaseHas('work_item_service_details', [
+            'work_item_id' => (string) $workItem->id,
+            'service_name' => 'Servis Rem Browser Contract',
+            'service_price_rupiah' => 210000,
+            'part_source' => 'none',
+        ]);
+
+        $storeStockLine = DB::table('work_item_store_stock_lines')
+            ->where('work_item_id', (string) $workItem->id)
+            ->first();
+
+        $this->assertNotNull($storeStockLine);
+        $this->assertSame('product-browser-contract-1', (string) $storeStockLine->product_id);
+        $this->assertSame(1, (int) $storeStockLine->qty);
+        $this->assertSame(40000, (int) $storeStockLine->line_total_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-browser-contract-1',
+            'movement_type' => 'stock_out',
+            'source_type' => 'work_item_store_stock_line',
+            'source_id' => (string) $storeStockLine->id,
+            'tanggal_mutasi' => '2026-03-15',
+            'qty_delta' => -1,
+            'unit_cost_rupiah' => 25000,
+            'total_cost_rupiah' => -25000,
+        ]);
+
+        $payment = DB::table('customer_payments')->first();
+
+        $this->assertNotNull($payment);
+        $this->assertSame(100000, (int) $payment->amount_rupiah);
+        $this->assertSame('cash', (string) $payment->payment_method);
+        $this->assertSame('2026-03-15', (string) $payment->paid_at);
+
+        $this->assertDatabaseHas('customer_payment_cash_details', [
+            'customer_payment_id' => (string) $payment->id,
+            'amount_paid_rupiah' => 100000,
+            'amount_received_rupiah' => 100000,
+            'change_rupiah' => 0,
+        ]);
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'customer_payment_id' => (string) $payment->id,
+            'note_id' => (string) $note->id,
+            'work_item_id' => (string) $workItem->id,
+            'component_type' => 'service_fee',
+            'component_ref_id' => (string) $workItem->id,
+            'component_amount_rupiah_snapshot' => 210000,
+            'allocated_amount_rupiah' => 100000,
+            'allocation_priority' => 1,
+        ]);
+
+        $this->assertDatabaseCount('payment_allocations', 0);
+
+        $this->assertDatabaseHas('note_history_projection', [
+            'note_id' => (string) $note->id,
+            'note_state' => 'open',
+            'customer_name' => 'Budi Browser Contract',
+            'customer_name_normalized' => 'budi browser contract',
+            'customer_phone' => '08123',
+            'total_rupiah' => 250000,
+            'allocated_rupiah' => 100000,
+            'refunded_rupiah' => 0,
+            'net_paid_rupiah' => 100000,
+            'outstanding_rupiah' => 150000,
+        ]);
+    }
+
 }
