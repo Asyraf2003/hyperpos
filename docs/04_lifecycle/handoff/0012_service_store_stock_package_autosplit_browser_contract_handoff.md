@@ -170,3 +170,68 @@ Full suite proof after this slice: pending
 Estimated total create-edit-refund progress after this slice:
 
 33 / 100
+
+### Detail UI create-result visibility proof
+
+Status: DONE for focused Detail UI visibility.
+
+Implemented proof:
+- Detail note payload now carries operational_note.
+- Detail header renders Keterangan Nota when operational_note exists.
+- Detail line rows render service store-stock package breakdown:
+  - Paket total
+  - Total sparepart
+  - Sisa jasa
+  - store-stock part rows with product display names
+- Existing focused detail/payment regressions remain green.
+
+Proof commands:
+
+php -l app/Application/Note/Services/CurrentRevision/CurrentRevisionPackageBreakdownMapper.php
+php -l app/Application/Note/Services/CurrentRevision/CurrentRevisionDetailBaseRowMapper.php
+php -l app/Application/Note/Services/NoteDetailPageDataBuilder.php
+php -l resources/views/shared/notes/partials/header-summary.blade.php
+php -l resources/views/cashier/notes/partials/note-row-refund-style.blade.php
+php -l resources/views/cashier/notes/partials/note-row-package-breakdown.blade.php
+php -l resources/views/cashier/notes/partials/note-rows-table.blade.php
+
+wc -l \
+  app/Application/Note/Services/CurrentRevision/CurrentRevisionPackageBreakdownMapper.php \
+  app/Application/Note/Services/CurrentRevision/CurrentRevisionDetailBaseRowMapper.php \
+  app/Application/Note/Services/NoteDetailPageDataBuilder.php \
+  resources/views/shared/notes/partials/header-summary.blade.php \
+  resources/views/cashier/notes/partials/note-row-refund-style.blade.php \
+  resources/views/cashier/notes/partials/note-row-package-breakdown.blade.php \
+  resources/views/cashier/notes/partials/note-rows-table.blade.php
+
+php artisan test tests/Feature/Note/NoteDetailOperationalPackageVisibilityFeatureTest.php
+
+php artisan test \
+  tests/Feature/Note/CashierHybridNoteDetailFeatureTest.php \
+  tests/Feature/Note/NoteDetailEditEntryFeatureTest.php \
+  tests/Feature/Note/CashierDetailRenderedBillingRowsPaymentFeatureTest.php \
+  tests/Feature/Note/NoteDetailOperationalPackageVisibilityFeatureTest.php
+
+Proof output:
+- Syntax checks: all target PHP/Blade files passed php -l.
+- Line count:
+  - 90 app/Application/Note/Services/CurrentRevision/CurrentRevisionPackageBreakdownMapper.php
+  - 68 app/Application/Note/Services/CurrentRevision/CurrentRevisionDetailBaseRowMapper.php
+  - 86 app/Application/Note/Services/NoteDetailPageDataBuilder.php
+  - 55 resources/views/shared/notes/partials/header-summary.blade.php
+  - 20 resources/views/cashier/notes/partials/note-row-refund-style.blade.php
+  - 31 resources/views/cashier/notes/partials/note-row-package-breakdown.blade.php
+  - 84 resources/views/cashier/notes/partials/note-rows-table.blade.php
+- Detail visibility test:
+  - PASS Tests\Feature\Note\NoteDetailOperationalPackageVisibilityFeatureTest
+  - Tests: 1 passed (11 assertions)
+- Focused detail/payment regression:
+  - PASS Tests\Feature\Note\CashierHybridNoteDetailFeatureTest
+  - PASS Tests\Feature\Note\NoteDetailEditEntryFeatureTest
+  - PASS Tests\Feature\Note\CashierDetailRenderedBillingRowsPaymentFeatureTest
+  - PASS Tests\Feature\Note\NoteDetailOperationalPackageVisibilityFeatureTest
+  - Tests: 7 passed (36 assertions)
+
+Remaining gaps:
+- Product display name in package breakdown is read from current products table, not a historical product name snapshot in revision payload.
+- Date display still uses current ViewDateFormatter format d/m/Y; client-facing tgl bulan tahun display remains a separate UI formatting step.
