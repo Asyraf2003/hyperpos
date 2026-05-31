@@ -198,7 +198,6 @@
         row.querySelector('input[name$="[external_purchase_lines][0][label]"]'),
         row.querySelector('input[name$="[external_purchase_lines][0][qty]"]'),
         moneyInputs[1],
-        row.querySelector('textarea[name$="[service][notes]"]'),
       ].filter(Boolean);
     }
 
@@ -325,8 +324,6 @@
     set('textarea[name$="[description]"]', item?.description || "");
     set("[data-pay-now]", item?.pay_now || "0");
     set('input[name$="[service][name]"]', item?.service?.name || "");
-    set('input[name$="[service][notes]"]', item?.service?.notes || "");
-    set('textarea[name$="[service][notes]"]', item?.service?.notes || "");
     set("[data-pricing-mode]", item?.pricing_mode || "package_auto_split");
     set('input[name$="[package_total_rupiah]"]', item?.package_total_rupiah || "");
     set('input[name$="[external_purchase_lines][0][label]"]', item?.external_purchase_lines?.[0]?.label || "");

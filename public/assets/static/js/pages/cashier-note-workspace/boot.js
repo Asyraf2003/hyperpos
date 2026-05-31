@@ -24,6 +24,7 @@
     const customerName = document.getElementById("note_customer_name");
     const customerPhone = document.getElementById("note_customer_phone");
     const transactionDate = document.getElementById("note_transaction_date");
+    const operationalNote = document.getElementById("note_operational_note");
     const paymentModal = document.getElementById("workspace-payment-modal");
 
     let activeMenuIndex = 0;
@@ -98,6 +99,10 @@
         note.transaction_date !== ""
       ) {
         transactionDate.value = note.transaction_date;
+      }
+
+      if (operationalNote && typeof note.operational_note === "string") {
+        operationalNote.value = note.operational_note;
       }
 
       if (customerName && !customerName.value.trim()) {

@@ -268,6 +268,7 @@
         customer_name: valueOf("#note_customer_name"),
         customer_phone: valueOf("#note_customer_phone"),
         transaction_date: valueOf("#note_transaction_date"),
+        operational_note: valueOf("#note_operational_note"),
       },
       items: Array.from(document.querySelectorAll("[data-line-item]")).map((row) =>
         normalizeItem(row),
