@@ -26,6 +26,7 @@
     unit_price_rupiah:
       draftLine?.unit_price_rupiah || baseLine?.unit_price_rupiah || "",
     price_basis: draftLine?.price_basis || baseLine?.price_basis || "current_catalog",
+    selected_label: draftLine?.selected_label || baseLine?.selected_label || "",
   });
 
   const mergeExternalLine = (draftLine, baseLine) => ({
@@ -34,6 +35,19 @@
     unit_cost_rupiah:
       draftLine?.unit_cost_rupiah || baseLine?.unit_cost_rupiah || "",
   });
+
+  const mergeProductLines = (draftLines, baseLines) => {
+    const draftList = Array.isArray(draftLines) ? draftLines : [];
+    const baseList = Array.isArray(baseLines) ? baseLines : [];
+    const maxLength = Math.max(draftList.length, baseList.length, 1);
+    const lines = [];
+
+    for (let index = 0; index < maxLength; index += 1) {
+      lines.push(mergeProductLine(draftList[index], baseList[index]));
+    }
+
+    return lines;
+  };
 
   const mergeService = (draftService, baseService) => ({
     name: draftService?.name || baseService?.name || "",
@@ -49,12 +63,7 @@
     part_source: draftItem?.part_source || preloadItem?.part_source || "",
     selected_label: draftItem?.selected_label || preloadItem?.selected_label || "",
     service: mergeService(draftItem?.service, preloadItem?.service),
-    product_lines: [
-      mergeProductLine(
-        Array.isArray(draftItem?.product_lines) ? draftItem.product_lines[0] : null,
-        Array.isArray(preloadItem?.product_lines) ? preloadItem.product_lines[0] : null,
-      ),
-    ],
+    product_lines: mergeProductLines(draftItem?.product_lines, preloadItem?.product_lines),
     external_purchase_lines: [
       mergeExternalLine(
         Array.isArray(draftItem?.external_purchase_lines)
@@ -167,6 +176,20 @@
   const numberText = (value) => String(value ?? "").replace(/\D+/g, "");
   const valueOf = (selector, root = document) => root.querySelector(selector)?.value || "";
 
+  const productLineScopes = (row) => {
+    const scopes = Array.from(row.querySelectorAll("[data-product-line]"));
+    return scopes.length ? scopes : [row];
+  };
+
+  const productLinesFromRow = (row) =>
+    productLineScopes(row).map((scope) => ({
+      product_id: valueOf("[data-product-id]", scope),
+      qty: numberText(valueOf("[data-qty-input]", scope)) || "1",
+      unit_price_rupiah: numberText(valueOf('input[name$="[unit_price_rupiah]"]', scope)),
+      price_basis: valueOf("[data-price-basis]", scope) || "current_catalog",
+      selected_label: valueOf("[data-product-search]", scope),
+    }));
+
   const normalizeItem = (row) => {
     const itemType = row.dataset.itemType || "service";
     const base = {
@@ -180,16 +203,7 @@
         entry_mode: "product",
         part_source: "store_stock",
         selected_label: valueOf("[data-product-search]", row),
-        product_lines: [
-          {
-            product_id: valueOf("[data-product-id]", row),
-            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
-            unit_price_rupiah: numberText(
-              valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
-            ),
-            price_basis: valueOf("[data-price-basis]", row) || "current_catalog",
-          },
-        ],
+        product_lines: productLinesFromRow(row).slice(0, 1),
       };
     }
 
@@ -204,16 +218,7 @@
           price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
         },
         selected_label: valueOf("[data-product-search]", row),
-        product_lines: [
-          {
-            product_id: valueOf("[data-product-id]", row),
-            qty: numberText(valueOf('input[name$="[product_lines][0][qty]"]', row)) || "1",
-            unit_price_rupiah: numberText(
-              valueOf('input[name$="[product_lines][0][unit_price_rupiah]"]', row),
-            ),
-            price_basis: valueOf("[data-price-basis]", row) || "current_catalog",
-          },
-        ],
+        product_lines: productLinesFromRow(row).slice(0, 1),
       };
     }
 
@@ -343,6 +348,8 @@
       if (
         event.target.closest("[data-add-item-type]") ||
         event.target.closest("[data-remove-line]") ||
+        event.target.closest("[data-add-product-line]") ||
+        event.target.closest("[data-remove-product-line]") ||
         event.target.closest("[data-payment-choice]") ||
         event.target.closest("#workspace-payment-open-cash") ||
         event.target.closest("#workspace-payment-back-cash")

@@ -142,7 +142,7 @@
       display.value = String(item.default_unit_price_rupiah || 0);
     }
 
-    NS.updateStockText?.(row, item.available_stock);
+    NS.updateStockText?.(row, item.available_stock, scope);
     window.AdminMoneyInput?.bindBySelector?.(row);
     NS.syncFloorPriceGuard?.(row);
     clearResults(scope);

@@ -60,10 +60,10 @@
     if (scopes.length) {
       scopes.forEach((scope) => {
         const input = scope.querySelector("[data-qty-input]");
-        const error = row.querySelector("[data-stock-error]");
+        const error = scope.querySelector("[data-stock-error]") || row.querySelector("[data-stock-error]");
         if (!input || !error) return;
 
-        const available = digits(row.dataset.availableStock || "0");
+        const available = digits(scope.dataset.availableStock || row.dataset.availableStock || "0");
         const qty = digits(input.value);
         const invalid = available > 0 && qty > available;
 
