@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Database\Seeders\CreateOnly;
 
-use Illuminate\Database\Seeder;
+use App\Core\IdentityAccess\Role\Role;
+use Database\Seeders\CreateOnly\Support\CreateOnlySeeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
-final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
+final class CreateEmployeeDebtAdjustmentSeeder extends CreateOnlySeeder
 {
     private const DEBT_TABLE = 'employee_debts';
     private const ADJUSTMENT_TABLE = 'employee_debt_adjustments';
@@ -73,8 +73,7 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
 
     public function run(): void
     {
-        $this->guardEnvironment();
-        $this->guardSchema();
+        $this->assertLocalOrTesting();
 
         $employeeIds = $this->employeeIds();
         $actorId = $this->adminActorId();
@@ -93,7 +92,7 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
             if ($this->debtExists($scenario['id'])) {
                 $this->assertExistingDebtMatches($scenario['id'], $afterTotalDebt);
             } else {
-                DB::table(self::DEBT_TABLE)->insert($this->filterExistingColumns(self::DEBT_TABLE, [
+                if ($this->createOnly(self::DEBT_TABLE, 'id', $scenario['id'], [
                     'id' => $scenario['id'],
                     'employee_id' => $employeeId,
                     'total_debt' => $afterTotalDebt,
@@ -102,9 +101,9 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
                     'notes' => $scenario['notes'],
                     'created_at' => $scenario['created_at'],
                     'updated_at' => $scenario['adjustment']['created_at'],
-                ]));
-
-                $createdDebts++;
+                ])) {
+                    $createdDebts++;
+                }
             }
 
             $adjustment = $scenario['adjustment'];
@@ -114,7 +113,7 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
                 continue;
             }
 
-            DB::table(self::ADJUSTMENT_TABLE)->insert($this->filterExistingColumns(self::ADJUSTMENT_TABLE, [
+            if ($this->createOnly(self::ADJUSTMENT_TABLE, 'id', $adjustment['id'], [
                 'id' => $adjustment['id'],
                 'employee_debt_id' => $scenario['id'],
                 'adjustment_type' => 'increase',
@@ -127,9 +126,9 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
                 'after_remaining_balance' => $afterTotalDebt,
                 'created_at' => $adjustment['created_at'],
                 'updated_at' => $adjustment['created_at'],
-            ]));
-
-            $createdAdjustments++;
+            ])) {
+                $createdAdjustments++;
+            }
         }
 
         $this->command?->info(sprintf(
@@ -139,64 +138,6 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
             count(self::SCENARIOS),
             $createdAdjustments
         ));
-    }
-
-    private function guardEnvironment(): void
-    {
-        if (! app()->environment(['local', 'testing'])) {
-            throw new RuntimeException('CreateEmployeeDebtAdjustmentSeeder may only run in local/testing environment.');
-        }
-    }
-
-    private function guardSchema(): void
-    {
-        foreach ([self::DEBT_TABLE, self::ADJUSTMENT_TABLE, 'employees', 'actor_accesses'] as $table) {
-            if (! Schema::hasTable($table)) {
-                throw new RuntimeException(sprintf('Required table missing: %s.', $table));
-            }
-        }
-
-        $requiredColumns = [
-            self::DEBT_TABLE => [
-                'id',
-                'employee_id',
-                'total_debt',
-                'remaining_balance',
-                'status',
-                'notes',
-                'created_at',
-                'updated_at',
-            ],
-            self::ADJUSTMENT_TABLE => [
-                'id',
-                'employee_debt_id',
-                'adjustment_type',
-                'amount',
-                'reason',
-                'performed_by_actor_id',
-                'before_total_debt',
-                'after_total_debt',
-                'before_remaining_balance',
-                'after_remaining_balance',
-                'created_at',
-                'updated_at',
-            ],
-            'employees' => [
-                'id',
-            ],
-            'actor_accesses' => [
-                'actor_id',
-                'role',
-            ],
-        ];
-
-        foreach ($requiredColumns as $table => $columns) {
-            foreach ($columns as $column) {
-                if (! Schema::hasColumn($table, $column)) {
-                    throw new RuntimeException(sprintf('Required column missing: %s.%s.', $table, $column));
-                }
-            }
-        }
     }
 
     /**
@@ -216,7 +157,7 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
     private function adminActorId(): string
     {
         $actorId = DB::table('actor_accesses')
-            ->where('role', 'admin')
+            ->where('role', Role::ADMIN)
             ->orderBy('actor_id')
             ->value('actor_id');
 
@@ -320,14 +261,4 @@ final class CreateEmployeeDebtAdjustmentSeeder extends Seeder
         }
     }
 
-    /**
-     * @param array<string, mixed> $record
-     * @return array<string, mixed>
-     */
-    private function filterExistingColumns(string $table, array $record): array
-    {
-        $columns = array_flip(Schema::getColumnListing($table));
-
-        return array_intersect_key($record, $columns);
-    }
 }
