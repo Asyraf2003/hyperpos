@@ -608,7 +608,7 @@ BOUNDARY:
 
 ## Slice 5 - Procurement projection raw index SQL cleanup
 
-Status: Pending focused verification
+Status: Focused Verified
 
 FACT:
 - `database/migrations/2026_04_23_130000_add_desc_index_for_admin_procurement_default_load.php` previously used raw MySQL `CREATE INDEX ... DESC ... ASC` and `DROP INDEX ... ON ...` statements.
@@ -633,3 +633,74 @@ REQUIRED PROOF:
 - Fresh MySQL migration proof.
 - Targeted procurement/index regression proof.
 - Full verification proof before closing this slice.
+
+## Slice 6 - Remaining migration portability scan classification
+
+Status: Classification baseline
+
+FACT:
+- The latest remaining scan command was:
+
+    rg -n "GENERATED ALWAYS|virtualAs|storedAs|DB::statement|after\(|->change\(|unsignedInteger|unsignedBigInteger|enum" database/migrations -g "*.php"
+
+- The scan still finds:
+  - Laravel framework-owned job table unsigned integer fields.
+  - Driver-aware employee nullability SQL.
+  - MySQL/MariaDB-gated JSON validity SQL.
+  - Product active unique generated-column workaround.
+  - Inventory reversal generated-column workaround.
+
+CLASSIFICATION:
+1. `database/migrations/0001_01_01_000002_create_jobs_table.php`
+   - Category: framework-owned table.
+   - Decision: do not patch as part of domain PostgreSQL-readiness hardening.
+
+2. `database/migrations/2026_04_10_000100_alter_employees_table_for_employee_master_v2.php`
+   - Category: accepted driver-aware SQL.
+   - Decision: keep. It already uses explicit MySQL/MariaDB and PostgreSQL branches for nullability tightening.
+
+3. `database/migrations/2026_04_02_001100_create_note_mutation_snapshots_table.php`
+   - Category: MySQL/MariaDB-gated JSON validity check.
+   - Decision: keep. It validates JSON storage on MySQL/MariaDB and skips unsupported drivers.
+
+4. `database/migrations/2026_04_04_100000_create_transaction_workspace_drafts_table.php`
+   - Category: MySQL/MariaDB-gated JSON validity check.
+   - Decision: keep. It validates JSON storage on MySQL/MariaDB and skips unsupported drivers.
+
+5. `database/migrations/2026_04_07_160100_fix_products_unique_constraints_for_soft_delete.php`
+   - Category: accepted MySQL generated-column workaround.
+   - Decision: keep for the MySQL target schema until PostgreSQL transition mapping exists.
+   - Transition note: PostgreSQL target should evaluate partial unique indexes for active product uniqueness instead of copying the MySQL generated-column workaround blindly.
+
+6. `database/migrations/2026_05_15_000005_add_unique_inventory_reversal_source_key.php`
+   - Category: accepted MySQL generated-column workaround.
+   - Decision: keep for the MySQL target schema until PostgreSQL transition mapping exists.
+   - Transition note: PostgreSQL target should evaluate partial unique indexes for reversal uniqueness instead of copying the MySQL generated-column workaround blindly.
+
+PROOF:
+- SHOW INDEX helper portability cleanup was verified by scan, fresh MySQL migration, targeted database/procurement tests, and full verification.
+- Procurement projection raw index SQL cleanup was verified by scan, fresh MySQL migration, targeted procurement/index tests, and full verification.
+- Latest full verification after Slice 5:
+  - Tests: 2 skipped, 1118 passed (6285 assertions)
+  - Duration: 76.51s
+
+CLAIM ALLOWED:
+- Current MySQL migration structure has been hardened against the known avoidable MySQL-only migration debt found in this Phase 4 slice.
+- Remaining scan findings are either framework-owned, accepted driver-aware SQL, accepted MySQL/MariaDB-gated validation, or accepted MySQL generated-column workarounds requiring future PostgreSQL transition mapping.
+
+CLAIM FORBIDDEN:
+- Do not claim PostgreSQL production cutover readiness.
+- Do not claim PostgreSQL runtime migration proof.
+- Do not claim query-plan or performance parity for PostgreSQL.
+- Do not claim edited historical migrations mutate the live MySQL database.
+
+NEXT TRANSITION-ONLY WORK:
+- PostgreSQL fresh migration proof.
+- PostgreSQL partial unique index mapping for active product uniqueness.
+- PostgreSQL partial unique index mapping for inventory reversal uniqueness.
+- Data export/import mapping.
+- Row-count parity.
+- Rupiah reconciliation.
+- Projection rebuild proof.
+- PostgreSQL application test suite.
+- Cutover and rollback runbook.
