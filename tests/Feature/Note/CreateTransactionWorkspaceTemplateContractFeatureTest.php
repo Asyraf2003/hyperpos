@@ -54,9 +54,8 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response = $this->actingAs($user)->get(route('cashier.notes.workspace.create'));
 
         $response->assertOk();
-        $response->assertSee('name="items[__INDEX__][pricing_mode]"', false);
-        $response->assertSee('value="manual_split" selected', false);
-        $response->assertSee('value="package_auto_split"', false);
+        $response->assertSee('name="items[__INDEX__][pricing_mode]" value="package_auto_split"', false);
+        $response->assertSee('data-pricing-mode', false);
         $response->assertSee('name="items[__INDEX__][package_total_rupiah]"', false);
         $response->assertSee('Total Paket', false);
     }
