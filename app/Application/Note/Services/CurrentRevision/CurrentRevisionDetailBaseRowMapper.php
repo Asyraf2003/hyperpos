@@ -11,6 +11,7 @@ final class CurrentRevisionDetailBaseRowMapper
 {
     public function __construct(
         private readonly CurrentRevisionLinePresentationSupport $presentation,
+        private readonly CurrentRevisionPackageBreakdownMapper $packages,
     ) {
     }
 
@@ -46,6 +47,7 @@ final class CurrentRevisionDetailBaseRowMapper
             'has_service_component' => $line->serviceLabel() !== null,
             'store_stock_count' => $storeLineCount,
             'external_purchase_count' => $this->lineCount($payload, 'external_purchase_lines'),
+            'package_breakdown' => $this->packages->map($line, $payload),
         ];
     }
 
