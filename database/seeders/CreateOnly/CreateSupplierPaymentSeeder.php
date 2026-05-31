@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders\CreateOnly;
 
-use Illuminate\Database\Seeder;
+use App\Core\IdentityAccess\Role\Role;
+use Database\Seeders\CreateOnly\Support\CreateOnlySeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
-final class CreateSupplierPaymentSeeder extends Seeder
+final class CreateSupplierPaymentSeeder extends CreateOnlySeeder
 {
     public function run(): void
     {
@@ -25,7 +26,7 @@ final class CreateSupplierPaymentSeeder extends Seeder
             throw new RuntimeException('CreateSupplierPaymentSeeder requires seeded procurement invoices. Run make procurement first.');
         }
 
-        $actorId = $this->resolveActorId();
+        $actorId = $this->resolveActiveAdminActorId();
         $now = now()->format('Y-m-d H:i:s');
 
         $created = [
@@ -40,7 +41,7 @@ final class CreateSupplierPaymentSeeder extends Seeder
                 $grandTotalRupiah = (int) $invoice->grand_total_rupiah;
 
                 if ($grandTotalRupiah < 1) {
-                    throw new RuntimeException('Seeded supplier invoice has invalid grand_total_rupiah: ' . $invoiceId);
+                    throw new RuntimeException('Seeded supplier invoice has invalid grand_total_rupiah: '.$invoiceId);
                 }
 
                 $paymentId = sprintf('seed-supplier-payment-%04d', $sequence);
@@ -54,7 +55,7 @@ final class CreateSupplierPaymentSeeder extends Seeder
                 $paidAt = (string) ($invoice->tanggal_pengiriman ?? '2026-05-20');
                 $proofStatus = $isUploadedProof ? 'uploaded' : 'pending';
 
-                if ($this->insertIfMissing('supplier_payments', $paymentId, [
+                if ($this->createOnly('supplier_payments', 'id', $paymentId, [
                     'id' => $paymentId,
                     'supplier_invoice_id' => $invoiceId,
                     'amount_rupiah' => $amountRupiah,
@@ -74,7 +75,7 @@ final class CreateSupplierPaymentSeeder extends Seeder
                 $attachmentId = sprintf('seed-supplier-payment-proof-%04d-01', $sequence);
                 $storagePath = sprintf('supplier-payment-proofs/%s/seed-proof-%04d.pdf', $paymentId, $sequence);
 
-                if ($this->insertIfMissing('supplier_payment_proof_attachments', $attachmentId, [
+                if ($this->createOnly('supplier_payment_proof_attachments', 'id', $attachmentId, [
                     'id' => $attachmentId,
                     'supplier_payment_id' => $paymentId,
                     'storage_path' => $storagePath,
@@ -90,72 +91,30 @@ final class CreateSupplierPaymentSeeder extends Seeder
         });
 
         foreach ($created as $table => $count) {
-            $this->command?->info($table . ' created=' . $count);
+            $this->command?->info($table.' created='.$count);
         }
     }
 
-    private function assertLocalOrTesting(): void
+    private function resolveActiveAdminActorId(): string
     {
-        if (! app()->environment(['local', 'testing'])) {
-            throw new RuntimeException('Create-only seeders may only run in local or testing environments.');
-        }
-    }
+        $row = DB::table('admin_transaction_capability_states as capability')
+            ->join('actor_accesses as access', 'access.actor_id', '=', 'capability.actor_id')
+            ->where('capability.active', true)
+            ->where('access.role', Role::ADMIN)
+            ->orderBy('capability.actor_id')
+            ->select('capability.actor_id')
+            ->first();
 
-    private function resolveActorId(): string
-    {
-        if (Schema::hasTable('actor_accesses')) {
-            $actorId = DB::table('actor_accesses')
-                ->orderBy('actor_id')
-                ->value('actor_id');
-
-            if (is_string($actorId) && trim($actorId) !== '') {
-                return trim($actorId);
-            }
-
-            if (is_int($actorId) || is_float($actorId)) {
-                return (string) $actorId;
-            }
+        if ($row === null) {
+            throw new RuntimeException('No active admin transaction capability actor found for supplier payment seed.');
         }
 
-        if (Schema::hasTable('users')) {
-            $userId = DB::table('users')
-                ->orderBy('id')
-                ->value('id');
+        $actorId = trim((string) $row->actor_id);
 
-            if (is_string($userId) && trim($userId) !== '') {
-                return trim($userId);
-            }
-
-            if (is_int($userId) || is_float($userId)) {
-                return (string) $userId;
-            }
+        if ($actorId === '') {
+            throw new RuntimeException('Resolved admin actor id is empty.');
         }
 
-        return 'seed-actor-admin';
-    }
-
-    /**
-     * @param array<string, mixed> $values
-     */
-    private function insertIfMissing(string $table, string $id, array $values): bool
-    {
-        if (DB::table($table)->where('id', $id)->exists()) {
-            return false;
-        }
-
-        DB::table($table)->insert($this->filterExistingColumns($table, $values));
-
-        return true;
-    }
-
-    /**
-     * @param array<string, mixed> $values
-     * @return array<string, mixed>
-     */
-    private function filterExistingColumns(string $table, array $values): array
-    {
-        $columns = array_flip(Schema::getColumnListing($table));
-
-        return array_intersect_key($values, $columns);
+        return $actorId;
     }
 }
