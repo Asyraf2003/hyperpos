@@ -105,6 +105,9 @@ return [
         ),
     ],
 
+    'version' => env('APP_VERSION', 'local'),
+    'asset_version' => env('ASSET_VERSION', env('APP_VERSION', 'local')),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
