@@ -58,5 +58,10 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertSee('data-pricing-mode', false);
         $response->assertSee('name="items[__INDEX__][package_total_rupiah]"', false);
         $response->assertSee('Total Paket', false);
+        $response->assertSee('data-product-lines', false);
+        $response->assertSee('data-product-line-template', false);
+        $response->assertSee('__PRODUCT_INDEX__', false);
+        $response->assertSee('data-add-product-line', false);
+        $response->assertSee('data-remove-product-line', false);
     }
 }
