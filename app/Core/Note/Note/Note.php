@@ -21,7 +21,13 @@ final class Note
     use NoteNormalization;
     use NoteOperationalStateMutations;
 
-    public static function create(string $id, string $name, ?string $customerPhone, DateTimeImmutable $date): self
+    public static function create(
+        string $id,
+        string $name,
+        ?string $customerPhone,
+        DateTimeImmutable $date,
+        ?string $operationalNote = null,
+    ): self
     {
         self::assertValidIdentity($id, $name);
 
@@ -31,6 +37,7 @@ final class Note
             self::normalizeCustomerPhone($customerPhone),
             $date,
             self::calculateDueDate($date),
+            self::normalizeOperationalNote($operationalNote),
             [],
             Money::zero(),
             self::STATE_OPEN,
@@ -55,6 +62,7 @@ final class Note
         ?DateTimeImmutable $reopenedAt = null,
         ?string $reopenedByActorId = null,
         ?DateTimeImmutable $dueDate = null,
+        ?string $operationalNote = null,
     ): self {
         self::assertValidIdentity($id, $name);
         self::assertValidWorkItems($workItems);
@@ -71,6 +79,7 @@ final class Note
             self::normalizeCustomerPhone($customerPhone),
             $date,
             $dueDate ?? self::calculateDueDate($date),
+            self::normalizeOperationalNote($operationalNote),
             array_values($workItems),
             $total,
             trim($noteState),

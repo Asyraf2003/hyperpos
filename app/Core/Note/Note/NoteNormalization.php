@@ -36,4 +36,15 @@ trait NoteNormalization
 
         return $normalized === '' ? null : $normalized;
     }
+    private static function normalizeOperationalNote(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed === '' ? null : $trimmed;
+    }
+
 }
