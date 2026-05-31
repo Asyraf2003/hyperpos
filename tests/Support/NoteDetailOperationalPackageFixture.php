@@ -33,7 +33,7 @@ trait NoteDetailOperationalPackageFixture
             'wi-detail-package-1',
             'Service Paket Detail',
             120000,
-            'store_stock',
+            'none',
         );
 
         $this->seedStoreStockLineBase('sto-detail-a', 'wi-detail-package-1', 'product-detail-a', 2, 100000);
