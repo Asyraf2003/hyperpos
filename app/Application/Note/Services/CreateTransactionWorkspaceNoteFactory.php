@@ -25,7 +25,8 @@ final class CreateTransactionWorkspaceNoteFactory
             $this->uuid->generate(),
             $this->requiredString($payload['customer_name'] ?? null, 'Nama customer wajib diisi.'),
             $this->nullableString($payload['customer_phone'] ?? null),
-            $this->parseDate($payload['transaction_date'] ?? null, 'Tanggal nota wajib valid dengan format Y-m-d.')
+            $this->parseDate($payload['transaction_date'] ?? null, 'Tanggal nota wajib valid dengan format Y-m-d.'),
+            $this->nullableString($payload['operational_note'] ?? null)
         );
     }
 

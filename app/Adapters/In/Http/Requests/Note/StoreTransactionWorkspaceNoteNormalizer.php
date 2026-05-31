@@ -18,6 +18,7 @@ final class StoreTransactionWorkspaceNoteNormalizer
             'customer_name' => self::trimOrNull($note['customer_name'] ?? null),
             'customer_phone' => self::trimOrNull($note['customer_phone'] ?? null),
             'transaction_date' => self::trimOrNull($note['transaction_date'] ?? null),
+            'operational_note' => self::trimOrNull($note['operational_note'] ?? null),
         ];
     }
 

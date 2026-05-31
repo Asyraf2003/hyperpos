@@ -17,6 +17,7 @@ final class StoreTransactionWorkspaceRules
             'note.customer_name' => ['required', 'string'],
             'note.customer_phone' => ['nullable', 'string'],
             'note.transaction_date' => ['required', 'date_format:Y-m-d'],
+            'note.operational_note' => ['nullable', 'string', 'max:2000'],
 
             'items' => ['required', 'array', 'min:1'],
             'items.*.entry_mode' => ['required', 'string', 'in:product,service'],
