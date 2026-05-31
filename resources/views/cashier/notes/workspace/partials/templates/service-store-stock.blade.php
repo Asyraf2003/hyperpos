@@ -43,71 +43,37 @@
                 </div>
             </div>
 
-            <div class="col-12 col-lg-6">
+            <div class="col-12 col-lg-4" data-product-line>
                 <label class="form-label small mb-1">Sparepart Toko</label>
-
-                <div class="row g-2 mb-1 align-items-start" data-product-line>
-                    <div class="col-8">
-                        <div class="position-relative">
-                            <input type="hidden" name="items[__INDEX__][product_lines][0][product_id]" value="" data-product-id>
-                            <input type="hidden" name="items[__INDEX__][product_lines][0][price_basis]" value="current_catalog" data-price-basis>
-                            <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw data-price-input>
-                            <input
-                                type="text"
-                                class="form-control form-control-sm"
-                                placeholder="Cari produk pertama"
-                                autocomplete="off"
-                                data-product-search
-                            >
-                            <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="input-group input-group-sm workspace-qty-control rounded-pill overflow-hidden">
-                            <button type="button" class="btn btn-outline-secondary px-2 fw-bold" data-qty-decrement>-</button>
-                            <input
-                                type="text"
-                                inputmode="numeric"
-                                name="items[__INDEX__][product_lines][0][qty]"
-                                value="1"
-                                class="form-control text-center px-1 fw-semibold"
-                                data-qty-input
-                            >
-                            <button type="button" class="btn btn-outline-secondary px-2 fw-bold" data-qty-increment>+</button>
-                        </div>
-                    </div>
+                <div class="position-relative">
+                    <input type="hidden" name="items[__INDEX__][product_lines][0][product_id]" value="" data-product-id>
+                    <input type="hidden" name="items[__INDEX__][product_lines][0][price_basis]" value="current_catalog" data-price-basis>
+                    <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw data-price-input>
+                    <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        placeholder="Pilih produk dari pencarian"
+                        autocomplete="off"
+                        data-product-search
+                    >
+                    <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
                 </div>
+                <small class="text-muted">Wajib pilih dari hasil pencarian, bukan diketik manual.</small>
+            </div>
 
-                <div class="row g-2 align-items-start" data-product-line>
-                    <div class="col-8">
-                        <div class="position-relative">
-                            <input type="hidden" name="items[__INDEX__][product_lines][1][product_id]" value="" data-product-id>
-                            <input type="hidden" name="items[__INDEX__][product_lines][1][price_basis]" value="current_catalog" data-price-basis>
-                            <input type="hidden" name="items[__INDEX__][product_lines][1][unit_price_rupiah]" value="" data-money-raw data-price-input>
-                            <input
-                                type="text"
-                                class="form-control form-control-sm"
-                                placeholder="Cari produk kedua, opsional"
-                                autocomplete="off"
-                                data-product-search
-                            >
-                            <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="input-group input-group-sm workspace-qty-control rounded-pill overflow-hidden">
-                            <button type="button" class="btn btn-outline-secondary px-2 fw-bold" data-qty-decrement>-</button>
-                            <input
-                                type="text"
-                                inputmode="numeric"
-                                name="items[__INDEX__][product_lines][1][qty]"
-                                value="1"
-                                class="form-control text-center px-1 fw-semibold"
-                                data-qty-input
-                            >
-                            <button type="button" class="btn btn-outline-secondary px-2 fw-bold" data-qty-increment>+</button>
-                        </div>
-                    </div>
+            <div class="col-8 col-lg-2">
+                <label class="form-label small mb-1">Qty</label>
+                <div class="input-group input-group-sm workspace-qty-control rounded-pill overflow-hidden">
+                    <button type="button" class="btn btn-outline-secondary px-3 fw-bold" data-qty-decrement>-</button>
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        name="items[__INDEX__][product_lines][0][qty]"
+                        value="1"
+                        class="form-control text-center px-1 fw-semibold"
+                        data-qty-input
+                    >
+                    <button type="button" class="btn btn-outline-secondary px-3 fw-bold" data-qty-increment>+</button>
                 </div>
             </div>
 
