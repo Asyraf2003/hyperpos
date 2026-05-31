@@ -96,3 +96,52 @@ php artisan test --filter=WebPageAccessFeatureTest
 - Status: CONFIRMED contract mismatch
 - Runtime impact: GAP
 - Owner-facing summary: seed aktif menulis role `user` untuk demo kasir, sementara canonical domain hanya mengenal `admin` dan `kasir`. Itu adalah mismatch kontrak yang sudah terbukti dari source, tetapi dampak runtime login/route/mobile masih perlu fresh seed proof.
+
+---
+
+## Resolution update - Phase 5 CreateOnly seeder contract hardening
+
+### Status
+
+FIXED WITH EXTENDED SEED + FULL VERIFY PROOF.
+
+### Decision
+
+The active `DatabaseSeeder` path remains on `Database\Seeders\CreateOnly\CreateUserSeeder` and `Database\Seeders\CreateOnly\CreateMasterBasicSeeder`.
+
+The seeder role contract was fixed in the active CreateOnly path. `kasir@gmail.com` is now seeded with canonical `Role::KASIR` / `kasir`, not the non-canonical `user` role.
+
+The CreateOnly seeders were also consolidated behind the shared create-only support path:
+
+- `database/seeders/CreateOnly/Support/CreateOnlySeeder.php`
+- `database/seeders/CreateOnly/Support/CreateOnlyMasterSeeder.php`
+
+The write behavior is now centralized through shared create-only helpers instead of scattered raw insert / local helper paths.
+
+### Proof
+
+- Static CreateOnly scan showed raw insert/update helpers only remain in the shared base or out-of-scope legacy `UserSeeder.php`.
+- Fresh seed proof showed:
+  - `admin@gmail.com => admin`
+  - `kasir@gmail.com => kasir`
+- Admin cashier area access proof showed:
+  - `admin@gmail.com => active: 1`
+- Idempotency proof after a second `php artisan db:seed --force` showed the demo users remained non-duplicated and roles stayed stable.
+- `make seed-create-all-v3` passed after extended CreateOnly scenario seed execution:
+  - supplier procurement seed created 24 invoices, 72 invoice lines, 24 receipts, and 72 receipt lines;
+  - supplier payment seed created 24 payments and 12 proof attachments;
+  - operational expense seed created 45 rows;
+  - employee debt/payment/adjustment/payroll scenario seeders completed with planned counts.
+- Targeted auth regression passed:
+  - `MobileApiAuthenticationFeatureTest`: 7 passed, 25 assertions.
+  - `WebPageAccessFeatureTest`: 8 passed, 20 assertions.
+- Full verify passed:
+  - `2 skipped, 1118 passed (6285 assertions)`.
+  - Duration: `76.37s`.
+
+### Remaining non-blocking follow-up
+
+`ProductSeederIdempotencyFeatureTest` still has 2 explicit skipped tests because product scenario seeders remain pending restoration under `database/seeders/Product`.
+
+This is not a blocker for `0002_seeder_role_contract.md`; it is a separate product scenario seeder restoration follow-up.
+
