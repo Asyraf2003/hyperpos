@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders\CreateOnly;
 
-use Illuminate\Database\Seeder;
+use Database\Seeders\CreateOnly\Support\CreateOnlySeeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
-final class CreatePayrollDisbursementSeeder extends Seeder
+final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
 {
     private const TARGET_TABLE = 'payroll_disbursements';
 
@@ -83,8 +82,7 @@ final class CreatePayrollDisbursementSeeder extends Seeder
 
     public function run(): void
     {
-        $this->guardEnvironment();
-        $this->guardSchema();
+        $this->assertLocalOrTesting();
 
         $employeeIds = $this->activeEmployeeIds();
 
@@ -104,7 +102,7 @@ final class CreatePayrollDisbursementSeeder extends Seeder
                 continue;
             }
 
-            DB::table(self::TARGET_TABLE)->insert($this->filterExistingColumns(self::TARGET_TABLE, [
+            if ($this->createOnly(self::TARGET_TABLE, 'id', $scenario['id'], [
                 'id' => $scenario['id'],
                 'employee_id' => $employeeId,
                 'amount' => $scenario['amount'],
@@ -113,9 +111,9 @@ final class CreatePayrollDisbursementSeeder extends Seeder
                 'notes' => $scenario['notes'],
                 'created_at' => $scenario['created_at'],
                 'updated_at' => $scenario['created_at'],
-            ]));
-
-            $created++;
+            ])) {
+                $created++;
+            }
         }
 
         $this->command?->info(sprintf(
@@ -125,46 +123,6 @@ final class CreatePayrollDisbursementSeeder extends Seeder
         ));
     }
 
-    private function guardEnvironment(): void
-    {
-        if (! app()->environment(['local', 'testing'])) {
-            throw new RuntimeException('CreatePayrollDisbursementSeeder may only run in local/testing environment.');
-        }
-    }
-
-    private function guardSchema(): void
-    {
-        foreach ([self::TARGET_TABLE, 'employees'] as $table) {
-            if (! Schema::hasTable($table)) {
-                throw new RuntimeException(sprintf('Required table missing: %s.', $table));
-            }
-        }
-
-        $requiredColumns = [
-            self::TARGET_TABLE => [
-                'id',
-                'employee_id',
-                'amount',
-                'disbursement_date',
-                'mode',
-                'notes',
-                'created_at',
-                'updated_at',
-            ],
-            'employees' => [
-                'id',
-                'employment_status',
-            ],
-        ];
-
-        foreach ($requiredColumns as $table => $columns) {
-            foreach ($columns as $column) {
-                if (! Schema::hasColumn($table, $column)) {
-                    throw new RuntimeException(sprintf('Required column missing: %s.%s.', $table, $column));
-                }
-            }
-        }
-    }
 
     /**
      * @return list<string>
