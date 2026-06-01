@@ -590,6 +590,84 @@ Transaction report dataset after package multi-product revision is PARTIAL GREEN
 Report/export lifecycle is still not fully closed because PDF/Excel export and browser/manual QA remain open.
 
 
+## Phase 3 Report Export HTTP Proof - Package Multi-Product Revision
+
+REPORT-EXPORT-002
+
+Problem / target:
+
+Characterize transaction report PDF and Excel export HTTP routes after service-store-stock package auto split multi-product downward revision.
+
+Scenario:
+
+Original note total = 250000.
+Existing payment = 250000.
+Downward revision package total = 200000.
+Revision settlement becomes overpaid_pending with surplus 50000.
+Transaction report dataset already proved:
+gross_transaction_rupiah = 200000
+allocated_payment_rupiah = 250000
+outstanding_rupiah = 0
+
+New export characterization:
+
+tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Added test:
+
+test_transaction_report_exports_after_package_multi_product_downward_revision_return_files
+
+Routes covered:
+
+admin.reports.transaction_summary.export_excel
+admin.reports.transaction_summary.export_pdf
+
+Local syntax proof:
+
+Command:
+php -l tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Output:
+No syntax errors detected in tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Local focused proof:
+
+Command:
+php artisan test tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Output:
+PASS Tests\Feature\Reporting\PackageAutoSplitRevisionReportImpactFeatureTest
+✓ transaction report reads current total after package multi product downward revision
+✓ transaction report exports after package multi product downward revision return files
+
+Tests: 2 passed (20 assertions)
+Duration: 6.62s
+
+Proven:
+
+transaction report dataset after package multi-product downward revision remains GREEN
+Excel transaction report export route returns HTTP 200
+Excel transaction report export returns spreadsheet content type
+Excel transaction report export returns expected laporan-transaksi filename
+PDF transaction report export route returns HTTP 200
+PDF transaction report export returns application/pdf content type
+PDF transaction report export returns expected laporan-transaksi filename
+PDF transaction report response starts with %PDF
+
+Boundary:
+
+This proof covers transaction summary PDF and Excel export HTTP responses only.
+This proof does not close transaction cash ledger export.
+This proof does not close browser/manual QA.
+This proof does not close full make verify.
+This proof does not prove downloaded file visual formatting beyond content type, filename, and PDF signature.
+
+Status impact:
+
+Transaction report dataset and transaction summary PDF/Excel export after package multi-product revision are GREEN in focused proof.
+Report/export lifecycle is PARTIAL GREEN because transaction cash ledger export and browser/manual QA remain open.
+
+
 Still OPEN
 Payment / Settlement
 
