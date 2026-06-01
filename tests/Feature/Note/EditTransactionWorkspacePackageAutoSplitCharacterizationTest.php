@@ -43,6 +43,140 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
         $response->assertSee('250000', false);
     }
 
+
+    public function test_admin_can_submit_service_store_stock_package_auto_split_multi_product_revision(): void
+    {
+        $this->seedOpenMultiProductPackageNote();
+
+        $user = User::query()->create([
+            'name' => 'Admin Package Revision Submit Characterization',
+            'email' => 'admin-package-revision-submit-characterization@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'admin',
+        ]);
+
+        $response = $this->actingAs($user)->patch(
+            route('admin.notes.workspace.update', ['noteId' => 'note-edit-package-multi-001']),
+            [
+                'reason' => 'Package multi-product revision submit characterization.',
+                'note' => [
+                    'customer_name' => 'Budi Edit Package Multi Revised',
+                    'customer_phone' => '08123456789',
+                    'transaction_date' => '2026-06-01',
+                    'operational_note' => 'Alasan revisi package multi.',
+                ],
+                'items' => [
+                    [
+                        'entry_mode' => 'service',
+                        'description' => null,
+                        'part_source' => 'store_stock',
+                        'pricing_mode' => 'package_auto_split',
+                        'package_total_rupiah' => 300000,
+                        'service' => [
+                            'name' => 'Servis Paket Multi Revised',
+                            'price_rupiah' => 0,
+                            'notes' => null,
+                        ],
+                        'product_lines' => [
+                            [
+                                'product_id' => 'product-package-edit-a',
+                                'qty' => 2,
+                                'unit_price_rupiah' => 50000,
+                                'price_basis' => 'revision_snapshot',
+                            ],
+                            [
+                                'product_id' => 'product-package-edit-b',
+                                'qty' => 2,
+                                'unit_price_rupiah' => 30000,
+                                'price_basis' => 'revision_snapshot',
+                            ],
+                        ],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+            ]
+        );
+
+        $response->assertRedirect(route('admin.notes.show', ['noteId' => 'note-edit-package-multi-001']));
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-edit-package-multi-001',
+            'customer_name' => 'Budi Edit Package Multi Revised',
+            'customer_phone' => '08123456789',
+            'transaction_date' => '2026-06-01',
+            'operational_note' => 'Alasan revisi package multi.',
+            'total_rupiah' => 300000,
+            'current_revision_id' => 'note-edit-package-multi-001-r002',
+            'latest_revision_number' => 2,
+        ]);
+
+        $this->assertDatabaseHas('note_revisions', [
+            'id' => 'note-edit-package-multi-001-r002',
+            'note_root_id' => 'note-edit-package-multi-001',
+            'revision_number' => 2,
+            'parent_revision_id' => 'note-edit-package-multi-001-r001',
+            'reason' => 'Package multi-product revision submit characterization.',
+            'customer_name' => 'Budi Edit Package Multi Revised',
+            'customer_phone' => '08123456789',
+            'transaction_date' => '2026-06-01',
+            'grand_total_rupiah' => 300000,
+            'line_count' => 1,
+        ]);
+
+        $workItemId = (string) DB::table('work_items')
+            ->where('note_id', 'note-edit-package-multi-001')
+            ->value('id');
+
+        self::assertNotSame('', $workItemId);
+
+        $this->assertDatabaseCount('work_items', 1);
+        $this->assertDatabaseHas('work_items', [
+            'id' => $workItemId,
+            'note_id' => 'note-edit-package-multi-001',
+            'transaction_type' => WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART,
+            'subtotal_rupiah' => 300000,
+        ]);
+
+        $this->assertDatabaseHas('work_item_service_details', [
+            'work_item_id' => $workItemId,
+            'service_name' => 'Servis Paket Multi Revised',
+            'service_price_rupiah' => 140000,
+            'part_source' => 'none',
+        ]);
+
+        $this->assertDatabaseCount('work_item_store_stock_lines', 2);
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'work_item_id' => $workItemId,
+            'product_id' => 'product-package-edit-a',
+            'qty' => 2,
+            'line_total_rupiah' => 100000,
+        ]);
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'work_item_id' => $workItemId,
+            'product_id' => 'product-package-edit-b',
+            'qty' => 2,
+            'line_total_rupiah' => 60000,
+        ]);
+
+        $revisionPayload = DB::table('note_revision_lines')
+            ->where('note_revision_id', 'note-edit-package-multi-001-r002')
+            ->where('work_item_root_id', $workItemId)
+            ->value('payload');
+
+        self::assertIsString($revisionPayload);
+
+        $decoded = json_decode($revisionPayload, true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame('package_auto_split', $decoded['pricing_mode'] ?? null);
+        self::assertSame(300000, $decoded['package_total_rupiah'] ?? null);
+        self::assertSame(140000, $decoded['service']['service_price_rupiah'] ?? null);
+        self::assertCount(2, $decoded['store_stock_lines'] ?? []);
+    }
+
     private function seedOpenMultiProductPackageNote(): void
     {
         $this->seedNoteBase(
