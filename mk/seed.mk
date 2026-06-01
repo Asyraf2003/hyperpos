@@ -119,6 +119,7 @@ seed-create-all-v1: seed-user seed-admin-cashier-area-access seed-create-basic s
 .PHONY: create-all-v1
 create-all-v1: seed-create-all-v1
 	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
 
 .PHONY: seed-create-all-v2
 seed-create-all-v2: seed-user seed-admin-cashier-area-access seed-create-basic seed-create-week seed-inventory seed-procurement seed-supplier-payment seed-expense seed-employee-debt seed-employee-debt-payment seed-employee-debt-adjustment seed-payroll-disbursement
@@ -126,6 +127,7 @@ seed-create-all-v2: seed-user seed-admin-cashier-area-access seed-create-basic s
 .PHONY: create-all-v2
 create-all-v2: seed-create-all-v2
 	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
 
 .PHONY: seed-create-all-v3
 seed-create-all-v3: seed-user seed-admin-cashier-area-access seed-create-basic seed-create-week seed-create-year seed-inventory seed-procurement seed-supplier-payment seed-expense seed-employee-debt seed-employee-debt-payment seed-employee-debt-adjustment seed-payroll-disbursement
@@ -133,6 +135,7 @@ seed-create-all-v3: seed-user seed-admin-cashier-area-access seed-create-basic s
 .PHONY: create-all-v3
 create-all-v3: seed-create-all-v3
 	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
 
 .PHONY: help
 help:
@@ -162,9 +165,9 @@ help:
 	@echo "  make seed-audit-baseline          Raw audit baseline target used by human-facing targets"
 	@echo ""
 	@echo "Aggregate create-only datasets:"
-	@echo "  make create-all-v1                Run source seed dataset v1, then audit baseline once"
-	@echo "  make create-all-v2                Run source seed dataset v2, then audit baseline once"
-	@echo "  make create-all-v3                Run source seed dataset v3, then audit baseline once"
+	@echo "  make create-all-v1                Run source seed dataset v1, then audit baseline and rebuild projections once"
+	@echo "  make create-all-v2                Run source seed dataset v2, then audit baseline and rebuild projections once"
+	@echo "  make create-all-v3                Run source seed dataset v3, then audit baseline and rebuild projections once"
 	@echo ""
 	@echo "Raw source-only targets:"
 	@echo "  make seed-create-all-v1           Source-only aggregate v1; does not run audit baseline"
@@ -175,9 +178,9 @@ help:
 	@echo "  make seed-expense                 Source-only expense seed; use make expense for natural audited flow"
 	@echo ""
 	@echo "Alias explanation:"
-	@echo "  make create-all-v3                Recommended human-facing command: source seed + audit baseline"
+	@echo "  make create-all-v3                Recommended human-facing command: source seed + audit baseline + projection rebuild"
 	@echo "  make seed-create-all-v3           Raw dependency/debug target: source seed only"
-	@echo "  Human-facing targets run audit baseline automatically; raw seed-* targets are kept for debugging"
+	@echo "  Human-facing targets run audit baseline and projection rebuild automatically; raw seed-* targets are kept for debugging"
 	@echo ""
 	@echo "Project utility targets:"
 	@echo "  make verify                       Run the project verification target defined by the repo"
