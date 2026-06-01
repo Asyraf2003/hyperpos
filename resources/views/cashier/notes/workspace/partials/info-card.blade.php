@@ -61,13 +61,13 @@
             </div>
 
             <div class="form-group mb-4">
-                <label for="note_operational_note" class="form-label">Keterangan Nota</label>
+                <label for="note_operational_note" class="form-label">Alasan Nota</label>
                 <textarea
                     id="note_operational_note"
                     name="note[operational_note]"
                     rows="2"
                     class="form-control"
-                    placeholder="Contoh: keluhan, instruksi, atau catatan umum nota"
+                    placeholder="Contoh: alasan, keluhan, instruksi, atau catatan umum nota"
                 >{{ $oldNote['operational_note'] ?? '' }}</textarea>
             </div>
 

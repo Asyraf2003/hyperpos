@@ -25,7 +25,7 @@ final class NoteDetailOperationalPackageVisibilityFeatureTest extends TestCase
 
         $this->get(route('admin.notes.show', ['noteId' => 'note-detail-package-1']))
             ->assertOk()
-            ->assertSee('Keterangan Nota')
+            ->assertSee('Alasan Nota')
             ->assertSee('Keterangan operasional detail package')
             ->assertSee('Paket total')
             ->assertSee('Total sparepart')

@@ -33,7 +33,7 @@
 
     @if (!empty($note['operational_note']))
       <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
-        <small>Keterangan Nota</small>
+        <small>Alasan Nota</small>
         <div class="text-end fw-semibold">{{ $note['operational_note'] }}</div>
       </div>
     @endif
