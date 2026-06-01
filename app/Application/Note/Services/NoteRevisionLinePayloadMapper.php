@@ -20,6 +20,11 @@ final class NoteRevisionLinePayloadMapper
      */
     public function map(WorkItem $item): array
     {
+        $storeStockLines = array_map(
+            fn (StoreStockLine $line): array => $this->mapStoreStockLine($line),
+            $item->storeStockLines(),
+        );
+
         $payload = [
             'work_item_root_id' => $item->id(),
             'transaction_type' => $item->transactionType(),
@@ -34,10 +39,7 @@ final class NoteRevisionLinePayloadMapper
                 ],
                 $item->externalPurchaseLines(),
             ),
-            'store_stock_lines' => array_map(
-                fn (StoreStockLine $line): array => $this->mapStoreStockLine($line),
-                $item->storeStockLines(),
-            ),
+            'store_stock_lines' => $storeStockLines,
         ];
 
         $service = $item->serviceDetail();
@@ -48,6 +50,18 @@ final class NoteRevisionLinePayloadMapper
                 'service_price_rupiah' => $service->servicePriceRupiah()->amount(),
                 'part_source' => $service->partSource(),
             ];
+        }
+
+        if ($item->transactionType() === WorkItem::TYPE_SERVICE_WITH_STORE_STOCK_PART) {
+            $partsTotal = array_sum(array_map(
+                static fn (array $line): int => (int) ($line['line_total_rupiah'] ?? 0),
+                $storeStockLines,
+            ));
+
+            $payload['pricing_mode'] = 'package_auto_split';
+            $payload['package_total_rupiah'] = $item->subtotalRupiah()->amount();
+            $payload['parts_total_rupiah'] = $partsTotal;
+            $payload['service_price_rupiah'] = $service?->servicePriceRupiah()->amount() ?? 0;
         }
 
         return $payload;
