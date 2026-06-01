@@ -253,6 +253,68 @@ The focused test proves preload, submit, package metadata, operational note upda
 
 It does not prove payment, settlement, refund, report/export, browser QA, or full repo verify.
 
+## Phase 3 Refund Boundary Proof - Downward Overpaid Package Multi-Product
+
+REFUND-BOUNDARY-001
+
+Problem / target:
+
+Characterize selected-row refund boundary after a fully paid service-store-stock package auto split multi-product note is revised downward and becomes overpaid.
+
+Scenario:
+- original package total = 250000
+- existing payment = 250000
+- revision package total = 200000
+- revised product A = 100000
+- revised product B = 30000
+- revised service residual = 70000
+- surplus after revision = 50000
+
+Local command:
+
+```text
+php artisan test tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php --filter=refund_after_downward_revision
+```
+
+Local output:
+
+```text
+PASS  Tests\Feature\Note\EditTransactionWorkspacePackageAutoSplitCharacterizationTest
+✓ package auto split multi product refund after downward revision targets current replace… 5.87s
+
+Tests: 1 passed (27 assertions)
+Duration: 6.01s
+```
+
+Proven by this local output:
+
+stale old work item id is rejected for refund after revision
+no customer_refunds row is created from stale old work item id
+no refund_component_allocations row is created from stale old work item id
+current replacement work item id is accepted for selected-row refund
+customer_refunds amount is 200000
+refund_component_allocations target current replacement components only:
+product A service_store_stock_part = 100000
+product B service_store_stock_part = 30000
+service fee = 70000
+refund_component_allocations total = 200000
+surplus 50000 is not wrongly refunded through selected-row component refund
+old work item id is not used in refund_component_allocations
+current replacement work item becomes canceled after refund
+
+Boundary:
+
+This proof covers downward overpaid package multi-product revision selected-row refund only.
+This proof does not close exact-paid revision settlement.
+This proof does not close report/export.
+This proof does not close browser/manual QA.
+This proof does not close full focused consolidation or make verify.
+
+Status impact:
+
+Refund boundary after package multi-product revision is PARTIAL GREEN for downward overpaid current replacement row refund.
+
+
 Still OPEN
 Payment / Settlement
 
