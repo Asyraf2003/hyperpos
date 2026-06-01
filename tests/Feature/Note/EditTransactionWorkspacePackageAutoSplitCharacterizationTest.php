@@ -114,7 +114,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'wi-edit-package-multi-001',
             'Servis Paket Multi Original',
             120000,
-            'store_stock',
+            'none',
         );
 
         $this->seedStoreStockLineBase(
