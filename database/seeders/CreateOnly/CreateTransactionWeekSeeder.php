@@ -57,8 +57,8 @@ final class CreateTransactionWeekSeeder extends CreateOnlySeeder
     private function resolveActorId(): string
     {
         $actorId = DB::table('actor_accesses')
-            ->whereIn('role', [Role::CASHIER, Role::ADMIN])
-            ->orderByRaw("CASE WHEN role = ? THEN 0 ELSE 1 END", [Role::CASHIER])
+            ->whereIn('role', [Role::KASIR, Role::ADMIN])
+            ->orderByRaw("CASE WHEN role = ? THEN 0 ELSE 1 END", [Role::KASIR])
             ->orderBy('actor_id')
             ->value('actor_id');
 
