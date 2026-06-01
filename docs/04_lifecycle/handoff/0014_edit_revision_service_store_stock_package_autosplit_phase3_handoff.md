@@ -368,6 +368,72 @@ Core focused edit/revision + inventory + payment/settlement base + downward refu
 Full lifecycle closure is still not claimed.
 
 
+## Phase 3 Payment / Settlement Proof - Exact Paid Package Multi-Product
+
+PAYMENT-SETTLEMENT-003
+
+Problem / target:
+
+Characterize exact-paid payment allocation rebuild and revision settlement after a fully paid note is revised into service-store-stock package auto split multi-product with the same final package total.
+
+Scenario:
+- original package total = 250000
+- existing payment = 250000
+- revision package total = 250000
+- revised product A = 100000
+- revised product B = 60000
+- revised service residual = 90000
+
+Local command:
+
+```text
+php artisan test tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php --filter=exact_paid_revision
+```
+
+Local output:
+
+```text
+PASS  Tests\Feature\Note\EditTransactionWorkspacePackageAutoSplitCharacterizationTest
+✓ package auto split multi product exact paid revision records paid settlement             6.10s
+
+Tests: 1 passed (13 assertions)
+Duration: 6.27s
+```
+
+Proven by this local output:
+
+old payment_component_allocations are removed from the old work item
+rebuilt allocation targets replacement work item rows
+product A allocation = 100000
+product B allocation = 60000
+service fee allocation = 90000
+replay total = 250000
+customer_payments row is preserved at 250000
+note_revision_settlements r002:
+gross_total_rupiah = 250000
+carry_forward_paid_rupiah = 250000
+carry_forward_refunded_rupiah = 0
+net_paid_rupiah = 250000
+outstanding_rupiah = 0
+surplus_rupiah = 0
+settlement_status = paid
+
+Boundary:
+
+This proof covers exact-paid package multi-product revision settlement only.
+This proof does not close report/export.
+This proof does not close browser/manual QA.
+This proof does not close full focused consolidation after this new test.
+This proof does not close full make verify.
+
+Status impact:
+
+Payment/settlement after package multi-product revision is now GREEN for:
+partial-paid underpaid
+exact-paid paid
+downward overpaid_pending
+
+
 Still OPEN
 Payment / Settlement
 
