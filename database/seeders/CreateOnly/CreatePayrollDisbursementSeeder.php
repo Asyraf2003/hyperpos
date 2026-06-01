@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders\CreateOnly;
 
 use Database\Seeders\CreateOnly\Support\CreateOnlySeeder;
+use Database\Seeders\CreateOnly\Support\CreateOnlySeedCalendar;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -17,10 +18,10 @@ final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
      *   id:string,
      *   employee_index:int,
      *   amount:int,
-     *   disbursement_date:string,
+     *   day:int,
+     *   time:string,
      *   mode:string,
-     *   notes:string,
-     *   created_at:string
+     *   notes:string
      * }>
      */
     private const PAYROLL_SCENARIOS = [
@@ -28,55 +29,55 @@ final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
             'id' => '00000000-0000-5300-0001-000000000001',
             'employee_index' => 13,
             'amount' => 125000,
-            'disbursement_date' => '2026-05-20 15:10:00',
+            'day' => 20,
+            'time' => '15:10:00',
             'mode' => 'daily',
             'notes' => 'Seed payroll harian aktif - shift pagi',
-            'created_at' => '2026-05-20 15:10:00',
         ],
         [
             'id' => '00000000-0000-5300-0001-000000000002',
             'employee_index' => 14,
             'amount' => 875000,
-            'disbursement_date' => '2026-05-20 15:20:00',
+            'day' => 20,
+            'time' => '15:20:00',
             'mode' => 'weekly',
             'notes' => 'Seed payroll mingguan aktif - minggu berjalan',
-            'created_at' => '2026-05-20 15:20:00',
         ],
         [
             'id' => '00000000-0000-5300-0001-000000000003',
             'employee_index' => 15,
             'amount' => 2650000,
-            'disbursement_date' => '2026-05-20 15:30:00',
+            'day' => 20,
+            'time' => '15:30:00',
             'mode' => 'monthly',
             'notes' => 'Seed payroll bulanan aktif - gaji pokok',
-            'created_at' => '2026-05-20 15:30:00',
         ],
         [
             'id' => '00000000-0000-5300-0001-000000000004',
             'employee_index' => 16,
             'amount' => 150000,
-            'disbursement_date' => '2026-05-21 09:10:00',
+            'day' => 21,
+            'time' => '09:10:00',
             'mode' => 'daily',
             'notes' => 'Seed payroll harian aktif - shift tambahan',
-            'created_at' => '2026-05-21 09:10:00',
         ],
         [
             'id' => '00000000-0000-5300-0001-000000000005',
             'employee_index' => 17,
             'amount' => 925000,
-            'disbursement_date' => '2026-05-21 09:20:00',
+            'day' => 21,
+            'time' => '09:20:00',
             'mode' => 'weekly',
             'notes' => 'Seed payroll mingguan aktif - bonus hadir',
-            'created_at' => '2026-05-21 09:20:00',
         ],
         [
             'id' => '00000000-0000-5300-0001-000000000006',
             'employee_index' => 18,
             'amount' => 2800000,
-            'disbursement_date' => '2026-05-21 09:30:00',
+            'day' => 21,
+            'time' => '09:30:00',
             'mode' => 'monthly',
             'notes' => 'Seed payroll bulanan aktif - gaji teknisi',
-            'created_at' => '2026-05-21 09:30:00',
         ],
     ];
 
@@ -102,15 +103,17 @@ final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
                 continue;
             }
 
+            $disbursementDate = $this->scenarioDateTime($scenario);
+
             if ($this->createOnly(self::TARGET_TABLE, 'id', $scenario['id'], [
                 'id' => $scenario['id'],
                 'employee_id' => $employeeId,
                 'amount' => $scenario['amount'],
-                'disbursement_date' => $scenario['disbursement_date'],
+                'disbursement_date' => $disbursementDate,
                 'mode' => $scenario['mode'],
                 'notes' => $scenario['notes'],
-                'created_at' => $scenario['created_at'],
-                'updated_at' => $scenario['created_at'],
+                'created_at' => $disbursementDate,
+                'updated_at' => $disbursementDate,
             ])) {
                 $created++;
             }
@@ -153,6 +156,17 @@ final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
         }
     }
 
+    /**
+     * @param array<string, mixed> $scenario
+     */
+    private function scenarioDateTime(array $scenario): string
+    {
+        return CreateOnlySeedCalendar::currentMonthDate((int) $scenario['day'])
+            .' '
+            .(string) $scenario['time'];
+    }
+
+
     private function payrollExists(string $id): bool
     {
         return DB::table(self::TARGET_TABLE)
@@ -176,7 +190,7 @@ final class CreatePayrollDisbursementSeeder extends CreateOnlySeeder
         $expected = [
             'employee_id' => $employeeId,
             'amount' => (int) $scenario['amount'],
-            'disbursement_date' => (string) $scenario['disbursement_date'],
+            'disbursement_date' => $this->scenarioDateTime($scenario),
             'mode' => (string) $scenario['mode'],
         ];
 
