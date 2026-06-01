@@ -59,6 +59,11 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'role' => 'admin',
         ]);
 
+        DB::table('admin_transaction_capability_states')->updateOrInsert(
+            ['actor_id' => (string) $user->getAuthIdentifier()],
+            ['active' => true],
+        );
+
         $response = $this->actingAs($user)->patch(
             route('admin.notes.workspace.update', ['noteId' => 'note-edit-package-multi-001']),
             [
