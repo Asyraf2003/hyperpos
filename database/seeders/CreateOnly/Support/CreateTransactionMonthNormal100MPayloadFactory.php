@@ -71,7 +71,15 @@ final class CreateTransactionMonthNormal100MPayloadFactory
         }
 
         if ($seq % 7 === 0) {
-            return ['decision' => 'pay_partial', 'payment_method' => $this->method($seq), 'paid_at' => $this->date($seq), 'amount_paid_rupiah' => $total - 250000];
+            $amountPaid = $total - 250000;
+
+            return [
+                'decision' => 'pay_partial',
+                'payment_method' => $this->method($seq),
+                'paid_at' => $this->date($seq),
+                'amount_paid_rupiah' => $amountPaid,
+                'amount_received_rupiah' => $amountPaid,
+            ];
         }
 
         return ['decision' => 'pay_full', 'payment_method' => $this->method($seq), 'paid_at' => $this->date($seq), 'amount_received_rupiah' => $total];
