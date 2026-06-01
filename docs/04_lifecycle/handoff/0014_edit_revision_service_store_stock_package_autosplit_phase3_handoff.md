@@ -489,6 +489,107 @@ Core focused edit/revision + inventory + payment/settlement + downward refund bo
 Remaining high-value lifecycle gap before full verify is report/export after package multi-product revision.
 
 
+## Phase 3 Report Dataset Proof - Package Multi-Product Revision
+
+REPORT-EXPORT-001
+
+Problem / target:
+
+Characterize transaction report dataset after service-store-stock package auto split multi-product downward revision.
+
+Bug found during characterization:
+
+Transaction report dataset read the revised gross total correctly.
+Existing payment allocation was read correctly.
+But outstanding_rupiah became negative on overpaid revision:
+gross_transaction_rupiah = 200000
+allocated_payment_rupiah = 250000
+old outstanding_rupiah = -50000
+
+Root cause:
+
+app/Application/Reporting/DTO/TransactionSummaryPerNoteRow.php
+outstandingRupiah() returned gross - allocated + refunded without clamping to zero.
+
+Patch:
+
+Clamp outstanding_rupiah to minimum 0.
+Overpaid/surplus is not negative receivable.
+
+Changed file:
+
+app/Application/Reporting/DTO/TransactionSummaryPerNoteRow.php
+
+New characterization test:
+
+tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Local syntax proof:
+
+text:
+No syntax errors detected in app/Application/Reporting/DTO/TransactionSummaryPerNoteRow.php
+
+Local focused proof:
+
+Command:
+php artisan test tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php
+
+Output:
+PASS Tests\Feature\Reporting\PackageAutoSplitRevisionReportImpactFeatureTest
+✓ transaction report reads current total after package multi product downward revision
+
+Tests: 1 passed (12 assertions)
+Duration: 6.09s
+
+Local regression proof:
+
+Command:
+php artisan test \
+tests/Feature/Reporting/GetTransactionReportDatasetFeatureTest.php \
+tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php \
+tests/Feature/Reporting/PackageAutoSplitCreateReportImpactFeatureTest.php
+
+Output:
+PASS Tests\Feature\Reporting\GetTransactionReportDatasetFeatureTest
+✓ transaction report dataset returns single exact dataset from summary rows
+✓ transaction report dataset distinguishes refund due surplus refund paid and remaining refund due
+
+PASS Tests\Feature\Reporting\TransactionSummaryReportingQueryFeatureTest
+✓ it reads summary from cash records
+✓ transaction summary uses cash records when component allocations are rebuilt after refund
+✓ downward revision surplus reporting uses capped allocations not customer payment gross
+
+PASS Tests\Feature\Reporting\PackageAutoSplitCreateReportImpactFeatureTest
+✓ package auto split create output is visible to transaction and profit reports
+
+Tests: 6 passed (70 assertions)
+Duration: 6.28s
+
+Proven:
+
+transaction report reads current revised notes.total_rupiah = 200000
+allocated_payment_rupiah remains 250000
+overpaid downward revision does not produce negative outstanding
+outstanding_rupiah is clamped to 0
+existing transaction report dataset tests remain GREEN
+existing transaction summary query tests remain GREEN
+existing package auto split create report impact test remains GREEN
+
+Boundary:
+
+This proof covers transaction report dataset only.
+This proof does not close PDF export.
+This proof does not close Excel export.
+This proof does not close transaction cash ledger export.
+This proof does not close browser/manual QA.
+This proof does not close full make verify.
+
+Status impact:
+
+Transaction report dataset after package multi-product revision is PARTIAL GREEN.
+Report/export lifecycle is still not fully closed because PDF/Excel export and browser/manual QA remain open.
+
+
 Still OPEN
 Payment / Settlement
 
