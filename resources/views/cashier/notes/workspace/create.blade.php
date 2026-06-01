@@ -13,13 +13,9 @@
     @endif
 
     <div class="ui-page-intro">
-        <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
         <h4 class="ui-page-intro-title">
             {{ ($workspaceMode ?? 'create') === 'edit' ? 'Edit Nota dari Workspace' : 'Buat Nota dari Workspace' }}
         </h4>
-        <p class="ui-page-intro-subtitle">
-            Header nota tetap di kanan dan rincian tetap di kiri supaya create dan edit memakai pola kerja yang sama.
-        </p>
     </div>
 
     <form action="{{ $formAction ?? route('notes.workspace.store') }}" method="POST" novalidate id="cashier-note-workspace-form">
