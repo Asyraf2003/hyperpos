@@ -14,6 +14,7 @@ use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLi
 use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineTrustMarker;
 use App\Application\Note\Services\WorkItemFactory;
 use App\Application\Note\UseCases\CreateNoteRevisionPayloadNoteBuilder;
+use App\Application\Note\UseCases\CreateNoteRevisionPayloadWorkItemBuilder;
 use App\Core\Note\WorkItem\StoreStockLine;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
@@ -155,18 +156,21 @@ final class CreateNoteRevisionPayloadNoteBuilderTest extends TestCase
             }
         };
 
+        $mapper = new CreateTransactionWorkspaceWorkItemPayloadMapper(
+            new CreateTransactionWorkspaceStoreStockLineMapper(),
+            new CreateTransactionWorkspaceExternalPurchaseLineMapper(),
+            new CreateTransactionWorkspaceServiceWorkItemVariantResolver(),
+            new CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer($products),
+        );
+
+        $factory = new WorkItemFactory(
+            $uuid,
+            $products,
+            new MinSellingPricePolicy()
+        );
+
         return new CreateNoteRevisionPayloadNoteBuilder(
-            new CreateTransactionWorkspaceWorkItemPayloadMapper(
-                new CreateTransactionWorkspaceStoreStockLineMapper(),
-                new CreateTransactionWorkspaceExternalPurchaseLineMapper(),
-                new CreateTransactionWorkspaceServiceWorkItemVariantResolver(),
-                new CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer($products),
-            ),
-            new WorkItemFactory(
-                $uuid,
-                $products,
-                new MinSellingPricePolicy()
-            ),
+            new CreateNoteRevisionPayloadWorkItemBuilder($mapper, $factory),
             $this->trustMarker(),
         );
     }

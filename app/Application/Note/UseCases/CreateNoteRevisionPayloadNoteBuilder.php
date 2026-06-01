@@ -4,20 +4,16 @@ declare(strict_types=1);
 
 namespace App\Application\Note\UseCases;
 
-use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPayloadMapper;
 use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineTrustMarker;
-use App\Application\Note\Services\WorkItemFactory;
 use App\Core\Note\Note\Note;
 use App\Core\Note\Revision\NoteRevision;
-use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 
 final class CreateNoteRevisionPayloadNoteBuilder
 {
     public function __construct(
-        private readonly CreateTransactionWorkspaceWorkItemPayloadMapper $mapper,
-        private readonly WorkItemFactory $factory,
+        private readonly CreateNoteRevisionPayloadWorkItemBuilder $workItems,
         private readonly RevisionSnapshotStoreStockLineTrustMarker $snapshotTrust,
     ) {
     }
@@ -42,7 +38,7 @@ final class CreateNoteRevisionPayloadNoteBuilder
             $currentRevision,
             $currentWorkItems,
         );
-        $workItems = $this->buildWorkItems($noteRootId, $items);
+        $workItems = $this->workItems->build($noteRootId, $items);
 
         if ($workItems === []) {
             throw new DomainException('Minimal satu item valid wajib ada untuk membuat revisi.');
@@ -50,7 +46,7 @@ final class CreateNoteRevisionPayloadNoteBuilder
 
         $total = array_reduce(
             $workItems,
-            fn (int $carry, WorkItem $item): int => $carry + $item->subtotalRupiah()->amount(),
+            fn (int $carry, object $item): int => $carry + $item->subtotalRupiah()->amount(),
             0,
         );
 
@@ -69,36 +65,5 @@ final class CreateNoteRevisionPayloadNoteBuilder
             null,
             isset($noteData['operational_note']) ? (string) $noteData['operational_note'] : null,
         );
-    }
-
-    /**
-     * @param list<array<string, mixed>> $itemsData
-     * @return list<WorkItem>
-     */
-    private function buildWorkItems(string $noteRootId, array $itemsData): array
-    {
-        $workItems = [];
-        $lineNo = 1;
-
-        foreach ($itemsData as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            [$type, $service, $external, $store] = $this->mapper->map($item);
-
-            $workItems[] = $this->factory->build(
-                $noteRootId,
-                $lineNo,
-                $type,
-                $service,
-                $external,
-                $store,
-            );
-
-            $lineNo++;
-        }
-
-        return $workItems;
     }
 }
