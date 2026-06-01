@@ -25,7 +25,7 @@ final class NoteDetailPageController extends Controller
         $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
 
         try {
-            $ensureInitialRevision->handle($noteId, trim($noteId) . '-r001', $actorId);
+            $ensureInitialRevision->handle($noteId, trim($noteId).'-r001', $actorId);
         } catch (DomainException $e) {
             abort(500, $e->getMessage());
         }
@@ -38,9 +38,6 @@ final class NoteDetailPageController extends Controller
 
         return view('shared.notes.show', $data + [
             'backUrl' => route('admin.notes.index'),
-            'pageIntroEyebrow' => 'Workspace Nota Admin',
-            'pageIntroTitle' => 'Detail Nota',
-            'pageIntroSubtitle' => 'Detail operasional nota aktif untuk admin dengan akses histori lebih luas.',
             'detailConfig' => [
                 'workspace_edit_route' => 'admin.notes.workspace.edit',
             ],
