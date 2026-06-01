@@ -30,6 +30,7 @@ final class ApplyNoteRevisionAsActiveReplacement
             $replacement->customerName(),
             $replacement->customerPhone(),
             $replacement->transactionDate(),
+            $replacement->operationalNote(),
         );
 
         $trustedItems = $this->snapshotTrust->mark(

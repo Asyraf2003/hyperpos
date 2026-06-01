@@ -62,6 +62,12 @@ final class CreateNoteRevisionPayloadNoteBuilder
             Money::fromInt($total),
             $workItems,
             Note::STATE_OPEN,
+            null,
+            null,
+            null,
+            null,
+            null,
+            isset($noteData['operational_note']) ? (string) $noteData['operational_note'] : null,
         );
     }
 

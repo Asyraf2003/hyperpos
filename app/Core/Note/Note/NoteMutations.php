@@ -15,6 +15,7 @@ trait NoteMutations
         string $customerName,
         ?string $customerPhone,
         DateTimeImmutable $transactionDate,
+        ?string $operationalNote = null,
     ): void {
         self::assertValidIdentity($this->id, $customerName);
 
@@ -22,6 +23,7 @@ trait NoteMutations
         $this->customerPhone = self::normalizeCustomerPhone($customerPhone);
         $this->transactionDate = $transactionDate;
         $this->dueDate = NoteDueDateCalculator::calculate($transactionDate);
+        $this->operationalNote = self::normalizeOperationalNote($operationalNote);
     }
 
     /** @param list<WorkItem> $workItems */
