@@ -378,6 +378,170 @@ Interpretation:
 Current seed/report changes pass the project verification target.
 No verification failure is known after monthly-normal seed and report export proof.
 
+
+### SEED-TXN-004 - Monthly-normal 100M transaction seed profile
+
+Added files:
+
+- `database/seeders/CreateOnly/CreateTransactionMonthNormal100MSeeder.php`
+- `database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MPayloadFactory.php`
+- `database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MItemFactory.php`
+
+Changed file:
+
+- `mk/seed.mk`
+
+Implementation decision:
+
+- Keep `CreateTransactionMonthNormalSeeder` as the existing small owner-readable sanity profile.
+- Add separate `CreateTransactionMonthNormal100MSeeder` as the monthly normal 100-200 juta profile.
+- Do not mutate `seed-create-all-v3`.
+- Add separate make targets:
+  - `seed-transaction-month-normal-100m`
+  - `seed-create-all-month-normal-100m`
+  - `create-all-month-normal-100m`
+- 100M profile still uses `App\Application\Note\UseCases\CreateTransactionWorkspaceHandler`.
+- Do not raw-insert notes, work_items, customer_payments, or projections.
+
+Local syntax and line-count proof:
+
+```text
+No syntax errors detected in database/seeders/CreateOnly/CreateTransactionMonthNormal100MSeeder.php
+No syntax errors detected in database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MPayloadFactory.php
+No syntax errors detected in database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MItemFactory.php
+  91 database/seeders/CreateOnly/CreateTransactionMonthNormal100MSeeder.php
+  97 database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MPayloadFactory.php
+  80 database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MItemFactory.php
+```
+
+Make target proof:
+
+```text
+120:.PHONY: seed-transaction-month-normal-100m
+121:seed-transaction-month-normal-100m:
+122:    php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthNormal100MSeeder'
+152:.PHONY: seed-create-all-month-normal-100m
+153:seed-create-all-month-normal-100m: seed-create-all-v3 seed-transaction-month-normal-100m
+155:.PHONY: create-all-month-normal-100m
+156:create-all-month-normal-100m: seed-create-all-month-normal-100m
+194:    @echo "  make create-all-month-normal-100m Run dataset v3 plus monthly normal 100M, then audit baseline and rebuild projections once"
+```
+
+Standalone local seed proof:
+
+```text
+notes_total = 90
+notes_100m_by_customer = 90
+notes_100m_by_note = 90
+work_items_total = 90
+customer_payments_total = 84
+store_stock_lines_total = 45
+external_purchase_lines_total = 18
+notes_total_sum = 154800000
+customer_payments_sum = 140600000
+```
+
+Aggregate local proof after create-all-month-normal-100m:
+
+```text
+notes = 124
+work_items = 124
+customer_payments = 115
+note_history_projection = 124
+notes_total_sum = 182925000
+customer_payments_sum = 167250000
+```
+
+Interpretation:
+
+Monthly normal 100-200 juta profile is now implemented and locally proven.
+Aggregate cash-in is Rp 167.250.000.
+Note projection is aligned: 124/124.
+Existing create-all-v3 remains intact as the smaller owner-readable sanity profile.
+
+### REPORT-SANITY-002 - Operational profit sanity for monthly-normal 100M profile
+
+Local aggregate report sanity output:
+
+```text
+success = true
+notes = 124
+work_items = 124
+customer_payments = 115
+note_history_projection = 124
+from_date = 2026-06-01
+to_date = 2026-06-30
+cash_in_rupiah = 167250000
+refunded_rupiah = 0
+external_purchase_cost_rupiah = 34120000
+store_stock_cogs_rupiah = 3209472
+product_purchase_cost_rupiah = 37329472
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+cash_operational_profit_rupiah = 112083028
+```
+
+Interpretation:
+
+Operational profit report is positive for the monthly normal 100M profile.
+Cash operational profit is Rp 112.083.028.
+Refund remains zero for create-only profile.
+
+### REPORT-EXPORT-002 - Operational profit PDF/XLSX proof for monthly-normal 100M profile
+
+Local generated files:
+
+```text
+storage/app/report-proof/laporan-laba-kas-operasional-100m-2026-06-01-sampai-2026-06-30.pdf
+storage/app/report-proof/laporan-laba-kas-operasional-100m-2026-06-01-sampai-2026-06-30.xlsx
+```
+
+PDF/XLSX proof:
+
+```text
+success = true
+from_date = 2026-06-01
+to_date = 2026-06-30
+pdf_exists = true
+pdf_size_bytes = 19703
+pdf_header = %PDF
+html_contains_profit_value = true
+xlsx_exists = true
+xlsx_size_bytes = 6608
+sheet_title = Ringkasan
+title_A1 = Laporan Laba Kas Operasional
+period_B2 = 01 Juni 2026 s/d 30 Juni 2026
+profit_B14 = 112083028
+```
+
+Interpretation:
+
+PDF artifact exists and has a valid %PDF header.
+XLSX artifact exists.
+XLSX cell B14 contains the numeric profit amount 112083028.
+Export proof matches the 100M operational profit sanity value.
+
+### VERIFY-002 - Full verification after monthly-normal 100M seed and report proof
+
+Local command:
+
+```text
+make verify
+```
+
+Visible final local output:
+
+```text
+Tests:    2 skipped, 1140 passed (6466 assertions)
+Duration: 83.03s
+```
+
+Interpretation:
+
+Test suite remains green after the monthly normal 100M seed/report changes.
+This proof records only the visible final output pasted in the session.
+
 ## Bugs Encountered And Resolved
 
 ### BUG-001 - Role constant mismatch
@@ -426,13 +590,26 @@ operational profit sanity is positive for June 2026.
 PDF/XLSX operational profit report artifacts are locally proven.
 full make verify is GREEN.
 
+Monthly normal 100-200 juta profile:
+
+100%
+
+Reason:
+
+standalone monthly-normal 100M transaction seed is locally proven.
+aggregate create-all-month-normal-100m is locally proven.
+cash-in is Rp 167.250.000.
+note projection is aligned at 124/124.
+operational profit sanity is positive at Rp 112.083.028.
+PDF/XLSX export proof is locally proven.
+test suite remains GREEN after the change.
+
 Full serious create-all seed system:
 
-65-67%
+80-82%
 
 Reason full system is not higher:
 
-monthly normal 100-200 juta dataset is not implemented.
 peak 500 juta/month dataset is not implemented.
 stress 6-8 miliar/month dataset is not implemented.
 refund scaffold is not implemented.
@@ -440,11 +617,10 @@ full lifecycle closure is not done.
 
 ## GAP
 
-No monthly normal 100-200 juta dataset.
-No peak profile.
-No stress profile.
+No peak 500 juta/month dataset.
+No stress 6-8 miliar/month dataset.
 No refund scaffold.
-No handoff closure after this update until local verification confirms the handoff patch.
+No full lifecycle closure.
 
 ## DECISION
 
@@ -453,32 +629,40 @@ Do not patch operational profit reporting query.
 Reason:
 
 operational profit arithmetic was locally proven consistent.
-the negative result was caused by transaction seed size being too small versus monthly fixed/cash-out seed.
+the earlier negative result was caused by transaction seed size being too small versus monthly fixed/cash-out seed.
 monthly-normal transaction seed made the report positive without modifying report logic.
+monthly-normal 100M profile also produced positive report output without modifying report logic.
 
 Keep CreateTransactionWeekSeeder as minimal weekly characterization seed.
 
-Use CreateTransactionMonthNormalSeeder as the June 2026 owner-readable report sanity profile.
+Keep CreateTransactionMonthNormalSeeder as the June 2026 owner-readable small sanity profile.
 
-Do not scale to monthly 100-200 juta, peak, stress, or refund scaffold in this step.
+Use CreateTransactionMonthNormal100MSeeder as the June 2026 monthly normal 100-200 juta profile.
+
+Keep create-all-v3 unchanged.
+
+Use create-all-month-normal-100m for the monthly normal 100-200 juta aggregate profile.
+
+Do not start peak, stress, or refund scaffold in the same step as the 100M profile.
 
 ## NEXT ACTIVE STEP
 
-Plan monthly normal 100-200 juta dataset profile.
+Plan peak 500 juta/month dataset profile.
 
 Goal:
 
-- Define the next seed profile above the current June 2026 owner-readable sanity profile.
-- Keep existing weekly and monthly-normal sanity seeds intact.
-- Do not patch code until the monthly 100-200 juta blueprint is explicit.
+Define the next seed profile above monthly normal 100-200 juta.
+Keep existing weekly, monthly-normal small, and monthly-normal 100M profiles intact.
+Do not patch code until the peak 500 juta blueprint is explicit.
 
 Scope:
 
-- Review current transaction seed totals.
-- Define target note count, cash-in range, product cost mix, paid/unpaid mix, and report expectations.
-- Decide whether the 100-200 juta profile should be a new seeder or a separate make target.
+Review current transaction seed totals.
+Define peak profile target note count, cash-in range, cost mix, paid/unpaid mix, payment method mix, and report expectations.
+Decide whether peak 500 juta should be a new seeder and separate make target.
+Preserve create-all-v3 and create-all-month-normal-100m behavior.
 
-Do not start peak, stress, refund scaffold, or report wording patch in the same step.
+Do not start stress 6-8 miliar/month, refund scaffold, or report wording patch in the same step.
 
 ## Opening Prompt For Next Session
 
@@ -500,14 +684,77 @@ docs/04_lifecycle/handoff/0015_create_only_seed_system_stabilization_handoff.md
 
 Cara kerja wajib:
 
-- Local command output adalah source of truth tertinggi.
-- Jangan mengarang file, status repo, hasil test, atau hasil command.
-- Gunakan struktur FACT / GAP / DECISION / ACTIVE STEP / PROOF / NEXT.
-- Blueprint-first sebelum implementasi.
-- Satu response hanya satu active step.
-- Jangan patch sebelum active scope jelas.
-- Jangan bahas git kecuali diminta eksplisit.
+Local command output adalah source of truth tertinggi.
+Jangan mengarang file, status repo, hasil test, atau hasil command.
+Gunakan struktur FACT / REFERENCES / SCOPE-IN / SCOPE-OUT / GAP / DECISION / BLUEPRINT / WORKFLOW / ACTIVE STEP / PROOF / NEXT / PROGRESS.
+Blueprint-first sebelum implementasi.
+Satu response hanya satu active step.
+Jangan patch sebelum active scope jelas.
+Jangan bahas git kecuali diminta eksplisit.
+
+Status terakhir yang sudah terbukti dan tercatat:
+
+CreateOnly seed stabilization progress: 99%.
+Monthly normal 100-200 juta profile: 100%.
+Full serious create-all seed system progress: 80-82%.
+Existing create-all-v3 remains the small owner-readable sanity profile.
+
+New 100M profile files:
+
+database/seeders/CreateOnly/CreateTransactionMonthNormal100MSeeder.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MPayloadFactory.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthNormal100MItemFactory.php
+
+New make targets:
+
+seed-transaction-month-normal-100m
+seed-create-all-month-normal-100m
+create-all-month-normal-100m
+
+Standalone 100M seed proof:
+
+notes_total = 90
+work_items_total = 90
+customer_payments_total = 84
+notes_total_sum = 154800000
+customer_payments_sum = 140600000
+
+Aggregate 100M proof:
+
+notes = 124
+work_items = 124
+customer_payments = 115
+note_history_projection = 124
+notes_total_sum = 182925000
+customer_payments_sum = 167250000
+
+Operational profit sanity 100M:
+
+cash_in_rupiah = 167250000
+refunded_rupiah = 0
+product_purchase_cost_rupiah = 37329472
+cash_operational_profit_rupiah = 112083028
+
+PDF/XLSX export proof:
+
+PDF exists true, header %PDF, contains Rp 112.083.028
+XLSX exists true, sheet Ringkasan, period 01 Juni 2026 s/d 30 Juni 2026, profit_B14 = 112083028
+
+make verify visible final proof:
+
+Tests: 2 skipped, 1140 passed, 6466 assertions.
+Duration: 83.03s.
 
 Mulai dari NEXT ACTIVE STEP di handoff:
-Plan monthly normal 100-200 juta dataset profile.
 
+Plan peak 500 juta/month dataset profile.
+
+Target sesi berikutnya:
+
+Jangan patch dulu.
+Buat blueprint dulu untuk peak 500 juta/month dataset profile.
+Review current transaction seed totals and existing monthly-normal 100M shape.
+Tentukan target note count, cash-in range, product cost mix, paid/unpaid mix, payment method mix, store-stock/external purchase/service/package mix, dan expected report output.
+Tentukan apakah profile peak 500 juta harus menjadi seeder baru atau make target baru.
+Jangan mulai stress 6-8 miliar/month, refund scaffold, atau report wording patch di step yang sama.
+Setelah blueprint jelas, baru next response boleh lanjut ke patch scope yang kecil dan provable.
