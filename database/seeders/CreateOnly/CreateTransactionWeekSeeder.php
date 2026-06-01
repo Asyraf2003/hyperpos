@@ -320,8 +320,9 @@ final class CreateTransactionWeekSeeder extends CreateOnlySeeder
                 'product_lines' => [$this->blankProductLine()],
                 'external_purchase_lines' => [[
                     'label' => 'Pembelian luar seed',
-                    'qty' => 1,
-                    'unit_cost_rupiah' => 100000,
+                    'qty' => '',
+                    'unit_cost_rupiah' => '',
+                    'total_rupiah' => 100000,
                 ]],
             ]],
             'inline_payment' => [
