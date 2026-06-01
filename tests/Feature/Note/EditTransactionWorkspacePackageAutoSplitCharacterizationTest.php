@@ -64,7 +64,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'PKG-EDIT-A',
             'Oli Edit Package A',
             'Federal',
-            50000,
+            100,
             50000,
         );
 
@@ -73,7 +73,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'PKG-EDIT-B',
             'Busi Edit Package B',
             'NGK',
-            30000,
+            100,
             30000,
         );
 
@@ -114,7 +114,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'wi-edit-package-multi-001',
             'Servis Paket Multi Original',
             120000,
-            'none',
+            'store_stock',
         );
 
         $this->seedStoreStockLineBase(
@@ -148,27 +148,42 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             100000,
         );
 
-        $payload = DB::table('note_revision_line_snapshots')
+        $payload = DB::table('note_revision_lines')
             ->where('note_revision_id', 'note-edit-package-multi-001-r001')
-            ->where('work_item_id', 'wi-edit-package-multi-001')
+            ->where('work_item_root_id', 'wi-edit-package-multi-001')
             ->value('payload');
 
         $decoded = json_decode((string) $payload, true, 512, JSON_THROW_ON_ERROR);
+
         $decoded['pricing_mode'] = 'package_auto_split';
         $decoded['package_total_rupiah'] = 250000;
-        $decoded['store_stock_lines'][] = [
-            'id' => 'ssl-edit-package-multi-b',
-            'work_item_id' => 'wi-edit-package-multi-001',
-            'product_id' => 'product-package-edit-b',
-            'qty' => 1,
-            'line_total_rupiah' => 30000,
-            'selling_price_rupiah' => 30000,
-            'product_name_snapshot' => 'Busi Edit Package B',
+        $decoded['parts_total_rupiah'] = 130000;
+        $decoded['service_price_rupiah'] = 120000;
+
+        $decoded['store_stock_lines'] = [
+            [
+                'id' => 'ssl-edit-package-multi-a',
+                'work_item_id' => 'wi-edit-package-multi-001',
+                'product_id' => 'product-package-edit-a',
+                'qty' => 2,
+                'line_total_rupiah' => 100000,
+                'selling_price_rupiah' => 50000,
+                'product_name_snapshot' => 'Oli Edit Package A',
+            ],
+            [
+                'id' => 'ssl-edit-package-multi-b',
+                'work_item_id' => 'wi-edit-package-multi-001',
+                'product_id' => 'product-package-edit-b',
+                'qty' => 1,
+                'line_total_rupiah' => 30000,
+                'selling_price_rupiah' => 30000,
+                'product_name_snapshot' => 'Busi Edit Package B',
+            ],
         ];
 
-        DB::table('note_revision_line_snapshots')
+        DB::table('note_revision_lines')
             ->where('note_revision_id', 'note-edit-package-multi-001-r001')
-            ->where('work_item_id', 'wi-edit-package-multi-001')
+            ->where('work_item_root_id', 'wi-edit-package-multi-001')
             ->update([
                 'payload' => json_encode($decoded, JSON_THROW_ON_ERROR),
             ]);
