@@ -8,24 +8,21 @@ use RuntimeException;
 
 final class CreateTransactionMonthStress8BPayloadFactory
 {
-    /** @var list<object{id:string,harga_jual:int,qty_on_hand:int,remaining:int}> */
     private array $products;
 
-    /** @param list<object{id:string,harga_jual:int,qty_on_hand:int}> $products */
     public function __construct(private readonly string $actorId, array $products)
     {
         $this->products = array_map(
             static fn (object $row): object => (object) [
-                'id' => $row->id,
-                'harga_jual' => $row->harga_jual,
-                'qty_on_hand' => $row->qty_on_hand,
-                'remaining' => $row->qty_on_hand,
+                'id' => (string) $row->id,
+                'harga_jual' => (int) $row->harga_jual,
+                'qty_on_hand' => (int) $row->qty_on_hand,
+                'remaining' => (int) $row->qty_on_hand,
             ],
             $products,
         );
     }
 
-    /** @return list<array<string, mixed>> */
     public function payloads(): array
     {
         $items = new CreateTransactionMonthStress8BItemFactory();
@@ -54,7 +51,6 @@ final class CreateTransactionMonthStress8BPayloadFactory
         return $payloads;
     }
 
-    /** @param array<string, mixed> $item @param array<string, mixed> $payment @return array<string, mixed> */
     private function payload(int $seq, string $note, array $item, array $payment): array
     {
         return [
@@ -66,7 +62,6 @@ final class CreateTransactionMonthStress8BPayloadFactory
         ];
     }
 
-    /** @return array<string, mixed> */
     private function payment(int $seq, int $position, int $full, int $partial, int $total, int $partialAmount): array
     {
         if ($position > $full + $partial) {
