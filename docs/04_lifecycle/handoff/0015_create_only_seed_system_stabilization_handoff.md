@@ -1018,3 +1018,279 @@ Open PR:
 
 PR-PEAK-001: investigate zero non-transaction cash-out in peak report sanity.
 PR-PEAK-002: clarify productless notes / service-only seed shape.
+
+### PEAK-500M-CLOSURE-001 - Peak 500M PR classification and export proof
+
+Local date: 2026-06-02.
+
+Scope:
+
+- Close PR-PEAK-001.
+- Close PR-PEAK-002.
+- Prove peak 500M operational profit PDF/XLSX export.
+- Do not start stress 6-8B.
+- Do not start 10B.
+- Do not start refund scaffold.
+
+#### PR-PEAK-001 classification
+
+Problem:
+
+Peak 500M report sanity previously returned zero fixed cash-out:
+
+```text
+operational_expense_rupiah = 0
+payroll_disbursement_rupiah = 0
+employee_debt_cash_out_rupiah = 0
+```
+
+Investigation result:
+
+The first probe showed the DB state had transaction rows but no non-transaction source rows:
+
+```text
+notes = 314
+customer_payments = 295
+operational_expenses = 0
+payroll_disbursements = 0
+employee_debts = 0
+employee_debt_payments = 0
+```
+
+Make target inspection showed seed-create-all-month-peak-500m already depends on:
+
+```text
+seed-create-all-v3
+seed-transaction-month-peak-500m
+```
+
+and seed-create-all-v3 already depends on the non-transaction seeds:
+
+```text
+seed-expense
+seed-employee-debt
+seed-employee-debt-payment
+seed-employee-debt-adjustment
+seed-payroll-disbursement
+```
+
+Reproduction with full target:
+
+```text
+php artisan migrate:fresh --seed
+make create-all-month-peak-500m
+```
+
+Local output proved non-transaction source rows are present after the correct full target:
+
+```text
+operational_expenses = 45
+payroll_disbursements = 6
+employee_debts = 13
+employee_debt_payments = 6
+notes = 314
+customer_payments = 295
+```
+
+June handler-aligned sums:
+
+```text
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+employee_debt_payments_sum_check_only = 1600000
+```
+
+Handler output:
+
+```text
+success = true
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+cash_operational_profit_rupiah = 418778307
+```
+
+Decision:
+
+PR-PEAK-001 CLOSED.
+Root cause was prior local DB state/run-path mismatch.
+No report handler patch required.
+No make dependency patch required.
+
+Important clarification:
+
+The operational profit handler reads employee debt cash-out from employee_debts.created_at and employee_debts.total_debt, not from employee_debt_payments.payment_date.
+
+#### PR-PEAK-002 classification
+
+Problem:
+
+Peak dataset contains service-only / productless notes.
+
+Local shape probe output:
+
+```text
+peak_note_total = 280
+peak_work_item_total = 280
+peak_total_rupiah = 576000000
+```
+
+Actual shape distribution:
+
+```text
+service_only_actual_productless = 80
+store_stock_actual = 90
+external_purchase_actual = 70
+package_store_stock_actual = 40
+```
+
+Expected segment distribution:
+
+```text
+service_only_expected = 80
+store_stock_expected = 90
+external_purchase_expected = 70
+package_store_stock_expected = 40
+```
+
+Segment-vs-actual mapping:
+
+```text
+service_only_expected -> service_only_actual_productless = 80
+store_stock_expected -> store_stock_actual = 90
+external_purchase_expected -> external_purchase_actual = 70
+package_store_stock_expected -> package_store_stock_actual = 40
+```
+
+Line totals:
+
+```text
+notes_with_store_stock_line = 130
+notes_with_external_purchase_line = 70
+notes_with_no_store_stock_line = 150
+notes_with_no_external_purchase_line = 210
+notes_with_neither_store_stock_nor_external_purchase = 80
+notes_with_both_store_stock_and_external_purchase = 0
+store_stock_line_rows = 170
+store_stock_qty = 260
+store_stock_total_rupiah = 57875000
+external_purchase_line_rows = 70
+external_purchase_qty = 70
+external_purchase_total_rupiah = 98000000
+```
+
+Mismatch result:
+
+```text
+mismatches = []
+```
+
+Decision:
+
+PR-PEAK-002 CLOSED.
+Productless notes are intentional service-only notes.
+This is not a runtime bug.
+No report handler patch required.
+No create transaction runtime patch required.
+No seed-shape patch required for technical correctness.
+
+#### Peak 500M export proof
+
+Command proof script:
+
+```text
+/tmp/hyperpos_peak_500m_export_proof_v2.php
+```
+
+Script sanity:
+
+```text
+109 /tmp/hyperpos_peak_500m_export_proof_v2.php
+No syntax errors detected in /tmp/hyperpos_peak_500m_export_proof_v2.php
+```
+
+Dataset used by export:
+
+```text
+success = true
+from_date = 2026-06-01
+to_date = 2026-06-30
+notes = 314
+customer_payments = 295
+note_history_projection = 314
+cash_in_rupiah = 550250000
+refunded_rupiah = 0
+external_purchase_cost_rupiah = 99720000
+store_stock_cogs_rupiah = 13914193
+product_purchase_cost_rupiah = 113634193
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+cash_operational_profit_rupiah = 418778307
+```
+
+PDF proof:
+
+```text
+path = /home/asyraf/Code/laravel/bengkel2/app/storage/app/report-proof/laporan-laba-kas-operasional-peak-500m-2026-06-01-sampai-2026-06-30.pdf
+exists = true
+size_bytes = 19708
+header = %PDF
+html_contains_title = true
+html_contains_profit_label = true
+html_contains_profit_value = true
+html_contains_operational_expense_value = true
+html_contains_payroll_value = true
+html_contains_employee_debt_value = true
+```
+
+XLSX proof:
+
+```text
+path = /home/asyraf/Code/laravel/bengkel2/app/storage/app/report-proof/laporan-laba-kas-operasional-peak-500m-2026-06-01-sampai-2026-06-30.xlsx
+exists = true
+size_bytes = 6614
+sheet_names = ["Ringkasan"]
+title_A1 = Laporan Laba Kas Operasional
+period_B2 = 01 Juni 2026 s/d 30 Juni 2026
+cash_in_B6 = 550250000
+external_purchase_B8 = 99720000
+store_stock_cogs_B9 = 13914193
+product_purchase_cost_B10 = 113634193
+operational_expense_B11 = 3262500
+payroll_B12 = 7525000
+employee_debt_B13 = 7050000
+profit_B14 = 418778307
+profit_B14_matches_handler = true
+```
+
+Generated artifacts:
+
+```text
+storage/app/report-proof/laporan-laba-kas-operasional-peak-500m-2026-06-01-sampai-2026-06-30.pdf
+storage/app/report-proof/laporan-laba-kas-operasional-peak-500m-2026-06-01-sampai-2026-06-30.xlsx
+```
+
+Decision:
+
+Peak 500M operational profit report sanity and export proof are CLOSED.
+
+#### Progress after this closure
+
+```text
+CreateOnly seed stabilization = 99%
+Monthly normal 100M profile = 100%
+Peak 500M profile = 100%
+Full serious create-all seed system = 91-93%
+```
+
+#### Next Step
+
+The next valid active step is to decide the next scale target:
+
+```text
+Start stress 6-8 miliar/month blueprint execution.
+```
+
+Do not start refund scaffold before the stress profile boundary is explicitly opened.
