@@ -390,9 +390,11 @@ expected cash_operational_profit_rupiah = 407412500 to 424412500
 
 Do not lock exact store-stock COGS before local proof.
 
-## Stress 6-8 Miliar Blueprint Placeholder
+## Stress 6-8 Miliar Blueprint
 
-Status: planned, not implemented.
+Status: executable blueprint, not implemented.
+
+### Target
 
 Target:
 
@@ -400,27 +402,328 @@ Target:
 create-all-month-stress-8b
 ```
 
-Expected high-level target:
+Primary goal:
+
+Stress the CreateOnly transaction path, projection rebuild, payment allocation volume, inventory stock-out behavior, audit baseline behavior, idempotency replay behavior, and operational profit report/export behavior at a 6-8 miliar cash-in scale.
+
+This profile must remain separate from:
 
 ```text
-gross notes total = 7 to 8.5 miliar
-cash-in = 6 to 8 miliar
-notes = 2500 to 4000
-payments = 2200 to 3600
-unpaid = 8% to 15%
-partial = 15% to 25%
+create-all-v3
+create-all-month-normal-100m
+create-all-month-peak-500m
+create-all-month-stress-10b
+refund scaffold
 ```
 
-Purpose:
+Do not depend on the peak 500M profile.
+Do not depend on the 100M profile.
+Do not mix refund behavior into this create-only stress profile.
 
-projection rebuild stress;
-report query stress;
-payment allocation volume;
-inventory stock-out volume;
-audit baseline behavior;
-idempotency replay behavior.
+### Target Command
 
-Do not implement before peak 500M is proven.
+Expected aggregate after:
+
+```text
+php artisan migrate:fresh --seed
+make create-all-month-stress-8b
+```
+
+### Proposed Files
+
+```text
+database/seeders/CreateOnly/CreateTransactionMonthStress8BSeeder.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BPayloadFactory.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BItemFactory.php
+```
+
+### Proposed Make Targets
+
+```text
+seed-transaction-month-stress-8b
+seed-create-all-month-stress-8b
+create-all-month-stress-8b
+```
+
+Target dependency:
+
+```text
+seed-create-all-month-stress-8b: seed-create-all-v3 seed-transaction-month-stress-8b
+create-all-month-stress-8b: seed-create-all-month-stress-8b
+    $(MAKE) seed-audit-baseline
+    php artisan projection:rebuild-indexes all
+```
+
+Do not depend on:
+
+```text
+seed-create-all-month-normal-100m
+seed-create-all-month-peak-500m
+create-all-month-normal-100m
+create-all-month-peak-500m
+```
+
+### Stress Seeder Incremental Target
+
+New stress seeder planned count:
+
+```text
+notes = 3200
+work_items = 3200
+customer_payments = 2816
+unpaid_notes = 384
+partial_payment_notes = 576
+gross_total_rupiah = 7820000000
+cash_in_rupiah = 6539600000
+```
+
+Ratios:
+
+```text
+unpaid = 384 / 3200 = 12%
+partial = 576 / 3200 = 18%
+payment_rows = 2816
+```
+
+These ratios stay inside the locked high-level target:
+
+```text
+unpaid = 8% to 15%
+partial = 15% to 25%
+payments = 2200 to 3600
+```
+
+### Aggregate Expected Target With create-all-v3
+
+Existing create-all-v3 baseline:
+
+```text
+notes = 34
+work_items = 34
+customer_payments = 31
+note_history_projection = 34
+notes_total_sum = 28125000
+customer_payments_sum = 26650000
+```
+
+Expected aggregate:
+
+```text
+notes = 3234
+work_items = 3234
+customer_payments = 2847
+note_history_projection = 3234
+notes_total_sum = 7848125000
+customer_payments_sum = 6566250000
+cash_in_rupiah = 6566250000
+refunded_rupiah = 0
+```
+
+### Transaction Mix
+
+| Segment | Count | Gross per note | Gross total |
+|---|---:|---:|---:|
+| Service-only | 800 | 1500000 | 1200000000 |
+| Store-stock | 1000 | 2200000 | 2200000000 |
+| External purchase | 900 | 2800000 | 2520000000 |
+| Package auto-split | 500 | 3800000 | 1900000000 |
+| Total | 3200 | | 7820000000 |
+
+### Payment Mix
+
+| Segment | Full | Partial | Skip/unpaid | Payment rows |
+|---|---:|---:|---:|---:|
+| Service-only | 560 | 144 | 96 | 704 |
+| Store-stock | 700 | 180 | 120 | 880 |
+| External purchase | 630 | 162 | 108 | 792 |
+| Package auto-split | 350 | 90 | 60 | 440 |
+| Total | 2240 | 576 | 384 | 2816 |
+
+Partial payment targets:
+
+```text
+service-only partial = 1100000
+store-stock partial = 1700000
+external purchase partial = 2100000
+package auto-split partial = 2900000
+```
+
+Stress seeder cash-in:
+
+```text
+service-only cash-in = 998400000
+store-stock cash-in = 1846000000
+external purchase cash-in = 2104200000
+package auto-split cash-in = 1591000000
+total stress cash-in = 6539600000
+```
+
+Aggregate cash-in with create-all-v3:
+
+```text
+6539600000 + 26650000 = 6566250000
+```
+
+### Item Shape
+
+Service-only:
+
+```text
+entry_mode = service
+part_source = none
+service price = 1500000
+product_lines = blank
+external_purchase_lines = blank
+```
+
+Store-stock:
+
+```text
+entry_mode = service
+part_source = none
+service price = 1400000
+product line:
+  qty = 2
+  unit_price_rupiah = 400000
+total = 2200000
+```
+
+External purchase:
+
+```text
+entry_mode = service
+part_source = none
+service price = 1400000
+external purchase:
+  qty = 1
+  unit_cost_rupiah = 1400000
+total = 2800000
+```
+
+Package auto-split store-stock:
+
+```text
+entry_mode = service
+part_source = none
+pricing_mode = package_auto_split
+package_total_rupiah = 3800000
+
+product A:
+  qty = 1
+  unit_price_rupiah = 900000
+
+product B:
+  qty = 1
+  unit_price_rupiah = 700000
+
+expected service residual = 2200000
+```
+
+### Inventory Pressure
+
+Stress estimated store-stock units:
+
+```text
+normal store-stock:
+1000 notes * 2 qty = 2000 units
+
+package store-stock:
+500 notes * 2 product lines = 1000 units
+
+total = 3000 units
+```
+
+Implementation requirement:
+
+rotate across many stocked products;
+require enough stocked products before running;
+do not drain one product repeatedly;
+fail loudly if inventory capacity is not enough;
+do not silently reduce note count to fit inventory.
+
+Recommended product query target before implementation:
+
+```text
+products with inventory and costing rows
+minimum products = 40
+preferred products = 80+
+minimum total available stock capacity = 3000 units
+```
+
+If local inventory capacity is lower than 3000 units, do not patch the stress seeder yet. First decide whether to expand CreateOnly inventory seed capacity or reduce stress store-stock pressure.
+
+### Cost Expectation
+
+Known fixed cash-out from create-all-v3 proof:
+
+```text
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+fixed_cash_out_total = 17837500
+```
+
+Expected external purchase cost:
+
+```text
+base external = 1720000
+stress external = 1260000000
+expected external_purchase_cost_rupiah = 1261720000
+```
+
+Expected store-stock COGS:
+
+```text
+120000000 to 600000000
+```
+
+Expected product purchase cost:
+
+```text
+1381720000 to 1861720000
+```
+
+Expected operational profit:
+
+```text
+cash_in = 6566250000
+minus product_purchase_cost = 1381720000 to 1861720000
+minus fixed_cash_out_total = 17837500
+
+expected cash_operational_profit_rupiah = 4686692500 to 5166692500
+```
+
+Do not lock exact store-stock COGS before local proof.
+
+### Implementation Order
+
+1. Inventory capacity proof.
+2. Patch only stress 8B seeder files:
+   - `database/seeders/CreateOnly/CreateTransactionMonthStress8BSeeder.php`
+   - `database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BPayloadFactory.php`
+   - `database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BItemFactory.php`
+3. Syntax and line-count proof.
+4. Standalone stress seeder proof.
+5. Patch `mk/seed.mk` only after the 3 files pass syntax and line-count proof.
+6. Make target dry-run or grep proof.
+7. Full aggregate proof:
+   ```text
+   php artisan migrate:fresh --seed
+   make create-all-month-stress-8b
+   ```
+8. Projection count proof.
+9. Operational profit sanity proof.
+10. PDF/XLSX proof only after operational profit sanity is valid.
+11. `make verify`.
+12. Handoff update proof.
+
+### Next Implementation Step
+
+Before writing seeder files, run inventory capacity proof:
+
+Check products with inventory and costing rows.
+Check total available stock capacity.
+Confirm whether 3000 store-stock units can be safely issued by the stress profile.
 
 ## Stress Ceiling 10 Miliar Blueprint Placeholder
 
@@ -483,12 +786,16 @@ For each new profile, run:
 
 ## Next Implementation Step
 
-Patch only:
+Run inventory capacity proof for stress 8B before writing seeder files.
+
+Required proof:
 
 ```text
-database/seeders/CreateOnly/CreateTransactionMonthPeak500MSeeder.php
-database/seeders/CreateOnly/Support/CreateTransactionMonthPeak500MPayloadFactory.php
-database/seeders/CreateOnly/Support/CreateTransactionMonthPeak500MItemFactory.php
+products with inventory and costing rows
+total available stock capacity
+whether 3000 store-stock units can be safely issued
 ```
 
-Do not patch mk/seed.mk until the 3 files pass syntax and line-count proof.
+Do not patch stress seeder files until this inventory capacity proof is available.
+
+Do not patch mk/seed.mk until the stress seeder files pass syntax and line-count proof.
