@@ -125,6 +125,10 @@ seed-transaction-month-normal-100m:
 seed-transaction-month-peak-500m:
 	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthPeak500MSeeder'
 
+.PHONY: seed-transaction-month-stress-8b
+seed-transaction-month-stress-8b:
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthStress8BSeeder'
+
 .PHONY: payroll-disbursement
 payroll-disbursement: seed-payroll-disbursement
 	$(MAKE) seed-audit-baseline
@@ -169,6 +173,14 @@ create-all-month-peak-500m: seed-create-all-month-peak-500m
 	$(MAKE) seed-audit-baseline
 	php artisan projection:rebuild-indexes all
 
+.PHONY: seed-create-all-month-stress-8b
+seed-create-all-month-stress-8b: seed-create-all-v3 seed-transaction-month-stress-8b
+
+.PHONY: create-all-month-stress-8b
+create-all-month-stress-8b: seed-create-all-month-stress-8b
+	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
+
 .PHONY: help
 help:
 	@echo ""
@@ -195,6 +207,7 @@ help:
 	@echo "  make seed-transaction-month-normal Source-only transaction notes monthly normal seed"
 	@echo "  make seed-transaction-month-normal-100m Source-only transaction notes monthly normal 100M seed"
 	@echo "  make seed-transaction-month-peak-500m Source-only transaction notes monthly peak 500M seed"
+	@echo "  make seed-transaction-month-stress-8b Source-only transaction notes monthly stress 8B seed"
 	@echo ""
 	@echo "Audit baseline:"
 	@echo "  make audit-baseline               Rebuild/create deterministic audit_events, snapshots, employee_versions, supplier_invoice_versions for existing seed rows"
@@ -206,6 +219,7 @@ help:
 	@echo "  make create-all-v3                Run source seed dataset v3, then audit baseline and rebuild projections once"
 	@echo "  make create-all-month-normal-100m Run dataset v3 plus monthly normal 100M, then audit baseline and rebuild projections once"
 	@echo "  make create-all-month-peak-500m Run dataset v3 plus monthly peak 500M, then audit baseline and rebuild projections once"
+	@echo "  make create-all-month-stress-8b Run dataset v3 plus monthly stress 8B, then audit baseline and rebuild projections once"
 	@echo ""
 	@echo "Raw source-only targets:"
 	@echo "  make seed-create-all-v1           Source-only aggregate v1; does not run audit baseline"

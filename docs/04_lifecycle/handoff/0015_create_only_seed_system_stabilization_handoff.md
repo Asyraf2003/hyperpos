@@ -1294,3 +1294,228 @@ Start stress 6-8 miliar/month blueprint execution.
 ```
 
 Do not start refund scaffold before the stress profile boundary is explicitly opened.
+
+### STRESS-8B-001 - Stress 6-8B blueprint, seeder, standalone proof, and make target wiring
+
+Local date: 2026-06-02.
+
+Scope:
+
+- Start stress 6-8 miliar/month execution after Peak 500M closure.
+- Promote stress 8B placeholder into executable blueprint.
+- Prove inventory capacity before writing seeder files.
+- Patch only stress 8B seeder files.
+- Prove standalone stress seeder.
+- Patch `mk/seed.mk` only after standalone seeder proof.
+- Do not start 10B.
+- Do not start refund scaffold.
+- Do not claim stress 8B full closure yet.
+
+#### Blueprint update
+
+Blueprint file:
+
+```text
+docs/03_blueprints/seeder/0001_create_only_seed_scale_profiles.md
+```
+
+Stress 6-8B placeholder was promoted to executable blueprint.
+
+Target:
+
+```text
+create-all-month-stress-8b
+```
+
+Planned stress seeder incremental target:
+
+```text
+notes = 3200
+work_items = 3200
+customer_payments = 2816
+unpaid_notes = 384
+partial_payment_notes = 576
+gross_total_rupiah = 7820000000
+cash_in_rupiah = 6539600000
+```
+
+Expected aggregate with seed-create-all-v3 baseline:
+
+```text
+notes = 3234
+work_items = 3234
+customer_payments = 2847
+note_history_projection = 3234
+notes_total_sum = 7848125000
+customer_payments_sum = 6566250000
+cash_in_rupiah = 6566250000
+refunded_rupiah = 0
+```
+
+Stress item mix:
+
+```text
+service_only = 800
+store_stock = 1000
+external_purchase = 900
+package_store_stock = 500
+```
+
+Stress payment mix:
+
+```text
+full = 2240
+partial = 576
+skip_unpaid = 384
+```
+
+Inventory capacity proof
+
+Required:
+
+```text
+minimum_products = 40
+required_store_stock_units = 3000
+```
+
+Local proof:
+
+```text
+product_count = 200
+total_qty_on_hand = 6547
+min_qty_on_hand = 13
+max_qty_on_hand = 49
+min_avg_cost_rupiah = 12250
+max_avg_cost_rupiah = 273000
+total_inventory_value_rupiah = 784994275
+```
+
+Decision:
+
+```text
+Inventory capacity PASS
+can_issue_3000_units = true
+has_minimum_40_products = true
+```
+
+Seeder files patched
+
+Files added:
+
+```text
+database/seeders/CreateOnly/CreateTransactionMonthStress8BSeeder.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BPayloadFactory.php
+database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BItemFactory.php
+```
+
+Syntax proof:
+
+```text
+No syntax errors detected in database/seeders/CreateOnly/CreateTransactionMonthStress8BSeeder.php
+No syntax errors detected in database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BPayloadFactory.php
+No syntax errors detected in database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BItemFactory.php
+```
+
+Line-count proof:
+
+```text
+94 database/seeders/CreateOnly/CreateTransactionMonthStress8BSeeder.php
+99 database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BPayloadFactory.php
+73 database/seeders/CreateOnly/Support/CreateTransactionMonthStress8BItemFactory.php
+```
+
+Standalone stress seeder proof
+
+```text
+php artisan migrate:fresh --seed
+make seed-create-all-v3
+php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthStress8BSeeder'
+
+create-only transaction month-stress-8b notes: planned=3200 created=3200 replayed=0
+```
+
+Aggregate after seed-create-all-v3 + stress:
+
+```text
+notes = 3234
+work_items = 3234
+customer_payments = 2847
+notes_total_sum = 7848125000
+customer_payments_sum = 6566250000
+```
+
+Decision:
+
+```text
+Standalone stress 8B seeder proof PASS
+Stress 8B make target wiring PASS
+```
+
+Make target wiring
+
+```text
+mk/seed.mk
+seed-transaction-month-stress-8b:
+    php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthStress8BSeeder'
+
+seed-create-all-month-stress-8b: seed-create-all-v3 seed-transaction-month-stress-8b
+
+create-all-month-stress-8b: seed-create-all-month-stress-8b
+    $(MAKE) seed-audit-baseline
+    php artisan projection:rebuild-indexes all
+```
+
+Dry-run proof:
+
+```text
+make -n create-all-month-stress-8b
+```
+
+Decision:
+
+```text
+Current Status:
+Stress 8B blueprint = done
+Inventory capacity proof = done
+Seeder files patch = done
+Seeder syntax and line-count proof = done
+Standalone seeder proof = done
+Standalone source aggregate proof = done
+mk/seed.mk target wiring = done
+make dry-run proof = done
+```
+
+Not done yet:
+
+```text
+Full aggregate proof via make create-all-month-stress-8b
+Projection count proof after full aggregate target
+Operational profit sanity proof
+PDF/XLSX export proof
+make verify
+Final handoff closure
+```
+
+Next Step:
+
+```text
+Run full aggregate stress 8B proof:
+
+php artisan migrate:fresh --seed
+make create-all-month-stress-8b
+
+Then prove:
+
+notes = 3234
+work_items = 3234
+customer_payments = 2847
+note_history_projection = 3234
+notes_total_sum = 7848125000
+customer_payments_sum = 6566250000
+cash_in_rupiah = 6566250000
+refunded_rupiah = 0
+
+Do not start 10B.
+Do not start refund scaffold.
+Do not claim stress 8B closed until full aggregate, report sanity, export proof, and verify are complete.
+```
