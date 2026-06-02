@@ -71,7 +71,6 @@ final class CreateTransactionMonthPeak500MSeeder extends CreateOnlySeeder
         $rows = DB::table('products')
             ->join('product_inventory', 'product_inventory.product_id', '=', 'products.id')
             ->join('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'products.id')
-            ->where('product_inventory.qty_on_hand', '>=', 20)
             ->where('products.harga_jual', '>', 0)
             ->orderBy('products.id')
             ->limit(80)
@@ -81,7 +80,7 @@ final class CreateTransactionMonthPeak500MSeeder extends CreateOnlySeeder
             ->all();
 
         if (count($rows) < 24) {
-            throw new RuntimeException('CreateTransactionMonthPeak500MSeeder requires at least 24 stocked products with qty_on_hand >= 20.');
+            throw new RuntimeException('CreateTransactionMonthPeak500MSeeder requires at least 24 products with inventory and costing rows.');
         }
 
         return $rows;
