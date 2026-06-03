@@ -576,3 +576,44 @@ The UI should resemble Google Forms:
 ### Next Active Step
 
 Review Variant 01 as a pure Google Form-like preview before continuing to other variants.
+
+---
+
+## ADDENDUM - Pure Google Form Visual Direction
+
+### FACT
+
+The first UI preview still used the app layout shell, which means it inherited the application/Mazer visual frame.
+
+### DECISION
+
+The mobile UI lab must render as a standalone preview page.
+
+Do not extend `layouts.app` for the preview page.
+
+The preview route may remain as the access door, but the view must behave like an independent mobile web mockup.
+
+### Visual Direction
+
+The UI should resemble Google Forms:
+
+- soft purple page background
+- centered form column
+- white form cards
+- purple top accent
+- simple title and description
+- clean input underline style
+- radio-like option rows
+- large but minimal mobile spacing
+- no admin dashboard chrome
+- no Mazer card styling
+
+### Scope
+
+- Rewrite the preview shell as standalone HTML.
+- Rewrite Variant 01 as a Google Form-like mobile UI.
+- Keep backend integration out of scope.
+
+### Next Active Step
+
+Review Variant 01 as a pure Google Form-like preview before continuing to other variants.
