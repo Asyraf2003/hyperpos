@@ -3,35 +3,31 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
-    <title>{{ $pageTitle }}</title>
+    <title>{{ $pageTitle }} - {{ $variants[$activeVariant] }}</title>
     @include('cashier.notes.workspace.mobile-ui-lab.partials.styles')
 </head>
-<body>
-    <main class="gform-page">
-        <header class="gform-preview-head">
-            <span>UI Preview</span>
-            <h1>10 Create Transaction Mobile Forms</h1>
-            <p>Semua tampilan standalone, mirip Google Form, tanpa Mazer dan tanpa backend.</p>
+<body class="lab-page lab-v{{ $activeVariant }}">
+    <main class="lab-shell" data-demo-root>
+        <header class="lab-top">
+            <small>UI Lab / Variant {{ $activeVariant }}</small>
+            <h1>{{ $variants[$activeVariant] }}</h1>
+            <p>Dummy UI only. Semua klik dan total hanya simulasi lokal untuk review kenyamanan client.</p>
         </header>
 
-        <nav class="gform-nav">
-            @foreach (range(1, 10) as $variantNumber)
-                <a href="#variant-{{ str_pad((string) $variantNumber, 2, '0', STR_PAD_LEFT) }}">
-                    {{ str_pad((string) $variantNumber, 2, '0', STR_PAD_LEFT) }}
+        <nav class="lab-nav" aria-label="UI variant navigation">
+            @foreach ($variants as $variantNumber => $variantLabel)
+                <a
+                    class="{{ $activeVariant === $variantNumber ? 'is-active' : '' }}"
+                    href="{{ route('cashier.notes.workspace.mobile-ui-lab', ['variant' => $variantNumber]) }}"
+                >
+                    {{ $variantNumber }}
                 </a>
             @endforeach
         </nav>
 
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-01')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-02')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-03')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-04')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-05')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-06')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-07')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-08')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-09')
-        @include('cashier.notes.workspace.mobile-ui-lab.partials.variant-10')
+        @include("cashier.notes.workspace.mobile-ui-lab.variants.variant-{$activeVariant}")
     </main>
+
+    @include('cashier.notes.workspace.mobile-ui-lab.partials.scripts')
 </body>
 </html>

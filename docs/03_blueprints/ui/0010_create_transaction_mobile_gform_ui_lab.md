@@ -651,3 +651,61 @@ They do not use Laravel request field names, workspace JavaScript hooks, product
 The preview page may show all variants in one scrollable page with local anchor navigation.
 
 After visual review, choose one candidate before any production create page replacement is planned.
+
+---
+
+## ADDENDUM - Separate Interactive Dummy Pages Correction
+
+### FACT
+
+The previous 10 variants were too visually similar because they shared the same Google Form card pattern.
+
+### DECISION
+
+The UI lab must become 10 separate interactive dummy preview pages.
+
+Each variant should be reachable through its own route path:
+
+- `/cashier/notes/workspace/mobile-ui-lab/01`
+- `/cashier/notes/workspace/mobile-ui-lab/02`
+- `/cashier/notes/workspace/mobile-ui-lab/03`
+- `/cashier/notes/workspace/mobile-ui-lab/04`
+- `/cashier/notes/workspace/mobile-ui-lab/05`
+- `/cashier/notes/workspace/mobile-ui-lab/06`
+- `/cashier/notes/workspace/mobile-ui-lab/07`
+- `/cashier/notes/workspace/mobile-ui-lab/08`
+- `/cashier/notes/workspace/mobile-ui-lab/09`
+- `/cashier/notes/workspace/mobile-ui-lab/10`
+
+The variants are still UI-only and must not bind to backend submit, request fields, product lookup, payment handlers, or existing workspace JavaScript.
+
+### Required Behavior
+
+The dummy UI may use local fake JavaScript for:
+
+- choosing products
+- adding cart items
+- removing cart items
+- changing visual steps
+- showing fake payment selection
+- opening bottom sheet or drawer
+- keypad-style price input
+- live receipt preview
+- static dummy totals
+
+### Variant Directions
+
+- 01: Google Form Classic Product Picker
+- 02: Stepper Wizard
+- 03: POS Keypad
+- 04: Bottom Sheet Checkout
+- 05: Accordion Checklist
+- 06: Service Package Builder
+- 07: Chat Style Intake
+- 08: Live Receipt Split View
+- 09: One-Hand Thumb UI
+- 10: Dense Table Power User
+
+### Review Rule
+
+Client review should compare the 10 separate pages and select the most comfortable direction before any production create page replacement is planned.
