@@ -12,6 +12,7 @@
 /.vscode
 /.zed
 /auth.json
+/docs/04_lifecycle/db_schema_parity
 /node_modules
 /public/build
 /public/hot
