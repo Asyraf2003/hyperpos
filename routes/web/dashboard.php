@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 use App\Adapters\In\Http\Controllers\Admin\AdminDashboardAnalyticsPayloadController;
 use App\Adapters\In\Http\Controllers\Admin\AdminDashboardPageController;
+use App\Adapters\In\Http\Controllers\Cashier\CashierAccountPreferencesPageController;
 use App\Adapters\In\Http\Controllers\Cashier\CashierDashboardPageController;
+use App\Adapters\In\Http\Controllers\Cashier\CashierProductSearchPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function (): void {
@@ -21,5 +23,11 @@ Route::middleware('web')->group(function (): void {
     Route::middleware(['auth', 'cashier.area', 'app.shell'])->group(function (): void {
         Route::get('/cashier/dashboard', CashierDashboardPageController::class)
             ->name('cashier.dashboard');
+
+        Route::get('/cashier/products/search', CashierProductSearchPageController::class)
+            ->name('cashier.products.search');
+
+        Route::get('/cashier/account/preferences', CashierAccountPreferencesPageController::class)
+            ->name('cashier.account.preferences');
     });
 });
