@@ -1,5 +1,5 @@
 <div style="max-width: 460px; margin: 0 auto;">
-    <div class="border rounded p-4">
+    <div class="workspace-gform-panel">
         <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
             <div>
                 <div class="fw-semibold fs-4">Kalkulator Cash</div>
@@ -15,12 +15,12 @@
         </div>
 
         <div class="d-grid gap-3">
-            <div class="border rounded p-4 text-center">
+            <div class="workspace-gform-panel text-center">
                 <div class="small text-muted mb-2">Tagihan</div>
                 <div class="fs-1 fw-bold lh-sm" id="workspace-cash-payable-text">0</div>
             </div>
 
-            <div class="border rounded p-4 text-center" data-money-input-group>
+            <div class="workspace-gform-panel text-center" data-money-input-group>
                 <div class="small text-muted mb-2">Uang Pelanggan</div>
 
                 <input type="hidden" value="" data-money-raw data-cash-received-raw>
@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <div class="border rounded p-4 text-center">
+            <div class="workspace-gform-panel text-center">
                 <div class="small text-muted mb-2">Kembalian</div>
                 <div class="fs-1 fw-bold lh-sm" id="workspace-cash-change-text">0</div>
             </div>

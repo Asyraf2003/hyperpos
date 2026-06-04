@@ -1,5 +1,5 @@
 <div class="col-12 col-xl-5">
-    <div class="border rounded p-3 h-100 d-flex flex-column">
+    <div class="workspace-gform-panel h-100 d-flex flex-column">
         <div class="fw-semibold mb-1">Pilih Aksi</div>
         <div class="text-muted small mb-3">
             Pilih salah satu aksi, lalu lanjutkan ke transfer atau cash.
@@ -9,7 +9,7 @@
         <div class="fw-semibold fs-5 mb-3" id="workspace-payment-mode-text">Belum dipilih</div>
 
         @if (($workspaceMode ?? 'create') === 'edit' && !empty($workspacePaymentSettlement['explanation']))
-            <div class="border rounded p-3 mb-3" id="workspace-payment-settlement-explanation">
+            <div class="workspace-gform-panel mb-3" id="workspace-payment-settlement-explanation">
                 <div class="fw-semibold mb-2">Settlement pembayaran backend</div>
                 <div class="small text-muted">
                     Gross total: {{ number_format((int) ($workspacePaymentSettlement['explanation']['gross_total_rupiah'] ?? 0), 0, ',', '.') }}
@@ -53,7 +53,7 @@
         </div>
 
         <div id="workspace-payment-panel-partial" class="d-none">
-            <div class="border rounded p-3">
+            <div class="workspace-gform-panel">
                 <div class="fw-semibold mb-1">Nominal Dibayar Sekarang</div>
                 <div class="text-muted small mb-3">
                     Isi nominal pembayaran sebagian, lalu pilih transfer atau cash.
