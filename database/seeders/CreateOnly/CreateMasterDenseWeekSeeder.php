@@ -14,6 +14,7 @@ final class CreateMasterDenseWeekSeeder extends CreateOnlyMasterSeeder
 
         $this->seedSuppliers('week', 15);
         $this->seedProducts('week', 150);
+        $this->seedServiceCatalogDefaults();
         $this->seedEmployees('week', 10);
         $this->seedExpenseCategories('week');
     }

@@ -16,6 +16,8 @@ use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryPageController as C
 use App\Adapters\In\Http\Controllers\Cashier\Note\NoteHistoryTableDataController as CashierNoteHistoryTableDataController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\ProductLookupController;
 use App\Adapters\In\Http\Controllers\Cashier\Note\SaveTransactionWorkspaceDraftController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\ServiceCatalogLookupController;
+use App\Adapters\In\Http\Controllers\Cashier\Note\ServiceCatalogStoreController;
 use App\Adapters\In\Http\Controllers\Note\AddNoteRowsController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidServiceOnlyWorkItemController;
 use App\Adapters\In\Http\Controllers\Note\CorrectPaidWorkItemStatusController;
@@ -44,6 +46,8 @@ Route::middleware(['auth', EnsureAdminPageAccess::class, 'app.shell'])
         Route::get('/', AdminNoteHistoryPageController::class)->name('index');
         Route::get('/table', AdminNoteHistoryTableDataController::class)->name('table');
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/services/lookup', ServiceCatalogLookupController::class)->name('services.lookup');
+        Route::post('/services', ServiceCatalogStoreController::class)->name('services.store');
         Route::get('/workspace/draft', GetTransactionWorkspaceDraftController::class)->name('workspace.draft.show');
         Route::post('/workspace/draft', SaveTransactionWorkspaceDraftController::class)->name('workspace.draft.save');
         Route::post(
@@ -75,6 +79,8 @@ Route::middleware(['auth', EnsureCashierAreaAccess::class, EnsureTransactionEntr
         Route::get('/table', CashierNoteHistoryTableDataController::class)->name('table');
 
         Route::get('/products/lookup', ProductLookupController::class)->name('products.lookup');
+        Route::get('/services/lookup', ServiceCatalogLookupController::class)->name('services.lookup');
+        Route::post('/services', ServiceCatalogStoreController::class)->name('services.store');
         Route::get('/workspace/draft', GetTransactionWorkspaceDraftController::class)->name('workspace.draft.show');
         Route::post('/workspace/draft', SaveTransactionWorkspaceDraftController::class)->name('workspace.draft.save');
         Route::get('/workspace/create', CreateTransactionWorkspacePageController::class)->name('workspace.create');

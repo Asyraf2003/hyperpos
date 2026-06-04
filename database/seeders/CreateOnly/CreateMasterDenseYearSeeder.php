@@ -14,6 +14,7 @@ final class CreateMasterDenseYearSeeder extends CreateOnlyMasterSeeder
 
         $this->seedSuppliers('year', 60);
         $this->seedProducts('year', 1200);
+        $this->seedServiceCatalogDefaults();
         $this->seedEmployees('year', 40);
         $this->seedExpenseCategories('year');
     }

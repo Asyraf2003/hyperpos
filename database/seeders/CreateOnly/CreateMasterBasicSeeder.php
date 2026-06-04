@@ -14,6 +14,7 @@ final class CreateMasterBasicSeeder extends CreateOnlyMasterSeeder
 
         $this->seedSuppliers('basic', 3);
         $this->seedProducts('basic', 10);
+        $this->seedServiceCatalogDefaults();
         $this->seedEmployees('basic', 3);
         $this->seedExpenseCategories('basic');
     }

@@ -102,11 +102,51 @@ abstract class CreateOnlyMasterSeeder extends CreateOnlySeeder
         }
     }
 
+    protected function seedServiceCatalogDefaults(): void
+    {
+        $rows = [
+            ['Sok Kopling (Besar)', 120000],
+            ['Sok Kopling (Kecil)', 110000],
+            ['Setting In (Kecil)', 70000],
+            ['Setting Ex (Kecil)', 70000],
+            ['Setting In (Besar)', 85000],
+            ['Setting Ex (Besar)', 85000],
+            ['Bosklep In (Kecil)', 60000],
+            ['Bosklep Ex (Kecil)', 60000],
+            ['Bosklep In (Besar)', 75000],
+            ['Bosklep Ex (Besar)', 75000],
+            ['Pasang Stang (Kecil)', 50000],
+            ['Pasang Stang (Besar)', 60000],
+        ];
+
+        foreach ($rows as $index => [$name, $price]) {
+            $normalized = $this->normalizeServiceName($name);
+            $this->createOnly('service_catalog_items', 'normalized_name', $normalized, [
+                'id' => $this->id('svc', 'default', $index + 1),
+                'name' => $name,
+                'normalized_name' => $normalized,
+                'default_price_rupiah' => $price,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
     private function normalize(string $value): string
     {
         $value = preg_replace('/\s+/', ' ', trim($value)) ?? trim($value);
 
         return mb_strtolower($value);
+    }
+
+    private function normalizeServiceName(string $value): string
+    {
+        $value = mb_strtolower(trim($value), 'UTF-8');
+        $value = preg_replace('/[^\p{L}\p{N}]+/u', ' ', $value) ?? $value;
+        $value = preg_replace('/\s+/', ' ', trim($value)) ?? trim($value);
+
+        return $value;
     }
 
     private function id(string $entity, string $prefix, int $number): string

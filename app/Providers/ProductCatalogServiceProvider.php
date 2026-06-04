@@ -9,6 +9,7 @@ use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseVersionedProductWriterAdapter;
+use App\Adapters\Out\ServiceCatalog\DatabaseServiceCatalogAdapter;
 use App\Application\ProductCatalog\Context\ProductChangeContext;
 use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Ports\Out\ProductCatalog\ProductDetailReaderPort;
@@ -17,6 +18,8 @@ use App\Ports\Out\ProductCatalog\ProductLifecyclePort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductTableReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
+use App\Ports\Out\ServiceCatalog\ServiceCatalogReaderPort;
+use App\Ports\Out\ServiceCatalog\ServiceCatalogWriterPort;
 use Illuminate\Support\ServiceProvider;
 
 class ProductCatalogServiceProvider extends ServiceProvider
@@ -33,5 +36,7 @@ class ProductCatalogServiceProvider extends ServiceProvider
         $this->app->scoped(ProductWriterPort::class, DatabaseVersionedProductWriterAdapter::class);
         $this->app->scoped(ProductLifecyclePort::class, DatabaseVersionedProductWriterAdapter::class);
         $this->app->singleton(ProductDuplicateCheckerPort::class, DatabaseProductDuplicateCheckerAdapter::class);
+        $this->app->singleton(ServiceCatalogReaderPort::class, DatabaseServiceCatalogAdapter::class);
+        $this->app->scoped(ServiceCatalogWriterPort::class, DatabaseServiceCatalogAdapter::class);
     }
 }
