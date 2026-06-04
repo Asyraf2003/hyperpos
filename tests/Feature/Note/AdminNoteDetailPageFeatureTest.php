@@ -31,9 +31,10 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Detail Nota');
-        $response->assertSee('Header');
-        $response->assertSee('List Line');
-        $response->assertSee('Versioning & Revisi');
+        $response->assertSee('Info Nota');
+        $response->assertSee('Rincian Nota');
+        $response->assertSee('Riwayat Nota')
+            ->assertSee('Versioning Nota');
         $response->assertDontSee('Status Operasional Admin');
         $response->assertDontSee('Buka Ulang Nota');
     }
@@ -55,9 +56,10 @@ final class AdminNoteDetailPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Detail Nota');
-        $response->assertSee('Header');
-        $response->assertSee('List Line');
-        $response->assertSee('Versioning & Revisi');
+        $response->assertSee('Info Nota');
+        $response->assertSee('Rincian Nota');
+        $response->assertSee('Riwayat Nota')
+            ->assertSee('Versioning Nota');
         $response->assertDontSee('Status Operasional Admin');
         $response->assertDontSee('Buka Ulang Nota');
     }

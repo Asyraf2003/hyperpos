@@ -24,9 +24,10 @@ final class CashierHybridNoteDetailFeatureTest extends TestCase
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
-            ->assertSee('Versioning & Revisi')
+            ->assertSee('Riwayat Nota')
+            ->assertSee('Versioning Nota')
             ->assertSee('Revision Aktif')
-            ->assertSee('List Line')
+            ->assertSee('Rincian Nota')
             ->assertSee('Bayar')
             ->assertSee('Lunasi');
     }
@@ -38,7 +39,8 @@ final class CashierHybridNoteDetailFeatureTest extends TestCase
 
         $this->actingAs($user)->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
-            ->assertSee('Versioning & Revisi')
+            ->assertSee('Riwayat Nota')
+            ->assertSee('Versioning Nota')
             ->assertSee('Revision Aktif');
     }
 
