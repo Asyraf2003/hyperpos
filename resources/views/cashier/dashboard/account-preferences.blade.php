@@ -52,11 +52,6 @@
     </style>
 
     <div class="cashier-account">
-        <div class="ui-page-intro">
-            <div class="small text-muted text-uppercase fw-semibold">Kasir</div>
-            <h4 class="ui-page-intro-title">Preferensi Akun</h4>
-            <p class="ui-page-intro-subtitle">Informasi akun yang sedang digunakan.</p>
-        </div>
 
         <div class="cashier-account-card">
             <div class="cashier-account-row">
