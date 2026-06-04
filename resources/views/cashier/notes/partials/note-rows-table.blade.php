@@ -1,16 +1,4 @@
-<div class="card h-100">
-  <div class="card-header">
-    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-      <div>
-        <h4 class="card-title mb-0">
-          Daftar Rincian
-          <span class="visually-hidden">Daftar Line Nota List Line Nota</span>
-        </h4>
-      </div>
-      <span class="badge bg-light text-dark border">{{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}</span>
-    </div>
-  </div>
-  <div class="card-body">
+<div>
     @include('cashier.notes.partials.note-row-refund-style')
 
     <div class="table-responsive">
@@ -83,5 +71,4 @@
       </table>
     </div>
     <div class="small text-muted mt-3">Refund dipilih dari rincian yang aktif.</div>
-  </div>
 </div>
