@@ -258,8 +258,6 @@
     }
 
     .cashier-note-detail .btn-outline-secondary,
-    .cashier-note-detail .btn-light-secondary,
-    .cashier-note-detail .btn-light-primary,
     #note-payment-modal .btn-outline-secondary,
     #note-refund-modal .btn-outline-secondary {
       border-color: var(--detail-border);
