@@ -89,4 +89,38 @@ final class SelectedRowsRefundBucketsBuilderTest extends TestCase
 
         self::assertSame([], $buckets);
     }
+
+    public function test_it_keeps_refund_totals_isolated_per_payment_for_the_same_row(): void
+    {
+        $builder = new SelectedRowsRefundBucketsBuilder();
+
+        $buckets = $builder->build(
+            ['wi-1'],
+            [
+                PaymentComponentAllocation::rehydrate(
+                    'pca-1', 'payment-1', 'note-1', 'wi-1',
+                    PaymentComponentType::PRODUCT_ONLY_WORK_ITEM, 'wi-1',
+                    Money::fromInt(100000), Money::fromInt(60000), 1,
+                ),
+                PaymentComponentAllocation::rehydrate(
+                    'pca-2', 'payment-2', 'note-1', 'wi-1',
+                    PaymentComponentType::PRODUCT_ONLY_WORK_ITEM, 'wi-1',
+                    Money::fromInt(100000), Money::fromInt(40000), 2,
+                ),
+            ],
+            [
+                RefundComponentAllocation::rehydrate(
+                    'rca-1', 'refund-1', 'payment-1', 'note-1', 'wi-1',
+                    PaymentComponentType::PRODUCT_ONLY_WORK_ITEM, 'wi-1',
+                    Money::fromInt(10000), 1,
+                ),
+            ],
+        );
+
+        self::assertCount(2, $buckets);
+        self::assertSame('payment-1', $buckets[0]->customerPaymentId());
+        self::assertSame(50000, $buckets[0]->amountRupiah());
+        self::assertSame('payment-2', $buckets[1]->customerPaymentId());
+        self::assertSame(40000, $buckets[1]->amountRupiah());
+    }
 }
