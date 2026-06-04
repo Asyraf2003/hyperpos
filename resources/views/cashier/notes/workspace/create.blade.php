@@ -10,17 +10,19 @@
 <section class="section">
     <style>
         .section:has(.cashier-workspace-stepper) {
-            background: #f0ebf8;
+            background: var(--cashier-page-bg);
             padding-block: 1rem 2rem;
         }
 
         .cashier-workspace-stepper {
-            --workspace-card: #ffffff;
-            --workspace-border: #dadce0;
-            --workspace-muted: #5f6368;
-            --workspace-text: #202124;
-            --workspace-accent: #673ab7;
-            --workspace-accent-soft: #ede7f6;
+            --workspace-card: var(--cashier-surface);
+            --workspace-border: var(--cashier-border);
+            --workspace-muted: var(--cashier-muted);
+            --workspace-text: var(--cashier-text);
+            --workspace-accent: var(--cashier-accent);
+            --workspace-accent-soft: var(--cashier-accent-soft);
+            --workspace-accent-border: var(--cashier-accent-border);
+            --workspace-surface-subtle: var(--cashier-surface-subtle);
             --workspace-radius: .5rem;
             max-width: 720px;
             margin: 0 auto;
@@ -50,7 +52,7 @@
             align-items: flex-start;
             gap: .85rem;
             padding: 1rem 1rem .75rem;
-            border-bottom: 1px solid rgba(15, 23, 42, .07);
+            border-bottom: 1px solid var(--workspace-border);
         }
 
         .cashier-workspace-stepper .workspace-step-number {
@@ -63,7 +65,7 @@
             border-radius: 50%;
             color: var(--workspace-accent);
             background: var(--workspace-accent-soft);
-            border: 1px solid #d1c4e9;
+            border: 1px solid var(--workspace-accent-border);
             font-weight: 800;
         }
 
@@ -90,11 +92,12 @@
         .cashier-workspace-stepper .form-select {
             min-height: 2.75rem;
             border: 0;
-            border-bottom: 1px solid #dadce0;
+            border-bottom: 1px solid var(--workspace-border);
             border-radius: 0;
             background: transparent;
             box-shadow: none;
             padding-inline: 0;
+            color: var(--workspace-text);
         }
 
         .cashier-workspace-stepper textarea.form-control {
@@ -121,30 +124,30 @@
 
         .cashier-workspace-stepper .btn-primary:hover,
         .cashier-workspace-stepper .btn-primary:focus {
-            border-color: #512da8;
-            background: #512da8;
+            border-color: var(--workspace-accent);
+            background: var(--workspace-accent);
             color: #fff;
         }
 
         .cashier-workspace-stepper .btn-light-primary,
         .cashier-workspace-stepper [data-add-product-line] {
-            border: 1px solid #d1c4e9;
-            background: #fff;
-            color: var(--workspace-accent);
+            border: 1px solid var(--workspace-accent-border);
+            background: var(--workspace-accent-soft);
+            color: var(--workspace-accent) !important;
             font-weight: 700;
         }
 
         .cashier-workspace-stepper .btn-light-secondary,
         .cashier-workspace-stepper .btn-light-danger {
-            border: 1px solid #dadce0;
-            background: #fff;
-            color: #3c4043;
+            border: 1px solid var(--workspace-border);
+            background: var(--workspace-card);
+            color: var(--workspace-text) !important;
             font-weight: 700;
         }
 
         .cashier-workspace-stepper [data-line-item] {
             border-radius: .5rem !important;
-            background: #fff;
+            background: var(--workspace-card);
         }
 
         .cashier-workspace-stepper .workspace-answer-card {
@@ -163,7 +166,7 @@
             gap: .75rem;
             padding-bottom: .85rem;
             margin-bottom: .85rem;
-            border-bottom: 1px solid #eceff1;
+            border-bottom: 1px solid var(--workspace-border);
         }
 
         .cashier-workspace-stepper .workspace-answer-field {
@@ -178,8 +181,18 @@
         }
 
         .cashier-workspace-stepper .workspace-answer-card .form-label {
-            color: #3c4043;
+            color: var(--workspace-text);
             font-weight: 700;
+        }
+
+        .cashier-workspace-stepper .text-muted {
+            color: var(--workspace-muted) !important;
+        }
+
+        .cashier-workspace-stepper .workspace-soft-badge {
+            border: 1px solid var(--workspace-border);
+            background: var(--workspace-surface-subtle);
+            color: var(--workspace-text);
         }
 
         .cashier-workspace-stepper details.workspace-step-card {
@@ -235,9 +248,9 @@
         }
 
         .cashier-workspace-stepper .workspace-add-question-button {
-            border: 1px dashed #b39ddb;
+            border: 1px dashed var(--workspace-accent-border);
             color: var(--workspace-accent);
-            background: #fff;
+            background: var(--workspace-card);
             font-weight: 700;
         }
 
@@ -266,8 +279,8 @@
             width: min(calc(100vw - 2rem), 22rem);
             border: 1px solid var(--workspace-border);
             border-radius: .5rem;
-            background: #fff;
-            box-shadow: 0 .35rem .9rem rgba(60, 64, 67, .16);
+            background: var(--workspace-card);
+            box-shadow: var(--cashier-shadow);
             overflow: hidden;
         }
 
@@ -281,8 +294,8 @@
             width: 100%;
             min-height: 2.75rem;
             border: 0;
-            border-bottom: 1px solid #f1f3f4;
-            background: #fff;
+            border-bottom: 1px solid var(--workspace-border);
+            background: var(--workspace-card);
             color: var(--workspace-text);
             text-align: left;
             padding: .8rem 1rem;
@@ -296,25 +309,25 @@
         .cashier-workspace-stepper .workspace-item-type-option:hover,
         .cashier-workspace-stepper .workspace-item-type-option:focus {
             color: var(--workspace-accent);
-            background: #f8f6ff;
+            background: var(--workspace-accent-soft);
         }
 
         .cashier-workspace-stepper .workspace-empty-answer {
-            border: 1px dashed #c7c4d1;
+            border: 1px dashed var(--workspace-border);
             border-radius: .5rem;
-            background: #fff;
+            background: var(--workspace-surface-subtle);
             padding: 1.2rem;
         }
 
         #workspace-payment-modal .modal-content {
             border-radius: .75rem;
-            border-top: .45rem solid var(--workspace-accent, #673ab7);
+            border-top: .45rem solid var(--workspace-accent);
         }
 
         #workspace-payment-modal .workspace-gform-panel {
-            border: 1px solid #dadce0;
+            border: 1px solid var(--workspace-border);
             border-radius: .5rem;
-            background: #fff;
+            background: var(--workspace-card);
             padding: 1rem;
         }
 
