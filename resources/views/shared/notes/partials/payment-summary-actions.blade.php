@@ -4,6 +4,31 @@
   </div>
 
   <div class="card-body">
+    <div class="d-grid gap-2 mb-3">
+      @if ($note['can_edit_workspace'] ?? false)
+        <a
+          href="{{ route($detailConfig['workspace_edit_route'], ['noteId' => $note['id']]) }}"
+          class="btn btn-primary"
+        >
+          Edit Nota
+        </a>
+      @endif
+
+      @if ($note['can_show_refund_form'] ?? false)
+        <button
+          type="button"
+          class="btn btn-outline-danger opacity-50 disabled"
+          data-bs-toggle="modal"
+          data-bs-target="#note-refund-modal"
+          id="note-refund-open-button"
+          disabled
+          aria-disabled="true"
+        >
+          Refund Line Terpilih
+        </button>
+      @endif
+    </div>
+
     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
       <span class="text-muted">Grand Total</span>
       <strong class="text-body">{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
