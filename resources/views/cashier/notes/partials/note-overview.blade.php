@@ -1,5 +1,5 @@
-<div class="row g-3">
-    <div class="col-12 col-xl-6">
+<div class="cashier-note-header-stack">
+    <div>
         <div class="card h-100">
             <div class="card-header">
                 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-xl-6">
+    <div>
         <div class="card h-100">
             <div class="card-header">
                 <h4 class="card-title mb-1">Ringkasan Pembayaran</h4>

@@ -109,6 +109,12 @@
       gap: .85rem;
     }
 
+    .cashier-note-detail .cashier-note-header-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: .85rem;
+    }
+
     .cashier-note-detail .card {
       border: 1px solid var(--detail-border);
       border-radius: .5rem;
@@ -248,12 +254,6 @@
   </style>
 
   <div class="cashier-note-detail">
-    <div class="ui-page-intro">
-      <div class="small text-muted text-uppercase fw-semibold">Workspace Nota Kasir</div>
-      <h4 class="ui-page-intro-title">Detail Nota</h4>
-      <p class="ui-page-intro-subtitle">Baca info nota, rincian, lalu lanjutkan aksi pembayaran atau refund.</p>
-    </div>
-
     <div class="cashier-note-detail-shell">
       <details class="cashier-note-detail-step" open>
         <summary class="cashier-note-detail-header">
