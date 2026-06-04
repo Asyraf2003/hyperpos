@@ -12,6 +12,7 @@ use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPayloadMappe
 use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineKeyer;
 use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineTrustInventory;
 use App\Application\Note\Services\RevisionWorkspace\RevisionSnapshotStoreStockLineTrustMarker;
+use App\Application\Note\Services\ServiceCatalogFromWorkItemSync;
 use App\Application\Note\Services\WorkItemFactory;
 use App\Application\Note\UseCases\CreateNoteRevisionPayloadNoteBuilder;
 use App\Application\Note\UseCases\CreateNoteRevisionPayloadWorkItemBuilder;
@@ -19,9 +20,11 @@ use App\Core\Note\WorkItem\StoreStockLine;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Core\ProductCatalog\Product\Product;
+use App\Core\ServiceCatalog\ServiceCatalogItem;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
+use App\Ports\Out\ServiceCatalog\ServiceCatalogWriterPort;
 use App\Ports\Out\UuidPort;
 use PHPUnit\Framework\TestCase;
 
@@ -170,9 +173,29 @@ final class CreateNoteRevisionPayloadNoteBuilderTest extends TestCase
         );
 
         return new CreateNoteRevisionPayloadNoteBuilder(
-            new CreateNoteRevisionPayloadWorkItemBuilder($mapper, $factory),
+            new CreateNoteRevisionPayloadWorkItemBuilder(
+                $mapper,
+                $factory,
+                new ServiceCatalogFromWorkItemSync($this->serviceCatalogWriter()),
+            ),
             $this->trustMarker(),
         );
+    }
+
+    private function serviceCatalogWriter(): ServiceCatalogWriterPort
+    {
+        return new class implements ServiceCatalogWriterPort {
+            public function createIfMissing(string $name, int $defaultPriceRupiah): ServiceCatalogItem
+            {
+                return ServiceCatalogItem::rehydrate(
+                    'service-test',
+                    $name,
+                    mb_strtolower(trim($name), 'UTF-8'),
+                    $defaultPriceRupiah,
+                    true,
+                );
+            }
+        };
     }
 
 
