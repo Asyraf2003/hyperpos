@@ -129,6 +129,10 @@ seed-transaction-month-peak-500m:
 seed-transaction-month-stress-8b:
 	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthStress8BSeeder'
 
+.PHONY: seed-transaction-month-stress-10b
+seed-transaction-month-stress-10b:
+	php artisan db:seed --class='Database\Seeders\CreateOnly\CreateTransactionMonthStress10BSeeder'
+
 .PHONY: payroll-disbursement
 payroll-disbursement: seed-payroll-disbursement
 	$(MAKE) seed-audit-baseline
@@ -181,6 +185,145 @@ create-all-month-stress-8b: seed-create-all-month-stress-8b
 	$(MAKE) seed-audit-baseline
 	php artisan projection:rebuild-indexes all
 
+.PHONY: seed-create-all-month-stress-10b
+seed-create-all-month-stress-10b: seed-create-all-v3 seed-transaction-month-stress-10b
+
+.PHONY: create-all-month-stress-10b
+create-all-month-stress-10b: seed-create-all-month-stress-10b
+	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
+
+.PHONY: seed-domain-user
+seed-domain-user: user
+
+.PHONY: seed-domain-product-basic
+seed-domain-product-basic: product-1
+
+.PHONY: seed-domain-product-week
+seed-domain-product-week: product-2
+
+.PHONY: seed-domain-product-year
+seed-domain-product-year: product-year
+
+.PHONY: seed-domain-inventory
+seed-domain-inventory: inventory
+
+.PHONY: seed-domain-procurement
+seed-domain-procurement: procurement
+
+.PHONY: seed-domain-supplier-payment
+seed-domain-supplier-payment: supplier-payment
+
+.PHONY: seed-domain-expense
+seed-domain-expense: expense
+
+.PHONY: seed-domain-employee-debt
+seed-domain-employee-debt: employee-debt
+
+.PHONY: seed-domain-employee-debt-payment
+seed-domain-employee-debt-payment: employee-debt-payment
+
+.PHONY: seed-domain-employee-debt-adjustment
+seed-domain-employee-debt-adjustment: employee-debt-adjustment
+
+.PHONY: seed-domain-payroll
+seed-domain-payroll: payroll-disbursement
+
+.PHONY: seed-weekly
+seed-weekly:
+	$(MAKE) seed-user
+	$(MAKE) seed-admin-cashier-area-access
+	$(MAKE) seed-create-basic
+	$(MAKE) seed-create-week
+	$(MAKE) seed-inventory
+	$(MAKE) seed-procurement
+	$(MAKE) seed-supplier-payment
+	$(MAKE) seed-expense
+	$(MAKE) seed-employee-debt
+	$(MAKE) seed-employee-debt-payment
+	$(MAKE) seed-employee-debt-adjustment
+	$(MAKE) seed-payroll-disbursement
+	$(MAKE) seed-transaction-week
+	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
+
+.PHONY: seed-monthly
+seed-monthly:
+	$(MAKE) seed-user
+	$(MAKE) seed-admin-cashier-area-access
+	$(MAKE) seed-create-basic
+	$(MAKE) seed-create-week
+	$(MAKE) seed-create-year
+	$(MAKE) seed-inventory
+	$(MAKE) seed-procurement
+	$(MAKE) seed-supplier-payment
+	$(MAKE) seed-expense
+	$(MAKE) seed-employee-debt
+	$(MAKE) seed-employee-debt-payment
+	$(MAKE) seed-employee-debt-adjustment
+	$(MAKE) seed-payroll-disbursement
+	$(MAKE) seed-transaction-week
+	$(MAKE) seed-transaction-month-normal
+	$(MAKE) seed-audit-baseline
+	php artisan projection:rebuild-indexes all
+
+.PHONY: seed-yearly
+seed-yearly: seed-monthly
+
+.PHONY: seed-load-real
+seed-load-real: create-all-month-normal-100m
+
+.PHONY: seed-load-peak
+seed-load-peak: create-all-month-peak-500m
+
+.PHONY: seed-load-stress
+seed-load-stress: create-all-month-stress-8b
+
+.PHONY: seed-load-10x
+seed-load-10x: create-all-month-stress-10b
+
+.PHONY: seed-load
+seed-load: seed-load-peak
+
+.PHONY: seed-max
+seed-max: seed-load-10x
+
+.PHONY: seed-help
+seed-help:
+	@echo ""
+	@echo "Simple seed aliases"
+	@echo "==================="
+	@echo ""
+	@echo "Per domain:"
+	@echo "  make seed-domain-user"
+	@echo "  make seed-domain-product-basic"
+	@echo "  make seed-domain-product-week"
+	@echo "  make seed-domain-product-year"
+	@echo "  make seed-domain-inventory"
+	@echo "  make seed-domain-procurement"
+	@echo "  make seed-domain-supplier-payment"
+	@echo "  make seed-domain-expense"
+	@echo "  make seed-domain-employee-debt"
+	@echo "  make seed-domain-employee-debt-payment"
+	@echo "  make seed-domain-employee-debt-adjustment"
+	@echo "  make seed-domain-payroll"
+	@echo ""
+	@echo "Sequential full flows:"
+	@echo "  make seed-weekly       Weekly create flow, audit baseline, projection rebuild"
+	@echo "  make seed-monthly      Monthly create flow, audit baseline, projection rebuild"
+	@echo "  make seed-yearly       Alias to monthly flow; year-dense master data is included"
+	@echo ""
+	@echo "Load profiles:"
+	@echo "  make seed-load-real    Realistic normal load profile"
+	@echo "  make seed-load-peak    Peak load profile"
+	@echo "  make seed-load-stress  Highest implemented stress profile"
+	@echo "  make seed-load-10x     10B upper ceiling load profile"
+	@echo "  make seed-load         Default load alias, currently peak"
+	@echo "  make seed-max          Alias to 10B upper ceiling load profile"
+	@echo ""
+	@echo "All aliases run existing create-only seed paths; transaction seeders use the application create handler."
+	@echo "Run from repo root."
+
 .PHONY: help
 help:
 	@echo ""
@@ -220,6 +363,14 @@ help:
 	@echo "  make create-all-month-normal-100m Run dataset v3 plus monthly normal 100M, then audit baseline and rebuild projections once"
 	@echo "  make create-all-month-peak-500m Run dataset v3 plus monthly peak 500M, then audit baseline and rebuild projections once"
 	@echo "  make create-all-month-stress-8b Run dataset v3 plus monthly stress 8B, then audit baseline and rebuild projections once"
+	@echo "  make create-all-month-stress-10b Run dataset v3 plus monthly stress 10B, then audit baseline and rebuild projections once"
+	@echo "  make seed-help                    Show the simple seed aliases for manual QA/load testing"
+	@echo "  make seed-weekly                  Sequential weekly create flow"
+	@echo "  make seed-monthly                 Sequential monthly create flow"
+	@echo "  make seed-load-real               Realistic normal load alias"
+	@echo "  make seed-load-peak               Peak load alias"
+	@echo "  make seed-load-stress             Highest implemented stress alias"
+	@echo "  make seed-load-10x                10B upper ceiling load alias"
 	@echo ""
 	@echo "Raw source-only targets:"
 	@echo "  make seed-create-all-v1           Source-only aggregate v1; does not run audit baseline"
