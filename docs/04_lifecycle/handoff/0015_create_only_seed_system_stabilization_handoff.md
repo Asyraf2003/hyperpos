@@ -1626,3 +1626,212 @@ edit/refund lifecycle
 
 Stress 8B may be resumed only by explicitly reopening this backlog item and completing the missing closure proofs.
 
+
+### STRESS-8B-CLOSURE-001 - Stress 8B aggregate, report, export, and verify closure
+
+Local date: 2026-06-04.
+
+Scope:
+
+- Resume paused Stress 8B backlog item.
+- Close full aggregate Stress 8B proof.
+- Close operational profit sanity proof.
+- Close PDF/XLSX export proof.
+- Close make verify proof.
+- Do not start 10B.
+- Do not start refund scaffold.
+
+#### Full aggregate make target proof
+
+Command:
+
+```text
+php artisan migrate:fresh --seed
+make create-all-month-stress-8b
+```
+
+Visible output:
+
+```text
+create-only transaction month-stress-8b notes: planned=3200 created=3200 replayed=0
+Create-only audit baseline seeded.
+Procurement projection: 24/24
+Supplier projection: 78/78
+Note projection: 3234/3234
+Projection rebuild selesai.
+```
+
+#### Corrected aggregate SQL proof
+
+Command:
+
+```text
+php artisan tinker --execute='... corrected Stress 8B aggregate SQL proof ...'
+```
+
+Visible output:
+
+```text
+notes = 3234
+work_items = 3234
+customer_payments = 2847
+note_history_projection = 3234
+notes_total_sum = 7848125000
+customer_payments_sum = 6566250000
+cash_in_rupiah = 6566250000
+refunded_rupiah = 0
+```
+
+Decision:
+
+Stress 8B full aggregate proof CLOSED.
+
+#### Operational profit sanity proof
+
+Command:
+
+```text
+php artisan tinker --execute='... GetOperationalProfitSummaryHandler Stress 8B sanity proof ...'
+```
+
+Visible output:
+
+```text
+success = true
+from_date = 2026-06-01
+to_date = 2026-06-30
+cash_in_rupiah = 6566250000
+refunded_rupiah = 0
+external_purchase_cost_rupiah = 1261720000
+store_stock_cogs_rupiah = 364093848
+product_purchase_cost_rupiah = 1625813848
+operational_expense_rupiah = 3262500
+payroll_disbursement_rupiah = 7525000
+employee_debt_cash_out_rupiah = 7050000
+cash_operational_profit_rupiah = 4922598652
+```
+
+Decision:
+
+Stress 8B operational profit sanity proof CLOSED.
+Cash operational profit is positive and inside the blueprint expected range.
+No operational profit report query patch required.
+
+#### PDF/XLSX export proof
+
+Command proof script:
+
+```text
+/tmp/hyperpos_stress_8b_export_proof.php
+```
+
+Script sanity:
+
+```text
+102 /tmp/hyperpos_stress_8b_export_proof.php
+No syntax errors detected in /tmp/hyperpos_stress_8b_export_proof.php
+```
+
+Visible output:
+
+```text
+success = true
+from_date = 2026-06-01
+to_date = 2026-06-30
+pdf_path = /home/asyraf/Code/laravel/bengkel2/app/storage/app/report-proof/laporan-laba-kas-operasional-stress-8b-2026-06-01-sampai-2026-06-30.pdf
+pdf_exists = true
+pdf_size_bytes = 19715
+pdf_header = %PDF
+html_contains_title = true
+html_contains_profit_label = true
+html_contains_profit_value = true
+html_contains_cash_in_value = true
+xlsx_path = /home/asyraf/Code/laravel/bengkel2/app/storage/app/report-proof/laporan-laba-kas-operasional-stress-8b-2026-06-01-sampai-2026-06-30.xlsx
+xlsx_exists = true
+xlsx_size_bytes = 6615
+sheet_names = ["Ringkasan"]
+title_A1 = Laporan Laba Kas Operasional
+period_B2 = 01 Juni 2026 s/d 30 Juni 2026
+cash_in_B6 = 6566250000
+external_purchase_B8 = 1261720000
+store_stock_cogs_B9 = 364093848
+product_purchase_cost_B10 = 1625813848
+operational_expense_B11 = 3262500
+payroll_B12 = 7525000
+employee_debt_B13 = 7050000
+profit_B14 = 4922598652
+profit_B14_matches_handler = true
+cash_in_B6_matches_handler = true
+```
+
+Generated artifacts:
+
+```text
+storage/app/report-proof/laporan-laba-kas-operasional-stress-8b-2026-06-01-sampai-2026-06-30.pdf
+storage/app/report-proof/laporan-laba-kas-operasional-stress-8b-2026-06-01-sampai-2026-06-30.xlsx
+```
+
+Decision:
+
+Stress 8B PDF export proof CLOSED.
+Stress 8B XLSX export proof CLOSED.
+
+#### Verify proof
+
+Command:
+
+```text
+make verify
+```
+
+Visible final output:
+
+```text
+Tests:    2 skipped, 1167 passed (6581 assertions)
+Duration: 68.10s
+```
+
+Decision:
+
+Stress 8B make verify proof CLOSED for the visible final test output.
+
+#### Final Stress 8B decision
+
+Stress 8B is no longer paused as an incomplete proof item.
+Stress 8B closure proof is complete for aggregate, projection, operational profit sanity, PDF/XLSX export, and visible make verify final output.
+Stress 8B remains an extreme-load profile and must not become the default normal development seed path.
+Do not route normal development through create-all-month-stress-8b.
+Do not start 10B automatically from this closure.
+Do not start refund scaffold as a continuation of Stress 8B.
+
+#### Progress after this closure
+
+```text
+CreateOnly seed stabilization = 100%
+Monthly normal 100M profile = 100%
+Peak 500M profile = 100%
+Stress 8B profile = 100%
+Full serious create-all seed system = 94-96%
+```
+
+Reason full serious create-all seed system is not 100%:
+
+```text
+10B optional ceiling is not implemented.
+Refund scaffold is not implemented.
+Full edit/refund lifecycle seed closure is not done.
+Normal application behavior work still remains outside create-only scale profiles.
+```
+
+#### Next valid work direction
+
+Return focus to application behavior work:
+
+```text
+create transaction
+reports
+edit/refund lifecycle
+```
+
+Do not continue to 10B unless the optional ceiling profile is explicitly reopened.
+Do not start refund scaffold unless it is explicitly opened as its own active step.
