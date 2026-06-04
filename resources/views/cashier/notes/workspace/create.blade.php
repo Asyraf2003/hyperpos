@@ -113,6 +113,40 @@
             background: #fff;
         }
 
+        .cashier-workspace-stepper .workspace-answer-card {
+            border: 1px solid var(--workspace-border) !important;
+            border-left: .3rem solid var(--workspace-accent) !important;
+            border-radius: .5rem !important;
+            padding: 1rem !important;
+            margin-bottom: .85rem !important;
+        }
+
+        .cashier-workspace-stepper .workspace-answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: .75rem;
+            padding-bottom: .85rem;
+            margin-bottom: .85rem;
+            border-bottom: 1px solid #eceff1;
+        }
+
+        .cashier-workspace-stepper .workspace-answer-field {
+            border: 1px solid #eceff1;
+            border-radius: .5rem;
+            background: #fff;
+            padding: .85rem;
+        }
+
+        .cashier-workspace-stepper .workspace-answer-field + .workspace-answer-field {
+            margin-top: .75rem;
+        }
+
+        .cashier-workspace-stepper .workspace-answer-card .form-label {
+            color: #3c4043;
+            font-weight: 700;
+        }
+
         .cashier-workspace-stepper details.workspace-step-card {
             padding: 0;
         }
