@@ -29,7 +29,7 @@
 | Package store stock pricing | `CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer.php` | Business pricing plus `ProductReaderPort`. | Do not move as-is; split catalog lookup from pure pricing if refactored. |
 | Package product line composer | `CreateTransactionWorkspaceServiceStoreStockPackageProductLinesComposer.php` | Needs `ProductReaderPort` and validates product existence/current price. | Keep Application; pure line total math can be extracted later if needed. |
 | Current revision row settlement | `CurrentRevision/*SettlementSummaryBuilder.php` | Mostly deterministic settlement math, but used for read model projection/presentation labels. | Keep Application until read model semantics are stable. |
-| Current revision product name | `CurrentRevision/CurrentRevisionPackageProductNameResolver.php` | Static helper mixes pure snapshot fallback with direct `DB` query. | Fix boundary by moving current-name lookup behind a Product reader/adapter; do not move to Core. |
+| Current revision product name | `CurrentRevision/CurrentRevisionPackageProductNameResolver.php` | Static helper now only resolves snapshot/current-name fallback. Current product lookup moved to `ProductReaderPort` through `CurrentRevisionPackageBreakdownMapper`. | Boundary smell fixed; do not move to Core. |
 | Inline payment amount | `CreateTransactionWorkspaceInlinePaymentAmountResolver.php` | Contains real payment rule but depends on allocation/refund ports. | Keep Application; optionally extract pure `outstanding(total, paid, refunded)` policy later. |
 
 ## DECISION
@@ -40,10 +40,19 @@
 
 ## RECOMMENDED NEXT STEPS
 
-1. Extract `NoteOperationalStatusEvaluator` to a Core policy and leave the Application class as a compatibility wrapper or update imports in one small slice.
-2. Run targeted unit tests for note status and affected detail/refund UI mappers.
-3. Run `make verify`.
-4. In a separate slice, replace `CurrentRevisionPackageProductNameResolver::currentNames()` DB access with a port-backed Application collaborator.
+1. Replace `CurrentRevisionPackageProductNameResolver::currentNames()` DB access with a port-backed Application collaborator.
+2. Extract `WorkItemOperationalStatusResolver` to Core after adding direct Core unit tests.
+3. Extract `BuildNoteRevisionSettlement` only after the Application DTO boundary is separated.
+4. Split package pricing lookup from pure package pricing math if package rules grow further.
+
+## IMPLEMENTATION UPDATE
+
+- `NoteOperationalStatusEvaluator` was extracted into Core as `App\Core\Note\Note\NoteOperationalStatusPolicy`.
+- The original Application service remains as a compatibility wrapper so existing service wiring and imports stay stable.
+- Targeted proof after extraction: `10 passed (50 assertions)`.
+- `CurrentRevisionPackageProductNameResolver` no longer imports or calls `DB`.
+- Current revision package current-name lookup now goes through `ProductReaderPort` in `CurrentRevisionPackageBreakdownMapper`.
+- Targeted proof after product-name boundary fix: `5 passed (20 assertions)`.
 
 ## PROOF
 

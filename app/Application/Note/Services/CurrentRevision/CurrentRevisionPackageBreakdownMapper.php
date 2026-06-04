@@ -6,9 +6,15 @@ namespace App\Application\Note\Services\CurrentRevision;
 
 use App\Core\Note\Revision\NoteRevisionLineSnapshot;
 use App\Core\Note\WorkItem\WorkItem;
+use App\Ports\Out\ProductCatalog\ProductReaderPort;
 
 final class CurrentRevisionPackageBreakdownMapper
 {
+    public function __construct(
+        private readonly ProductReaderPort $products,
+    ) {
+    }
+
     /** @param array<string, mixed> $payload */
     public function map(NoteRevisionLineSnapshot $line, array $payload): ?array
     {
@@ -44,7 +50,7 @@ final class CurrentRevisionPackageBreakdownMapper
             ? array_values(array_filter($payload['store_stock_lines'], 'is_array'))
             : [];
 
-        $names = CurrentRevisionPackageProductNameResolver::currentNames(array_map(
+        $names = $this->currentNames(array_map(
             static fn (array $line): string => trim((string) ($line['product_id'] ?? '')),
             $lines,
         ));
@@ -66,5 +72,24 @@ final class CurrentRevisionPackageBreakdownMapper
         }
 
         return $parts;
+    }
+
+    /**
+     * @param list<string> $productIds
+     * @return array<string, string>
+     */
+    private function currentNames(array $productIds): array
+    {
+        $names = [];
+
+        foreach (array_values(array_unique(array_filter($productIds))) as $productId) {
+            $product = $this->products->getById($productId);
+
+            if ($product !== null) {
+                $names[$productId] = $product->namaBarang();
+            }
+        }
+
+        return $names;
     }
 }

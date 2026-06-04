@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services\CurrentRevision;
 
-use Illuminate\Support\Facades\DB;
-
 final class CurrentRevisionPackageProductNameResolver
 {
     /**
@@ -23,24 +21,5 @@ final class CurrentRevisionPackageProductNameResolver
         }
 
         return $currentNames[$productId] ?? $productId;
-    }
-
-    /**
-     * @param list<string> $productIds
-     * @return array<string, string>
-     */
-    public static function currentNames(array $productIds): array
-    {
-        $ids = array_values(array_unique(array_filter($productIds)));
-
-        if ($ids === []) {
-            return [];
-        }
-
-        return DB::table('products')
-            ->whereIn('id', $ids)
-            ->pluck('nama_barang', 'id')
-            ->map(static fn ($name): string => (string) $name)
-            ->all();
     }
 }

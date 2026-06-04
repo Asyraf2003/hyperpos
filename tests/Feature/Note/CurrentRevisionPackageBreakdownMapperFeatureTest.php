@@ -27,7 +27,7 @@ final class CurrentRevisionPackageBreakdownMapperFeatureTest extends TestCase
             'line_total_rupiah' => 100000,
         ]);
 
-        $mapped = (new CurrentRevisionPackageBreakdownMapper())->map($line, $line->payload());
+        $mapped = app(CurrentRevisionPackageBreakdownMapper::class)->map($line, $line->payload());
 
         self::assertIsArray($mapped);
         self::assertSame('Nama Snapshot Lama', $mapped['parts'][0]['product_name']);
@@ -45,7 +45,7 @@ final class CurrentRevisionPackageBreakdownMapperFeatureTest extends TestCase
             'line_total_rupiah' => 50000,
         ]);
 
-        $mapped = (new CurrentRevisionPackageBreakdownMapper())->map($line, $line->payload());
+        $mapped = app(CurrentRevisionPackageBreakdownMapper::class)->map($line, $line->payload());
 
         self::assertIsArray($mapped);
         self::assertSame('Nama Current Legacy', $mapped['parts'][0]['product_name']);
