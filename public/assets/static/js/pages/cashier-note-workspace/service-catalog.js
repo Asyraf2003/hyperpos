@@ -195,13 +195,13 @@
 
     serviceDisplay(row)?.addEventListener("input", () => {
       row.dataset.servicePriceManual = "1";
-      setTimeout(() => void ensureCatalog(row), 0);
     });
+    serviceDisplay(row)?.addEventListener("blur", () => void ensureCatalog(row));
 
     packageDisplay(row)?.addEventListener("input", () => {
       row.dataset.servicePackageAutofilled = "0";
-      setTimeout(() => void ensureCatalog(row), 0);
     });
+    packageDisplay(row)?.addEventListener("blur", () => void ensureCatalog(row));
 
     row.addEventListener("input", (event) => {
       if (event.target instanceof Element && event.target.matches("[data-qty-input]")) {
@@ -210,7 +210,7 @@
     });
 
     document.addEventListener("click", (event) => {
-      if (!row.contains(event.target)) clearResults(row);
+      if (event.target instanceof Node && !row.contains(event.target)) clearResults(row);
     });
 
     NS.syncServiceDefaults(row);
