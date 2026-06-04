@@ -45,7 +45,7 @@ final class LegacyAllocatedNoteDetailFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-legacy']))
             ->assertOk()
             ->assertSee('1 Close')
-            ->assertSee('Daftar Line Nota')
+            ->assertSee('List Line')
             ->assertDontSee('Buka Modal Refund')
             ->assertDontSee('Refund Nota');
     }

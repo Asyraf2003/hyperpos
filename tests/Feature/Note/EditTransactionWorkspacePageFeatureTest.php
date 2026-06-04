@@ -232,10 +232,10 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Edit Nota');
-        $response->assertSee('Settlement pembayaran backend');
-        $response->assertSee('Gross total: 100.000');
-        $response->assertSee('Net paid: 40.000');
-        $response->assertSee('Payable now: 60.000');
+        $response->assertSee('Ringkasan pembayaran tersimpan');
+        $response->assertSee('Total nota: 100.000');
+        $response->assertSee('Sudah dibayar: 40.000');
+        $response->assertSee('Sisa yang perlu dibayar: 60.000');
     }
 
     public function test_cashier_edit_workspace_exposes_backend_payable_amount_to_payment_calculator(): void

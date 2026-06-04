@@ -39,10 +39,10 @@ final class ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest extends TestCa
         $response->assertSee('Proses Nota');
         $response->assertSee('id="workspace-payment-modal"', false);
 
-        $response->assertSee('Settlement pembayaran backend');
-        $response->assertSee('Gross total: 100.000');
-        $response->assertSee('Net paid: 100.000');
-        $response->assertSee('Payable now: 0');
+        $response->assertSee('Ringkasan pembayaran tersimpan');
+        $response->assertSee('Total nota: 100.000');
+        $response->assertSee('Sudah dibayar: 100.000');
+        $response->assertSee('Sisa yang perlu dibayar: 0');
 
         $response->assertSee('data-backend-payable-rupiah="0"', false);
         $response->assertSee('data-backend-payment-basis="backend_outstanding_settlement"', false);
