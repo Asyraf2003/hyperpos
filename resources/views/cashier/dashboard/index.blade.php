@@ -86,11 +86,6 @@
     </style>
 
     <div class="cashier-home">
-        <div class="ui-page-intro">
-            <div class="small text-muted text-uppercase fw-semibold">Pusat Kerja Kasir</div>
-            <h4 class="ui-page-intro-title">Dashboard Kasir</h4>
-            <p class="ui-page-intro-subtitle">Pilih menu kerja utama.</p>
-        </div>
 
         <div class="cashier-home-grid">
             <a href="{{ route('cashier.notes.workspace.create') }}" class="cashier-home-card">
