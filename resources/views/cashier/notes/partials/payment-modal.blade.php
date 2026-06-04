@@ -61,7 +61,7 @@
                         Tagihan aktif dipilih otomatis. Data billing row tetap dikirim hidden untuk allocation.
                       </div>
                     </div>
-                    <span class="badge bg-light text-dark border" id="detail-payment-mode-text">
+                    <span class="badge border" id="detail-payment-mode-text">
                       {{ ($note['can_show_partial_payment_action'] ?? false) ? 'Bayar Sebagian' : 'Lunasi' }}
                     </span>
                   </div>

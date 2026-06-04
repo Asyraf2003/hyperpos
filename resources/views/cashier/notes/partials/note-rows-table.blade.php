@@ -46,7 +46,7 @@
               </td>
               <td>{{ $row['type_label'] }}</td>
               <td>
-                <span class="badge bg-light text-dark border text-uppercase">
+                <span class="badge border text-uppercase">
                   {{ (string) ($row['line_status'] ?? '') !== '' ? $row['line_status'] : '-' }}
                 </span>
               </td>

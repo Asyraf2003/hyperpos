@@ -5,7 +5,7 @@
                 <h4 class="card-title mb-1">Refund Line Close Terpilih</h4>
             </div>
 
-            <span class="badge bg-light text-dark border">Panel Refund</span>
+            <span class="badge border">Panel Refund</span>
         </div>
     </div>
 
@@ -119,7 +119,7 @@
                     <button type="submit" class="btn btn-primary" id="note-refund-submit">Catat Refund Line</button>
                 </div>
             @else
-                <div class="border rounded p-3 bg-light">
+                <div class="border rounded p-3">
                     <div class="fw-semibold mb-1">Belum ada sumber refund yang bisa dipilih</div>
                     <div class="text-muted small">
                         Semua pembayaran pada nota ini sudah habis direfund atau data pembayaran lama belum tersedia untuk flow refund.

@@ -13,7 +13,7 @@
                         </p>
                     </div>
 
-                    <span class="badge bg-light text-dark border">
+                    <span class="badge border">
                         {{ count($note['rows']) }} Line
                     </span>
                 </div>
@@ -62,13 +62,13 @@
                     <div class="small text-muted mb-2">Komposisi Status Line</div>
 
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark border">
+                        <span class="badge border">
                             Open: {{ (int) ($note['line_summary']['open_count'] ?? 0) }}
                         </span>
-                        <span class="badge bg-light text-dark border">
+                        <span class="badge border">
                             Close: {{ (int) ($note['line_summary']['close_count'] ?? 0) }}
                         </span>
-                        <span class="badge bg-light text-dark border">
+                        <span class="badge border">
                             Refund: {{ (int) ($note['line_summary']['refund_count'] ?? 0) }}
                         </span>
                     </div>
@@ -109,7 +109,7 @@
                 </div>
 
                 @if ((int) $note['refund_required_rupiah'] > 0)
-                    <div class="border rounded p-3 mt-3 bg-light">
+                    <div class="border rounded p-3 mt-3">
                         <div class="small text-muted">Refund Wajib Saat Ini</div>
                         <div class="fs-5 fw-bold">{{ number_format($note['refund_required_rupiah'], 0, ',', '.') }}</div>
                     </div>

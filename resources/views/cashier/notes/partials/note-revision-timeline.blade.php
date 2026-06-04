@@ -5,7 +5,7 @@
         <h4 class="card-title mb-1">Riwayat Perubahan</h4>
         <p class="mb-0 text-muted">Perubahan nota yang pernah disimpan dari halaman edit.</p>
       </div>
-      <span class="badge bg-light-info text-info border">Riwayat Nota</span>
+      <span class="badge border">Riwayat Nota</span>
     </div>
   </div>
   <div class="card-body">
@@ -44,7 +44,7 @@
         <div class="border rounded p-3 h-100">
           <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
             <h5 class="mb-0">Versi Awal</h5>
-            <span class="badge bg-light text-dark border">
+            <span class="badge border">
               R{{ (int) ($baselineRevision['revision_number'] ?? 0) }}
             </span>
           </div>
@@ -79,7 +79,7 @@
           <h5 class="mb-1">Daftar Perubahan</h5>
           <p class="text-muted mb-0 small">Urutan perubahan yang pernah tersimpan pada nota ini.</p>
         </div>
-        <span class="badge bg-light text-dark border">{{ count($timelineRevisions) }} Perubahan</span>
+        <span class="badge border">{{ count($timelineRevisions) }} Perubahan</span>
       </div>
 
       @if ($timelineRevisions === [])
@@ -93,7 +93,7 @@
                   <h6 class="mb-1">Perubahan R{{ (int) ($entry['revision_number'] ?? 0) }}</h6>
                   <small class="text-muted">{{ \App\Support\ViewDateFormatter::display($entry['created_at'] ?? null, true) }}</small>
                 </div>
-                <span class="badge bg-light-secondary text-secondary align-self-start">
+                <span class="badge align-self-start">
                   Revisi Nota
                 </span>
               </div>
@@ -108,7 +108,7 @@
                 </div>
               @endif
 
-              <div class="border rounded p-3 bg-light-subtle">
+              <div class="border rounded p-3">
                 <div class="row g-3">
                   <div class="col-12 col-md-4">
                     <small class="text-muted d-block">Customer</small>

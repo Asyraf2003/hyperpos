@@ -21,7 +21,7 @@
                     <div class="fw-semibold">Line Terpilih</div>
                     <div class="small text-muted">Hanya line yang Anda klik akan diproses. Line belum dibayar akan dibatalkan tanpa refund uang.</div>
                   </div>
-                  <span class="badge bg-light text-dark border" id="refund-modal-selected-count">0</span>
+                  <span class="badge border" id="refund-modal-selected-count">0</span>
                 </div>
 
                 <div id="note-refund-selected-lines" class="d-flex flex-column gap-2">

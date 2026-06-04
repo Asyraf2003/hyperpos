@@ -9,7 +9,7 @@
                     </p>
                 </div>
 
-                <span class="badge bg-light text-dark border">Panel Bayar</span>
+                <span class="badge border">Panel Bayar</span>
             </div>
 
             <p class="mt-2 mb-0 text-muted small">
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div class="border rounded p-3 mb-4 bg-light">
+                <div class="border rounded p-3 mb-4">
                     <div class="fw-semibold mb-1">Catatan Transisi</div>
                     <div class="small text-muted">
                         Opsi penuh atau sebagian tidak lagi ditonjolkan. Fokus utamanya sekarang adalah memilih line Open lalu mengisi nominal pembayaran untuk line yang dipilih.

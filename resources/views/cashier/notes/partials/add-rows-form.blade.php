@@ -3,7 +3,7 @@
         <h5 class="card-title mb-1">Edit Rincian</h5>
 
         @if (($note['can_edit_workspace'] ?? false) && $note['can_add_rows'])
-            <div class="border rounded p-3 bg-light mb-3">
+            <div class="border rounded p-3 mb-3">
                 <div class="fw-semibold mb-1">Edit nota tersedia</div>
                 <div class="text-muted small">
                     Gunakan form edit untuk menambah atau memperbaiki rincian nota.
@@ -19,7 +19,7 @@
                 </a>
             </div>
         @else
-            <div class="border rounded p-3 bg-light">
+            <div class="border rounded p-3">
                 <div class="fw-semibold mb-1">Workspace tidak aktif</div>
 
                 @if ($note['is_closed'])

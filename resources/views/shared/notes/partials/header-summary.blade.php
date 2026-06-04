@@ -4,7 +4,7 @@
       <div>
         <h4 class="card-title mb-0">Header Nota</h4>
       </div>
-      <span class="badge bg-light text-dark border">
+      <span class="badge border">
         {{ count($note['rows']) }} Line
       </span>
     </div>
@@ -41,7 +41,7 @@
     <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
       <small>Status Operasional</small>
       <div class="text-end">
-        <span class="badge bg-light text-dark border text-uppercase">
+        <span class="badge border text-uppercase">
           {{ $note['operational_status'] ?? $note['payment_status'] ?? '-' }}
         </span>
       </div>

@@ -238,7 +238,7 @@
                 <div class="text-end small text-muted">
                   <div>{{ \App\Support\ViewDateFormatter::display($auditItem['occurred_at'] ?? null, true) }}</div>
                   @if (! empty($auditItem['actor_role']))
-                    <div class="badge bg-light-secondary text-secondary mt-1">{{ $auditItem['actor_role'] }}</div>
+                    <div class="badge mt-1">{{ $auditItem['actor_role'] }}</div>
                   @endif
                 </div>
               </div>

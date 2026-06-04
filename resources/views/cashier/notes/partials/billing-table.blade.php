@@ -5,7 +5,7 @@
         <h4 class="card-title mb-1">Rincian Tagihan</h4>
         <p class="mb-0 text-muted">Urutan tagihan yang dipakai saat pembayaran nota.</p>
       </div>
-      <span class="badge bg-light text-dark border">{{ count($note['billing_rows'] ?? []) }} Billing Row</span>
+      <span class="badge border">{{ count($note['billing_rows'] ?? []) }} Billing Row</span>
     </div>
   </div>
   <div class="card-body">
@@ -34,7 +34,7 @@
                 <div class="small text-muted">Urutan tagih {{ $row['component_order'] }}</div>
               </td>
               <td>
-                <span class="badge bg-light text-dark border">{{ $row['status_label'] }}</span>
+                <span class="badge border">{{ $row['status_label'] }}</span>
               </td>
               <td class="text-end">{{ number_format((int) ($row['component_total_rupiah'] ?? 0), 0, ',', '.') }}</td>
               <td class="text-end">{{ number_format((int) ($row['net_paid_rupiah'] ?? 0), 0, ',', '.') }}</td>

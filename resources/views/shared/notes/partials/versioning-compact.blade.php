@@ -4,7 +4,7 @@
       <div>
         <h4 class="card-title mb-0">Versioning Nota</h4>
       </div>
-      <span class="badge bg-light-primary text-primary border-0">{{ $revisionCount }} Revision</span>
+      <span class="badge border">{{ $revisionCount }} Revision</span>
     </div>
   </div>
 
@@ -79,7 +79,7 @@
               <div class="text-end small text-muted">
                 <div>{{ \App\Support\ViewDateFormatter::display($entry['created_at'] ?? null, true) }}</div>
                 @if (!empty($entry['created_by_actor_id']))
-                  <div class="badge bg-light-secondary text-secondary mt-1">
+                  <div class="badge mt-1">
                     {{ $entry['created_by_actor_id'] }}
                   </div>
                 @endif
