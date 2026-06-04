@@ -4,7 +4,7 @@
 
 - Date: 2026-06-04
 - Area: Cashier UI
-- Status: Audit recorded, implementation not started
+- Status: Audit recorded, implementation started
 - Related blueprint: `docs/03_blueprints/ui/0011_cashier_stepper_mobile_ui_redesign.md`
 - Active concern: Cashier UI supports the global light theme visually, but is not ready for consistent dark/light theme switching.
 
@@ -333,18 +333,15 @@ wc -l resources/views/cashier/dashboard/*.blade.php resources/views/cashier/note
 ## Current Progress
 
 - Audit recorded in this blueprint.
-- Implementation not started.
-- No theme patch has been applied yet.
+- Cashier theme token foundation has been added in `public/assets/static/css/ui-foundation.css`.
+- Cashier dashboard first pass has been patched to consume cashier theme tokens.
+- Cashier note index and filter drawer first pass has been patched to consume cashier theme tokens.
 - No test or browser proof has been run yet.
+- Targeted HTTP proof has passed for cashier dashboard access and cashier note history page/table.
+- Browser visual proof has not been run yet.
 
 ## Next Active Step
 
-Build the final implementation map from this blueprint:
+Continue implementation with the cashier workspace shell and workspace partials.
 
-- file path
-- theme issue
-- whether patch is CSS-only, Blade class replacement, JS class replacement, or shared-partial scoping
-- risk level
-- verification command
-
-After that, start implementation with the lowest-risk shared cashier theme token layer.
+The workspace is the next active theme area because it is the main create/edit transaction surface and already has local light-only variables that can be migrated to the cashier token contract.
