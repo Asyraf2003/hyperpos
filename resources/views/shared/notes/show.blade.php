@@ -35,7 +35,8 @@
       border-top: .45rem solid var(--note-detail-accent);
       border-radius: .5rem;
       background: var(--note-detail-card);
-      overflow: hidden;
+      overflow: visible;
+      box-shadow: none;
     }
 
     .note-detail-mobile-summary {
@@ -46,6 +47,10 @@
       cursor: pointer;
       list-style: none;
       border-bottom: 1px solid var(--note-detail-border);
+    }
+
+    .note-detail-mobile-summary > .flex-grow-1 {
+      min-width: 0;
     }
 
     .note-detail-mobile-summary::-webkit-details-marker {
@@ -89,6 +94,7 @@
       align-items: center;
       justify-content: center;
       margin-left: auto;
+      border-radius: 50%;
       color: var(--note-detail-accent);
       transition: transform .15s ease;
     }
@@ -244,7 +250,7 @@
       <details class="note-detail-mobile-step" open>
         <summary class="note-detail-mobile-summary">
           <span class="note-detail-mobile-number">1</span>
-          <div>
+          <div class="flex-grow-1">
             <h4 class="note-detail-mobile-title">Info Nota</h4>
             <p class="note-detail-mobile-help">Identitas customer, tanggal, dan status nota.</p>
           </div>
@@ -260,7 +266,7 @@
       <details class="note-detail-mobile-step" open>
         <summary class="note-detail-mobile-summary">
           <span class="note-detail-mobile-number">2</span>
-          <div>
+          <div class="flex-grow-1">
             <h4 class="note-detail-mobile-title">Rincian Nota</h4>
             <p class="note-detail-mobile-help">Daftar rincian nota dan status setiap line.</p>
           </div>
@@ -276,7 +282,7 @@
       <details class="note-detail-mobile-step" open>
         <summary class="note-detail-mobile-summary">
           <span class="note-detail-mobile-number">3</span>
-          <div>
+          <div class="flex-grow-1">
             <h4 class="note-detail-mobile-title">Review &amp; Pembayaran</h4>
             <p class="note-detail-mobile-help">Edit, pembayaran, dan refund setelah rincian nota dicek.</p>
           </div>
@@ -292,7 +298,7 @@
       <details class="note-detail-mobile-step">
         <summary class="note-detail-mobile-summary">
           <span class="note-detail-mobile-number">4</span>
-          <div>
+          <div class="flex-grow-1">
             <h4 class="note-detail-mobile-title">Riwayat Nota</h4>
             <p class="note-detail-mobile-help">Riwayat perubahan nota terbaru.</p>
           </div>
