@@ -1,6 +1,6 @@
 # error-log
 
-29 individual bug and security findings in the Hyperpos system.
+34 individual bug and security findings in the Hyperpos system.
 
 ## Index
 
@@ -35,6 +35,11 @@
 | 027 | `027-admin-invoice-creation-bypasses-transaction-entry-gate.md` | Admin invoice creation bypasses the transaction-entry gate |
 | 028 | `028-di-fix-exposes-unsafe-proof-attachment-content-type.md` | DI fix exposes unsafe proof attachment content type |
 | 029 | `029-cashier-create-page-leaks-total-note-count.md` | Cashier create page leaks total note count |
+| 030 | `0030_locked_dependency_security_advisories.md` | Locked dependency security advisories remain open |
+| 031 | `0031_transaction_workspace_duplicate_submit_without_idempotency_key.md` | Transaction workspace duplicate submit can create duplicate financial rows without idempotency key |
+| 032 | `0032_inventory_stock_value_excel_formula_injection.md` | Inventory stock value Excel export writes product text through formula-capable cells |
+| 033 | `0033_web_and_mobile_login_without_rate_limiting.md` | Web and mobile login endpoints lack explicit rate limiting |
+| 034 | `0034_product_lookup_unbounded_query_and_per_row_inventory_reads.md` | Product lookup fetches unbounded product rows and performs per-row inventory reads |
 
 ## Rules
 

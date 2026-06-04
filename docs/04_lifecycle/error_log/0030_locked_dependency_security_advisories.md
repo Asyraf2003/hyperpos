@@ -1,0 +1,111 @@
+# 030 - Locked dependency security advisories remain open
+
+Status: Reported
+Keparahan: High
+Klasifikasi: dependency security / supply-chain hygiene
+
+## Ringkasan
+
+`composer.lock` saat ini masih berisi package yang terkena advisory keamanan aktif.
+
+Temuan ini bukan proof exploit lokal terhadap fitur tertentu. Ini adalah boundary security hygiene: dependency yang dipakai aplikasi berada pada rentang versi terdampak menurut `composer audit --locked`.
+
+Karena package terdampak mencakup Laravel framework dan beberapa komponen Symfony inti, issue ini perlu ditutup dengan update dependency terkendali dan verification suite penuh.
+
+## Bukti awal
+
+Command:
+
+`composer audit --locked`
+
+Result:
+
+`Found 12 security vulnerability advisories affecting 8 packages`
+
+Exit code:
+
+`1`
+
+Locked runtime packages yang terdampak:
+
+`composer show --locked --no-dev | rg '^(laravel/framework|symfony/http-foundation|symfony/http-kernel|symfony/mailer|symfony/mime|symfony/polyfill-intl-idn|symfony/routing)\s'`
+
+Output:
+
+- `laravel/framework 12.53.0`
+- `symfony/http-foundation 7.4.7`
+- `symfony/http-kernel 7.4.7`
+- `symfony/mailer 7.4.6`
+- `symfony/mime 7.4.7`
+- `symfony/polyfill-intl-idn 1.33.0`
+- `symfony/routing 7.4.6`
+
+Locked dev package yang juga muncul di audit:
+
+`composer show --locked | rg '^(symfony/yaml)\s'`
+
+Output:
+
+- `symfony/yaml 8.0.6`
+
+## Advisory yang tercatat
+
+| Package | Locked version | Advisory / CVE | Ringkasan |
+|---|---:|---|---|
+| `laravel/framework` | `12.53.0` | `PKSA-mdq4-51ck-6kdq`, `CVE-2026-48019` | Laravel CRLF injection in default email rule; affected `<12.60.0` for Laravel 12. |
+| `symfony/http-foundation` | `7.4.7` | `PKSA-y6py-qpv1-h52p`, `CVE-2026-48736` | SSRF bypass in `NoPrivateNetworkHttpClient`; affected `<7.4.13` for Symfony 7.4. |
+| `symfony/http-kernel` | `7.4.7` | `PKSA-dw7n-x7f5-zf63`, `CVE-2026-45075` | HEAD request bypass in method filters; affected `<7.4.12`. |
+| `symfony/mailer` | `7.4.6` | `PKSA-28rh-rzzn-djk4`, `CVE-2026-45068` | Sendmail argument injection via dash-prefixed recipient; affected `<7.4.12`. |
+| `symfony/mime` | `7.4.7` | `PKSA-wtxr-p26d-nn42`, `CVE-2026-45070` | Email header injection via MIME parameter names; affected `<7.4.12`. |
+| `symfony/mime` | `7.4.7` | `PKSA-2n2k-66v2-bwg3`, `CVE-2026-45067` | Email header / SMTP command injection via CRLF in `Address`; affected `<7.4.12`. |
+| `symfony/polyfill-intl-idn` | `1.33.0` | `PKSA-dwsq-ppd2-mb1x`, `CVE-2026-46644` | Insecure equivalence in IDN polyfill; affected `<1.38.1`. |
+| `symfony/routing` | `7.4.6` | `PKSA-bf7t-jnpz-492k`, `CVE-2026-48784` | URL generation dot-segment encoding issue; affected `<7.4.13`. |
+| `symfony/routing` | `7.4.6` | `PKSA-yc7t-91v9-99xs`, `CVE-2026-45065` | URL generation route-requirement bypass; affected `<7.4.12`. |
+| `symfony/yaml` | `8.0.6` | `PKSA-v5yj-8nmz-sk2q`, `CVE-2026-45304` | YAML recursive collection alias memory allocation issue; affected `<8.0.12`. |
+| `symfony/yaml` | `8.0.6` | `PKSA-ft77-7h5f-p3r6`, `CVE-2026-45305` | YAML parser ReDoS; affected `<8.0.12`. |
+| `symfony/yaml` | `8.0.6` | `PKSA-b14r-zh1d-vdrc`, `CVE-2026-45133` | YAML parser stack exhaustion; affected `<8.0.12`. |
+
+## Dampak
+
+Risiko utama adalah aplikasi membawa dependency yang sudah diketahui rentan. Dampak spesifik bergantung pada apakah aplikasi memakai jalur yang terdampak, misalnya email validation, email address construction, URL generation, HTTP client network filtering, atau YAML parsing.
+
+Meski exploit lokal belum dibuktikan, dependency advisories tetap harus dibaca sebagai blocker security hygiene sebelum klaim project production-ready.
+
+## Root cause
+
+`composer.lock` belum diperbarui ke versi patch yang keluar setelah advisory tersebut.
+
+## Kontrol yang sudah ada
+
+- `make verify` lulus pada baseline saat audit.
+- Full Pest suite lulus pada baseline saat audit.
+- Tidak ada proof lokal bahwa advisory ini sudah dieksploitasi pada fitur aplikasi.
+
+## Remediasi yang disarankan
+
+Lakukan update dependency terkendali, minimal menutup rentang affected versions yang tercatat oleh audit.
+
+Candidate command untuk fase patch:
+
+`composer update laravel/framework symfony/http-foundation symfony/http-kernel symfony/mailer symfony/mime symfony/polyfill-intl-idn symfony/routing symfony/yaml --with-all-dependencies`
+
+Setelah update, ulangi:
+
+- `composer audit --locked`
+- `composer check-platform-reqs --lock`
+- `make verify`
+- Focused smoke untuk login, email/validation path, report export, dan route generation bila ada perubahan transitive signifikan.
+
+## Keputusan owner yang mungkin dibutuhkan
+
+- Apakah update dependency boleh langsung dilakukan pada branch sekarang.
+- Apakah `symfony/yaml` dev-only tetap harus ditutup dalam patch yang sama atau boleh dipisah.
+- Apakah production PHP target tetap mengikuti `composer.json` atau perlu dibakukan ulang setelah dependency update.
+
+## Verification gap
+
+Belum ada patch dependency.
+
+Belum ada proof bahwa `composer audit --locked` menjadi bersih setelah update.
+
+Belum ada proof regresi setelah dependency update.
