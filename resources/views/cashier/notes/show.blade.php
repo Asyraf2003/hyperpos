@@ -8,18 +8,20 @@
 <section class="section">
   <style>
     .section:has(.cashier-note-detail) {
-      background: #f0ebf8;
+      --detail-card: var(--cashier-surface);
+      --detail-surface-subtle: var(--cashier-surface-subtle);
+      --detail-border: var(--cashier-border);
+      --detail-border-strong: var(--cashier-border-strong);
+      --detail-muted: var(--cashier-muted);
+      --detail-text: var(--cashier-text);
+      --detail-accent: var(--cashier-accent);
+      --detail-accent-soft: var(--cashier-accent-soft);
+      --detail-accent-border: var(--cashier-accent-border);
+      background: var(--cashier-page-bg);
       padding-block: 1rem 2rem;
     }
 
     .cashier-note-detail {
-      --detail-card: #ffffff;
-      --detail-border: #dadce0;
-      --detail-muted: #5f6368;
-      --detail-text: #202124;
-      --detail-accent: #673ab7;
-      --detail-accent-soft: #ede7f6;
-      --detail-accent-border: #d1c4e9;
       max-width: 720px;
       margin: 0 auto;
     }
@@ -43,7 +45,7 @@
       align-items: flex-start;
       gap: .85rem;
       padding: 1rem 1rem .75rem;
-      border-bottom: 1px solid rgba(15, 23, 42, .07);
+      border-bottom: 1px solid var(--detail-border);
     }
 
     summary.cashier-note-detail-header {
@@ -118,13 +120,15 @@
     .cashier-note-detail .card {
       border: 1px solid var(--detail-border);
       border-radius: .5rem;
+      background: var(--detail-card);
+      color: var(--detail-text);
       box-shadow: none !important;
       overflow: hidden;
     }
 
     .cashier-note-detail .card-header {
-      border-bottom: 1px solid #eceff1;
-      background: #fff;
+      border-bottom: 1px solid var(--detail-border);
+      background: var(--detail-card);
       padding: 1rem;
     }
 
@@ -140,22 +144,25 @@
     }
 
     .cashier-note-detail .badge {
-      border-color: #dadce0 !important;
+      border-color: var(--detail-border) !important;
       border-radius: 999px;
-      background: #fff !important;
-      color: #3c4043 !important;
+      background: var(--detail-surface-subtle) !important;
+      color: var(--detail-text) !important;
       font-weight: 700;
     }
 
     .cashier-note-detail .border.rounded,
-    .cashier-note-detail .bg-light {
-      border-color: #dadce0 !important;
+    .cashier-note-detail .bg-light,
+    .cashier-note-detail .bg-light-subtle,
+    .cashier-note-detail .bg-body {
+      border-color: var(--detail-border) !important;
       border-radius: .5rem !important;
-      background: #fff !important;
+      background: var(--detail-surface-subtle) !important;
+      color: var(--detail-text) !important;
     }
 
     .cashier-note-detail .ui-key-value {
-      border-bottom: 1px solid #eceff1 !important;
+      border-bottom: 1px solid var(--detail-border) !important;
       padding-block: .85rem !important;
     }
 
@@ -165,20 +172,22 @@
     }
 
     .cashier-note-detail .table-responsive {
-      border: 1px solid #dadce0;
+      border: 1px solid var(--detail-border);
       border-radius: .5rem;
       -webkit-overflow-scrolling: touch;
     }
 
     .cashier-note-detail .table {
       margin-bottom: 0;
-      --bs-table-striped-bg: #fff;
-      --bs-table-bg: #fff;
+      --bs-table-striped-bg: var(--detail-surface-subtle);
+      --bs-table-bg: var(--detail-card);
+      --bs-table-color: var(--detail-text);
+      --bs-table-border-color: var(--detail-border);
     }
 
     .cashier-note-detail .table thead th {
-      border-bottom: 1px solid #dadce0;
-      background: #fff;
+      border-bottom: 1px solid var(--detail-border);
+      background: var(--detail-card);
       color: var(--detail-muted);
       font-size: .78rem;
       font-weight: 800;
@@ -187,8 +196,29 @@
     }
 
     .cashier-note-detail .table tbody td {
-      border-color: #eceff1;
+      border-color: var(--detail-border);
       vertical-align: top;
+    }
+
+    .cashier-note-detail .form-control,
+    .cashier-note-detail .form-select,
+    #note-payment-modal .form-control,
+    #note-payment-modal .form-select,
+    #note-refund-modal .form-control,
+    #note-refund-modal .form-select {
+      border-color: var(--detail-border);
+      background: var(--detail-card);
+      color: var(--detail-text);
+    }
+
+    .cashier-note-detail .form-control:focus,
+    .cashier-note-detail .form-select:focus,
+    #note-payment-modal .form-control:focus,
+    #note-payment-modal .form-select:focus,
+    #note-refund-modal .form-control:focus,
+    #note-refund-modal .form-select:focus {
+      border-color: var(--detail-accent);
+      box-shadow: 0 0 0 .15rem var(--detail-accent-soft);
     }
 
     .cashier-note-detail .btn {
@@ -222,23 +252,59 @@
 
     .cashier-note-detail .btn-primary:hover,
     .cashier-note-detail .btn-primary:focus {
-      border-color: #512da8;
-      background: #512da8;
+      border-color: var(--detail-accent);
+      background: var(--detail-accent);
       color: #fff;
     }
 
     .cashier-note-detail .btn-outline-secondary,
     .cashier-note-detail .btn-light-secondary,
-    .cashier-note-detail .btn-light-primary {
-      border-color: #dadce0;
-      background: #fff;
+    .cashier-note-detail .btn-light-primary,
+    #note-payment-modal .btn-outline-secondary,
+    #note-refund-modal .btn-outline-secondary {
+      border-color: var(--detail-border);
+      background: var(--detail-card);
       color: var(--detail-accent);
     }
 
     .cashier-note-detail .btn-outline-warning {
-      border-color: #fbbc04;
-      background: #fff;
-      color: #8a5d00;
+      border-color: var(--bs-warning);
+      background: var(--cashier-warning-soft);
+      color: var(--bs-warning);
+    }
+
+    #note-payment-modal .modal-content,
+    #note-refund-modal .modal-content {
+      border: 1px solid var(--detail-border);
+      background: var(--detail-card);
+      color: var(--detail-text);
+    }
+
+    #note-payment-modal .modal-header,
+    #note-payment-modal .modal-footer,
+    #note-refund-modal .modal-header,
+    #note-refund-modal .modal-footer {
+      border-color: var(--detail-border);
+      background: var(--detail-card);
+    }
+
+    #note-payment-modal .border.rounded,
+    #note-refund-modal .border.rounded {
+      border-color: var(--detail-border) !important;
+      background: var(--detail-surface-subtle);
+      color: var(--detail-text);
+    }
+
+    #note-payment-modal .badge,
+    #note-refund-modal .badge {
+      border-color: var(--detail-border) !important;
+      background: var(--detail-surface-subtle) !important;
+      color: var(--detail-text) !important;
+    }
+
+    #note-payment-modal .text-muted,
+    #note-refund-modal .text-muted {
+      color: var(--detail-muted) !important;
     }
 
     @media (max-width: 575.98px) {
