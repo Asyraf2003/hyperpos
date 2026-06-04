@@ -53,7 +53,7 @@
                 <div>
                     <h5 class="modal-title mb-1" id="workspace-payment-modal-title">Proses Nota</h5>
                     <p class="mb-0 text-muted small" id="workspace-payment-modal-subtitle">
-                        Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.
+                        Pilih aksi nota, cek ringkasan transaksi, lalu lanjutkan dengan tombol aksi.
                     </p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>

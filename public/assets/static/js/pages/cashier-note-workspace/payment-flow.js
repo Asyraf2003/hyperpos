@@ -489,13 +489,13 @@
     if (NS.paymentState.cashStep) {
       title.textContent = "Pembayaran Cash";
       subtitle.textContent =
-        "Masukkan uang pelanggan, cek kembalian, lalu tekan Enter atau simpan cash.";
+        "Masukkan uang pelanggan, cek kembalian, lalu simpan cash.";
       return;
     }
 
     title.textContent = "Proses Nota";
     subtitle.textContent =
-      "Pilih aksi nota, cek ringkasan transaksi, lalu simpan dengan keyboard.";
+      "Pilih aksi nota, cek ringkasan transaksi, lalu lanjutkan dengan tombol aksi.";
   };
 
   const updateModeText = () => {
@@ -531,30 +531,6 @@
               ? "Simpan nota tanpa pembayaran."
               : "Pilih aksi nota terlebih dahulu.";
     }
-  };
-
-  const focusByState = () => {
-    if (NS.paymentState.cashStep) {
-      focusElement(receivedAmountInput());
-      return;
-    }
-
-    if (NS.paymentState.mode === "partial") {
-      focusElement(partialAmountInput());
-      return;
-    }
-
-    if (NS.paymentState.mode === "full") {
-      focusElement(byId("workspace-payment-submit-transfer"), false);
-      return;
-    }
-
-    if (NS.paymentState.mode === "skip") {
-      focusElement(byId("workspace-payment-submit-skip"), false);
-      return;
-    }
-
-    focusElement(byId("workspace-payment-choice-full"), false);
   };
 
   const syncDialogWidth = () => {
@@ -664,7 +640,6 @@
     el.addEventListener("shown.bs.modal", () => {
       window.AdminMoneyInput?.bindBySelector?.(el);
       NS.refreshPaymentUi();
-      focusByState();
     });
 
     el.addEventListener("hidden.bs.modal", () => {
@@ -731,7 +706,6 @@
     const choiceButton = event.target.closest("[data-payment-choice]");
     if (choiceButton) {
       applyMode(choiceButton.dataset.paymentChoice || "");
-      focusByState();
       return;
     }
 
@@ -783,69 +757,6 @@
 
     if (event.target.id === "note_transaction_date") {
       NS.refreshPaymentUi();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    const choiceButton = event.target.closest("[data-payment-choice]");
-    const buttons = choiceButtons();
-
-    if (choiceButton && buttons.length) {
-      const currentIndex = buttons.indexOf(choiceButton);
-
-      if (event.key === "ArrowDown" || event.key === "ArrowRight") {
-        event.preventDefault();
-        const nextButton =
-          buttons[Math.min(currentIndex + 1, buttons.length - 1)] || buttons[0];
-        focusElement(nextButton, false);
-        return;
-      }
-
-      if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
-        event.preventDefault();
-        const nextButton =
-          buttons[Math.max(currentIndex - 1, 0)] || buttons[0];
-        focusElement(nextButton, false);
-        return;
-      }
-    }
-
-    if (event.target.id === "inline_payment_amount_paid_display" && event.key === "Enter") {
-      if (event.ctrlKey || event.altKey || event.metaKey) {
-        return;
-      }
-
-      event.preventDefault();
-      NS.refreshPaymentUi();
-
-      const total = grandTotal();
-      if (payableAmount(total) <= 0) {
-        return;
-      }
-
-      focusElement(byId("workspace-payment-submit-transfer"), false);
-      return;
-    }
-
-    if (event.target.id === "inline_payment_amount_received_display" && event.key === "Enter") {
-      if (event.ctrlKey || event.altKey || event.metaKey) {
-        return;
-      }
-
-      const total = grandTotal();
-      const payable = payableAmount(total);
-      const received = digits(receivedAmountInput()?.value || "");
-
-      if (payable <= 0 || received < payable) {
-        event.preventDefault();
-        NS.refreshPaymentUi();
-        return;
-      }
-
-      event.preventDefault();
-      updateHidden("inline_payment_method_hidden", "cash");
-      updateHidden("inline_payment_amount_received_rupiah", received);
-      formEl()?.requestSubmit();
     }
   });
 

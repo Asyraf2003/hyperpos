@@ -231,53 +231,6 @@
         }
       });
 
-      input.addEventListener("keydown", (event) => {
-        const buttons = resultButtons(scope);
-        const activeIndex = activeChoiceIndexes.get(scope) ?? -1;
-
-        if (event.key === "ArrowDown" && buttons.length) {
-          event.preventDefault();
-          setActiveChoice(scope, activeIndex + 1);
-          return;
-        }
-
-        if (event.key === "ArrowUp" && buttons.length) {
-          event.preventDefault();
-          setActiveChoice(scope, activeIndex - 1);
-          return;
-        }
-
-        if (event.key === "Escape") {
-          event.preventDefault();
-          clearResults(scope);
-          return;
-        }
-
-        if (event.key !== "Enter") {
-          return;
-        }
-
-        if (event.ctrlKey || event.altKey || event.metaKey) {
-          return;
-        }
-
-        event.preventDefault();
-
-        if (buttons.length && activeIndex >= 0 && buttons[activeIndex]) {
-          buttons[activeIndex].click();
-          return;
-        }
-
-        if (hidden?.value.trim()) {
-          focusElement(scope.querySelector("[data-qty-input]"));
-          return;
-        }
-
-        if (input.value.trim().length >= 2) {
-          void fetchResults();
-        }
-      });
-
       if (scope.dataset.searchOutsideBound !== "1") {
         scope.dataset.searchOutsideBound = "1";
 

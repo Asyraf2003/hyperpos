@@ -167,84 +167,6 @@
     );
   };
 
-  const rowFieldSequence = (row) => {
-    const type = row?.dataset?.itemType || "";
-    const moneyInputs = Array.from(row.querySelectorAll("[data-money-display]"));
-
-    if (type === "product") {
-      return [
-        row.querySelector("[data-product-search]"),
-        row.querySelector("[data-qty-input]"),
-        row.querySelector("[data-price-input]"),
-      ].filter(Boolean);
-    }
-
-    if (type === "service_store_stock") {
-      return [
-        row.querySelector('input[name$="[service][name]"]'),
-        row.querySelector("[data-package-total-input]"),
-        ...productLineScopes(row).flatMap((scope) => [
-          scope.querySelector("[data-product-search]"),
-          scope.querySelector("[data-qty-input]"),
-          scope.querySelector("[data-price-input]"),
-        ]),
-      ].filter(Boolean);
-    }
-
-    if (type === "service_external") {
-      return [
-        row.querySelector('input[name$="[service][name]"]'),
-        moneyInputs[0],
-        row.querySelector('input[name$="[external_purchase_lines][0][label]"]'),
-        row.querySelector('input[name$="[external_purchase_lines][0][qty]"]'),
-        moneyInputs[1],
-      ].filter(Boolean);
-    }
-
-    return [
-      row.querySelector('input[name$="[service][name]"]'),
-      moneyInputs[0],
-      row.querySelector('textarea[name$="[service][notes]"]'),
-    ].filter(Boolean);
-  };
-
-  NS.bindRowKeyboard = (row) => {
-    if (!(row instanceof HTMLElement)) return;
-    if (row.dataset.keyboardBound === "1") return;
-
-    row.dataset.keyboardBound = "1";
-
-    row.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter") return;
-      if (event.ctrlKey || event.altKey || event.metaKey) return;
-      if (!(event.target instanceof HTMLElement)) return;
-
-      const fields = rowFieldSequence(row);
-      const index = fields.indexOf(event.target);
-
-      if (index < 0) return;
-
-      event.preventDefault();
-
-      if (event.shiftKey) {
-        const prev = fields[index - 1];
-        if (prev) focusElement(prev);
-        return;
-      }
-
-      const next = fields[index + 1];
-      if (next) {
-        focusElement(next);
-        return;
-      }
-
-      const addButton = document.getElementById("workspace-add-button");
-      if (addButton) {
-        focusElement(addButton, false);
-      }
-    });
-  };
-
   NS.bindQtyControls = (row) => {
     if (!(row instanceof HTMLElement)) return;
     if (row.dataset.qtyControlsBound === "1") return;
@@ -301,7 +223,6 @@
     NS.bindProductSearch?.(row);
     NS.bindQtyControls?.(row);
     NS.bindProductLines?.(row);
-    NS.bindRowKeyboard?.(row);
     NS.renumberRows();
     NS.updateSummary?.();
 

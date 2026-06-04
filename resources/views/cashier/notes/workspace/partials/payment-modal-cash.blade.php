@@ -37,7 +37,7 @@
                 >
 
                 <div class="form-text mt-3">
-                    Ketik nominal lalu tekan Enter untuk simpan saat jumlah cukup.
+                    Ketik nominal, cek kembalian, lalu simpan cash saat jumlah cukup.
                 </div>
             </div>
 

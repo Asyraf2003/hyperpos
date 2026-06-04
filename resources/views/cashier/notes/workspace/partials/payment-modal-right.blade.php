@@ -2,7 +2,7 @@
     <div class="border rounded p-3 h-100 d-flex flex-column">
         <div class="fw-semibold mb-1">Pilih Aksi</div>
         <div class="text-muted small mb-3">
-            Pakai panah lalu Enter. Setelah aksi dipilih, lanjutkan ke transfer atau cash.
+            Pilih salah satu aksi, lalu lanjutkan ke transfer atau cash.
         </div>
 
         <div class="small text-muted">Mode Aktif</div>
@@ -56,7 +56,7 @@
             <div class="border rounded p-3">
                 <div class="fw-semibold mb-1">Nominal Dibayar Sekarang</div>
                 <div class="text-muted small mb-3">
-                    Isi nominal pembayaran sebagian. Tekan Enter untuk lanjut ke transfer atau cash.
+                    Isi nominal pembayaran sebagian, lalu pilih transfer atau cash.
                 </div>
 
                 <div class="form-group mb-0">
