@@ -4,7 +4,7 @@
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0">Filter Daftar Nota Kasir</h5>
-            <button type="button" id="close-cashier-note-filter" class="btn btn-sm btn-light-secondary">Tutup</button>
+            <button type="button" id="close-cashier-note-filter" class="btn btn-sm btn-outline-secondary">Tutup</button>
         </div>
 
         <form id="cashier-note-filter-form">
@@ -23,7 +23,7 @@
 
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary">Terapkan Filter</button>
-                <button type="button" id="reset-cashier-note-filter" class="btn btn-light-secondary">Reset</button>
+                <button type="button" id="reset-cashier-note-filter" class="btn btn-outline-secondary">Reset</button>
             </div>
         </form>
     </div>
