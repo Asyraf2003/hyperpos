@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Note;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 final class ServiceCatalogEndpointFeatureTest extends TestCase
@@ -71,16 +70,4 @@ final class ServiceCatalogEndpointFeatureTest extends TestCase
         ]);
     }
 
-    private function seedService(string $id, string $name, string $normalized, int $price): void
-    {
-        DB::table('service_catalog_items')->insert([
-            'id' => $id,
-            'name' => $name,
-            'normalized_name' => $normalized,
-            'default_price_rupiah' => $price,
-            'is_active' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    }
 }
