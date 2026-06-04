@@ -15,10 +15,10 @@
         .cashier-product-card,
         .cashier-result-item,
         .cashier-empty-state {
-            border: 1px solid rgba(15, 23, 42, .10);
+            border: 1px solid var(--cashier-border);
             border-radius: 1rem;
-            background: #fff;
-            box-shadow: 0 .85rem 1.8rem rgba(15, 23, 42, .06);
+            background: var(--cashier-surface);
+            box-shadow: var(--cashier-shadow);
         }
 
         .cashier-product-card {
@@ -44,7 +44,7 @@
 
         .cashier-result-title {
             margin: 0;
-            color: #0f172a;
+            color: var(--cashier-text);
             font-size: .98rem;
             font-weight: 800;
             line-height: 1.45;
@@ -53,13 +53,13 @@
         .cashier-result-meta,
         .cashier-section-desc,
         .cashier-search-status {
-            color: #64748b;
+            color: var(--cashier-muted);
             font-size: .9rem;
             line-height: 1.55;
         }
 
         .cashier-result-price {
-            color: #0f172a;
+            color: var(--cashier-text);
             font-weight: 800;
         }
 

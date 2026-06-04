@@ -13,11 +13,11 @@
         }
 
         .cashier-account-card {
-            border: 1px solid rgba(15, 23, 42, .10);
+            border: 1px solid var(--cashier-border);
             border-radius: 1rem;
-            background: #fff;
+            background: var(--cashier-surface);
             padding: 1rem;
-            box-shadow: 0 .85rem 1.8rem rgba(15, 23, 42, .06);
+            box-shadow: var(--cashier-shadow);
         }
 
         .cashier-account-row {
@@ -25,7 +25,7 @@
             justify-content: space-between;
             gap: 1rem;
             padding: .85rem 0;
-            border-bottom: 1px solid rgba(15, 23, 42, .08);
+            border-bottom: 1px solid var(--cashier-border);
         }
 
         .cashier-account-row:last-child {
@@ -33,12 +33,12 @@
         }
 
         .cashier-account-label {
-            color: #64748b;
+            color: var(--cashier-muted);
             font-size: .9rem;
         }
 
         .cashier-account-value {
-            color: #0f172a;
+            color: var(--cashier-text);
             font-weight: 800;
             text-align: right;
             word-break: break-word;
