@@ -152,7 +152,6 @@
                 <span class="cashier-home-card-inner">
                     <span>
                         <span class="cashier-home-title">Download App PWA</span>
-                        <span class="cashier-home-desc d-block">Pasang HyperPOS Kasir ke layar utama.</span>
                         <span class="cashier-home-status d-block" data-pwa-install-status>Gunakan Chrome/Edge mobile, lalu tekan tombol install.</span>
                     </span>
                     <button type="button" class="cashier-home-button cashier-home-install-button" data-pwa-install-button>
