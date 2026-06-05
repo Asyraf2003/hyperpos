@@ -69,6 +69,29 @@ final class ProductLookupFeatureTest extends TestCase
         $response->assertJsonPath('data.rows.0.nama_barang', 'Aki Kering');
     }
 
+    public function test_admin_product_lookup_caps_rows_for_large_catalog(): void
+    {
+        for ($index = 1; $index <= 25; $index++) {
+            $this->seedProduct(
+                sprintf('product-%03d', $index),
+                sprintf('KB-%03d', $index),
+                sprintf('Ban Procurement %03d', $index),
+                'Federal',
+                90,
+                35000,
+            );
+        }
+
+        $response = $this->actingAs($this->user('admin'))
+            ->getJson(route('admin.procurement.products.lookup', ['q' => 'Ban']));
+
+        $response->assertOk();
+        $response->assertJsonPath('success', true);
+        $response->assertJsonCount(20, 'data.rows');
+        $response->assertJsonPath('data.rows.0.id', 'product-001');
+        $response->assertJsonPath('data.rows.19.id', 'product-020');
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
