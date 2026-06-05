@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Adapters\In\Http\Controllers\Admin\Procurement;
 
 use App\Application\Procurement\Services\ProcurementProductLookupData;
+use App\Application\ProductCatalog\DTO\ProductLookupRow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -27,34 +28,7 @@ final class ProductLookupController extends Controller
         }
 
         $rows = array_map(
-            static function ($product): array {
-                $kode = $product->kodeBarang();
-                $ukuran = $product->ukuran();
-
-                $parts = [
-                    $product->namaBarang(),
-                    $product->merek(),
-                ];
-
-                if ($ukuran !== null) {
-                    $parts[] = (string) $ukuran;
-                }
-
-                $label = implode(' — ', $parts);
-
-                if ($kode !== null) {
-                    $label .= ' (' . $kode . ')';
-                }
-
-                return [
-                    'id' => $product->id(),
-                    'label' => $label,
-                    'kode_barang' => $kode,
-                    'nama_barang' => $product->namaBarang(),
-                    'merek' => $product->merek(),
-                    'ukuran' => $ukuran,
-                ];
-            },
+            $this->toRow(...),
             $lookupData->search($query),
         );
 
@@ -64,5 +38,20 @@ final class ProductLookupController extends Controller
                 'rows' => $rows,
             ],
         ]);
+    }
+
+    /**
+     * @return array{id:string,label:string,kode_barang:?string,nama_barang:string,merek:string,ukuran:?int}
+     */
+    private function toRow(ProductLookupRow $product): array
+    {
+        return [
+            'id' => $product->id,
+            'label' => $product->label(),
+            'kode_barang' => $product->kodeBarang,
+            'nama_barang' => $product->namaBarang,
+            'merek' => $product->merek,
+            'ukuran' => $product->ukuran,
+        ];
     }
 }
