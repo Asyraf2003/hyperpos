@@ -22,6 +22,11 @@ Before giving technical guidance, planning implementation, editing files, or pro
 14. `docsgo/api/0050_echo_http_contract.md`
 15. `docsgo/testing/0060_test_and_quality_gates.md`
 16. `docsgo/workflow/0070_docs_go_workflow.md`
+17. `docsgo/workflow/0071_handoff_protocol.md`
+18. `docsgo/security/0080_security_baseline.md`
+19. `docsgo/scripts/0090_makefile_and_scripts.md`
+20. `docsgo/style/0100_go_style.md`
+21. `docsgo/templates/0110_domain_scope_packet.md`
 
 If the user names a blueprint, ADR, handoff, error log, branch, commit, command output, API, domain, table, or module, that reference defines the active scope until the user changes it.
 
@@ -39,4 +44,5 @@ If the user names a blueprint, ADR, handoff, error log, branch, commit, command 
 - API capability control must exist as a first-class admin surface and backend policy.
 - Every domain database resource must have explicit create, edit/update, delete, show, list, and capability rules unless the domain contract marks an operation forbidden.
 - Tests and scripts are required gates, not optional polish.
-
+- Cross-AI work must use a scope packet and handoff.
+- Makefile/script contracts must stay stable so terminal Codex and GPT web workflows use the same proof language.

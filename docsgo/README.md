@@ -57,6 +57,11 @@ Read in this order:
 11. `api/0050_echo_http_contract.md`
 12. `testing/0060_test_and_quality_gates.md`
 13. `workflow/0070_docs_go_workflow.md`
+14. `workflow/0071_handoff_protocol.md`
+15. `security/0080_security_baseline.md`
+16. `scripts/0090_makefile_and_scripts.md`
+17. `style/0100_go_style.md`
+18. `templates/0110_domain_scope_packet.md`
 
 `README.md` is the human entry point.
 
@@ -80,6 +85,10 @@ docsgo/
   api/
   testing/
   workflow/
+  security/
+  scripts/
+  style/
+  templates/
 ```
 
 ## Core Rule Summary
@@ -108,6 +117,23 @@ After work:
 - report progress only from proof;
 - write handoff only when needed;
 - do not move to the next step without feedback.
+
+## Cross-AI Work Pattern
+
+When work moves between terminal Codex and GPT web, use a scope packet.
+
+The packet must include:
+
+- active domain or API;
+- files included;
+- files forbidden to touch;
+- current blueprint;
+- relevant rules;
+- desired output;
+- proof required;
+- handoff target.
+
+The receiving AI may only work inside that packet unless the owner changes scope.
 
 ## Architecture Rule In One Line
 
@@ -183,3 +209,19 @@ Implement products.show from the accepted blueprint.
 
 That named scope becomes the active scope until changed.
 
+## Critical Local Commands
+
+The future Go repository should keep these command names stable:
+
+```bash
+make verify
+make test
+make test-api
+make test-db
+make lint
+make arch
+make seed
+make security
+```
+
+Exact implementation may change, but command meaning must stay documented in `scripts/0090_makefile_and_scripts.md`.

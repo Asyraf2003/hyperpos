@@ -38,6 +38,11 @@ It prevents:
 13. `api/0050_echo_http_contract.md`
 14. `testing/0060_test_and_quality_gates.md`
 15. `workflow/0070_docs_go_workflow.md`
+16. `workflow/0071_handoff_protocol.md`
+17. `security/0080_security_baseline.md`
+18. `scripts/0090_makefile_and_scripts.md`
+19. `style/0100_go_style.md`
+20. `templates/0110_domain_scope_packet.md`
 
 ## Constitution Summary
 
@@ -62,6 +67,10 @@ It prevents:
 - `api/`: Echo HTTP contract and response envelope rules.
 - `testing/`: unit, integration, contract, API, architecture, and script gates.
 - `workflow/`: docs hygiene, blueprint/handoff/archive separation, and work sequencing.
+- `security/`: authentication, authorization, capability, input, output, secret, audit, and abuse-control rules.
+- `scripts/`: Makefile and command contracts for repeatable proof.
+- `style/`: Go writing style and forbidden patterns.
+- `templates/`: copyable work packet and handoff templates.
 
 ## Non-Negotiable Behavior
 
@@ -72,4 +81,4 @@ It prevents:
 - Do not add a table without migration, constraints, repository tests, and rollback/forward policy.
 - Do not expose an API without capability metadata.
 - Do not claim tests passed without visible output.
-
+- Do not hand work to another AI without a scope packet and handoff target.
