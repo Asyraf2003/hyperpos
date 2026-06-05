@@ -123,6 +123,7 @@ final class PackageAutoSplitCreateReportImpactFeatureTest extends TestCase
     private function storeStockPackagePayload(): array
     {
         return [
+            'idempotency_key' => 'package-auto-split-store-report-idem-001',
             'note' => [
                 'customer_name' => 'Budi Package Store Report',
                 'customer_phone' => '08123',
@@ -168,6 +169,7 @@ final class PackageAutoSplitCreateReportImpactFeatureTest extends TestCase
     private function externalPackagePayload(): array
     {
         return [
+            'idempotency_key' => 'package-auto-split-external-report-idem-001',
             'note' => [
                 'customer_name' => 'Budi Package External Report',
                 'customer_phone' => '08123',
