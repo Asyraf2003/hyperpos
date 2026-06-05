@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Adapters\Out\ProductCatalog\DatabaseProductDetailReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductDuplicateCheckerAdapter;
+use App\Adapters\Out\ProductCatalog\DatabaseProductLookupReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseProductTableReaderAdapter;
 use App\Adapters\Out\ProductCatalog\DatabaseVersionedProductWriterAdapter;
@@ -15,6 +16,7 @@ use App\Core\ProductCatalog\Policies\MinSellingPricePolicy;
 use App\Ports\Out\ProductCatalog\ProductDetailReaderPort;
 use App\Ports\Out\ProductCatalog\ProductDuplicateCheckerPort;
 use App\Ports\Out\ProductCatalog\ProductLifecyclePort;
+use App\Ports\Out\ProductCatalog\ProductLookupReaderPort;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ProductCatalog\ProductTableReaderPort;
 use App\Ports\Out\ProductCatalog\ProductWriterPort;
@@ -31,6 +33,7 @@ class ProductCatalogServiceProvider extends ServiceProvider
         $this->app->singleton(MinSellingPricePolicy::class);
 
         $this->app->singleton(ProductReaderPort::class, DatabaseProductReaderAdapter::class);
+        $this->app->singleton(ProductLookupReaderPort::class, DatabaseProductLookupReaderAdapter::class);
         $this->app->singleton(ProductDetailReaderPort::class, DatabaseProductDetailReaderAdapter::class);
         $this->app->singleton(ProductTableReaderPort::class, DatabaseProductTableReaderAdapter::class);
         $this->app->scoped(ProductWriterPort::class, DatabaseVersionedProductWriterAdapter::class);
