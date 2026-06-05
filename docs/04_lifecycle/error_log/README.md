@@ -2,6 +2,26 @@
 
 34 individual bug and security findings in the Hyperpos system.
 
+## Kesimpulan Remediasi Saat Ini
+
+Per 2026-06-05, remediation batch terakhir menutup 0031 sampai 0034 dengan status `Strict Fixed`.
+
+Kesimpulan sistem:
+
+- 0031 menutup duplicate submit create transaction workspace dengan server-generated idempotency key dan DB-backed idempotency.
+- 0032 menutup Excel formula injection pada inventory stock value export dengan explicit string cells untuk product text.
+- 0033 menutup login brute-force gap pada web dan mobile login dengan explicit Laravel rate limiter.
+- 0034 menutup unbounded product lookup dan N+1 inventory read dengan dedicated hexagonal lookup port dan bounded database adapter.
+- Patch 0034 tidak menjadikan Laravel API sebagai fokus produk; mobile endpoint hanya dirapikan sebagai boundary sistem yang sudah ada.
+- Jalur 0034 disiplin hexagonal: controller/handler tidak melakukan DB shortcut, application bergantung ke port, persistence berada di out adapter.
+- Query lookup 0034 memakai SQL umum melalui query builder (`LEFT JOIN`, `COALESCE`, `LIKE`, `LIMIT`) dan tidak menambah syntax MySQL-only baru.
+- Catatan migrasi PostgreSQL: perilaku case-sensitivity `LIKE` tetap perlu diputuskan eksplisit saat migrasi Go/PostgreSQL.
+
+Pending yang masih terpisah:
+
+- 0030 dependency security advisories tetap perlu ditangani lewat dependency update/audit.
+- Generic `ProductReaderPort::search()` masih layak diaudit jika nanti dipakai consumer lookup besar di luar port khusus 0034.
+
 ## Index
 
 | # | File | Topic |
@@ -44,5 +64,5 @@
 ## Rules
 
 - File status may only be updated after there is proof.
-- Allowed statuses: Reported, Planned, Patched with verification gap, Fixed with proof, Deferred with owner acceptance.
+- Allowed statuses: Reported, Planned, Patched with verification gap, Fixed with proof, Strict Fixed, Deferred with owner acceptance.
 - The remediation blueprint lives in `docs/03_blueprints/error_log_remediation/`.

@@ -1,106 +1,167 @@
 # 034 - Product lookup fetches unbounded product rows and performs per-row inventory reads
 
-Status: Reported
+Status: Strict Fixed
 Keparahan: Medium
-Klasifikasi: performance / scalability / lookup consistency
+Klasifikasi: performance / scalability / lookup consistency / hexagonal discipline
 
 ## Ringkasan
 
-Product lookup untuk cashier dan mobile API mengambil hasil product search tanpa query-level limit, lalu membaca inventory per product row.
+Product lookup cashier, mobile, dan procurement sekarang memakai dedicated lookup port yang bounded di query database.
 
-Mobile API memang membatasi response menjadi 20 row, tetapi limit diterapkan setelah product search mengembalikan array penuh. Web cashier lookup bahkan mengembalikan semua row yang lolos stock filter.
+Sebelumnya jalur lookup mengambil product search tanpa query-level limit, lalu beberapa jalur membaca inventory per product row. Mobile memang memotong response menjadi 20 row, tetapi pemotongan terjadi setelah product search mengembalikan array penuh.
 
-Ini bukan functional test failure pada katalog kecil. Ini adalah risiko performa saat katalog membesar.
+Patch menutup masalah runtime lookup tanpa menjadikan Laravel API sebagai fokus produk baru. Mobile endpoint ikut dirapikan karena endpoint itu sudah menjadi boundary sistem yang ada.
 
-## Bukti awal
+## Strict-Fixed-Scope
 
-Product reader search tidak menerima limit dan memakai `get()`:
+Scope yang ditutup:
 
-`app/Adapters/Out/ProductCatalog/DatabaseProductReaderAdapter.php`
+- cashier product lookup hanya mengambil product in-stock dengan cap query-level;
+- mobile product search mengambil product dengan cap query-level;
+- procurement product lookup ikut memakai bounded lookup agar contract lookup product seragam;
+- inventory availability dibaca melalui join lookup, bukan N+1 per-row inventory read;
+- controller/handler tidak melakukan query shortcut langsung ke database.
 
-- `search(string $query): array`
-- jika query kosong, return `findAll()`;
-- jika query ada, menjalankan `applySearch(...)->get()` tanpa `limit`.
+Out of scope untuk log ini:
 
-Lookup service hanya meneruskan search:
-
-`app/Application/Note/Services/CashierNoteProductLookupData.php`
-
-- `searchProducts(string $query)` return `$this->products->search(trim($query))`.
-
-Cashier product lookup controller membaca inventory per product:
-
-`app/Adapters/In/Http/Controllers/Cashier/Note/ProductLookupController.php`
-
-- loop seluruh `$lookupData->searchProducts($query)`;
-- pada setiap product memanggil `$lookupData->getInventoryByProductId($product->id())`;
-- hanya product dengan stock > 0 yang masuk response;
-- response mengembalikan semua row yang tersisa tanpa cap.
-
-Mobile API handler membatasi setelah fetch:
-
-`app/Application/MobileApi/Product/UseCases/SearchMobileApiProductsHandler.php`
-
-- `array_slice($this->lookupData->searchProducts($normalizedQuery), 0, $limit)`;
-- default limit `20`;
-- inventory tetap dibaca per product pada rows hasil slice;
-- query-level fetch tetap tidak terbatas sebelum slice.
-
-Blueprint mobile sudah mencatat gap yang sama:
-
-`docs/03_blueprints/mobile/0001_mobile_api.md`
-
-- "Current result limit is applied in the application layer with `array_slice` at 20 rows."
-- "Future improvement: query-level limit in `ProductReaderPort` or a dedicated mobile product reader for large catalogs."
-- "Product search currently uses application-layer `array_slice` limit; query-level limit may be needed for large catalogs."
-
-## Jalur bermasalah
-
-User mengetik query product lookup -> adapter mengambil semua product yang cocok -> controller/handler melakukan inventory read per product -> response dibangun setelah filter stock -> pada katalog besar, request lookup dapat menjadi lambat dan membebani database.
-
-## Dampak
-
-- Latency lookup cashier meningkat.
-- Mobile product search dapat tetap mahal meskipun response hanya 20 rows.
-- Query count meningkat karena inventory dibaca per product.
-- Risiko timeout atau beban database saat katalog dan inventory rows membesar.
-
-Keparahan Medium karena issue ini belum menunjukkan data corruption atau security bypass, tetapi berdampak pada UX dan kapasitas runtime.
+- mengubah arah produk menjadi Laravel API-first;
+- migrasi Go/PostgreSQL;
+- menghapus seluruh generic `ProductReaderPort::search()`;
+- mengubah response contract product lookup yang sudah dipakai UI/mobile.
 
 ## Root cause
 
-Contract product search saat ini mengembalikan array penuh dan tidak mendukung query-level limit.
+Contract product search lama mengembalikan array penuh dan tidak membawa limit eksplisit.
 
-Stock availability filter dilakukan di application loop dengan per-row inventory read, bukan dalam query lookup yang bisa join/aggregate secara bounded.
+Stock availability juga difilter di application loop dengan per-row inventory read, bukan di query lookup yang bisa dibatasi dan dijalankan sekali.
 
-## Kontrol yang sudah ada
+## Source Reality Setelah Patch
 
-- Query kurang dari 2 karakter di web cashier lookup langsung return empty rows.
-- Mobile API membatasi output menjadi 20 rows.
-- Blueprint mobile sudah menandai query-level limit sebagai future improvement.
+`app/Ports/Out/ProductCatalog/ProductLookupReaderPort.php`
 
-Kontrol tersebut belum cukup karena fetch product masih tidak bounded sebelum response limit diterapkan.
+- port lookup khusus dengan `DEFAULT_LIMIT = 20` dan `MAX_LIMIT = 50`;
+- method `search(string $query, int $limit = self::DEFAULT_LIMIT, bool $onlyInStock = false): array`.
 
-## Remediasi yang disarankan
+`app/Adapters/Out/ProductCatalog/DatabaseProductLookupReaderAdapter.php`
 
-Candidate patch direction:
+- implementasi database berada di adapter out;
+- memakai `products` left join `product_inventory`;
+- memilih `COALESCE(product_inventory.qty_on_hand, 0) as available_stock`;
+- memakai qualified columns untuk mencegah ambiguity;
+- membatasi hasil dengan bounded `limit`;
+- filter `onlyInStock` dilakukan di query.
 
-- Tambahkan query-level limit pada product search contract atau buat dedicated lookup query.
-- Terapkan limit sebelum hydration array penuh.
-- Gabungkan inventory availability ke query lookup bila memungkinkan.
-- Pastikan web cashier lookup juga punya cap response yang eksplisit.
-- Tambahkan performance-oriented feature/unit test yang memastikan result cap dan query count tidak tumbuh linear secara tidak terkendali.
+`app/Application/Note/Services/CashierNoteProductLookupData.php`
 
-## Keputusan owner yang mungkin dibutuhkan
+- cashier lookup memakai `ProductLookupReaderPort`;
+- `searchAvailableProducts()` meminta product in-stock dari port;
+- tidak lagi membaca inventory per product row.
 
-- Batas result web cashier lookup, misalnya 20, 30, atau 50 row.
-- Apakah product reader port umum boleh berubah signature, atau dibuat dedicated lookup reader agar contract lama tidak ikut berubah.
-- Apakah lookup harus hanya menampilkan product dengan stock > 0 untuk semua channel atau mobile boleh menampilkan stock 0.
+`app/Application/MobileApi/Product/UseCases/SearchMobileApiProductsHandler.php`
 
-## Verification gap
+- mobile search meminta limit ke lookup port;
+- tidak lagi memakai `array_slice()` setelah fetch penuh;
+- tidak lagi membaca inventory per product row.
 
-Belum ada patch.
+`app/Application/Procurement/Services/ProcurementProductLookupData.php`
 
-Belum ada test query-level limit.
+- procurement lookup ikut memakai `ProductLookupReaderPort` agar lookup product lintas channel seragam.
 
-Belum ada query-count/performance proof untuk katalog besar.
+## Hexagonal Discipline
+
+Patch menjaga boundary:
+
+- DB access product lookup hanya berada di out adapter;
+- application service/use case hanya bergantung pada port;
+- HTTP controller hanya mapping DTO ke public response;
+- tidak ada controller yang mengambil jalan pintas dengan query database langsung untuk lookup ini.
+
+Ini selaras dengan baseline hexagonal: transport/UI tidak menjadi tempat keputusan persistence atau source-of-truth.
+
+## PostgreSQL Readiness
+
+Query lookup memakai Laravel query builder dengan SQL umum:
+
+- `LEFT JOIN`;
+- `COALESCE`;
+- `LIKE`;
+- `LIMIT`;
+- qualified column names.
+
+Tidak ada syntax MySQL-only baru di patch ini. Catatan migrasi: perilaku case-sensitivity `LIKE` dapat berbeda antara MySQL collation dan PostgreSQL; saat migrasi Go/PostgreSQL, contract search perlu diputuskan eksplisit apakah memakai `LIKE`, `ILIKE`, atau normalized search column.
+
+## RED Proof
+
+Command:
+
+```bash
+php artisan test tests/Feature/Note/ProductLookupPerformanceFeatureTest.php tests/Feature/MobileApi/Product/MobileApiProductSearchFeatureTest.php tests/Feature/Procurement/ProductLookupFeatureTest.php
+```
+
+Hasil sebelum production patch:
+
+- exit code `1`;
+- `4 failed, 9 passed, 44 assertions`;
+- cashier lookup mengembalikan 25/30 row, bukan 20;
+- mobile lookup query count `24`, melewati batas `<= 8`;
+- procurement lookup mengembalikan 25 row, bukan 20.
+
+## GREEN Proof
+
+Targeted command yang sama setelah patch:
+
+- `PASS`;
+- `13 passed, 50 assertions`.
+
+Focused blast-radius command:
+
+```bash
+php artisan test tests/Feature/Note/ProductLookupPerformanceFeatureTest.php tests/Feature/MobileApi/Product tests/Feature/Procurement/ProductLookupFeatureTest.php tests/Feature/ProductCatalog
+```
+
+Hasil:
+
+- `PASS`;
+- `84 passed, 324 assertions`.
+
+Full verification command:
+
+```bash
+make verify
+```
+
+Hasil:
+
+- PHPStan `1798/1798`, `[OK] No errors`;
+- line-count audit passed;
+- Blade audit passed;
+- contract audit passed;
+- Pest `1179 passed, 6670 assertions`;
+- exit code `0`.
+
+## Negative Search
+
+Search terhadap jalur lama menunjukkan runtime lookup tidak lagi memakai:
+
+- `getInventoryByProductId` pada product lookup loop;
+- `array_slice($this->lookupData->searchProducts(...), 0, $limit)` pada mobile product search;
+- DB query shortcut di controller lookup.
+
+Search terhadap port/adapter menunjukkan lookup DB access berada pada:
+
+- `ProductLookupReaderPort`;
+- `DatabaseProductLookupReaderAdapter`;
+- binding `ProductCatalogServiceProvider`;
+- application lookup services.
+
+## Remaining Gap
+
+`ProductReaderPort::search()` generic masih ada dan belum diubah menjadi bounded contract.
+
+Gap ini tidak membuka kembali 0034 karena cashier/mobile/procurement runtime lookup sudah dipindahkan ke dedicated bounded lookup port. Jika nanti ada consumer baru yang memakai generic product search untuk lookup besar, contract generic reader perlu diaudit atau didepresiasi.
+
+## Kesimpulan
+
+0034 ditutup sebagai `Strict Fixed`.
+
+Masalah utama sudah ditutup di level sistem: lookup product bounded di query, inventory availability tidak lagi N+1, jalur lookup tetap lewat port/out adapter, dan patch tidak menambah ketergantungan MySQL-only.
