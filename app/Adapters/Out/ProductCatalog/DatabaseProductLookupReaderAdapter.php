@@ -40,9 +40,7 @@ final class DatabaseProductLookupReaderAdapter implements ProductLookupReaderPor
             $builder->where('product_inventory.qty_on_hand', '>', 0);
         }
 
-        $rows = $this->applyOrdering($builder)
-            ->limit($boundedLimit)
-            ->get();
+        $rows = $this->applyOrdering($builder)->limit($boundedLimit)->get();
 
         return array_map(
             static fn (object $row): ProductLookupRow => new ProductLookupRow(
@@ -85,11 +83,7 @@ final class DatabaseProductLookupReaderAdapter implements ProductLookupReaderPor
 
     private function boundedLimit(int $limit): int
     {
-        if ($limit < 1) {
-            return self::DEFAULT_LIMIT;
-        }
-
-        return min($limit, self::MAX_LIMIT);
+        return $limit < 1 ? self::DEFAULT_LIMIT : min($limit, self::MAX_LIMIT);
     }
 
     private function normalizeForSearch(string $value): string
