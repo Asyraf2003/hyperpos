@@ -143,6 +143,41 @@ final class MobileApiProductSearchFeatureTest extends TestCase
         ]);
     }
 
+    public function test_cashier_product_search_uses_bounded_query_count_for_large_catalog(): void
+    {
+        $token = $this->loginMobileToken(
+            email: 'mobile-kasir-product-search-bounded@example.test',
+            role: 'kasir',
+        );
+
+        for ($index = 1; $index <= 30; $index++) {
+            $this->seedProduct(
+                id: sprintf('product-mobile-%03d', $index),
+                kodeBarang: sprintf('MB-%03d', $index),
+                namaBarang: sprintf('Ban Mobile %03d', $index),
+                merek: 'Federal',
+                ukuran: 80,
+                hargaJual: 15000,
+                qtyOnHand: $index % 2 === 0 ? 0 : 7,
+            );
+        }
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $response = $this
+            ->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/v1/products/search?q=ban');
+
+        $queryCount = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $response->assertOk();
+        $response->assertJsonCount(20, 'data.rows');
+        $response->assertJsonPath('meta.limit', 20);
+        $this->assertLessThanOrEqual(8, $queryCount);
+    }
+
     private function loginMobileToken(string $email, string $role): string
     {
         $this->createUserWithRole($email, $role);
