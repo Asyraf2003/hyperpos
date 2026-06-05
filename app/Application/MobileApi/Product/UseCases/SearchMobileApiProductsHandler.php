@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Application\MobileApi\Product\UseCases;
 
 use App\Application\Note\Services\CashierNoteProductLookupData;
+use App\Application\ProductCatalog\DTO\ProductLookupRow;
 
 final readonly class SearchMobileApiProductsHandler
 {
@@ -35,37 +36,8 @@ final readonly class SearchMobileApiProductsHandler
 
         $rows = [];
 
-        foreach (array_slice($this->lookupData->searchProducts($normalizedQuery), 0, $limit) as $product) {
-            $inventory = $this->lookupData->getInventoryByProductId($product->id());
-            $availableStock = $inventory?->qtyOnHand() ?? 0;
-            $floorPrice = $product->hargaJual()->amount();
-
-            $parts = [
-                $product->namaBarang(),
-                $product->merek(),
-            ];
-
-            if ($product->ukuran() !== null) {
-                $parts[] = (string) $product->ukuran();
-            }
-
-            $label = implode(' — ', $parts);
-
-            if ($product->kodeBarang() !== null) {
-                $label .= ' (' . $product->kodeBarang() . ')';
-            }
-
-            $rows[] = [
-                'id' => $product->id(),
-                'label' => $label,
-                'kode_barang' => $product->kodeBarang(),
-                'nama_barang' => $product->namaBarang(),
-                'merek' => $product->merek(),
-                'ukuran' => $product->ukuran(),
-                'available_stock' => $availableStock,
-                'default_unit_price_rupiah' => $floorPrice,
-                'minimum_unit_price_rupiah' => $floorPrice,
-            ];
+        foreach ($this->lookupData->searchProducts($normalizedQuery, $limit) as $product) {
+            $rows[] = $this->toRow($product);
         }
 
         return [
@@ -74,6 +46,24 @@ final readonly class SearchMobileApiProductsHandler
                 'query' => $normalizedQuery,
                 'limit' => $limit,
             ],
+        ];
+    }
+
+    /**
+     * @return array{id:string,label:string,kode_barang:?string,nama_barang:string,merek:string,ukuran:?int,available_stock:int,default_unit_price_rupiah:int,minimum_unit_price_rupiah:int}
+     */
+    private function toRow(ProductLookupRow $product): array
+    {
+        return [
+            'id' => $product->id,
+            'label' => $product->label(),
+            'kode_barang' => $product->kodeBarang,
+            'nama_barang' => $product->namaBarang,
+            'merek' => $product->merek,
+            'ukuran' => $product->ukuran,
+            'available_stock' => $product->availableStock,
+            'default_unit_price_rupiah' => $product->defaultUnitPriceRupiah,
+            'minimum_unit_price_rupiah' => $product->minimumUnitPriceRupiah,
         ];
     }
 }
