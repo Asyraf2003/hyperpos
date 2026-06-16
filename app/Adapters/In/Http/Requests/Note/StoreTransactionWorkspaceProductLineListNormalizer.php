@@ -39,6 +39,7 @@ final class StoreTransactionWorkspaceProductLineListNormalizer
             'qty' => null,
             'unit_price_rupiah' => null,
             'price_basis' => null,
+            'tax_input' => null,
         ];
     }
 
