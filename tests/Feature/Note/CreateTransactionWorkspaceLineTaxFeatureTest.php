@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
+use App\Application\Note\Services\EnsureInitialNoteRevisionExists;
 use App\Adapters\Out\Persistence\Eloquent\IdentityAccess\EloquentUser as User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -120,6 +121,42 @@ final class CreateTransactionWorkspaceLineTaxFeatureTest extends TestCase
             'qty_delta' => -2,
             'unit_cost_rupiah' => 10000,
             'total_cost_rupiah' => -20000,
+        ]);
+
+        /** revision stores line tax snapshot payload */
+        app(EnsureInitialNoteRevisionExists::class)->handle(
+            $noteId,
+            'revision-line-tax-001',
+            (string) $user->getAuthIdentifier(),
+        );
+
+        $revisionLine = DB::table('note_revision_lines')
+            ->where('note_revision_id', 'revision-line-tax-001')
+            ->first();
+
+        $this->assertNotNull($revisionLine);
+
+        $payload = json_decode((string) $revisionLine->payload, true, flags: JSON_THROW_ON_ERROR);
+        $storeStockLine = $payload['store_stock_lines'][0] ?? null;
+
+        $this->assertIsArray($storeStockLine);
+        $this->assertSame($storeStockLineId, $storeStockLine['id']);
+        $this->assertSame('product-tax-1', $storeStockLine['product_id']);
+        $this->assertSame(2, $storeStockLine['qty']);
+        $this->assertSame(40000, $storeStockLine['base_total_rupiah']);
+        $this->assertSame('11%', $storeStockLine['tax_input']);
+        $this->assertSame('percent', $storeStockLine['tax_mode']);
+        $this->assertSame(1100, $storeStockLine['tax_rate_basis_points']);
+        $this->assertSame(4400, $storeStockLine['tax_amount_rupiah']);
+        $this->assertSame(44400, $storeStockLine['line_total_rupiah']);
+
+        $this->assertDatabaseHas('note_revisions', [
+            'id' => 'revision-line-tax-001',
+            'note_root_id' => $noteId,
+            'grand_total_rupiah' => 44400,
+            'subtotal_before_note_tax_rupiah' => 44400,
+            'note_tax_mode' => 'none',
+            'note_tax_amount_rupiah' => 0,
         ]);
     }
 }
