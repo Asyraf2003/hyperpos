@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
+use App\Application\Note\Services\EnsureInitialNoteRevisionExists;
 use App\Adapters\Out\Persistence\Eloquent\IdentityAccess\EloquentUser as User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -110,6 +111,25 @@ final class CreateTransactionWorkspaceNoteTaxFeatureTest extends TestCase
             'tax_mode' => 'none',
             'tax_amount_rupiah' => 0,
             'line_total_rupiah' => 40000,
+        ]);
+
+        /** revision stores note tax snapshot */
+        app(EnsureInitialNoteRevisionExists::class)->handle(
+            $noteId,
+            'revision-note-tax-001',
+            (string) $user->getAuthIdentifier(),
+        );
+
+        $this->assertDatabaseHas('note_revisions', [
+            'id' => 'revision-note-tax-001',
+            'note_root_id' => $noteId,
+            'revision_number' => 1,
+            'grand_total_rupiah' => 44400,
+            'subtotal_before_note_tax_rupiah' => 40000,
+            'note_tax_input' => '11%',
+            'note_tax_mode' => 'percent',
+            'note_tax_rate_basis_points' => 1100,
+            'note_tax_amount_rupiah' => 4400,
         ]);
     }
 }
