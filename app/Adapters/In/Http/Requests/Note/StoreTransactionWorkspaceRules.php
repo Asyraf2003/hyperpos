@@ -17,6 +17,7 @@ final class StoreTransactionWorkspaceRules
             'note.customer_name' => ['required', 'string'],
             'note.customer_phone' => ['nullable', 'string'],
             'note.transaction_date' => ['required', 'date_format:Y-m-d'],
+            'note.tax_input' => ['nullable', 'string', 'max:32'],
             'note.operational_note' => ['nullable', 'string', 'max:2000'],
 
             'items' => ['required', 'array', 'min:1'],
@@ -35,6 +36,7 @@ final class StoreTransactionWorkspaceRules
             'items.*.product_lines.*.product_id' => ['nullable', 'string'],
             'items.*.product_lines.*.qty' => ['nullable', 'integer', 'min:1'],
             'items.*.product_lines.*.unit_price_rupiah' => ['nullable', 'integer', 'min:1'],
+            'items.*.product_lines.*.tax_input' => ['nullable', 'string', 'max:32'],
 
             'items.*.external_purchase_lines' => ['nullable', 'array'],
             'items.*.external_purchase_lines.0.label' => ['nullable', 'string'],
