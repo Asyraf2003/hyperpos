@@ -198,6 +198,96 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         ]);
     }
 
+    public function test_create_supplier_invoice_endpoint_allocates_tax_to_landed_cost_and_inventory_costing(): void
+    {
+        $this->loginAsKasir();
+
+        $this->seedMinimalProduct('product-tax-1', 'TAX-001', 'Taxable One', 'Federal', 100, 15000);
+        $this->seedMinimalProduct('product-tax-2', 'TAX-002', 'Taxable Two', 'Federal', 90, 17000);
+
+        $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-TAX-001',
+            'nama_pt_pengirim' => 'PT Supplier Pajak',
+            'tanggal_pengiriman' => '2026-03-12',
+            'tax_input' => '10%',
+            'lines' => [
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-tax-1',
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 20000,
+                ],
+                [
+                    'line_no' => 2,
+                    'product_id' => 'product-tax-2',
+                    'qty_pcs' => 3,
+                    'line_total_rupiah' => 30000,
+                ],
+            ],
+        ]);
+
+        $response->assertOk();
+
+        $invoice = DB::table('supplier_invoices')
+            ->where('nomor_faktur_normalized', 'inv-sup-tax-001')
+            ->first();
+
+        $this->assertNotNull($invoice);
+
+        $this->assertSame(50000, (int) $invoice->subtotal_before_tax_rupiah);
+        $this->assertSame('10%', (string) $invoice->tax_input);
+        $this->assertSame('percent', (string) $invoice->tax_mode);
+        $this->assertSame(1000, (int) $invoice->tax_rate_basis_points);
+        $this->assertSame(5000, (int) $invoice->tax_amount_rupiah);
+        $this->assertSame(55000, (int) $invoice->grand_total_rupiah);
+
+        $line1 = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', (string) $invoice->id)
+            ->where('product_id', 'product-tax-1')
+            ->first();
+
+        $line2 = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', (string) $invoice->id)
+            ->where('product_id', 'product-tax-2')
+            ->first();
+
+        $this->assertNotNull($line1);
+        $this->assertNotNull($line2);
+
+        $this->assertSame(22000, (int) $line1->line_total_rupiah);
+        $this->assertSame(11000, (int) $line1->unit_cost_rupiah);
+        $this->assertSame(33000, (int) $line2->line_total_rupiah);
+        $this->assertSame(11000, (int) $line2->unit_cost_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'stock_in',
+            'qty_delta' => 2,
+            'unit_cost_rupiah' => 11000,
+            'total_cost_rupiah' => 22000,
+        ]);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-2',
+            'movement_type' => 'stock_in',
+            'qty_delta' => 3,
+            'unit_cost_rupiah' => 11000,
+            'total_cost_rupiah' => 33000,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-tax-1',
+            'avg_cost_rupiah' => 11000,
+            'inventory_value_rupiah' => 22000,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-tax-2',
+            'avg_cost_rupiah' => 11000,
+            'inventory_value_rupiah' => 33000,
+        ]);
+    }
+
     public function test_create_supplier_invoice_endpoint_rejects_unknown_product(): void
     {
         $this->loginAsKasir();
