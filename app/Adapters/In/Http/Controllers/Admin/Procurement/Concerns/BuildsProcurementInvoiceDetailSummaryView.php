@@ -8,11 +8,14 @@ trait BuildsProcurementInvoiceDetailSummaryView
 {
     /**
      * @param array<string, mixed> $summary
-     * @return array<string, bool|int|string>
+     * @return array<string, bool|int|string|null>
      */
     private function buildSummaryView(array $summary): array
     {
         $outstandingAmount = (int) ($summary['outstanding_rupiah'] ?? 0);
+        $grandTotalRupiah = (int) ($summary['grand_total_rupiah'] ?? 0);
+        $subtotalBeforeTaxRupiah = (int) ($summary['subtotal_before_tax_rupiah'] ?? $grandTotalRupiah);
+        $taxAmountRupiah = (int) ($summary['tax_amount_rupiah'] ?? 0);
 
         $supplierNamaCurrent = trim((string) ($summary['supplier_nama_pt_pengirim_current'] ?? ''));
         $supplierNamaSnapshot = trim((string) ($summary['supplier_nama_pt_pengirim_snapshot'] ?? ''));
@@ -25,7 +28,16 @@ trait BuildsProcurementInvoiceDetailSummaryView
             'supplier_nama_pt_pengirim_snapshot' => $supplierNamaSnapshot,
             'shipment_date' => (string) ($summary['shipment_date'] ?? ''),
             'due_date' => (string) ($summary['due_date'] ?? ''),
-            'grand_total_label' => $this->formatRupiah((int) ($summary['grand_total_rupiah'] ?? 0)),
+            'subtotal_before_tax_rupiah' => $subtotalBeforeTaxRupiah,
+            'subtotal_before_tax_label' => $this->formatRupiah($subtotalBeforeTaxRupiah),
+            'tax_input' => ($summary['tax_input'] ?? null) !== null ? (string) $summary['tax_input'] : null,
+            'tax_mode' => (string) ($summary['tax_mode'] ?? 'none'),
+            'tax_rate_basis_points' => ($summary['tax_rate_basis_points'] ?? null) !== null
+                ? (int) $summary['tax_rate_basis_points']
+                : null,
+            'tax_amount_rupiah' => $taxAmountRupiah,
+            'tax_amount_label' => $this->formatRupiah($taxAmountRupiah),
+            'grand_total_label' => $this->formatRupiah($grandTotalRupiah),
             'total_paid_label' => $this->formatRupiah((int) ($summary['total_paid_rupiah'] ?? 0)),
             'outstanding_label' => $this->formatRupiah($outstandingAmount),
             'outstanding_amount' => $outstandingAmount,
