@@ -25,7 +25,7 @@ final class SupplierInvoice
 
         $grandTotalRupiah = self::calculateGrandTotalRupiah($lines);
         $resolvedTaxSummary = $taxSummary ?? SupplierInvoiceTaxSummary::none($grandTotalRupiah->amount());
-        self::assertTaxSummaryMatchesGrandTotal($resolvedTaxSummary, $grandTotalRupiah);
+        self::assertTaxSummaryMatchesGrandTotal($resolvedTaxSummary, $grandTotalRupiah, $lines);
 
         return new self(
             trim($id),
@@ -63,7 +63,7 @@ final class SupplierInvoice
 
         $grandTotalRupiah = self::calculateGrandTotalRupiah($lines);
         $resolvedTaxSummary = $taxSummary ?? SupplierInvoiceTaxSummary::none($grandTotalRupiah->amount());
-        self::assertTaxSummaryMatchesGrandTotal($resolvedTaxSummary, $grandTotalRupiah);
+        self::assertTaxSummaryMatchesGrandTotal($resolvedTaxSummary, $grandTotalRupiah, $lines);
 
         return new self(
             trim($id),
