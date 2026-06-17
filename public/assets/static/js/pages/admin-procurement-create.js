@@ -1251,6 +1251,7 @@
     initProductLookup(item);
     initQtyInput(item);
     initMoneyInput(item);
+    attachTaxModeHandlers(item);
 
     const { qty, total } = getLineFields(item);
     attachSharedShortcuts(qty, item, "qty");

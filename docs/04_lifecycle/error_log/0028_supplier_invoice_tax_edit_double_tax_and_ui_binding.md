@@ -261,3 +261,8 @@ Minimum tests:
 Open.
 
 Next implementation slice should be 0028-A first because it protects money and inventory correctness. JS UX can wait; corrupted totals cannot. Humanity survives another annoying form, but accounting does not survive double tax.
+
+## Progress Log
+
+- 2026-06-18: 0028-A fixed. Edit/revise line item input now uses before-tax subtotal when available, preventing double tax on existing taxed invoices.
+- 2026-06-18: 0028-B fixed. Create/edit JS now binds line tax mode handlers during line item initialization.
