@@ -288,6 +288,62 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         ]);
     }
 
+    public function test_create_supplier_invoice_endpoint_rejects_invalid_supplier_tax_input(): void
+    {
+        $this->loginAsKasir();
+        $this->seedMinimalProduct('product-tax-invalid-1', 'TAX-INV-001', 'Tax Invalid', 'Federal', 100, 15000);
+
+        $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-TAX-INVALID-001',
+            'nama_pt_pengirim' => 'PT Supplier Pajak Invalid',
+            'tanggal_pengiriman' => '2026-03-12',
+            'tax_input' => 'abc%',
+            'lines' => [
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-tax-invalid-1',
+                    'qty_pcs' => 1,
+                    'line_total_rupiah' => 10000,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['tax_input']);
+
+        $this->assertDatabaseMissing('supplier_invoices', [
+            'nomor_faktur_normalized' => 'inv-sup-tax-invalid-001',
+        ]);
+    }
+
+    public function test_create_supplier_invoice_endpoint_rejects_supplier_tax_allocation_that_breaks_unit_cost_invariant(): void
+    {
+        $this->loginAsKasir();
+        $this->seedMinimalProduct('product-tax-invalid-2', 'TAX-INV-002', 'Tax Invalid Unit Cost', 'Federal', 100, 15000);
+
+        $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-TAX-INVALID-002',
+            'nama_pt_pengirim' => 'PT Supplier Pajak Invalid',
+            'tanggal_pengiriman' => '2026-03-12',
+            'tax_input' => '1',
+            'lines' => [
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-tax-invalid-2',
+                    'qty_pcs' => 3,
+                    'line_total_rupiah' => 300,
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['tax_input']);
+
+        $this->assertDatabaseMissing('supplier_invoices', [
+            'nomor_faktur_normalized' => 'inv-sup-tax-invalid-002',
+        ]);
+    }
+
     public function test_create_supplier_invoice_endpoint_rejects_unknown_product(): void
     {
         $this->loginAsKasir();
