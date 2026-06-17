@@ -82,6 +82,7 @@ trait SupplierInvoiceValidation
     }
 
     /** @param array<int, SupplierInvoiceLine> $lines */
+    /** @param array<int, SupplierInvoiceLine> $lines */
     private static function assertTaxSummaryMatchesGrandTotal(
         SupplierInvoiceTaxSummary $taxSummary, Money $grandTotalRupiah, array $lines
     ): void {
