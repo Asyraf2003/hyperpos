@@ -44,11 +44,12 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 144px 44px; gap: 16px;"
                             >
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
                                 <div>Total Rincian</div>
+                                <div>Pajak Rincian</div>
                                 <div class="text-center">Aksi</div>
                             </div>
 
@@ -71,7 +72,7 @@
 
                                         <div
                                             class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                            style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
+                                            style="grid-template-columns: minmax(0, 1fr) 72px 168px 144px 44px;"
                                         >
                                             <div class="w-100 position-relative">
                                                 <label class="form-label d-xl-none">Produk</label>
@@ -148,6 +149,20 @@
                                             </div>
 
                                             <div class="w-100">
+                                                <label class="form-label d-xl-none">Pajak Rincian</label>
+                                                <input
+                                                    type="text"
+                                                    name="lines[{{ $lineView['index'] }}][tax_input]"
+                                                    value="{{ $lineView['tax_input'] }}"
+                                                    class="form-control @error('lines.' . $lineView['index'] . '.tax_input') is-invalid @enderror"
+                                                    placeholder="11% / 15000"
+                                                >
+                                                @error('lines.' . $lineView['index'] . '.tax_input')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="w-100">
                                                 <label class="form-label d-xl-none">Aksi</label>
                                                 <button
                                                     type="button"
@@ -182,7 +197,7 @@
 
                                     <div
                                         class="d-flex flex-column d-xl-grid gap-3 align-items-start"
-                                        style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px;"
+                                        style="grid-template-columns: minmax(0, 1fr) 72px 168px 144px 44px;"
                                     >
                                         <div class="w-100 position-relative">
                                             <label class="form-label d-xl-none">Produk</label>
@@ -244,6 +259,17 @@
                                                 data-money-display
                                                 style="text-align: right;"
                                                 required
+                                            >
+                                        </div>
+
+                                        <div class="w-100">
+                                            <label class="form-label d-xl-none">Pajak Rincian</label>
+                                            <input
+                                                type="text"
+                                                name="lines[__INDEX__][tax_input]"
+                                                value=""
+                                                class="form-control"
+                                                placeholder="11% / 15000"
                                             >
                                         </div>
 

@@ -269,6 +269,8 @@
                                         <th>Ukuran</th>
                                         <th>Jumlah</th>
                                         <th>Harga Satuan</th>
+                                        <th>Subtotal Sebelum Pajak</th>
+                                        <th>Pajak Rincian</th>
                                         <th>Total Rincian</th>
                                     </tr>
                                 </thead>
@@ -282,11 +284,18 @@
                                             <td>{{ $line['ukuran'] ?? '-' }}</td>
                                             <td>{{ $line['qty_pcs'] }}</td>
                                             <td>{{ $line['unit_cost_label'] }}</td>
+                                            <td>{{ $line['line_subtotal_before_tax_label'] }}</td>
+                                            <td>
+                                                {{ $line['tax_amount_label'] }}
+                                                @if (($line['tax_input'] ?? null) !== null)
+                                                    <small class="text-muted d-block">Input: {{ $line['tax_input'] }}</small>
+                                                @endif
+                                            </td>
                                             <td>{{ $line['line_total_label'] }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
+                                            <td colspan="10" class="text-center text-muted py-4">
                                                 Belum ada rincian nota.
                                             </td>
                                         </tr>
