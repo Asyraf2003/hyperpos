@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Procurement\SupplierInvoice;
 
-use App\Core\Support\Money;
+use App\Core\Shared\ValueObjects\Money;
 
 trait SupplierInvoiceLineState
 {

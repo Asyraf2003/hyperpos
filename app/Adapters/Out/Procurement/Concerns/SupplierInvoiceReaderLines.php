@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 trait SupplierInvoiceReaderLines
 {
-    /** @return list<SupplierInvoiceLine> */
     private function supplierInvoiceLines(string $supplierInvoiceId): array
     {
         $rows = DB::table('supplier_invoice_lines')
-            ->select([
+            ->where('supplier_invoice_id', $supplierInvoiceId)
+            ->where('is_current', true)
+            ->orderBy('line_no')
+            ->get([
                 'id',
                 'line_no',
                 'product_id',
@@ -24,11 +26,13 @@ trait SupplierInvoiceReaderLines
                 'product_ukuran_snapshot',
                 'qty_pcs',
                 'line_total_rupiah',
-            ])
-            ->where('supplier_invoice_id', $supplierInvoiceId)
-            ->where('is_current', true)
-            ->orderBy('line_no')
-            ->get();
+                'unit_cost_rupiah',
+                'line_subtotal_before_tax_rupiah',
+                'tax_input',
+                'tax_mode',
+                'tax_rate_basis_points',
+                'tax_amount_rupiah',
+            ]);
 
         $lines = [];
 
@@ -43,6 +47,12 @@ trait SupplierInvoiceReaderLines
                 $row->product_ukuran_snapshot !== null ? (int) $row->product_ukuran_snapshot : null,
                 (int) $row->qty_pcs,
                 Money::fromInt((int) $row->line_total_rupiah),
+                Money::fromInt((int) $row->unit_cost_rupiah),
+                Money::fromInt((int) ($row->line_subtotal_before_tax_rupiah ?? $row->line_total_rupiah)),
+                $row->tax_input !== null ? (string) $row->tax_input : null,
+                (string) ($row->tax_mode ?? 'none'),
+                $row->tax_rate_basis_points !== null ? (int) $row->tax_rate_basis_points : null,
+                Money::fromInt((int) ($row->tax_amount_rupiah ?? 0))
             );
         }
 
