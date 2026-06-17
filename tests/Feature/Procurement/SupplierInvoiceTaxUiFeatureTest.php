@@ -22,6 +22,8 @@ final class SupplierInvoiceTaxUiFeatureTest extends TestCase
         $response->assertSee('Pajak Supplier');
         $response->assertSee('name="tax_input"', false);
         $response->assertSee('Contoh: 11% atau 15000');
+        $response->assertSee('Pajak Rincian');
+        $response->assertSee('name="lines[0][tax_input]"', false);
     }
 
     public function test_edit_page_renders_supplier_tax_input_with_existing_value(): void

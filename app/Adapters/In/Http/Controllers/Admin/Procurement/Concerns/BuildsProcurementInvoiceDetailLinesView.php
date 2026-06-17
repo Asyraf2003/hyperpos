@@ -23,18 +23,6 @@ trait BuildsProcurementInvoiceDetailLinesView
             $lineTaxInput = isset($line['tax_input']) ? trim((string) $line['tax_input']) : '';
             $lineTaxAmount = (int) ($line['tax_amount_rupiah'] ?? 0);
 
-            $lineSubtotalBeforeTax = $this->lineSubtotalBeforeTaxRupiah($line);
-            $lineTaxInput = isset($line['tax_input']) ? trim((string) $line['tax_input']) : '';
-            $lineTaxAmount = (int) ($line['tax_amount_rupiah'] ?? 0);
-
-            $lineSubtotalBeforeTax = $this->lineSubtotalBeforeTaxRupiah($line);
-            $lineTaxInput = isset($line['tax_input']) ? trim((string) $line['tax_input']) : '';
-            $lineTaxAmount = (int) ($line['tax_amount_rupiah'] ?? 0);
-
-            $lineSubtotalBeforeTax = $this->lineSubtotalBeforeTaxRupiah($line);
-            $lineTaxInput = isset($line['tax_input']) ? trim((string) $line['tax_input']) : '';
-            $lineTaxAmount = (int) ($line['tax_amount_rupiah'] ?? 0);
-
             $lineViews[] = [
                 'supplier_invoice_line_id' => isset($line['id']) ? (string) $line['id'] : null,
                 'product_id' => isset($line['product_id']) ? (string) $line['product_id'] : null,
@@ -65,4 +53,3 @@ trait BuildsProcurementInvoiceDetailLinesView
         return $subtotal > 0 ? $subtotal : (int) ($line['line_total_rupiah'] ?? 0);
     }
 }
-
