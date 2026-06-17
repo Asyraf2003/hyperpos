@@ -40,7 +40,7 @@
                         <div class="card-body">
                             <div
                                 class="d-none d-xl-grid text-muted small fw-semibold border-bottom pb-2 mb-3"
-                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 44px; gap: 16px;"
+                                style="grid-template-columns: minmax(0, 1fr) 72px 168px 144px 44px; gap: 16px;"
                             >
                                 <div>Produk</div>
                                 <div>Qty (Pcs)</div>
@@ -137,7 +137,7 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="w-100">
+                                            <div class="w-100" data-tax-line-group>
                                                 <label class="form-label d-xl-none">Pajak Rincian</label>
                                                 <input
                                                     type="text"
@@ -145,6 +145,7 @@
                                                     value="{{ $lineView['tax_input'] }}"
                                                     class="form-control @error('lines.' . $lineView['index'] . '.tax_input') is-invalid @enderror"
                                                     placeholder="11% / 15000"
+                                                    data-tax-line-input
                                                 >
                                                 @error('lines.' . $lineView['index'] . '.tax_input')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -243,7 +244,7 @@
                                             >
                                         </div>
 
-                                        <div class="w-100">
+                                        <div class="w-100" data-tax-line-group>
                                             <label class="form-label d-xl-none">Pajak Rincian</label>
                                             <input
                                                 type="text"
@@ -251,6 +252,7 @@
                                                 value=""
                                                 class="form-control"
                                                 placeholder="11% / 15000"
+                                                data-tax-line-input
                                             >
                                         </div>
 
@@ -360,13 +362,14 @@
                                         value="{{ old('tanggal_terima', now()->format('Y-m-d')) }}"
                                         class="form-control @error('tanggal_terima') is-invalid @enderror"
                                         data-procurement-header-field
+                                        data-tax-header-input
                                     >
                                     @error('tanggal_terima')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group" data-tax-header-group>
                                     <label for="tax_input" class="form-label">Pajak Supplier</label>
                                     <input
                                         type="text"
@@ -378,7 +381,7 @@
                                         data-procurement-header-field
                                     >
                                     <small class="text-muted d-block mt-1">
-                                        Pajak faktur supplier akan masuk ke landed cost stok. Kosongkan jika tidak ada pajak.
+                                        Isi ini untuk pajak faktur seragam. Jika terisi, pajak per rincian akan disembunyikan.
                                     </small>
                                     @error('tax_input')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>

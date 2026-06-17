@@ -28,6 +28,91 @@
 
   const lineItems = () => Array.from(container.querySelectorAll("[data-line-item]"));
 
+  const headerTaxInput = form.querySelector("[data-tax-header-input]");
+  const taxHasValue = (input) => String(input?.value ?? "").trim() !== "";
+  const lineTaxInputs = () => lineItems()
+    .map((item) => item.querySelector("[data-tax-line-input]"))
+    .filter((input) => input);
+
+  const setElementHidden = (element, hidden) => {
+    if (!element) return;
+    element.classList.toggle("d-none", hidden);
+  };
+
+  const clearInputValue = (input) => {
+    if (!input || input.value === "") return;
+    input.value = "";
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
+  const setHeaderTaxDisabled = (disabled) => {
+    if (!headerTaxInput) return;
+    headerTaxInput.disabled = disabled;
+    setElementHidden(headerTaxInput.closest("[data-tax-header-group]"), disabled);
+  };
+
+  const setLineTaxDisabled = (disabled) => {
+    lineItems().forEach((item) => {
+      const input = item.querySelector("[data-tax-line-input]");
+      if (input) input.disabled = disabled;
+      setElementHidden(item.querySelector("[data-tax-line-group]"), disabled);
+    });
+  };
+
+  const clearLineTaxInputs = () => {
+    lineTaxInputs().forEach(clearInputValue);
+  };
+
+  const updateTaxModeFields = (source = "") => {
+    const hasHeaderTax = taxHasValue(headerTaxInput);
+    const hasLineTax = lineTaxInputs().some(taxHasValue);
+
+    if (source === "header" && hasHeaderTax) {
+      clearLineTaxInputs();
+      setHeaderTaxDisabled(false);
+      setLineTaxDisabled(true);
+      return;
+    }
+
+    if (source === "line" && hasLineTax) {
+      clearInputValue(headerTaxInput);
+      setHeaderTaxDisabled(true);
+      setLineTaxDisabled(false);
+      return;
+    }
+
+    if (hasLineTax) {
+      setHeaderTaxDisabled(true);
+      setLineTaxDisabled(false);
+      return;
+    }
+
+    if (hasHeaderTax) {
+      setHeaderTaxDisabled(false);
+      setLineTaxDisabled(true);
+      return;
+    }
+
+    setHeaderTaxDisabled(false);
+    setLineTaxDisabled(false);
+  };
+
+  const attachTaxModeHandlers = (item) => {
+    const input = item.querySelector("[data-tax-line-input]");
+
+    if (!input || input.dataset.taxModeBound === "1") return;
+
+    input.dataset.taxModeBound = "1";
+    input.addEventListener("input", () => updateTaxModeFields("line"));
+    input.addEventListener("change", () => updateTaxModeFields("line"));
+  };
+
+  if (headerTaxInput) {
+    headerTaxInput.addEventListener("input", () => updateTaxModeFields("header"));
+    headerTaxInput.addEventListener("change", () => updateTaxModeFields("header"));
+  }
+
+
   const headerFields = () =>
     Array.from(form.querySelectorAll("[data-procurement-header-field]"))
       .filter((field) => field instanceof HTMLElement);
@@ -35,7 +120,8 @@
   const getLineFields = (item) => ({
     product: item.querySelector("[data-product-search]"),
     qty: item.querySelector("[data-qty-input]"),
-    total: item.querySelector("[data-money-display]")
+    total: item.querySelector("[data-money-display]"),
+    tax: item.querySelector("[data-tax-line-input]")
   });
 
   const focusField = (field, select = true) => {
@@ -405,6 +491,7 @@
     const qtyInput = item.querySelector("[data-qty-input]");
     const moneyRawInput = item.querySelector("[data-money-raw]");
     const moneyDisplayInput = item.querySelector("[data-money-display]");
+    const taxInput = item.querySelector("[data-tax-line-input]");
 
     if (lineNoInput) {
       lineNoInput.value = String(line.line_no ?? "");
@@ -433,6 +520,10 @@
         line.line_total_rupiah ?? "",
         line.line_total_display ?? ""
       );
+    }
+
+    if (taxInput) {
+      taxInput.value = String(line.tax_input ?? "");
     }
   };
 
@@ -467,7 +558,10 @@
 
     if (!item) return null;
 
-    return mountLineItem(item, lineData);
+    const mounted = mountLineItem(item, lineData);
+    updateTaxModeFields();
+
+    return mounted;
   };
 
   const getTopLine = () => lineItems()[0] || null;
@@ -616,7 +710,8 @@
             : "",
           qty_pcs: String(item.querySelector("[data-qty-input]")?.value ?? ""),
           line_total_rupiah: String(item.querySelector("[data-money-raw]")?.value ?? ""),
-          line_total_display: String(item.querySelector("[data-money-display]")?.value ?? "")
+          line_total_display: String(item.querySelector("[data-money-display]")?.value ?? ""),
+          tax_input: String(item.querySelector("[data-tax-line-input]")?.value ?? "")
         }))
     };
   };
@@ -1245,6 +1340,7 @@
   });
 
   lineItems().forEach(initLineItem);
+  updateTaxModeFields();
   initSupplierLookup();
   syncLineNumbers();
   updateRemoveButtons();

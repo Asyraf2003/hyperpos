@@ -21,9 +21,12 @@ final class SupplierInvoiceTaxUiFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Pajak Supplier');
         $response->assertSee('name="tax_input"', false);
+        $response->assertSee('data-tax-header-input', false);
         $response->assertSee('Contoh: 11% atau 15000');
         $response->assertSee('Pajak Rincian');
         $response->assertSee('name="lines[0][tax_input]"', false);
+        $response->assertSee('data-tax-line-input', false);
+        $response->assertSee('data-tax-line-group', false);
     }
 
     public function test_edit_page_renders_supplier_tax_input_with_existing_value(): void
@@ -38,6 +41,7 @@ final class SupplierInvoiceTaxUiFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Pajak Supplier');
         $response->assertSee('name="tax_input"', false);
+        $response->assertSee('data-tax-header-input', false);
         $response->assertSee('value="10%"', false);
         $response->assertSee('Pajak Rincian');
         $response->assertSee('name="lines[0][tax_input]"', false);
@@ -73,6 +77,8 @@ final class SupplierInvoiceTaxUiFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Pajak Rincian');
         $response->assertSee('name="lines[0][tax_input]"', false);
+        $response->assertSee('data-tax-line-input', false);
+        $response->assertSee('data-tax-line-group', false);
         $response->assertSee('value="11%"', false);
     }
 

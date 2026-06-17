@@ -148,7 +148,7 @@
                                                 @enderror
                                             </div>
 
-                                            <div class="w-100">
+                                            <div class="w-100" data-tax-line-group>
                                                 <label class="form-label d-xl-none">Pajak Rincian</label>
                                                 <input
                                                     type="text"
@@ -156,6 +156,7 @@
                                                     value="{{ $lineView['tax_input'] }}"
                                                     class="form-control @error('lines.' . $lineView['index'] . '.tax_input') is-invalid @enderror"
                                                     placeholder="11% / 15000"
+                                                    data-tax-line-input
                                                 >
                                                 @error('lines.' . $lineView['index'] . '.tax_input')
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -262,7 +263,7 @@
                                             >
                                         </div>
 
-                                        <div class="w-100">
+                                        <div class="w-100" data-tax-line-group>
                                             <label class="form-label d-xl-none">Pajak Rincian</label>
                                             <input
                                                 type="text"
@@ -270,6 +271,7 @@
                                                 value=""
                                                 class="form-control"
                                                 placeholder="11% / 15000"
+                                                data-tax-line-input
                                             >
                                         </div>
 
@@ -374,7 +376,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group" data-tax-header-group>
                                     <label for="tax_input" class="form-label">Pajak Supplier</label>
                                     <input
                                         type="text"
@@ -384,9 +386,10 @@
                                         class="form-control @error('tax_input') is-invalid @enderror"
                                         placeholder="Contoh: 11% atau 15000"
                                         data-procurement-header-field
+                                        data-tax-header-input
                                     >
                                     <small class="text-muted d-block mt-1">
-                                        Pajak faktur supplier akan masuk ke landed cost stok. Kosongkan jika tidak ada pajak.
+                                        Isi ini untuk pajak faktur seragam. Jika terisi, pajak per rincian akan disembunyikan.
                                     </small>
                                     @error('tax_input')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
