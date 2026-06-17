@@ -11,58 +11,68 @@ final class SupplierInvoiceTaxLandedCostAllocator
     public function __construct(
         private readonly SupplierInvoiceTaxInputCalculator $calculator,
         private readonly ?SupplierInvoiceTaxLineAllocator $lineAllocator = null,
-    ) {
-    }
+        private readonly ?SupplierInvoiceLineTaxAllocator $lineTaxAllocator = null,
+    ) {}
 
     /**
-     * @param list<array<string, mixed>> $lines
+     * @param array<int, array<string, mixed>> $lines
      */
     public function allocate(array $lines, null|string|int $taxInput): SupplierInvoiceTaxLandedCostAllocation
     {
-        $subtotal = $this->subtotalBeforeTax($lines);
-        $tax = $this->calculator->calculate($taxInput, $subtotal);
+        $baseSubtotal = $this->subtotal($lines);
+        $lineTaxedLines = $this->lineTaxAllocator()->allocate($lines);
+        $subtotalAfterLineTax = $this->subtotal($lineTaxedLines);
+        $tax = $this->calculator->calculate($taxInput, $subtotalAfterLineTax);
 
-        if ($tax->taxAmountRupiah() === 0) {
-            return new SupplierInvoiceTaxLandedCostAllocation($subtotal, $tax, $lines);
+        if ($tax->taxAmountRupiah() <= 0) {
+            $resolvedLines = $this->shouldKeepOriginalLines($lineTaxedLines) ? $lines : $lineTaxedLines;
+
+            return new SupplierInvoiceTaxLandedCostAllocation($baseSubtotal, $tax, $resolvedLines);
         }
 
-        if ($subtotal <= 0) {
-            throw new InvalidArgumentException('Subtotal supplier invoice harus lebih dari 0 untuk alokasi pajak.');
+        if ($subtotalAfterLineTax <= 0) {
+            throw new InvalidArgumentException('Subtotal supplier invoice wajib lebih dari 0 untuk pajak.');
         }
 
         return new SupplierInvoiceTaxLandedCostAllocation(
-            $subtotal,
+            $baseSubtotal,
             $tax,
-            $this->taxLineAllocator()->allocate($lines, $subtotal, $tax->taxAmountRupiah()),
+            $this->taxLineAllocator()->allocate($lineTaxedLines, $subtotalAfterLineTax, $tax->taxAmountRupiah())
         );
     }
 
     /**
-     * @param list<array<string, mixed>> $lines
+     * @param array<int, array<string, mixed>> $lines
      */
-    private function subtotalBeforeTax(array $lines): int
+    private function subtotal(array $lines): int
     {
-        $subtotal = 0;
+        return array_sum(array_map(
+            static fn (array $line): int => (int) ($line['line_total_rupiah'] ?? 0),
+            $lines
+        ));
+    }
 
+    /**
+     * @param array<int, array<string, mixed>> $lines
+     */
+    private function shouldKeepOriginalLines(array $lines): bool
+    {
         foreach ($lines as $line) {
-            if (! is_array($line)) {
-                throw new InvalidArgumentException('Line supplier invoice tidak valid.');
+            if (($line['tax_input'] ?? null) !== null || (int) ($line['tax_amount_rupiah'] ?? 0) !== 0) {
+                return false;
             }
-
-            $lineTotal = (int) ($line['line_total_rupiah'] ?? 0);
-
-            if ($lineTotal < 0) {
-                throw new InvalidArgumentException('Total line supplier invoice tidak boleh negatif.');
-            }
-
-            $subtotal += $lineTotal;
         }
 
-        return $subtotal;
+        return true;
     }
 
     private function taxLineAllocator(): SupplierInvoiceTaxLineAllocator
     {
         return $this->lineAllocator ?? new SupplierInvoiceTaxLineAllocator();
+    }
+
+    private function lineTaxAllocator(): SupplierInvoiceLineTaxAllocator
+    {
+        return $this->lineTaxAllocator ?? new SupplierInvoiceLineTaxAllocator($this->calculator);
     }
 }
