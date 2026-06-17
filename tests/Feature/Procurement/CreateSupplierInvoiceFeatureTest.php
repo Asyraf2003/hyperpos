@@ -550,7 +550,7 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
             ],
         ]);
 
-        $response->assertCreated();
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.index'));
 
         $invoice = DB::table('supplier_invoices')
             ->where('nomor_faktur_normalized', 'inv-sup-line-tax-001')
