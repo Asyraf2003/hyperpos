@@ -599,6 +599,7 @@
         nama_pt_pengirim: String(document.getElementById("nama_pt_pengirim")?.value ?? ""),
         tanggal_pengiriman: String(document.getElementById("tanggal_pengiriman")?.value ?? ""),
         tanggal_terima: String(document.getElementById("tanggal_terima")?.value ?? ""),
+        tax_input: String(document.getElementById("tax_input")?.value ?? ""),
         auto_receive: selectedAutoReceive ? String(selectedAutoReceive.value) : "1"
       },
       lines: lineItems()
@@ -620,7 +621,8 @@
     const payload = collectDraftPayload();
     const hasMeaningfulHeader =
       payload.header.nomor_faktur.trim() !== "" ||
-      payload.header.nama_pt_pengirim.trim() !== "";
+      payload.header.nama_pt_pengirim.trim() !== "" ||
+      payload.header.tax_input.trim() !== "";
 
     if (!hasMeaningfulHeader && payload.lines.length === 0) {
       clearDraft();
@@ -650,12 +652,14 @@
     const namaPtInput = document.getElementById("nama_pt_pengirim");
     const tanggalPengirimanInput = document.getElementById("tanggal_pengiriman");
     const tanggalTerimaInputLocal = document.getElementById("tanggal_terima");
+    const taxInput = document.getElementById("tax_input");
     const autoReceiveValue = String(header.auto_receive ?? "1");
 
     if (nomorFakturInput) nomorFakturInput.value = String(header.nomor_faktur ?? "");
     if (namaPtInput) namaPtInput.value = String(header.nama_pt_pengirim ?? "");
     if (tanggalPengirimanInput) tanggalPengirimanInput.value = String(header.tanggal_pengiriman ?? "");
     if (tanggalTerimaInputLocal) tanggalTerimaInputLocal.value = String(header.tanggal_terima ?? "");
+    if (taxInput) taxInput.value = String(header.tax_input ?? "");
 
     const autoReceiveTarget = document.querySelector(`input[name="auto_receive"][value="${autoReceiveValue}"]`);
     if (autoReceiveTarget instanceof HTMLInputElement) {
@@ -672,6 +676,7 @@
     }
 
     updateTanggalTerimaState();
+    updateTaxModeFields();
     updateDraftPanelState();
 
     const topLine = getTopLine();

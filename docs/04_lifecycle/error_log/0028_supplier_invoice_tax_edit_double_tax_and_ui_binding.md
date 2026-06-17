@@ -266,3 +266,4 @@ Next implementation slice should be 0028-A first because it protects money and i
 
 - 2026-06-18: 0028-A fixed. Edit/revise line item input now uses before-tax subtotal when available, preventing double tax on existing taxed invoices.
 - 2026-06-18: 0028-B fixed. Create/edit JS now binds line tax mode handlers during line item initialization.
+- 2026-06-18: 0028-C fixed. Create/edit draft payload now persists and restores header tax input, then recomputes tax mode visibility.
