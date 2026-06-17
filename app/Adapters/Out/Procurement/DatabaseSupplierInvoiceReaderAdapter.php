@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace App\Adapters\Out\Procurement;
 
+use App\Adapters\Out\Procurement\Concerns\SupplierInvoiceReaderLines;
+use App\Adapters\Out\Procurement\Concerns\SupplierInvoiceReaderTaxSummary;
 use App\Core\Procurement\SupplierInvoice\SupplierInvoice;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoiceLine;
-use App\Core\Procurement\SupplierInvoice\SupplierInvoiceTaxSummary;
-use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Procurement\SupplierInvoiceReaderPort;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
 final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReaderPort
 {
+    use SupplierInvoiceReaderLines;
+    use SupplierInvoiceReaderTaxSummary;
+
     public function getById(string $supplierInvoiceId): ?SupplierInvoice
     {
         return $this->fetch($supplierInvoiceId, false);
@@ -56,38 +58,7 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
             return null;
         }
 
-        $lineRows = DB::table('supplier_invoice_lines')
-            ->select([
-                'id',
-                'line_no',
-                'product_id',
-                'product_kode_barang_snapshot',
-                'product_nama_barang_snapshot',
-                'product_merek_snapshot',
-                'product_ukuran_snapshot',
-                'qty_pcs',
-                'line_total_rupiah',
-            ])
-            ->where('supplier_invoice_id', (string) $invoiceRow->id)
-            ->where('is_current', true)
-            ->orderBy('line_no')
-            ->get();
-
-        $lines = [];
-
-        foreach ($lineRows as $row) {
-            $lines[] = SupplierInvoiceLine::rehydrate(
-                (string) $row->id,
-                (int) $row->line_no,
-                (string) $row->product_id,
-                $row->product_kode_barang_snapshot !== null ? (string) $row->product_kode_barang_snapshot : null,
-                (string) $row->product_nama_barang_snapshot,
-                (string) $row->product_merek_snapshot,
-                $row->product_ukuran_snapshot !== null ? (int) $row->product_ukuran_snapshot : null,
-                (int) $row->qty_pcs,
-                Money::fromInt((int) $row->line_total_rupiah),
-            );
-        }
+        $lines = $this->supplierInvoiceLines((string) $invoiceRow->id);
 
         return SupplierInvoice::rehydrate(
             (string) $invoiceRow->id,
@@ -103,50 +74,5 @@ final class DatabaseSupplierInvoiceReaderAdapter implements SupplierInvoiceReade
             $lines,
             $this->taxSummary($invoiceRow, $lines),
         );
-    }
-
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
-    private function taxSummary(object $invoiceRow, array $lines): SupplierInvoiceTaxSummary
-    {
-        $taxInput = $invoiceRow->tax_input !== null ? trim((string) $invoiceRow->tax_input) : null;
-        $taxInput = $taxInput === '' ? null : $taxInput;
-        $taxMode = trim((string) ($invoiceRow->tax_mode ?? SupplierInvoiceTaxSummary::MODE_NONE));
-        $taxRateBasisPoints = $invoiceRow->tax_rate_basis_points !== null
-            ? (int) $invoiceRow->tax_rate_basis_points
-            : null;
-        $taxAmountRupiah = (int) ($invoiceRow->tax_amount_rupiah ?? 0);
-
-        if (
-            $taxInput === null
-            && ($taxMode === '' || $taxMode === SupplierInvoiceTaxSummary::MODE_NONE)
-            && $taxRateBasisPoints === null
-            && $taxAmountRupiah === 0
-        ) {
-            return SupplierInvoiceTaxSummary::none($this->sumLineTotalRupiah($lines));
-        }
-
-        return SupplierInvoiceTaxSummary::rehydrate(
-            (int) ($invoiceRow->subtotal_before_tax_rupiah ?? 0),
-            $taxInput,
-            $taxMode,
-            $taxRateBasisPoints,
-            $taxAmountRupiah,
-        );
-    }
-
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
-    private function sumLineTotalRupiah(array $lines): int
-    {
-        $total = 0;
-
-        foreach ($lines as $line) {
-            $total += $line->lineTotalRupiah()->amount();
-        }
-
-        return $total;
     }
 }

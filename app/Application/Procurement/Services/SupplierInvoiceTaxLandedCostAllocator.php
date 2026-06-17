@@ -10,6 +10,7 @@ final class SupplierInvoiceTaxLandedCostAllocator
 {
     public function __construct(
         private readonly SupplierInvoiceTaxInputCalculator $calculator,
+        private readonly ?SupplierInvoiceTaxLineAllocator $lineAllocator = null,
     ) {
     }
 
@@ -32,7 +33,7 @@ final class SupplierInvoiceTaxLandedCostAllocator
         return new SupplierInvoiceTaxLandedCostAllocation(
             $subtotal,
             $tax,
-            $this->allocateTaxToLines($lines, $subtotal, $tax->taxAmountRupiah()),
+            $this->taxLineAllocator()->allocate($lines, $subtotal, $tax->taxAmountRupiah()),
         );
     }
 
@@ -60,71 +61,8 @@ final class SupplierInvoiceTaxLandedCostAllocator
         return $subtotal;
     }
 
-    /**
-     * @param list<array<string, mixed>> $lines
-     * @return list<array<string, mixed>>
-     */
-    private function allocateTaxToLines(array $lines, int $subtotal, int $taxAmount): array
+    private function taxLineAllocator(): SupplierInvoiceTaxLineAllocator
     {
-        $allocatedLines = [];
-        $remainders = [];
-        $allocatedTaxTotal = 0;
-
-        foreach ($lines as $index => $line) {
-            $lineTotal = (int) ($line['line_total_rupiah'] ?? 0);
-            $numerator = $lineTotal * $taxAmount;
-            $allocatedTax = intdiv($numerator, $subtotal);
-
-            $allocatedLines[$index] = [
-                ...$line,
-                'line_total_rupiah' => $lineTotal + $allocatedTax,
-            ];
-
-            $allocatedTaxTotal += $allocatedTax;
-
-            $remainders[] = [
-                'index' => $index,
-                'remainder' => $numerator % $subtotal,
-            ];
-        }
-
-        $remainingTax = $taxAmount - $allocatedTaxTotal;
-
-        usort($remainders, static function (array $left, array $right): int {
-            $byRemainder = $right['remainder'] <=> $left['remainder'];
-
-            return $byRemainder !== 0 ? $byRemainder : ($left['index'] <=> $right['index']);
-        });
-
-        for ($i = 0; $i < $remainingTax; $i++) {
-            $targetIndex = (int) $remainders[$i]['index'];
-            $allocatedLines[$targetIndex]['line_total_rupiah'] = (int) $allocatedLines[$targetIndex]['line_total_rupiah'] + 1;
-        }
-
-        ksort($allocatedLines);
-
-        $allocatedLines = array_values($allocatedLines);
-        $this->assertAllocatedLinesPreserveUnitCostInvariant($allocatedLines);
-
-        return $allocatedLines;
-    }
-
-    /**
-     * @param list<array<string, mixed>> $lines
-     */
-    private function assertAllocatedLinesPreserveUnitCostInvariant(array $lines): void
-    {
-        foreach ($lines as $line) {
-            $qtyPcs = (int) ($line['qty_pcs'] ?? 0);
-            $lineTotal = (int) ($line['line_total_rupiah'] ?? 0);
-
-            if ($qtyPcs < 1) {
-                throw new InvalidArgumentException('Qty supplier invoice harus lebih dari 0 untuk alokasi pajak.');
-            }
-
-            if ($lineTotal % $qtyPcs !== 0) {
-                throw new InvalidArgumentException('Alokasi pajak supplier invoice membuat total line tidak habis dibagi qty.');
-            }
-        }
+        return $this->lineAllocator ?? new SupplierInvoiceTaxLineAllocator();
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core\Procurement\SupplierInvoice;
 
-use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 
 final class SupplierInvoiceTaxSummary
@@ -24,9 +23,7 @@ final class SupplierInvoiceTaxSummary
 
     public static function none(int $subtotalBeforeTaxRupiah): self
     {
-        if ($subtotalBeforeTaxRupiah < 0) {
-            throw new DomainException('Subtotal sebelum pajak supplier invoice tidak boleh negatif.');
-        }
+        SupplierInvoiceTaxSummaryValidation::assertSubtotalBeforeTax($subtotalBeforeTaxRupiah);
 
         return new self(
             Money::fromInt($subtotalBeforeTaxRupiah),
@@ -52,7 +49,7 @@ final class SupplierInvoiceTaxSummary
             Money::fromInt($taxAmountRupiah),
         );
 
-        $summary->assertValid();
+        SupplierInvoiceTaxSummaryValidation::assertValid($summary);
 
         return $summary;
     }
@@ -85,41 +82,6 @@ final class SupplierInvoiceTaxSummary
     public function grandTotalAfterTaxRupiah(): Money
     {
         return $this->subtotalBeforeTaxRupiah->add($this->taxAmountRupiah);
-    }
-
-    private function assertValid(): void
-    {
-        if ($this->subtotalBeforeTaxRupiah->amount() < 0) {
-            throw new DomainException('Subtotal sebelum pajak supplier invoice tidak boleh negatif.');
-        }
-
-        if ($this->taxAmountRupiah->amount() < 0) {
-            throw new DomainException('Nominal pajak supplier invoice tidak boleh negatif.');
-        }
-
-        if (! in_array($this->taxMode, [self::MODE_NONE, self::MODE_PERCENT, self::MODE_FIXED], true)) {
-            throw new DomainException('Mode pajak supplier invoice tidak valid.');
-        }
-
-        if ($this->taxMode === self::MODE_NONE) {
-            if ($this->taxInput !== null || $this->taxRateBasisPoints !== null || $this->taxAmountRupiah->amount() !== 0) {
-                throw new DomainException('Pajak supplier invoice mode none harus kosong.');
-            }
-
-            return;
-        }
-
-        if ($this->taxInput === null) {
-            throw new DomainException('Input pajak supplier invoice wajib ada.');
-        }
-
-        if ($this->taxMode === self::MODE_PERCENT && ($this->taxRateBasisPoints === null || $this->taxRateBasisPoints < 0)) {
-            throw new DomainException('Basis points pajak supplier invoice tidak valid.');
-        }
-
-        if ($this->taxMode === self::MODE_FIXED && $this->taxRateBasisPoints !== null) {
-            throw new DomainException('Pajak fixed supplier invoice tidak boleh punya basis points.');
-        }
     }
 
     private static function normalizeNullableString(?string $value): ?string
