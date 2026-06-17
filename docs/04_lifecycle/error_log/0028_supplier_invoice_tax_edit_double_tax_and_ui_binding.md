@@ -1,10 +1,10 @@
 # 0028 Supplier Invoice Tax Edit Double Tax and UI Binding
 
-Status: OPEN  
+Status: RESOLVED  
 Severity: P0 for edit data correctness, P1 for JS/UI draft behavior  
 Area: Admin Procurement Supplier Invoices  
 Detected at: 2026-06-18  
-Owner: TBD  
+Owner: Asyraf Mubarak  
 
 ## Summary
 
@@ -267,3 +267,25 @@ Next implementation slice should be 0028-A first because it protects money and i
 - 2026-06-18: 0028-A fixed. Edit/revise line item input now uses before-tax subtotal when available, preventing double tax on existing taxed invoices.
 - 2026-06-18: 0028-B fixed. Create/edit JS now binds line tax mode handlers during line item initialization.
 - 2026-06-18: 0028-C fixed. Create/edit draft payload now persists and restores header tax input, then recomputes tax mode visibility.
+
+## Resolution Summary
+
+Resolved at: 2026-06-18
+
+Implemented fixes:
+
+- 0028-A: Edit/revise form now uses `line_subtotal_before_tax_rupiah` as the line input base when available, preventing double tax on existing taxed invoices.
+- 0028-B: Create/edit JavaScript now binds `attachTaxModeHandlers(item)` during line item initialization, so line tax immediately disables header tax mode.
+- 0028-C: Create/edit draft payload now persists and restores header `tax_input`, then recomputes tax mode visibility after restore.
+
+Verification performed:
+
+- Focused tax UI tests passed.
+- Focused supplier invoice update tests passed.
+- Browser manual verification passed for supplier invoice detail page.
+- Migration/schema issue was checked; detail page works after runtime DB verification.
+
+Remaining notes:
+
+- Optional UI badge for active tax mode is not required for correctness.
+- Full regression test should pass before commit/push.

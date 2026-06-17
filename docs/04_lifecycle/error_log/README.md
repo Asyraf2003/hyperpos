@@ -66,3 +66,4 @@ Pending yang masih terpisah:
 - File status may only be updated after there is proof.
 - Allowed statuses: Reported, Planned, Patched with verification gap, Fixed with proof, Strict Fixed, Deferred with owner acceptance.
 - The remediation blueprint lives in `docs/03_blueprints/error_log_remediation/`.
+- `0028_supplier_invoice_tax_edit_double_tax_and_ui_binding.md` — RESOLVED: supplier invoice tax edit double-tax, JS tax mode binding, and draft header tax persistence.
