@@ -39,6 +39,11 @@ trait ProcurementInvoiceDetailLinesQuery
                 'supplier_invoice_lines.qty_pcs',
                 'supplier_invoice_lines.line_total_rupiah',
                 'supplier_invoice_lines.unit_cost_rupiah',
+                'supplier_invoice_lines.line_subtotal_before_tax_rupiah',
+                'supplier_invoice_lines.tax_input',
+                'supplier_invoice_lines.tax_mode',
+                'supplier_invoice_lines.tax_rate_basis_points',
+                'supplier_invoice_lines.tax_amount_rupiah',
             ])
             ->map(static fn (object $row): array => [
                 'id' => (string) $row->id,
@@ -51,6 +56,13 @@ trait ProcurementInvoiceDetailLinesQuery
                 'qty_pcs' => (int) $row->qty_pcs,
                 'line_total_rupiah' => (int) $row->line_total_rupiah,
                 'unit_cost_rupiah' => (int) $row->unit_cost_rupiah,
+                'line_subtotal_before_tax_rupiah' => (int) ($row->line_subtotal_before_tax_rupiah ?? 0),
+                'tax_input' => $row->tax_input !== null ? (string) $row->tax_input : null,
+                'tax_mode' => (string) ($row->tax_mode ?? 'none'),
+                'tax_rate_basis_points' => $row->tax_rate_basis_points !== null
+                    ? (int) $row->tax_rate_basis_points
+                    : null,
+                'tax_amount_rupiah' => (int) ($row->tax_amount_rupiah ?? 0),
             ])
             ->all();
     }
