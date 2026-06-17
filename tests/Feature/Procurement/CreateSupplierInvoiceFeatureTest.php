@@ -527,4 +527,44 @@ final class CreateSupplierInvoiceFeatureTest extends TestCase
         $this->assertDatabaseCount('product_inventory', 0);
         $this->assertDatabaseCount('product_inventory_costing', 0);
     }
+
+    public function test_create_supplier_invoice_endpoint_accepts_line_tax_input(): void
+    {
+        $this->seedMinimalProduct('product-1', 'KB-001', 'Supra', 'Federal', 100, 15000);
+
+        $response = $this->postJson('/procurement/supplier-invoices/create', [
+            'nomor_faktur' => 'INV-SUP-LINE-TAX-001',
+            'nama_pt_pengirim' => 'PT Supplier Line Tax',
+            'tanggal_pengiriman' => '2026-03-12',
+            'lines' => [
+                [
+                    'line_no' => 1,
+                    'product_id' => 'product-1',
+                    'qty_pcs' => 1,
+                    'line_total_rupiah' => 100000,
+                    'tax_input' => ' 11% ',
+                ],
+            ],
+        ]);
+
+        $response->assertCreated();
+
+        $invoice = DB::table('supplier_invoices')
+            ->where('nomor_faktur_normalized', 'inv-sup-line-tax-001')
+            ->first();
+
+        $line = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', $invoice->id)
+            ->where('product_id', 'product-1')
+            ->first();
+
+        $this->assertSame(111000, (int) $line->line_total_rupiah);
+        $this->assertSame(111000, (int) $line->unit_cost_rupiah);
+        $this->assertSame(100000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame('11%', (string) $line->tax_input);
+        $this->assertSame('percent', (string) $line->tax_mode);
+        $this->assertSame(1100, (int) $line->tax_rate_basis_points);
+        $this->assertSame(11000, (int) $line->tax_amount_rupiah);
+    }
+
 }

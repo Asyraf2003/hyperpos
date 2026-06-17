@@ -21,7 +21,30 @@ final class CreateSupplierInvoiceInputNormalizer
             'tanggal_terima' => $this->trimOrNull($input['tanggal_terima'] ?? null),
             'auto_receive' => is_bool($autoReceive) ? $autoReceive : $this->toNullableBool($autoReceive),
             'tax_input' => $this->trimScalarOrNull($input['tax_input'] ?? null),
+            'lines' => $this->normalizeLines($input['lines'] ?? []),
         ];
+    }
+
+
+    /**
+     * @return array<int|string, mixed>
+     */
+    private function normalizeLines(mixed $lines): array
+    {
+        if (! is_array($lines)) {
+            return [];
+        }
+
+        foreach ($lines as $index => $line) {
+            if (! is_array($line)) {
+                continue;
+            }
+
+            $line['tax_input'] = $this->trimScalarOrNull($line['tax_input'] ?? null);
+            $lines[$index] = $line;
+        }
+
+        return $lines;
     }
 
     private function trimScalarOrNull(mixed $value): ?string

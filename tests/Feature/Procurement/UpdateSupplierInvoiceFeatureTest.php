@@ -349,6 +349,49 @@ final class UpdateSupplierInvoiceFeatureTest extends TestCase
         ], $overrides);
     }
 
+    public function test_admin_can_update_supplier_invoice_with_line_tax_input(): void
+    {
+        $this->seedEditableInvoice();
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-1',
+            ]), [
+                'nomor_faktur' => 'INV-SUP-LINE-TAX-UPDATE',
+                'nama_pt_pengirim' => 'PT Supplier Line Tax Update',
+                'tanggal_pengiriman' => '2026-03-13',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-1',
+                        'qty_pcs' => 1,
+                        'line_total_rupiah' => 100000,
+                        'tax_input' => ' 11% ',
+                    ],
+                ],
+            ]);
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-1',
+        ]));
+
+        $line = DB::table('supplier_invoice_lines')
+            ->where('supplier_invoice_id', 'invoice-1')
+            ->where('product_id', 'product-1')
+            ->where('is_current', true)
+            ->first();
+
+        $this->assertSame(111000, (int) $line->line_total_rupiah);
+        $this->assertSame(111000, (int) $line->unit_cost_rupiah);
+        $this->assertSame(100000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame('11%', (string) $line->tax_input);
+        $this->assertSame('percent', (string) $line->tax_mode);
+        $this->assertSame(1100, (int) $line->tax_rate_basis_points);
+        $this->assertSame(11000, (int) $line->tax_amount_rupiah);
+    }
+
+
     private function seedEditableInvoice(): void
     {
         DB::table('suppliers')->insert([
