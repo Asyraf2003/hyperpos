@@ -83,15 +83,9 @@ trait SupplierInvoiceValidation
 
     /** @param array<int, SupplierInvoiceLine> $lines */
     /** @param array<int, SupplierInvoiceLine> $lines */
-    private static function assertTaxSummaryMatchesGrandTotal(
-        SupplierInvoiceTaxSummary $taxSummary, Money $grandTotalRupiah, array $lines
-    ): void {
-        $lineTaxTotal = 0;
-
-        foreach ($lines as $line) {
-            $lineTaxTotal += $line->taxAmountRupiah()->amount();
-        }
-
+    private static function assertTaxSummaryMatchesGrandTotal(SupplierInvoiceTaxSummary $taxSummary, Money $grandTotalRupiah, array $lines): void
+    {
+        $lineTaxTotal = array_reduce($lines, static fn (int $total, SupplierInvoiceLine $line): int => $total + $line->taxAmountRupiah()->amount(), 0);
         $expected = $taxSummary->grandTotalAfterTaxRupiah()->amount() + $lineTaxTotal;
 
         if ($expected !== $grandTotalRupiah->amount()) {
