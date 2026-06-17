@@ -41,7 +41,22 @@ final class CreateSupplierInvoiceTaxPostValidation
         try {
             $this->allocator->allocate(array_values($lines), $request->input('tax_input'));
         } catch (InvalidArgumentException $exception) {
-            $validator->errors()->add('tax_input', $exception->getMessage());
+            $validator->errors()->add($this->taxErrorKey($lines), $exception->getMessage());
         }
+    }
+    /**
+     * @param array<int, array<string, mixed>> $lines
+     */
+    private function taxErrorKey(array $lines): string
+    {
+        foreach ($lines as $index => $line) {
+            $value = $line['tax_input'] ?? null;
+
+            if ($value !== null && trim((string) $value) !== '') {
+                return 'lines.' . $index . '.tax_input';
+            }
+        }
+
+        return 'tax_input';
     }
 }

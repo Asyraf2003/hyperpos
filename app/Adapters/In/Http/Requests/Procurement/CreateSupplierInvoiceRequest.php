@@ -35,6 +35,7 @@ final class CreateSupplierInvoiceRequest extends FormRequest
             'lines.*.product_id' => ['required', 'string'],
             'lines.*.qty_pcs' => ['required', 'integer', 'min:1'],
             'lines.*.line_total_rupiah' => ['required', 'integer', 'min:1'],
+            'lines.*.tax_input' => ['nullable', 'string', 'max:64'],
         ];
     }
 

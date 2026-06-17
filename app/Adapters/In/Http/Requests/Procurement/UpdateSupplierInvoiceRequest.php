@@ -54,6 +54,7 @@ final class UpdateSupplierInvoiceRequest extends FormRequest
             'lines.*.product_id' => ['required', 'string'],
             'lines.*.qty_pcs' => ['required', 'integer', 'min:1'],
             'lines.*.line_total_rupiah' => ['required', 'integer', 'min:1'],
+            'lines.*.tax_input' => ['nullable', 'string', 'max:64'],
         ];
     }
 
@@ -69,6 +70,8 @@ final class UpdateSupplierInvoiceRequest extends FormRequest
             'change_reason.required' => 'Alasan perubahan wajib diisi.',
             'tax_input.string' => 'Pajak supplier invoice harus berupa teks.',
             'tax_input.max' => 'Pajak supplier invoice maksimal 64 karakter.',
+            'lines.*.tax_input.string' => 'Pajak per rincian harus berupa teks.',
+            'lines.*.tax_input.max' => 'Pajak per rincian maksimal 64 karakter.',
         ];
     }
 

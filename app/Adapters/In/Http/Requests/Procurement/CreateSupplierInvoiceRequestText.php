@@ -34,6 +34,8 @@ final class CreateSupplierInvoiceRequestText
             'lines.*.line_total_rupiah.required' => 'Total rincian wajib diisi.',
             'lines.*.line_total_rupiah.integer' => 'Total rincian harus berupa bilangan bulat.',
             'lines.*.line_total_rupiah.min' => 'Total rincian minimal 1 rupiah.',
+            'lines.*.tax_input.string' => 'Pajak per rincian harus berupa teks.',
+            'lines.*.tax_input.max' => 'Pajak per rincian maksimal 64 karakter.',
         ];
     }
 
@@ -52,6 +54,7 @@ final class CreateSupplierInvoiceRequestText
             'lines.*.product_id' => 'produk pada rincian',
             'lines.*.qty_pcs' => 'jumlah pada rincian',
             'lines.*.line_total_rupiah' => 'total rincian',
+            'lines.*.tax_input' => 'pajak per rincian',
         ];
     }
 }
