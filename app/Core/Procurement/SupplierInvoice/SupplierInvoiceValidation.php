@@ -92,11 +92,8 @@ trait SupplierInvoiceValidation
             throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
         }
     }
-
     /** @param array<int, SupplierInvoiceLine> $lines */
-
     /** @param array<int, SupplierInvoiceLine> $lines */
-
     /**
      * @param array<int, SupplierInvoiceLine> $lines
      */
