@@ -1000,4 +1000,91 @@ final class CreateTransactionWorkspaceServiceStoreStockFeatureTest extends TestC
         $this->assertDatabaseCount('inventory_movements', 0);
     }
 
+
+    public function test_cashier_cannot_store_template_locked_service_store_stock_without_active_template(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Template Locked Missing',
+            'email' => 'service-store-stock-template-locked-missing@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('products')->insert([
+            'id' => 'product-template-locked-missing-1',
+            'kode_barang' => 'KB-TPL-LOCK-MISS-001',
+            'nama_barang' => 'Produk Tanpa Template Paket',
+            'merek' => 'Federal',
+            'ukuran' => null,
+            'harga_jual' => 40000,
+        ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-template-locked-missing-1',
+            'qty_on_hand' => 10,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-template-locked-missing-1',
+            'avg_cost_rupiah' => 25000,
+            'inventory_value_rupiah' => 250000,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.create'))
+            ->post(route('notes.workspace.store'), [
+                'idempotency_key' => 'create-workspace-service-store-stock-template-locked-missing-idem-001',
+                'note' => [
+                    'customer_name' => 'Budi Template Locked Missing',
+                    'customer_phone' => '08123',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [[
+                    'entry_mode' => 'service',
+                    'part_source' => 'store_stock',
+                    'pricing_mode' => 'package_auto_split',
+                    'requires_service_product_template' => '1',
+                    'package_total_rupiah' => 100000,
+                    'pay_now' => 0,
+                    'service' => [
+                        'name' => 'Paket Tanpa Template',
+                        'price_rupiah' => 0,
+                        'notes' => '',
+                    ],
+                    'product_lines' => [[
+                        'product_id' => 'product-template-locked-missing-1',
+                        'qty' => 1,
+                        'unit_price_rupiah' => 40000,
+                    ]],
+                    'external_purchase_lines' => [[
+                        'label' => '',
+                        'qty' => '',
+                        'unit_cost_rupiah' => '',
+                    ]],
+                ]],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => '2026-03-15',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.workspace.create'));
+        $response->assertSessionHasErrors([
+            'workspace' => 'Paket servis + produk wajib memakai template aktif.',
+        ]);
+
+        $this->assertDatabaseCount('notes', 0);
+        $this->assertDatabaseCount('work_items', 0);
+        $this->assertDatabaseCount('work_item_service_details', 0);
+        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+    }
+
 }

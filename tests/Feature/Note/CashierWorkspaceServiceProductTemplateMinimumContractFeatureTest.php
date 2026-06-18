@@ -16,9 +16,13 @@ final class CashierWorkspaceServiceProductTemplateMinimumContractFeatureTest ext
         $this->assertStringContainsString('serviceTemplateDefaultPriceRupiah', $serviceCatalogJs);
         $this->assertStringContainsString('delete row.dataset.serviceTemplateDefaultPriceRupiah', $serviceCatalogJs);
         $this->assertStringContainsString('template.default_service_price_rupiah', $serviceCatalogJs);
+        $this->assertStringContainsString('serviceProductTemplateApplied', $serviceCatalogJs);
 
         $this->assertStringContainsString('minimumTemplateServicePrice', $paymentFlowJs);
         $this->assertStringContainsString('sparepartTotal + minimumTemplateServicePrice', $paymentFlowJs);
         $this->assertStringContainsString('Total paket tidak boleh membuat harga jasa di bawah default template', $paymentFlowJs);
+        $this->assertStringContainsString('requiresServiceProductTemplate', $paymentFlowJs);
+        $this->assertStringContainsString('Paket servis + produk wajib memakai template aktif.', $paymentFlowJs);
+        $this->assertStringContainsString('requires_service_product_template', (string) file_get_contents(resource_path('views/cashier/notes/workspace/partials/templates/service-store-stock.blade.php')));
     }
 }

@@ -40,7 +40,10 @@ final class CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer
         }
 
         $servicePrice = $packageTotal - $sparepartTotal;
-        $minimumTemplateServicePrice = $this->minimumTemplateServicePrice($pricedLines['product_lines']);
+        $minimumTemplateServicePrice = $this->minimumTemplateServicePrice(
+            $pricedLines['product_lines'],
+            $this->requiresServiceProductTemplate($item),
+        );
 
         if ($minimumTemplateServicePrice > 0 && $servicePrice < $minimumTemplateServicePrice) {
             throw new DomainException('Harga paket tidak boleh membuat harga jasa di bawah default template.');
@@ -58,7 +61,7 @@ final class CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer
     /**
      * @param mixed $productLines
      */
-    private function minimumTemplateServicePrice(mixed $productLines): int
+    private function minimumTemplateServicePrice(mixed $productLines, bool $requireTemplate = false): int
     {
         if (! is_array($productLines)) {
             return 0;
@@ -79,12 +82,26 @@ final class CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer
 
             $template = $this->templates->findActiveByProductId($productId);
 
-            if ($template !== null) {
-                $minimum = max($minimum, $template->defaultServicePriceRupiah);
+            if ($template === null) {
+                if ($requireTemplate) {
+                    throw new DomainException('Paket servis + produk wajib memakai template aktif.');
+                }
+
+                continue;
             }
+
+            $minimum = max($minimum, $template->defaultServicePriceRupiah);
         }
 
         return $minimum;
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function requiresServiceProductTemplate(array $item): bool
+    {
+        return filter_var($item['requires_service_product_template'] ?? false, FILTER_VALIDATE_BOOLEAN);
     }
 
     private function hasProductLine(mixed $value): bool

@@ -218,6 +218,8 @@
     const pricingMode = row.querySelector("[data-pricing-mode]")?.value || "";
     const packageTotalInput = row.querySelector('input[name$="[package_total_rupiah]"]');
     const packageTotal = digits(packageTotalInput?.value || "");
+    const requiresServiceProductTemplate =
+      row.querySelector("[data-requires-service-product-template]")?.value === "1";
 
     if (pricingMode !== "package_auto_split") {
       return null;
@@ -270,6 +272,16 @@
       return {
         message: "Total paket tidak boleh lebih kecil dari total harga sparepart.",
         target: row.querySelector("[data-package-total-input]") || packageTotalInput,
+      };
+    }
+
+    if (
+      requiresServiceProductTemplate &&
+      row.dataset.serviceProductTemplateApplied !== "1"
+    ) {
+      return {
+        message: "Paket servis + produk wajib memakai template aktif.",
+        target: row.querySelector("[data-product-search]") || row.querySelector("[data-package-total-input]") || packageTotalInput,
       };
     }
 
