@@ -55,6 +55,17 @@
   const currentPackageTotal = (row) =>
     digits(packageRaw(row)?.value || packageDisplay(row)?.value || "");
 
+  const shouldAutofillServiceIdentity = (row) => {
+    const input = serviceNameInput(row);
+    const currentName = String(input?.value || "").trim();
+
+    return (
+      currentName === "" ||
+      row.dataset.serviceTemplateAutofilled === "1" ||
+      row.dataset.serviceNameManual !== "1"
+    );
+  };
+
   const syncPackageTotal = (row, force = false) => {
     if ((row.dataset.itemType || "") !== "service_store_stock") return;
 
@@ -98,6 +109,8 @@
     const input = serviceNameInput(row);
     if (input) input.value = item.label || "";
     if (catalogIdInput(row)) catalogIdInput(row).value = item.id || "";
+    row.dataset.serviceNameManual = "1";
+    row.dataset.serviceTemplateAutofilled = "0";
 
     setDefaultFee(row, digits(item.default_price_rupiah), forceDisplay);
     syncPackageTotal(row, true);
@@ -192,6 +205,47 @@
     if (response.ok && rowData) selectService(row, rowData, row.dataset.servicePriceManual !== "1");
   };
 
+  NS.applyServiceProductTemplate = (row, template) => {
+    if (!(row instanceof HTMLElement)) return;
+    if ((row.dataset.itemType || "") !== "service_store_stock") return;
+    if (!template || typeof template !== "object") return;
+
+    const canAutofillServiceIdentity = shouldAutofillServiceIdentity(row);
+    const serviceName = String(template.service_name || "").trim();
+    const serviceCatalogItemId = String(template.service_catalog_item_id || "").trim();
+    const servicePrice = digits(template.default_service_price_rupiah);
+    const templatePackageTotal = digits(template.default_package_total_rupiah);
+
+    if (canAutofillServiceIdentity && serviceName !== "") {
+      const input = serviceNameInput(row);
+      if (input) input.value = serviceName;
+      row.dataset.serviceNameManual = "0";
+      row.dataset.serviceTemplateAutofilled = "1";
+    }
+
+    if (canAutofillServiceIdentity && serviceCatalogItemId !== "" && catalogIdInput(row)) {
+      catalogIdInput(row).value = serviceCatalogItemId;
+    }
+
+    if (servicePrice > 0 && row.dataset.servicePriceManual !== "1") {
+      setDefaultFee(row, servicePrice, true);
+    }
+
+    if (templatePackageTotal > 0) {
+      const current = currentPackageTotal(row);
+      const shouldSyncPackage = row.dataset.servicePackageAutofilled === "1" || current <= 0;
+
+      if (shouldSyncPackage) {
+        setPackageTotal(row, templatePackageTotal);
+      }
+    } else {
+      syncPackageTotal(row, false);
+    }
+
+    window.AdminMoneyInput?.bindBySelector?.(row);
+    NS.updateSummary?.();
+  };
+
   NS.syncServiceDefaults = (row, options = {}) => {
     if (!(row instanceof HTMLElement)) return;
 
@@ -210,6 +264,8 @@
     if (!(input instanceof HTMLInputElement)) return;
 
     input.addEventListener("input", () => {
+      row.dataset.serviceNameManual = "1";
+      row.dataset.serviceTemplateAutofilled = "0";
       catalogIdInput(row)?.setAttribute("value", "");
       if (catalogIdInput(row)) catalogIdInput(row).value = "";
       clearTimeout(timers.get(input));

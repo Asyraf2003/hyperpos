@@ -142,6 +142,7 @@
       display.value = String(item.default_unit_price_rupiah || 0);
     }
 
+    NS.applyServiceProductTemplate?.(row, item.service_product_template || null, scope);
     NS.updateStockText?.(row, item.available_stock, scope);
     window.AdminMoneyInput?.bindBySelector?.(row);
     NS.syncFloorPriceGuard?.(row);
@@ -183,7 +184,14 @@
         requestTokens.set(input, token);
 
         try {
-          const url = `${endpoint}?q=${encodeURIComponent(query)}`;
+          const params = new URLSearchParams({ q: query });
+
+          if ((row?.dataset?.itemType || "") === "service_store_stock") {
+            params.set("context", "service_product");
+          }
+
+          const separator = endpoint.includes("?") ? "&" : "?";
+          const url = `${endpoint}${separator}${params.toString()}`;
           const response = await fetch(url, { headers: { Accept: "application/json" } });
 
           if (!response.ok) {
