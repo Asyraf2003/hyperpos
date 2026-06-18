@@ -90,6 +90,13 @@
                                                         @endif
                                                     </small>
 
+                                                    <div class="small text-muted mt-1">
+                                                        Modal AVG:
+                                                        {{ $package['average_cost'] !== null ? number_format($package['average_cost'], 0, ',', '.') : 'Belum tersedia' }}
+                                                        · Margin produk:
+                                                        {{ $package['product_gross_margin'] !== null ? number_format($package['product_gross_margin'], 0, ',', '.') : 'Belum tersedia' }}
+                                                    </div>
+
                                                     <div class="mt-2">
                                                         <span class="badge {{ $package['is_active'] ? 'bg-success' : 'bg-secondary' }}">
                                                             {{ $package['is_active'] ? 'Aktif' : 'Nonaktif' }}

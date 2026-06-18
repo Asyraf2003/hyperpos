@@ -42,6 +42,7 @@ final class ShowProductPageController extends Controller
         return DB::table('service_product_templates')
             ->join('products', 'products.id', '=', 'service_product_templates.product_id')
             ->join('service_catalog_items', 'service_catalog_items.id', '=', 'service_product_templates.service_catalog_item_id')
+            ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'products.id')
             ->where('service_product_templates.product_id', trim($productId))
             ->select([
                 'service_product_templates.id',
@@ -52,6 +53,8 @@ final class ShowProductPageController extends Controller
                 'service_product_templates.is_active',
                 'products.nama_barang',
                 'products.harga_jual',
+                'product_inventory_costing.avg_cost_rupiah',
+                'product_inventory_costing.inventory_value_rupiah',
                 'service_catalog_items.name as service_name',
             ])
             ->orderByDesc('service_product_templates.is_active')
@@ -60,6 +63,9 @@ final class ShowProductPageController extends Controller
             ->get()
             ->map(function (object $row): array {
                 $productPrice = (int) $row->harga_jual;
+                $averageCost = $row->avg_cost_rupiah !== null ? (int) $row->avg_cost_rupiah : null;
+                $inventoryValue = $row->inventory_value_rupiah !== null ? (int) $row->inventory_value_rupiah : null;
+                $productGrossMargin = $averageCost !== null ? $productPrice - $averageCost : null;
                 $servicePrice = (int) $row->default_service_price_rupiah;
                 $minimumTotal = $productPrice + $servicePrice;
                 $packageTotal = $row->default_package_total_rupiah !== null
@@ -73,6 +79,9 @@ final class ShowProductPageController extends Controller
                     'product_name' => (string) $row->nama_barang,
                     'service_name' => (string) $row->service_name,
                     'product_price' => $productPrice,
+                    'average_cost' => $averageCost,
+                    'inventory_value' => $inventoryValue,
+                    'product_gross_margin' => $productGrossMargin,
                     'service_price' => $servicePrice,
                     'minimum_total' => $minimumTotal,
                     'package_total' => $packageTotal,

@@ -16,6 +16,7 @@ final class ShowServiceProductTemplatePageController extends Controller
         $row = DB::table('service_product_templates')
             ->join('products', 'products.id', '=', 'service_product_templates.product_id')
             ->join('service_catalog_items', 'service_catalog_items.id', '=', 'service_product_templates.service_catalog_item_id')
+            ->leftJoin('product_inventory_costing', 'product_inventory_costing.product_id', '=', 'products.id')
             ->where('service_product_templates.id', trim($templateId))
             ->select([
                 'service_product_templates.id',
@@ -31,6 +32,8 @@ final class ShowServiceProductTemplatePageController extends Controller
                 'products.merek',
                 'products.ukuran',
                 'products.harga_jual',
+                'product_inventory_costing.avg_cost_rupiah',
+                'product_inventory_costing.inventory_value_rupiah',
                 'service_catalog_items.name as service_name',
                 'service_catalog_items.default_price_rupiah as current_service_price_rupiah',
                 'service_catalog_items.is_active as service_is_active',
@@ -44,6 +47,9 @@ final class ShowServiceProductTemplatePageController extends Controller
         }
 
         $productPrice = (int) $row->harga_jual;
+        $averageCost = $row->avg_cost_rupiah !== null ? (int) $row->avg_cost_rupiah : null;
+        $inventoryValue = $row->inventory_value_rupiah !== null ? (int) $row->inventory_value_rupiah : null;
+        $productGrossMargin = $averageCost !== null ? $productPrice - $averageCost : null;
         $templateServicePrice = (int) $row->default_service_price_rupiah;
         $currentServicePrice = (int) $row->current_service_price_rupiah;
         $minimumTotal = $productPrice + $templateServicePrice;
@@ -62,6 +68,9 @@ final class ShowServiceProductTemplatePageController extends Controller
                 'product_brand' => $row->merek !== null && $row->merek !== '' ? (string) $row->merek : '-',
                 'product_size' => $row->ukuran !== null && (string) $row->ukuran !== '' ? (string) $row->ukuran : '-',
                 'product_price' => $productPrice,
+                'average_cost' => $averageCost,
+                'inventory_value' => $inventoryValue,
+                'product_gross_margin' => $productGrossMargin,
                 'service_name' => (string) $row->service_name,
                 'template_service_price' => $templateServicePrice,
                 'current_service_price' => $currentServicePrice,

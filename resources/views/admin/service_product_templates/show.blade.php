@@ -85,6 +85,20 @@
                         </div>
 
                         <div class="ui-key-value mb-3">
+                            <small>Harga Modal Produk AVG</small>
+                            <div>
+                                {{ $template['average_cost'] !== null ? number_format($template['average_cost'], 0, ',', '.') : 'Belum tersedia' }}
+                            </div>
+                        </div>
+
+                        <div class="ui-key-value mb-3">
+                            <small>Margin Produk dari Harga Jual</small>
+                            <div>
+                                {{ $template['product_gross_margin'] !== null ? number_format($template['product_gross_margin'], 0, ',', '.') : 'Belum tersedia' }}
+                            </div>
+                        </div>
+
+                        <div class="ui-key-value mb-3">
                             <small>Dibuat</small>
                             <div>{{ \App\Support\ViewDateFormatter::display($template['created_at'] ?? null, true) }}</div>
                         </div>
@@ -138,6 +152,27 @@
                                     <div class="ui-key-value">
                                         <small>Harga Jual Produk</small>
                                         <div>{{ number_format($template['product_price'], 0, ',', '.') }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="ui-key-value">
+                                        <small>Harga Modal AVG</small>
+                                        <div>{{ $template['average_cost'] !== null ? number_format($template['average_cost'], 0, ',', '.') : 'Belum tersedia' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="ui-key-value">
+                                        <small>Margin Produk</small>
+                                        <div>{{ $template['product_gross_margin'] !== null ? number_format($template['product_gross_margin'], 0, ',', '.') : 'Belum tersedia' }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="ui-key-value">
+                                        <small>Nilai Persediaan Produk</small>
+                                        <div>{{ $template['inventory_value'] !== null ? number_format($template['inventory_value'], 0, ',', '.') : 'Belum tersedia' }}</div>
                                     </div>
                                 </div>
 
