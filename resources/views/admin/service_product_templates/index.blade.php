@@ -83,6 +83,10 @@
                                     </td>
                                     <td>
                                         <div class="d-flex flex-wrap gap-2">
+                                            <a href="{{ route('admin.service-product-templates.show', ['templateId' => $template['id']]) }}" class="btn btn-sm btn-outline-info">
+                                                Detail
+                                            </a>
+
                                             <a href="{{ route('admin.service-product-templates.edit', ['templateId' => $template['id']]) }}" class="btn btn-sm btn-outline-primary">
                                                 Edit
                                             </a>

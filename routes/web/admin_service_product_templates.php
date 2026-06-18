@@ -7,6 +7,7 @@ use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\DeactivateServ
 use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\EditServiceProductTemplatePageController;
 use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\ReactivateServiceProductTemplateController;
 use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\ServiceProductTemplateIndexPageController;
+use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\ShowServiceProductTemplatePageController;
 use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\StoreServiceProductTemplateController;
 use App\Adapters\In\Http\Controllers\Admin\ServiceProductTemplate\UpdateServiceProductTemplateController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,9 @@ Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function ()
 
     Route::get('/admin/service-product-templates/create', CreateServiceProductTemplatePageController::class)
         ->name('admin.service-product-templates.create');
+
+    Route::get('/admin/service-product-templates/{templateId}', ShowServiceProductTemplatePageController::class)
+        ->name('admin.service-product-templates.show');
 
     Route::get('/admin/service-product-templates/{templateId}/edit', EditServiceProductTemplatePageController::class)
         ->name('admin.service-product-templates.edit');
