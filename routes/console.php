@@ -154,5 +154,7 @@ Artisan::command(
 )->purpose('Send push notification untuk hutang pemasok yang mendekati atau melewati jatuh tempo');
 
 
-require __DIR__ . '/console_audit.php';
-require __DIR__ . '/console_audit_outbox.php';
+if (! app()->runningUnitTests()) {
+    require __DIR__ . '/console_audit.php';
+    require __DIR__ . '/console_audit_outbox.php';
+}
