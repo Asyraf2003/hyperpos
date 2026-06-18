@@ -9,7 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Produk memakai harga jual katalog. Harga jasa mengikuti master jasa. Total paket wajib minimal produk + jasa.</h4>
+                        <h4 class="card-title mb-1">Produk memakai harga jual katalog. Harga jasa mengikuti master jasa. Total paket wajib minimal produk + jasa</h4>
                     </div>
 
                     <a href="{{ route('admin.service-product-templates.create') }}" class="btn btn-primary">
