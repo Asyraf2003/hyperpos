@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Master Jasa')
-@section('heading', 'Master Jasa')
+@section('title', 'Jasa')
+@section('heading', 'Jasa')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Master jasa bengkel</h4>
-                        <p class="text-muted mb-0">Dipakai untuk lookup kasir dan template jasa + produk.</p>
+                        <h4 class="card-title mb-1">Dipakai untuk lookup kasir dan template jasa + produk.</h4>
                     </div>
 
                     <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
