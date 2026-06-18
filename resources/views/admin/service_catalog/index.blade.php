@@ -9,7 +9,7 @@
             <div class="card-header">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                     <div>
-                        <h4 class="card-title mb-1">Dipakai untuk lookup kasir dan template jasa + produk.</h4>
+                        <h4 class="card-title mb-1">Dipakai untuk lookup kasir dan paket service</h4>
                     </div>
 
                     <a href="{{ route('admin.services.create') }}" class="btn btn-primary">
