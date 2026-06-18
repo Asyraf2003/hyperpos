@@ -83,6 +83,7 @@ final class ServiceProductTemplateFoundationMigrationTest extends TestCase
 
     public function test_service_product_templates_accept_valid_template_and_reject_non_positive_defaults(): void
     {
+        $this->skipUnlessMysqlOrMariaDb();
         $this->insertProductAndServiceCatalogItem();
 
         DB::table('service_product_templates')->insert([

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -34,21 +35,34 @@ return new class extends Migration
                 ->references('id')
                 ->on('service_catalog_items')
                 ->restrictOnDelete();
-
-            $table->check(
-                'default_service_price_rupiah > 0',
-                'service_product_templates_default_service_price_positive'
-            );
-
-            $table->check(
-                'default_package_total_rupiah IS NULL OR default_package_total_rupiah > 0',
-                'service_product_templates_default_package_total_positive'
-            );
         });
+
+        $this->addCheckConstraintsWhenSupported();
     }
 
     public function down(): void
     {
         Schema::dropIfExists('service_product_templates');
+    }
+
+    private function addCheckConstraintsWhenSupported(): void
+    {
+        $driver = DB::getDriverName();
+
+        if (! in_array($driver, ['mysql', 'mariadb'], true)) {
+            return;
+        }
+
+        DB::statement(
+            'ALTER TABLE service_product_templates
+             ADD CONSTRAINT service_product_templates_default_service_price_positive
+             CHECK (default_service_price_rupiah > 0)'
+        );
+
+        DB::statement(
+            'ALTER TABLE service_product_templates
+             ADD CONSTRAINT service_product_templates_default_package_total_positive
+             CHECK (default_package_total_rupiah IS NULL OR default_package_total_rupiah > 0)'
+        );
     }
 };
