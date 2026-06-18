@@ -67,6 +67,62 @@
                         </div>
                     </div>
 
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Paket Service Terhubung</h5>
+                        </div>
+
+                        <div class="card-body">
+                            @if (count($page['linked_service_packages'] ?? []) === 0)
+                                <p class="text-muted mb-0">Produk ini belum terhubung ke paket service.</p>
+                            @else
+                                <div class="vstack gap-3">
+                                    @foreach ($page['linked_service_packages'] as $package)
+                                        <div class="border rounded p-3">
+                                            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                                                <div>
+                                                    <div class="fw-semibold">{{ $package['service_name'] }}</div>
+                                                    <small class="text-muted">
+                                                        Total {{ number_format($package['package_total'], 0, ',', '.') }}
+                                                        · Min {{ number_format($package['minimum_total'], 0, ',', '.') }}
+                                                        @if ($package['package_margin'] > 0)
+                                                            · Selisih {{ number_format($package['package_margin'], 0, ',', '.') }}
+                                                        @endif
+                                                    </small>
+
+                                                    <div class="mt-2">
+                                                        <span class="badge {{ $package['is_active'] ? 'bg-success' : 'bg-secondary' }}">
+                                                            {{ $package['is_active'] ? 'Aktif' : 'Nonaktif' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="align-self-md-center">
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-sm btn-outline-primary"
+                                                        data-package-action="open"
+                                                        data-package-name="{{ $package['service_name'] }}"
+                                                        data-package-product="{{ $package['product_name'] }}"
+                                                        data-package-status="{{ $package['is_active'] ? 'active' : 'inactive' }}"
+                                                        data-detail-url="{{ route('admin.service-product-templates.show', ['templateId' => $package['id']]) }}"
+                                                        data-edit-url="{{ route('admin.service-product-templates.edit', ['templateId' => $package['id']]) }}"
+                                                        data-product-url="{{ route('admin.products.show', ['productId' => $package['product_id']]) }}"
+                                                        data-service-url="{{ route('admin.services.edit', ['serviceId' => $package['service_catalog_item_id']]) }}"
+                                                        data-deactivate-url="{{ route('admin.service-product-templates.deactivate', ['templateId' => $package['id']]) }}"
+                                                        data-reactivate-url="{{ route('admin.service-product-templates.reactivate', ['templateId' => $package['id']]) }}"
+                                                    >
+                                                        Aksi
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
                     @if ($page['initial_identity'] !== null || $page['initial_identity_meta']['note'] !== null)
                         <div class="card">
                             <div class="card-header">
@@ -232,5 +288,74 @@
                 </div>
             </div>
         </div>
+
+        <div
+            class="modal fade"
+            id="package-service-action-modal"
+            tabindex="-1"
+            aria-labelledby="package-service-action-modal-title"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header border-0 pb-0 px-4 pt-4">
+                        <div class="w-100">
+                            <h3 class="modal-title fw-bold mb-1" id="package-service-action-modal-title">Aksi Paket Service</h3>
+                            <p class="mb-0 text-muted fs-6" id="package-service-action-modal-subtitle">
+                                Pilih tindakan untuk paket service.
+                            </p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pb-4 pt-3">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <a href="#" id="package-service-action-detail-link" class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100">
+                                    <div class="fw-bold fs-5 mb-1">Detail</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a href="#" id="package-service-action-edit-link" class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100">
+                                    <div class="fw-bold fs-5 mb-1">Edit Paket</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a href="#" id="package-service-action-product-link" class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100">
+                                    <div class="fw-bold fs-5 mb-1">Lihat Produk</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <a href="#" id="package-service-action-service-link" class="btn btn-outline-primary w-100 text-start py-3 px-4 h-100">
+                                    <div class="fw-bold fs-5 mb-1">Edit Jasa</div>
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <form id="package-service-action-status-form" method="post" class="m-0">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <button
+                                        type="submit"
+                                        id="package-service-action-status-button"
+                                        class="btn btn-outline-warning w-100 text-start py-3 px-4"
+                                    >
+                                        <div class="fw-bold fs-5 mb-1" id="package-service-action-status-title">Nonaktifkan</div>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/static/js/pages/admin-package-service-actions.js') }}?v={{ config('app.asset_version') }}"></script>
+@endpush
