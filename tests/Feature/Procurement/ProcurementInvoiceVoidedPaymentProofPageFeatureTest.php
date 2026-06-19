@@ -42,7 +42,7 @@ final class ProcurementInvoiceVoidedPaymentProofPageFeatureTest extends TestCase
         $response->assertDontSee('Simpan Pembayaran');
         $response->assertDontSee('Unggah Bukti');
         $response->assertDontSee('Kirim Bukti Pembayaran');
-        $response->assertDontSee('Kirim Bukti &amp; Tandai Lunas', false);
+        $response->assertDontSee('Kirim Bukti & Tandai Lunas', false);
     }
 
     private function seedVoidedInvoice(string $id, string $supplierId): void
