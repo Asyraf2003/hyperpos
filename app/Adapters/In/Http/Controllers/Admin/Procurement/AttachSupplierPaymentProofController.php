@@ -19,7 +19,22 @@ final class AttachSupplierPaymentProofController extends Controller
     ): RedirectResponse {
         $data = $request->validate([
             'proof_files' => ['required', 'array', 'min:1', 'max:3'],
-            'proof_files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'proof_files.*' => [
+                'required',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf',
+                'max:10240',
+            ],
+        ], [
+            'proof_files.required' => 'Bukti pembayaran wajib dipilih.',
+            'proof_files.array' => 'Bukti pembayaran harus berupa daftar file.',
+            'proof_files.min' => 'Minimal unggah 1 bukti pembayaran.',
+            'proof_files.max' => 'Maksimal unggah 3 bukti pembayaran.',
+            'proof_files.*.required' => 'Bukti pembayaran wajib dipilih.',
+            'proof_files.*.uploaded' => 'Bukti pembayaran gagal diunggah. Biasanya ukuran foto kamera terlalu besar untuk batas upload server.',
+            'proof_files.*.file' => 'Bukti pembayaran harus berupa file.',
+            'proof_files.*.mimetypes' => 'Format bukti pembayaran harus JPG, PNG, WEBP, HEIC, HEIF, atau PDF.',
+            'proof_files.*.max' => 'Ukuran tiap bukti pembayaran maksimal 10 MB.',
         ]);
 
         $user = $request->user();
