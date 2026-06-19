@@ -1,6 +1,6 @@
 # 0036 - Supplier invoice payment proof Web/PWA audit findings
 
-Status: Draft / Audit Finding / Not Patched
+Status: Partially Fixed / Finding A Fixed / Finding B-C Open
 Keparahan: Medium
 Klasifikasi: procurement payment proof / attachment hardening / UI contract mismatch / idempotency test gap
 
@@ -36,6 +36,8 @@ Target owner:
 
 ## Finding A - Attachment storage path validation defense-in-depth
 
+Status: Fixed
+
 Severity: Medium
 
 Type: Attachment path validation / defense-in-depth
@@ -70,7 +72,31 @@ Test recommendation:
 - Assert route `admin.procurement.supplier-payment-proof-attachments.show` menghasilkan `404`.
 - Pastikan valid path existing tetap bisa inline/download.
 
+Fixed evidence:
+
+- `app/Adapters/Out/Procurement/LaravelSupplierPaymentProofFileStorageAdapter.php` sekarang memiliki `DIRECTORY_PREFIX = 'supplier-payment-proofs/'`.
+- `app/Adapters/Out/Procurement/LaravelSupplierPaymentProofFileStorageAdapter.php` sekarang memiliki `isValidPath()` guard.
+- `exists()` hanya mengecek disk jika path valid.
+- `get()` memakai `exists()`, sehingga hanya membaca path valid.
+- Guard menolak path kosong, path di luar prefix, `..`, backslash, NUL byte, leading slash, skema/protokol seperti `file://` atau `http://`, dan path absolute-like.
+- `app/Adapters/Out/Procurement/DatabaseSupplierPaymentProofAttachmentReaderAdapter.php` mengembalikan `null` untuk attachment row dengan invalid `storage_path`, sehingga controller menghasilkan `404` seperti file tidak ditemukan.
+- Test baru `test_admin_gets_404_when_supplier_payment_proof_attachment_storage_path_is_tampered` mencakup outside-prefix, traversal, leading slash, backslash, protocol URL, absolute-like path, empty path, dan NUL byte.
+
+Fixed test proof:
+
+- `php artisan test --filter=ServeSupplierPaymentProofAttachmentFeatureTest`
+  - PASS
+  - `4 passed (21 assertions)`
+- `php artisan test --filter=ExtremeProcurementAdminGuardAndAttachmentFailureMatrixFeatureTest`
+  - PASS
+  - `5 passed (9 assertions)`
+- `php artisan test --filter=UploadSupplierInvoicePaymentProofFeatureTest`
+  - PASS
+  - `4 passed (44 assertions)`
+
 ## Finding B - UI/backend contract mismatch for file format and max size
+
+Status: Open
 
 Severity: Medium
 
@@ -114,6 +140,8 @@ Test recommendation:
 
 ## Finding C - UX/idempotency/concurrency test gap
 
+Status: Open
+
 Severity: Low
 
 Type: UX/idempotency/concurrency test gap
@@ -152,7 +180,7 @@ Test recommendation:
 
 ## Safe Patch Order
 
-1. Fix Finding A dulu: attachment path whitelist/normalization + invalid path test.
+1. Finding A fixed: attachment path whitelist/normalization + invalid path test.
 2. Fix Finding B setelah owner lock contract format/size.
 3. Fix Finding C terakhir: double submit UI guard + duplicate/concurrency tests.
 
@@ -167,8 +195,8 @@ Test recommendation:
 
 ## Current Status
 
-Audit finding sudah dicatat sebagai draft.
+Finding A sudah fixed.
 
-Belum ada patch source app.
+Finding B dan Finding C masih open.
 
-Patch berikutnya harus dimulai dari Finding A setelah owner meminta eksekusi.
+Patch berikutnya harus menunggu owner decision untuk Finding B contract format/size, atau owner request terpisah untuk Finding C.
