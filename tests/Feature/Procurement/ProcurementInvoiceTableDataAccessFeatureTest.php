@@ -69,9 +69,9 @@ final class ProcurementInvoiceTableDataAccessFeatureTest extends TestCase
         self::assertSame(3, $lockedRow['total_received_qty']);
         self::assertSame('locked', $lockedRow['policy_state']);
 
-        self::assertSame('proof', $lockedRow['payment_action_kind']);
-        self::assertSame('Bukti Bayar', $lockedRow['payment_action_label']);
-        self::assertSame('link', $lockedRow['payment_action_mode']);
+        self::assertSame('payment_proof', $lockedRow['payment_action_kind']);
+        self::assertSame('Bayar', $lockedRow['payment_action_label']);
+        self::assertSame('modal', $lockedRow['payment_action_mode']);
         self::assertSame(
             route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-locked']),
             $lockedRow['payment_action_url']
