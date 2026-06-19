@@ -32,7 +32,9 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
                 $storedPath = $disk->putFileAs(
                     SupplierPaymentProofStoragePathGuard::directory($supplierPaymentId),
                     new File($sourcePath),
-                    $this->filename($file),
+                    SupplierPaymentProofStoredFilenameFactory::make(
+                        (string) ($file['original_filename'] ?? '')
+                    ),
                 );
 
                 if (! is_string($storedPath) || $storedPath === '') {
@@ -88,14 +90,4 @@ final class LaravelSupplierPaymentProofFileStorageAdapter implements SupplierPay
         return SupplierPaymentProofStoragePathGuard::isValid($path);
     }
 
-    private function filename(array $file): string
-    {
-        $extension = preg_replace(
-            '/[^a-z0-9]/',
-            '',
-            strtolower((string) pathinfo((string) ($file['original_filename'] ?? ''), PATHINFO_EXTENSION)),
-        ) ?? '';
-
-        return bin2hex(random_bytes(16)) . ($extension !== '' ? '.' . $extension : '');
-    }
 }
