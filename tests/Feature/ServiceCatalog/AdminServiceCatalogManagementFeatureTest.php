@@ -19,7 +19,7 @@ final class AdminServiceCatalogManagementFeatureTest extends TestCase
 
         $createPage = $this->actingAs($admin)->get(route('admin.services.create'));
         $createPage->assertOk();
-        $createPage->assertSee('Tambah Master Jasa', false);
+        $createPage->assertSee('Tambah Jasa', false);
 
         $storeResponse = $this->actingAs($admin)->post(route('admin.services.store'), [
             'name' => 'Ganti Oli Mesin',
