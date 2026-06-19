@@ -19,7 +19,12 @@ final class UploadSupplierInvoicePaymentProofController extends Controller
     ): RedirectResponse {
         $data = $request->validate([
             'proof_files' => ['required', 'array', 'min:1', 'max:3'],
-            'proof_files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'proof_files.*' => [
+                'required',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf',
+                'max:10240',
+            ],
         ]);
 
         $user = $request->user();

@@ -213,6 +213,10 @@
                     </div>
 
                     <div class="modal-body px-4 pb-4 pt-3">
+                        @error('supplier_payment_proof')
+                            <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
+
                         <form method="post" id="procurement-payment-form" enctype="multipart/form-data">
                             @csrf
 
@@ -225,7 +229,7 @@
                                     id="procurement-payment-proof-files"
                                     name="proof_files[]"
                                     class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
-                                    accept="image/*,.pdf"
+                                    accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf"
                                     multiple
                                     required
                                 >

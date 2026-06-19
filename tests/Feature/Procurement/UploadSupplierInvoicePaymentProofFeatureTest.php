@@ -61,6 +61,45 @@ final class UploadSupplierInvoicePaymentProofFeatureTest extends TestCase
         $this->assertPaidProjection('invoice-admin-proof-full-1', 100000, 1);
     }
 
+    public function test_admin_can_upload_webp_phone_image_payment_proof_and_auto_lunas(): void
+    {
+        Storage::fake('local');
+        $this->seedInvoiceFixture('invoice-admin-proof-webp-1', 100000);
+
+        $backUrl = route('admin.procurement.supplier-invoices.index');
+
+        $response = $this->actingAs($this->admin())
+            ->from($backUrl)
+            ->post(route('admin.procurement.supplier-invoices.payment-proof.store', [
+                'supplierInvoiceId' => 'invoice-admin-proof-webp-1',
+            ]), [
+                'payment_invoice_id' => 'invoice-admin-proof-webp-1',
+                'proof_files' => [
+                    UploadedFile::fake()->create('proof-admin-phone.webp', 5120, 'image/webp'),
+                ],
+            ]);
+
+        $response->assertRedirect($backUrl);
+        $response->assertSessionHas('success', 'Bukti pembayaran supplier berhasil diunggah.');
+
+        $payment = DB::table('supplier_payments')
+            ->where('supplier_invoice_id', 'invoice-admin-proof-webp-1')
+            ->first();
+
+        self::assertNotNull($payment);
+        self::assertSame(100000, (int) $payment->amount_rupiah);
+        self::assertSame('uploaded', (string) $payment->proof_status);
+
+        $attachments = DB::table('supplier_payment_proof_attachments')
+            ->where('supplier_payment_id', (string) $payment->id)
+            ->get();
+
+        self::assertCount(1, $attachments);
+        self::assertSame('proof-admin-phone.webp', (string) $attachments->first()->original_filename);
+
+        $this->assertPaidProjection('invoice-admin-proof-webp-1', 100000, 1);
+    }
+
     public function test_admin_invoice_level_payment_proof_pays_only_remaining_outstanding_after_legacy_partial_payment(): void
     {
         Storage::fake('local');
