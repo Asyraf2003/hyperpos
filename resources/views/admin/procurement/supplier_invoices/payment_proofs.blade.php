@@ -1,5 +1,4 @@
 @extends('layouts.app')
-@include('layouts.partials.date-picker-assets')
 
 @section('title', 'Pembayaran Nota Pemasok')
 @section('heading', 'Pembayaran Nota Pemasok')
@@ -18,66 +17,56 @@
                 @if ($summaryView['can_record_payment'] && ! $policyView['is_voided'])
                     <div class="card" id="payment-form-section">
                         <div class="card-header">
-                            <h4 class="card-title mb-1">Catat Pembayaran</h4>
+                            <h4 class="card-title mb-1">Kirim Bukti Pembayaran</h4>
                             <p class="mb-0 text-muted">
-                                Gunakan halaman ini untuk melihat status pembayaran, mencatat pembayaran baru, dan mengelola bukti bayar.
+                                Unggah bukti bayar. Setelah dikirim, nota pemasok otomatis ditandai lunas sebesar sisa tagihan.
                             </p>
                         </div>
 
                         <div class="card-body">
-                            @error('supplier_payment')
+                            @error('supplier_payment_proof')
                                 <div class="alert alert-danger">{{ $message }}</div>
                             @enderror
 
-                            <form action="{{ route('admin.procurement.supplier-invoices.payments.store', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}" method="post">
+                            @error('proof_files')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+
+                            @error('proof_files.*')
+                                <div class="alert alert-danger">{{ $message }}</div>
+                            @enderror
+
+                            <form
+                                action="{{ route('admin.procurement.supplier-invoices.payment-proof.store', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}"
+                                method="post"
+                                enctype="multipart/form-data"
+                            >
                                 @csrf
 
                                 <div class="form-group mb-4">
-                                    <label for="payment_date" class="form-label">Tanggal Pembayaran</label>
+                                    <label for="invoice_proof_files" class="form-label">Bukti Pembayaran</label>
                                     <input
-                                        type="date"
-                                        data-ui-date="single"
-                                        id="payment_date"
-                                        name="payment_date"
-                                        value="{{ old('payment_date', now()->format('Y-m-d')) }}"
-                                        class="form-control @error('payment_date') is-invalid @enderror"
+                                        type="file"
+                                        id="invoice_proof_files"
+                                        name="proof_files[]"
+                                        class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
+                                        accept=".jpg,.jpeg,.png,.pdf,image/*,application/pdf"
+                                        multiple
                                         required
                                     >
-                                    @error('payment_date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                    <small class="text-muted d-block mt-1">
+                                        Di PWA/mobile, pilih kamera atau galeri dari dialog perangkat. Maksimal 3 file. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
+                                    </small>
                                 </div>
 
-                                <div class="form-group mb-4" data-money-input-group>
-                                    <label for="amount_display" class="form-label">Nominal Pembayaran</label>
-
-                                    <input
-                                        type="hidden"
-                                        id="amount"
-                                        name="amount"
-                                        value="{{ old('amount', $summaryView['outstanding_amount']) }}"
-                                        data-money-raw
-                                    >
-
-                                    <input
-                                        type="text"
-                                        id="amount_display"
-                                        value="{{ old('amount', $summaryView['outstanding_amount']) }}"
-                                        class="form-control @error('amount') is-invalid @enderror"
-                                        placeholder="Contoh: 150.000"
-                                        inputmode="numeric"
-                                        data-money-display
-                                        required
-                                    >
-
-                                    @error('amount')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
+                                <div class="alert alert-light border">
+                                    <small class="text-muted d-block">Sisa tagihan yang akan otomatis dilunasi</small>
+                                    <strong>{{ $summaryView['outstanding_label'] }}</strong>
                                 </div>
 
                                 <div class="ui-form-actions">
                                     <button type="submit" class="btn btn-primary">
-                                        Simpan Pembayaran
+                                        Kirim Bukti & Tandai Lunas
                                     </button>
                                 </div>
                             </form>
@@ -91,18 +80,6 @@
                     </div>
 
                     <div class="card-body">
-                        @error('supplier_payment_proof')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-
-                        @error('proof_files')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-
-                        @error('proof_files.*')
-                            <div class="alert alert-danger">{{ $message }}</div>
-                        @enderror
-
                         @if ($paymentsView === [])
                             <div class="text-muted">Belum ada pembayaran pemasok.</div>
                         @else
@@ -133,40 +110,6 @@
                                             <small>Jumlah Lampiran</small>
                                             <strong>{{ $payment['attachment_count'] }}</strong>
                                         </div>
-
-                                        @if (! $policyView['is_voided'])
-                                            <form
-                                                action="{{ route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => $payment['id']]) }}"
-                                                method="post"
-                                                enctype="multipart/form-data"
-                                            >
-                                                @csrf
-
-                                                <div class="form-group mb-3">
-                                                    <label class="form-label" for="proof_files_{{ $payment['id'] }}">File Bukti</label>
-                                                    <input
-                                                        type="file"
-                                                        id="proof_files_{{ $payment['id'] }}"
-                                                        name="proof_files[]"
-                                                        class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
-                                                        accept=".jpg,.jpeg,.png,.pdf"
-                                                        multiple
-                                                        required
-                                                    >
-                                                    <small class="text-muted d-block mt-1">
-                                                        Maksimal 3 file per unggahan. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
-                                                    </small>
-                                                </div>
-
-                                                <div class="ui-form-actions">
-                                                    <button type="submit" class="btn btn-light-primary">
-                                                        Unggah Bukti
-                                                    </button>
-                                                </div>
-                                            </form>
-
-                                            <hr>
-                                        @endif
 
                                         <div>
                                             <small class="text-muted d-block mb-2">Riwayat Lampiran</small>
@@ -315,10 +258,3 @@
         </div>
     </section>
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('assets/static/js/shared/admin-money-input.js') }}?v={{ config('app.asset_version') }}"></script>
-    <script>
-        window.AdminMoneyInput?.bindBySelector(document);
-    </script>
-@endpush
