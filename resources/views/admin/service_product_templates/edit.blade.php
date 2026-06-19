@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Template Jasa + Produk')
-@section('heading', 'Edit Template Jasa + Produk')
+@section('title', 'Edit Service')
+@section('heading', 'Edit Service')
 
 @section('content')
     <section class="section">
@@ -9,8 +9,7 @@
             <div class="col-12 col-lg-7">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Edit Template Jasa + Produk</h4>
-                        <p class="text-muted mb-0">Perubahan hanya berlaku untuk lookup berikutnya. Nota historis tidak diubah.</p>
+                        <h4 class="card-title mb-1">Perubahan hanya berlaku untuk lookup berikutnya. Nota historis tidak diubah</h4>
                     </div>
 
                     <div class="card-body">
