@@ -30,7 +30,6 @@ Design blueprints, DoD, and workflow by topic. Flat within each topic subfolder.
 - `finance/` - note finance stabilization, finance residual, note revision refund ledger
 - `reporting/` - report export, reporting execution workflow
 - `seeder/` - legacy-to-clean
-- `mobile/` - mobile API
 - `error_log_remediation/` - DoD, sequence, workflow, strict closure protocol
 - `feature_continuation/` - feature continuation blueprint
 

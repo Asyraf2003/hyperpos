@@ -43,7 +43,6 @@ Each topic subfolder may contain adjacent file types:
 | `finance/` | Note finance stabilization, finance residual, note revision refund ledger |
 | `reporting/` | Report export, reporting execution workflow |
 | `seeder/` | Legacy-to-clean seeder migration |
-| `mobile/` | Mobile API v1 |
 | `audit/` | Canonical audit runtime, audit outbox planning, audit write-path readiness, and PostgreSQL/API audit transition planning |
 | `error_log_remediation/` | Error-log remediation process |
 | `feature_continuation/` | Feature continuation scope blueprint |

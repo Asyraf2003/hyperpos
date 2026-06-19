@@ -39,7 +39,6 @@ All old handoffs live in `docs/99_archive/handoff/`:
 - `step-based/` - handoffs from steps 02 through 12 (v1 era)
 - `ui/` - UI session handoffs
 - `v2/` - feature continuation session handoffs
-- `kotlin/` - Kotlin Android handoffs
 - `mobile-api/` - Mobile API handoffs
 - `seeder/` - Seeder handoffs
 - `error_log/` - Error-log remediation handoffs

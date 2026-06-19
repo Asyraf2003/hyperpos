@@ -93,7 +93,6 @@ Organized into subfolders:
 - `finance/` — note finance, residual, revision-refund-ledger
 - `reporting/` — report export, reporting execution
 - `seeder/` — legacy-to-clean
-- `mobile/` — mobile API
 - `error_log_remediation/` — error log remediation docs
 - `feature_continuation/` — feature continuation blueprint
 

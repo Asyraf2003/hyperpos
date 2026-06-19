@@ -1,26 +1,26 @@
-# 033 - Web and mobile login endpoints lack explicit rate limiting
+# 033 - Web login rate limiting; obsolete mobile API note retired
 
 Status: Strict Fixed
 Keparahan: Medium
 Klasifikasi: authentication hardening / brute-force resistance
 
+## Current Runtime Note
+
+HyperPOS current target adalah PWA/web-only. `routes/api.php`, `/api/v1/*`, `mobile-login`, dan Kotlin Android companion app tidak boleh diperlakukan sebagai runtime target aktif untuk sesi audit baru. Penyebutan mobile API di dokumen audit lama hanya boleh dibaca sebagai histori/superseded context.
+
 ## Ringkasan
 
-Web login dan mobile API login sebelumnya tidak memiliki throttle middleware atau rate limiter eksplisit.
+Web login sebelumnya tidak memiliki throttle middleware atau rate limiter eksplisit. Catatan lama tentang mobile API sudah obsolete karena HyperPOS sekarang memakai PWA/web dan tidak mendaftarkan routes/api.php.
 
-Patch sekarang menambahkan named rate limiter untuk dua boundary login:
+Patch sekarang mempertahankan named rate limiter `web-login` untuk `POST /login`.
 
-- `web-login` untuk `POST /login`;
-- `mobile-login` untuk `POST /api/v1/auth/login`.
-
-Kedua limiter memakai batas `5` request per menit dengan key `email ternormalisasi + IP address`.
+Limiter memakai batas `5` request per menit dengan key `email ternormalisasi + IP address`.
 
 ## Strict-Fixed-Scope
 
 Scope yang ditutup:
 
 - web login route `POST /login`;
-- mobile API login route `POST /api/v1/auth/login`;
 - repeated invalid login attempts dari email dan IP yang sama;
 - response `429` setelah limit terlampaui;
 - existing safe invalid-credential responses tetap dipertahankan.
@@ -38,7 +38,7 @@ Out of scope untuk log ini:
 
 Route web auth sebelumnya hanya memakai middleware `web` dan `app.shell`.
 
-Route mobile API login sebelumnya berada di luar `mobile.api.auth`, tetapi juga tidak memiliki throttle sendiri.
+Catatan mobile API pada dokumen ini adalah arsip lama dan tidak lagi menjadi runtime target.
 
 Controller login web dan mobile sudah mengembalikan pesan invalid credential yang aman, tetapi tidak ada request counter atau `429` proof untuk repeated attempts.
 
@@ -48,7 +48,6 @@ Controller login web dan mobile sudah mengembalikan pesan invalid credential yan
 
 - mendefinisikan `LOGIN_MAX_ATTEMPTS_PER_MINUTE = 5`;
 - register `RateLimiter::for('web-login', ...)`;
-- register `RateLimiter::for('mobile-login', ...)`;
 - key limiter dibuat dari `mb_strtolower(trim(email))` dan `$request->ip()`;
 - jika email kosong, key memakai fallback `missing-email`;
 - jika IP tidak tersedia, key memakai fallback `unknown-ip`.
@@ -57,9 +56,9 @@ Controller login web dan mobile sudah mengembalikan pesan invalid credential yan
 
 - `POST /login` sekarang memakai middleware `throttle:web-login`.
 
-`routes/api.php`
+`routes/api.php` sudah tidak menjadi runtime route target untuk HyperPOS PWA/web.
 
-- `POST /api/v1/auth/login` sekarang memakai middleware `throttle:mobile-login`.
+- Catatan `POST /api/v1/auth/login` adalah histori lama; route API mobile sudah retired dari target runtime PWA/web.
 
 `tests/Feature/Auth/WebAuthenticationFeatureTest.php`
 
@@ -75,7 +74,7 @@ Controller login web dan mobile sudah mengembalikan pesan invalid credential yan
 
 ## Jalur Rentan Sebelum Patch
 
-Attacker mengirim banyak request login dengan kombinasi email/password ke web login atau mobile API login -> aplikasi memproses setiap attempt tanpa counter rate-limit yang terlihat -> attacker dapat melakukan brute force atau credential stuffing sampai dibatasi oleh kontrol eksternal.
+Attacker mengirim banyak request login dengan kombinasi email/password ke web login -> aplikasi memproses setiap attempt tanpa counter rate-limit yang terlihat -> attacker dapat melakukan brute force atau credential stuffing sampai dibatasi oleh kontrol eksternal.
 
 ## Dampak
 
@@ -170,15 +169,13 @@ Hasil:
 Command:
 
 ```bash
-rg -n "RateLimiter::for|throttle:web-login|throttle:mobile-login|LOGIN_MAX_ATTEMPTS_PER_MINUTE|loginRateLimiterKey" app/Providers/IdentityAccessServiceProvider.php routes/web/auth.php routes/api.php
+rg -n "RateLimiter::for|throttle:web-login|LOGIN_MAX_ATTEMPTS_PER_MINUTE|loginRateLimiterKey" app/Providers/IdentityAccessServiceProvider.php routes/web/auth.php
 ```
 
 Hasil relevan:
 
 - `RateLimiter::for('web-login', ...)` ditemukan;
-- `RateLimiter::for('mobile-login', ...)` ditemukan;
 - `POST /login` memakai `throttle:web-login`;
-- `POST /api/v1/auth/login` memakai `throttle:mobile-login`;
 - limiter key builder ada di provider.
 
 ## Remaining Gaps
@@ -196,7 +193,7 @@ Belum ada kontrol untuk distributed credential stuffing dari banyak IP. Itu memb
 
 ## Strict Closure Decision
 
-0033 ditutup sebagai `Strict Fixed` untuk web login dan mobile API login rate limiting.
+0033 ditutup sebagai `Strict Fixed` untuk web login rate limiting. Bagian mobile API adalah histori lama dan superseded oleh keputusan PWA/web-only.
 
 Dasar closure:
 
