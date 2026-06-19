@@ -84,9 +84,9 @@ trait SupplierInvoiceValidation
     /** @param array<int, SupplierInvoiceLine> $lines */
     private static function assertTaxSummaryMatchesGrandTotal(SupplierInvoiceTaxSummary $taxSummary, Money $grandTotalRupiah, array $lines): void
     {
-        $lineSubtotalBeforeTaxTotal = array_reduce(
+        $lineGrandTotal = array_reduce(
             $lines,
-            static fn (int $total, SupplierInvoiceLine $line): int => $total + $line->lineSubtotalBeforeTaxRupiah()->amount(),
+            static fn (int $total, SupplierInvoiceLine $line): int => $total + $line->lineTotalRupiah()->amount(),
             0
         );
 
@@ -96,9 +96,21 @@ trait SupplierInvoiceValidation
             0
         );
 
-        if ($lineSubtotalBeforeTaxTotal !== $taxSummary->subtotalBeforeTaxRupiah()->amount()) {
+        $expectedGrandTotal = $taxSummary->grandTotalAfterTaxRupiah()->amount() + $lineTaxTotal;
+
+        if ($lineGrandTotal !== $grandTotalRupiah->amount()) {
             throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
         }
+
+        if ($expectedGrandTotal !== $grandTotalRupiah->amount()) {
+            throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
+        }
+    }
+
+        if ($expectedGrandTotal !== $grandTotalRupiah->amount()) {
+            throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
+        }
+    }
 
         if ($lineTaxTotal !== $taxSummary->taxAmountRupiah()->amount()) {
             throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
