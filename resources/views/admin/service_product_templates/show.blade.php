@@ -160,10 +160,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="alert alert-light-info border mt-3 mb-0">
-                                    Breakdown ini masih tampilan master paket. Persistence transaksi 80/20 akan masuk slice berikutnya supaya total nota tetap utuh.
-                                </div>
                             @endif
                         </div>
                     </div>
