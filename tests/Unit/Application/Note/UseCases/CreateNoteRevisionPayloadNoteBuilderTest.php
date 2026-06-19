@@ -25,6 +25,7 @@ use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use App\Ports\Out\ServiceCatalog\ServiceCatalogWriterPort;
+use App\Ports\Out\ServiceProductTemplate\ServiceProductTemplateLookupReaderPort;
 use App\Ports\Out\UuidPort;
 use PHPUnit\Framework\TestCase;
 
@@ -159,11 +160,18 @@ final class CreateNoteRevisionPayloadNoteBuilderTest extends TestCase
             }
         };
 
+        $templates = new class implements ServiceProductTemplateLookupReaderPort {
+            public function findActiveByProductId(string $productId): ?\App\Application\ServiceProductTemplate\DTO\ServiceProductTemplateLookupRow
+            {
+                return null;
+            }
+        };
+
         $mapper = new CreateTransactionWorkspaceWorkItemPayloadMapper(
             new CreateTransactionWorkspaceStoreStockLineMapper(),
             new CreateTransactionWorkspaceExternalPurchaseLineMapper(),
             new CreateTransactionWorkspaceServiceWorkItemVariantResolver(),
-            new CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer($products),
+            new CreateTransactionWorkspaceServiceStoreStockPackagePricingComposer($products, $templates),
         );
 
         $factory = new WorkItemFactory(

@@ -70,9 +70,6 @@ final class CreateTransactionWorkspaceWorkItemPayloadMapper
         return trim($value);
     }
 
-    /**
-     * @param array<string, mixed> $item
-     */
     private function optionalNonNegativeInt(mixed $value): int
     {
         return is_int($value) && $value > 0 ? $value : 0;
