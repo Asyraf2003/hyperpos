@@ -134,6 +134,33 @@ final class ProcurementInvoicePaymentProofPageFeatureTest extends TestCase
         $response->assertDontSee('Nominal Pembayaran');
     }
 
+    public function test_admin_can_attach_proof_to_existing_paid_supplier_payment_without_attachments(): void
+    {
+        $this->seedProduct('product-1', 'KB-001', 'Ban Luar', 'Federal', 90, 35000);
+        $this->seedSupplier('supplier-1', 'PT Sumber Makmur', 'pt sumber makmur');
+
+        $this->seedSupplierInvoice('invoice-1', 'supplier-1', '2026-03-15', '2026-04-15', 20000);
+        $this->seedSupplierInvoiceLine('invoice-line-1', 'invoice-1', 'product-1', 2, 20000, 10000);
+        $this->seedSupplierPayment('payment-1', 'invoice-1', 20000, '2026-03-16', 'pending');
+
+        $response = $this->actingAs($this->user('admin'))
+            ->get(route('admin.procurement.supplier-invoices.payment-proofs.show', ['supplierInvoiceId' => 'invoice-1']));
+
+        $response->assertOk();
+
+        $response->assertSee('Status Pembayaran');
+        $response->assertSee('Lunas');
+        $response->assertSee('Belum Ada Bukti');
+        $response->assertSee('Belum ada lampiran bukti.');
+        $response->assertSee('Upload Bukti Pembayaran');
+        $response->assertSee('payment_proof_files_0', false);
+        $response->assertSee(route('admin.procurement.supplier-payments.proof.store', ['supplierPaymentId' => 'payment-1']), false);
+        $response->assertSee('.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf', false);
+        $response->assertSee('Maksimal 3 file. Format: JPG, JPEG, PNG, WEBP, HEIC, HEIF, PDF. Maksimal 10 MB per file.');
+        $response->assertDontSee('Kirim Bukti & Tandai Lunas', false);
+        $response->assertDontSee('Nominal Pembayaran');
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
