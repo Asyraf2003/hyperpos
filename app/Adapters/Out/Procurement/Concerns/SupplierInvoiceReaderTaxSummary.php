@@ -9,9 +9,9 @@ use App\Core\Procurement\SupplierInvoice\SupplierInvoiceTaxSummary;
 
 trait SupplierInvoiceReaderTaxSummary
 {
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
+    use SupplierInvoiceReaderTaxSummaryLineTotals;
+
+    /** @param list<SupplierInvoiceLine> $lines */
     private function taxSummary(object $invoiceRow, array $lines): SupplierInvoiceTaxSummary
     {
         $taxInput = $invoiceRow->tax_input !== null ? trim((string) $invoiceRow->tax_input) : null;
@@ -21,7 +21,6 @@ trait SupplierInvoiceReaderTaxSummary
             ? (int) $invoiceRow->tax_rate_basis_points
             : null;
         $taxAmountRupiah = (int) ($invoiceRow->tax_amount_rupiah ?? 0);
-
         $subtotalBeforeTaxRupiah = $this->subtotalBeforeTaxRupiah($invoiceRow, $lines);
 
         if ($this->isNoTaxSummary($taxInput, $taxMode, $taxRateBasisPoints, $taxAmountRupiah)) {
@@ -45,9 +44,7 @@ trait SupplierInvoiceReaderTaxSummary
             && $amount === 0;
     }
 
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
+    /** @param list<SupplierInvoiceLine> $lines */
     private function subtotalBeforeTaxRupiah(object $invoiceRow, array $lines): int
     {
         $storedSubtotalBeforeTax = (int) ($invoiceRow->subtotal_before_tax_rupiah ?? 0);
@@ -61,47 +58,5 @@ trait SupplierInvoiceReaderTaxSummary
         }
 
         return $this->sumLineTotalRupiah($lines);
-    }
-
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
-    private function sumLineSubtotalBeforeTaxRupiah(array $lines): int
-    {
-        $total = 0;
-
-        foreach ($lines as $line) {
-            $total += $line->lineSubtotalBeforeTaxRupiah()->amount();
-        }
-
-        return $total;
-    }
-
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
-    private function sumLineTaxRupiah(array $lines): int
-    {
-        $total = 0;
-
-        foreach ($lines as $line) {
-            $total += $line->taxAmountRupiah()->amount();
-        }
-
-        return $total;
-    }
-
-    /**
-     * @param list<SupplierInvoiceLine> $lines
-     */
-    private function sumLineTotalRupiah(array $lines): int
-    {
-        $total = 0;
-
-        foreach ($lines as $line) {
-            $total += $line->lineTotalRupiah()->amount();
-        }
-
-        return $total;
     }
 }

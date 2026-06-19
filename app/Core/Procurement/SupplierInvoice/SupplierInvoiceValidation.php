@@ -10,6 +10,8 @@ use DateTimeImmutable;
 
 trait SupplierInvoiceValidation
 {
+    use SupplierInvoiceTaxValidation;
+
     /** @param list<SupplierInvoiceLine> $lines */
     private static function assertValid(
         string $id,
@@ -43,9 +45,7 @@ trait SupplierInvoiceValidation
             $lineNo = $line->lineNo();
 
             if (array_key_exists($productId, $seen)) {
-                throw new DomainException(
-                    'Baris ' . $lineNo . ': produk yang sama sudah dipakai di baris ' . $seen[$productId] . '.'
-                );
+                throw new DomainException('Baris ' . $lineNo . ': produk yang sama sudah dipakai di baris ' . $seen[$productId] . '.');
             }
 
             $seen[$productId] = $lineNo;
@@ -80,31 +80,4 @@ trait SupplierInvoiceValidation
 
         return $total;
     }
-
-    /** @param array<int, SupplierInvoiceLine> $lines */
-    private static function assertTaxSummaryMatchesGrandTotal(SupplierInvoiceTaxSummary $taxSummary, Money $grandTotalRupiah, array $lines): void
-    {
-        $lineGrandTotal = array_reduce(
-            $lines,
-            static fn (int $total, SupplierInvoiceLine $line): int => $total + $line->lineTotalRupiah()->amount(),
-            0
-        );
-
-        $lineTaxTotal = array_reduce(
-            $lines,
-            static fn (int $total, SupplierInvoiceLine $line): int => $total + $line->taxAmountRupiah()->amount(),
-            0
-        );
-
-        $expectedGrandTotal = $taxSummary->grandTotalAfterTaxRupiah()->amount() + $lineTaxTotal;
-
-        if ($lineGrandTotal !== $grandTotalRupiah->amount()) {
-            throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
-        }
-
-        if ($expectedGrandTotal !== $grandTotalRupiah->amount()) {
-            throw new DomainException('Grand total supplier invoice tidak cocok dengan subtotal dan pajak.');
-        }
-    }
-
 }

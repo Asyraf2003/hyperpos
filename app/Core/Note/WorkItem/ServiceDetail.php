@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Core\Note\WorkItem;
 
-use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 
 final class ServiceDetail
 {
+    use ServiceDetailValidation;
+
     public const PART_SOURCE_NONE = 'none';
     public const PART_SOURCE_CUSTOMER_OWNED = 'customer_owned';
 
@@ -35,14 +36,7 @@ final class ServiceDetail
 
         self::assertValid($serviceName, $servicePriceRupiah, $partSource, $profit, $packageBaseServicePriceRupiah, $extra);
 
-        return new self(
-            trim($serviceName),
-            $servicePriceRupiah,
-            trim($partSource),
-            $profit,
-            $packageBaseServicePriceRupiah,
-            $extra,
-        );
+        return new self(trim($serviceName), $servicePriceRupiah, trim($partSource), $profit, $packageBaseServicePriceRupiah, $extra);
     }
 
     public static function rehydrate(
@@ -53,14 +47,7 @@ final class ServiceDetail
         ?Money $packageBaseServicePriceRupiah = null,
         ?Money $packageServiceExtraRupiah = null,
     ): self {
-        return self::create(
-            $serviceName,
-            $servicePriceRupiah,
-            $partSource,
-            $packageProfitRupiah,
-            $packageBaseServicePriceRupiah,
-            $packageServiceExtraRupiah,
-        );
+        return self::create($serviceName, $servicePriceRupiah, $partSource, $packageProfitRupiah, $packageBaseServicePriceRupiah, $packageServiceExtraRupiah);
     }
 
     public function serviceName(): string
@@ -96,47 +83,5 @@ final class ServiceDetail
     public function partSource(): string
     {
         return $this->partSource;
-    }
-
-    private static function assertValid(
-        string $serviceName,
-        Money $servicePriceRupiah,
-        string $partSource,
-        Money $packageProfitRupiah,
-        ?Money $packageBaseServicePriceRupiah,
-        Money $packageServiceExtraRupiah,
-    ): void {
-        if (trim($serviceName) === '') {
-            throw new DomainException('Service name wajib ada.');
-        }
-
-        if ($servicePriceRupiah->amount() < 0) {
-            throw new DomainException('Service price rupiah tidak boleh negatif.');
-        }
-
-        if ($packageProfitRupiah->amount() < 0) {
-            throw new DomainException('Package profit rupiah tidak boleh negatif.');
-        }
-
-        if ($packageBaseServicePriceRupiah !== null && $packageBaseServicePriceRupiah->amount() < 0) {
-            throw new DomainException('Package base service price rupiah tidak boleh negatif.');
-        }
-
-        if ($packageServiceExtraRupiah->amount() < 0) {
-            throw new DomainException('Package service extra rupiah tidak boleh negatif.');
-        }
-
-        $normalizedPartSource = trim($partSource);
-
-        if (in_array(
-            $normalizedPartSource,
-            [
-                self::PART_SOURCE_NONE,
-                self::PART_SOURCE_CUSTOMER_OWNED,
-            ],
-            true
-        ) === false) {
-            throw new DomainException('Part source pada service detail tidak valid.');
-        }
     }
 }
