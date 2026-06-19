@@ -19,7 +19,7 @@ final class ReactivateServiceProductTemplateController extends Controller
         if ($template === null) {
             return redirect()
                 ->route('admin.service-product-templates.index')
-                ->with('error', 'Template jasa + produk tidak ditemukan.');
+                ->with('error', 'Service tidak ditemukan.');
         }
 
         $activeTemplateExists = DB::table('service_product_templates')
@@ -42,6 +42,6 @@ final class ReactivateServiceProductTemplateController extends Controller
 
         return redirect()
             ->route('admin.service-product-templates.index')
-            ->with('success', 'Template jasa + produk diaktifkan.');
+            ->with('success', 'Service diaktifkan.');
     }
 }

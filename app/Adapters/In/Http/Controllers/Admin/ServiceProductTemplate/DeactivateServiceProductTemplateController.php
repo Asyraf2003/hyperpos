@@ -22,11 +22,11 @@ final class DeactivateServiceProductTemplateController extends Controller
         if ($affected < 1) {
             return redirect()
                 ->route('admin.service-product-templates.index')
-                ->with('error', 'Template jasa + produk tidak ditemukan.');
+                ->with('error', 'Service tidak ditemukan.');
         }
 
         return redirect()
             ->route('admin.service-product-templates.index')
-            ->with('success', 'Template jasa + produk dinonaktifkan.');
+            ->with('success', 'Service dinonaktifkan.');
     }
 }

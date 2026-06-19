@@ -49,6 +49,6 @@ final class StoreServiceProductTemplateController extends Controller
 
         return redirect()
             ->route('admin.service-product-templates.index')
-            ->with('success', 'Template jasa + produk berhasil dibuat.');
+            ->with('success', 'Service berhasil dibuat.');
     }
 }

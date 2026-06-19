@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Template Jasa + Produk')
-@section('heading', 'Detail Template Jasa + Produk')
+@section('title', 'Detail Service')
+@section('heading', 'Detail Service')
 @section('back_url', route('admin.service-product-templates.index'))
 
 @section('content')

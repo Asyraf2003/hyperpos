@@ -22,7 +22,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $createPage = $this->actingAs($admin)->get(route('admin.service-product-templates.create'));
         $createPage->assertOk();
-        $createPage->assertSee('Tambah Template Jasa + Produk', false);
+        $createPage->assertSee('Tambah Service', false);
         $createPage->assertSee('Ban Admin Template', false);
         $createPage->assertSee('Jasa Pasang Ban Admin', false);
 
@@ -35,7 +35,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         ]);
 
         $storeResponse->assertRedirect(route('admin.service-product-templates.index'));
-        $storeResponse->assertSessionHas('success', 'Template jasa + produk berhasil dibuat.');
+        $storeResponse->assertSessionHas('success', 'Service berhasil dibuat.');
 
         $templateId = (string) DB::table('service_product_templates')
             ->where('product_id', 'product-admin-template-1')
@@ -59,7 +59,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $editPage = $this->actingAs($admin)->get(route('admin.service-product-templates.edit', ['templateId' => $templateId]));
         $editPage->assertOk();
-        $editPage->assertSee('Edit Template Jasa + Produk', false);
+        $editPage->assertSee('Edit Service', false);
         $editPage->assertSee('Jasa Pasang Ban Admin Update', false);
 
         $updateResponse = $this->actingAs($admin)->put(route('admin.service-product-templates.update', ['templateId' => $templateId]), [
@@ -71,7 +71,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         ]);
 
         $updateResponse->assertRedirect(route('admin.service-product-templates.index'));
-        $updateResponse->assertSessionHas('success', 'Template jasa + produk berhasil diperbarui.');
+        $updateResponse->assertSessionHas('success', 'Service berhasil diperbarui.');
 
         $this->assertDatabaseHas('service_product_templates', [
             'id' => $templateId,
@@ -83,7 +83,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $deactivateResponse = $this->actingAs($admin)->patch(route('admin.service-product-templates.deactivate', ['templateId' => $templateId]));
         $deactivateResponse->assertRedirect(route('admin.service-product-templates.index'));
-        $deactivateResponse->assertSessionHas('success', 'Template jasa + produk dinonaktifkan.');
+        $deactivateResponse->assertSessionHas('success', 'Service dinonaktifkan.');
 
         $this->assertDatabaseHas('service_product_templates', [
             'id' => $templateId,
@@ -92,7 +92,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $reactivateResponse = $this->actingAs($admin)->patch(route('admin.service-product-templates.reactivate', ['templateId' => $templateId]));
         $reactivateResponse->assertRedirect(route('admin.service-product-templates.index'));
-        $reactivateResponse->assertSessionHas('success', 'Template jasa + produk diaktifkan.');
+        $reactivateResponse->assertSessionHas('success', 'Service diaktifkan.');
 
         $this->assertDatabaseHas('service_product_templates', [
             'id' => $templateId,
@@ -168,7 +168,7 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
     {
         $user = User::query()->create([
             'name' => 'Admin Template User',
-            'email' => $role . '-service-product-template@example.test',
+            'email' => $role.'-service-product-template@example.test',
             'password' => 'password123',
         ]);
 

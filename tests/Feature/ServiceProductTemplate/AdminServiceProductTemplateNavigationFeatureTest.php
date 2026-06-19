@@ -19,7 +19,7 @@ final class AdminServiceProductTemplateNavigationFeatureTest extends TestCase
             ->get(route('admin.service-product-templates.index'));
 
         $response->assertOk();
-        $response->assertSee('Template Jasa + Produk', false);
+        $response->assertSee('Service', false);
         $response->assertSee(route('admin.service-product-templates.index'), false);
         $response->assertSee('bi bi-tools', false);
     }
@@ -28,7 +28,7 @@ final class AdminServiceProductTemplateNavigationFeatureTest extends TestCase
     {
         $user = User::query()->create([
             'name' => 'Admin Navigation User',
-            'email' => $role . '-service-product-template-navigation@example.test',
+            'email' => $role.'-service-product-template-navigation@example.test',
             'password' => 'password123',
         ]);
 

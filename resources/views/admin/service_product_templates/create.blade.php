@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Template Jasa + Produk')
-@section('heading', 'Tambah Template Jasa + Produk')
+@section('title', 'Tambah Service')
+@section('heading', 'Tambah Service')
 
 @section('content')
     <section class="section">
