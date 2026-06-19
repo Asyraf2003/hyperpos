@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Master Jasa')
-@section('heading', 'Tambah Master Jasa')
+@section('title', 'Tambah Jasa')
+@section('heading', 'Tambah Jasa')
 
 @section('content')
     <section class="section">
@@ -9,7 +9,7 @@
             <div class="col-12 col-lg-6">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Tambah Master Jasa</h4>
+                        <h4 class="card-title mb-1">Tambah Jasa</h4>
                     </div>
 
                     <div class="card-body">

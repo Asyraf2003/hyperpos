@@ -9,8 +9,7 @@
             <div class="col-12 col-lg-7">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-1">Tambah Template Jasa + Produk</h4>
-                        <p class="text-muted mb-0">Paket ini dipakai kasir untuk autofill servis + produk dari template aktif.</p>
+                        <h4 class="card-title mb-1">Paket ini dipakai kasir untuk autofill servis + produk dari template aktif</h4>
                     </div>
 
                     <div class="card-body">
