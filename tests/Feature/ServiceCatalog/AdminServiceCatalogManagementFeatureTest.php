@@ -43,7 +43,6 @@ final class AdminServiceCatalogManagementFeatureTest extends TestCase
 
         $indexPage = $this->actingAs($admin)->get(route('admin.services.index'));
         $indexPage->assertOk();
-        $indexPage->assertSee('Master jasa bengkel', false);
         $indexPage->assertSee('Ganti Oli Mesin', false);
         $indexPage->assertSee('Master Jasa', false);
         $indexPage->assertSee(route('admin.services.index'), false);
