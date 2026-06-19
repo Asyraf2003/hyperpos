@@ -42,7 +42,12 @@ final class ProcurementInvoiceIndexPageFeatureTest extends TestCase
         $response->assertSee('proof_files[]', false);
         $response->assertSee('image/webp', false);
         $response->assertSee('image/heic', false);
+        $response->assertSee('image/heif', false);
+        $response->assertSee('.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf', false);
+        $response->assertSee('Maksimal 3 file. Format: JPG, JPEG, PNG, WEBP, HEIC, HEIF, PDF. Maksimal 10 MB per file.');
         $response->assertSee('Kirim Bukti & Tandai Lunas', false);
+        $response->assertSee('procurement-payment-submit', false);
+        $response->assertSee('data-submitting-label="Mengirim..."', false);
         $response->assertDontSee('Catat Pembayaran Nota');
         $response->assertDontSee('Nominal Pembayaran');
         $response->assertDontSee('Simpan Pembayaran');

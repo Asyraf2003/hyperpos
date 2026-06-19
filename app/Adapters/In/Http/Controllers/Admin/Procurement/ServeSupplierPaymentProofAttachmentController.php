@@ -15,10 +15,23 @@ final class ServeSupplierPaymentProofAttachmentController extends Controller
     /**
      * @var array<string, true>
      */
+    private const SAFE_MIME_TYPES = [
+        'application/pdf' => true,
+        'image/jpeg' => true,
+        'image/png' => true,
+        'image/webp' => true,
+        'image/heic' => true,
+        'image/heif' => true,
+    ];
+
+    /**
+     * @var array<string, true>
+     */
     private const INLINE_MIME_TYPES = [
         'application/pdf' => true,
         'image/jpeg' => true,
         'image/png' => true,
+        'image/webp' => true,
     ];
 
     public function __invoke(
@@ -32,7 +45,7 @@ final class ServeSupplierPaymentProofAttachmentController extends Controller
 
         $content = $file->content();
         $mimeType = $this->safeMimeType($content);
-        $disposition = $request->boolean('download') || $mimeType === 'application/octet-stream'
+        $disposition = $request->boolean('download') || ! isset(self::INLINE_MIME_TYPES[$mimeType])
             ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
             : ResponseHeaderBag::DISPOSITION_INLINE;
 
@@ -60,7 +73,7 @@ final class ServeSupplierPaymentProofAttachmentController extends Controller
     {
         $detectedMimeType = $this->detectMimeType($content);
 
-        return isset(self::INLINE_MIME_TYPES[$detectedMimeType])
+        return isset(self::SAFE_MIME_TYPES[$detectedMimeType])
             ? $detectedMimeType
             : 'application/octet-stream';
     }

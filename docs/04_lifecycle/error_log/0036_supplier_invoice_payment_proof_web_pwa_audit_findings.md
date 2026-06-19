@@ -1,6 +1,6 @@
 # 0036 - Supplier invoice payment proof Web/PWA audit findings
 
-Status: Partially Fixed / Finding A Fixed / Finding B-C Open
+Status: Fixed / Finding A-C Fixed / True Concurrency Characterization Gap Remains
 Keparahan: Medium
 Klasifikasi: procurement payment proof / attachment hardening / UI contract mismatch / idempotency test gap
 
@@ -96,7 +96,7 @@ Fixed test proof:
 
 ## Finding B - UI/backend contract mismatch for file format and max size
 
-Status: Open
+Status: Fixed
 
 Severity: Medium
 
@@ -138,9 +138,42 @@ Test recommendation:
 - Tambahkan test upload untuk setiap format yang owner setujui.
 - Tambahkan test rejected format untuk format di luar kontrak.
 
+Fixed evidence:
+
+- Owner locked final upload contract:
+  - max file count `3`;
+  - max size `10 MB` per file;
+  - allowed formats `JPG/JPEG`, `PNG`, `WEBP`, `HEIC`, `HEIF`, `PDF`.
+- `resources/views/admin/procurement/supplier_invoices/index.blade.php` now uses explicit accept contract:
+  - `.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf`.
+- `resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php` now uses the same explicit accept contract and no longer uses free `image/*`.
+- Both UI upload forms now show the same help text:
+  - `Maksimal 3 file. Format: JPG, JPEG, PNG, WEBP, HEIC, HEIF, PDF. Maksimal 10 MB per file.`
+- `UploadSupplierInvoicePaymentProofController` already remained the backend source of truth with MIME validation `image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf` and max size `10240` KB.
+- `SupplierPaymentProofMimeTypeDetector` now keeps server-detected `image/webp`, `image/heic`, and `image/heif` as safe MIME values instead of downgrading all non-PDF/JPEG/PNG files to `application/octet-stream`.
+- `ServeSupplierPaymentProofAttachmentController` now treats PDF/JPEG/PNG/WEBP as safe inline MIME types, keeps HEIC/HEIF as safe MIME types, and serves unsupported inline-preview formats as attachment while preserving `X-Content-Type-Options: nosniff`.
+
+Fixed test proof:
+
+- `php artisan test --filter=ProcurementInvoiceIndexPageFeatureTest`
+  - PASS
+  - `3 passed (24 assertions)`
+- `php artisan test --filter=ProcurementInvoicePaymentProofPageFeatureTest`
+  - PASS
+  - `5 passed (56 assertions)`
+- `php artisan test --filter=ServeSupplierPaymentProofAttachmentFeatureTest`
+  - PASS
+  - `5 passed (25 assertions)`
+- `php artisan test --filter=SupplierPaymentProofFileStorageAdapterFeatureTest`
+  - PASS
+  - `2 passed (10 assertions)`
+- `php artisan test --filter=UploadSupplierInvoicePaymentProofFeatureTest`
+  - PASS
+  - `5 passed (58 assertions)`
+
 ## Finding C - UX/idempotency/concurrency test gap
 
-Status: Open
+Status: Fixed for UX guard and duplicate sequential POST; true concurrent two-tab characterization remains open
 
 Severity: Low
 
@@ -178,11 +211,35 @@ Test recommendation:
 - Jika runtime test mendukung concurrency, tambahkan concurrent characterization test dua worker terhadap invoice yang sama.
 - Assert projection tetap `paid`, outstanding `0`, dan payment sum tepat sebesar grand total.
 
+Fixed evidence:
+
+- `resources/views/admin/procurement/supplier_invoices/index.blade.php` now gives the modal payment proof submit button a stable `id="procurement-payment-submit"` and `data-submitting-label="Mengirim..."`.
+- `public/assets/static/js/pages/admin-procurement-invoices-table.js` now listens to the payment proof form submit event, checks native browser validity, disables the submit button only for valid submits, and changes the text to `Mengirim...`.
+- `resources/views/admin/procurement/supplier_invoices/payment_proofs.blade.php` now gives the direct payment proof page form and submit button stable IDs and applies the same valid-submit disable behavior.
+- The guard does not change server-side source of truth. Server-side preflight still recalculates outstanding under lock and rejects already-paid invoices.
+- Duplicate sequential POST test was added in `UploadSupplierInvoicePaymentProofFeatureTest`: first upload records the outstanding and paid projection; second upload to the same invoice is rejected and does not create a second payment.
+
+Fixed test proof:
+
+- `php artisan test --filter=UploadSupplierInvoicePaymentProofFeatureTest`
+  - PASS
+  - `5 passed (58 assertions)`
+- `php artisan test --filter=ProcurementInvoiceIndexPageFeatureTest`
+  - PASS
+  - `3 passed (24 assertions)`
+- `php artisan test --filter=ProcurementInvoicePaymentProofPageFeatureTest`
+  - PASS
+  - `5 passed (56 assertions)`
+
+Remaining gap:
+
+- True concurrent two-tab request characterization is not yet covered by a stable concurrency test. The server-side lock and already-paid preflight remain the source-of-truth controls, but a forked/two-worker characterization test is deferred to avoid introducing flaky DB-runtime behavior in this patch.
+
 ## Safe Patch Order
 
 1. Finding A fixed: attachment path whitelist/normalization + invalid path test.
-2. Fix Finding B setelah owner lock contract format/size.
-3. Fix Finding C terakhir: double submit UI guard + duplicate/concurrency tests.
+2. Finding B fixed: owner-locked file contract aligned across UI/backend/storage/serving.
+3. Finding C fixed for UX guard and duplicate sequential POST; true concurrent two-tab characterization remains deferred.
 
 ## Non-Goals
 
@@ -197,6 +254,10 @@ Test recommendation:
 
 Finding A sudah fixed.
 
-Finding B dan Finding C masih open.
+Finding B sudah fixed.
 
-Patch berikutnya harus menunggu owner decision untuk Finding B contract format/size, atau owner request terpisah untuk Finding C.
+Finding C sudah fixed untuk UX guard dan duplicate sequential POST.
+
+Remaining gap:
+
+- True concurrent two-tab characterization test belum ditambahkan.

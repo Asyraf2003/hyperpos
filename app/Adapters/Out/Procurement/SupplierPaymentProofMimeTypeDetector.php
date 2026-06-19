@@ -13,6 +13,9 @@ final class SupplierPaymentProofMimeTypeDetector
         'application/pdf' => true,
         'image/jpeg' => true,
         'image/png' => true,
+        'image/webp' => true,
+        'image/heic' => true,
+        'image/heif' => true,
     ];
 
     public static function safe(string $path): string

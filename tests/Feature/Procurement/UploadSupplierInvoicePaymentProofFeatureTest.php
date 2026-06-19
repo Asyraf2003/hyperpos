@@ -100,6 +100,58 @@ final class UploadSupplierInvoicePaymentProofFeatureTest extends TestCase
         $this->assertPaidProjection('invoice-admin-proof-webp-1', 100000, 1);
     }
 
+    public function test_duplicate_invoice_payment_proof_submit_does_not_create_second_payment(): void
+    {
+        Storage::fake('local');
+        $this->seedInvoiceFixture('invoice-admin-proof-duplicate-1', 100000);
+        $admin = $this->admin();
+
+        $backUrl = route('admin.procurement.supplier-invoices.payment-proofs.show', [
+            'supplierInvoiceId' => 'invoice-admin-proof-duplicate-1',
+        ]);
+        $route = route('admin.procurement.supplier-invoices.payment-proof.store', [
+            'supplierInvoiceId' => 'invoice-admin-proof-duplicate-1',
+        ]);
+
+        $first = $this->actingAs($admin)
+            ->from($backUrl)
+            ->post($route, [
+                'proof_files' => [
+                    UploadedFile::fake()->create('proof-admin-duplicate-1.pdf', 120, 'application/pdf'),
+                ],
+            ]);
+
+        $first->assertRedirect($backUrl);
+        $first->assertSessionHas('success', 'Bukti pembayaran supplier berhasil diunggah.');
+
+        $second = $this->actingAs($admin)
+            ->from($backUrl)
+            ->post($route, [
+                'proof_files' => [
+                    UploadedFile::fake()->create('proof-admin-duplicate-2.pdf', 120, 'application/pdf'),
+                ],
+            ]);
+
+        $second->assertRedirect($backUrl);
+        $second->assertSessionHasErrors(['supplier_payment_proof']);
+
+        self::assertSame(
+            1,
+            DB::table('supplier_payments')
+                ->where('supplier_invoice_id', 'invoice-admin-proof-duplicate-1')
+                ->count()
+        );
+
+        self::assertSame(
+            100000,
+            (int) DB::table('supplier_payments')
+                ->where('supplier_invoice_id', 'invoice-admin-proof-duplicate-1')
+                ->sum('amount_rupiah')
+        );
+
+        $this->assertPaidProjection('invoice-admin-proof-duplicate-1', 100000, 1);
+    }
+
     public function test_admin_invoice_level_payment_proof_pays_only_remaining_outstanding_after_legacy_partial_payment(): void
     {
         Storage::fake('local');

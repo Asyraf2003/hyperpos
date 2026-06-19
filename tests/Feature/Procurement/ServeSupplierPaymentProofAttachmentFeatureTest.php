@@ -65,6 +65,31 @@ final class ServeSupplierPaymentProofAttachmentFeatureTest extends TestCase
         self::assertStringContainsString('attachment', (string) $response->headers->get('content-disposition'));
     }
 
+    public function test_admin_can_preview_webp_supplier_payment_proof_attachment_inline(): void
+    {
+        Storage::fake('local');
+        $this->storeWebpFixture('supplier-payment-proofs/payment-1/proof.webp');
+
+        $this->seedPaymentFixture('payment-1');
+        $this->seedAttachment(
+            'attachment-1',
+            'payment-1',
+            'supplier-payment-proofs/payment-1/proof.webp',
+            'proof.webp',
+            'image/webp',
+        );
+
+        $response = $this->actingAs($this->user('admin'))
+            ->get(route('admin.procurement.supplier-payment-proof-attachments.show', [
+                'attachmentId' => 'attachment-1',
+            ]));
+
+        $response->assertOk();
+        self::assertStringContainsString('image/webp', (string) $response->headers->get('content-type'));
+        self::assertStringContainsString('inline', (string) $response->headers->get('content-disposition'));
+        self::assertSame('nosniff', strtolower((string) $response->headers->get('x-content-type-options')));
+    }
+
 
     public function test_supplier_payment_proof_attachment_does_not_serve_client_controlled_html_mime_inline(): void
     {
@@ -151,6 +176,16 @@ final class ServeSupplierPaymentProofAttachmentFeatureTest extends TestCase
         );
 
         Storage::disk('local')->put($path, is_string($jpeg) ? $jpeg : '');
+    }
+
+    private function storeWebpFixture(string $path): void
+    {
+        $webp = base64_decode(
+            'UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AA/vuUAAA=',
+            true,
+        );
+
+        Storage::disk('local')->put($path, is_string($webp) ? $webp : '');
     }
 
     private function user(string $role): User

@@ -240,13 +240,13 @@
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                                 <p class="fs-5 text-muted d-block mt-2">
-                                    Pilih foto dari kamera/galeri atau PDF. Setelah dikirim, sistem mencatat pembayaran sebesar sisa tagihan dan menandai nota lunas.
+                                    Maksimal 3 file. Format: JPG, JPEG, PNG, WEBP, HEIC, HEIF, PDF. Maksimal 10 MB per file.
                                 </p>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
                                 <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Kirim Bukti & Tandai Lunas</button>
+                                <button type="submit" class="btn btn-primary" id="procurement-payment-submit" data-submitting-label="Mengirim...">Kirim Bukti & Tandai Lunas</button>
                             </div>
                         </form>
                     </div>

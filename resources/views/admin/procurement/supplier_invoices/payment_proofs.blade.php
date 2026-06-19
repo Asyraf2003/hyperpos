@@ -37,6 +37,7 @@
                             @enderror
 
                             <form
+                                id="invoice-payment-proof-form"
                                 action="{{ route('admin.procurement.supplier-invoices.payment-proof.store', ['supplierInvoiceId' => $summaryView['supplier_invoice_id']]) }}"
                                 method="post"
                                 enctype="multipart/form-data"
@@ -50,12 +51,12 @@
                                         id="invoice_proof_files"
                                         name="proof_files[]"
                                         class="form-control @error('proof_files') is-invalid @enderror @error('proof_files.*') is-invalid @enderror"
-                                        accept=".jpg,.jpeg,.png,.pdf,image/*,application/pdf"
+                                        accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf"
                                         multiple
                                         required
                                     >
                                     <small class="text-muted d-block mt-1">
-                                        Di PWA/mobile, pilih kamera atau galeri dari dialog perangkat. Maksimal 3 file. Format: JPG, JPEG, PNG, PDF. Maksimal 2 MB per file.
+                                        Maksimal 3 file. Format: JPG, JPEG, PNG, WEBP, HEIC, HEIF, PDF. Maksimal 10 MB per file.
                                     </small>
                                 </div>
 
@@ -65,7 +66,7 @@
                                 </div>
 
                                 <div class="ui-form-actions">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-primary" id="invoice-payment-proof-submit" data-submitting-label="Mengirim...">
                                         Kirim Bukti & Tandai Lunas
                                     </button>
                                 </div>
@@ -258,3 +259,23 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    <script>
+        (() => {
+            const form = document.getElementById('invoice-payment-proof-form');
+            const button = document.getElementById('invoice-payment-proof-submit');
+
+            form?.addEventListener('submit', (event) => {
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = button.dataset.submittingLabel || 'Mengirim...';
+                }
+            });
+        })();
+    </script>
+@endpush
