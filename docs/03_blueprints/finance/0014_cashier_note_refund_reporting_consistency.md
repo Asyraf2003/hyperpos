@@ -69,8 +69,19 @@ Evidence:
 - Refund raw component policy and money realization basis lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: AUDIT_READY
+- Status: Batch 3 characterized
 - Last checked: 2026-06-20
-- Next action: Phase 1 refund/report characterization tests for raw component policy vs current behavior.
-- Tests linked: ClosedNoteFullRefund*, RecordSelectedRowsCustomerRefundFeatureTest, TransactionSummary*, TransactionCashLedger*, OperationalProfit*.
-- Owner decision dependency: none for V2 direction; exact manual exception workflow still needs characterization.
+- Last evidence: Phase 1 Batch 3 refund/reporting GREEN. `php artisan test --filter=RefundReportingOwnerDecisionV2CharacterizationTest`; `php artisan test --filter=ClosedNoteFullRefund`; `php artisan test --filter=RecordSelectedRowsCustomerRefund`; `php artisan test --filter=TransactionSummary`; `php artisan test --filter=TransactionCashLedger`; `php artisan test --filter=OperationalProfit`.
+- Current behavior found:
+  - Product store-stock refund records `refund_component_allocations` and inventory reversal uses the original `inventory_movements.unit_cost_rupiah`, not current AVG.
+  - Service-only refund currently can refund `service_fee`; this is a current-gap characterization against Owner Decision V2 default non-refundable service target.
+  - External purchase refund currently can refund `service_external_purchase_part` and `service_fee`; this is a current-gap characterization against Owner Decision V2 default non-refundable external purchase target.
+  - Package `service_with_store_stock_part` refund currently maps to raw payment component allocations: `service_store_stock_part` and `service_fee`. Product part and service fee can be separated or combined by allocation amount/order.
+  - Package refund after replacement targets current payment component allocations in the characterization fixture, not stale old components.
+  - Transaction summary uses `transaction_date`; cash ledger uses payment/refund event dates; Operational Profit remains cash-operational; inventory stock value remains current snapshot.
+- Gap summary:
+  - Phase 5 candidate: raw component-type refund policy.
+  - Phase 6 candidate: report query combination basis / package breakdown.
+- Next action: Phase 1 closure / Phase 2 preparation, not source patch.
+- Tests linked: RefundReportingOwnerDecisionV2CharacterizationTest, ClosedNoteFullRefund*, RecordSelectedRowsCustomerRefundFeatureTest, TransactionSummary*, TransactionCashLedger*, OperationalProfit*.
+- Owner decision dependency: none for V2 direction; manual exception workflow remains Phase 5 design target.

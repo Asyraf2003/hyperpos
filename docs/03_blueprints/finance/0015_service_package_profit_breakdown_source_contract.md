@@ -103,8 +103,16 @@ Evidence:
 - Combination date basis, future flexible package support, and full payload fingerprint lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: TEST_DESIGNED
+- Status: Batch 3 characterized
 - Last checked: 2026-06-20
-- Next action: Phase 1 characterization for combination date mapping and full payload field completeness.
-- Tests linked: future ServicePackageProfitBreakdown query tests; OperationalProfit regression tests.
-- Owner decision dependency: none for V2 direction; exact base-missing formula still needs characterization.
+- Last evidence: Phase 1 Batch 3 verified refund/report source basis through RefundReportingOwnerDecisionV2CharacterizationTest and focused OperationalProfit/TransactionSummary/TransactionCashLedger regressions.
+- Current behavior found:
+  - Future package breakdown source remains `payment_component_allocations`, `refund_component_allocations`, and `inventory_movements`.
+  - Operational Profit remains separate cash-operational report and does not expose package breakdown fields.
+  - InventoryCurrentSnapshotDatabaseQuery remains current product inventory/costing snapshot, not historical package profit source.
+  - Refund allocation shape uses raw component types (`service_store_stock_part`, `service_fee`, `service_external_purchase_part`, `product_only_work_item`) and does not create a package aggregate component.
+- Gap summary:
+  - Phase 6 candidate: explicit Service Package Profit Breakdown source contract across `transaction_date`, `payment_date`, `refund_date`, and `movement_date`.
+  - Double-count guard candidate: avoid counting `service_fee`, package service fields, and package profit fields twice once breakdown report exists.
+- Next action: Phase 1 closure / Phase 2 preparation, not report query patch.
+- Owner decision dependency: none for V2 direction; exact base-missing formula remains future characterization/hardening input.
