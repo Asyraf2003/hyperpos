@@ -40,7 +40,7 @@ Direction locked by Owner Decision V2:
 - Inventory movement: none.
 - Report impact: external purchase cost in Operational Profit uses transaction_date and refund netting uses refunded_at.
 - Current tests: `CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest` includes backend package path.
-- Gaps: external package auto split backend exists, but Owner Decision V2 justru mengunci external purchase tetap domain sendiri; current behavior vs target needs characterization.
+- Phase 2 guard fixed locally: external package auto split backend path is blocked until an explicit label + total contract exists. External purchase remains a separate domain; UI simplification remains deferred to Phase 4.
 
 ## Line Type: store_stock_sale_only
 - UI Blade/JS: product row; exact partial needs re-check.
@@ -86,6 +86,7 @@ Evidence:
 - Template/non-template package branch: `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:22`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:38`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:57`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:69`
 - External package branch: `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:19`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:30`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:37`
 - Flexible package direction, template as preset, and external purchase as separate domain: owner decision V2 from current discussion
+- Phase 2 close note: backend guards now prevent premature template multi-product preset extension and external purchase package backend auto split before Phase 4 UI/source contract work.
 
 Progress Local:
 - Status: IN_PROGRESS
