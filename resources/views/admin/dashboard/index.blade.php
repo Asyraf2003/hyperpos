@@ -1256,13 +1256,6 @@
                 <div class="card-body p-4 p-lg-5 hero-content">
                     <div class="row g-4 align-items-start">
                         <div class="col-12">
-                            <h2 class="mt-3 mb-2 fw-bold text-white">
-                                Laporan stok, aset, penjualan, harga, dan perputaran keuangan dalam satu layar.
-                            </h2>
-                            <p class="mb-0 text-white" style="opacity:.88;">
-                                Dashboard ini menampilkan ringkasan utama yang sudah terhubung ke report aktif. Panel analitik lanjutan ada di section bawah sesuai layout dashboard admin.
-                            </p>
-
                             <div class="hero-grid">
                                 <div class="hero-metric">
                                     <div class="hero-metric-label">Total Penjualan Bulan Ini</div>
@@ -1284,50 +1277,25 @@
         </div>
 
         <div class="col-12 col-xl-3">
-            <div class="card profile-card h-100">
-                <div class="admin-profile-top">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="admin-avatar-wrap">
-                            <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna">
+                <div class="admin-profile-top bg-primary p-4 text-white card profile-card h-100 border-0 shadow-sm overflow-hidden">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="admin-avatar-wrap flex-shrink-0">
+                            <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna" class="rounded-circle border border-2 border-white" style="width: 64px; height: 64px; object-fit: cover;">
                         </div>
-
                         <div class="min-w-0">
-                            <div class="mb-1">
-                                <div class="profile-name">{{ $appShell['actor_label'] ?? 'Admin' }}</div>
-                            </div>
-                            <div class="profile-mail">{{ $appShell['user_email'] ?? '-' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-body p-4">
-                    <div class="summary-strip">
-                        <div class="summary-mini">
-                            <div class="summary-mini-label">Role</div>
-                            <p class="summary-mini-value">Admin</p>
-                        </div>
-                        <div class="summary-mini">
-                            <div class="summary-mini-label">Status</div>
-                            <p class="summary-mini-value">Online</p>
+                            <h5 class="profile-name fw-bold mb-0 text-truncate text-white">{{ $appShell['actor_label'] ?? 'Admin' }}</h5>
+                            <small class="profile-mail text-white-50 text-truncate d-block">{{ $appShell['user_email'] ?? '-' }}</small>
                         </div>
                     </div>
 
-                    <div class="mt-4 mb-3">
-                        <div class="summary-mini-label">Akun sedang digunakan</div>
-                        <p class="section-subtitle mb-0">
-                            Pastikan keluar dari akun setelah selesai menggunakan dashboard admin, terutama bila perangkat dipakai bergantian.
-                        </p>
-                    </div>
-
-                    <form action="{{ route('logout') }}" method="post" class="d-grid">
+                    <form action="{{ route('logout') }}" method="POST" class="d-grid">
                         @csrf
-                        <button type="submit" class="btn btn-outline-danger admin-main-btn">
+                        <button type="submit" class="btn btn-light text-danger fw-semibold py-2">
                             <i class="bi bi-box-arrow-right me-2"></i>
                             Keluar Akun
                         </button>
                     </form>
                 </div>
-            </div>
         </div>
     </section>
 
