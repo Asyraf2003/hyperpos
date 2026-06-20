@@ -76,8 +76,19 @@ Evidence:
 - Full financial fingerprint, package-aware correction, and DP/pelunasan behavior lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: TEST_DESIGNED
+- Status: IN_PROGRESS
 - Last checked: 2026-06-20
-- Next action: Phase 1 characterization tests for full revision payload and package-aware correction floor.
-- Tests linked: EditTransactionWorkspacePackageAutoSplitCharacterizationTest, CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.
-- Owner decision dependency: none for V2 direction; base-missing behavior still needs characterization.
+- Last evidence: Batch 2 edit/revision/payment GREEN. `php artisan test --filter=EditTransactionWorkspaceRevisionPaymentCharacterizationTest` => 5 passed, 66 assertions; `php artisan test --filter=EditTransactionWorkspace` => 16 passed, 155 assertions; `php artisan test --filter=CorrectPaidServiceWithStoreStockPartServiceFeeOnly` => 3 passed, 44 assertions; `php artisan test --filter=CreateTransactionWorkspaceLineTypeCharacterizationTest` => 8 passed, 67 assertions; broad `php artisan test --filter=Payment` => 82 passed, 752 assertions.
+- Current behavior found:
+  - Edit up from DP replays payment to replacement components and records underpaid.
+  - Edit down from paid caps replay and records overpaid_pending/surplus.
+  - Revision payload is not full package financial fingerprint yet.
+  - Correction fee-only package currently accepts below base/default service price and leaves package fields stale.
+  - DP/follow-up payment does not change subtotal or inventory COGS.
+- Gap summary:
+  - Phase 2 candidate: package-aware correction floor guard.
+  - Phase 3 candidate: full revision payload fingerprint fields.
+- Next action: Continue Phase 1 Batch 3 refund/reporting characterization; do not start Phase 2 yet.
+- Tests linked: EditTransactionWorkspaceRevisionPaymentCharacterizationTest, EditTransactionWorkspacePackageAutoSplitCharacterizationTest, CorrectPaidServiceWithStoreStockPartServiceFeeOnlyFeatureTest.
+- Owner decision dependency: none for V2 direction; base-missing behavior still needs characterization before patch.
+
