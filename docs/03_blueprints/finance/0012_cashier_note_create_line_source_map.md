@@ -10,6 +10,12 @@ Links:
 Scope:
 Create nota kasir sebagai source of truth untuk line semantics, subtotal, payment component allocation, inventory movement, dan report source.
 
+Direction locked by Owner Decision V2:
+- Target awal flexible package adalah satu package row dengan satu service utama dan banyak product/sparepart lines.
+- Target lanjutan adalah banyak service components dan banyak product lines setelah source contract stabil.
+- Template diposisikan sebagai package preset.
+- External purchase tetap domain sendiri dengan UI sederhana: label + total biaya keluar.
+
 ## Line Type: service_only
 - UI Blade/JS: service row; needs re-check for exact partial path.
 - Request validation: `entry_mode=service`, `part_source=none`, service fields in `StoreTransactionWorkspaceRules`.
@@ -24,7 +30,7 @@ Create nota kasir sebagai source of truth untuk line semantics, subtotal, paymen
 - Gaps: correction fee-only is existing path; package-specific risk not applicable unless mixed with package route.
 
 ## Line Type: service_with_external_purchase
-- UI Blade/JS: service external row has label/qty/unit_cost; external package UI is not confirmed exposed.
+- UI Blade/JS: current row masih terlihat berorientasi label/qty/unit_cost; owner-facing target adalah label + total biaya keluar saja.
 - Request validation: external line 0 label/qty/unit_cost and `total_rupiah` accepted.
 - Normalizer: create item normalizer preserves first external purchase line.
 - Mapper: create mapper runs external package composer then returns `TYPE_SERVICE_WITH_EXTERNAL_PURCHASE` when external lines exist.
@@ -34,7 +40,7 @@ Create nota kasir sebagai source of truth untuk line semantics, subtotal, paymen
 - Inventory movement: none.
 - Report impact: external purchase cost in Operational Profit uses transaction_date and refund netting uses refunded_at.
 - Current tests: `CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest` includes backend package path.
-- Gaps: external package auto split backend exists, but UI exposure needs owner decision.
+- Gaps: external package auto split backend exists, but Owner Decision V2 justru mengunci external purchase tetap domain sendiri; current behavior vs target needs characterization.
 
 ## Line Type: store_stock_sale_only
 - UI Blade/JS: product row; exact partial needs re-check.
@@ -50,7 +56,7 @@ Create nota kasir sebagai source of truth untuk line semantics, subtotal, paymen
 - Gaps: product-only UI appears single-line; multi-line behavior outside package needs re-check.
 
 ## Line Type: service_with_store_stock_part
-- UI Blade/JS: service_store_stock template sets `pricing_mode=package_auto_split`, `requires_service_product_template=1`, and package total.
+- UI Blade/JS: current `service_store_stock` template sets `pricing_mode=package_auto_split`, `requires_service_product_template=1`, and package total.
 - Request validation: accepts `manual_split`, `package_auto_split`, `package_total_rupiah`, and product_lines.
 - Normalizer: product_lines preserved by create item normalizer; exact multi-line browser contract is blocked by UI JS.
 - Mapper: create mapper composes store-stock package pricing then maps store lines and service.
@@ -60,14 +66,14 @@ Create nota kasir sebagai source of truth untuk line semantics, subtotal, paymen
 - Inventory movement: stock_out per store-stock line.
 - Report impact: transaction gross, payment/refund cash, COGS from inventory_movements, package breakdown future source.
 - Current tests: backend multi-product package create tests exist in `CreateTransactionWorkspaceServiceStoreStockFeatureTest`.
-- Gaps: UI JS blocks/preloads only one product line for service_store_stock.
+- Gaps: current UI JS blocks/preloads only one product line, padahal arah final adalah flexible package multi-part bertahap.
 
 ## Package Auto Split Create Map
 - manual_split: request accepts it; advanced/UI visibility needs re-check.
 - package_auto_split: request accepts it and package_total.
-- template branch: rejects product_lines count not equal to 1 and fills package_profit/base/extra.
+- template branch: current behavior rejects product_lines count not equal to 1 and fills package_profit/base/extra; Owner Decision V2 positions template as preset, not permanent boundary.
 - non-template branch: service price is package_total minus sparepart total; package profit/base/extra become zero/null.
-- external package branch: backend computes service price as package_total minus external total and forces external qty 1/unit_cost external total.
+- external package branch: backend computes service price as package_total minus external total and forces internal qty `1`/unit_cost `external total`, but this is not the primary owner-facing direction.
 
 Evidence:
 - Work item constants: `app/Core/Note/WorkItem/WorkItem.php:12`, `app/Core/Note/WorkItem/WorkItem.php:13`, `app/Core/Note/WorkItem/WorkItem.php:14`, `app/Core/Note/WorkItem/WorkItem.php:15`
@@ -79,10 +85,11 @@ Evidence:
 - UI multi-line limit: `public/assets/static/js/pages/cashier-note-workspace/rows.js:80`, `public/assets/static/js/pages/cashier-note-workspace/rows.js:81`, `public/assets/static/js/pages/cashier-note-workspace/rows.js:268`
 - Template/non-template package branch: `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:22`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:38`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:57`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches.php:69`
 - External package branch: `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:19`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:30`, `app/Application/Note/Services/CreateTransactionWorkspaceServiceExternalPurchasePackagePricingComposer.php:37`
+- Flexible package direction, template as preset, and external purchase as separate domain: owner decision V2 from current discussion
 
 Progress Local:
 - Status: AUDIT_READY
 - Last checked: 2026-06-20
-- Next action: Phase 1 characterization tests only.
+- Next action: Phase 1 characterization tests only for current create behavior vs flexible package direction.
 - Tests linked: CreateTransactionWorkspace*, PackageAutoSplitCreateReportImpactFeatureTest.
-- Owner decision dependency: multi-product UI, template branch policy, external package UI.
+- Owner decision dependency: none for V2 direction; exact browser contract still needs characterization.

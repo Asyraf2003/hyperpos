@@ -1,7 +1,7 @@
 # 0038 - Cashier note create/edit/refund/reporting consistency audit findings
 
 Status:
-Audit Findings / Owner Decision Required / No Patch Yet
+Audit Findings / Owner Decision V2 Locked / No Patch Yet
 
 Boundary:
 - Web/PWA only.
@@ -28,27 +28,38 @@ Executive Summary:
 - Service Package Profit Breakdown harus report/section terpisah.
 - UI/backend dan payload historis punya gap yang harus diputuskan owner sebelum patch.
 
+## Owner Decision V2 - Locked Direction
+- Package service harus fleksibel. Target awal adalah satu package row mendukung satu service utama dan banyak product/sparepart lines. Target lanjutan adalah banyak service components dan banyak product lines setelah source contract stabil.
+- Template adalah package preset, bukan batas permanen. Template mengisi default service/product/harga, lalu kasir tetap boleh menambah atau manual sesuai aturan validasi.
+- Create tetap menjadi source of truth untuk package semantics.
+- Correction fee/package adjustment boleh, tetapi harus package-aware dan tidak boleh menurunkan adjusted service price di bawah package base/default service price.
+- Revision payload wajib lengkap sebagai financial fingerprint historis.
+- Sparepart luar tetap domain sendiri. External purchase package UI bukan target utama.
+- Reporting memakai basis kombinasi: `transaction_date` untuk konteks transaksi, `payment_date` dan `refund_date` untuk realisasi uang, `movement_date` untuk inventory/COGS.
+- Refund memakai component-type policy paling mentah: product toko refundable, service dan sparepart luar default non-refundable tetapi bisa manual exception, dan package refund harus bisa dipetakan ke komponen mentah.
+
 Finding Groups:
 
 ## Group A - UI/backend mismatch create package
 Severity: High
 
 Summary:
-Backend mendukung service_with_store_stock_part package_auto_split multi-product direct POST, tetapi UI cashier masih membatasi multi-product pada service_store_stock.
+Arahan final package adalah fleksibel, tetapi current UI cashier masih membatasi `service_store_stock` ke satu product line walaupun backend create sudah punya evidence multi-product direct POST.
 
 Owner decision:
-- Buka multi-product package UI sekarang, atau
-- kunci single-product secara eksplisit.
+- Arah final adalah flexible package.
+- Phase patch harus bertahap: mulai dari hardening dan characterization dulu, lalu UI flexible package.
 
 ## Group B - Template fast-entry vs multi-part package conflict
 Severity: High
 
 Summary:
-UI/template fast-entry mengarah ke template, sedangkan backend template branch menolak product_lines lebih dari 1.
+Template sekarang mengarah ke fast-entry preset, sementara branch template backend masih menolak `product_lines` lebih dari 1.
 
 Owner decision:
-- Satu template tetap hanya satu product, atau
-- buat package/header template multi-product.
+- Template dikunci sebagai package preset, bukan batas permanen.
+- Multi-part package adalah arah final, tetapi rollout patch tetap bertahap.
+- Exact behavior saat kasir menambah line di atas preset perlu characterization.
 
 ## Group C - Revision payload incomplete for package reporting
 Severity: Medium/High
@@ -57,8 +68,8 @@ Summary:
 work_item_service_details menyimpan package_profit/base/extra, tetapi note_revision_lines.payload belum menyimpan package_profit_rupiah, package_base_service_price_rupiah, package_service_extra_rupiah.
 
 Owner decision:
-- revision payload menjadi financial fingerprint, atau
-- report cukup membaca active rows + movement + allocation.
+- Revision payload wajib menjadi financial fingerprint.
+- Report historis ke depan harus bisa dikembangkan tanpa membaca current mutable master data.
 
 ## Group D - Correction fee-only package risk
 Severity: High
@@ -67,18 +78,21 @@ Summary:
 Correction fee-only belum package-aware dan bisa membuat package metadata stale.
 
 Owner decision:
-- reject correction fee-only untuk package_auto_split, atau
-- buat correction package-aware.
+- Jangan reject semua correction package.
+- Correction harus package-aware.
+- Adjusted service price tidak boleh turun di bawah `package_base_service_price_rupiah` atau default service price.
+- Jika package base tidak tersedia, behavior masuk characterization test dulu.
 
 ## Group E - External purchase package UI gap
 Severity: Medium
 
 Summary:
-Backend punya external purchase package auto split, tetapi UI belum expose package_total/total_rupiah untuk external package.
+Sparepart luar tetap domain sendiri. Backend masih punya jejak external package composer, tetapi external purchase package UI bukan target utama owner.
 
 Owner decision:
-- expose ke UI, atau
-- tetap backend-only.
+- UI cukup nama sparepart luar + total biaya keluar.
+- Qty tidak perlu tampil di UI owner-facing.
+- Jika struktur internal masih butuh `qty/unit_cost`, treat internal `qty=1` dan `unit_cost=total`.
 
 ## Group F - Reporting clarity gap
 Severity: Medium
@@ -88,25 +102,29 @@ Operational Profit bukan Service Package Profit Breakdown.
 
 Owner decision:
 - buat Service Package Profit Breakdown terpisah setelah source data dikunci.
+- Basis report dikunci sebagai kombinasi tanggal, bukan satu tanggal tunggal.
 
 ## Group G - Refund package breakdown gap
 Severity: Medium
 
 Summary:
-Refund store-stock normal sudah reverse original COGS, tetapi refund package belum eksplisit memecah package_profit/package_service_extra.
+Refund sudah punya jalur component allocation, tetapi policy bisnis refund per jenis komponen masih perlu dikunci agar package refund bisa fleksibel.
 
 Owner decision:
-- package refund cukup melebur ke service_fee, atau
-- perlu breakdown internal service base/extra/profit.
+- Refund mengikuti component-type policy paling mentah.
+- Product toko default refundable dan reverse stock memakai original unit cost.
+- Service default non-refundable setelah DP/dikerjakan, tetapi manual exception bisa ada dengan reason/approval.
+- Sparepart luar default non-refundable, tetapi manual exception bisa ada.
+- Package refund harus bisa dipetakan ke komponen mentah: product saja, service saja, atau kombinasi.
 
 Owner Decision Checklist:
-- [ ] Multi-product package UI dibuka sekarang atau ditunda.
-- [ ] Template branch tetap single-product atau dibuat package template multi-product.
-- [ ] Correction fee-only untuk package_auto_split ditolak atau dibuat package-aware.
-- [ ] Revision payload wajib menyimpan package fields atau tidak.
-- [ ] External purchase package auto split diekspos di UI atau tidak.
-- [ ] Service Package Profit Breakdown basis tanggal memakai transaction_date, payment_date, refund_date, atau kombinasi.
-- [ ] Refund package breakdown melebur ke service_fee atau dipecah internal.
+- [x] Flexible package adalah arah final; target awal satu service utama + banyak product lines.
+- [x] Template adalah package preset, bukan batas permanen.
+- [x] Correction package boleh, tetapi harus package-aware dan tidak boleh turun di bawah base/default service price.
+- [x] Revision payload wajib lengkap sebagai financial fingerprint.
+- [x] Sparepart luar tetap domain sendiri; external purchase package UI bukan target utama.
+- [x] Service Package Profit Breakdown memakai basis kombinasi tanggal.
+- [x] Refund mengikuti component-type policy paling mentah.
 
 Blueprint Map:
 - [0011_cashier_note_consistency_workflow_index.md](../../03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md)
@@ -131,3 +149,4 @@ Evidence:
 - Edit replacement reverses inventory, deletes/replaces work items, and rebuilds payment allocations: `app/Application/Note/Services/UpdateTransactionWorkspaceWorkItemPersister.php:25`, `app/Application/Note/Services/UpdateTransactionWorkspaceWorkItemPersister.php:31`, `app/Application/Note/Services/ApplyNoteRevisionAsActiveReplacement.php:43`, `app/Application/Note/Services/ApplyNoteRevisionAsActiveReplacement.php:46`
 - Refund allocates through payment components and writes refund component allocations: `app/Application/Payment/Services/AllocateRefundAcrossComponents.php:36`, `app/Application/Payment/Services/AllocateRefundAcrossComponents.php:65`
 - Store-stock refund reversal uses original movement unit cost: `app/Application/Inventory/Services/ReverseIssuedInventoryOperation.php:48`, `app/Application/Inventory/Services/ReverseIssuedInventoryOperation.php:77`
+- Flexible package direction, template as preset, correction package-aware, full revision payload fingerprint, external purchase separate domain, reporting basis combination, dan refund component-type policy: owner decision V2 from current discussion

@@ -10,11 +10,18 @@ Links:
 Scope:
 Service Package Profit Breakdown adalah report terpisah dari Operational Profit. Operational Profit tetap laporan kas operasional dan formulanya tidak diubah.
 
+Direction locked by Owner Decision V2:
+- Source contract harus mendukung future flexible package.
+- Basis reporting adalah kombinasi `transaction_date`, `payment_date`, `refund_date`, dan `movement_date`.
+- `payment_date` dan `refund_date` tetap basis realisasi uang.
+- `transaction_date` tetap konteks kapan package dibuat/dijual.
+- `movement_date` tetap basis inventory/COGS.
+
 ## Source Data
 - work_items: package row identity, transaction type, active/canceled/refunded status.
 - work_item_service_details: service price, package_profit_rupiah, package_base_service_price_rupiah, package_service_extra_rupiah.
 - work_item_store_stock_lines: sparepart sales line totals.
-- work_item_external_purchase_lines: external purchase line totals for external package branch.
+- work_item_external_purchase_lines: external purchase snapshot jika tetap dibutuhkan sebagai domain terpisah, bukan package auto split utama.
 - note_revision_lines payload: candidate historical fingerprint after Phase 3 decision.
 - payment_component_allocations: paid component allocation by current replacement component.
 - refund_component_allocations: refunded component allocation and netting source.
@@ -22,6 +29,8 @@ Service Package Profit Breakdown adalah report terpisah dari Operational Profit.
 
 ## Field Minimal
 - package_total_rupiah
+- parts_total_rupiah
+- service_price_rupiah
 - sparepart_sales_total_rupiah
 - sparepart_cogs_rupiah
 - sparepart_margin_rupiah
@@ -33,23 +42,25 @@ Service Package Profit Breakdown adalah report terpisah dari Operational Profit.
 
 ## Formula Candidate
 - package_total_rupiah = final customer package total from historical package row.
+- parts_total_rupiah = historical sum of raw package part sales snapshot.
+- service_price_rupiah = historical package service price snapshot after package-aware recalculation.
 - sparepart_sales_total_rupiah = sum store_stock line totals for package rows.
 - sparepart_cogs_rupiah = sum ABS stock_out total_cost_rupiah for linked store_stock lines minus linked reversal costs, depending on selected date basis.
 - sparepart_margin_rupiah = sparepart_sales_total_rupiah - sparepart_cogs_rupiah.
 - base_service_price_rupiah = package_base_service_price_rupiah if present; otherwise owner decision required for non-template branch.
 - package_service_extra_rupiah = package_service_extra_rupiah if present; otherwise 0.
 - package_profit_rupiah = package_profit_rupiah if present; otherwise 0.
-- total_service_component_rupiah = service_price_rupiah + package_profit_rupiah, or another owner-approved final formula.
+- total_service_component_rupiah = package-aware service component from full payload fields, after correction-aware recalculation; exact formula when base snapshot missing is `needs characterization`.
 - total_package_gross_profit_rupiah = sparepart_margin_rupiah + total_service_component_rupiah.
 
 ## Basis Tanggal Decision
-Owner must choose one:
-- transaction_date: best for package sold performance.
-- payment_date: best for cash-realized package performance.
-- refund_date: needed for refund event view.
-- combination: transaction basis with separate cash/refund columns.
+Owner Decision V2 sudah memilih basis kombinasi:
+- `transaction_date`: konteks package dibuat/dijual.
+- `payment_date`: realisasi uang masuk.
+- `refund_date`: realisasi uang keluar.
+- `movement_date`: inventory/COGS.
 
-No patch may start for Phase 5 until this basis is locked.
+No patch may start for report query phase until field mapping for combination basis is characterized.
 
 ## Historical Snapshot Rules
 - Historical money must come from work item rows, service detail package fields, note revision payload, payment/refund allocations, or inventory movements.
@@ -58,24 +69,27 @@ No patch may start for Phase 5 until this basis is locked.
 - Current AVG/modal must not change historical COGS.
 - Service catalog/template current defaults must not change old package service values.
 - Refund package breakdown must not double count service_fee and package_profit.
+- Revision payload minimal harus memuat `package_total_rupiah`, `parts_total_rupiah`, `service_price_rupiah`, `package_base_service_price_rupiah`, `package_service_extra_rupiah`, `package_profit_rupiah`, `total_service_component_rupiah`, `store_stock_lines` snapshot, dan `external_purchase_lines` snapshot jika ada.
+- Payment/refund allocation references dimasukkan jika memang dibutuhkan report; exact field set `needs characterization`.
 
 ## Current Master Data Leak Risks
 - Inventory current snapshot joins products/current costing and is not a historical package profit source.
 - Revision payload currently lacks package_profit/base/extra in inspected mapper, so using payload alone would under-spec template package profit.
 - UI/backend mismatch can create different package shapes unless Phase 4 locks the contract.
-- External package backend exists, but UI exposure and report formula must be locked before showing it as supported cashier workflow.
+- External package backend exists, but owner direction justru memisahkan external purchase dari package auto split utama.
 
 ## Required Tests Before Report UI
 - normal template package.
 - non-template package.
 - multi-product package.
-- external package if enabled.
+- external purchase separate-domain behavior if it still affects report source.
 - package after edit upward and downward.
 - package after selected-row refund.
 - package after product price update.
 - package after AVG update.
 - package after service template update.
 - basis tanggal behavior across transaction/payment/refund/movement dates.
+- package-aware correction behavior and base-missing fallback characterization.
 - no Operational Profit formula regression.
 
 Evidence:
@@ -86,10 +100,11 @@ Evidence:
 - Payment/refund component source: `app/Application/Payment/Services/PayableComponentsFromWorkItem.php:36`, `app/Application/Payment/Services/PayableComponentsFromWorkItem.php:50`, `app/Application/Payment/Services/AllocateRefundAcrossComponents.php:36`, `app/Application/Payment/Services/AllocateRefundAcrossComponents.php:65`
 - Inventory movement COGS source: `app/Adapters/Out/Reporting/Queries/OperationalProfit/ProductCostMetricQuery.php:31`, `app/Application/Inventory/Services/ReverseIssuedInventoryOperation.php:77`
 - Current inventory snapshot leak risk: `app/Adapters/Out/Reporting/InventoryCurrentSnapshotDatabaseQuery.php:13`, `app/Adapters/Out/Reporting/InventoryCurrentSnapshotDatabaseQuery.php:38`, `app/Adapters/Out/Reporting/InventoryCurrentSnapshotDatabaseQuery.php:39`
+- Combination date basis, future flexible package support, and full payload fingerprint lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: DECISION_REQUIRED
+- Status: TEST_DESIGNED
 - Last checked: 2026-06-20
-- Next action: Owner locks basis tanggal and service component formula before Phase 5.
+- Next action: Phase 1 characterization for combination date mapping and full payload field completeness.
 - Tests linked: future ServicePackageProfitBreakdown query tests; OperationalProfit regression tests.
-- Owner decision dependency: basis tanggal, total_service_component formula, revision payload fingerprint, refund package breakdown.
+- Owner decision dependency: none for V2 direction; exact base-missing formula still needs characterization.
