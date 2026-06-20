@@ -74,7 +74,7 @@ No patch may start for report query phase until field mapping for combination ba
 
 ## Current Master Data Leak Risks
 - Inventory current snapshot joins products/current costing and is not a historical package profit source.
-- Revision payload currently lacks package_profit/base/extra in inspected mapper, so using payload alone would under-spec template package profit.
+- Phase 3 local source contract: revision payload now writes `package_profit_rupiah`, `package_base_service_price_rupiah`, `package_service_extra_rupiah`, and `total_service_component_rupiah`; report query remains deferred.
 - UI/backend mismatch can create different package shapes unless Phase 4 locks the contract.
 - External package backend exists, but owner direction justru memisahkan external purchase dari package auto split utama.
 
@@ -103,16 +103,17 @@ Evidence:
 - Combination date basis, future flexible package support, and full payload fingerprint lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: Batch 3 characterized
-- Last checked: 2026-06-20
-- Last evidence: Phase 1 Batch 3 verified refund/report source basis through RefundReportingOwnerDecisionV2CharacterizationTest and focused OperationalProfit/TransactionSummary/TransactionCashLedger regressions.
+- Status: Phase 3 fingerprint fixed locally
+- Last checked: 2026-06-21
+- Last evidence: Phase 3 revision payload historical fingerprint GREEN. `php artisan test --filter=NoteRevisionLinePayloadMapperTest`, `php artisan test --filter=EditTransactionWorkspaceRevisionPaymentCharacterizationTest`, `php artisan test --filter=EditTransactionWorkspacePackageAutoSplitCharacterizationTest`, `php artisan test --filter=CreateTransactionWorkspaceLineTypeCharacterizationTest`, `php artisan test --filter=CorrectPaidServiceWithStoreStockPartServiceFeeOnly`, and `make verify` GREEN: 1275 passed, 7417 assertions.
 - Current behavior found:
   - Future package breakdown source remains `payment_component_allocations`, `refund_component_allocations`, and `inventory_movements`.
   - Operational Profit remains separate cash-operational report and does not expose package breakdown fields.
   - InventoryCurrentSnapshotDatabaseQuery remains current product inventory/costing snapshot, not historical package profit source.
   - Refund allocation shape uses raw component types (`service_store_stock_part`, `service_fee`, `service_external_purchase_part`, `product_only_work_item`) and does not create a package aggregate component.
+  - Revision payload now snapshots minimal package fingerprint fields from work item/service detail/store-stock snapshots; `total_service_component_rupiah` is the historical service detail component total (`service_price_rupiah + package_profit_rupiah`).
 - Gap summary:
   - Phase 6 candidate: explicit Service Package Profit Breakdown source contract across `transaction_date`, `payment_date`, `refund_date`, and `movement_date`.
   - Double-count guard candidate: avoid counting `service_fee`, package service fields, and package profit fields twice once breakdown report exists.
-- Next action: Phase 1 closure / Phase 2 preparation, not report query patch.
+- Next action: Stop here; do not implement report query until Phase 6 is explicitly opened.
 - Owner decision dependency: none for V2 direction; exact base-missing formula remains future characterization/hardening input.
