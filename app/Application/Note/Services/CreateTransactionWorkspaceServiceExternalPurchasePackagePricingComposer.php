@@ -27,6 +27,8 @@ final class CreateTransactionWorkspaceServiceExternalPurchasePackagePricingCompo
             return $item;
         }
 
+        throw new DomainException('Pembelian luar tidak boleh memakai jalur package auto split sebelum kontrak label + total dikunci.');
+
         $packageTotal = $this->requiredInt($item['package_total_rupiah'] ?? null, 'Harga paket wajib diisi.');
 
         if ($packageTotal < $externalTotal) {
