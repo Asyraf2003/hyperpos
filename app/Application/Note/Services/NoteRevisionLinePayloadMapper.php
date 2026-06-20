@@ -57,11 +57,17 @@ final class NoteRevisionLinePayloadMapper
                 static fn (array $line): int => (int) ($line['line_total_rupiah'] ?? 0),
                 $storeStockLines,
             ));
+            $servicePrice = $service?->servicePriceRupiah()->amount() ?? 0;
+            $packageProfit = $service?->packageProfitRupiah()->amount() ?? 0;
 
             $payload['pricing_mode'] = 'package_auto_split';
             $payload['package_total_rupiah'] = $item->subtotalRupiah()->amount();
             $payload['parts_total_rupiah'] = $partsTotal;
-            $payload['service_price_rupiah'] = $service?->servicePriceRupiah()->amount() ?? 0;
+            $payload['service_price_rupiah'] = $servicePrice;
+            $payload['package_base_service_price_rupiah'] = $service?->packageBaseServicePriceRupiah()?->amount();
+            $payload['package_service_extra_rupiah'] = $service?->packageServiceExtraRupiah()->amount() ?? 0;
+            $payload['package_profit_rupiah'] = $packageProfit;
+            $payload['total_service_component_rupiah'] = $servicePrice + $packageProfit;
         }
 
         return $payload;
