@@ -88,8 +88,9 @@ Evidence:
 - Flexible package direction, template as preset, and external purchase as separate domain: owner decision V2 from current discussion
 
 Progress Local:
-- Status: AUDIT_READY
+- Status: IN_PROGRESS
 - Last checked: 2026-06-20
-- Next action: Phase 1 characterization tests only for current create behavior vs flexible package direction.
+- Last evidence: Batch 1 create/package GREEN. `php artisan test --filter=CreateTransactionWorkspaceLineTypeCharacterizationTest` => 8 passed, 67 assertions. `php artisan test --filter=CreateTransactionWorkspace` => 44 passed, 429 assertions.
+- Next action: Keep this create/package map as characterization evidence; do not start Phase 2 until remaining Phase 1 batches are complete.
 - Tests linked: CreateTransactionWorkspace*, PackageAutoSplitCreateReportImpactFeatureTest.
-- Owner decision dependency: none for V2 direction; exact browser contract still needs characterization.
+- Owner decision dependency: none for V2 direction; current source gap is characterized, final browser patch contract is deferred to Phase 4.
