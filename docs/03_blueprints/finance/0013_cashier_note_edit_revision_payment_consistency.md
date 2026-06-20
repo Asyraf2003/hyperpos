@@ -79,7 +79,7 @@ Progress Local:
 - Status: FIXED
 - Last checked: 2026-06-21
 - Last evidence: Phase 3 revision payload historical fingerprint GREEN. RED first proved missing package fields in `NoteRevisionLinePayloadMapperTest`; targeted filters GREEN; `make verify` GREEN: 1275 passed, 7417 assertions.
-- Current behavior after Phase 2:
+- Current behavior after Phase 3:
   - Edit up/down and payment allocation behavior remains characterized by Batch 2 tests.
   - Correction fee-only package no longer accepts below-base service price when package base exists.
   - Revision payload now snapshots `package_total_rupiah`, `parts_total_rupiah`, `service_price_rupiah`, `package_base_service_price_rupiah`, `package_service_extra_rupiah`, `package_profit_rupiah`, `total_service_component_rupiah`, `store_stock_lines`, and `external_purchase_lines`.
