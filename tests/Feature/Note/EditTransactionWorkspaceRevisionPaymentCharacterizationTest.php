@@ -294,7 +294,7 @@ final class EditTransactionWorkspaceRevisionPaymentCharacterizationTest extends 
         ]);
     }
 
-    public function test_current_gap_owner_decision_v2_target_revision_payload_is_not_full_package_financial_fingerprint(): void
+    public function test_current_behavior_owner_decision_v2_target_revision_payload_is_full_package_financial_fingerprint(): void
     {
         $product = Product::create(
             'batch2-payload-product',
@@ -337,17 +337,12 @@ final class EditTransactionWorkspaceRevisionPaymentCharacterizationTest extends 
         self::assertSame(50000, $payload['parts_total_rupiah'] ?? null);
         self::assertSame(130000, $payload['service_price_rupiah'] ?? null);
         self::assertSame(130000, $payload['service']['service_price_rupiah'] ?? null);
+        self::assertSame(100000, $payload['package_base_service_price_rupiah'] ?? null);
+        self::assertSame(30000, $payload['package_service_extra_rupiah'] ?? null);
+        self::assertSame(40000, $payload['package_profit_rupiah'] ?? null);
+        self::assertSame(170000, $payload['total_service_component_rupiah'] ?? null);
         self::assertSame('Batch 2 Payload Product', $payload['store_stock_lines'][0]['product_name_snapshot'] ?? null);
-
-        foreach ([
-            'package_profit_rupiah',
-            'package_base_service_price_rupiah',
-            'package_service_extra_rupiah',
-            'total_service_component_rupiah',
-        ] as $missingFinancialFingerprintField) {
-            self::assertArrayNotHasKey($missingFinancialFingerprintField, $payload);
-            self::assertArrayNotHasKey($missingFinancialFingerprintField, $payload['service']);
-        }
+        self::assertSame([], $payload['external_purchase_lines']);
     }
 
     public function test_phase2_package_correction_rejects_service_price_below_package_base_floor_and_keeps_rows_unchanged(): void
