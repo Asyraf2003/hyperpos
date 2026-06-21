@@ -1,7 +1,7 @@
 # Blueprint 0016 - Cashier Note Final Regression Matrix
 
 Status:
-VERIFYING / Final Regression Matrix Created / Awaiting Focused Regression And make verify Proof
+FIXED / Final Regression Matrix / Focused Regression And make verify GREEN
 
 Purpose:
 Final regression matrix untuk mengunci seluruh Phase 0-6 cashier note consistency workflow sebelum Phase 7 ditutup.
@@ -37,7 +37,7 @@ Source map:
 | Phase 4 UI Flexible Package | UI and backend contract match for service store-stock package: one service plus many product lines; template is preset; external purchase remains label + total. | Create workspace and package auto-split tests | `php artisan test --filter=CreateTransactionWorkspaceLineTypeCharacterizationTest`<br>`php artisan test --filter=EditTransactionWorkspacePackageAutoSplitCharacterizationTest` | FIXED | No many-service component feature. No Mobile API. No route/config changes. |
 | Phase 5 Refund Component-Type Policy | Product/store-stock components are default refundable; service_fee and external_purchase are default blocked; package refund maps to raw components without double counting. | `RefundReportingOwnerDecisionV2CharacterizationTest`, refund feature/unit tests | `php artisan test --filter=RefundReportingOwnerDecisionV2CharacterizationTest`<br>`php artisan test --filter=ClosedNoteFullRefund`<br>`php artisan test --filter=RecordSelectedRowsCustomerRefund`<br>`php artisan test --filter=RecordCustomerRefundFeatureTest`<br>`php artisan test --filter=RecordClosedNoteRefundControllerFeatureTest`<br>`php artisan test --filter=CashierRefundSelectionFirstFeatureTest`<br>`php artisan test --filter=AllocateRefundAcrossComponentsTest` | FIXED | Do not change refund policy. Manual exception remains deferred unless explicitly designed. |
 | Phase 6 Report Query / Service Package Profit Breakdown | Dedicated report query reconciles package profit breakdown from historical rows, inventory COGS, and component-aware refunds without changing Operational Profit. | `ServicePackageProfitBreakdownQueryTest`, reporting boundary regressions | `php artisan test tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php`<br>`php artisan test --filter=TransactionSummary`<br>`php artisan test --filter=TransactionCashLedger`<br>`php artisan test --filter=OperationalProfit` | FIXED | Do not change Operational Profit formula. Do not change ServicePackageProfitBreakdown behavior unless regression proves a bug. |
-| Phase 7 Final Regression Matrix | Final docs matrix and command index prove Phase 0-6 remain locked under focused regression and `make verify`. | `0011`, `0016`, focused regression log, full verify log | Focused matrix below, then `make verify`. | VERIFYING | Verification/docs only. No feature, migration, route/config, supplier proof, Mobile API, formula, refund policy, or report behavior change. |
+| Phase 7 Final Regression Matrix | Final docs matrix and command index prove Phase 0-6 remain locked under focused regression and `make verify`. | `0011`, `0016`, focused regression log, full verify log | Focused matrix below, then `make verify`. | FIXED | Verification/docs only. No feature, migration, route/config, supplier proof, Mobile API, formula, refund policy, or report behavior change. |
 
 ## Focused Regression Command Index
 
@@ -78,4 +78,7 @@ Phase 7 may be marked FIXED only if:
 - boundaries remain unchanged.
 
 Last proof:
-Pending local focused regression and `make verify`.
+- Focused regression matrix GREEN.
+- Final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
+- Phase 7 is closed as verification/docs-only.
+- STOP. No Phase 8 for this workflow.

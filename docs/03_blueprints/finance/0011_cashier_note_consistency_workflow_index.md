@@ -1,7 +1,7 @@
 # Blueprint 0011 - Cashier Note Consistency Workflow Index
 
 Status:
-Draft / Workflow Index / No Patch Yet
+FIXED / Workflow Index / Phase 7 Regression Matrix Closed
 
 Purpose:
 File ini adalah progress ledger utama untuk pekerjaan create/edit/refund/payment/report kasir.
@@ -43,7 +43,7 @@ Progress Ledger:
 | Phase 4 UI flexible package | FIXED | Flexible package direction locked; template as preset; external purchase separate domain | 0011, 0012, 0013 | Blade/JS workspace, request validator/mapper, store-stock package template branch | Page/submit contract tests | Phase 4 UI flexible package GREEN: service_store_stock UI supports one service + many product lines; template preset multi-product extension supported; external purchase owner-facing label + total supported; external package_auto_split still blocked; targeted filters GREEN; `make verify` GREEN: 1275 passed, 7423 assertions. | Prepare Phase 5 refund component-type policy | UI dan backend contract sama |
 | Phase 5 Refund component-type policy | FIXED | Locked policy encoded; manual exception remains deferred unless approval path is explicitly designed | 0011, 0014, 0015 | Refund policy and guard candidates | Refund policy tests | Phase 5 refund component-type policy GREEN: product/store-stock components default refundable; service_fee and external_purchase components default blocked; package refund maps to raw components; cancellable rows limited to fully refundable rows; targeted refund/report/edit tests GREEN; `make verify` GREEN. | Prepare Phase 6 report query / Service Package Profit Breakdown source contract | refund behavior matches locked component-type policy |
 | Phase 6 Report query | FIXED | Combination basis locked; Service Package Profit Breakdown implemented as separate query/read-model; query split to satisfy audit-lines | 0011, 0015 | ServicePackageProfitBreakdownQuery + split helper queries/mappers | ServicePackageProfitBreakdownQueryTest | RED: missing query class; GREEN: query test 1 passed / 17 assertions; targeted reporting boundary regression GREEN; final make verify GREEN by operator confirmation | STOP; do not start Phase 7 in this slice | query reconciled and no mutable master leak for money |
-| Phase 7 Regression matrix | VERIFYING | Phase 0-6 accepted; Phase 7 is verification/docs-only | 0011, 0016 | None | Focused regression matrix + `make verify` | Final regression matrix docs created; focused regression and final verify pending | If all commands are GREEN, update Phase 7 to FIXED | focused suites and `make verify` green |
+| Phase 7 Regression matrix | FIXED | Phase 0-6 accepted; Phase 7 verification/docs-only | 0011, 0016 | None | Focused regression matrix + `make verify` | Focused regression matrix GREEN; final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s. | STOP; no Phase 8 | focused suites and `make verify` green |
 
 Decision Log:
 - Owner Decision V2 locked:
@@ -266,3 +266,11 @@ Stop condition:
 - focused regression matrix green.
 - final `make verify` green.
 - this ledger row updated to `FIXED`.
+
+Final evidence:
+- Focused regression matrix GREEN.
+- Final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
+
+Final status:
+- Phase 7 `FIXED`.
+- STOP. No Phase 8 for this workflow.
