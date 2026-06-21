@@ -21,6 +21,8 @@ final class StoreNoteRevisionController extends Controller
         $user = $request->user();
         $actorId = $user !== null ? (string) $user->getAuthIdentifier() : null;
 
+        // Admin workspace revisions are an explicit post-close correction path.
+        // Cashier/default workspace revisions must keep the editability guard enabled.
         $enforceWorkspaceEditability = ! $request->routeIs('admin.notes.workspace.update');
 
         $result = $handler->handle(
