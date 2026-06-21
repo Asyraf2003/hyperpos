@@ -25,8 +25,7 @@ final class RecordSelectedRowsRefundPlanTransaction
         private readonly RecordSelectedRowsRefundPlanAuditRecorder $audit,
         private readonly NoteHistoryProjectionService $projection,
         private readonly NoteReaderPort $notes,
-    ) {
-    }
+    ) {}
 
     public function run(
         SelectedRowsRefundPlan $plan,
@@ -42,16 +41,13 @@ final class RecordSelectedRowsRefundPlanTransaction
             $started = true;
 
             $processed = $this->buckets->process($plan, $refundedAt, $reason);
-            $activeTotalRupiah = $this->currentActiveTotalRupiah($plan->noteId());
+            $activeTotalRupiah = $this->notes->getById($plan->noteId())?->totalRupiah()->amount() ?? 0;
             $cancellableRowIds = $plan->cancellableRowIds();
-
             if ($cancellableRowIds !== []) {
                 $canceled = $this->cancelRows->execute($plan->noteId(), $cancellableRowIds, $actorId, $actorRole, $reason);
-
                 if ($canceled->isFailure()) {
                     throw new DomainException($canceled->message() ?? 'Gagal membatalkan line refund.');
                 }
-
                 $activeTotalRupiah = (int) ($canceled->data()['active_total_rupiah'] ?? $activeTotalRupiah);
             }
 
@@ -63,7 +59,6 @@ final class RecordSelectedRowsRefundPlanTransaction
 
             if ((int) $processed['allocation_count'] > 0) {
                 $finalized = $this->finalizeRefunded->execute($plan->noteId(), $actorId, $actorRole, $reason);
-
                 if ($finalized->isFailure()) {
                     throw new DomainException($finalized->message() ?? 'Gagal finalisasi note refund.');
                 }
@@ -96,20 +91,8 @@ final class RecordSelectedRowsRefundPlanTransaction
         } catch (Throwable $e) {
             if ($started) {
                 $this->transactions->rollBack();
-            }
-
-            throw $e;
+                }
+                throw $e;
         }
-    }
-
-    private function currentActiveTotalRupiah(string $noteId): int
-    {
-        $note = $this->notes->getById(trim($noteId));
-
-        if ($note === null) {
-            return 0;
-        }
-
-        return $note->totalRupiah()->amount();
     }
 }

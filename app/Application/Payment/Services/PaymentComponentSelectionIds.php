@@ -8,22 +8,16 @@ use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
 
 final class PaymentComponentSelectionIds
 {
-    /**
-     * @param list<string> $selectedIds
-     * @return list<string>
-     */
+    /** @param list<string> $selectedIds @return list<string> */
     public static function normalize(array $selectedIds): array
     {
         $normalized = [];
-
         foreach ($selectedIds as $id) {
             $trimmed = trim($id);
-
             if ($trimmed !== '') {
                 $normalized[] = $trimmed;
             }
         }
-
         return array_values(array_unique($normalized));
     }
 
@@ -49,14 +43,10 @@ final class PaymentComponentSelectionIds
     public static function workItemId(string $id): string
     {
         $parts = self::parts($id);
-
         return $parts !== null ? $parts[0] : trim($id);
     }
 
-    /**
-     * @param list<string> $selectedIds
-     * @return list<string>
-     */
+    /** @param list<string> $selectedIds @return list<string> */
     public static function workItemIds(array $selectedIds): array
     {
         return array_values(array_unique(array_map(
@@ -65,59 +55,40 @@ final class PaymentComponentSelectionIds
         )));
     }
 
-    /**
-     * @param list<string> $selectedIds
-     */
+    /** @param list<string> $selectedIds */
     public static function matches(PaymentComponentAllocation $allocation, array $selectedIds): bool
     {
         $normalized = self::normalize($selectedIds);
-
-        if ($normalized === []) {
-            return true;
-        }
-
-        return self::matchingIds($allocation, $normalized) !== [];
+        return $normalized === [] || self::matchingIds($allocation, $normalized) !== [];
     }
 
-    /**
-     * @param list<string> $selectedIds
-     * @return list<string>
-     */
+    /** @param list<string> $selectedIds @return list<string> */
     public static function matchingIds(PaymentComponentAllocation $allocation, array $selectedIds): array
     {
         $matches = [];
         $componentId = self::fromAllocation($allocation);
-
         foreach (self::normalize($selectedIds) as $id) {
             if (self::isComponentSelector($id)) {
                 if ($id === $componentId) {
                     $matches[] = $id;
                 }
-
                 continue;
             }
-
             if (trim($id) === $allocation->workItemId()) {
                 $matches[] = trim($id);
             }
         }
-
         return array_values(array_unique($matches));
     }
 
-    /**
-     * @return array{0:string,1:string,2:string}|null
-     */
+    /** @return array{0:string,1:string,2:string}|null */
     private static function parts(string $id): ?array
     {
         $parts = explode('::', trim($id), 3);
-
         if (count($parts) !== 3) {
             return null;
         }
-
         $normalized = array_map(static fn (string $part): string => trim($part), $parts);
-
         return in_array('', $normalized, true) ? null : $normalized;
     }
 }
