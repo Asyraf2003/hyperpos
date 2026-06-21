@@ -20,7 +20,7 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_it_records_refund_only_for_selected_rows(): void
+    public function test_it_records_refund_only_for_default_refundable_product_components_on_selected_rows(): void
     {
         $this->seedNote();
         $this->seedPaymentAndAllocations();
@@ -28,9 +28,9 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
         $result = app(RecordCustomerRefundHandler::class)->handle(
             'payment-1',
             'note-1',
-            4000,
+            3000,
             '2026-04-03',
-            'Refund line terpilih',
+            'Refund komponen produk line terpilih',
             'actor-1',
             ['wi-2'],
         );
@@ -44,9 +44,14 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
             'customer_payment_id' => 'payment-1',
             'note_id' => 'note-1',
             'work_item_id' => 'wi-2',
+            'component_type' => 'service_store_stock_part',
+            'component_ref_id' => 'sto-2',
+            'refunded_amount_rupiah' => 3000,
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
             'component_type' => 'service_fee',
-            'component_ref_id' => 'wi-2',
-            'refunded_amount_rupiah' => 4000,
         ]);
 
         $this->assertDatabaseMissing('refund_component_allocations', [
@@ -60,7 +65,7 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
         ]);
     }
 
-    public function test_it_records_external_purchase_refund_only_for_selected_external_row(): void
+    public function test_external_purchase_refund_is_default_blocked_without_manual_exception_path(): void
     {
         $this->seedNote();
         $this->seedPaymentAndAllocations();
@@ -75,46 +80,10 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
             ['wi-3'],
         );
 
-        $this->assertTrue($result->isSuccess());
-
-        $refundId = (string) DB::table('customer_refunds')->value('id');
-
-        $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'customer_payment_id' => 'payment-1',
-            'note_id' => 'note-1',
-            'work_item_id' => 'wi-3',
-            'component_type' => 'service_external_purchase_part',
-            'component_ref_id' => 'ext-1',
-            'refunded_amount_rupiah' => 2000,
-        ]);
-
-        $this->assertDatabaseMissing('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'work_item_id' => 'wi-1',
-        ]);
-
-        $this->assertDatabaseMissing('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'work_item_id' => 'wi-2',
-        ]);
-
-        $this->assertDatabaseMissing('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'component_type' => 'product_only_work_item',
-        ]);
-
-        $this->assertDatabaseMissing('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'component_type' => 'service_store_stock_part',
-        ]);
-
-        $this->assertSame(
-            1,
-            DB::table('refund_component_allocations')
-                ->where('customer_refund_id', $refundId)
-                ->count()
-        );
+        $this->assertTrue($result->isFailure());
+        $this->assertSame('Tidak ada komponen payment yang bisa direfund.', $result->message());
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
     }
 
 
@@ -126,7 +95,7 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
         $result = app(RecordCustomerRefundHandler::class)->handle(
             'payment-1',
             'note-1',
-            4000,
+            3000,
             '2026-04-03',
             'Refund timestamp allocation',
             'actor-1',
