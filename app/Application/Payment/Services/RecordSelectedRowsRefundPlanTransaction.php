@@ -11,6 +11,7 @@ use App\Application\Payment\DTO\RecordedSelectedRowsRefundPlanResult;
 use App\Application\Payment\DTO\SelectedRowsRefundPlan;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
+use App\Ports\Out\Note\NoteReaderPort;
 use App\Ports\Out\TransactionManagerPort;
 use Throwable;
 
@@ -23,6 +24,7 @@ final class RecordSelectedRowsRefundPlanTransaction
         private readonly TransactionManagerPort $transactions,
         private readonly RecordSelectedRowsRefundPlanAuditRecorder $audit,
         private readonly NoteHistoryProjectionService $projection,
+        private readonly NoteReaderPort $notes,
     ) {
     }
 
@@ -40,10 +42,17 @@ final class RecordSelectedRowsRefundPlanTransaction
             $started = true;
 
             $processed = $this->buckets->process($plan, $refundedAt, $reason);
-            $canceled = $this->cancelRows->execute($plan->noteId(), $plan->selectedRowIds(), $actorId, $actorRole, $reason);
+            $activeTotalRupiah = $this->currentActiveTotalRupiah($plan->noteId());
+            $cancellableRowIds = $plan->cancellableRowIds();
 
-            if ($canceled->isFailure()) {
-                throw new DomainException($canceled->message() ?? 'Gagal membatalkan line refund.');
+            if ($cancellableRowIds !== []) {
+                $canceled = $this->cancelRows->execute($plan->noteId(), $cancellableRowIds, $actorId, $actorRole, $reason);
+
+                if ($canceled->isFailure()) {
+                    throw new DomainException($canceled->message() ?? 'Gagal membatalkan line refund.');
+                }
+
+                $activeTotalRupiah = (int) ($canceled->data()['active_total_rupiah'] ?? $activeTotalRupiah);
             }
 
             $finalized = Result::success([
@@ -71,9 +80,10 @@ final class RecordSelectedRowsRefundPlanTransaction
                     $processed['refund_ids'],
                     $plan->selectedRowIds(),
                     $plan->unpaidRowIds(),
+                    $plan->cancellableRowIds(),
                     (int) $processed['allocation_count'],
                     $plan->totalRefundRupiah(),
-                    (int) ($canceled->data()['active_total_rupiah'] ?? 0),
+                    $activeTotalRupiah,
                 ))->toArray(),
                 'Refund selected rows berhasil dicatat.',
             );
@@ -90,5 +100,16 @@ final class RecordSelectedRowsRefundPlanTransaction
 
             throw $e;
         }
+    }
+
+    private function currentActiveTotalRupiah(string $noteId): int
+    {
+        $note = $this->notes->getById(trim($noteId));
+
+        if ($note === null) {
+            return 0;
+        }
+
+        return $note->totalRupiah()->amount();
     }
 }

@@ -11,6 +11,7 @@ final class SelectedRowsRefundPlanArraySerializer
      *   note_id: string,
      *   selected_row_ids: list<string>,
      *   unpaid_row_ids: list<string>,
+     *   cancellable_row_ids: list<string>,
      *   total_refund_rupiah: int,
      *   payment_buckets: list<array{customer_payment_id: string, row_ids: list<string>, amount_rupiah: int}>
      * }
@@ -21,6 +22,7 @@ final class SelectedRowsRefundPlanArraySerializer
             'note_id' => $plan->noteId(),
             'selected_row_ids' => $plan->selectedRowIds(),
             'unpaid_row_ids' => $plan->unpaidRowIds(),
+            'cancellable_row_ids' => $plan->cancellableRowIds(),
             'total_refund_rupiah' => $plan->totalRefundRupiah(),
             'payment_buckets' => array_map(
                 static fn (SelectedRowsRefundPaymentBucket $bucket): array => $bucket->toArray(),

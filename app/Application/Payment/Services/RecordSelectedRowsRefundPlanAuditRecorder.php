@@ -27,6 +27,7 @@ final class RecordSelectedRowsRefundPlanAuditRecorder
             'actor_role' => $actorRole,
             'selected_row_ids' => $plan->selectedRowIds(),
             'unpaid_row_ids' => $plan->unpaidRowIds(),
+            'cancellable_row_ids' => $plan->cancellableRowIds(),
             'refund_ids' => $processed['refund_ids'],
             'allocation_count' => $processed['allocation_count'],
             'total_refund_rupiah' => $plan->totalRefundRupiah(),

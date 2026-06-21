@@ -12,12 +12,14 @@ final class SelectedRowsRefundPlan
      * @param list<string> $selectedRowIds
      * @param list<string> $unpaidRowIds
      * @param list<SelectedRowsRefundPaymentBucket> $paymentBuckets
+     * @param list<string> $cancellableRowIds
      */
     private function __construct(
         private readonly string $noteId,
         private readonly array $selectedRowIds,
         private readonly array $unpaidRowIds,
         private readonly array $paymentBuckets,
+        private readonly array $cancellableRowIds,
     ) {
     }
 
@@ -25,8 +27,15 @@ final class SelectedRowsRefundPlan
      * @param list<string> $selectedRowIds
      * @param list<string> $unpaidRowIds
      * @param list<SelectedRowsRefundPaymentBucket> $paymentBuckets
+     * @param list<string> $cancellableRowIds
      */
-    public static function create(string $noteId, array $selectedRowIds, array $unpaidRowIds, array $paymentBuckets): self
+    public static function create(
+        string $noteId,
+        array $selectedRowIds,
+        array $unpaidRowIds,
+        array $paymentBuckets,
+        array $cancellableRowIds = [],
+    ): self
     {
         $normalizedNoteId = trim($noteId);
 
@@ -38,7 +47,13 @@ final class SelectedRowsRefundPlan
             throw new DomainException('Refund plan wajib memiliki selected rows.');
         }
 
-        return new self($normalizedNoteId, $selectedRowIds, $unpaidRowIds, $paymentBuckets);
+        return new self(
+            $normalizedNoteId,
+            array_values($selectedRowIds),
+            array_values($unpaidRowIds),
+            $paymentBuckets,
+            array_values($cancellableRowIds),
+        );
     }
 
     public function noteId(): string
@@ -59,6 +74,11 @@ final class SelectedRowsRefundPlan
     public function paymentBuckets(): array
     {
         return $this->paymentBuckets;
+    }
+
+    public function cancellableRowIds(): array
+    {
+        return $this->cancellableRowIds;
     }
 
     public function totalRefundRupiah(): int
