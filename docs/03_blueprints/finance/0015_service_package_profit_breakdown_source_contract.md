@@ -1,7 +1,7 @@
 # Blueprint 0015 - Service Package Profit Breakdown Source Contract
 
 Status:
-Draft / Source Contract / No Patch Yet
+FIXED / Source Contract Implemented / Query Only / No UI Patch
 
 Links:
 - [0038 audit findings](../../04_lifecycle/error_log/0038_cashier_note_create_edit_refund_reporting_audit_findings.md)
@@ -104,17 +104,37 @@ Evidence:
 - Combination date basis, future flexible package support, and full payload fingerprint lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: Phase 3 fingerprint fixed locally
-- Last checked: 2026-06-21
-- Last evidence: Phase 3 revision payload historical fingerprint GREEN. `php artisan test --filter=NoteRevisionLinePayloadMapperTest`, `php artisan test --filter=EditTransactionWorkspaceRevisionPaymentCharacterizationTest`, `php artisan test --filter=EditTransactionWorkspacePackageAutoSplitCharacterizationTest`, `php artisan test --filter=CreateTransactionWorkspaceLineTypeCharacterizationTest`, `php artisan test --filter=CorrectPaidServiceWithStoreStockPartServiceFeeOnly`, and `make verify` GREEN: 1275 passed, 7417 assertions.
+- Status: Phase 6 query fixed locally.
+- Last checked: 2026-06-21.
+- Implemented source:
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdownQuery.php`
+  - `tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php`
+- Last evidence:
+  - RED: `ServicePackageProfitBreakdownQuery` missing.
+  - GREEN: `php artisan test tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php` -> 1 passed, 17 assertions.
+  - Targeted boundary regression GREEN:
+    - `php artisan test --filter=OperationalProfit` -> 16 passed, 101 assertions.
+    - `php artisan test --filter=RefundReportingOwnerDecisionV2CharacterizationTest` -> 6 passed, 63 assertions.
+    - `php artisan test --filter=TransactionSummary` -> 5 passed, 49 assertions.
+    - `php artisan test --filter=TransactionCashLedger` -> 34 passed, 263 assertions.
 - Current behavior found:
-  - Future package breakdown source remains `payment_component_allocations`, `refund_component_allocations`, and `inventory_movements`.
+  - Service Package Profit Breakdown is a separate query/read-model.
   - Operational Profit remains separate cash-operational report and does not expose package breakdown fields.
   - InventoryCurrentSnapshotDatabaseQuery remains current product inventory/costing snapshot, not historical package profit source.
   - Refund allocation shape uses raw component types (`service_store_stock_part`, `service_fee`, `service_external_purchase_part`, `product_only_work_item`) and does not create a package aggregate component.
-  - Revision payload now snapshots minimal package fingerprint fields from work item/service detail/store-stock snapshots; `total_service_component_rupiah` is the historical service detail component total (`service_price_rupiah + package_profit_rupiah`).
+  - Query uses historical work item/service detail/store-stock line/refund allocation/inventory movement sources.
+  - Query does not read current product price or current AVG for historical money.
+- Locked formula in this slice:
+  - `parts_total_rupiah = SUM(work_item_store_stock_lines.line_total_rupiah)`.
+  - `sparepart_cogs_rupiah = stock_out COGS - stock_in reversal COGS from inventory_movements`.
+  - `sparepart_margin_rupiah = parts_total_rupiah - sparepart_cogs_rupiah`.
+  - `total_service_component_rupiah = service_price_rupiah + package_profit_rupiah`.
+  - `total_package_gross_profit_rupiah = sparepart_margin_rupiah + total_service_component_rupiah`.
+  - `refunded_product_component_rupiah` sums product/store-stock refund components.
+  - `refunded_service_component_rupiah` sums service_fee refund components only if an explicit future/manual exception writes that component.
 - Gap summary:
-  - Phase 6 candidate: explicit Service Package Profit Breakdown source contract across `transaction_date`, `payment_date`, `refund_date`, and `movement_date`.
-  - Double-count guard candidate: avoid counting `service_fee`, package service fields, and package profit fields twice once breakdown report exists.
-- Next action: Prepare Phase 6 report query explicitly; do not change Operational Profit formula.
-- Owner decision dependency: none for V2 direction; exact base-missing formula remains future characterization/hardening input.
+  - No UI/report page/export yet.
+  - Exact base-missing formula remains future characterization/hardening input.
+  - Phase 7 regression matrix remains separate and not started.
+- Next action: Run `make verify`, then stop Phase 6 if GREEN.
+- Owner decision dependency: none for V2 direction.

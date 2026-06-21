@@ -41,7 +41,7 @@ Progress Ledger:
 | Phase 3 Revision payload historical fingerprint | FIXED | Required: revision payload financial fingerprint or active rows/movement/allocation only | 0011, 0013, 0015 | NoteRevisionLinePayloadMapper | Revision payload tests | Phase 3 fingerprint fields GREEN. RED first: `php artisan test --filter=NoteRevisionLinePayloadMapperTest` failed on missing `package_base_service_price_rupiah`; after patch targeted tests GREEN and `make verify` GREEN: 1275 passed, 7417 assertions. | Stop; do not start Phase 4 until owner opens UI flexible package scope | revision payload can become financial fingerprint for minimal package fields |
 | Phase 4 UI flexible package | FIXED | Flexible package direction locked; template as preset; external purchase separate domain | 0011, 0012, 0013 | Blade/JS workspace, request validator/mapper, store-stock package template branch | Page/submit contract tests | Phase 4 UI flexible package GREEN: service_store_stock UI supports one service + many product lines; template preset multi-product extension supported; external purchase owner-facing label + total supported; external package_auto_split still blocked; targeted filters GREEN; `make verify` GREEN: 1275 passed, 7423 assertions. | Prepare Phase 5 refund component-type policy | UI dan backend contract sama |
 | Phase 5 Refund component-type policy | FIXED | Locked policy encoded; manual exception remains deferred unless approval path is explicitly designed | 0011, 0014, 0015 | Refund policy and guard candidates | Refund policy tests | Phase 5 refund component-type policy GREEN: product/store-stock components default refundable; service_fee and external_purchase components default blocked; package refund maps to raw components; cancellable rows limited to fully refundable rows; targeted refund/report/edit tests GREEN; `make verify` GREEN. | Prepare Phase 6 report query / Service Package Profit Breakdown source contract | refund behavior matches locked component-type policy |
-| Phase 6 Report query | TODO | Combination basis locked; exact query field mapping still needs characterization | 0011, 0015 | Query/source candidates only | Query tests | `docs/04_lifecycle/error_log/0037_profit_calculation_logic_audit_findings.md:23` | Lock source contract and implement query only | query reconciled and no mutable master leak for money |
+| Phase 6 Report query | FIXED | Combination basis locked; query field mapping implemented as separate Service Package Profit Breakdown read-model | 0011, 0015 | ServicePackageProfitBreakdownQuery | ServicePackageProfitBreakdownQueryTest | RED: missing `ServicePackageProfitBreakdownQuery`; GREEN: new query test 1 passed / 17 assertions; targeted reporting boundary regression GREEN: OperationalProfit 16/101, RefundReportingOwnerDecisionV2 6/63, TransactionSummary 5/49, TransactionCashLedger 34/263 | Run `make verify`, then stop; do not start Phase 7 | query reconciled and no mutable master leak for money |
 | Phase 7 Regression matrix | TODO | Not required unless prior phases accepted | 0011 | None or phase patches | Focused suites | needs re-check | Build final regression command index | focused suites green |
 
 Decision Log:
@@ -203,26 +203,35 @@ Stop condition:
 ## Phase 6 - Report Query
 Goal:
 - Query/report source tanpa UI dulu.
+- Selesai sebagai read-model/query terpisah, bukan perubahan Operational Profit.
 
-Formula candidate:
-- sparepart_sales_total_rupiah = sum store_stock line totals.
-- sparepart_cogs_rupiah = sum ABS inventory movement total_cost for linked store_stock lines.
-- sparepart_margin_rupiah = sparepart_sales_total - sparepart_cogs.
-- total_service_component_rupiah = package-aware service component from full payload fields and correction-aware recalculation.
-- total_package_gross_profit_rupiah = sparepart_margin + total_service_component.
+Implemented source:
+- `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdownQuery.php`
+- `tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php`
+
+Formula locked in this slice:
+- parts_total_rupiah = sum `work_item_store_stock_lines.line_total_rupiah`.
+- sparepart_cogs_rupiah = stock-out COGS from `inventory_movements` minus stock-in reversal COGS for linked store-stock lines.
+- sparepart_margin_rupiah = parts_total_rupiah - sparepart_cogs_rupiah.
+- total_service_component_rupiah = `service_price_rupiah + package_profit_rupiah` from historical service detail fields.
+- total_package_gross_profit_rupiah = sparepart_margin_rupiah + total_service_component_rupiah.
+- refunded_product_component_rupiah = component-aware refund sum for `product_only_work_item` and `service_store_stock_part`.
+- refunded_service_component_rupiah = explicit `service_fee` refund sum only when a future/manual exception writes that component.
 
 Tests:
-- normal package.
-- package after edit.
-- package after refund.
-- product price changed after note.
-- AVG changed after note.
-- multi-product package.
-- non-template package.
-- combination date basis across transaction/payment/refund/movement dates.
+- RED: missing `ServicePackageProfitBreakdownQuery`.
+- GREEN: `php artisan test tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php` -> 1 passed, 17 assertions.
+- Boundary regression GREEN:
+  - `php artisan test --filter=OperationalProfit` -> 16 passed, 101 assertions.
+  - `php artisan test --filter=RefundReportingOwnerDecisionV2CharacterizationTest` -> 6 passed, 63 assertions.
+  - `php artisan test --filter=TransactionSummary` -> 5 passed, 49 assertions.
+  - `php artisan test --filter=TransactionCashLedger` -> 34 passed, 263 assertions.
 
 Stop condition:
 - query angka reconciled dan tidak membaca current mutable master untuk historical money.
+- Operational Profit formula tetap tidak berubah.
+- No migration, no route/config, no supplier invoice payment proof, no Mobile API.
+- Phase 7 tidak dimulai di slice ini.
 
 ## Phase 7 - Regression Matrix
 Goal:
