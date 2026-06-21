@@ -966,7 +966,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             ->post(route('admin.notes.refunds.store', ['noteId' => 'note-edit-package-multi-001']), [
                 'selected_row_ids' => [$workItemId],
                 'refunded_at' => '2026-06-02',
-                'reason' => 'Refund current replacement package multi row.',
+                'reason' => 'Refund current replacement package multi product components.',
             ])
             ->assertRedirect(route('admin.notes.index'))
             ->assertSessionHas('success');
@@ -981,8 +981,8 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'id' => $refundId,
             'customer_payment_id' => 'payment-edit-package-multi-refund-001',
             'note_id' => 'note-edit-package-multi-001',
-            'amount_rupiah' => 200000,
-            'reason' => 'Refund current replacement package multi row.',
+            'amount_rupiah' => 130000,
+            'reason' => 'Refund current replacement package multi product components.',
         ]);
 
         $this->assertDatabaseHas('refund_component_allocations', [
@@ -1005,18 +1005,17 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
             'refunded_amount_rupiah' => 30000,
         ]);
 
-        $this->assertDatabaseHas('refund_component_allocations', [
+        $this->assertDatabaseMissing('refund_component_allocations', [
             'customer_refund_id' => $refundId,
             'customer_payment_id' => 'payment-edit-package-multi-refund-001',
             'note_id' => 'note-edit-package-multi-001',
             'work_item_id' => $workItemId,
             'component_type' => PaymentComponentType::SERVICE_FEE,
             'component_ref_id' => $workItemId,
-            'refunded_amount_rupiah' => 70000,
         ]);
 
         self::assertSame(
-            200000,
+            130000,
             (int) DB::table('refund_component_allocations')
                 ->where('customer_refund_id', $refundId)
                 ->sum('refunded_amount_rupiah'),
@@ -1030,7 +1029,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
         $this->assertDatabaseHas('work_items', [
             'id' => $workItemId,
             'note_id' => 'note-edit-package-multi-001',
-            'status' => WorkItem::STATUS_CANCELED,
+            'status' => WorkItem::STATUS_OPEN,
         ]);
     }
 
