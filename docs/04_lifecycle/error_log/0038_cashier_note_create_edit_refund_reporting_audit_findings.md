@@ -1,7 +1,15 @@
 # 0038 - Cashier note create/edit/refund/reporting consistency audit findings
 
 Status:
-Audit Findings / Owner Decision V2 Locked / No Patch Yet
+RESOLVED / Historical Audit Findings / Final Closure In 0039
+
+Final Resolution:
+- This audit finding set is resolved by the Phase 0-7 workflow.
+- Final closure pointer: [0039_cashier_note_create_edit_refund_reporting_final_closure.md](0039_cashier_note_create_edit_refund_reporting_final_closure.md)
+- Final regression matrix: [0016_cashier_note_final_regression_matrix.md](../../03_blueprints/finance/0016_cashier_note_final_regression_matrix.md)
+- Workflow ledger: [0011_cashier_note_consistency_workflow_index.md](../../03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md)
+- Final proof: `make verify` GREEN, 1276 passed, 7445 assertions, 54.12s.
+- Do not treat this file as active patch scope unless a new bug/workflow explicitly reopens it.
 
 Boundary:
 - Web/PWA only.
@@ -11,8 +19,7 @@ Boundary:
 - Scope ini hanya create/edit/refund/payment/report kasir.
 
 Purpose:
-Dokumen ini hanya mencatat finding dan owner decision.
-Progress pengerjaan tidak dicatat di file ini.
+Dokumen ini adalah catatan historis finding dan owner decision. Semua finding dalam file ini sudah ditutup oleh workflow Phase 0-7. Progress final ditutup di 0011, 0016, dan 0039.
 Progress pengerjaan dicatat di:
 [docs/03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md](../../03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md)
 

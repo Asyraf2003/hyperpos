@@ -82,3 +82,8 @@ Last proof:
 - Final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
 - Phase 7 is closed as verification/docs-only.
 - STOP. No Phase 8 for this workflow.
+
+Final Closure Pointer:
+- `docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md`
+- README latest handoff points to the final closure document.
+

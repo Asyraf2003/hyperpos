@@ -274,3 +274,10 @@ Final evidence:
 Final status:
 - Phase 7 `FIXED`.
 - STOP. No Phase 8 for this workflow.
+
+Final Closure:
+- Cashier note create/edit/refund/reporting consistency workflow is closed at Phase 7.
+- Final closure pointer: `docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md`
+- Final regression matrix: `docs/03_blueprints/finance/0016_cashier_note_final_regression_matrix.md`
+- STOP. No Phase 8 for this workflow.
+
