@@ -17,7 +17,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_full_refund_for_closed_store_stock_note_reverses_inventory_and_marks_note_refunded(): void
+    public function test_refund_for_closed_store_stock_package_refunds_product_component_only_and_reverses_inventory(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidStoreStockNote();
@@ -34,13 +34,18 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'note_state' => 'refunded',
+            'note_state' => 'closed',
         ]);
 
         $this->assertDatabaseHas('customer_refunds', [
             'customer_payment_id' => 'payment-1',
             'note_id' => 'note-1',
-            'amount_rupiah' => 50000,
+            'amount_rupiah' => 30000,
+        ]);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-1',
         ]);
 
         $this->assertDatabaseHas('inventory_movements', [
@@ -65,7 +70,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
         ]);
     }
 
-    public function test_selected_row_refund_for_closed_store_stock_note_refunds_whole_row_components(): void
+    public function test_selected_row_refund_for_closed_store_stock_note_skips_default_blocked_service_fee(): void
     {
         $user = $this->seedKasir();
         $this->seedClosedPaidStoreStockNote();
@@ -82,11 +87,10 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
 
         $refundId = (string) DB::table('customer_refunds')->value('id');
 
-        $this->assertDatabaseHas('refund_component_allocations', [
+        $this->assertDatabaseMissing('refund_component_allocations', [
             'customer_refund_id' => $refundId,
             'component_type' => 'service_fee',
             'component_ref_id' => 'wi-1',
-            'refunded_amount_rupiah' => 20000,
         ]);
 
         $this->assertDatabaseHas('refund_component_allocations', [
@@ -98,7 +102,7 @@ final class ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest extends 
 
         $this->assertDatabaseHas('notes', [
             'id' => 'note-1',
-            'note_state' => 'refunded',
+            'note_state' => 'closed',
         ]);
     }
 
