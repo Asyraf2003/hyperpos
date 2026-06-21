@@ -80,7 +80,7 @@ final class RefundReportingOwnerDecisionV2CharacterizationTest extends TestCase
         ]);
     }
 
-    public function test_current_gap_owner_decision_v2_target_service_default_non_refundable_but_current_service_fee_refunds(): void
+    public function test_phase5_service_only_refund_is_default_blocked_without_manual_exception_path(): void
     {
         $this->seedClosedServiceOnlyNote(
             noteId: 'note-batch3-service',
@@ -89,28 +89,25 @@ final class RefundReportingOwnerDecisionV2CharacterizationTest extends TestCase
             servicePriceRupiah: 50000,
         );
 
-        $refundId = $this->recordRefund(
+        $result = app(RecordCustomerRefundHandler::class)->handle(
             'payment-batch3-service',
             'note-batch3-service',
             50000,
             '2026-05-04',
+            'Phase 5 default service block.',
+            'actor-phase5-refund',
             ['wi-batch3-service'],
         );
 
-        $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'customer_payment_id' => 'payment-batch3-service',
-            'note_id' => 'note-batch3-service',
-            'work_item_id' => 'wi-batch3-service',
-            'component_type' => PaymentComponentType::SERVICE_FEE,
-            'component_ref_id' => 'wi-batch3-service',
-            'refunded_amount_rupiah' => 50000,
-        ]);
+        self::assertTrue($result->isFailure());
+        self::assertSame('Tidak ada komponen payment yang bisa direfund.', $result->message());
 
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
     }
 
-    public function test_current_gap_owner_decision_v2_target_external_purchase_default_non_refundable_but_current_external_and_service_components_refund(): void
+    public function test_phase5_external_purchase_refund_is_default_blocked_without_manual_exception_path(): void
     {
         $this->seedClosedExternalPurchaseNote(
             noteId: 'note-batch3-external',
@@ -121,38 +118,25 @@ final class RefundReportingOwnerDecisionV2CharacterizationTest extends TestCase
             externalCostRupiah: 2000,
         );
 
-        $refundId = $this->recordRefund(
+        $result = app(RecordCustomerRefundHandler::class)->handle(
             'payment-batch3-external',
             'note-batch3-external',
             11000,
             '2026-05-05',
+            'Phase 5 default external block.',
+            'actor-phase5-refund',
             ['wi-batch3-external'],
         );
 
-        $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'customer_payment_id' => 'payment-batch3-external',
-            'note_id' => 'note-batch3-external',
-            'work_item_id' => 'wi-batch3-external',
-            'component_type' => PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART,
-            'component_ref_id' => 'ext-batch3-external',
-            'refunded_amount_rupiah' => 2000,
-        ]);
+        self::assertTrue($result->isFailure());
+        self::assertSame('Tidak ada komponen payment yang bisa direfund.', $result->message());
 
-        $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $refundId,
-            'customer_payment_id' => 'payment-batch3-external',
-            'note_id' => 'note-batch3-external',
-            'work_item_id' => 'wi-batch3-external',
-            'component_type' => PaymentComponentType::SERVICE_FEE,
-            'component_ref_id' => 'wi-batch3-external',
-            'refunded_amount_rupiah' => 9000,
-        ]);
-
+        $this->assertDatabaseCount('customer_refunds', 0);
+        $this->assertDatabaseCount('refund_component_allocations', 0);
         $this->assertDatabaseCount('inventory_movements', 0);
     }
 
-    public function test_current_behavior_package_refund_maps_to_raw_product_and_service_components_and_can_split_or_merge_by_allocation_shape(): void
+    public function test_phase5_package_refund_maps_to_raw_product_component_without_refunding_service_fee(): void
     {
         $this->seedClosedPackageNote(
             noteId: 'note-batch3-package-product-only',
@@ -211,44 +195,41 @@ final class RefundReportingOwnerDecisionV2CharacterizationTest extends TestCase
             servicePriority: 1,
         );
 
-        $fullRefundId = $this->recordRefund(
+        $serviceBlockedResult = app(RecordCustomerRefundHandler::class)->handle(
             'payment-batch3-package-full',
             'note-batch3-package-full',
-            100000,
+            70000,
             '2026-05-07',
-            ['wi-batch3-package-full'],
+            'Phase 5 package service component default blocked.',
+            'actor-phase5-refund',
+            ['wi-batch3-package-full::service_fee::wi-batch3-package-full'],
+        );
+
+        self::assertTrue($serviceBlockedResult->isFailure());
+
+        $productComponentRefundId = $this->recordRefund(
+            'payment-batch3-package-full',
+            'note-batch3-package-full',
+            30000,
+            '2026-05-07',
+            ['wi-batch3-package-full::service_store_stock_part::ssl-batch3-package-full'],
         );
 
         $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $fullRefundId,
+            'customer_refund_id' => $productComponentRefundId,
             'component_type' => PaymentComponentType::SERVICE_STORE_STOCK_PART,
             'component_ref_id' => 'ssl-batch3-package-full',
             'refunded_amount_rupiah' => 30000,
         ]);
 
-        $this->assertDatabaseHas('refund_component_allocations', [
-            'customer_refund_id' => $fullRefundId,
-            'component_type' => PaymentComponentType::SERVICE_FEE,
-            'component_ref_id' => 'wi-batch3-package-full',
-            'refunded_amount_rupiah' => 70000,
-        ]);
-
-        self::assertSame(
-            2,
-            DB::table('refund_component_allocations')
-                ->where('customer_refund_id', $fullRefundId)
-                ->whereIn('component_type', [
-                    PaymentComponentType::SERVICE_STORE_STOCK_PART,
-                    PaymentComponentType::SERVICE_FEE,
-                ])
-                ->count()
-        );
-
         self::assertSame(
             0,
             DB::table('refund_component_allocations')
-                ->where('customer_refund_id', $fullRefundId)
-                ->where('component_type', 'package')
+                ->where('customer_refund_id', $productComponentRefundId)
+                ->whereIn('component_type', [
+                    PaymentComponentType::SERVICE_FEE,
+                    'package',
+                ])
                 ->count()
         );
     }
