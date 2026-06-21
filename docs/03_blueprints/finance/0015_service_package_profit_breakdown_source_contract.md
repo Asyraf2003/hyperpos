@@ -1,7 +1,7 @@
 # Blueprint 0015 - Service Package Profit Breakdown Source Contract
 
 Status:
-FIXED / Source Contract Implemented / Query Only / No UI Patch
+FIXED / Query Implemented / Split for audit-lines / No UI Patch
 
 Links:
 - [0038 audit findings](../../04_lifecycle/error_log/0038_cashier_note_create_edit_refund_reporting_audit_findings.md)
@@ -104,10 +104,15 @@ Evidence:
 - Combination date basis, future flexible package support, and full payload fingerprint lock: owner decision V2 from current discussion
 
 Progress Local:
-- Status: Phase 6 query fixed locally.
+- Status: Phase 6 query fixed and verified locally.
 - Last checked: 2026-06-21.
 - Implemented source:
   - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdownQuery.php`
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdown/BreakdownSourceRowsQuery.php`
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdown/PartsTotalSubquery.php`
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdown/CogsSubqueries.php`
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdown/RefundComponentSubqueries.php`
+  - `app/Adapters/Out/Reporting/Queries/ServicePackageProfitBreakdown/BreakdownRowMapper.php`
   - `tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php`
 - Last evidence:
   - RED: `ServicePackageProfitBreakdownQuery` missing.
@@ -117,6 +122,7 @@ Progress Local:
     - `php artisan test --filter=RefundReportingOwnerDecisionV2CharacterizationTest` -> 6 passed, 63 assertions.
     - `php artisan test --filter=TransactionSummary` -> 5 passed, 49 assertions.
     - `php artisan test --filter=TransactionCashLedger` -> 34 passed, 263 assertions.
+  - Final `make verify` GREEN by operator confirmation after testing database reset.
 - Current behavior found:
   - Service Package Profit Breakdown is a separate query/read-model.
   - Operational Profit remains separate cash-operational report and does not expose package breakdown fields.
@@ -131,10 +137,12 @@ Progress Local:
   - `total_service_component_rupiah = service_price_rupiah + package_profit_rupiah`.
   - `total_package_gross_profit_rupiah = sparepart_margin_rupiah + total_service_component_rupiah`.
   - `refunded_product_component_rupiah` sums product/store-stock refund components.
-  - `refunded_service_component_rupiah` sums service_fee refund components only if an explicit future/manual exception writes that component.
+  - `refunded_service_component_rupiah` sums explicit `service_fee` refund components only.
 - Gap summary:
   - No UI/report page/export yet.
   - Exact base-missing formula remains future characterization/hardening input.
   - Phase 7 regression matrix remains separate and not started.
-- Next action: Run `make verify`, then stop Phase 6 if GREEN.
+- Next action:
+  - Stop Phase 6.
+  - Do not start Phase 7 in this slice.
 - Owner decision dependency: none for V2 direction.
