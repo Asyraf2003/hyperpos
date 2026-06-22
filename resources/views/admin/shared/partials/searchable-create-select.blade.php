@@ -1,31 +1,22 @@
-@php
-    $selectedValue = (string) ($selected ?? '');
-    $helpText = $help ?? null;
-    $errorName = $errorName ?? $name;
-    $placeholderText = $placeholder ?? 'Cari / pilih data';
-    $emptyText = $emptyMessage ?? 'Data tidak ditemukan.';
-    $createText = $createLabel ?? 'Buat data baru';
-@endphp
-
 <div class="form-group mb-4" data-searchable-create-select>
     <label for="{{ $id }}" class="form-label">{{ $label }}</label>
 
     <select
         id="{{ $id }}"
         name="{{ $name }}"
-        class="form-select @error($errorName) is-invalid @enderror"
+        class="form-select @error($name) is-invalid @enderror"
         required
         data-searchable-create-select-native
-        data-placeholder="{{ $placeholderText }}"
-        data-empty-message="{{ $emptyText }}"
+        data-placeholder="{{ $placeholder ?? 'Cari / pilih data' }}"
+        data-empty-message="{{ $emptyMessage ?? 'Data tidak ditemukan.' }}"
         data-create-url="{{ $createUrl }}"
-        data-create-label="{{ $createText }}"
+        data-create-label="{{ $createLabel ?? 'Buat data baru' }}"
     >
-        <option value="">{{ $placeholderText }}</option>
+        <option value="">{{ $placeholder ?? 'Cari / pilih data' }}</option>
         @foreach ($options as $option)
             <option
                 value="{{ $option['id'] }}"
-                @selected($selectedValue === (string) $option['id'])
+                @selected((string) ($selected ?? '') === (string) $option['id'])
             >
                 {{ $option['label'] }}
             </option>
@@ -37,7 +28,7 @@
             type="text"
             class="form-control"
             autocomplete="off"
-            placeholder="{{ $placeholderText }}"
+            placeholder="{{ $placeholder ?? 'Cari / pilih data' }}"
             data-searchable-create-select-search
         >
 
@@ -50,18 +41,18 @@
             class="alert alert-warning mt-2 mb-0 py-2 px-3 d-none"
             data-searchable-create-select-empty
         >
-            <div class="fw-semibold">{{ $emptyText }}</div>
+            <div class="fw-semibold">{{ $emptyMessage ?? 'Data tidak ditemukan.' }}</div>
             <a href="{{ $createUrl }}" class="alert-link">
-                {{ $createText }}
+                {{ $createLabel ?? 'Buat data baru' }}
             </a>
         </div>
     </div>
 
-    @if ($helpText)
-        <small class="text-muted">{{ $helpText }}</small>
+    @if ($help ?? null)
+        <small class="text-muted">{{ $help }}</small>
     @endif
 
-    @error($errorName)
+    @error($name)
         <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
 </div>
