@@ -55,33 +55,14 @@ final class CreateTransactionWorkspaceServiceStoreStockPackageProductLinesCompos
         $product = $this->products->getById($productId)
             ?? throw new DomainException('Product tidak ditemukan.');
 
-        $productUnitPrice = $this->unitPrice($line, $product->hargaJual()->amount());
+        $productUnitPrice = (new CreateTransactionWorkspaceRevisionSnapshotUnitPriceResolver())
+            ->resolve($line, $product->hargaJual()->amount());
 
         $line['product_id'] = $productId;
         $line['qty'] = $qty;
         $line['unit_price_rupiah'] = $productUnitPrice;
 
         return [$line, $productUnitPrice * $qty];
-    }
-
-    /**
-     * @param array<string, mixed> $line
-     */
-    private function unitPrice(array $line, int $catalogUnitPrice): int
-    {
-        $isTrustedRevisionSnapshot = ($line['_server_trusted_revision_snapshot'] ?? false) === true;
-
-        if (! $isTrustedRevisionSnapshot) {
-            return $catalogUnitPrice;
-        }
-
-        $snapshotUnitPrice = $line['unit_price_rupiah'] ?? null;
-
-        if (! is_int($snapshotUnitPrice) || $snapshotUnitPrice <= 0) {
-            throw new DomainException('Harga satuan produk snapshot revisi tidak valid.');
-        }
-
-        return $snapshotUnitPrice;
     }
 
     private function requiredString(mixed $value, string $message): string

@@ -10,13 +10,11 @@ use App\Application\Note\Services\CreateTransactionWorkspaceIdempotencyService;
 use App\Application\Note\Services\CreateTransactionWorkspaceNoteFactory;
 use App\Application\Note\Services\CreateTransactionWorkspaceResultBuilder;
 use App\Application\Note\Services\CreateTransactionWorkspaceWorkItemPersister;
+use App\Application\Note\Services\CreateTransactionWorkspaceInitialRevisionBootstrapper;
 use App\Application\Note\Services\NoteHistoryProjectionService;
-use App\Application\Note\Services\NoteRevisionBootstrapFactory;
 use App\Application\Shared\DTO\Result;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\AuditLogPort;
-use App\Ports\Out\ClockPort;
-use App\Ports\Out\Note\NoteRevisionWriterPort;
 use App\Ports\Out\Note\NoteWriterPort;
 use App\Ports\Out\TransactionManagerPort;
 use Throwable;
@@ -34,9 +32,7 @@ final class CreateTransactionWorkspaceHandler
         private readonly CreateTransactionWorkspaceResultBuilder $results,
         private readonly AuditLogPort $audit,
         private readonly NoteHistoryProjectionService $projection,
-        private readonly NoteRevisionBootstrapFactory $revisionFactory,
-        private readonly NoteRevisionWriterPort $revisions,
-        private readonly ClockPort $clock,
+        private readonly CreateTransactionWorkspaceInitialRevisionBootstrapper $initialRevision,
     ) {
     }
 
@@ -67,20 +63,9 @@ final class CreateTransactionWorkspaceHandler
             $persistedItems = $this->items->persist($note, $payload['items'] ?? []);
             $this->notes->updateTotal($note);
 
-            $actorId = is_string($payload['_actor_id'] ?? null) ? $payload['_actor_id'] : null;
-            $initialRevision = $this->revisionFactory->createInitialRevision(
-                sprintf('%s-r001', $note->id()),
+            $this->initialRevision->bootstrap(
                 $note,
-                $actorId,
-                $this->clock->now(),
-                'Bootstrap initial revision from transaction workspace create',
-            );
-
-            $this->revisions->create($initialRevision);
-            $this->revisions->setCurrentRevision(
-                $note->id(),
-                $initialRevision->id(),
-                $initialRevision->revisionNumber(),
+                is_string($payload['_actor_id'] ?? null) ? $payload['_actor_id'] : null,
             );
 
             $paymentSummary = $this->payments->record($note, $payload['inline_payment'] ?? []);
