@@ -199,6 +199,93 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         ]);
     }
 
+
+    public function test_cashier_can_refund_legacy_paid_product_only_note_without_component_allocations(): void
+    {
+        $user = $this->seedKasir();
+        $today = date('Y-m-d');
+
+        $this->seedProductForRefund('product-legacy-refund-1', 50000, 30000, 1);
+        $this->seedNoteBase('note-legacy-refund-1', 'Budi Legacy Refund', $today, 50000, 'closed');
+        $this->seedWorkItemBase(
+            'wi-legacy-refund-1',
+            'note-legacy-refund-1',
+            1,
+            WorkItem::TYPE_STORE_STOCK_SALE_ONLY,
+            WorkItem::STATUS_OPEN,
+            50000
+        );
+        $this->seedStoreStockLineBase(
+            'ssl-legacy-refund-1',
+            'wi-legacy-refund-1',
+            'product-legacy-refund-1',
+            1,
+            50000
+        );
+        $this->seedStockOut(
+            'move-legacy-refund-1',
+            'product-legacy-refund-1',
+            'ssl-legacy-refund-1',
+            $today,
+            30000
+        );
+
+        $this->seedCustomerPaymentBase('payment-legacy-refund-1', 50000, $today);
+        $this->seedPaymentAllocationBase(
+            'allocation-legacy-refund-1',
+            'payment-legacy-refund-1',
+            'note-legacy-refund-1',
+            50000
+        );
+
+        $this->assertSame(0, DB::table('payment_component_allocations')->count());
+
+        $this->actingAs($user)
+            ->from(route('cashier.notes.index'))
+            ->post(route('cashier.notes.refunds.store', ['noteId' => 'note-legacy-refund-1']), [
+                'selected_row_ids' => ['wi-legacy-refund-1'],
+                'refunded_at' => $today,
+                'reason' => 'Refund legacy paid product line',
+            ])
+            ->assertRedirect(route('cashier.notes.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('customer_refunds', [
+            'customer_payment_id' => 'payment-legacy-refund-1',
+            'note_id' => 'note-legacy-refund-1',
+            'amount_rupiah' => 50000,
+            'reason' => 'Refund legacy paid product line',
+        ]);
+
+        $refundId = (string) DB::table('customer_refunds')
+            ->where('customer_payment_id', 'payment-legacy-refund-1')
+            ->where('note_id', 'note-legacy-refund-1')
+            ->value('id');
+
+        $this->assertNotSame('', $refundId);
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'customer_refund_id' => $refundId,
+            'customer_payment_id' => 'payment-legacy-refund-1',
+            'note_id' => 'note-legacy-refund-1',
+            'work_item_id' => 'wi-legacy-refund-1',
+            'component_type' => 'product_only_work_item',
+            'component_ref_id' => 'wi-legacy-refund-1',
+            'refunded_amount_rupiah' => 50000,
+        ]);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'wi-legacy-refund-1',
+            'status' => WorkItem::STATUS_CANCELED,
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-legacy-refund-1',
+            'total_rupiah' => 0,
+        ]);
+    }
+
+
     private function seedKasir(): User
     {
         $this->loginAsKasir();
