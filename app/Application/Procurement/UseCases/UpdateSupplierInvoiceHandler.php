@@ -36,6 +36,7 @@ final class UpdateSupplierInvoiceHandler
         ?string $performedByActorRole = null,
         string $sourceChannel = 'web_admin',
         null|string|int $taxInput = null,
+        bool $taxRoundingResidueConfirmed = false,
     ): Result {
         $current = $this->reader->getById($supplierInvoiceId);
 
@@ -70,7 +71,8 @@ final class UpdateSupplierInvoiceHandler
                 $namaPtPengirim,
                 $tanggalPengiriman,
                 $lines,
-                $taxInput
+                $taxInput,
+                $taxRoundingResidueConfirmed
             ): Result {
                 $result = $this->operation->execute(
                     $current,
@@ -80,6 +82,7 @@ final class UpdateSupplierInvoiceHandler
                     $tanggalPengiriman,
                     $lines,
                     $taxInput,
+                    $taxRoundingResidueConfirmed,
                 );
 
                 if (! $result->isFailure()) {

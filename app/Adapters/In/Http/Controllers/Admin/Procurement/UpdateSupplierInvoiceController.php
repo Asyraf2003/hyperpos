@@ -33,6 +33,7 @@ final class UpdateSupplierInvoiceController extends Controller
             null,
             'web_admin',
             taxInput: $this->resolveTaxInput($data),
+            taxRoundingResidueConfirmed: $this->resolveTaxRoundingResidueConfirmed($data),
         );
 
         if ($result->isFailure()) {
@@ -60,6 +61,14 @@ final class UpdateSupplierInvoiceController extends Controller
         return redirect()
             ->route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => $supplierInvoiceId])
             ->with('success', $result->message() ?? 'Nota supplier berhasil diperbarui.');
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveTaxRoundingResidueConfirmed(array $data): bool
+    {
+        return (bool) ($data['tax_rounding_residue_confirmed'] ?? false);
     }
 
     /**

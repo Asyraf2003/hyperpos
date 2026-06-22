@@ -29,6 +29,7 @@ final class UpdateSupplierInvoiceOperation
         string $tanggalPengiriman,
         array $lines,
         null|string|int $taxInput = null,
+        bool $taxRoundingResidueConfirmed = false,
     ): Result {
         $updated = $this->builder->build(
             $current,
@@ -37,6 +38,7 @@ final class UpdateSupplierInvoiceOperation
             $tanggalPengiriman,
             $lines,
             $taxInput,
+            $taxRoundingResidueConfirmed,
         );
 
         $context = $this->contextResolver->resolve($supplierInvoiceId, $updated);

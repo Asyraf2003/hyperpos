@@ -25,12 +25,13 @@ final class UpdatedSupplierInvoiceBuilder
         string $tanggalPengiriman,
         array $lines,
         null|string|int $taxInput = null,
+        bool $taxRoundingResidueConfirmed = false,
     ): SupplierInvoice {
         $shipmentDate = DateTimeImmutable::createFromFormat('!Y-m-d', trim($tanggalPengiriman))
             ?: throw new DomainException('Format tanggal pengiriman salah.');
 
         $supplier = $this->supplierService->resolve($namaPtPengirim);
-        $taxAllocation = $this->taxAllocator->allocate($lines, $taxInput);
+        $taxAllocation = $this->taxAllocator->allocate($lines, $taxInput, $taxRoundingResidueConfirmed);
         $taxCalculation = $taxAllocation->tax();
         $invoiceLines = $this->invoiceFactory->makeLines($taxAllocation->lines());
 

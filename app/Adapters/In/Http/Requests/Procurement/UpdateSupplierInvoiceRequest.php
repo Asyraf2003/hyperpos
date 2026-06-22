@@ -48,6 +48,7 @@ final class UpdateSupplierInvoiceRequest extends FormRequest
             'nama_pt_pengirim' => ['required', 'string'],
             'tanggal_pengiriman' => ['required', 'date_format:Y-m-d'],
             'tax_input' => ['nullable', 'string', 'max:64'],
+            'tax_rounding_residue_confirmed' => ['nullable', 'boolean'],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.line_no' => ['required', 'integer', 'min:1'],
             'lines.*.previous_line_id' => ['nullable', 'string'],
