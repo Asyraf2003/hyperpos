@@ -31,6 +31,117 @@
     .map((item) => item.querySelector("[data-tax-line-input]"))
     .filter((input) => input);
 
+  const taxRoundingResidueConfirmedInput = form.querySelector("[data-tax-rounding-residue-confirmed-input]");
+  const taxRoundingResidueMessage = form.querySelector("[data-tax-rounding-residue-message]");
+
+  const parsePositiveInt = (value) => {
+    const digits = String(value ?? "").replace(/\D+/g, "");
+    if (digits === "") return 0;
+
+    const parsed = Number.parseInt(digits, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  };
+
+  const calculateTaxAmount = (taxInput, baseAmount) => {
+    const input = String(taxInput ?? "").trim();
+    if (input === "" || baseAmount < 1) return 0;
+
+    if (input.endsWith("%")) {
+      const rate = Number.parseFloat(input.slice(0, -1).replace(",", "."));
+      if (!Number.isFinite(rate) || rate < 0) return 0;
+
+      return Math.trunc((baseAmount * rate) / 100);
+    }
+
+    return parsePositiveInt(input);
+  };
+
+  const collectTaxRoundingLines = () => lineItems()
+    .map((item, index) => ({
+      index,
+      qty: parsePositiveInt(item.querySelector("[data-qty-input]")?.value),
+      total: parsePositiveInt(item.querySelector("[data-money-raw]")?.value),
+      lineTaxInput: String(item.querySelector("[data-tax-line-input]")?.value ?? "").trim()
+    }))
+    .filter((line) => line.qty > 0 && line.total > 0);
+
+  const resetTaxRoundingResidueConfirmation = () => {
+    if (!taxRoundingResidueConfirmedInput) return;
+    taxRoundingResidueConfirmedInput.value = "0";
+  };
+
+  const requiresTaxRoundingResidueConfirmation = () => {
+    const lines = collectTaxRoundingLines();
+    if (lines.length === 0) return false;
+
+    const headerTax = String(headerTaxInput?.value ?? "").trim();
+    const hasHeaderTax = headerTax !== "";
+    const hasLineTax = lines.some((line) => line.lineTaxInput !== "");
+
+    if (hasLineTax) {
+      return lines.some((line) => {
+        const taxedTotal = line.total + calculateTaxAmount(line.lineTaxInput, line.total);
+        return taxedTotal % line.qty !== 0;
+      });
+    }
+
+    if (!hasHeaderTax) return false;
+
+    const subtotal = lines.reduce((sum, line) => sum + line.total, 0);
+    const taxAmount = calculateTaxAmount(headerTax, subtotal);
+    if (subtotal < 1 || taxAmount < 1) return false;
+
+    const allocated = lines.map((line) => {
+      const numerator = line.total * taxAmount;
+      const tax = Math.trunc(numerator / subtotal);
+
+      return {
+        ...line,
+        tax,
+        remainder: numerator % subtotal
+      };
+    });
+
+    const allocatedTax = allocated.reduce((sum, line) => sum + line.tax, 0);
+    let remainingTax = taxAmount - allocatedTax;
+
+    allocated
+      .slice()
+      .sort((left, right) => {
+        const byRemainder = right.remainder - left.remainder;
+        return byRemainder !== 0 ? byRemainder : left.index - right.index;
+      })
+      .forEach((line) => {
+        if (remainingTax < 1) return;
+
+        line.tax += 1;
+        remainingTax -= 1;
+      });
+
+    return allocated.some((line) => (line.total + line.tax) % line.qty !== 0);
+  };
+
+  const confirmTaxRoundingResidueBeforeSubmit = () => {
+    if (!taxRoundingResidueConfirmedInput) return true;
+    if (!requiresTaxRoundingResidueConfirmation()) return true;
+    if (taxRoundingResidueConfirmedInput.value === "1") return true;
+
+    const message = String(taxRoundingResidueMessage?.textContent ?? "Total setelah pajak tidak habis dibagi qty, sehingga modal per pcs akan dibulatkan dan selisih pembulatan akan dicatat. Lanjutkan?").trim();
+
+    if (!window.confirm(message)) {
+      return false;
+    }
+
+    taxRoundingResidueConfirmedInput.value = "1";
+    return true;
+  };
+
+  const shouldResetTaxRoundingResidueConfirmation = (target) =>
+    target instanceof Element && Boolean(target.closest(
+      "[data-tax-header-input], [data-tax-line-input], [data-qty-input], [data-money-display], [data-money-raw]"
+    ));
+
+
   const setElementHidden = (element, hidden) => {
     if (!element) return;
     element.classList.toggle("d-none", hidden);
@@ -1073,8 +1184,21 @@
     });
   });
 
-  form.addEventListener("input", scheduleDraftSave);
-  form.addEventListener("change", scheduleDraftSave);
+  form.addEventListener("input", (event) => {
+    if (shouldResetTaxRoundingResidueConfirmation(event.target)) {
+      resetTaxRoundingResidueConfirmation();
+    }
+
+    scheduleDraftSave();
+  });
+
+  form.addEventListener("change", (event) => {
+    if (shouldResetTaxRoundingResidueConfirmation(event.target)) {
+      resetTaxRoundingResidueConfirmation();
+    }
+
+    scheduleDraftSave();
+  });
 
   form.addEventListener("submit", (event) => {
     pruneEmptyLinesBeforeSubmit();
@@ -1092,6 +1216,12 @@
         focusField(invalidItem.querySelector("[data-product-search]"), false);
       }
 
+      return;
+    }
+
+    if (!confirmTaxRoundingResidueBeforeSubmit()) {
+      event.preventDefault();
+      persistDraftNow();
       return;
     }
 
