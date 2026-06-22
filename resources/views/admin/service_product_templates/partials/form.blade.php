@@ -15,42 +15,30 @@
         @method($method)
     @endif
 
-    <div class="form-group mb-4">
-        <label for="product_id" class="form-label">Produk</label>
-        <select id="product_id" name="product_id" class="form-select @error('product_id') is-invalid @enderror" required>
-            <option value="">Pilih produk</option>
-            @foreach ($productOptions as $option)
-                <option
-                    value="{{ $option['id'] }}"
-                    @selected(old('product_id', $template['product_id'] ?? '') === $option['id'])
-                >
-                    {{ $option['label'] }}
-                </option>
-            @endforeach
-        </select>
-        @error('product_id')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+    @include('admin.shared.partials.searchable-create-select', [
+        'id' => 'product_id',
+        'name' => 'product_id',
+        'label' => 'Produk',
+        'options' => $productOptions,
+        'selected' => old('product_id', $template['product_id'] ?? ''),
+        'placeholder' => 'Cari / pilih produk',
+        'emptyMessage' => 'Produk tidak ditemukan.',
+        'createUrl' => route('admin.products.create'),
+        'createLabel' => 'Buat produk baru',
+    ])
 
-    <div class="form-group mb-4">
-        <label for="service_catalog_item_id" class="form-label">Jasa</label>
-        <select id="service_catalog_item_id" name="service_catalog_item_id" class="form-select @error('service_catalog_item_id') is-invalid @enderror" required>
-            <option value="">Pilih jasa</option>
-            @foreach ($serviceOptions as $option)
-                <option
-                    value="{{ $option['id'] }}"
-                    @selected(old('service_catalog_item_id', $template['service_catalog_item_id'] ?? '') === $option['id'])
-                >
-                    {{ $option['label'] }}
-                </option>
-            @endforeach
-        </select>
-        <small class="text-muted">Harga jasa otomatis mengikuti data master jasa yang dipilih.</small>
-        @error('service_catalog_item_id')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
+    @include('admin.shared.partials.searchable-create-select', [
+        'id' => 'service_catalog_item_id',
+        'name' => 'service_catalog_item_id',
+        'label' => 'Jasa',
+        'options' => $serviceOptions,
+        'selected' => old('service_catalog_item_id', $template['service_catalog_item_id'] ?? ''),
+        'placeholder' => 'Cari / pilih jasa',
+        'emptyMessage' => 'Jasa tidak ditemukan.',
+        'createUrl' => route('admin.services.create'),
+        'createLabel' => 'Buat jasa baru',
+        'help' => 'Harga jasa otomatis mengikuti data master jasa yang dipilih.',
+    ])
 
     <div class="form-group mb-4" data-money-input-group>
         <label for="default_service_price_rupiah_display" class="form-label">Harga Jasa Template</label>

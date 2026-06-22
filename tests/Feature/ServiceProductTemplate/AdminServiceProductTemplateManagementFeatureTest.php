@@ -25,6 +25,10 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         $createPage->assertSee('Tambah Service', false);
         $createPage->assertSee('Ban Admin Template', false);
         $createPage->assertSee('Jasa Pasang Ban Admin', false);
+        $createPage->assertSee('data-searchable-create-select', false);
+        $createPage->assertSee('admin-searchable-create-select.js', false);
+        $createPage->assertSee(route('admin.products.create'), false);
+        $createPage->assertSee(route('admin.services.create'), false);
 
         $storeResponse = $this->actingAs($admin)->post(route('admin.service-product-templates.store'), [
             'product_id' => 'product-admin-template-1',
@@ -61,6 +65,9 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         $editPage->assertOk();
         $editPage->assertSee('Edit Service', false);
         $editPage->assertSee('Jasa Pasang Ban Admin Update', false);
+        $editPage->assertSee('data-searchable-create-select', false);
+        $editPage->assertSee(route('admin.products.create'), false);
+        $editPage->assertSee(route('admin.services.create'), false);
 
         $updateResponse = $this->actingAs($admin)->put(route('admin.service-product-templates.update', ['templateId' => $templateId]), [
             'product_id' => 'product-admin-template-1',
