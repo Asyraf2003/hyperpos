@@ -84,6 +84,47 @@ final class RevisionSnapshotStoreStockLineTrustMarkerTest extends TestCase
         $this->assertFalse($marked[0]['product_lines'][0]['_server_trusted_revision_snapshot']);
     }
 
+    public function test_it_marks_all_matching_revision_snapshot_product_lines_not_only_first_line(): void
+    {
+        $marker = $this->marker();
+
+        $items = [[
+            'entry_mode' => 'service',
+            'product_lines' => [
+                [
+                    'product_id' => 'product-1',
+                    'qty' => 2,
+                    'unit_price_rupiah' => 50000,
+                    'price_basis' => 'revision_snapshot',
+                ],
+                [
+                    'product_id' => 'product-2',
+                    'qty' => 1,
+                    'unit_price_rupiah' => 30000,
+                    'price_basis' => 'revision_snapshot',
+                ],
+            ],
+        ]];
+
+        $workItems = [
+            WorkItem::createStoreStockSaleOnly(
+                'wi-old-1',
+                'note-1',
+                1,
+                [
+                    StoreStockLine::create('ssl-old-1', 'product-1', 2, Money::fromInt(100000)),
+                    StoreStockLine::create('ssl-old-2', 'product-2', 1, Money::fromInt(30000)),
+                ]
+            ),
+        ];
+
+        $marked = $marker->mark($items, null, $workItems);
+
+        $this->assertTrue($marked[0]['product_lines'][0]['_server_trusted_revision_snapshot']);
+        $this->assertTrue($marked[0]['product_lines'][1]['_server_trusted_revision_snapshot']);
+    }
+
+
 
     private function marker(): RevisionSnapshotStoreStockLineTrustMarker
     {
