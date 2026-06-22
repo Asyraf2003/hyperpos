@@ -15,6 +15,7 @@ use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\AuditLogPort;
 use App\Ports\Out\Payment\CustomerPaymentWriterPort;
 use App\Ports\Out\Payment\PaymentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 use App\Ports\Out\Payment\PaymentComponentAllocationWriterPort;
 use App\Ports\Out\UuidPort;
 
@@ -24,6 +25,7 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
         private readonly CustomerPaymentWriterPort $payments,
         private readonly PaymentComponentAllocationWriterPort $componentAllocations,
         private readonly PaymentAllocationReaderPort $paymentAllocations,
+        private readonly RefundComponentAllocationReaderPort $refunds,
         private readonly PaymentAllocationPolicy $policy,
         private readonly UuidPort $uuid,
         private readonly AuditLogPort $audit,
@@ -65,7 +67,9 @@ final class CreateTransactionWorkspaceInlinePaymentRecorder
                 : null,
         );
 
-        $existingAllocated = $this->paymentAllocations->getTotalAllocatedAmountByNoteId($note->id());
+        $grossAllocated = $this->paymentAllocations->getTotalAllocatedAmountByNoteId($note->id());
+        $refunded = $this->refunds->getTotalRefundedAmountByNoteId($note->id());
+        $existingAllocated = Money::fromInt(max($grossAllocated->amount() - $refunded->amount(), 0));
 
         $this->policy->assertAllocatable(
             $money,

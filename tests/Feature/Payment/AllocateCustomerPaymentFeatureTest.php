@@ -73,6 +73,71 @@ final class AllocateCustomerPaymentFeatureTest extends TestCase
         $this->assertSame(['payment' => ['PAYMENT_INVALID_TARGET']], $result->errors());
     }
 
+
+    public function test_allocate_customer_payment_allows_replacement_payment_after_refund(): void
+    {
+        $this->seedNote('note-refund-allocate-1', 'Budi Refund Allocate', '2026-03-14', 100000);
+        $this->seedCustomerPayment('payment-existing-refund-allocate-1', 100000, '2026-03-15');
+        $this->seedCustomerPayment('payment-replacement-refund-allocate-1', 40000, '2026-03-16');
+
+        DB::table('payment_allocations')->insert([
+            'id' => 'allocation-existing-refund-allocate-1',
+            'customer_payment_id' => 'payment-existing-refund-allocate-1',
+            'note_id' => 'note-refund-allocate-1',
+            'amount_rupiah' => 100000,
+        ]);
+
+        DB::table('customer_refunds')->insert([
+            'id' => 'refund-refund-allocate-1',
+            'customer_payment_id' => 'payment-existing-refund-allocate-1',
+            'note_id' => 'note-refund-allocate-1',
+            'amount_rupiah' => 40000,
+            'refunded_at' => '2026-03-16',
+            'reason' => 'Refund sebagian sebelum allocate ulang',
+        ]);
+
+        $handler = $this->buildHandler('allocation-replacement-refund-allocate-1');
+        $result = $handler->handle(
+            'payment-replacement-refund-allocate-1',
+            'note-refund-allocate-1',
+            40000
+        );
+
+        $this->assertTrue($result->isSuccess(), $result->message() ?? 'Allocation should succeed after refund reopens outstanding.');
+
+        $this->assertDatabaseHas('payment_allocations', [
+            'id' => 'allocation-replacement-refund-allocate-1',
+            'customer_payment_id' => 'payment-replacement-refund-allocate-1',
+            'note_id' => 'note-refund-allocate-1',
+            'amount_rupiah' => 40000,
+        ]);
+
+        self::assertSame(
+            140000,
+            (int) DB::table('payment_allocations')
+                ->where('note_id', 'note-refund-allocate-1')
+                ->sum('amount_rupiah')
+        );
+
+        self::assertSame(
+            40000,
+            (int) DB::table('customer_refunds')
+                ->where('note_id', 'note-refund-allocate-1')
+                ->sum('amount_rupiah')
+        );
+
+        self::assertSame(
+            100000,
+            (int) DB::table('payment_allocations')
+                ->where('note_id', 'note-refund-allocate-1')
+                ->sum('amount_rupiah')
+                - (int) DB::table('customer_refunds')
+                    ->where('note_id', 'note-refund-allocate-1')
+                    ->sum('amount_rupiah')
+        );
+    }
+
+
     private function buildHandler(string $allocationId): AllocateCustomerPaymentHandler
     {
         return new AllocateCustomerPaymentHandler(
