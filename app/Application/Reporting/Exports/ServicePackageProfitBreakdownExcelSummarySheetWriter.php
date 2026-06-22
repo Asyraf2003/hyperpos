@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Exports;
 
+use App\Support\ViewDateFormatter;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 final class ServicePackageProfitBreakdownExcelSummarySheetWriter
@@ -19,7 +20,7 @@ final class ServicePackageProfitBreakdownExcelSummarySheetWriter
         $sheet->setCellValue('A1', 'Laba Paket Service');
 
         $this->tables->writeTable($sheet, 2, ['Metrik', 'Nilai'], [
-            ['Periode', (string) ($filters['range_label'] ?? '')],
+            ['Periode', ViewDateFormatter::range($filters['date_from'] ?? null, $filters['date_to'] ?? null)],
             ['Jumlah Paket', (int) ($summary['total_packages'] ?? 0)],
             ['Nilai Paket Terjual', (int) ($summary['package_sold_amount_rupiah'] ?? 0)],
             ['Total Sparepart', (int) ($summary['parts_total_rupiah'] ?? 0)],
