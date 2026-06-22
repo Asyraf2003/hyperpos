@@ -88,12 +88,10 @@ final class TaxLandedCostReportingFeatureTest extends TestCase
 
         DB::table('product_inventory')->insert([
             ['product_id' => 'product-tax-report-1', 'qty_on_hand' => 2],
-            ['product_id' => 'product-tax-report-outside', 'qty_on_hand' => 9],
         ]);
 
         DB::table('product_inventory_costing')->insert([
             ['product_id' => 'product-tax-report-1', 'avg_cost_rupiah' => 11000, 'inventory_value_rupiah' => 22000],
-            ['product_id' => 'product-tax-report-outside', 'avg_cost_rupiah' => 99999, 'inventory_value_rupiah' => 899991],
         ]);
 
         $response = $this->actingAs($this->user('admin'))->get(
@@ -113,6 +111,8 @@ final class TaxLandedCostReportingFeatureTest extends TestCase
 
     public function test_operational_profit_summary_uses_taxed_landed_cost_as_store_stock_cogs(): void
     {
+        $this->seedProduct('product-tax-report-1', 'TAX-RPT-001', 'Ban Pajak Report', 'Federal', 90, 35000);
+
         DB::table('customer_payments')->insert([
             'id' => 'tax-report-payment-1',
             'amount_rupiah' => 50000,
@@ -141,6 +141,9 @@ final class TaxLandedCostReportingFeatureTest extends TestCase
 
     public function test_operational_profit_summary_sums_multiple_taxed_store_stock_cogs_lines(): void
     {
+        $this->seedProduct('product-tax-report-1', 'TAX-RPT-001', 'Ban Pajak Report', 'Federal', 90, 35000);
+        $this->seedProduct('product-tax-report-2', 'TAX-RPT-002', 'Oli Pajak Report', 'Federal', 1, 55000);
+
         DB::table('customer_payments')->insert([
             'id' => 'tax-report-payment-1',
             'amount_rupiah' => 80000,
@@ -181,6 +184,8 @@ final class TaxLandedCostReportingFeatureTest extends TestCase
 
     public function test_operational_profit_summary_nets_taxed_store_stock_reversal_against_cogs(): void
     {
+        $this->seedProduct('product-tax-report-1', 'TAX-RPT-001', 'Ban Pajak Report', 'Federal', 90, 35000);
+
         DB::table('customer_payments')->insert([
             'id' => 'tax-report-payment-1',
             'amount_rupiah' => 50000,
