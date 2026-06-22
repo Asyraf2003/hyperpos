@@ -23,7 +23,7 @@ final class PaymentAllocationPolicyTest extends TestCase
             Money::fromInt(60000),
         );
 
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function test_allows_replacement_payment_when_caller_passes_net_allocated_after_refund(): void
@@ -38,7 +38,7 @@ final class PaymentAllocationPolicyTest extends TestCase
             Money::fromInt(60000),
         );
 
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function test_rejects_zero_allocation_amount(): void

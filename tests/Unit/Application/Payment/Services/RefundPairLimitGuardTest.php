@@ -19,7 +19,7 @@ final class RefundPairLimitGuardTest extends TestCase
             Money::fromInt(30000),
         );
 
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function test_allows_refund_that_exactly_reaches_allocated_pair_total(): void
@@ -30,7 +30,7 @@ final class RefundPairLimitGuardTest extends TestCase
             Money::fromInt(60000),
         );
 
-        $this->assertTrue(true);
+        $this->addToAssertionCount(1);
     }
 
     public function test_rejects_refund_that_exceeds_allocated_pair_total(): void

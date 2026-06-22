@@ -10,6 +10,7 @@ use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\Payment\PaymentComponentAllocationReaderPort;
+use App\Ports\Out\Payment\RefundComponentAllocationReaderPort;
 use App\Ports\Out\UuidPort;
 use PHPUnit\Framework\TestCase;
 
@@ -22,6 +23,12 @@ final class AllocatePaymentAcrossComponentsTest extends TestCase
                 public function getTotalAllocatedAmountByNoteId(string $noteId): Money { return Money::zero(); }
                 public function getTotalAllocatedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money { return Money::zero(); }
                 public function getTotalAllocatedAmountByWorkItemId(string $workItemId): Money { return Money::zero(); }
+                public function listByNoteId(string $noteId): array { return []; }
+            },
+            new class () implements RefundComponentAllocationReaderPort {
+                public function getTotalRefundedAmountByNoteId(string $noteId): Money { return Money::zero(); }
+                public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money { return Money::zero(); }
+                public function getTotalRefundedAmountByWorkItemId(string $workItemId): Money { return Money::zero(); }
                 public function listByNoteId(string $noteId): array { return []; }
             },
             new class () implements UuidPort {
