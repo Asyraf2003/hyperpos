@@ -36,13 +36,6 @@ final class CreateTransactionWorkspaceHandler
     ) {
     }
 
-    /**
-     * @param array{
-     * note: array<string, mixed>,
-     * items: list<array<string, mixed>>,
-     * inline_payment: array<string, mixed>
-     * } $payload
-     */
     public function handle(array $payload): Result
     {
         $started = false;
