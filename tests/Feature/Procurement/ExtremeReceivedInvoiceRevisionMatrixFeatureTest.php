@@ -142,6 +142,67 @@ final class ExtremeReceivedInvoiceRevisionMatrixFeatureTest extends TestCase
         ]);
     }
 
+    public function test_received_invoice_cost_revaluation_revision_writes_version_and_audit_snapshots(): void
+    {
+        $this->seedReceivedInvoiceBase();
+
+        $r = $this->actingAs($this->admin())->put(
+            route('admin.procurement.supplier-invoices.update', ['supplierInvoiceId' => 'invoice-1']),
+            $this->payload([
+                'change_reason' => 'Audit koreksi modal setelah receipt.',
+                'lines' => [[
+                    'previous_line_id' => 'invoice-line-1',
+                    'line_no' => 1,
+                    'product_id' => 'product-1',
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 22000,
+                ]],
+            ])
+        );
+
+        $r->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
+            ->assertSessionHas('success', 'Nota supplier berhasil diperbarui.');
+
+        $this->assertDatabaseHas('supplier_invoice_versions', [
+            'supplier_invoice_id' => 'invoice-1',
+            'revision_no' => 2,
+            'event_name' => 'supplier_invoice_updated',
+        ]);
+
+        $auditEventId = (string) DB::table('audit_events')
+            ->where('aggregate_type', 'supplier_invoice')
+            ->where('aggregate_id', 'invoice-1')
+            ->where('event_name', 'supplier_invoice_updated')
+            ->value('id');
+
+        $this->assertNotSame('', $auditEventId);
+
+        $this->assertDatabaseHas('audit_event_snapshots', [
+            'audit_event_id' => $auditEventId,
+            'snapshot_kind' => 'before',
+        ]);
+
+        $this->assertDatabaseHas('audit_event_snapshots', [
+            'audit_event_id' => $auditEventId,
+            'snapshot_kind' => 'after',
+        ]);
+
+        $beforePayload = json_decode((string) DB::table('audit_event_snapshots')
+            ->where('audit_event_id', $auditEventId)
+            ->where('snapshot_kind', 'before')
+            ->value('payload_json'), true);
+
+        $afterPayload = json_decode((string) DB::table('audit_event_snapshots')
+            ->where('audit_event_id', $auditEventId)
+            ->where('snapshot_kind', 'after')
+            ->value('payload_json'), true);
+
+        $this->assertSame(20000, $beforePayload['grand_total_rupiah']);
+        $this->assertSame(22000, $afterPayload['grand_total_rupiah']);
+        $this->assertSame(10000, $beforePayload['lines'][0]['unit_cost_rupiah']);
+        $this->assertSame(11000, $afterPayload['lines'][0]['unit_cost_rupiah']);
+    }
+
     public function test_admin_cannot_revise_received_invoice_when_total_would_drop_below_paid(): void
     {
         $this->seedReceivedInvoiceBase();
