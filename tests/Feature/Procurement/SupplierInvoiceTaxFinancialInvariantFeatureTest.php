@@ -586,7 +586,7 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
         $this->assertSame(10000, (int) $line->unit_cost_rupiah);
     }
 
-    public function test_received_invoice_same_qty_tax_revision_is_rejected_until_revaluation_exists(): void
+    public function test_received_invoice_same_qty_tax_revision_creates_cost_revaluation(): void
     {
         $this->seedReceivedNoTaxInvoice();
 
@@ -609,26 +609,35 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-received-tax-1',
         ]));
-        $response->assertSessionHasErrors(['supplier_invoice']);
 
         $this->assertDatabaseHas('supplier_invoices', [
             'id' => 'invoice-received-tax-1',
             'subtotal_before_tax_rupiah' => 20000,
-            'tax_input' => null,
-            'tax_mode' => 'none',
-            'tax_amount_rupiah' => 0,
-            'grand_total_rupiah' => 20000,
-            'last_revision_no' => 1,
+            'tax_input' => '10%',
+            'tax_mode' => 'percent',
+            'tax_rate_basis_points' => 1000,
+            'tax_amount_rupiah' => 2000,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
         ]);
 
         $line = $this->currentLine('invoice-received-tax-1', 'product-tax-1');
 
         $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
-        $this->assertSame(20000, (int) $line->line_total_rupiah);
-        $this->assertSame(10000, (int) $line->unit_cost_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => 2000,
+        ]);
 
         $this->assertDatabaseHas('product_inventory', [
             'product_id' => 'product-tax-1',
@@ -637,12 +646,13 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-tax-1',
-            'avg_cost_rupiah' => 10000,
-            'inventory_value_rupiah' => 20000,
+            'avg_cost_rupiah' => 11000,
+            'inventory_value_rupiah' => 22000,
         ]);
     }
 
-    public function test_received_invoice_remove_tax_revision_is_rejected_until_revaluation_exists(): void
+
+    public function test_received_invoice_remove_tax_revision_creates_negative_cost_revaluation(): void
     {
         $this->seedReceivedHeaderTaxInvoice();
 
@@ -665,36 +675,45 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-tax-1',
         ]));
-        $response->assertSessionHasErrors(['supplier_invoice']);
 
         $this->assertDatabaseHas('supplier_invoices', [
             'id' => 'invoice-tax-1',
             'subtotal_before_tax_rupiah' => 20000,
-            'tax_input' => '10%',
-            'tax_mode' => 'percent',
-            'tax_rate_basis_points' => 1000,
-            'tax_amount_rupiah' => 2000,
-            'grand_total_rupiah' => 22000,
-            'last_revision_no' => 1,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => 20000,
+            'last_revision_no' => 2,
         ]);
 
         $line = $this->currentLine('invoice-tax-1', 'product-tax-1');
 
         $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
-        $this->assertSame(22000, (int) $line->line_total_rupiah);
-        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+        $this->assertSame(20000, (int) $line->line_total_rupiah);
+        $this->assertSame(10000, (int) $line->unit_cost_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => -2000,
+        ]);
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-tax-1',
-            'avg_cost_rupiah' => 11000,
-            'inventory_value_rupiah' => 22000,
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 20000,
         ]);
     }
 
-    public function test_received_invoice_change_tax_amount_revision_is_rejected_until_revaluation_exists(): void
+
+    public function test_received_invoice_change_tax_amount_revision_creates_cost_revaluation(): void
     {
         $this->seedReceivedHeaderTaxInvoice();
 
@@ -717,29 +736,44 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-tax-1',
         ]));
-        $response->assertSessionHasErrors(['supplier_invoice']);
 
         $this->assertDatabaseHas('supplier_invoices', [
             'id' => 'invoice-tax-1',
-            'tax_input' => '10%',
-            'tax_mode' => 'percent',
-            'tax_rate_basis_points' => 1000,
-            'tax_amount_rupiah' => 2000,
-            'grand_total_rupiah' => 22000,
-            'last_revision_no' => 1,
+            'tax_input' => '3000',
+            'tax_mode' => 'fixed',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 3000,
+            'grand_total_rupiah' => 23000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-tax-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(23000, (int) $line->line_total_rupiah);
+        $this->assertSame(11500, (int) $line->unit_cost_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => 1000,
         ]);
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-tax-1',
-            'avg_cost_rupiah' => 11000,
-            'inventory_value_rupiah' => 22000,
+            'avg_cost_rupiah' => 11500,
+            'inventory_value_rupiah' => 23000,
         ]);
     }
 
-    public function test_received_invoice_base_price_decrease_revision_is_rejected_until_revaluation_exists(): void
+
+    public function test_received_invoice_base_price_decrease_revision_creates_negative_cost_revaluation(): void
     {
         $this->seedReceivedHeaderTaxInvoice();
 
@@ -762,26 +796,43 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
             'supplierInvoiceId' => 'invoice-tax-1',
         ]));
-        $response->assertSessionHasErrors(['supplier_invoice']);
 
         $this->assertDatabaseHas('supplier_invoices', [
             'id' => 'invoice-tax-1',
-            'subtotal_before_tax_rupiah' => 20000,
+            'subtotal_before_tax_rupiah' => 18000,
             'tax_input' => '10%',
-            'tax_amount_rupiah' => 2000,
-            'grand_total_rupiah' => 22000,
-            'last_revision_no' => 1,
+            'tax_mode' => 'percent',
+            'tax_rate_basis_points' => 1000,
+            'tax_amount_rupiah' => 1800,
+            'grand_total_rupiah' => 19800,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-tax-1', 'product-tax-1');
+
+        $this->assertSame(18000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(19800, (int) $line->line_total_rupiah);
+        $this->assertSame(9900, (int) $line->unit_cost_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => -2200,
         ]);
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-tax-1',
-            'avg_cost_rupiah' => 11000,
-            'inventory_value_rupiah' => 22000,
+            'avg_cost_rupiah' => 9900,
+            'inventory_value_rupiah' => 19800,
         ]);
     }
+
 
     public function test_received_invoice_qty_increase_with_same_unit_cost_is_allowed(): void
     {
