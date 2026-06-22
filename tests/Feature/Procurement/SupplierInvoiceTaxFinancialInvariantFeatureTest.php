@@ -265,6 +265,260 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
         ]);
     }
 
+    public function test_legacy_no_tax_invoice_can_add_header_percent_tax_as_landed_cost(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 20000, 10000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => '10%',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => '10%',
+            'tax_mode' => 'percent',
+            'tax_rate_basis_points' => 1000,
+            'tax_amount_rupiah' => 2000,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+    }
+
+    public function test_legacy_no_tax_invoice_can_add_header_fixed_tax_as_landed_cost(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 20000, 10000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => '2000',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => '2000',
+            'tax_mode' => 'fixed',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 2000,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+    }
+
+    public function test_legacy_tax_included_invoice_can_split_fixed_tax_without_changing_grand_total(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 22000, 11000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => '2000',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => '2000',
+            'tax_mode' => 'fixed',
+            'tax_amount_rupiah' => 2000,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+    }
+
+    public function test_legacy_tax_included_invoice_can_split_percent_tax_without_changing_grand_total(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 22000, 11000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => '10%',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => '10%',
+            'tax_mode' => 'percent',
+            'tax_rate_basis_points' => 1000,
+            'tax_amount_rupiah' => 2000,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+    }
+
+    public function test_legacy_tax_included_invoice_can_move_tax_to_line_without_changing_grand_total(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 22000, 11000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => null,
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                        'tax_input' => '2000',
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 22000,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => 22000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(22000, (int) $line->line_total_rupiah);
+        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+        $this->assertSame('2000', (string) $line->tax_input);
+        $this->assertSame('fixed', (string) $line->tax_mode);
+        $this->assertSame(2000, (int) $line->tax_amount_rupiah);
+    }
+
+    public function test_legacy_no_tax_invoice_blank_tax_preserves_no_tax_state(): void
+    {
+        $this->seedLegacyNoTaxInvoice('invoice-legacy-1', 'invoice-legacy-line-1', 20000, 10000);
+
+        $response = $this->actingAs($this->user('admin'))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-legacy-1',
+            ]), $this->updatePayload([
+                'tax_input' => '   ',
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-legacy-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 2,
+                        'line_total_rupiah' => 20000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-legacy-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-legacy-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => 20000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-legacy-1', 'product-tax-1');
+
+        $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(20000, (int) $line->line_total_rupiah);
+        $this->assertSame(10000, (int) $line->unit_cost_rupiah);
+    }
+
     public function test_received_invoice_same_qty_tax_revision_is_rejected_until_revaluation_exists(): void
     {
         $this->seedReceivedNoTaxInvoice();
@@ -576,6 +830,47 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ],
         ], $overrides);
+    }
+
+    private function seedLegacyNoTaxInvoice(
+        string $invoiceId,
+        string $lineId,
+        int $lineTotalRupiah,
+        int $unitCostRupiah
+    ): void {
+        $this->seedSupplierAndProduct();
+
+        DB::table('supplier_invoices')->insert([
+            'id' => $invoiceId,
+            'supplier_id' => 'supplier-tax-1',
+            'supplier_nama_pt_pengirim_snapshot' => 'PT Supplier Pajak',
+            'nomor_faktur' => 'INV-LEGACY-001',
+            'nomor_faktur_normalized' => 'inv-legacy-001',
+            'document_kind' => 'invoice',
+            'lifecycle_status' => 'active',
+            'origin_supplier_invoice_id' => null,
+            'superseded_by_supplier_invoice_id' => null,
+            'tanggal_pengiriman' => '2026-03-15',
+            'jatuh_tempo' => '2026-04-15',
+            'subtotal_before_tax_rupiah' => $lineTotalRupiah,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => $lineTotalRupiah,
+            'voided_at' => null,
+            'void_reason' => null,
+            'last_revision_no' => 1,
+        ]);
+
+        $this->insertInvoiceLine(
+            $lineId,
+            $invoiceId,
+            2,
+            $lineTotalRupiah,
+            $unitCostRupiah,
+            $lineTotalRupiah,
+        );
     }
 
     private function seedHeaderTaxInvoice(): void
