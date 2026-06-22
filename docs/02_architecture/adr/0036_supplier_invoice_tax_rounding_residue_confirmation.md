@@ -1,6 +1,6 @@
 # ADR-0036 - Supplier Invoice Tax Rounding Residue Confirmation
 
-Status: Draft
+Status: Accepted - Implemented
 
 Date: 2026-06-22
 
@@ -74,3 +74,25 @@ This ADR does not remove landed-cost tax treatment.
 This ADR does not implement inventory revaluation for received invoices.
 
 This ADR does not decide the final persistence schema.
+
+## Implementation Proof
+
+Implemented on 2026-06-22.
+
+Implementation summary:
+
+- Supplier invoice tax allocation may continue after explicit operator confirmation when taxed totals do not divide evenly by `qty_pcs`.
+- Rounding uses deterministic integer unit cost via floor division.
+- The remaining difference is stored explicitly as `rounding_residue_rupiah`.
+- Create and update flows both carry `tax_rounding_residue_confirmed`.
+- Create/edit UI renders the confirmation contract and JavaScript confirmation hook.
+- Unconfirmed update is rejected through validation instead of producing HTTP 500.
+- Received-invoice unit cost revision guard remains unchanged.
+
+Verification:
+
+```text
+Focused regression: 65 tests, 451 assertions - GREEN.
+ADR-0036 focused matrix: 9 tests, 61 assertions - GREEN.
+make verify - GREEN by operator confirmation.
+```
