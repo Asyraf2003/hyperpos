@@ -33,6 +33,7 @@ trait BuildsProcurementInvoiceDetailLinesView
                 'qty_pcs' => (int) ($line['qty_pcs'] ?? 0),
                 'unit_cost_rupiah' => (int) ($line['unit_cost_rupiah'] ?? 0),
                 'line_total_rupiah' => (int) ($line['line_total_rupiah'] ?? 0),
+                'rounding_residue_rupiah' => (int) ($line['rounding_residue_rupiah'] ?? 0),
                 'unit_cost_label' => $this->formatRupiah((int) ($line['unit_cost_rupiah'] ?? 0)),
                 'line_total_label' => $this->formatRupiah((int) ($line['line_total_rupiah'] ?? 0)),
                 'line_subtotal_before_tax_rupiah' => $lineSubtotalBeforeTax,

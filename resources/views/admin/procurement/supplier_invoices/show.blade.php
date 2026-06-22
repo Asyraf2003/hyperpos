@@ -283,7 +283,12 @@
                                             <td>{{ $line['merek'] }}</td>
                                             <td>{{ $line['ukuran'] ?? '-' }}</td>
                                             <td>{{ $line['qty_pcs'] }}</td>
-                                            <td>{{ $line['unit_cost_label'] }}</td>
+                                            <td>
+                                                {{ $line['unit_cost_label'] }}
+                                                @if (((int) ($line['rounding_residue_rupiah'] ?? 0)) > 0)
+                                                    <small class="text-muted d-block">Modal per pcs dibulatkan. Selisih pembulatan disimpan agar total nota tetap sesuai dokumen supplier.</small>
+                                                @endif
+                                            </td>
                                             <td>{{ $line['line_subtotal_before_tax_label'] }}</td>
                                             <td>
                                                 {{ $line['tax_amount_label'] }}
