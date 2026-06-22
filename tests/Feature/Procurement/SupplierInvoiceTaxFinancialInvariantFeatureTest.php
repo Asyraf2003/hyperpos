@@ -834,6 +834,82 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
     }
 
 
+    public function test_received_invoice_qty_increase_with_non_divisible_base_line_total_preserves_exact_inventory_value(): void
+    {
+        $this->seedReceivedNoTaxInvoice();
+
+        $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.procurement.supplier-invoices.edit', [
+                'supplierInvoiceId' => 'invoice-received-tax-1',
+            ]))
+            ->put(route('admin.procurement.supplier-invoices.update', [
+                'supplierInvoiceId' => 'invoice-received-tax-1',
+            ]), $this->updatePayload([
+                'tax_input' => null,
+                'tax_rounding_residue_confirmed' => true,
+                'lines' => [
+                    [
+                        'previous_line_id' => 'invoice-received-tax-line-1',
+                        'line_no' => 1,
+                        'product_id' => 'product-tax-1',
+                        'qty_pcs' => 3,
+                        'line_total_rupiah' => 155000,
+                    ],
+                ],
+            ]));
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+            'supplierInvoiceId' => 'invoice-received-tax-1',
+        ]));
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-received-tax-1',
+            'subtotal_before_tax_rupiah' => 155000,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_rate_basis_points' => null,
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => 155000,
+            'last_revision_no' => 2,
+        ]);
+
+        $line = $this->currentLine('invoice-received-tax-1', 'product-tax-1');
+
+        $this->assertSame(155000, (int) $line->line_subtotal_before_tax_rupiah);
+        $this->assertSame(155000, (int) $line->line_total_rupiah);
+        $this->assertSame(51666, (int) $line->unit_cost_rupiah);
+        $this->assertSame(2, (int) $line->rounding_residue_rupiah);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'stock_in',
+            'source_type' => 'supplier_invoice_revision_delta_line',
+            'qty_delta' => 1,
+            'unit_cost_rupiah' => 51666,
+            'total_cost_rupiah' => 51666,
+        ]);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-tax-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => 83334,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-tax-1',
+            'qty_on_hand' => 3,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-tax-1',
+            'avg_cost_rupiah' => 51666,
+            'inventory_value_rupiah' => 155000,
+        ]);
+    }
+
     public function test_received_invoice_qty_increase_with_fixed_tax_residue_confirmation_preserves_exact_inventory_value(): void
     {
         $this->seedReceivedNoTaxInvoice();
