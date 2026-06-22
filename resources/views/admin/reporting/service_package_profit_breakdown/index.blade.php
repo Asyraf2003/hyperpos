@@ -68,6 +68,20 @@
 
     <div class="col-12 col-md-6 col-xl-4">
         <div class="card"><div class="card-body">
+            <div class="text-muted small">Refund Komponen Produk</div>
+            <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['refunded_product_component_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Refund Komponen Service</div>
+            <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['refunded_service_component_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-4">
+        <div class="card"><div class="card-body">
             <div class="text-muted small">Gross Profit Paket</div>
             <div class="fs-5 fw-bold text-success">Rp {{ number_format($summary['total_package_gross_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
@@ -91,6 +105,8 @@
                         <th class="text-end">Margin Sparepart</th>
                         <th class="text-end">Service</th>
                         <th class="text-end">Profit Paket</th>
+                        <th class="text-end">Refund Produk</th>
+                        <th class="text-end">Refund Service</th>
                         <th class="text-end">Gross Profit</th>
                     </tr>
                 </thead>
@@ -115,11 +131,13 @@
                                 </div>
                             </td>
                             <td class="text-end">Rp {{ number_format($row['package_profit_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                            <td class="text-end">Rp {{ number_format($row['refunded_product_component_rupiah'] ?? 0, 0, ',', '.') }}</td>
+                            <td class="text-end">Rp {{ number_format($row['refunded_service_component_rupiah'] ?? 0, 0, ',', '.') }}</td>
                             <td class="text-end fw-bold">Rp {{ number_format($row['total_package_gross_profit_rupiah'] ?? 0, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted">Belum ada paket service pada periode ini.</td>
+                            <td colspan="12" class="text-center text-muted">Belum ada paket service pada periode ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

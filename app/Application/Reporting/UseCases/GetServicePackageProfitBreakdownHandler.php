@@ -37,6 +37,8 @@ final class GetServicePackageProfitBreakdownHandler
             'sparepart_cogs_rupiah' => 0,
             'sparepart_margin_rupiah' => 0,
             'total_service_component_rupiah' => 0,
+            'refunded_product_component_rupiah' => 0,
+            'refunded_service_component_rupiah' => 0,
             'total_package_gross_profit_rupiah' => 0,
         ];
 

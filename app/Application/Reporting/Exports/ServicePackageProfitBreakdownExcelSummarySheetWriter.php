@@ -27,6 +27,8 @@ final class ServicePackageProfitBreakdownExcelSummarySheetWriter
             ['HPP Sparepart', (int) ($summary['sparepart_cogs_rupiah'] ?? 0)],
             ['Margin Sparepart', (int) ($summary['sparepart_margin_rupiah'] ?? 0)],
             ['Komponen Service', (int) ($summary['total_service_component_rupiah'] ?? 0)],
+            ['Refund Komponen Produk', (int) ($summary['refunded_product_component_rupiah'] ?? 0)],
+            ['Refund Komponen Service', (int) ($summary['refunded_service_component_rupiah'] ?? 0)],
             ['Gross Profit Paket', (int) ($summary['total_package_gross_profit_rupiah'] ?? 0)],
         ]);
 
