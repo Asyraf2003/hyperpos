@@ -14,6 +14,13 @@
     'basisDateNote' => 'Laporan ini memakai tanggal transaksi nota dan sumber historis inventory movement, bukan harga modal produk saat ini.',
     'noteText' => 'Breakdown ini dipisahkan dari Laba Kas Operasional agar keuntungan paket service + sparepart tidak tercampur dengan laporan kas.',
     'supportsCustomRange' => true,
+    'exportActions' => [
+        [
+            'label' => 'Unduh Excel',
+            'url' => route('admin.reports.service_package_profit_breakdown.export_excel', request()->query()),
+            'class' => 'btn btn-outline-success text-nowrap',
+        ],
+    ],
 ])
 
 <div class="row g-3 mb-4">
