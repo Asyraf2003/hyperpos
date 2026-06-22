@@ -43,6 +43,7 @@ trait SupplierInvoiceVersionSnapshotPayloads
                     'qty_pcs' => $line->qtyPcs(),
                     'line_total_rupiah' => $line->lineTotalRupiah()->amount(),
                     'unit_cost_rupiah' => $line->unitCostRupiah()->amount(),
+                    'rounding_residue_rupiah' => $line->roundingResidueRupiah()->amount(),
                 'line_subtotal_before_tax_rupiah' => $line->lineSubtotalBeforeTaxRupiah()->amount(),
                 'tax_input' => $line->taxInput(),
                 'tax_mode' => $line->taxMode(),

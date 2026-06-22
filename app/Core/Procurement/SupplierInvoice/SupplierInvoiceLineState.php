@@ -19,6 +19,7 @@ trait SupplierInvoiceLineState
         private int $qtyPcs,
         private Money $lineTotalRupiah,
         private Money $unitCostRupiah,
+        private Money $roundingResidueRupiah,
         private Money $lineSubtotalBeforeTaxRupiah,
         private ?string $taxInput,
         private string $taxMode,
@@ -36,6 +37,7 @@ trait SupplierInvoiceLineState
     public function qtyPcs(): int { return $this->qtyPcs; }
     public function lineTotalRupiah(): Money { return $this->lineTotalRupiah; }
     public function unitCostRupiah(): Money { return $this->unitCostRupiah; }
+    public function roundingResidueRupiah(): Money { return $this->roundingResidueRupiah; }
     public function lineSubtotalBeforeTaxRupiah(): Money { return $this->lineSubtotalBeforeTaxRupiah; }
     public function taxInput(): ?string { return $this->taxInput; }
     public function taxMode(): string { return $this->taxMode; }

@@ -51,7 +51,8 @@ final class SupplierInvoiceFactory
                 isset($line['tax_input']) ? (string) $line['tax_input'] : null,
                 (string) ($line['tax_mode'] ?? SupplierInvoiceTaxSummary::MODE_NONE),
                 array_key_exists('tax_rate_basis_points', $line) && $line['tax_rate_basis_points'] !== null ? (int) $line['tax_rate_basis_points'] : null,
-                Money::fromInt((int) ($line['tax_amount_rupiah'] ?? 0))
+                Money::fromInt((int) ($line['tax_amount_rupiah'] ?? 0)),
+                Money::fromInt((int) ($line['rounding_residue_rupiah'] ?? 0))
             );
         }, $lines, array_keys($lines));
     }

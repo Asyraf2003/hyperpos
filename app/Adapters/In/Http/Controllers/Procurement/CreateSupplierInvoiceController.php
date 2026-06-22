@@ -26,6 +26,7 @@ final class CreateSupplierInvoiceController
             $this->resolveAutoReceive($data),
             $this->resolveTanggalTerima($data),
             taxInput: $this->resolveTaxInput($data),
+            taxRoundingResidueConfirmed: $this->resolveTaxRoundingResidueConfirmed($data),
         );
 
         if ($result->isFailure()) {
@@ -47,6 +48,14 @@ final class CreateSupplierInvoiceController
         $value = trim((string) $data['tax_input']);
 
         return $value === '' ? null : $value;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function resolveTaxRoundingResidueConfirmed(array $data): bool
+    {
+        return (bool) ($data['tax_rounding_residue_confirmed'] ?? false);
     }
 
     /**

@@ -33,6 +33,7 @@ final class CreateSupplierInvoiceFlowHandler
         ?string $performedByActorRole = null,
         string $sourceChannel = 'http',
         null|string|int $taxInput = null,
+        bool $taxRoundingResidueConfirmed = false,
     ): Result {
         $started = false;
 
@@ -55,6 +56,7 @@ final class CreateSupplierInvoiceFlowHandler
                 $taxInput,
                 $autoRec,
                 $tglTerima,
+                $taxRoundingResidueConfirmed,
             );
 
             $this->projection->syncInvoice($invoice->id());

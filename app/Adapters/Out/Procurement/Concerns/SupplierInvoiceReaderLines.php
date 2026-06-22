@@ -27,6 +27,7 @@ trait SupplierInvoiceReaderLines
                 'qty_pcs',
                 'line_total_rupiah',
                 'unit_cost_rupiah',
+                'rounding_residue_rupiah',
                 'line_subtotal_before_tax_rupiah',
                 'tax_input',
                 'tax_mode',
@@ -52,7 +53,8 @@ trait SupplierInvoiceReaderLines
                 $row->tax_input !== null ? (string) $row->tax_input : null,
                 (string) ($row->tax_mode ?? 'none'),
                 $row->tax_rate_basis_points !== null ? (int) $row->tax_rate_basis_points : null,
-                Money::fromInt((int) ($row->tax_amount_rupiah ?? 0))
+                Money::fromInt((int) ($row->tax_amount_rupiah ?? 0)),
+                Money::fromInt((int) ($row->rounding_residue_rupiah ?? 0))
             );
         }
 

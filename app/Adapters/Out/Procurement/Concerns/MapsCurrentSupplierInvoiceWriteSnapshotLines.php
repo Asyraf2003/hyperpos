@@ -16,6 +16,7 @@ trait MapsCurrentSupplierInvoiceWriteSnapshotLines
             'qty_pcs' => (int) $line->qty_pcs,
             'line_total_rupiah' => (int) $line->line_total_rupiah,
             'unit_cost_rupiah' => (int) $line->unit_cost_rupiah,
+            'rounding_residue_rupiah' => (int) ($line->rounding_residue_rupiah ?? 0),
             'line_subtotal_before_tax_rupiah' => (int) ($line->line_subtotal_before_tax_rupiah ?? 0),
             'tax_input' => $line->tax_input !== null ? (string) $line->tax_input : null,
             'tax_mode' => (string) ($line->tax_mode ?? 'none'),

@@ -38,7 +38,11 @@ final class CreateSupplierInvoiceTaxPostValidation
         }
 
         try {
-            $this->allocator->allocate(array_values($lines), $request->input('tax_input'));
+            $this->allocator->allocate(
+                array_values($lines),
+                $request->input('tax_input'),
+                $request->boolean('tax_rounding_residue_confirmed')
+            );
         } catch (InvalidArgumentException $exception) {
             $validator->errors()->add(
                 $this->taxErrorAttribute($lines),

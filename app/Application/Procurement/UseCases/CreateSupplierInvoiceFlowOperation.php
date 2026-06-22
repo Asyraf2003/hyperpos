@@ -35,10 +35,11 @@ final class CreateSupplierInvoiceFlowOperation
         null|string|int $taxInput = null,
         bool $autoRec = true,
         ?string $tglTerima = null,
+        bool $taxRoundingResidueConfirmed = false,
     ): SupplierInvoice {
         [$dateKirim, $dateTerima] = $this->dateResolver->resolve($tglKirim, $autoRec, $tglTerima);
         $supplier = $this->supplierService->resolve($pt);
-        $taxAllocation = $this->taxAllocator->allocate($lines, $taxInput);
+        $taxAllocation = $this->taxAllocator->allocate($lines, $taxInput, $taxRoundingResidueConfirmed);
         $taxCalculation = $taxAllocation->tax();
 
         $invoice = SupplierInvoice::create(

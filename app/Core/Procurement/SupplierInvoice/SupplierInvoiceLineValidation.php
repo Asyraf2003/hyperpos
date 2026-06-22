@@ -17,6 +17,8 @@ trait SupplierInvoiceLineValidation
         string $productMerekSnapshot,
         int $qtyPcs,
         Money $lineTotalRupiah,
+        Money $unitCostRupiah,
+        Money $roundingResidueRupiah,
         Money $lineSubtotalBeforeTaxRupiah,
         ?string $taxInput,
         string $taxMode,
@@ -30,9 +32,14 @@ trait SupplierInvoiceLineValidation
         if (trim($productMerekSnapshot) === '') throw new DomainException('Merek produk snapshot wajib diisi.');
         if ($qtyPcs < 1) throw new DomainException('Qty wajib lebih dari 0.');
         if ($lineTotalRupiah->amount() < 1) throw new DomainException('Total line wajib lebih dari 0.');
+        if ($unitCostRupiah->amount() < 1) throw new DomainException('Unit cost wajib lebih dari 0.');
+        if ($roundingResidueRupiah->amount() < 0) throw new DomainException('Residue pembulatan tidak boleh negatif.');
+        if ($roundingResidueRupiah->amount() >= $qtyPcs) throw new DomainException('Residue pembulatan harus lebih kecil dari qty.');
         if ($lineSubtotalBeforeTaxRupiah->amount() < 1) throw new DomainException('Subtotal line sebelum pajak wajib lebih dari 0.');
-        if ($lineTotalRupiah->amount() % $qtyPcs !== 0) {
-            throw new DomainException('Total line harus habis dibagi qty agar unit cost presisi.');
+
+        $projectedTotal = ($unitCostRupiah->amount() * $qtyPcs) + $roundingResidueRupiah->amount();
+        if ($projectedTotal !== $lineTotalRupiah->amount()) {
+            throw new DomainException('Total line harus sama dengan unit cost dikali qty plus residue pembulatan.');
         }
 
         self::assertValidTaxMetadata($taxInput, $taxMode, $taxRateBasisPoints, $taxAmountRupiah);

@@ -55,6 +55,7 @@ trait LoadsCurrentSupplierInvoiceWriteSnapshot
                 'qty_pcs',
                 'line_total_rupiah',
                 'unit_cost_rupiah',
+                'rounding_residue_rupiah',
                 'line_subtotal_before_tax_rupiah',
                 'tax_input',
                 'tax_mode',

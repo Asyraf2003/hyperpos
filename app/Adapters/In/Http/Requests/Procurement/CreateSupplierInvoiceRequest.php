@@ -30,6 +30,7 @@ final class CreateSupplierInvoiceRequest extends FormRequest
             'auto_receive' => ['nullable', 'boolean'],
             'tanggal_terima' => ['nullable', 'date_format:Y-m-d'],
             'tax_input' => ['nullable', 'string', 'max:64'],
+            'tax_rounding_residue_confirmed' => ['nullable', 'boolean'],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.line_no' => ['required', 'integer', 'min:1'],
             'lines.*.product_id' => ['required', 'string'],
