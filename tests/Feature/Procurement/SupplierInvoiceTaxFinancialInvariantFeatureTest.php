@@ -141,11 +141,14 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
         $this->assertSame(12100, (int) $line->unit_cost_rupiah);
     }
 
-    public function test_received_invoice_same_qty_tax_revision_keeps_inventory_costing_presise(): void
+    public function test_received_invoice_same_qty_tax_revision_is_rejected_until_revaluation_exists(): void
     {
         $this->seedReceivedNoTaxInvoice();
 
         $response = $this->actingAs($this->user('admin'))
+            ->from(route('admin.procurement.supplier-invoices.edit', [
+                'supplierInvoiceId' => 'invoice-received-tax-1',
+            ]))
             ->put(route('admin.procurement.supplier-invoices.update', [
                 'supplierInvoiceId' => 'invoice-received-tax-1',
             ]), $this->updatePayload([
@@ -161,15 +164,26 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
                 ],
             ]));
 
-        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', [
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.edit', [
             'supplierInvoiceId' => 'invoice-received-tax-1',
         ]));
+        $response->assertSessionHasErrors(['supplier_invoice']);
+
+        $this->assertDatabaseHas('supplier_invoices', [
+            'id' => 'invoice-received-tax-1',
+            'subtotal_before_tax_rupiah' => 20000,
+            'tax_input' => null,
+            'tax_mode' => 'none',
+            'tax_amount_rupiah' => 0,
+            'grand_total_rupiah' => 20000,
+            'last_revision_no' => 1,
+        ]);
 
         $line = $this->currentLine('invoice-received-tax-1', 'product-tax-1');
 
         $this->assertSame(20000, (int) $line->line_subtotal_before_tax_rupiah);
-        $this->assertSame(22000, (int) $line->line_total_rupiah);
-        $this->assertSame(11000, (int) $line->unit_cost_rupiah);
+        $this->assertSame(20000, (int) $line->line_total_rupiah);
+        $this->assertSame(10000, (int) $line->unit_cost_rupiah);
 
         $this->assertDatabaseHas('product_inventory', [
             'product_id' => 'product-tax-1',
@@ -178,8 +192,8 @@ final class SupplierInvoiceTaxFinancialInvariantFeatureTest extends TestCase
 
         $this->assertDatabaseHas('product_inventory_costing', [
             'product_id' => 'product-tax-1',
-            'avg_cost_rupiah' => 11000,
-            'inventory_value_rupiah' => 22000,
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 20000,
         ]);
     }
 
