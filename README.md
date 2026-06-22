@@ -8,44 +8,66 @@ Latest Handoff: docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund
 
 Cashier note create/edit/refund/reporting consistency workflow is **FINAL CLOSED**.
 
-### Latest verified checkpoint
-
-Service Package Profit Breakdown and transaction workspace revision-snapshot reporting workflow is **CLOSED / VERIFIED**.
-
-Verified scope:
-- admin report page **Laba Paket Service**
-- sidebar entry and index route for service package profit breakdown
-- Excel export for service package profit breakdown, including summary and detail sheets
-- UI-level report checks, not only query/database checks
-- HTTP workflow regression from transaction create, late payment, admin revision, report UI, and Excel export
-- package auto split multi-sparepart reporting
-- historical COGS from inventory movements
-- component refund exposure in UI and Excel summary
-- custom/monthly period filtering
-- canceled/outside-range package exclusion
-- catalog price changes after transaction without corrupting historical package reporting
-- admin revision after catalog price changes without double counting old package rows
-
-Regression fixes captured by the latest checkpoint:
-- transaction workspace create now bootstraps an initial current revision so late selected-row payments can read billing rows
-- trusted revision snapshot marking covers all product lines, not only the first line
-- package auto split product line composition preserves server-trusted revision snapshot unit prices instead of silently using the latest catalog price
-- revision/payment/reporting fixtures replace existing revision lines when reseeding current revisions, preventing duplicate `revision_id + line_no` collisions after automatic bootstrap
-- audit-lines remains enforced without bypass by extracting new responsibilities into small services
-
-Latest proof:
-- `make audit-lines` GREEN
-- `php artisan test` GREEN: 1290 passed, 7617 assertions, 54.50s
-
-Canonical closure:
+Source of truth:
 - `docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md`
+
+Status:
+FINAL CLOSED / Phase 0-7 FIXED / No Phase 8
+
+Purpose:
+Dokumen ini adalah rambu final untuk AI/operator agar tidak mengulang audit dan source-map workflow cashier note create/edit/refund/reporting yang sudah selesai.
+
+Final scope closed:
+- cashier note create line source-map
+- edit/revision/payment consistency
+- revision payload historical fingerprint
+- UI flexible package
+- refund component-type policy
+- Service Package Profit Breakdown query
+- final regression matrix
+
+Final phase status:
+- Phase 0 Docs Lock: FIXED
+- Phase 0A Owner Decision V2 Docs Lock: FIXED
+- Phase 1 Characterization: FIXED
+- Phase 2 Hardening Guards: FIXED
+- Phase 3 Revision Payload Historical Fingerprint: FIXED
+- Phase 4 UI Flexible Package: FIXED
+- Phase 5 Refund Component-Type Policy: FIXED
+- Phase 6 Service Package Profit Breakdown Query: FIXED
+- Phase 7 Final Regression Matrix: FIXED
+
+Final proof:
+- Focused regression matrix GREEN.
+- Final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
+
+Canonical closure docs:
 - `docs/03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md`
 - `docs/03_blueprints/finance/0016_cashier_note_final_regression_matrix.md`
+- `docs/04_lifecycle/error_log/0038_cashier_note_create_edit_refund_reporting_audit_findings.md`
 
-Previous closure proof:
-- Phase 0-7 FIXED.
-- Focused regression matrix GREEN.
-- `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
+Important:
+- `0038` is historical audit input, not active work.
+- `0011` is the workflow ledger.
+- `0016` is the final regression matrix.
+- This `0039` document is the final closure pointer.
+
+Do not reopen without new bug evidence:
+- Do not restart Phase 0-7 analysis.
+- Do not create Phase 8.
+- Do not patch cashier note create/edit/refund/reporting from this workflow unless a new concrete failing test, production bug, or owner request explicitly opens a new workflow.
+
+Boundaries still locked:
+- No supplier invoice payment proof scope.
+- No Mobile API scope.
+- No Operational Profit formula change.
+- No refund policy change.
+- No Service Package Profit Breakdown behavior change.
+- No migration/route/config from this closure.
+- No git operation requested by this document.
+
+Final stop rule:
+STOP. No Phase 8 for this workflow.
 
 Operator/AI rule:
 Do not reopen this workflow, restart its source-map, or create a new phase unless there is new concrete failing test evidence, production bug evidence, or explicit owner instruction.
