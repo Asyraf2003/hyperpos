@@ -52,28 +52,4 @@ final class CreateSupplierInvoiceLinesPostValidation
         }
     }
 
-    /**
-     * @param array<int, mixed> $lines
-     */
-    private function validateLineTotalDivisibleByQty(array $lines, Validator $validator): void
-    {
-        foreach ($lines as $index => $line) {
-            if (! is_array($line)) {
-                continue;
-            }
-
-            $qty = isset($line['qty_pcs']) ? (int) $line['qty_pcs'] : 0;
-            $lineTotal = isset($line['line_total_rupiah']) ? (int) $line['line_total_rupiah'] : 0;
-            $lineNo = isset($line['line_no']) ? (int) $line['line_no'] : ((int) $index + 1);
-
-            if ($qty < 1 || $lineTotal < 1 || $lineTotal % $qty === 0) {
-                continue;
-            }
-
-            $validator->errors()->add(
-                'lines.' . $index . '.line_total_rupiah',
-                'Baris ' . $lineNo . ': total rincian harus habis dibagi qty.'
-            );
-        }
-    }
 }

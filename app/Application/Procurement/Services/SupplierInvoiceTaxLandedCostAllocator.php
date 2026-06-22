@@ -61,6 +61,10 @@ final class SupplierInvoiceTaxLandedCostAllocator
             if (($line['tax_input'] ?? null) !== null || (int) ($line['tax_amount_rupiah'] ?? 0) !== 0) {
                 return false;
             }
+
+            if ((int) ($line['rounding_residue_rupiah'] ?? 0) !== 0) {
+                return false;
+            }
         }
 
         return true;
