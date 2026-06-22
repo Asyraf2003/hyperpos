@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
-use App\Application\Payment\DTO\SelectedRowsRefundPlan;
 use App\Application\Payment\Services\LegacyPaymentComponentAllocationSynthesizer;
 use App\Application\Payment\Services\PaymentComponentSelectionIds;
-use App\Application\Payment\Services\RefundComponentTypePolicy;
 use App\Application\Shared\DTO\Result;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
 use App\Ports\Out\Note\NoteReaderPort;
@@ -24,6 +22,7 @@ final class SelectedNoteRowsRefundPlanResolver
         private readonly LegacyPaymentComponentAllocationSynthesizer $legacyAllocations,
         private readonly SelectedRowsRefundBucketsBuilder $buckets,
         private readonly SelectedNoteRowsRefundEligibilityGuard $eligibility,
+        private readonly SelectedNoteRowsRefundPlanFactory $planFactory,
     ) {
     }
 
@@ -53,22 +52,25 @@ final class SelectedNoteRowsRefundPlanResolver
         }
 
         $paymentAllocations = $this->paymentAllocations($note->id());
-        $paymentBuckets = $this->buckets->build($selectedIds, $paymentAllocations, $this->refunds->listByNoteId($note->id()));
+        $paymentBuckets = $this->buckets->build(
+            $selectedIds,
+            $paymentAllocations,
+            $this->refunds->listByNoteId($note->id()),
+        );
+
         if ($paymentBuckets === []) {
-            return Result::failure('Tidak ada komponen refund yang eligible sesuai kebijakan.', ['refund' => ['NO_REFUNDABLE_COMPONENTS']]);
+            return Result::failure(
+                'Tidak ada komponen refund yang eligible sesuai kebijakan.',
+                ['refund' => ['NO_REFUNDABLE_COMPONENTS']],
+            );
         }
 
-        $paidRowIds = [];
-        foreach ($paymentBuckets as $bucket) {
-            $paidRowIds = array_merge($paidRowIds, PaymentComponentSelectionIds::workItemIds($bucket->rowIds()));
-        }
-
-        $plan = SelectedRowsRefundPlan::create(
+        $plan = $this->planFactory->build(
             $note->id(),
             $selectedIds,
-            array_values(array_diff($selectedWorkItemIds, array_values(array_unique($paidRowIds)))),
+            $selectedWorkItemIds,
+            $paymentAllocations,
             $paymentBuckets,
-            $this->cancellableRowIds($selectedIds, $paymentAllocations),
         );
 
         return Result::success(['plan' => $plan, 'plan_array' => $plan->toArray()]);
@@ -80,39 +82,5 @@ final class SelectedNoteRowsRefundPlanResolver
         $paymentAllocations = $this->allocations->listByNoteId($noteId);
 
         return $paymentAllocations !== [] ? $paymentAllocations : $this->legacyAllocations->forNote($noteId);
-    }
-
-    /** @param list<string> $selectedIds @param list<PaymentComponentAllocation> $allocations @return list<string> */
-    private function cancellableRowIds(array $selectedIds, array $allocations): array
-    {
-        $cancellable = [];
-        foreach ($selectedIds as $selectedId) {
-            if (PaymentComponentSelectionIds::isComponentSelector($selectedId)) {
-                continue;
-            }
-
-            $rowAllocations = array_values(array_filter(
-                $allocations,
-                static fn (PaymentComponentAllocation $allocation): bool => $allocation->workItemId() === $selectedId,
-            ));
-
-            if ($rowAllocations !== [] && $this->allDefaultRefundable($rowAllocations)) {
-                $cancellable[] = $selectedId;
-            }
-        }
-
-        return array_values(array_unique($cancellable));
-    }
-
-    /** @param list<PaymentComponentAllocation> $allocations */
-    private function allDefaultRefundable(array $allocations): bool
-    {
-        foreach ($allocations as $allocation) {
-            if (! RefundComponentTypePolicy::isDefaultRefundable($allocation->componentType())) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
