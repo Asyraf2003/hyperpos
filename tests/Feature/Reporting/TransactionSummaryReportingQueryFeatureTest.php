@@ -107,6 +107,38 @@ final class TransactionSummaryReportingQueryFeatureTest extends TestCase
         $this->assertSame(1000, $recon['refunded_rupiah']);
     }
 
+
+    public function test_transaction_summary_includes_component_only_payment_allocations_without_legacy_rows(): void
+    {
+        $this->seedNote('note-component-only-summary', 'Component Only', '2026-04-02', 150000);
+        $this->seedWorkItem('wi-component-only-summary', 'note-component-only-summary', 1, 150000);
+
+        $this->seedCustomerPayment('pay-component-only-summary', 150000, '2026-04-02');
+
+        DB::table('payment_component_allocations')->insert([
+            'id' => 'pca-component-only-summary',
+            'customer_payment_id' => 'pay-component-only-summary',
+            'note_id' => 'note-component-only-summary',
+            'work_item_id' => 'wi-component-only-summary',
+            'component_type' => 'service_fee',
+            'component_ref_id' => 'wi-component-only-summary',
+            'component_amount_rupiah_snapshot' => 150000,
+            'allocated_amount_rupiah' => 150000,
+            'allocation_priority' => 1,
+        ]);
+
+        $query = app(TransactionSummaryReportingQuery::class);
+        $rows = $query->rows('2026-04-01', '2026-04-30');
+        $recon = $query->reconciliation('2026-04-01', '2026-04-30');
+
+        $this->assertCount(1, $rows);
+        $this->assertSame(150000, $rows[0]['gross_transaction_rupiah']);
+        $this->assertSame(150000, $rows[0]['allocated_payment_rupiah']);
+        $this->assertSame(0, $rows[0]['refunded_rupiah']);
+        $this->assertSame(150000, $recon['allocated_payment_rupiah']);
+    }
+
+
     public function test_transaction_summary_uses_cash_records_when_component_allocations_are_rebuilt_after_refund_revision(): void
     {
         $this->seedNote('note-revision-summary', 'Budi Revision', '2026-04-30', 0);
