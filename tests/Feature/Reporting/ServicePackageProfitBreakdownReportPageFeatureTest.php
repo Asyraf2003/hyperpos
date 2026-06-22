@@ -19,8 +19,9 @@ final class ServicePackageProfitBreakdownReportPageFeatureTest extends TestCase
 
     public function test_kasir_is_redirected_back_to_cashier_dashboard_when_accessing_service_package_profit_breakdown_page(): void
     {
-        $response = $this->actingAs($this->user('kasir'))
-            ->get(route('admin.reports.service_package_profit_breakdown.index'));
+        $this->loginAsKasir();
+
+        $response = $this->get(route('admin.reports.service_package_profit_breakdown.index'));
 
         $response->assertRedirect(route('cashier.dashboard'));
         $response->assertSessionHas('error', 'Halaman admin hanya untuk role admin.');
@@ -28,7 +29,9 @@ final class ServicePackageProfitBreakdownReportPageFeatureTest extends TestCase
 
     public function test_admin_can_access_service_package_profit_breakdown_page_from_sidebar(): void
     {
-        $response = $this->actingAs($this->user('admin'))->get(
+        $this->loginAsAuthorizedAdmin();
+
+        $response = $this->get(
             route('admin.reports.service_package_profit_breakdown.index', [
                 'period_mode' => 'monthly',
                 'reference_date' => '2030-01-31',
