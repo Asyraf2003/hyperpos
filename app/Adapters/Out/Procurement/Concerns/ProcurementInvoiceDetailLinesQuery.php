@@ -44,6 +44,7 @@ trait ProcurementInvoiceDetailLinesQuery
                 'supplier_invoice_lines.tax_mode',
                 'supplier_invoice_lines.tax_rate_basis_points',
                 'supplier_invoice_lines.tax_amount_rupiah',
+                'supplier_invoice_lines.rounding_residue_rupiah',
             ])
             ->map(static fn (object $row): array => [
                 'id' => (string) $row->id,
@@ -63,6 +64,7 @@ trait ProcurementInvoiceDetailLinesQuery
                     ? (int) $row->tax_rate_basis_points
                     : null,
                 'tax_amount_rupiah' => (int) ($row->tax_amount_rupiah ?? 0),
+                'rounding_residue_rupiah' => (int) ($row->rounding_residue_rupiah ?? 0),
             ])
             ->all();
     }
