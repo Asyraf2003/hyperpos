@@ -371,8 +371,10 @@ final class ServicePackageProfitBreakdownHttpWorkflowFeatureTest extends TestCas
         ]);
 
         // Revisi harus meninggalkan reversal inventory untuk versi lama.
+        // Production default source_type reversal workspace update adalah transaction_workspace_updated.
         $this->assertDatabaseHas('inventory_movements', [
-            'source_type' => 'work_item_store_stock_line_reversal',
+            'source_type' => 'transaction_workspace_updated',
+            'movement_type' => 'stock_in',
             'tanggal_mutasi' => $today,
         ]);
 
