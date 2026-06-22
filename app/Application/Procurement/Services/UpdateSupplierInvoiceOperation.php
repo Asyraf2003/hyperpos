@@ -17,6 +17,7 @@ final class UpdateSupplierInvoiceOperation
         private readonly SupplierInvoiceRevisionDeltaMovementsBuilder $deltaMovements,
         private readonly SupplierInvoiceRevisionDeltaStockGuard $deltaStockGuard,
         private readonly SupplierInvoiceRevisionInventoryEffectsApplier $inventoryEffects,
+        private readonly SupplierInvoiceReceivedUnitCostRevisionGuard $receivedUnitCostRevisionGuard,
     ) {
     }
 
@@ -29,7 +30,15 @@ final class UpdateSupplierInvoiceOperation
         array $lines,
         null|string|int $taxInput = null,
     ): Result {
-        $updated = $this->builder->build($current, $nomorFaktur, $namaPtPengirim, $tanggalPengiriman, $lines, $taxInput);
+        $updated = $this->builder->build(
+            $current,
+            $nomorFaktur,
+            $namaPtPengirim,
+            $tanggalPengiriman,
+            $lines,
+            $taxInput,
+        );
+
         $context = $this->contextResolver->resolve($supplierInvoiceId, $updated);
 
         if ($updated->grandTotalRupiah()->amount() < $context->totalPaidRupiah()) {
@@ -39,7 +48,9 @@ final class UpdateSupplierInvoiceOperation
             );
         }
 
-        if ($context->totalReceivedQty() > 0 && $this->changesReceivedUnitCost($current, $updated, $lines)) {
+        if ($context->totalReceivedQty() > 0
+            && $this->receivedUnitCostRevisionGuard->changesReceivedUnitCost($current, $updated, $lines)
+        ) {
             return Result::failure(
                 'Revisi faktur yang mengubah modal/unit cost pada barang yang sudah diterima belum didukung. Buat koreksi stok/modal terpisah agar laporan keuntungan tetap presisi.',
                 ['supplier_invoice' => ['SUPPLIER_INVOICE_RECEIVED_UNIT_COST_REVISION_UNSUPPORTED']]
@@ -66,42 +77,4 @@ final class UpdateSupplierInvoiceOperation
 
         return Result::success(['id' => $updated->id()], 'Nota supplier berhasil diperbarui.');
     }
-    /**
-     * @param array<int, mixed> $submittedLines
-     */
-    private function changesReceivedUnitCost(SupplierInvoice $current, SupplierInvoice $updated, array $submittedLines): bool
-    {
-        $currentLinesById = [];
-
-        foreach ($current->lines() as $currentLine) {
-            $currentLinesById[$currentLine->id()] = $currentLine;
-        }
-
-        foreach ($updated->lines() as $index => $updatedLine) {
-            $submittedLine = $submittedLines[$index] ?? null;
-
-            if (! is_array($submittedLine)) {
-                continue;
-            }
-
-            $previousLineId = trim((string) ($submittedLine['previous_line_id'] ?? ''));
-
-            if ($previousLineId === '' || ! array_key_exists($previousLineId, $currentLinesById)) {
-                continue;
-            }
-
-            $currentLine = $currentLinesById[$previousLineId];
-
-            if ($currentLine->productId() !== $updatedLine->productId()) {
-                continue;
-            }
-
-            if ($currentLine->unitCostRupiah()->amount() !== $updatedLine->unitCostRupiah()->amount()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
 }
