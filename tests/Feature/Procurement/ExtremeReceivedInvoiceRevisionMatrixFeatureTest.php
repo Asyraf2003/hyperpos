@@ -98,6 +98,50 @@ final class ExtremeReceivedInvoiceRevisionMatrixFeatureTest extends TestCase
         ]);
     }
 
+    public function test_paid_received_invoice_cost_revision_can_increase_total_and_outstanding_remaining(): void
+    {
+        $this->seedReceivedInvoiceBase();
+        $this->seedPayment(5000);
+
+        $r = $this->actingAs($this->admin())->put(
+            route('admin.procurement.supplier-invoices.update', ['supplierInvoiceId' => 'invoice-1']),
+            $this->payload([
+                'change_reason' => 'Koreksi modal setelah sebagian pembayaran tercatat.',
+                'lines' => [[
+                    'previous_line_id' => 'invoice-line-1',
+                    'line_no' => 1,
+                    'product_id' => 'product-1',
+                    'qty_pcs' => 2,
+                    'line_total_rupiah' => 22000,
+                ]],
+            ])
+        );
+
+        $r->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
+            ->assertSessionHas('success', 'Nota supplier berhasil diperbarui.');
+
+        $grandTotal = (int) DB::table('supplier_invoices')
+            ->where('id', 'invoice-1')
+            ->value('grand_total_rupiah');
+
+        $totalPaid = (int) DB::table('supplier_payments')
+            ->where('supplier_invoice_id', 'invoice-1')
+            ->sum('amount_rupiah');
+
+        $this->assertSame(22000, $grandTotal);
+        $this->assertSame(5000, $totalPaid);
+        $this->assertSame(17000, $grandTotal - $totalPaid);
+
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-1',
+            'movement_type' => 'cost_revaluation',
+            'source_type' => 'supplier_invoice_cost_revaluation',
+            'qty_delta' => 0,
+            'unit_cost_rupiah' => 0,
+            'total_cost_rupiah' => 2000,
+        ]);
+    }
+
     public function test_admin_cannot_revise_received_invoice_when_total_would_drop_below_paid(): void
     {
         $this->seedReceivedInvoiceBase();
