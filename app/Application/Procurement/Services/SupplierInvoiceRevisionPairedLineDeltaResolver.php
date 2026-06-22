@@ -31,22 +31,25 @@ final class SupplierInvoiceRevisionPairedLineDeltaResolver
         }
 
         $deltaQty = $newLine->qtyPcs() - $oldLine->qtyPcs();
-        $unitCostDelta = $newLine->unitCostRupiah()->amount() - $oldLine->unitCostRupiah()->amount();
 
-        $movements = [];
-
-        if ($unitCostDelta !== 0) {
-            $movements[] = $this->movements->costRevaluation(
-                $newLine,
-                $movementDate,
-                $unitCostDelta * $oldLine->qtyPcs(),
-            );
-        }
-
-        return match (true) {
-            $deltaQty > 0 => [...$movements, $this->movements->stockIn($newLine, $movementDate, $deltaQty)],
-            $deltaQty < 0 => [...$movements, $this->movements->stockOut($newLine, $movementDate, abs($deltaQty))],
-            default => $movements,
+        $stockMovements = match (true) {
+            $deltaQty > 0 => [$this->movements->stockIn($newLine, $movementDate, $deltaQty)],
+            $deltaQty < 0 => [$this->movements->stockOut($newLine, $movementDate, abs($deltaQty))],
+            default => [],
         };
+
+        $stockMovementTotal = array_sum(array_map(
+            static fn (InventoryMovement $movement): int => $movement->totalCostRupiah()->amount(),
+            $stockMovements,
+        ));
+
+        $exactLineTotalDelta = $newLine->lineTotalRupiah()->amount() - $oldLine->lineTotalRupiah()->amount();
+        $revaluationDelta = $exactLineTotalDelta - $stockMovementTotal;
+
+        $revaluationMovements = $revaluationDelta !== 0
+            ? [$this->movements->costRevaluation($newLine, $movementDate, $revaluationDelta)]
+            : [];
+
+        return [...$revaluationMovements, ...$stockMovements];
     }
 }
