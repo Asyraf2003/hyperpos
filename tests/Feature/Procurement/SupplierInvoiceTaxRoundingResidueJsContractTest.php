@@ -27,7 +27,8 @@ final class SupplierInvoiceTaxRoundingResidueJsContractTest extends TestCase
         self::assertStringContainsString('data-tax-rounding-residue-message', $js);
         self::assertStringContainsString('requiresTaxRoundingResidueConfirmation', $js);
         self::assertStringContainsString('confirmTaxRoundingResidueBeforeSubmit', $js);
-        self::assertStringContainsString('window.confirm', $js);
+        self::assertStringNotContainsString('window.confirm', $js);
+        self::assertStringContainsString('Swal.fire', $js);
         self::assertStringContainsString('taxRoundingResidueConfirmedInput.value = "1"', $js);
         self::assertStringContainsString('taxRoundingResidueConfirmedInput.value = "0"', $js);
     }
