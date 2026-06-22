@@ -17,6 +17,21 @@
         >
             @csrf
             @method('PUT')
+            <input
+                type="hidden"
+                name="tax_rounding_residue_confirmed"
+                value="0"
+                data-tax-rounding-residue-confirmed-input
+            >
+
+            <div
+                class="alert alert-warning d-none"
+                role="alert"
+                data-tax-rounding-residue-message
+            >
+                Total setelah pajak tidak habis dibagi qty, sehingga modal per pcs akan dibulatkan dan selisih pembulatan akan dicatat. Lanjutkan?
+            </div>
+
 
             <input
                 type="hidden"
