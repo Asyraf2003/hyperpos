@@ -365,6 +365,14 @@ final class RecordNotePaymentHttpFeatureTest extends TestCase
         $this->assertSame(60000, $componentTotal);
         $this->assertSame(40000, $legacyTotal);
         $this->assertSame(100000, $legacyTotal + $componentTotal);
+
+        $this->assertSame(
+            'closed',
+            DB::table('notes')
+                ->where('id', 'note-mixed-allocation-1')
+                ->value('note_state'),
+            'Note must auto-close when combined legacy and component allocations settle the note total.'
+        );
     }
 
 
