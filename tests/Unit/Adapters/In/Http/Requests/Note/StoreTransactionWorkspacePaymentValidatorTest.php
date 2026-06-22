@@ -48,7 +48,7 @@ final class StoreTransactionWorkspacePaymentValidatorTest extends TestCase
     }
 
 
-    public function test_pay_full_cash_received_is_not_validated_against_payload_grand_total(): void
+    public function test_pay_full_cash_received_must_cover_payload_grand_total(): void
     {
         $payload = [
             'items' => [
@@ -79,9 +79,9 @@ final class StoreTransactionWorkspacePaymentValidatorTest extends TestCase
 
         StoreTransactionWorkspacePaymentValidator::validate($payload, $validator);
 
-        $this->assertFalse(
+        $this->assertTrue(
             $validator->errors()->has('inline_payment.amount_received_rupiah'),
-            'Request validator must validate payment payload shape only. Backend settlement/payable logic owns the accepted payable amount. Errors: '
+            'Full cash payment must require received cash to cover the payload grand total. Errors: '
                 . $validator->errors()->toJson()
         );
     }
