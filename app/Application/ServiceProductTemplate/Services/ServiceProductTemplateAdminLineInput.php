@@ -15,6 +15,7 @@ final class ServiceProductTemplateAdminLineInput
      */
     public function fromData(array $data): array
     {
+        $inputLines = is_array($data['product_lines'] ?? null) ? $data['product_lines'] : [];
         $lines = [[
             'product_id' => trim((string) $data['product_id']),
             'qty' => 1,
@@ -22,7 +23,7 @@ final class ServiceProductTemplateAdminLineInput
         ]];
 
         foreach ([1, 2] as $index) {
-            $line = is_array($data['product_lines'][$index] ?? null) ? $data['product_lines'][$index] : [];
+            $line = is_array($inputLines[$index] ?? null) ? $inputLines[$index] : [];
             $productId = trim((string) ($line['product_id'] ?? ''));
 
             if ($productId !== '') {

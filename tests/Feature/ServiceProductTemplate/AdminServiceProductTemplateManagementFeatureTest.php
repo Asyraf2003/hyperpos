@@ -17,6 +17,8 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
     {
         $admin = $this->user('admin');
         $this->seedProduct('product-admin-template-1', 'SPT-ADM-001', 'Ban Admin Template', 125000);
+        $this->seedProduct('product-admin-template-2', 'SPT-ADM-002', 'Oli Admin Template', 45000);
+        $this->seedProduct('product-admin-template-3', 'SPT-ADM-003', 'Seal Admin Template', 30000);
         $this->seedService('service-admin-template-1', 'Jasa Pasang Ban Admin', true);
         $this->seedService('service-admin-template-2', 'Jasa Pasang Ban Admin Update', true);
 
@@ -24,6 +26,9 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         $createPage->assertOk();
         $createPage->assertSee('Tambah Service', false);
         $createPage->assertSee('Ban Admin Template', false);
+        $createPage->assertSee('Produk 1', false);
+        $createPage->assertSee('Produk 2', false);
+        $createPage->assertSee('Produk 3', false);
         $createPage->assertSee('Jasa Pasang Ban Admin', false);
         $createPage->assertSee('data-searchable-create-select', false);
         $createPage->assertSee('admin-searchable-create-select.js', false);
@@ -32,9 +37,13 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $storeResponse = $this->actingAs($admin)->post(route('admin.service-product-templates.store'), [
             'product_id' => 'product-admin-template-1',
+            'product_lines' => [
+                1 => ['product_id' => 'product-admin-template-2', 'qty' => 2],
+                2 => ['product_id' => 'product-admin-template-3', 'qty' => 1],
+            ],
             'service_catalog_item_id' => 'service-admin-template-1',
             'default_service_price_rupiah' => 75000,
-            'default_package_total_rupiah' => 200000,
+            'default_package_total_rupiah' => 350000,
             'sort_order' => 3,
         ]);
 
@@ -50,9 +59,28 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
             'product_id' => 'product-admin-template-1',
             'service_catalog_item_id' => 'service-admin-template-1',
             'default_service_price_rupiah' => 75000,
-            'default_package_total_rupiah' => 200000,
+            'default_package_total_rupiah' => 350000,
             'is_active' => true,
             'sort_order' => 3,
+        ]);
+
+        $this->assertDatabaseHas('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-1',
+            'qty' => 1,
+            'sort_order' => 0,
+        ]);
+        $this->assertDatabaseHas('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-2',
+            'qty' => 2,
+            'sort_order' => 1,
+        ]);
+        $this->assertDatabaseHas('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-3',
+            'qty' => 1,
+            'sort_order' => 2,
         ]);
 
         $indexPage = $this->actingAs($admin)->get(route('admin.service-product-templates.index'));
@@ -71,10 +99,30 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
 
         $updateResponse = $this->actingAs($admin)->put(route('admin.service-product-templates.update', ['templateId' => $templateId]), [
             'product_id' => 'product-admin-template-1',
+            'product_lines' => [
+                1 => ['product_id' => 'product-admin-template-2', 'qty' => 1],
+            ],
             'service_catalog_item_id' => 'service-admin-template-2',
             'default_service_price_rupiah' => 80000,
             'default_package_total_rupiah' => '',
             'sort_order' => 5,
+        ]);
+
+        $this->assertDatabaseHas('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-1',
+            'qty' => 1,
+            'sort_order' => 0,
+        ]);
+        $this->assertDatabaseHas('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-2',
+            'qty' => 1,
+            'sort_order' => 1,
+        ]);
+        $this->assertDatabaseMissing('service_product_template_lines', [
+            'service_product_template_id' => $templateId,
+            'product_id' => 'product-admin-template-3',
         ]);
 
         $updateResponse->assertRedirect(route('admin.service-product-templates.index'));
@@ -169,6 +217,26 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
             'default_package_total_rupiah',
             'sort_order',
         ]);
+    }
+
+    public function test_admin_validation_rejects_duplicate_product_lines(): void
+    {
+        $admin = $this->user('admin');
+        $this->seedProduct('product-admin-template-duplicate-line', 'SPT-ADM-LINE', 'Produk Line Duplicate', 100000);
+        $this->seedService('service-admin-template-line', 'Jasa Line Duplicate', true);
+
+        $response = $this->actingAs($admin)->post(route('admin.service-product-templates.store'), [
+            'product_id' => 'product-admin-template-duplicate-line',
+            'product_lines' => [
+                1 => ['product_id' => 'product-admin-template-duplicate-line', 'qty' => 1],
+            ],
+            'service_catalog_item_id' => 'service-admin-template-line',
+            'default_service_price_rupiah' => 50000,
+            'default_package_total_rupiah' => 150000,
+            'sort_order' => 0,
+        ]);
+
+        $response->assertSessionHasErrors('product_lines');
     }
 
     private function user(string $role): User
