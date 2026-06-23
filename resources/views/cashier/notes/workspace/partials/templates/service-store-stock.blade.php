@@ -87,6 +87,6 @@
             </template>
         </div>
 
-        <button type="button" class="d-none" data-add-product-line>Tambah Produk Opsional</button>
+        <button type="button" class="d-none" data-add-product-line>Tambah Produk</button>
     </div>
 </template>
