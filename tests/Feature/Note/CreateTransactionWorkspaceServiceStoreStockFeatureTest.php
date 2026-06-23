@@ -1084,6 +1084,182 @@ final class CreateTransactionWorkspaceServiceStoreStockFeatureTest extends TestC
     }
 
 
+    public function test_cashier_cannot_store_template_locked_service_store_stock_when_product_lines_do_not_match_active_template(): void
+    {
+        $this->loginAsKasir();
+
+        $user = User::query()->create([
+            'name' => 'Kasir Template Locked Mismatch',
+            'email' => 'service-store-stock-template-locked-mismatch@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'kasir',
+        ]);
+
+        DB::table('products')->insert([
+            [
+                'id' => 'product-template-locked-match-a',
+                'kode_barang' => 'KB-TPL-LOCK-MATCH-001',
+                'nama_barang' => 'Produk Template Match A',
+                'merek' => 'Federal',
+                'ukuran' => null,
+                'harga_jual' => 50000,
+            ],
+            [
+                'id' => 'product-template-locked-match-b',
+                'kode_barang' => 'KB-TPL-LOCK-MATCH-002',
+                'nama_barang' => 'Produk Template Match B',
+                'merek' => 'Federal',
+                'ukuran' => null,
+                'harga_jual' => 30000,
+            ],
+            [
+                'id' => 'product-template-locked-match-c',
+                'kode_barang' => 'KB-TPL-LOCK-MATCH-003',
+                'nama_barang' => 'Produk Template Match C',
+                'merek' => 'Federal',
+                'ukuran' => null,
+                'harga_jual' => 25000,
+            ],
+        ]);
+
+        DB::table('product_inventory')->insert([
+            [
+                'product_id' => 'product-template-locked-match-a',
+                'qty_on_hand' => 10,
+            ],
+            [
+                'product_id' => 'product-template-locked-match-b',
+                'qty_on_hand' => 10,
+            ],
+            [
+                'product_id' => 'product-template-locked-match-c',
+                'qty_on_hand' => 10,
+            ],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            [
+                'product_id' => 'product-template-locked-match-a',
+                'avg_cost_rupiah' => 35000,
+                'inventory_value_rupiah' => 350000,
+            ],
+            [
+                'product_id' => 'product-template-locked-match-b',
+                'avg_cost_rupiah' => 20000,
+                'inventory_value_rupiah' => 200000,
+            ],
+            [
+                'product_id' => 'product-template-locked-match-c',
+                'avg_cost_rupiah' => 15000,
+                'inventory_value_rupiah' => 150000,
+            ],
+        ]);
+
+        DB::table('service_catalog_items')->insert([
+            'id' => 'service-template-locked-match-x',
+            'name' => 'Paket Template Match X',
+            'normalized_name' => 'paket template match x',
+            'default_price_rupiah' => 100000,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('service_product_templates')->insert([
+            'id' => 'service-product-template-locked-match-x',
+            'product_id' => 'product-template-locked-match-a',
+            'service_catalog_item_id' => 'service-template-locked-match-x',
+            'default_service_price_rupiah' => 100000,
+            'default_package_total_rupiah' => 180000,
+            'is_active' => true,
+            'sort_order' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('service_product_template_lines')->insert([
+            [
+                'id' => 'service-product-template-locked-match-line-a',
+                'service_product_template_id' => 'service-product-template-locked-match-x',
+                'product_id' => 'product-template-locked-match-a',
+                'qty' => 1,
+                'sort_order' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'service-product-template-locked-match-line-b',
+                'service_product_template_id' => 'service-product-template-locked-match-x',
+                'product_id' => 'product-template-locked-match-b',
+                'qty' => 1,
+                'sort_order' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('cashier.notes.workspace.create'))
+            ->post(route('notes.workspace.store'), [
+                'idempotency_key' => 'create-workspace-service-store-stock-template-locked-mismatch-idem-001',
+                'note' => [
+                    'customer_name' => 'Budi Template Locked Mismatch',
+                    'customer_phone' => '08123',
+                    'transaction_date' => '2026-03-15',
+                ],
+                'items' => [[
+                    'entry_mode' => 'service',
+                    'part_source' => 'store_stock',
+                    'pricing_mode' => 'package_auto_split',
+                    'requires_service_product_template' => '1',
+                    'pay_now' => 0,
+                    'service' => [
+                        'name' => 'Paket Template Match X',
+                        'price_rupiah' => 100000,
+                        'notes' => '',
+                    ],
+                    'product_lines' => [
+                        [
+                            'product_id' => 'product-template-locked-match-a',
+                            'qty' => 1,
+                            'unit_price_rupiah' => 50000,
+                        ],
+                        [
+                            'product_id' => 'product-template-locked-match-c',
+                            'qty' => 1,
+                            'unit_price_rupiah' => 25000,
+                        ],
+                    ],
+                    'external_purchase_lines' => [[
+                        'label' => '',
+                        'qty' => '',
+                        'unit_cost_rupiah' => '',
+                    ]],
+                ]],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => '2026-03-15',
+                ],
+            ]);
+
+        $response->assertRedirect(route('cashier.notes.workspace.create'));
+        $response->assertSessionHasErrors([
+            'workspace' => 'Payload paket servis + produk tidak sesuai template aktif.',
+        ]);
+
+        $this->assertDatabaseCount('notes', 0);
+        $this->assertDatabaseCount('work_items', 0);
+        $this->assertDatabaseCount('work_item_service_details', 0);
+        $this->assertDatabaseCount('work_item_store_stock_lines', 0);
+        $this->assertDatabaseCount('inventory_movements', 0);
+    }
+
+
     public function test_cashier_cannot_store_template_locked_service_store_stock_when_primary_product_has_no_active_template(): void
     {
         $this->loginAsKasir();

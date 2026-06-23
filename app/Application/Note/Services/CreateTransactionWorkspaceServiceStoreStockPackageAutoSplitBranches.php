@@ -18,7 +18,7 @@ trait CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches
         array $pricedLines,
         int $serviceTotal
     ): array {
-        $this->rules->activeTemplateForSingleProductLine($pricedLines['product_lines']);
+        $this->rules->assertExactActiveTemplatePayload($item, $pricedLines['product_lines']);
         [$serviceFee, $packageProfit] = $this->splitServiceTotal($serviceTotal);
         $service = $this->service($item);
 

@@ -14,6 +14,8 @@ interface ServiceProductTemplateLookupReaderPort
 
     public function findActiveByProductId(string $productId): ?ServiceProductTemplateLookupRow;
 
+    public function findActivePackageByProductId(string $productId): ?ServiceProductTemplatePackageLookupRow;
+
     /**
      * @return list<ServiceProductTemplatePackageLookupRow>
      */

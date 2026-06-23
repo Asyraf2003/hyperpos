@@ -192,6 +192,185 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
     }
 
 
+    public function test_admin_cannot_submit_template_locked_package_revision_when_product_lines_do_not_match_active_template(): void
+    {
+        $this->seedOpenMultiProductPackageNote();
+
+        $user = User::query()->create([
+            'name' => 'Admin Package Revision Template Lock Characterization',
+            'email' => 'admin-package-revision-template-lock-characterization@example.test',
+            'password' => 'password',
+        ]);
+
+        DB::table('actor_accesses')->insert([
+            'actor_id' => (string) $user->getAuthIdentifier(),
+            'role' => 'admin',
+        ]);
+
+        DB::table('admin_transaction_capability_states')->updateOrInsert(
+            ['actor_id' => (string) $user->getAuthIdentifier()],
+            ['active' => true],
+        );
+
+        DB::table('products')->insert([
+            'id' => 'product-package-edit-c',
+            'kode_barang' => 'PKG-EDIT-C',
+            'nama_barang' => 'Filter Edit Package C',
+            'merek' => 'Sakura',
+            'ukuran' => 100,
+            'harga_jual' => 25000,
+        ]);
+
+        DB::table('product_inventory')->insert([
+            'product_id' => 'product-package-edit-c',
+            'qty_on_hand' => 10,
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            'product_id' => 'product-package-edit-c',
+            'avg_cost_rupiah' => 15000,
+            'inventory_value_rupiah' => 150000,
+        ]);
+
+        DB::table('service_catalog_items')->insert([
+            'id' => 'service-package-edit-template-lock',
+            'name' => 'Servis Paket Multi Template Lock',
+            'normalized_name' => 'servis paket multi template lock',
+            'default_price_rupiah' => 120000,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('service_product_templates')->insert([
+            'id' => 'service-product-template-edit-lock',
+            'product_id' => 'product-package-edit-a',
+            'service_catalog_item_id' => 'service-package-edit-template-lock',
+            'default_service_price_rupiah' => 120000,
+            'default_package_total_rupiah' => 250000,
+            'is_active' => true,
+            'sort_order' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('service_product_template_lines')->insert([
+            [
+                'id' => 'service-product-template-edit-lock-line-a',
+                'service_product_template_id' => 'service-product-template-edit-lock',
+                'product_id' => 'product-package-edit-a',
+                'qty' => 2,
+                'sort_order' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'service-product-template-edit-lock-line-b',
+                'service_product_template_id' => 'service-product-template-edit-lock',
+                'product_id' => 'product-package-edit-b',
+                'qty' => 1,
+                'sort_order' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $response = $this->actingAs($user)
+            ->from(route('admin.notes.workspace.edit', ['noteId' => 'note-edit-package-multi-001']))
+            ->patch(
+                route('admin.notes.workspace.update', ['noteId' => 'note-edit-package-multi-001']),
+                [
+                    'reason' => 'Package template lock mismatch characterization.',
+                    'note' => [
+                        'customer_name' => 'Budi Edit Package Multi Revised',
+                        'customer_phone' => '08123456789',
+                        'transaction_date' => '2026-06-01',
+                        'operational_note' => 'Alasan revisi package template lock.',
+                    ],
+                    'items' => [
+                        [
+                            'entry_mode' => 'service',
+                            'description' => null,
+                            'part_source' => 'store_stock',
+                            'pricing_mode' => 'package_auto_split',
+                            'requires_service_product_template' => '1',
+                            'package_total_rupiah' => 275000,
+                            'service' => [
+                                'name' => 'Servis Paket Multi Template Lock',
+                                'price_rupiah' => 0,
+                                'notes' => null,
+                            ],
+                            'product_lines' => [
+                                [
+                                    'product_id' => 'product-package-edit-a',
+                                    'qty' => 2,
+                                    'unit_price_rupiah' => 50000,
+                                    'price_basis' => 'revision_snapshot',
+                                ],
+                                [
+                                    'product_id' => 'product-package-edit-c',
+                                    'qty' => 1,
+                                    'unit_price_rupiah' => 25000,
+                                    'price_basis' => 'revision_snapshot',
+                                ],
+                            ],
+                            'external_purchase_lines' => [],
+                        ],
+                    ],
+                    'inline_payment' => [
+                        'decision' => 'skip',
+                        'payment_method' => null,
+                        'paid_at' => '2026-06-01',
+                    ],
+                ]
+            );
+
+        $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-edit-package-multi-001']));
+        $response->assertSessionHasErrors([
+            'workspace' => 'Payload paket servis + produk tidak sesuai template aktif.',
+        ]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => 'note-edit-package-multi-001',
+            'customer_name' => 'Budi Edit Package Multi',
+            'customer_phone' => null,
+            'transaction_date' => '2026-05-31',
+            'operational_note' => 'Alasan awal package multi.',
+            'total_rupiah' => 250000,
+            'current_revision_id' => 'note-edit-package-multi-001-r001',
+            'latest_revision_number' => 1,
+        ]);
+
+        $this->assertDatabaseHas('work_items', [
+            'id' => 'wi-edit-package-multi-001',
+            'note_id' => 'note-edit-package-multi-001',
+            'subtotal_rupiah' => 250000,
+        ]);
+
+        $this->assertDatabaseHas('work_item_service_details', [
+            'work_item_id' => 'wi-edit-package-multi-001',
+            'service_name' => 'Servis Paket Multi Original',
+            'service_price_rupiah' => 120000,
+        ]);
+
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'id' => 'ssl-edit-package-multi-b',
+            'work_item_id' => 'wi-edit-package-multi-001',
+            'product_id' => 'product-package-edit-b',
+            'qty' => 1,
+            'line_total_rupiah' => 30000,
+        ]);
+
+        $this->assertDatabaseMissing('work_item_store_stock_lines', [
+            'work_item_id' => 'wi-edit-package-multi-001',
+            'product_id' => 'product-package-edit-c',
+        ]);
+
+        $this->assertDatabaseCount('note_revisions', 1);
+        $this->assertDatabaseCount('payment_component_allocations', 0);
+    }
+
+
     public function test_package_auto_split_multi_product_revision_reverses_old_stock_and_issues_replacement_stock(): void
     {
         $this->seedOpenMultiProductPackageNote();

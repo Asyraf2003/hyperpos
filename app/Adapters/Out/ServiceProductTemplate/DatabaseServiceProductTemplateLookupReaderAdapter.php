@@ -25,6 +25,25 @@ final class DatabaseServiceProductTemplateLookupReaderAdapter implements Service
         return $row === null ? null : $this->lookupRows->map($row);
     }
 
+    public function findActivePackageByProductId(string $productId): ?ServiceProductTemplatePackageLookupRow
+    {
+        $row = $this->activeLookup->firstByProductId($productId);
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->packageRows->map((object) [
+            'id' => $row->id,
+            'legacy_product_id' => $row->product_id,
+            'service_catalog_item_id' => $row->service_catalog_item_id,
+            'default_service_price_rupiah' => $row->default_service_price_rupiah,
+            'default_package_total_rupiah' => $row->default_package_total_rupiah,
+            'is_active' => $row->is_active,
+            'service_name' => $row->service_name,
+        ]);
+    }
+
     /**
      * @return list<ServiceProductTemplatePackageLookupRow>
      */

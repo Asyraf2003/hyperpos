@@ -34,7 +34,7 @@ final class StoreNoteRevisionController extends Controller
 
         if ($result->isFailure()) {
             return back()
-                ->withErrors(['revision' => $result->message() ?? 'Revisi nota gagal disimpan.'])
+                ->withErrors(['workspace' => $result->message() ?? 'Revisi nota gagal disimpan.'])
                 ->withInput();
         }
 
