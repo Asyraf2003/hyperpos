@@ -332,6 +332,26 @@ final class CreateTransactionWorkspaceLineTypeCharacterizationTest extends TestC
             50000,
             90000
         );
+        DB::table('service_product_template_lines')->insert([
+            [
+                'id' => 'phase4-template-preset-a-line-a',
+                'service_product_template_id' => 'phase4-template-preset-a',
+                'product_id' => 'phase2-template-guard-a',
+                'qty' => 1,
+                'sort_order' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'id' => 'phase4-template-preset-a-line-b',
+                'service_product_template_id' => 'phase4-template-preset-a',
+                'product_id' => 'phase2-template-guard-b',
+                'qty' => 1,
+                'sort_order' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
 
         $response = $this->actingAs($user)
             ->from(route('cashier.notes.workspace.create'))
@@ -350,7 +370,7 @@ final class CreateTransactionWorkspaceLineTypeCharacterizationTest extends TestC
                     'package_total_rupiah' => 150000,
                     'pay_now' => 0,
                     'service' => [
-                        'name' => 'Template Preset Multi Phase 2 Guard',
+                        'name' => 'Template Preset Multi Phase 4',
                         'price_rupiah' => 0,
                         'notes' => '',
                     ],
