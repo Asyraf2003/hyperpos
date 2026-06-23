@@ -47,7 +47,7 @@ final class TransactionWorkspaceExistingServiceStoreStockMapper
             'part_source' => 'store_stock',
             'service' => [
                 'name' => $service->serviceName(),
-                'price_rupiah' => $service->servicePriceRupiah()->amount(),
+                'price_rupiah' => $service->totalPriceRupiah()->amount(),
                 'notes' => '',
             ],
             'product_lines' => [[

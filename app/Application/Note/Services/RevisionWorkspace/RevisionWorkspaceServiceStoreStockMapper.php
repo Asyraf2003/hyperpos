@@ -37,7 +37,8 @@ final class RevisionWorkspaceServiceStoreStockMapper
             'package_total_rupiah' => $this->packageTotal($line, $payload),
             'service' => [
                 'name' => (string) ($service['service_name'] ?? ($line->serviceLabel() ?? '')),
-                'price_rupiah' => (int) ($service['service_price_rupiah'] ?? ($line->servicePriceRupiah() ?? 0)),
+                'price_rupiah' => (int) ($service['service_price_rupiah'] ?? ($line->servicePriceRupiah() ?? 0))
+                    + (int) ($payload['package_profit_rupiah'] ?? 0),
                 'notes' => '',
             ],
             'selected_label' => (string) ($productLines[0]['selected_label'] ?? ''),

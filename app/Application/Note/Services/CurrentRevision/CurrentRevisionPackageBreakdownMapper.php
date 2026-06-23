@@ -35,7 +35,8 @@ final class CurrentRevisionPackageBreakdownMapper
         return [
             'package_total_rupiah' => $line->subtotalRupiah(),
             'parts_total_rupiah' => $partsTotal,
-            'service_residual_rupiah' => (int) ($payload['service']['service_price_rupiah'] ?? 0),
+            'service_residual_rupiah' => (int) ($payload['service']['service_price_rupiah'] ?? 0)
+                + (int) ($payload['package_profit_rupiah'] ?? 0),
             'parts' => $parts,
         ];
     }

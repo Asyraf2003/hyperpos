@@ -16,9 +16,10 @@ final class CurrentRevisionServiceAmountResolver
     {
         $service = is_array($payload['service'] ?? null) ? $payload['service'] : [];
         $fromPayload = (int) ($service['service_price_rupiah'] ?? 0);
+        $packageProfit = (int) ($payload['package_profit_rupiah'] ?? 0);
 
-        if ($fromPayload > 0) {
-            return $fromPayload;
+        if ($fromPayload > 0 || $packageProfit > 0) {
+            return $fromPayload + $packageProfit;
         }
 
         $fromLine = (int) ($line->servicePriceRupiah() ?? 0);
