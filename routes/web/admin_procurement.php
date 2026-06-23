@@ -7,6 +7,7 @@ use App\Adapters\In\Http\Controllers\Admin\Procurement\CreateSupplierInvoicePage
 use App\Adapters\In\Http\Controllers\Admin\Procurement\EditSupplierInvoicePageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoicePaymentProofPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProductLookupController;
+use App\Adapters\In\Http\Controllers\Admin\Procurement\PreviewSupplierPaymentProofAttachmentPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceDetailPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceIndexPageController;
 use App\Adapters\In\Http\Controllers\Admin\Procurement\ProcurementInvoiceTableDataController;
@@ -59,6 +60,9 @@ Route::middleware(['web', 'auth', 'admin.page'])->group(function (): void {
 });
 
 Route::middleware(['web', 'auth', 'admin.page', 'app.shell'])->group(function (): void {
+    Route::get('/admin/procurement/supplier-payment-proof-attachments/{attachmentId}/preview', PreviewSupplierPaymentProofAttachmentPageController::class)
+        ->name('admin.procurement.supplier-payment-proof-attachments.preview');
+
     Route::get('/admin/procurement/supplier-invoices', ProcurementInvoiceIndexPageController::class)
         ->name('admin.procurement.supplier-invoices.index');
 

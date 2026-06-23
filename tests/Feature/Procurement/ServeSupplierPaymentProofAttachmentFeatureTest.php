@@ -160,6 +160,43 @@ final class ServeSupplierPaymentProofAttachmentFeatureTest extends TestCase
     }
 
 
+
+    public function test_admin_can_open_supplier_payment_proof_attachment_preview_page_with_back_button(): void
+    {
+        Storage::fake('local');
+        $this->storePdfFixture('supplier-payment-proofs/payment-1/proof.pdf');
+
+        $this->seedPaymentFixture('payment-1');
+        $this->seedAttachment(
+            'attachment-1',
+            'payment-1',
+            'supplier-payment-proofs/payment-1/proof.pdf',
+            'proof.pdf',
+            'application/pdf',
+        );
+
+        $backUrl = '/admin/procurement/supplier-invoices/invoice-1/payment-proofs';
+
+        $response = $this->actingAs($this->user('admin'))
+            ->get(route('admin.procurement.supplier-payment-proof-attachments.preview', [
+                'attachmentId' => 'attachment-1',
+                'back_url' => $backUrl,
+            ]));
+
+        $response->assertOk();
+        $response->assertSee('Pratinjau Bukti Pembayaran');
+        $response->assertSee('proof.pdf');
+        $response->assertSee('Tipe Berkas: application/pdf');
+        $response->assertSee($backUrl, false);
+        $response->assertSee(route('admin.procurement.supplier-payment-proof-attachments.show', [
+            'attachmentId' => 'attachment-1',
+        ]), false);
+        $response->assertSee(route('admin.procurement.supplier-payment-proof-attachments.show', [
+            'attachmentId' => 'attachment-1',
+            'download' => 1,
+        ]), false);
+    }
+
     private function storePdfFixture(string $path): void
     {
         Storage::disk('local')->put(

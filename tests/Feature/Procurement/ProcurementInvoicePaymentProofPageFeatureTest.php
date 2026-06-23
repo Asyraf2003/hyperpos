@@ -106,6 +106,10 @@ final class ProcurementInvoicePaymentProofPageFeatureTest extends TestCase
         $response->assertSee('Riwayat Lampiran');
         $response->assertSee('proof.pdf');
         $response->assertSee('Lihat PDF');
+        $response->assertSee(route('admin.procurement.supplier-payment-proof-attachments.preview', [
+            'attachmentId' => 'attachment-1',
+            'back_url' => '/admin/procurement/supplier-invoices/invoice-1/payment-proofs',
+        ]), false);
         $response->assertSee('Unduh');
     }
 

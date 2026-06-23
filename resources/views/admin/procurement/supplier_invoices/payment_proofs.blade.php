@@ -180,27 +180,21 @@
                                                             <div class="d-flex flex-wrap gap-2 mt-2">
                                                                 @if ($attachment['mime_type'] === 'application/pdf')
                                                                     <a
-                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
-                                                                        target="_blank"
-                                                                        rel="noopener"
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.preview', ['attachmentId' => $attachment['id'], 'back_url' => request()->getRequestUri()]) }}"
                                                                         class="btn btn-sm btn-outline-primary"
                                                                     >
                                                                         Lihat PDF
                                                                     </a>
                                                                 @elseif (str_starts_with($attachment['mime_type'], 'image/'))
                                                                     <a
-                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
-                                                                        target="_blank"
-                                                                        rel="noopener"
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.preview', ['attachmentId' => $attachment['id'], 'back_url' => request()->getRequestUri()]) }}"
                                                                         class="btn btn-sm btn-outline-primary"
                                                                     >
                                                                         Lihat Gambar
                                                                     </a>
                                                                 @else
                                                                     <a
-                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.show', ['attachmentId' => $attachment['id']]) }}"
-                                                                        target="_blank"
-                                                                        rel="noopener"
+                                                                        href="{{ route('admin.procurement.supplier-payment-proof-attachments.preview', ['attachmentId' => $attachment['id'], 'back_url' => request()->getRequestUri()]) }}"
                                                                         class="btn btn-sm btn-outline-primary"
                                                                     >
                                                                         Lihat Berkas
