@@ -214,30 +214,36 @@
     }
   };
 
-  const serviceStoreStockAutosplitIssue = (row) => {
-    const pricingMode = row.querySelector("[data-pricing-mode]")?.value || "";
-    const packageTotalInput = row.querySelector('input[name$="[package_total_rupiah]"]');
-    const packageTotal = digits(packageTotalInput?.value || "");
-    const requiresServiceProductTemplate =
-      row.querySelector("[data-requires-service-product-template]")?.value === "1";
+	  const serviceStoreStockAutosplitIssue = (row) => {
+	    const pricingMode = row.querySelector("[data-pricing-mode]")?.value || "";
+	    const servicePriceInput = row.querySelector('input[name$="[service][price_rupiah]"]');
+	    const servicePriceDisplay = row.querySelector("[data-service-price-display]");
+	    const serviceTotal = digits(servicePriceInput?.value || servicePriceDisplay?.value || "");
+	    const requiresServiceProductTemplate =
+	      row.querySelector("[data-requires-service-product-template]")?.value === "1";
 
     if (pricingMode !== "package_auto_split") {
       return null;
     }
 
-    if (packageTotal <= 0) {
-      return {
-        message: "Total paket wajib diisi sebelum proses nota.",
-        target: row.querySelector("[data-package-total-input]") || packageTotalInput,
-      };
-    }
+	    if (serviceTotal <= 0) {
+	      return {
+	        message: "Harga servis wajib diisi sebelum proses nota.",
+	        target: servicePriceDisplay || servicePriceInput,
+	      };
+	    }
 
     const scopes = Array.from(row.querySelectorAll("[data-product-line]"));
     const productScopes = scopes.length ? scopes : [row];
 
-	    let sparepartTotal = 0;
+    if (productScopes.length > 3) {
+      return {
+        message: "Paket servis maksimal memakai 3 produk.",
+        target: row.querySelector("[data-add-product-line]") || productScopes[2],
+      };
+    }
 
-    for (const scope of productScopes) {
+	    for (const scope of productScopes) {
       const productSearch = scope.querySelector("[data-product-search]");
       const productId = scope.querySelector("[data-product-id]")?.value?.trim() || "";
       const qtyInput = scope.querySelector("[data-qty-input]");
@@ -266,41 +272,19 @@
         };
       }
 
-      sparepartTotal += qty * unitPrice;
-    }
-
-    if (packageTotal < sparepartTotal) {
-      return {
-        message: "Total paket tidak boleh lebih kecil dari total harga sparepart.",
-        target: row.querySelector("[data-package-total-input]") || packageTotalInput,
-      };
-    }
+	    }
 
     if (
       requiresServiceProductTemplate &&
       row.dataset.serviceProductTemplateApplied !== "1"
     ) {
       return {
-        message: "Paket servis + produk wajib memakai template aktif.",
-        target: row.querySelector("[data-product-search]") || row.querySelector("[data-package-total-input]") || packageTotalInput,
-      };
-    }
+	        message: "Paket servis + produk wajib memakai template aktif.",
+	        target: row.querySelector("[data-product-search]") || servicePriceDisplay || servicePriceInput,
+	      };
+	    }
 
-    const minimumTemplateServicePrice = digits(
-      row.dataset.serviceTemplateDefaultPriceRupiah || ""
-    );
-
-    if (
-      minimumTemplateServicePrice > 0 &&
-      packageTotal < sparepartTotal + minimumTemplateServicePrice
-    ) {
-      return {
-        message: `Total paket tidak boleh membuat harga jasa di bawah default template (${format(minimumTemplateServicePrice)}).`,
-        target: row.querySelector("[data-package-total-input]") || packageTotalInput,
-      };
-    }
-
-    return null;
+	    return null;
   };
 
   const firstWorkspaceValidationIssue = () => {
