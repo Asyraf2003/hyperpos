@@ -170,6 +170,10 @@
   };
 
   NS.bindProductSearch = (row) => {
+    if ((row?.dataset?.itemType || "") === "service_store_stock" && row.querySelector("[data-package-search]")) {
+      return;
+    }
+
     row.querySelectorAll("[data-product-search]").forEach((input) => {
       const scope = productScope(input);
       const hidden = scope.querySelector("[data-product-id]");

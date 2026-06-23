@@ -3,7 +3,7 @@
         <div class="workspace-answer-header">
             <div>
                 <h6 class="mb-0 small fw-semibold" data-line-title>Rincian</h6>
-                <small class="text-muted">Paket servis dengan maksimal 3 produk.</small>
+                <small class="text-muted">Cari paket servis. Produk dan jasa terisi otomatis dari template.</small>
             </div>
             <button type="button" class="btn btn-sm btn-outline-danger py-1" data-remove-line>Hapus</button>
         </div>
@@ -17,149 +17,76 @@
         <input type="hidden" value="" data-service-catalog-id>
         <input type="hidden" value="" data-service-default-fee-rupiah>
 
-        <div class="workspace-answer-field" data-product-lines>
-            <div data-product-line>
-		                <label class="form-label small mb-1">Produk 1 <span class="text-danger">*</span></label>
-                <div class="position-relative">
-                    <input type="hidden" name="items[__INDEX__][product_lines][0][product_id]" value="" data-product-id>
-                    <input type="hidden" name="items[__INDEX__][product_lines][0][price_basis]" value="current_catalog" data-price-basis>
-                    <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw data-price-input>
-                    <input
-                        type="text"
-                        class="form-control form-control-sm"
-                        placeholder="Ketik nama produk atau kode barang"
-                        autocomplete="off"
-                        data-product-search
-                    >
-                    <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
-                </div>
-                <small class="text-muted" data-template-empty-section>
-                    Hanya produk yang punya template aktif yang muncul.
-                </small>
+        <input
+            type="hidden"
+            name="items[__INDEX__][service][name]"
+            value=""
+            data-service-name
+            data-template-service-name
+        >
+        <input
+            type="hidden"
+            name="items[__INDEX__][service][price_rupiah]"
+            value="0"
+            data-money-raw
+            data-service-price-raw
+        >
+        <input type="hidden" value="" data-service-price-display>
 
-                <div class="d-none mt-3" data-template-selected-section>
-                    <div class="rounded border bg-light p-2 mb-2">
-	                        <div class="small text-muted">Produk template terpilih</div>
-                        <div class="fw-semibold small" data-template-product-name>-</div>
-                        <div class="small text-muted">
-                            <span data-stock-text>Stok tersedia: -</span>
-                            <span class="mx-1">·</span>
-                            <span data-min-price-text>Harga produk mengikuti katalog.</span>
-                        </div>
-                        <small class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</small>
-                        <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
-                    </div>
-
-                    <label class="form-label small mb-1">Qty</label>
-                    <input
-                        type="text"
-                        inputmode="numeric"
-                        name="items[__INDEX__][product_lines][0][qty]"
-                        value="1"
-                        class="form-control form-control-sm text-center px-1 fw-semibold"
-                        style="width: 4rem;"
-                        data-qty-input
-                    >
-                </div>
-            </div>
-            <template data-product-line-template>
-                <div data-product-line>
-		                    <label class="form-label small mb-1">Produk Opsional</label>
-                    <div class="position-relative">
-                        <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][product_id]" value="" data-product-id>
-                        <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][price_basis]" value="current_catalog" data-price-basis>
-                        <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][unit_price_rupiah]" value="" data-money-raw data-price-input>
-                        <input
-                            type="text"
-                            class="form-control form-control-sm"
-                            placeholder="Ketik nama produk atau kode barang"
-                            autocomplete="off"
-                            data-product-search
-                        >
-                        <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-product-results></div>
-                    </div>
-
-                    <div class="d-none mt-3" data-template-selected-section>
-                        <div class="rounded border bg-light p-2 mb-2">
-	                            <div class="small text-muted">Produk/sparepart terpilih</div>
-                            <div class="fw-semibold small" data-template-product-name>-</div>
-                            <div class="small text-muted">
-                                <span data-stock-text>Stok tersedia: -</span>
-                                <span class="mx-1">·</span>
-                                <span data-min-price-text>Harga produk mengikuti katalog.</span>
-                            </div>
-                            <small class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</small>
-                            <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
-                        </div>
-
-                        <div class="d-flex align-items-end gap-2">
-                            <div>
-                                <label class="form-label small mb-1">Qty</label>
-                                <input
-                                    type="text"
-                                    inputmode="numeric"
-                                    name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][qty]"
-                                    value="1"
-                                    class="form-control form-control-sm text-center px-1 fw-semibold"
-                                    style="width: 4rem;"
-                                    data-qty-input
-                                >
-                            </div>
-
-                            <button type="button" class="btn btn-sm btn-outline-danger" data-remove-product-line>
-                                Hapus
-                            </button>
-                        </div>
-                    </div>
-                </div>
-	            </template>
-	        </div>
-
-		        <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-add-product-line>
-		            Tambah Produk Opsional
-		        </button>
-                <small class="text-muted d-block mt-1">Produk 2 dan 3 opsional. Maksimal 3 produk dalam satu paket.</small>
-
-		        <div class="d-none mt-3" data-template-selected-section>
-            <div class="workspace-answer-field">
-                <label class="form-label small mb-1">Nama Paket/Jasa dari Template</label>
+        <div class="workspace-answer-field">
+            <label class="form-label small mb-1">Paket Service x Product <span class="text-danger">*</span></label>
+            <div class="position-relative">
                 <input
                     type="text"
-                    name="items[__INDEX__][service][name]"
-                    value=""
                     class="form-control form-control-sm"
-                    placeholder="Terisi otomatis setelah produk dipilih"
+                    placeholder="Cari paket, service, atau produk"
                     autocomplete="off"
-                    readonly
-                    data-service-name
-                    data-template-service-name
+                    data-package-search
                 >
-                <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-service-results></div>
-                <small class="text-muted">Dari template aktif. Tidak diketik manual.</small>
+                <div class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20;" data-package-results></div>
+            </div>
+            <small class="text-muted d-block mt-1">
+                Pilih paket. Service wajib, Produk 1 wajib, Produk 2 dan 3 opsional dari template.
+            </small>
+            <small class="text-danger d-none" data-package-error>Paket wajib dipilih.</small>
+        </div>
+
+        <div class="rounded border bg-light p-2 d-none" data-package-selected-section>
+            <div class="small text-muted">Paket terpilih</div>
+            <div class="fw-semibold small" data-package-title>-</div>
+            <div class="small text-muted mt-1" data-package-description>-</div>
+            <div class="small text-muted mt-1" data-package-stock-text>-</div>
+        </div>
+
+        <div class="d-none" data-product-lines>
+            <div data-product-line>
+                <input type="hidden" name="items[__INDEX__][product_lines][0][product_id]" value="" data-product-id>
+                <input type="hidden" name="items[__INDEX__][product_lines][0][price_basis]" value="current_catalog" data-price-basis>
+                <input type="hidden" name="items[__INDEX__][product_lines][0][unit_price_rupiah]" value="" data-money-raw data-price-input>
+                <input type="hidden" name="items[__INDEX__][product_lines][0][qty]" value="1" data-qty-input>
+                <input type="hidden" value="" data-product-search>
+                <small class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</small>
+                <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
+                <small class="text-muted d-none" data-stock-text>Stok tersedia: -</small>
+                <small class="text-muted d-none" data-min-price-text>Harga produk mengikuti katalog.</small>
             </div>
 
-	            <div class="workspace-answer-field mt-3">
-	                <div data-money-input-group>
-	                    <label class="form-label small mb-1">Harga Servis</label>
-	                    <input type="hidden" name="items[__INDEX__][service][price_rupiah]" value="0" data-money-raw data-service-price-raw>
-	                    <input
-	                        type="text"
-	                        inputmode="numeric"
-	                        value=""
-	                        class="form-control form-control-sm"
-	                        placeholder="Default dari template"
-	                        data-money-display
-	                        data-service-price-display
-	                    >
-	                </div>
-	                <small class="text-muted">
-	                    Harga servis otomatis dipecah 20% jasa dan 80% keuntungan paket.
-	                </small>
-	            </div>
+            <template data-product-line-template>
+                <div data-product-line>
+                    <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][product_id]" value="" data-product-id>
+                    <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][price_basis]" value="current_catalog" data-price-basis>
+                    <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][unit_price_rupiah]" value="" data-money-raw data-price-input>
+                    <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][qty]" value="1" data-qty-input>
+                    <input type="hidden" value="" data-product-search>
+                    <small class="text-danger d-none" data-stock-error>Qty melebihi stok tersedia.</small>
+                    <small class="text-danger d-none" data-min-price-warning>Harga tidak boleh di bawah minimum.</small>
+                    <small class="text-muted d-none" data-stock-text>Stok tersedia: -</small>
+                    <small class="text-muted d-none" data-min-price-text>Harga produk mengikuti katalog.</small>
+                    <button type="button" class="d-none" data-remove-product-line>Hapus</button>
+                </div>
+            </template>
+        </div>
 
-		            <small class="text-muted d-block mt-2">
-		                Produk pertama memakai template aktif. Produk opsional boleh ditambahkan dalam paket yang sama.
-		            </small>
-		        </div>
+        <button type="button" class="d-none" data-add-product-line>Tambah Produk Opsional</button>
     </div>
 </template>

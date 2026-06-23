@@ -58,6 +58,8 @@
     updateProductLineRemoveState(row);
   };
 
+  NS.reindexProductLines = reindexProductLines;
+
   const setValue = (root, selector, value) => {
     const el = root.querySelector(selector);
     if (el && value !== undefined && value !== null) el.value = String(value);
@@ -133,7 +135,7 @@
     return scope;
 	  };
 
-  NS.addProductLine = (row, line = {}) => appendProductLine(row, line, true);
+  NS.addProductLine = (row, line = {}, focus = true) => appendProductLine(row, line, focus);
 
 	  NS.bindProductLines = (row) => {
     if (!(row instanceof HTMLElement)) return;
@@ -254,6 +256,7 @@
     NS.applyInitialValues(row, type, initial);
     window.AdminMoneyInput?.bindBySelector?.(row);
     NS.bindProductSearch?.(row);
+    NS.bindPackageSearch?.(row);
     NS.bindServiceCatalog?.(row);
     NS.bindQtyControls?.(row);
     NS.bindProductLines?.(row);

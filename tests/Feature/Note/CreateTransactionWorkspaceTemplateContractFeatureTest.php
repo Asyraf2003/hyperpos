@@ -58,13 +58,24 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertSee('data-pricing-mode', false);
         $response->assertDontSee('name="items[__INDEX__][package_total_rupiah]"', false);
         $response->assertDontSee('Total Paket', false);
-        $response->assertSee('Harga Servis', false);
-        $response->assertSee('Harga servis otomatis dipecah 20% jasa dan 80% keuntungan paket.', false);
+
+        $response->assertSee('data-package-search', false);
+        $response->assertSee('data-package-results', false);
+        $response->assertSee('data-package-selected-section', false);
+        $response->assertSee('package-search.js', false);
+
+        $response->assertSee('name="items[__INDEX__][service][name]"', false);
+        $response->assertSee('name="items[__INDEX__][service][price_rupiah]"', false);
         $response->assertSee('data-product-lines', false);
         $response->assertSee('data-product-line-template', false);
         $response->assertSee('__PRODUCT_INDEX__', false);
         $response->assertSee('data-add-product-line', false);
         $response->assertSee('data-remove-product-line', false);
+
+        $response->assertDontSee('Produk 1 <span class="text-danger">*</span>', false);
+        $response->assertDontSee('Produk Opsional', false);
+        $response->assertDontSee('Tambah Produk Opsional', false);
+        $response->assertDontSee('Harga Servis', false);
     }
 
     public function test_workspace_create_page_embeds_service_catalog_contract(): void
