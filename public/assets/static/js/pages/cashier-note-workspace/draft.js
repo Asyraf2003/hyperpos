@@ -176,7 +176,9 @@
   };
 
   const numberText = (value) => String(value ?? "").replace(/\D+/g, "");
-  const valueOf = (selector, root = document) => root.querySelector(selector)?.value || "";
+	  const valueOf = (selector, root = document) => root.querySelector(selector)?.value || "";
+	  const packageLabelFromRow = (row) =>
+	    valueOf("[data-package-search]", row) || valueOf("[data-product-search]", row);
 
   const productLineScopes = (row) => {
     const scopes = Array.from(row.querySelectorAll("[data-product-line]"));
@@ -214,20 +216,20 @@
 	      };
 	    }
 
-    if (itemType === "service_store_stock") {
-      return {
-        ...base,
-        entry_mode: "service",
+	    if (itemType === "service_store_stock") {
+	      return {
+	        ...base,
+	        entry_mode: "service",
         part_source: "store_stock",
         service: {
           name: valueOf('input[name$="[service][name]"]', row),
           notes: valueOf('textarea[name$="[service][notes]"]', row),
           price_rupiah: numberText(valueOf('input[name$="[service][price_rupiah]"]', row)),
 	        },
-	        selected_label: valueOf("[data-product-search]", row),
-	        product_lines: productLinesFromRow(row),
-	      };
-	    }
+		        selected_label: packageLabelFromRow(row),
+		        product_lines: productLinesFromRow(row),
+		      };
+		    }
 
     if (itemType === "service_external") {
       return {
