@@ -586,6 +586,9 @@ final class EditTransactionWorkspaceRevisionPaymentCharacterizationTest extends 
             (string) $storeStockLine->product_id,
             (int) $storeStockLine->qty,
             (int) $storeStockLine->line_total_rupiah,
+            'open',
+            null,
+            (int) ($serviceDetail->package_profit_rupiah ?? 0),
         );
     }
 
