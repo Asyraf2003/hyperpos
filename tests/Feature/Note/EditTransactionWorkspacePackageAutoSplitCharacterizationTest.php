@@ -327,7 +327,7 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
 
         $response->assertRedirect(route('admin.notes.workspace.edit', ['noteId' => 'note-edit-package-multi-001']));
         $response->assertSessionHasErrors([
-            'workspace' => 'Payload paket servis + produk tidak sesuai template aktif.',
+            'revision' => 'Payload paket servis + produk tidak sesuai template aktif.',
         ]);
 
         $this->assertDatabaseHas('notes', [
