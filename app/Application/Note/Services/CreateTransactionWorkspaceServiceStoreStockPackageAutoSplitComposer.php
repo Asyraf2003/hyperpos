@@ -23,22 +23,18 @@ final class CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitComposer
      */
     public function compose(array $item): array
     {
-        $packageTotal = $this->requiredInt(
-            $item['package_total_rupiah'] ?? null,
-            'Harga paket wajib diisi.'
+        $serviceTotal = $this->requiredInt(
+            $item['service']['price_rupiah'] ?? null,
+            'Harga servis wajib diisi.'
         );
 
         $pricedLines = (new CreateTransactionWorkspaceServiceStoreStockPackageProductLinesComposer($this->products))
             ->compose($item['product_lines'] ?? []);
 
-        $sparepartTotal = $pricedLines['sparepart_total_rupiah'];
-
-        $this->assertPackageCoversSparepart($packageTotal, $sparepartTotal);
-
         if ($this->rules->requiresTemplate($item)) {
-            return $this->composeWithTemplate($item, $pricedLines, $packageTotal, $sparepartTotal);
+            return $this->composeWithTemplate($item, $pricedLines, $serviceTotal);
         }
 
-        return $this->composeWithoutTemplate($item, $pricedLines, $packageTotal, $sparepartTotal);
+        return $this->composeWithoutTemplate($item, $pricedLines, $serviceTotal);
     }
 }

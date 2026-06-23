@@ -26,13 +26,6 @@ trait CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitPayload
         return $value;
     }
 
-    private function assertPackageCoversSparepart(int $packageTotal, int $sparepartTotal): void
-    {
-        if ($packageTotal < $sparepartTotal) {
-            throw new DomainException('Harga paket tidak boleh lebih kecil dari total harga sparepart.');
-        }
-    }
-
     /**
      * @param array<string, mixed> $item
      * @param array<string, mixed> $service

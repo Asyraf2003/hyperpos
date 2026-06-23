@@ -26,6 +26,10 @@ final class CreateTransactionWorkspaceServiceStoreStockPackageProductLinesCompos
             throw new DomainException('Product wajib dipilih.');
         }
 
+        if (count($lines) > 3) {
+            throw new DomainException('Paket servis maksimal memakai 3 produk.');
+        }
+
         CreateTransactionWorkspaceDuplicateProductLineGuard::assertUnique($lines);
 
         $sparepartTotal = 0;

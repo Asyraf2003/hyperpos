@@ -22,7 +22,7 @@ final class StoreTransactionWorkspaceServiceItemValidator
         if (! StoreTransactionWorkspaceServicePriceValidator::isValid($item)) {
             $validator->errors()->add(
                 "items.$index.service.price_rupiah",
-                'Harga servis wajib lebih dari 0 kecuali package service + sparepart.'
+                'Harga servis wajib lebih dari 0.'
             );
         }
 

@@ -16,25 +16,16 @@ trait CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches
     private function composeWithTemplate(
         array $item,
         array $pricedLines,
-        int $packageTotal,
-        int $sparepartTotal
+        int $serviceTotal
     ): array {
-	        $template = $this->rules->activeTemplateForSingleProductLine($pricedLines['product_lines']);
-        $baseServicePrice = $template->defaultServicePriceRupiah;
-        $minimumPackageTotal = $sparepartTotal + $baseServicePrice;
-
-        if ($packageTotal < $minimumPackageTotal) {
-            throw new DomainException('Harga paket tidak boleh membuat harga jasa di bawah default template.');
-        }
-
-        $extra = $packageTotal - $minimumPackageTotal;
-        $serviceExtra = intdiv($extra, 5);
+        $this->rules->activeTemplateForSingleProductLine($pricedLines['product_lines']);
+        [$serviceFee, $packageProfit] = $this->splitServiceTotal($serviceTotal);
         $service = $this->service($item);
 
-        $service['price_rupiah'] = $baseServicePrice + $serviceExtra;
-        $service['package_profit_rupiah'] = $extra - $serviceExtra;
-        $service['package_base_service_price_rupiah'] = $baseServicePrice;
-        $service['package_service_extra_rupiah'] = $serviceExtra;
+        $service['price_rupiah'] = $serviceFee;
+        $service['package_profit_rupiah'] = $packageProfit;
+        $service['package_base_service_price_rupiah'] = $serviceFee;
+        $service['package_service_extra_rupiah'] = 0;
 
         return $this->withServiceAndLines($item, $service, $pricedLines);
     }
@@ -47,25 +38,25 @@ trait CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitBranches
     private function composeWithoutTemplate(
         array $item,
         array $pricedLines,
-        int $packageTotal,
-        int $sparepartTotal
+        int $serviceTotal
     ): array {
-        $servicePrice = $packageTotal - $sparepartTotal;
-        $minimumTemplateServicePrice = $this->rules->minimumTemplateServicePrice(
-            $pricedLines['product_lines'],
-            false
-        );
-
-        if ($minimumTemplateServicePrice > 0 && $servicePrice < $minimumTemplateServicePrice) {
-            throw new DomainException('Harga paket tidak boleh membuat harga jasa di bawah default template.');
-        }
-
+        [$serviceFee, $packageProfit] = $this->splitServiceTotal($serviceTotal);
         $service = $this->service($item);
-        $service['price_rupiah'] = $servicePrice;
-        $service['package_profit_rupiah'] = 0;
+        $service['price_rupiah'] = $serviceFee;
+        $service['package_profit_rupiah'] = $packageProfit;
         $service['package_base_service_price_rupiah'] = null;
         $service['package_service_extra_rupiah'] = 0;
 
         return $this->withServiceAndLines($item, $service, $pricedLines);
+    }
+
+    /**
+     * @return array{0:int,1:int}
+     */
+    private function splitServiceTotal(int $serviceTotal): array
+    {
+        $serviceFee = intdiv($serviceTotal, 5);
+
+        return [$serviceFee, $serviceTotal - $serviceFee];
     }
 }
