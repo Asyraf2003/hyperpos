@@ -6,6 +6,7 @@ namespace Tests\Unit\Application\Note\Services;
 
 use App\Application\Note\Services\CreateTransactionWorkspaceServiceStoreStockPackageProductLinesComposer;
 use App\Core\ProductCatalog\Product\Product;
+use App\Core\Shared\Exceptions\DomainException;
 use App\Core\Shared\ValueObjects\Money;
 use App\Ports\Out\ProductCatalog\ProductReaderPort;
 use PHPUnit\Framework\TestCase;
@@ -63,6 +64,28 @@ final class CreateTransactionWorkspaceServiceStoreStockPackageProductLinesCompos
 
         $this->assertSame(1999998, $result['sparepart_total_rupiah']);
         $this->assertSame(999999, $result['product_lines'][0]['unit_price_rupiah']);
+    }
+
+    public function test_it_rejects_more_than_three_product_lines(): void
+    {
+        $composer = new CreateTransactionWorkspaceServiceStoreStockPackageProductLinesComposer(
+            $this->products([
+                'product-1' => 10000,
+                'product-2' => 10000,
+                'product-3' => 10000,
+                'product-4' => 10000,
+            ])
+        );
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Paket servis maksimal memakai 3 produk.');
+
+        $composer->compose([
+            ['product_id' => 'product-1', 'qty' => 1, 'unit_price_rupiah' => 10000],
+            ['product_id' => 'product-2', 'qty' => 1, 'unit_price_rupiah' => 10000],
+            ['product_id' => 'product-3', 'qty' => 1, 'unit_price_rupiah' => 10000],
+            ['product_id' => 'product-4', 'qty' => 1, 'unit_price_rupiah' => 10000],
+        ]);
     }
 
     /**

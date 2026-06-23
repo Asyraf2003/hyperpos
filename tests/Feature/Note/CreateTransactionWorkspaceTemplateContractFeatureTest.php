@@ -56,8 +56,10 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertOk();
         $response->assertSee('name="items[__INDEX__][pricing_mode]" value="package_auto_split"', false);
         $response->assertSee('data-pricing-mode', false);
-        $response->assertSee('name="items[__INDEX__][package_total_rupiah]"', false);
-        $response->assertSee('Total Paket', false);
+        $response->assertDontSee('name="items[__INDEX__][package_total_rupiah]"', false);
+        $response->assertDontSee('Total Paket', false);
+        $response->assertSee('Harga Servis', false);
+        $response->assertSee('Harga servis otomatis dipecah 20% jasa dan 80% keuntungan paket.', false);
         $response->assertSee('data-product-lines', false);
         $response->assertSee('data-product-line-template', false);
         $response->assertSee('__PRODUCT_INDEX__', false);

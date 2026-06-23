@@ -25,8 +25,8 @@ final class CashierWorkspaceServiceProductTemplateAutofillContractFeatureTest ex
         self::assertStringContainsString('NS.applyServiceProductTemplate = (row, template) =>', $source);
         self::assertStringContainsString('shouldAutofillServiceIdentity', $source);
         self::assertStringContainsString('row.dataset.serviceNameManual !== "1"', $source);
-        self::assertStringContainsString('row.dataset.servicePackageAutofilled === "1" || current <= 0', $source);
-        self::assertStringContainsString('setPackageTotal(row, templatePackageTotal);', $source);
+        self::assertStringContainsString('template.default_service_price_rupiah', $source);
+        self::assertStringContainsString('setDefaultFee(row, servicePrice, true);', $source);
         self::assertStringContainsString('row.dataset.serviceNameManual = "1";', $source);
         self::assertStringContainsString('row.dataset.serviceTemplateAutofilled = "0";', $source);
     }
