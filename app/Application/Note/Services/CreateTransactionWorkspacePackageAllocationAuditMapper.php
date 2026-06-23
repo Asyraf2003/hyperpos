@@ -29,13 +29,15 @@ final class CreateTransactionWorkspacePackageAllocationAuditMapper
         foreach ($workItem->storeStockLines() as $line) {
             $qty = $line->qty();
             $partTotal = $line->lineTotalRupiah()->amount();
+            $serviceTotal = $serviceDetail->totalPriceRupiah()->amount();
             $allocations[] = [
                 'work_item_id' => $workItem->id(),
                 'store_stock_line_id' => $line->id(),
                 'pricing_mode' => 'package_auto_split',
-                'package_total_rupiah' => (int) ($item['package_total_rupiah'] ?? 0),
+                'package_total_rupiah' => $workItem->subtotalRupiah()->amount(),
                 'sparepart_total_rupiah' => $partTotal,
                 'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
+                'service_total_rupiah' => $serviceTotal,
                 'product_id' => $line->productId(),
                 'qty' => $qty,
                 'product_unit_price_rupiah' => intdiv($partTotal, max(1, $qty)),
@@ -47,9 +49,10 @@ final class CreateTransactionWorkspacePackageAllocationAuditMapper
             $allocations[] = [
                 'work_item_id' => $workItem->id(),
                 'pricing_mode' => 'package_auto_split',
-                'package_total_rupiah' => (int) ($item['package_total_rupiah'] ?? 0),
+                'package_total_rupiah' => $workItem->subtotalRupiah()->amount(),
                 'external_total_rupiah' => $line->lineTotalRupiah()->amount(),
                 'service_price_rupiah' => $serviceDetail->servicePriceRupiah()->amount(),
+                'service_total_rupiah' => $serviceDetail->totalPriceRupiah()->amount(),
                 'source' => 'external_purchase',
                 'label' => $this->nullableString($input['label'] ?? null),
                 'qty' => is_int($input['qty'] ?? null) ? $input['qty'] : null,

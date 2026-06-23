@@ -23,7 +23,11 @@ final class StoreTransactionWorkspaceGrandTotalItemCalculator
         }
 
         if (self::usesPackageAutoSplit($item, $partSource)) {
-            return StoreTransactionWorkspaceGrandTotalLineCalculator::intValue($item['package_total_rupiah'] ?? null);
+            $service = is_array($item['service'] ?? null) ? $item['service'] : [];
+            $servicePrice = StoreTransactionWorkspaceGrandTotalLineCalculator::intValue($service['price_rupiah'] ?? null);
+
+            return $servicePrice
+                + StoreTransactionWorkspaceGrandTotalLineCalculator::productLineTotal($item['product_lines'] ?? []);
         }
 
         $service = is_array($item['service'] ?? null) ? $item['service'] : [];
@@ -51,7 +55,6 @@ final class StoreTransactionWorkspaceGrandTotalItemCalculator
             return false;
         }
 
-        return ($item['pricing_mode'] ?? null) === 'package_auto_split'
-            && StoreTransactionWorkspaceGrandTotalLineCalculator::intValue($item['package_total_rupiah'] ?? null) > 0;
+        return ($item['pricing_mode'] ?? null) === 'package_auto_split';
     }
 }
