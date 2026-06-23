@@ -38,7 +38,7 @@ final class StoreServiceProductTemplateController extends Controller
         $servicePrice = $this->serviceDefaultPriceRupiah($serviceCatalogItemId);
         $packageTotal = $this->lineInput->total($lines) + $servicePrice;
 
-        DB::transaction(function () use ($data, $lines, $packageTotal, $servicePrice, $serviceCatalogItemId): void {
+        DB::transaction(function () use ($lines, $packageTotal, $servicePrice, $serviceCatalogItemId): void {
             $templateId = (string) Str::uuid();
 
             DB::table('service_product_templates')->insert([
