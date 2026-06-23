@@ -214,7 +214,8 @@ final class CreateTransactionWorkspaceLineTypeCharacterizationTest extends TestC
         $this->assertDatabaseHas('work_item_service_details', [
             'work_item_id' => $workItemId,
             'service_name' => 'Paket Rem Single',
-            'service_price_rupiah' => 110000,
+            'service_price_rupiah' => 22000,
+            'package_profit_rupiah' => 88000,
         ]);
         $this->assertDatabaseHas('work_item_store_stock_lines', [
             'work_item_id' => $workItemId,
@@ -276,7 +277,8 @@ final class CreateTransactionWorkspaceLineTypeCharacterizationTest extends TestC
         ]);
         $this->assertDatabaseHas('work_item_service_details', [
             'work_item_id' => $workItemId,
-            'service_price_rupiah' => 120000,
+            'service_price_rupiah' => 24000,
+            'package_profit_rupiah' => 96000,
         ]);
         $this->assertDatabaseCount('work_item_store_stock_lines', 2);
         $this->assertDatabaseHas('work_item_store_stock_lines', [
@@ -398,10 +400,10 @@ final class CreateTransactionWorkspaceLineTypeCharacterizationTest extends TestC
         ]);
         $this->assertDatabaseHas('work_item_service_details', [
             'work_item_id' => $workItemId,
-            'service_price_rupiah' => 56000,
-            'package_base_service_price_rupiah' => 50000,
-            'package_service_extra_rupiah' => 6000,
-            'package_profit_rupiah' => 24000,
+            'service_price_rupiah' => 16000,
+            'package_base_service_price_rupiah' => 16000,
+            'package_service_extra_rupiah' => 0,
+            'package_profit_rupiah' => 64000,
         ]);
         $this->assertDatabaseCount('work_item_store_stock_lines', 2);
         $this->assertDatabaseHas('work_item_store_stock_lines', [
