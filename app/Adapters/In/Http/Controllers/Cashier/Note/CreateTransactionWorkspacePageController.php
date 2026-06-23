@@ -22,6 +22,7 @@ final class CreateTransactionWorkspacePageController extends Controller
         $page = $builder->build();
         $defaultCustomerName = (string) $page['defaultCustomerName'];
         $productLookupEndpoint = route('cashier.notes.products.lookup');
+        $packageLookupEndpoint = route('cashier.notes.packages.lookup');
         $serviceLookupEndpoint = route('cashier.notes.services.lookup');
         $serviceStoreEndpoint = route('cashier.notes.services.store');
         $oldIdempotencyKey = $request->old('idempotency_key');
@@ -64,6 +65,7 @@ final class CreateTransactionWorkspacePageController extends Controller
             'oldInlinePayment' => $resolvedInlinePayment,
             'defaultCustomerName' => $defaultCustomerName,
             'productLookupEndpoint' => $productLookupEndpoint,
+            'packageLookupEndpoint' => $packageLookupEndpoint,
             'serviceLookupEndpoint' => $serviceLookupEndpoint,
             'serviceStoreEndpoint' => $serviceStoreEndpoint,
             'idempotencyKey' => $idempotencyKey,

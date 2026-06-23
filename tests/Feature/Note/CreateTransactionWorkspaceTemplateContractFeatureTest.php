@@ -81,4 +81,16 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertSee('data-service-results', false);
         $response->assertSee('data-service-default-fee-rupiah', false);
     }
+
+    public function test_workspace_create_page_embeds_package_lookup_endpoint_contract(): void
+    {
+        $this->loginAsKasir();
+
+        $response = $this->get(route('cashier.notes.workspace.create'));
+
+        $response->assertOk();
+        $response->assertSee('packageLookupEndpoint', false);
+        $response->assertSee('/cashier/notes/packages/lookup', false);
+    }
+
 }

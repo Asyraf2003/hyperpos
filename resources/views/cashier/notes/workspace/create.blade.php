@@ -383,6 +383,7 @@
             'oldInlinePayment' => is_array($oldInlinePayment ?? null) ? $oldInlinePayment : [],
             'defaultCustomerName' => $defaultCustomerName ?? null,
             'productLookupEndpoint' => $productLookupEndpoint ?? null,
+            'packageLookupEndpoint' => $packageLookupEndpoint ?? null,
             'serviceLookupEndpoint' => $serviceLookupEndpoint ?? null,
             'serviceStoreEndpoint' => $serviceStoreEndpoint ?? null,
             'workspaceMode' => $workspaceMode ?? 'create',
