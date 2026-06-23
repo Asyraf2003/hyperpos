@@ -25,6 +25,11 @@ final class StoreTransactionWorkspaceGrandTotalItemCalculator
         if (self::usesPackageAutoSplit($item, $partSource)) {
             $service = is_array($item['service'] ?? null) ? $item['service'] : [];
             $servicePrice = StoreTransactionWorkspaceGrandTotalLineCalculator::intValue($service['price_rupiah'] ?? null);
+            $legacyPackageTotal = StoreTransactionWorkspaceGrandTotalLineCalculator::intValue($item['package_total_rupiah'] ?? null);
+
+            if ($servicePrice <= 0 && $legacyPackageTotal > 0) {
+                return $legacyPackageTotal;
+            }
 
             return $servicePrice
                 + StoreTransactionWorkspaceGrandTotalLineCalculator::productLineTotal($item['product_lines'] ?? []);
