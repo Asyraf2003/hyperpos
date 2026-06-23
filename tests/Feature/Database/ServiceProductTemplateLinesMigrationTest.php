@@ -49,8 +49,6 @@ final class ServiceProductTemplateLinesMigrationTest extends TestCase
                 'nama_barang' => 'Produk Paket Lines ' . $index,
                 'merek' => 'Federal',
                 'harga_jual' => 10000 * $index,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
 
