@@ -53,7 +53,7 @@ final class StoreTransactionWorkspaceProductItemValidator
 
     /**
      * @param mixed $value
-     * @return array<string, mixed>
+     * @return list<array<string, mixed>>
      */
     private static function lines(mixed $value): array
     {
@@ -61,9 +61,25 @@ final class StoreTransactionWorkspaceProductItemValidator
             return [];
         }
 
-        $lines = array_values(array_filter($value, 'is_array'));
+        $lines = [];
 
-        return array_values($lines);
+        foreach ($value as $candidate) {
+            if (! is_array($candidate)) {
+                continue;
+            }
+
+            $line = [];
+
+            foreach ($candidate as $key => $lineValue) {
+                if (is_string($key)) {
+                    $line[$key] = $lineValue;
+                }
+            }
+
+            $lines[] = $line;
+        }
+
+        return $lines;
     }
 
     private static function blank(mixed $value): bool
