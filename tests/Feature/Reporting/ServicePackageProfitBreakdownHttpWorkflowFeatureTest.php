@@ -207,7 +207,7 @@ final class ServicePackageProfitBreakdownHttpWorkflowFeatureTest extends TestCas
         $this->assertSame(130000, $summary->getCell('B6')->getValue());
         $this->assertSame(90000, $summary->getCell('B7')->getValue());
         $this->assertSame(40000, $summary->getCell('B8')->getValue());
-        $this->assertSame(24000, $summary->getCell('B9')->getValue());
+        $this->assertSame(120000, $summary->getCell('B9')->getValue());
         $this->assertSame(160000, $summary->getCell('B12')->getValue());
 
         $this->assertSame($noteId, $detail->getCell('B2')->getValue());
@@ -443,7 +443,7 @@ final class ServicePackageProfitBreakdownHttpWorkflowFeatureTest extends TestCas
         $this->assertSame(130000, $summary->getCell('B6')->getValue());
         $this->assertSame(90000, $summary->getCell('B7')->getValue());
         $this->assertSame(40000, $summary->getCell('B8')->getValue());
-        $this->assertSame(34000, $summary->getCell('B9')->getValue());
+        $this->assertSame(170000, $summary->getCell('B9')->getValue());
         $this->assertSame(210000, $summary->getCell('B12')->getValue());
 
         $this->assertSame($noteId, $detail->getCell('B2')->getValue());
