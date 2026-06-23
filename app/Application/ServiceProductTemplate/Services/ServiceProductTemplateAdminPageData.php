@@ -11,8 +11,10 @@ final class ServiceProductTemplateAdminPageData
     use ServiceProductTemplateAdminProductOptions;
     use ServiceProductTemplateAdminServiceOptions;
 
-    public function __construct(private readonly ServiceProductTemplatePackageSplitCalculator $split)
-    {
+    public function __construct(
+        private readonly ServiceProductTemplatePackageSplitCalculator $split,
+        private readonly ServiceProductTemplateAdminLineRows $lines,
+    ) {
     }
 
     /** @return list<array<string, mixed>> */
@@ -84,6 +86,7 @@ final class ServiceProductTemplateAdminPageData
             'default_package_total_rupiah' => $this->nullableInt($row->default_package_total_rupiah),
             'is_active' => (bool) $row->is_active,
             'sort_order' => (int) $row->sort_order,
+            'product_lines' => $this->lines->forTemplate((string) $row->id, (string) $row->product_id),
         ] + $split;
     }
 
