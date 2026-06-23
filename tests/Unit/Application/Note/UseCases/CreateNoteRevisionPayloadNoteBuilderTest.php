@@ -166,6 +166,11 @@ final class CreateNoteRevisionPayloadNoteBuilderTest extends TestCase
                 return null;
             }
 
+            public function findActivePackageByProductId(string $productId): ?\App\Application\ServiceProductTemplate\DTO\ServiceProductTemplatePackageLookupRow
+            {
+                return null;
+            }
+
             public function searchActivePackages(
                 string $query,
                 int $limit = ServiceProductTemplateLookupReaderPort::DEFAULT_PACKAGE_LIMIT,
