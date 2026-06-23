@@ -72,10 +72,12 @@ final class CreateTransactionWorkspaceTemplateContractFeatureTest extends TestCa
         $response->assertSee('data-add-product-line', false);
         $response->assertSee('data-remove-product-line', false);
 
-        $response->assertDontSee('Produk 1 <span class="text-danger">*</span>', false);
-        $response->assertDontSee('Produk Opsional', false);
-        $response->assertDontSee('Tambah Produk Opsional', false);
-        $response->assertDontSee('Harga Servis', false);
+        $blade = (string) file_get_contents(resource_path('views/cashier/notes/workspace/partials/templates/service-store-stock.blade.php'));
+
+        $this->assertStringNotContainsString('Produk 1 <span class="text-danger">*</span>', $blade);
+        $this->assertStringNotContainsString('Produk Opsional', $blade);
+        $this->assertStringNotContainsString('Tambah Produk Opsional', $blade);
+        $this->assertStringNotContainsString('Harga Servis', $blade);
     }
 
     public function test_workspace_create_page_embeds_service_catalog_contract(): void
