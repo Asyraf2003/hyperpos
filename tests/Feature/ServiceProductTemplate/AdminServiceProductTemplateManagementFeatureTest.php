@@ -202,6 +202,63 @@ final class AdminServiceProductTemplateManagementFeatureTest extends TestCase
         ]);
     }
 
+    public function test_admin_cannot_reactivate_template_when_product_is_deleted_or_service_is_inactive(): void
+    {
+        $admin = $this->user('admin');
+
+        $this->seedProduct('product-admin-template-stale-product', 'SPT-ADM-STALE-PROD', 'Produk Stale Template', 100000);
+        $this->seedProduct('product-admin-template-stale-service', 'SPT-ADM-STALE-SVC', 'Produk Stale Service Template', 100000);
+        $this->seedService('service-admin-template-stale-product', 'Jasa Stale Product Template', true);
+        $this->seedService('service-admin-template-stale-service', 'Jasa Stale Service Template', true);
+
+        $this->insertTemplate(
+            id: 'template-admin-inactive-stale-product',
+            productId: 'product-admin-template-stale-product',
+            serviceId: 'service-admin-template-stale-product',
+            isActive: false,
+        );
+
+        $this->insertTemplate(
+            id: 'template-admin-inactive-stale-service',
+            productId: 'product-admin-template-stale-service',
+            serviceId: 'service-admin-template-stale-service',
+            isActive: false,
+        );
+
+        DB::table('products')
+            ->where('id', 'product-admin-template-stale-product')
+            ->update(['deleted_at' => now()]);
+
+        DB::table('service_catalog_items')
+            ->where('id', 'service-admin-template-stale-service')
+            ->update(['is_active' => false]);
+
+        $staleProductResponse = $this->actingAs($admin)
+            ->from(route('admin.service-product-templates.index'))
+            ->patch(route('admin.service-product-templates.reactivate', ['templateId' => 'template-admin-inactive-stale-product']));
+
+        $staleProductResponse->assertRedirect(route('admin.service-product-templates.index'));
+        $staleProductResponse->assertSessionHasErrors('product_id');
+
+        $this->assertDatabaseHas('service_product_templates', [
+            'id' => 'template-admin-inactive-stale-product',
+            'is_active' => false,
+        ]);
+
+        $staleServiceResponse = $this->actingAs($admin)
+            ->from(route('admin.service-product-templates.index'))
+            ->patch(route('admin.service-product-templates.reactivate', ['templateId' => 'template-admin-inactive-stale-service']));
+
+        $staleServiceResponse->assertRedirect(route('admin.service-product-templates.index'));
+        $staleServiceResponse->assertSessionHasErrors('service_catalog_item_id');
+
+        $this->assertDatabaseHas('service_product_templates', [
+            'id' => 'template-admin-inactive-stale-service',
+            'is_active' => false,
+        ]);
+    }
+
+
     public function test_admin_validation_rejects_missing_product_and_service(): void
     {
         $admin = $this->user('admin');

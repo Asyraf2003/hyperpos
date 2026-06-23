@@ -22,6 +22,26 @@ final class ReactivateServiceProductTemplateController extends Controller
                 ->with('error', 'Service tidak ditemukan.');
         }
 
+        $productExists = DB::table('products')
+            ->where('id', (string) $template->product_id)
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if (! $productExists) {
+            return back()
+                ->withErrors(['product_id' => 'Produk 1 template sudah tidak tersedia.']);
+        }
+
+        $serviceIsActive = DB::table('service_catalog_items')
+            ->where('id', (string) $template->service_catalog_item_id)
+            ->where('is_active', true)
+            ->exists();
+
+        if (! $serviceIsActive) {
+            return back()
+                ->withErrors(['service_catalog_item_id' => 'Jasa template sudah tidak aktif.']);
+        }
+
         $activeTemplateExists = DB::table('service_product_templates')
             ->where('product_id', (string) $template->product_id)
             ->where('service_catalog_item_id', (string) $template->service_catalog_item_id)
