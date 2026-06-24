@@ -244,3 +244,151 @@ Next audit step should read source around:
 - `ServicePackageProfitBreakdownQuery`
 
 No patch before characterization test exists.
+
+## Slice 2 Forensic Source Discovery - Payment Allocator Candidate
+
+### FACT
+
+Source discovery mengarah ke write-side payment allocation, bukan reporting layer.
+
+Kandidat utama:
+
+- `app/Application/Payment/Services/AllocatePaymentAcrossComponents.php`
+- `app/Application/Payment/Services/ExistingPaymentComponentTotals.php`
+- `app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceInlinePaymentRecorder.php`
+
+`RecordAndAllocateNotePaymentOperation` membuat payment baru melalui flow:
+
+1. Lock note via `getByIdForUpdate`.
+2. Hitung `grossAllocatedByNote`.
+3. Hitung `refundedByNote`.
+4. Hitung `netAllocatedByNote = grossAllocated - refunded`.
+5. Resolve payable components.
+6. Panggil `AllocatePaymentAcrossComponents::allocate`.
+7. Baru tulis `customer_payments`.
+8. Baru tulis `payment_component_allocations`.
+
+Implikasi: guard paling aman diletakkan sebelum writer dipanggil, supaya silent pay-again gagal sebagai `Result::failure()` dan tidak membuat payment/allocation baru.
+
+### DATA FOUND
+
+`AllocatePaymentAcrossComponents` saat ini membaca existing component total lewat:
+
+```php
+$existing = ExistingPaymentComponentTotals::build($this->existingAllocations, $noteId, $this->refunds);
+```
+
+Lalu untuk setiap component:
+
+```php
+$key = ExistingPaymentComponentTotals::key($component->componentType(), $component->componentRefId());
+$already = $existing[$key] ?? 0;
+$available = max($component->amountRupiah()->amount() - $already, 0);
+```
+
+`ExistingPaymentComponentTotals` mengurangi allocated component total dengan refund component total:
+
+```php
+$totals[$key] = max(($totals[$key] ?? 0) - $refund->refundedAmountRupiah()->amount(), 0);
+```
+
+Ini membuka kembali allocation room untuk semua refunded component.
+
+Untuk component biasa, perilaku ini masih masuk akal karena refund memang membuka outstanding ulang.
+
+Untuk inventory-backed service package stock component, perilaku ini berbahaya karena component `service_store_stock_part` memakai `component_ref_id` berupa `work_item_store_stock_lines.id`, dan refund sudah membalik inventory lewat movement reversal.
+
+Tipe component yang relevan:
+
+```php
+PaymentComponentType::SERVICE_STORE_STOCK_PART
+```
+
+Inventory reversal sudah bisa dibaca lewat existing port:
+
+```php
+InventoryMovementReaderPort::getBySource(string $sourceType, string $sourceId): array
+```
+
+Dengan source:
+
+```text
+source_type = work_item_store_stock_line_reversal
+source_id   = component_ref_id
+```
+
+Binding port inventory reader juga sudah tersedia di `InventoryServiceProvider`, sehingga tidak perlu query DB langsung dari payment service.
+
+### ROOT CAUSE
+
+Akar kandidat yang sudah terkonfirmasi secara source:
+
+`ExistingPaymentComponentTotals` membuka kembali ruang payment allocation untuk refunded component tanpa membedakan component yang inventory-backed dan sudah memiliki stock reversal.
+
+Akibatnya `AllocatePaymentAcrossComponents` dapat melihat `service_store_stock_part` yang sudah refund sebagai available lagi, lalu membuat `payment_component_allocations` baru tanpa ada deliberate new `stock_out`.
+
+Inilah penyebab write-side mismatch:
+
+- Cash/payment naik lagi.
+- Payment allocation baru tercatat.
+- Inventory tetap net zero karena `stock_out` lama sudah dibalik reversal.
+- Report kemudian terlihat ngawur karena membaca state yang memang sudah tidak konsisten.
+
+Report bukan akar masalah. Report hanya memperlihatkan state busuk yang dibuat write-side. Komputer tidak sedang kerasukan, cuma terlalu patuh.
+
+### PATCH DESIGN
+
+Patch produksi yang disarankan untuk slice berikutnya:
+
+1. Inject `InventoryMovementReaderPort` ke `AllocatePaymentAcrossComponents`.
+2. Saat iterasi payable component, deteksi component:
+   - `component_type === PaymentComponentType::SERVICE_STORE_STOCK_PART`
+   - sudah punya refunded component amount `> 0`
+   - sudah punya inventory movement:
+     - `source_type = work_item_store_stock_line_reversal`
+     - `source_id = component_ref_id`
+3. Component tersebut tidak boleh dialokasikan ulang secara silent.
+4. Jika semua target component blocked, allocator tetap throw existing domain failure:
+   - `Tidak ada komponen note yang bisa dialokasikan untuk payment ini.`
+   - atau `Payment tidak bisa dialokasikan penuh ke komponen note.`
+5. Handler akan classify `DomainException` menjadi `Result::failure()`, sehingga matrix test cukup assert `isFailure()`.
+
+Patch ini akan melindungi dua flow sekaligus karena sama-sama memakai allocator yang sama:
+
+- Normal note payment via `RecordAndAllocateNotePaymentOperation`.
+- Inline payment create workspace via `CreateTransactionWorkspaceInlinePaymentRecorder`.
+
+### TEST IMPACT
+
+Unit test berikut instantiate allocator secara manual dan harus ikut disesuaikan dengan fake `InventoryMovementReaderPort`:
+
+- `tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php`
+
+Target verification setelah patch:
+
+```bash
+php -l app/Application/Payment/Services/AllocatePaymentAcrossComponents.php
+php -l tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php
+php artisan test tests/Unit/Application/Payment/Services/AllocatePaymentAcrossComponentsTest.php
+php artisan test tests/Feature/Payment/ServicePackageComponentRefundPayAgainMatrixTest.php
+```
+
+Expected:
+
+- Unit allocator tetap PASS.
+- Matrix test `ServicePackageComponentRefundPayAgainMatrixTest` berubah dari RED business menjadi PASS.
+- Tidak ada `customer_payments` baru untuk refunded reversed stock component.
+- Tidak ada `payment_component_allocations` baru untuk refunded reversed stock component.
+- Tidak ada inventory `stock_out` baru yang diam-diam dibuat.
+- Net inventory component yang sudah refund tetap zero.
+
+### PROOF
+
+Slice 2 source discovery menyimpulkan patch tidak boleh dimulai dari report.
+
+Guard harus berada di write-side allocation path sebelum `customer_payments` dan `payment_component_allocations` ditulis.
+
+Final target invariant:
+
+`service_store_stock_part` yang sudah refunded dan sudah punya `work_item_store_stock_line_reversal` tidak boleh menerima payment allocation ulang kecuali ada deliberate new stock-out/reissue flow.
