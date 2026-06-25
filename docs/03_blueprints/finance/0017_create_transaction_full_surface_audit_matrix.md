@@ -555,8 +555,22 @@ Status: PENDING BROWSER.
     - package search term: `Pasang Stang` or `Barang Demo YEAR 005`
   - Current local DB has enough data for service-store-stock package create QA.
 
+### 2026-06-25 22:12 - Manual Browser QA Checklist Prepared
+
+- Doc update executed:
+  - Added `CURRENT MANUAL BROWSER QA CHECKLIST` with cases C1-C7.
+- Current server state:
+  - Laravel dev server was started through escalated `php artisan serve` and reported running at `http://127.0.0.1:8001`.
+- Current limitation:
+  - No CLI browser/headless runner is installed or available in `PATH`.
+  - Automated real-browser proof is therefore not produced in this session.
+- Current conclusion:
+  - Create path is automated-test GREEN and local server/data are ready.
+  - Browser/manual create QA is now the active pending proof.
+  - Do not move to edit/refund until C1-C7 are either executed or explicitly deferred by owner.
+
 ## PROGRESS
 
-Create path progress: 35%.
+Create path progress: 45%.
 
-Reason: source map, automated coverage matrix, and targeted create test subset are complete, but real browser/manual proof is still absent.
+Reason: source map, automated coverage matrix, targeted create test subset, local server readiness, local DB QA data discovery, and current manual checklist are complete. Real browser/manual proof is still absent.
