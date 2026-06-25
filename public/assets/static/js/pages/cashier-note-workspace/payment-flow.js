@@ -287,7 +287,33 @@
 	    return null;
   };
 
+  const transactionTotalIssue = () => {
+    const rows = currentRows();
+
+    if (!rows.length) {
+      return {
+        message: "Tambahkan minimal satu rincian nota sebelum proses nota.",
+        target: byId("workspace-add-button"),
+      };
+    }
+
+    if (grandTotal() <= 0) {
+      return {
+        message: "Total nota harus lebih besar dari 0 sebelum proses nota.",
+        target: NS.firstFieldForRow?.(rows[0]?.row),
+      };
+    }
+
+    return null;
+  };
+
   const firstWorkspaceValidationIssue = () => {
+    const totalIssue = transactionTotalIssue();
+
+    if (totalIssue) {
+      return totalIssue;
+    }
+
     for (const row of document.querySelectorAll("[data-line-item]")) {
       if (!(row instanceof HTMLElement)) {
         continue;
@@ -383,14 +409,31 @@
     setHtml("workspace-payment-line-summary", html);
   };
 
-  const syncChoiceButtons = () => {
+  const paymentChoiceDisabled = (choice, total) => {
+    const baseInvalid = total <= 0;
+
+    if (choice === "skip") {
+      return baseInvalid;
+    }
+
+    if (["full", "partial"].includes(choice)) {
+      return baseInvalid || effectivePaymentTotal(total) <= 0;
+    }
+
+    return true;
+  };
+
+  const syncChoiceButtons = (total = grandTotal()) => {
     choiceButtons().forEach((button) => {
       const active = button.dataset.paymentChoice === NS.paymentState.mode;
+      const disabled = paymentChoiceDisabled(button.dataset.paymentChoice || "", total);
 
       button.classList.toggle("btn-primary", active);
       button.classList.toggle("text-white", active);
       button.classList.toggle("btn-outline-secondary", !active);
       button.classList.toggle("shadow-sm", active);
+      button.disabled = disabled;
+      button.setAttribute("aria-disabled", disabled ? "true" : "false");
     });
   };
 
