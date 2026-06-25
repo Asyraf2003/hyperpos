@@ -569,6 +569,20 @@ Status: PENDING BROWSER.
   - Browser/manual create QA is now the active pending proof.
   - Do not move to edit/refund until C1-C7 are either executed or explicitly deferred by owner.
 
+### 2026-06-26 00:00 - Owner Clarification: Brave Manual UI + Static Blade/JS Consistency
+
+- Owner clarification:
+  - Browser used by owner/operator is Brave.
+  - Automated browser proof is not required from this environment right now.
+  - UI checks should be recorded, but implementation focus should be strict Blade/JS consistency with backend logic.
+  - Example rule: if a note/payment state should not be payable anymore, UI must not offer a misleading pay-off path.
+- Active step adjusted:
+  - Continue with static Blade/JS payment strictness audit for workspace UI.
+  - Keep real Brave click-through as manual checklist/proof, not as blocker for static audit.
+- Current conclusion:
+  - Do not claim Brave/browser proof from this session.
+  - Use source-level Blade/JS proof to verify UI affordances match backend settlement/payment logic.
+
 ## PROGRESS
 
 Create path progress: 45%.
