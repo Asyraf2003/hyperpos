@@ -763,6 +763,11 @@
 
     const choiceButton = event.target.closest("[data-payment-choice]");
     if (choiceButton) {
+      if (choiceButton.disabled) {
+        event.preventDefault();
+        return;
+      }
+
       applyMode(choiceButton.dataset.paymentChoice || "");
       return;
     }
