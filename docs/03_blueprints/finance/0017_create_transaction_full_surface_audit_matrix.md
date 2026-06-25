@@ -141,6 +141,9 @@ Create Transaction Full Surface Audit - Source Map + Test Matrix.
 
 ## PROOF
 
+- Targeted create verification:
+  - Command: `php artisan test tests/Feature/Note/CreateTransactionWorkspaceLineTypeCharacterizationTest.php tests/Feature/Note/CreateTransactionWorkspaceServiceStoreStockFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceServiceExternalPurchaseFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceInlinePaymentLifecycleFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceDuplicateSubmitFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceRollbackFeatureTest.php tests/Feature/Note/CreateTransactionWorkspaceTemplateContractFeatureTest.php tests/Feature/Note/CashierWorkspaceServiceProductTemplateMinimumContractFeatureTest.php tests/Feature/Note/CashierWorkspaceServiceProductTemplateAutofillContractFeatureTest.php tests/Feature/Reporting/PackageAutoSplitCreateReportImpactFeatureTest.php tests/Unit/Adapters/In/Http/Requests/Note/StoreTransactionWorkspacePaymentValidatorTest.php tests/Unit/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageProductLinesComposerTest.php`
+  - Result: PASS, 47 passed, 478 assertions, duration 9.18s.
 - Source files read in this session:
   - `routes/web/note.php`
   - `resources/views/cashier/notes/workspace/create.blade.php`
