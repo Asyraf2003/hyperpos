@@ -36,7 +36,7 @@ final class CashierWorkspaceServiceProductTemplateMinimumContractFeatureTest ext
         $this->assertStringContainsString('data-package-selected-section', $blade);
         $this->assertStringContainsString('data-service-price-raw', $blade);
         $this->assertStringContainsString('data-product-lines', $blade);
-        $this->assertStringContainsString('data-add-product-line', $blade);
+        $this->assertStringNotContainsString('data-add-product-line', $blade);
         $this->assertStringNotContainsString('Nama Paket/Jasa dari Template', $blade);
         $this->assertStringNotContainsString('Tambah Produk Opsional', $blade);
         $this->assertStringNotContainsString('Sok Kopling Besar', $blade);
