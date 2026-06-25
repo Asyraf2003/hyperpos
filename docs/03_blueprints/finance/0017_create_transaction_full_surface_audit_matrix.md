@@ -1,6 +1,6 @@
 # Create Transaction Full Surface Audit Matrix
 
-Status: Source map and test matrix complete. No runtime patch yet.
+Status: Source map, test matrix, and targeted automated verification complete. No runtime patch yet.
 Date: 2026-06-25
 Scope: Create transaction workspace only. Edit, refund, and reports are downstream scopes.
 
@@ -133,7 +133,7 @@ Scope: Create transaction workspace only. Edit, refund, and reports are downstre
 
 - Do not patch runtime create code until a concrete create-path defect is reproduced.
 - Treat create transaction as automated-green but browser-unverified.
-- Continue with one active create step next: execute targeted create test subset and then run browser/manual create scenarios.
+- Continue with one active create step next: run browser/manual create scenarios against local DB and compare UI, DB, stock, payment, and projection results.
 
 ## ACTIVE STEP
 
@@ -174,7 +174,7 @@ Create Transaction Full Surface Audit - Source Map + Test Matrix.
 
 ## NEXT
 
-Run targeted create test subset, then execute browser/manual create scenarios:
+Execute browser/manual create scenarios:
 
 1. create service only: skip, full cash, partial cash, full transfer, partial transfer.
 2. create product only: stock valid, stock over limit, cash/transfer.
@@ -185,6 +185,6 @@ Run targeted create test subset, then execute browser/manual create scenarios:
 
 ## PROGRESS
 
-Create path progress: 25%.
+Create path progress: 35%.
 
-Reason: source map and automated coverage matrix are complete, but real browser/manual proof is still absent.
+Reason: source map, automated coverage matrix, and targeted create test subset are complete, but real browser/manual proof is still absent.
