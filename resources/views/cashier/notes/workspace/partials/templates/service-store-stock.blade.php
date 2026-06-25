@@ -71,6 +71,8 @@
                 <small class="text-muted d-none" data-min-price-text>Harga produk mengikuti katalog.</small>
             </div>
 
+            <button type="button" class="d-none" data-add-product-line>Tambah Produk</button>
+
             <template data-product-line-template>
                 <div data-product-line>
                     <input type="hidden" name="items[__INDEX__][product_lines][__PRODUCT_INDEX__][product_id]" value="" data-product-id>
