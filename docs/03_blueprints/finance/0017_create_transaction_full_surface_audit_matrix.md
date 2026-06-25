@@ -612,6 +612,27 @@ Status: PENDING BROWSER.
 - Decision:
   - Patch UI strictness so non-payable payment choices cannot be selected when payable is zero, and empty/zero-total create path shows a client validation error before modal.
 
+### 2026-06-26 00:14 - Workspace Payment UI Strictness Patch
+
+- Files patched:
+  - `public/assets/static/js/pages/cashier-note-workspace/payment-flow.js`
+  - `tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php`
+- Patch summary:
+  - Added `paymentChoiceDisabled(choice, total)` so `Bayar Penuh` and `Bayar Sebagian` are disabled when effective payable is `0`.
+  - Added `resetUnavailablePaymentMode(total)` so an unavailable full/partial mode cannot stay visually active; hidden payment decision resets to `skip`.
+  - Added disabled-choice click guard before `applyMode`.
+  - Added `transactionTotalIssue()` so empty workspace or zero-total workspace shows client validation before opening payment modal.
+  - Added focused static contract test for these payment UI strictness markers.
+- Proof commands:
+  - `node --check public/assets/static/js/pages/cashier-note-workspace/payment-flow.js`
+  - `php artisan test tests/Feature/Note/CashierWorkspacePaymentFlowJavascriptContractTest.php`
+- Proof result:
+  - `node --check` exited `0`.
+  - Payment flow JS contract test: PASS, 3 passed, 17 assertions, duration 0.38s.
+- Current conclusion:
+  - Workspace payment UI is now stricter at Blade/JS layer for no-payable and empty/zero-total cases.
+  - Backend remains the source of truth and still rejects invalid payment attempts.
+
 ## PROGRESS
 
 Create path progress: 45%.
