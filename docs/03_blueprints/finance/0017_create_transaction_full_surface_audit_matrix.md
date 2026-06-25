@@ -347,6 +347,21 @@ Execute browser/manual create scenarios:
   - Local browser QA should have product stock if create-only master/inventory seeders were run.
   - Next check: read `CreateOnlyMasterSeeder` and service product template seed paths narrowly.
 
+### 2026-06-25 22:02 - Seed Master Helper Read
+
+- Commands executed:
+  - `sed -n '1,240p' database/seeders/CreateOnly/Support/CreateOnlyMasterSeeder.php`
+  - `sed -n '240,520p' database/seeders/CreateOnly/Support/CreateOnlyMasterSeeder.php`
+  - `rg -n "service_product_templates|service_product_template_lines|seedServiceProduct|service product template|default_package_total_rupiah" database/seeders database/migrations tests/Feature/ServiceProductTemplate tests/Feature/Note`
+- Observed result:
+  - Product seed names are `Barang Demo BASIC 001..010`, with prices `15000 + (i * 2500)`.
+  - Service catalog defaults include `Sok Kopling (Besar)`, `Sok Kopling (Kecil)`, `Setting In/Ex`, `Bosklep`, and `Pasang Stang`.
+  - No create-only seeder for active service-product package templates was found in the inspected master helper.
+- Current conclusion:
+  - Products and service catalog are likely available after create-only seeding.
+  - Current service-store-stock package lookup may require admin-created template rows in the local DB.
+  - Next check: read actual local DB counts/rows before deciding manual QA data setup.
+
 ## PROGRESS
 
 Create path progress: 35%.
