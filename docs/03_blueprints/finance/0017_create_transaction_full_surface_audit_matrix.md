@@ -183,6 +183,160 @@ Execute browser/manual create scenarios:
 5. delete all lines before submit: UI should show empty state and backend should reject `items` with no financial rows.
 6. duplicate submit/reload/back-submit: no duplicate note/payment/stock rows.
 
+## CURRENT MANUAL BROWSER QA CHECKLIST
+
+Runtime:
+
+- URL: `http://127.0.0.1:8001`
+- Login: `kasir@gmail.com` / `12345678`
+- Create page: `/cashier/notes/workspace/create`
+- Known active package term: `Pasang Stang` or `Barang Demo YEAR 005`
+- Expected active package values:
+  - service: `Pasang Stang (Kecil)`
+  - product: `Barang Demo YEAR 005`
+  - package total: `205000`
+  - service price: `50000`
+  - product stock before manual QA sample: `10`
+
+### Case C1 - Service Only, Save Without Payment
+
+Steps:
+
+1. Login as cashier.
+2. Open create workspace.
+3. Add `Servis`.
+4. Fill service name `QA Service Only`.
+5. Fill service price `85.000`.
+6. Process note.
+7. Choose save without payment.
+
+Expected:
+
+- UI allows submit.
+- Note total is `85000`.
+- No `customer_payments` row for the note.
+- No inventory movement for the note.
+- Note remains open/outstanding.
+
+Status: PENDING BROWSER.
+
+### Case C2 - Product Only, Full Cash
+
+Steps:
+
+1. Add `Produk`.
+2. Search/select product with stock, prefer `Barang Demo YEAR 005`.
+3. Qty `1`.
+4. Process note.
+5. Choose full payment, cash.
+6. Enter received cash greater than or equal to total.
+7. Submit.
+
+Expected:
+
+- UI shows total equal to product unit price.
+- Cash submit is disabled until received cash covers payable amount.
+- DB creates note, one store-stock work item line, one `stock_out` inventory movement, one cash payment, cash detail, and payment component allocation.
+
+Status: PENDING BROWSER.
+
+### Case C3 - Service Store-Stock Package, Full Transfer
+
+Steps:
+
+1. Add `Servis + Sparepart Toko`.
+2. Search package using `Pasang Stang` or `Barang Demo YEAR 005`.
+3. Select the active package.
+4. Confirm selected package section appears.
+5. Process note.
+6. Choose full payment, transfer.
+7. Submit.
+
+Expected:
+
+- UI package row is hydrated from active template.
+- Total shown is `205000`.
+- DB note total is `205000`.
+- DB service detail price is `50000`.
+- DB store-stock line uses `Barang Demo YEAR 005`.
+- Inventory decreases by package line qty.
+- Transfer payment has no cash detail.
+
+Status: PENDING BROWSER.
+
+### Case C4 - Service Store-Stock Package, Partial Cash Default
+
+Steps:
+
+1. Add/select the same active package.
+2. Process note.
+3. Choose partial payment.
+4. Confirm partial amount defaults to product component amount when applicable.
+5. Choose cash.
+6. Enter received cash equal to or greater than partial amount.
+7. Submit.
+
+Expected:
+
+- Partial amount is greater than zero and less than `205000`.
+- Cash received must cover the partial amount.
+- Note remains open.
+- Cash detail records received/change.
+- Payment allocation is component-consistent.
+
+Status: PENDING BROWSER.
+
+### Case C5 - Service External Purchase, Save Without Payment
+
+Steps:
+
+1. Add `Servis + Pembelian Luar`.
+2. Fill service name `QA External`.
+3. Fill service price `80.000`.
+4. Fill external label `Part Luar QA`.
+5. Fill total biaya keluar `120.000`.
+6. Save without payment.
+
+Expected:
+
+- UI total is `200000`.
+- DB creates service external work item and external purchase line.
+- No inventory movement.
+- No payment row.
+
+Status: PENDING BROWSER.
+
+### Case C6 - Delete All Lines Before Submit
+
+Steps:
+
+1. Add any line.
+2. Delete the line.
+3. Confirm empty state appears.
+4. Open/process payment or submit path if reachable.
+
+Expected:
+
+- UI shows empty state.
+- Backend rejects empty `items` if form submission occurs.
+- No note, payment, or inventory side effect is created.
+
+Status: PENDING BROWSER.
+
+### Case C7 - Duplicate Submit
+
+Steps:
+
+1. Create a valid small service-only note.
+2. Attempt double-click submit or browser back/re-submit on same form.
+
+Expected:
+
+- No duplicate note/payment/inventory rows for same idempotency key and payload.
+- If payload differs with same key, backend rejects second create.
+
+Status: PENDING BROWSER.
+
 ## SESSION CONTINUITY LOG
 
 ### 2026-06-25 21:31 - Active Step Opened
