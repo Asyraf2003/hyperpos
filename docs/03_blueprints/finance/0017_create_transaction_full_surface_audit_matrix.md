@@ -278,6 +278,21 @@ Execute browser/manual create scenarios:
   - Browser/manual QA can use `http://127.0.0.1:8001`.
   - Next check: determine whether a local headless browser binary exists, because the repo itself has no Playwright/Dusk/Cypress dependency.
 
+### 2026-06-25 21:49 - Local Browser Binary Check
+
+- Commands executed:
+  - `which chromium`
+  - `which chromium-browser`
+  - `which google-chrome`
+  - `which firefox`
+  - `which playwright`
+- Observed result:
+  - None of those commands found a browser/headless runner in `PATH`.
+- Current conclusion:
+  - This session cannot produce automated real-browser click/type/modal proof without installing additional tooling.
+  - Server proof and manual browser proof must be separated clearly.
+  - Manual browser URL for owner/operator: `http://127.0.0.1:8001`.
+
 ## PROGRESS
 
 Create path progress: 35%.
