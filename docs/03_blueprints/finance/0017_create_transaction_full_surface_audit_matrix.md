@@ -258,6 +258,16 @@ Execute browser/manual create scenarios:
   - Port 8000 is unavailable in this session.
   - Next attempt uses port 8001.
 
+### 2026-06-25 21:45 - Local Server Start Attempt 2
+
+- Command executed:
+  - `php artisan serve --host=127.0.0.1 --port=8001`
+- Observed result:
+  - Failed with: `Failed to listen on 127.0.0.1:8001`.
+- Current conclusion:
+  - Two local bind attempts failed inside the sandbox.
+  - Next attempt requires escalated execution for `php artisan serve` so browser/manual QA can use a local URL.
+
 ## PROGRESS
 
 Create path progress: 35%.
