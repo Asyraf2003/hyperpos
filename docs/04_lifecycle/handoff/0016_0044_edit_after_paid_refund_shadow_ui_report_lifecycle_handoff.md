@@ -48,22 +48,22 @@ Slice 0 - Structure, Source Map, and Guardrail.
 
 ### Slice 0 - Structure / Source Map
 
-- [ ] Active edit routes mapped.
-- [ ] Active refund routes mapped.
-- [ ] Active payment routes mapped.
-- [ ] Note detail UI data source mapped.
-- [ ] UI action flag builders mapped.
-- [ ] Note revision services mapped.
-- [ ] Payment allocation services mapped.
-- [ ] Refund allocation services mapped.
-- [ ] Inventory movement services mapped.
-- [ ] Note history projection mapped.
-- [ ] Surplus/refund_due/refund_paid records mapped.
-- [ ] Transaction report dataset mapped.
-- [ ] Excel export path mapped.
-- [ ] PDF export path mapped.
-- [ ] Dead/unproven paths listed.
-- [ ] First characterization test selected.
+- [x] Active edit routes mapped.
+- [x] Active refund routes mapped.
+- [x] Active payment routes mapped.
+- [x] Note detail UI data source mapped.
+- [x] UI action flag builders mapped.
+- [x] Note revision services mapped.
+- [x] Payment allocation services mapped.
+- [x] Refund allocation services mapped.
+- [x] Inventory movement services mapped.
+- [x] Note history projection mapped.
+- [x] Surplus/refund_due/refund_paid records mapped.
+- [x] Transaction report dataset mapped.
+- [x] Excel export path mapped.
+- [x] PDF export path mapped.
+- [x] Dead/unproven paths listed.
+- [x] First characterization test selected.
 - [x] No production code patch made.
 
 ### Slice 1 - Edit After Unpaid/Paid
@@ -296,3 +296,224 @@ Meaning:
 #### Next Allowed Step
 
 - Slice 0 source-map only.
+
+
+### Session Update - 2026-06-25 18:26 WITA - Slice 0 Source Map Completion
+
+#### Slice
+
+- Active slice: Slice 0 - Structure, Source Map, and Guardrail.
+- Status: source-map documented, dead/unproven paths listed, first characterization test selected.
+- Production code patch: none.
+
+#### Files Read
+
+- `docs/04_lifecycle/error_log/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_gap.md`
+- `docs/04_lifecycle/workflow/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_workflow.md`
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+- `docs/01_standards/architecture/0044_audit_and_dod.md`
+- `docs/03_blueprints/db/0016_edit_refund_readiness_analysis.md`
+- `docs/03_blueprints/db/0017_edit_refund_characterization_plan.md`
+- `routes/web.php`
+- `routes/web/note.php`
+- `routes/web/admin_reporting.php`
+- `app/Adapters/In/Http/Controllers/Admin/Note/NoteDetailPageController.php`
+- `app/Adapters/In/Http/Controllers/Cashier/Note/NoteDetailPageController.php`
+- `app/Adapters/In/Http/Controllers/Note/StoreNoteRevisionController.php`
+- `app/Adapters/In/Http/Controllers/Note/RecordNotePaymentController.php`
+- `app/Adapters/In/Http/Controllers/Note/RecordClosedNoteRefundController.php`
+- `app/Adapters/In/Http/Controllers/Admin/Note/CreateNoteRevisionSurplusRefundDueController.php`
+- `app/Adapters/In/Http/Controllers/Admin/Note/RecordNoteRevisionSurplusRefundPaymentController.php`
+- `app/Application/Note/Services/NoteDetailPageDataBuilder.php`
+- `app/Application/Note/Services/NoteDetailNotePayloadBuilder.php`
+- `app/Application/Note/Services/NoteWorkspacePanelDataBuilder.php`
+- `app/Application/Note/Services/NoteBillingProjectionBuilder.php`
+- `app/Application/Note/Services/CurrentRevision/CurrentRevisionRowSettlementProjector.php`
+- `app/Application/Note/Services/CurrentRevision/CurrentRevisionDetailRowMapper.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionHandler.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionWorkflow.php`
+- `app/Application/Note/Services/ApplyNoteRevisionAsActiveReplacement.php`
+- `app/Application/Note/Services/NoteReplacementPaymentAllocationReconciler.php`
+- `app/Application/Payment/UseCases/RecordAndAllocateNotePaymentHandler.php`
+- `app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php`
+- `app/Application/Note/Services/SelectedNoteRowsPaymentAmountResolver.php`
+- `app/Application/Note/Services/SelectedNoteBillingRowsProvider.php`
+- `app/Application/Note/Services/SelectedNoteRowsRefundPlanResolver.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundPlanTransaction.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundPlanBucketProcessor.php`
+- `app/Application/Payment/Services/RecordCustomerRefundOperation.php`
+- `app/Application/Inventory/Services/AutoReverseRefundedStoreStockInventory.php`
+- `app/Application/Note/Services/NoteHistoryProjectionService.php`
+- `app/Adapters/Out/Note/DatabaseNoteHistoryProjectionSourceReaderAdapter.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionSurplusRefundDueHandler.php`
+- `app/Application/Note/UseCases/RecordNoteRevisionSurplusRefundPaymentHandler.php`
+- `app/Adapters/In/Http/Controllers/Admin/Reporting/TransactionReportPageController.php`
+- `app/Adapters/In/Http/Controllers/Admin/Reporting/TransactionReportExcelExportController.php`
+- `app/Adapters/In/Http/Controllers/Admin/Reporting/TransactionReportPdfExportController.php`
+- `app/Application/Reporting/UseCases/GetTransactionReportDatasetHandler.php`
+- `app/Application/Reporting/UseCases/GetTransactionSummaryPerNoteHandler.php`
+- `app/Adapters/Out/Reporting/DatabaseTransactionReportingSourceReaderAdapter.php`
+- `app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php`
+- `app/Application/Reporting/Exports/TransactionReportExcelWorkbookBuilder.php`
+- `app/Application/Reporting/Exports/TransactionReportExcelDetailSheetWriter.php`
+- `app/Application/Reporting/Exports/TransactionReportPdfViewDataBuilder.php`
+- `resources/views/shared/notes/show.blade.php`
+- `resources/views/shared/notes/partials/payment-summary-actions.blade.php`
+- `resources/views/cashier/notes/partials/payment-modal.blade.php`
+- `resources/views/admin/reporting/transaction_summary/export_pdf.blade.php`
+- `public/assets/static/js/pages/cashier-note-payment.js`
+
+#### Files Changed
+
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+
+#### FACT
+
+- Active edit routes:
+  - `PATCH /admin/notes/{noteId}/workspace` -> `StoreNoteRevisionController` -> `StoreNoteRevisionRequest` -> `CreateNoteRevisionHandler`.
+  - `PATCH /cashier/notes/{noteId}/workspace` -> `StoreNoteRevisionController` -> `StoreNoteRevisionRequest` -> `CreateNoteRevisionHandler`.
+- Active refund routes:
+  - `POST /admin/notes/{noteId}/refunds` -> `RecordClosedNoteRefundController`.
+  - `POST /cashier/notes/{noteId}/refunds` -> `RecordClosedNoteRefundController`.
+- Active payment routes:
+  - `POST /admin/notes/{noteId}/payments` -> `RecordNotePaymentController`.
+  - `POST /cashier/notes/{noteId}/payments` -> `RecordNotePaymentController`.
+- Active note detail pages:
+  - Admin detail -> `Admin\\Note\\NoteDetailPageController` -> `NoteDetailPageDataBuilder` -> `shared.notes.show`.
+  - Cashier detail -> `Cashier\\Note\\NoteDetailPageController` -> `NoteDetailPageDataBuilder` -> `shared.notes.show`.
+- Active UI action flags are built by backend payload:
+  - `NoteDetailNotePayloadBuilder`
+  - `can_edit_workspace`
+  - `can_show_payment_form`
+  - `can_show_partial_payment_action`
+  - `can_show_settle_payment_action`
+  - `can_show_refund_form`
+- Active note revision services:
+  - `CreateNoteRevisionHandler`
+  - `CreateNoteRevisionWorkflow`
+  - `ApplyNoteRevisionAsActiveReplacement`
+  - `NoteReplacementPaymentAllocationReconciler`
+  - `BuildCreateNoteRevisionSettlement`
+  - `CreateNoteRevisionCommitter`
+- Active payment allocation services:
+  - `SelectedNoteRowsPaymentAmountResolver`
+  - `SelectedNoteBillingRowsProvider`
+  - `RecordAndAllocateNotePaymentHandler`
+  - `RecordAndAllocateNotePaymentOperation`
+  - `ResolveNotePayableComponents`
+  - `AllocatePaymentAcrossComponents`
+  - `PaymentAllocationPolicy`
+- Active refund allocation services:
+  - `SelectedNoteRowsRefundPlanResolver`
+  - `SelectedRowsRefundBucketsBuilder`
+  - `SelectedNoteRowsRefundEligibilityGuard`
+  - `SelectedNoteRowsRefundPlanFactory`
+  - `RecordSelectedRowsRefundPlanTransaction`
+  - `RecordSelectedRowsRefundPlanBucketProcessor`
+  - `RecordCustomerRefundOperation`
+  - `AllocateRefundAcrossComponents`
+- Active inventory refund effect source:
+  - `AutoReverseRefundedStoreStockInventory`
+  - `ReverseIssuedInventoryOperation`
+  - `RefundedStoreStockComponentTargets`
+- Active note history projection source:
+  - `NoteHistoryProjectionService`
+  - `DatabaseNoteHistoryProjectionSourceReaderAdapter`
+  - `NoteHistoryAggregationSubqueries`
+  - component/legacy line summary subqueries
+- Active surplus/refund_due/refund_paid source:
+  - `CreateNoteRevisionSurplusRefundDueController`
+  - `CreateNoteRevisionSurplusRefundDueHandler`
+  - `RecordNoteRevisionSurplusRefundPaymentController`
+  - `RecordNoteRevisionSurplusRefundPaymentHandler`
+  - `NoteRevisionSurplusDispositionActionViewDataBuilder`
+  - `NoteSurplusDispositionAuditTimelineBuilder`
+- Active transaction report dataset:
+  - `TransactionReportPageController`
+  - `GetTransactionReportDatasetHandler`
+  - `GetTransactionSummaryPerNoteHandler`
+  - `DatabaseTransactionReportingSourceReaderAdapter`
+  - `TransactionSummaryReportingQuery`
+- Active Excel export path:
+  - `TransactionReportExcelExportController`
+  - `TransactionReportExcelWorkbookBuilder`
+  - `TransactionReportExcelDetailSheetWriter`
+- Active PDF export path:
+  - `TransactionReportPdfExportController`
+  - `TransactionReportPdfViewDataBuilder`
+  - `resources/views/admin/reporting/transaction_summary/export_pdf.blade.php`
+
+#### GAP
+
+- No local test command was executed in this Slice 0 source-map update.
+- No local `php artisan route:list` proof was executed yet.
+- Browser refresh and hard-refresh behavior are not proven.
+- Report/PDF/Excel lifecycle parity after edit/refund/surplus/refund_paid is not proven.
+- Cash ledger impact is not proven in this slice.
+- DB row state for a real 0044 runtime case is not inspected in this slice.
+
+#### DECISION
+
+- Treat `UpdateTransactionWorkspaceController` and `UpdateTransactionWorkspaceHandler` as dead/unproven path for active edit behavior until route proof says otherwise.
+- Do not patch UI, report, payment, refund, inventory, projection, or allocation code in Slice 0.
+- First characterization target:
+  - `tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php`
+  - first test: `test_revision_after_partial_payment_carries_paid_amount_into_underpaid_settlement`
+  - second test: `test_revision_after_ordinary_refund_counts_refund_once_in_settlement`
+- Next step is test-only, not runtime patch.
+
+#### Tests / Commands Run
+
+```bash
+# ChatGPT connector read-only source inspection only.
+# Local command generated to update handoff.
+# No local test executed by assistant.
+```
+
+Result:
+
+```text
+Pending owner local proof after running this handoff update command.
+```
+
+Meaning:
+
+- Slice 0 source-map is documented.
+- Handoff checklist is updated.
+- Production code remains untouched.
+
+#### Checklist Changes
+
+- [x] Active edit routes mapped.
+- [x] Active refund routes mapped.
+- [x] Active payment routes mapped.
+- [x] Note detail UI data source mapped.
+- [x] UI action flag builders mapped.
+- [x] Note revision services mapped.
+- [x] Payment allocation services mapped.
+- [x] Refund allocation services mapped.
+- [x] Inventory movement services mapped.
+- [x] Note history projection mapped.
+- [x] Surplus/refund_due/refund_paid records mapped.
+- [x] Transaction report dataset mapped.
+- [x] Excel export path mapped.
+- [x] PDF export path mapped.
+- [x] Dead/unproven paths listed.
+- [x] First characterization test selected.
+- [x] No production code patch made.
+
+#### Residual Gaps
+
+- Local route proof remains required.
+- Local test fixture proof remains required.
+- Browser refresh/hard-refresh proof remains required.
+- Report/PDF/Excel parity proof remains required.
+- Cash ledger impact proof remains required.
+- Runtime DB proof for a concrete 0044 lifecycle case remains required.
+
+#### Next Allowed Step
+
+- Add only `tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php`.
+- Run only targeted characterization test first.
+- Stop on first failure and record RED proof before any production patch.
+
