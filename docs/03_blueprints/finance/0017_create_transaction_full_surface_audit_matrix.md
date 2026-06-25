@@ -333,6 +333,20 @@ Execute browser/manual create scenarios:
   - Manual browser QA can login with `kasir@gmail.com` / `12345678` for cashier create flow, assuming local DB has been seeded.
   - Next check: identify local seed product/template data for service-store-stock package lookup.
 
+### 2026-06-25 21:58 - Seed Product/Template Discovery Check
+
+- Commands executed:
+  - `sed -n '1,260p' database/seeders/CreateOnly/CreateInventorySeeder.php`
+  - `sed -n '1,320p' database/seeders/CreateOnly/CreateMasterBasicSeeder.php`
+  - `rg -n "service_product_templates|service_product_template_lines|service_catalog_items|default_service|default_package|product_id|normalized_name" database/seeders app tests`
+- Observed result:
+  - `CreateMasterBasicSeeder` seeds suppliers, 10 products, service catalog defaults, employees, and expense categories.
+  - `CreateInventorySeeder` creates opening stock for up to 200 non-deleted products with `qty_on_hand = 20 + (lineNo % 30)`.
+  - The broad template grep produced large output and needs a narrower helper read.
+- Current conclusion:
+  - Local browser QA should have product stock if create-only master/inventory seeders were run.
+  - Next check: read `CreateOnlyMasterSeeder` and service product template seed paths narrowly.
+
 ## PROGRESS
 
 Create path progress: 35%.
