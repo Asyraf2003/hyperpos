@@ -34,6 +34,8 @@ final class RevisionWorkspaceServiceStoreStockMapper
             'description' => '',
             'part_source' => 'store_stock',
             'pricing_mode' => $this->pricingMode($payload),
+            'requires_service_product_template' => false,
+            'historical_package_snapshot' => true,
             'package_total_rupiah' => $this->packageTotal($line, $payload),
             'service' => [
                 'name' => (string) ($service['service_name'] ?? ($line->serviceLabel() ?? '')),

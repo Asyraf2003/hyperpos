@@ -42,6 +42,8 @@ final class EditTransactionWorkspacePackageAutoSplitCharacterizationTest extends
         $response->assertSee('product-package-edit-a', false);
         $response->assertSee('product-package-edit-b', false);
         $response->assertSee('250000', false);
+        $response->assertSee('"requires_service_product_template":false', false);
+        $response->assertSee('"historical_package_snapshot":true', false);
     }
 
 

@@ -202,3 +202,33 @@ Observed proof:
 Current conclusion:
 - Current backend revision payload supports package-aware edit and multi-product snapshot data.
 - Next UI check must verify edit hydration uses these fields instead of collapsing to one product or forcing current catalog/template values.
+
+### Edit Preload Template-Lock UI Gap - 2026-06-26
+
+Commands/files inspected:
+- `app/Application/Note/Services/NoteRevisionWorkspaceExistingItemMapper.php`
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceServiceStoreStockMapper.php`
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceProductLineMapper.php`
+- `public/assets/static/js/pages/cashier-note-workspace/rows.js`
+- `public/assets/static/js/pages/cashier-note-workspace/draft.js`
+- `public/assets/static/js/pages/cashier-note-workspace/payment-flow.js`
+- `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageTemplateRules.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageTemplatePayloadGuard.php`
+- `app/Application/Note/Services/CreateTransactionWorkspaceServiceStoreStockPackageAutoSplitComposer.php`
+- `tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php`
+
+Facts found:
+- Edit preload maps revision `service_with_store_stock_part` into `part_source=store_stock`, `pricing_mode=package_auto_split`, and product lines with `price_basis=revision_snapshot`.
+- The active Blade template for service-store-stock has hidden `requires_service_product_template=1` by default.
+- `rows.js` did not override that hidden value when hydrating revision preload.
+- `payment-flow.js` blocks service-store-stock package rows with `requires_service_product_template=1` unless `row.dataset.serviceProductTemplateApplied === "1"`.
+- Existing backend edit tests often submit revision package payload without `requires_service_product_template`; this allows trusted historical revision snapshot behavior.
+- Backend exact active-template guard is correct for new template-locked package payloads, but historical edit preload should not be forced to reselect an active template just to submit unchanged snapshot rows.
+
+Gap:
+- UI preload could make valid historical edit rows stricter than backend revision snapshot semantics by preserving the Blade default `requires_service_product_template=1`.
+
+Decision:
+- Patch revision preload to explicitly mark historical snapshot package rows as `requires_service_product_template=false`.
+- Patch JS hydration to honor explicit `requires_service_product_template`.
+- Patch package lookup JS so choosing or typing a new package re-enables template requirement.

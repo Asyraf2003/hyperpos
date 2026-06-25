@@ -6,6 +6,7 @@
     html.replaceAll("__PRODUCT_INDEX__", String(index));
   const titleByType = (type, number) => `Rincian ${number} · ${NS.labelByType(type)}`;
   const digits = (value) => Number.parseInt(String(value || "").replace(/\D+/g, "") || "0", 10);
+  const truthy = (value) => value === true || value === 1 || value === "1" || value === "true";
 
   const focusElement = (element, select = true) => {
     if (!(element instanceof HTMLElement)) return;
@@ -292,6 +293,12 @@
     set('input[name$="[service][name]"]', item?.service?.name || "");
     set("[data-service-default-fee-rupiah]", item?.service?.price_rupiah || "");
 	    set("[data-pricing-mode]", item?.pricing_mode || "package_auto_split");
+    if (item?.requires_service_product_template !== undefined) {
+      set(
+        "[data-requires-service-product-template]",
+        truthy(item.requires_service_product_template) ? "1" : "0",
+      );
+    }
 		    set('input[name$="[external_purchase_lines][0][label]"]', item?.external_purchase_lines?.[0]?.label || "");
 		    set('input[name$="[service][price_rupiah]"]', item?.service?.price_rupiah ?? "0");
 	    set(
@@ -300,6 +307,11 @@
 	    );
 
 	    if (type === "service_store_stock") {
+      if (truthy(item?.historical_package_snapshot)) {
+        row.dataset.serviceProductTemplateApplied = "1";
+        row.dataset.serviceTemplateAutofilled = "1";
+      }
+
 		      const productLines = (
 		        Array.isArray(item?.product_lines) && item.product_lines.length > 0
 		          ? item.product_lines.slice(0, 3)

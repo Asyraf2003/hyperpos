@@ -97,6 +97,7 @@
     row.dataset.serviceProductTemplateApplied = productLines.length > 0 ? "1" : "0";
     row.dataset.serviceTemplateAutofilled = productLines.length > 0 ? "1" : "0";
     row.dataset.selectedPackageId = String(item?.id || "");
+    setValue(row, "[data-requires-service-product-template]", "1");
 
     const input = packageSearchInput(row);
     if (input) input.value = String(item?.label || "");
@@ -205,6 +206,7 @@
     row.dataset.serviceProductTemplateApplied = "0";
     row.dataset.serviceTemplateAutofilled = "0";
     row.dataset.selectedPackageId = "";
+    setValue(row, "[data-requires-service-product-template]", "1");
 
     setValue(row, "[data-service-name]", "");
     setValue(row, "[data-service-catalog-id]", "");
