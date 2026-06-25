@@ -42,5 +42,19 @@ final class CashierWorkspacePaymentFlowJavascriptContractTest extends TestCase
         self::assertStringNotContainsString('return backendPayable > 0 ? backendPayable : total;', $script);
     }
 
+    public function test_payment_flow_blocks_unavailable_payment_choices_before_submit(): void
+    {
+        $script = file_get_contents(base_path('public/assets/static/js/pages/cashier-note-workspace/payment-flow.js'));
+
+        self::assertIsString($script);
+        self::assertStringContainsString('const paymentChoiceDisabled = (choice, total) => {', $script);
+        self::assertStringContainsString('return baseInvalid || effectivePaymentTotal(total) <= 0;', $script);
+        self::assertStringContainsString('button.disabled = disabled;', $script);
+        self::assertStringContainsString('choiceButton.disabled', $script);
+        self::assertStringContainsString('const resetUnavailablePaymentMode = (total) => {', $script);
+        self::assertStringContainsString('Tambahkan minimal satu rincian nota sebelum proses nota.', $script);
+        self::assertStringContainsString('Total nota harus lebih besar dari 0 sebelum proses nota.', $script);
+    }
+
 
 }
