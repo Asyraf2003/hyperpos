@@ -8,6 +8,29 @@ This file is not an implementation patch.
 
 This file does not mark `0044` as fixed.
 
+## Current Evidence Note - 2026-06-25
+
+Latest automated verification recorded in the active handoff:
+
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+- `make verify` PASS.
+- Full Pest summary: `1416 passed, 8405 assertions`.
+
+The automated backend/render/report lifecycle coverage is GREEN, including edit
+revision settlement, refund shadow continuity, payment-after-revision delta,
+package auto split revision behavior, and report/export impact tests.
+
+This workflow still requires explicit owner handling for residual closure gaps:
+
+- real browser/manual QA;
+- refresh and hard-refresh proof through an actual browser runner or accepted
+  manual proof;
+- browser-only console, visual, focus, and double-click checks;
+- broader audit lifecycle redesign if the owner opens that scope.
+
+Therefore this workflow remains open for residual manual/audit closure even
+though current automated verification is GREEN.
+
 ## Session Rule
 
 Every 0044 session must update the active handoff:

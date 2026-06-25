@@ -2,7 +2,27 @@
 
 ## Status
 
-Forensic audit only. Belum patch.
+Fixed with proof.
+
+Current verification:
+
+- `make verify` PASS on 2026-06-25.
+- Full Pest summary: `1416 passed, 8405 assertions`.
+- Target matrix included in full suite:
+  - `tests/Feature/Payment/ServicePackageComponentRefundPayAgainMatrixTest.php`
+  - result in full suite: PASS.
+
+Final patch scope:
+
+- Write-side payment allocator guard blocks silent pay-again for refunded
+  `service_store_stock_part` components that already have inventory reversal.
+- Report layer was not used to hide write-side mismatch.
+- No Mobile API scope was changed.
+
+Historical note:
+
+- The forensic audit text below is retained as source evidence for the original
+  bug and patch reasoning.
 
 ## Scope
 

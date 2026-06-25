@@ -2,7 +2,26 @@
 
 ## Status
 
-Forensic policy gap. Belum patch.
+Patched with automated proof and residual manual/audit gaps.
+
+Current verification:
+
+- `make verify` PASS on 2026-06-25.
+- Full Pest summary: `1416 passed, 8405 assertions`.
+- Relevant automated coverage now includes:
+  - `tests/Feature/Note/NoteRevisionSettlementCarryForwardFeatureTest.php`
+  - `tests/Feature/Note/NoteRevisionRefundDueCarryForwardFeatureTest.php`
+  - `tests/Feature/Note/CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest.php`
+  - `tests/Feature/Note/NoteReplacementOverpaidAllocationReplayFeatureTest.php`
+  - `tests/Feature/Note/RefundAfterRevisionCurrentRowBoundaryFeatureTest.php`
+  - `tests/Feature/Note/TransactionCashLedgerAfterRevisionRefundFeatureTest.php`
+  - `tests/Feature/Note/ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest.php`
+  - `tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php`
+  - `tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php`
+  - `tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php`
+
+Do not mark this issue fully fixed until the residual manual/browser and audit
+gaps below are either proven or explicitly accepted as deferred.
 
 ## Scope
 
@@ -32,29 +51,39 @@ Existing docs sudah mencatat sebagian arah:
 - Inventory movements adalah stock ledger events.
 - UI/API adalah transport adapters.
 - Surplus/refund_due/refund_paid harus eksplisit dan tidak boleh hilang diam-diam.
-- Full browser UI dan full report/export after edit/refund/surplus/refund_paid masih pernah dicatat sebagai gap.
+- Full browser UI masih menjadi manual/browser gap.
+- Report/export after edit/refund/revision has automated proof through focused
+  tests and full `make verify`.
+- Edit/revision package auto split has automated proof through focused tests and
+  full `make verify`.
 
 ## GAP
 
-Belum ada satu error log aktif yang mengunci seluruh policy berikut:
+Residual gaps after current automated proof:
 
-1. Edit after paid/refund behavior.
-2. Refund shadow/historical truth behavior.
-3. UI action visibility after refresh.
-4. Downward edit surplus display and lifecycle.
-5. Report/PDF/Excel parity for paid/refund/edit/delete-all lifecycle.
-6. Stock transaction status after edit/refund.
-7. Financial status wording that is clear for user, not only internally correct.
+1. Real browser/manual QA is not closed.
+2. Browser refresh and hard-refresh behavior are not proven by a real browser runner.
+3. Console errors, responsive visual behavior, modal focus, and real double-click
+   timing remain manual/browser-only checks unless Dusk/Playwright or equivalent
+   is introduced.
+4. Broader audit lifecycle redesign remains transitional.
 
 ## DECISION
 
-Jangan patch UI dulu.
+Automated backend/render/report coverage is now the accepted proof for the
+non-browser parts of this issue.
 
-Langkah aman pertama adalah characterization test dan source-map untuk backend state yang harus ditampilkan UI.
+Do not patch reports to hide lifecycle state. Reports must keep reading official
+domain records.
+
+Do not start broader audit redesign under this issue without a new active scope.
 
 ## NEXT SAFE STEP
 
-Buat test pertama untuk memastikan note detail UI tidak menampilkan action pembayaran yang backend allocator akan tolak, dan menampilkan alasan/status yang informatif.
+Either:
+
+1. close or defer the remaining browser/manual QA gap by owner decision; or
+2. introduce a real browser runner and prove refresh/hard-refresh behavior.
 
 ## Workflow Control
 
@@ -71,4 +100,3 @@ Rule:
 - Every implementation session must update the active handoff checklist.
 - Do not mark this error log fixed until the workflow DoD is satisfied.
 - Do not execute direct GitHub connector write actions for this workflow unless owner explicitly overrides in the same session.
-

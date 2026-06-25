@@ -8,6 +8,32 @@ This handoff must be updated at the end of every 0044 session.
 
 This file is not an implementation patch.
 
+## Current Sync Note - 2026-06-25
+
+This handoff had stale checklist entries after later lifecycle work was recorded
+in `docs/04_lifecycle/handoff/0008_edit_transaction_lifecycle_characterization_handoff.md`.
+
+Current local verification in this session:
+
+- `make verify` PASS.
+- Full Pest summary: `1416 passed, 8405 assertions`.
+
+Automated backend/render/report proof now covers the main 0044 lifecycle areas,
+including revision settlement carry-forward, refund_due/refund_paid continuity,
+refund after revision current-row boundary, closed paid edit settlement preview,
+payment after active revision delta, package auto split edit/revision
+characterization, and report/export impact tests.
+
+Residual gaps remain:
+
+- real browser/manual QA;
+- refresh/hard-refresh proof through an actual browser runner;
+- console/visual/focus/double-click browser-only checks;
+- broader audit lifecycle redesign.
+
+Do not mark `0044` fully fixed until those residual gaps are proven or explicitly
+accepted as deferred by the owner.
+
 ## Linked Documents
 
 - Error log: `docs/04_lifecycle/error_log/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_gap.md`
@@ -610,3 +636,119 @@ Meaning:
 #### Next Allowed Step
 
 - Test-only characterization for revision carry-forward settlement.
+
+
+### Session Update - 2026-06-25 Current Proof Sync
+
+#### Slice
+
+- Active slice: 0044 proof/status synchronization.
+- Status: automated backend/render/report proof GREEN; browser/manual and audit gaps remain.
+- Production code patch: none in this session.
+
+#### Files Read
+
+- `docs/01_standards/README.md`
+- `docs/01_standards/0001_index.md`
+- `docs/01_standards/0002_decision_policy.md`
+- `docs/01_standards/0003_gpt_bootstrap_prompt.md`
+- `docs/01_standards/0004_session_start_protocol.md`
+- `docs/01_standards/core/0010_scope_and_facts.md`
+- `docs/01_standards/core/0011_blueprint_first.md`
+- `docs/01_standards/core/0012_step_by_step_execution.md`
+- `docs/01_standards/core/0013_proof_and_progress.md`
+- `docs/01_standards/workflow/0020_response_structure.md`
+- `docs/01_standards/workflow/0021_active_step_policy.md`
+- `docs/01_standards/workflow/0024_session_capacity_policy.md`
+- `docs/01_standards/output/0033_terminal_command_delivery.md`
+- `docs/04_lifecycle/error_log/0041_service_product_package_one_input_admin_contract_verified.md`
+- `docs/04_lifecycle/error_log/0042_service_product_package_template_lock_and_reactivate_hardening.md`
+- `docs/04_lifecycle/error_log/0043_service_package_component_refund_pay_again_inventory_cash_mismatch.md`
+- `docs/04_lifecycle/error_log/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_gap.md`
+- `docs/04_lifecycle/workflow/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_workflow.md`
+- `docs/04_lifecycle/handoff/0008_edit_transaction_lifecycle_characterization_handoff.md`
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+- `docs/03_blueprints/db/0016_edit_refund_readiness_analysis.md`
+- `docs/03_blueprints/db/0017_edit_refund_characterization_plan.md`
+
+#### Files Changed
+
+- `docs/04_lifecycle/error_log/0043_service_package_component_refund_pay_again_inventory_cash_mismatch.md`
+- `docs/04_lifecycle/error_log/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_gap.md`
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+- `docs/04_lifecycle/workflow/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_workflow.md`
+
+#### FACT
+
+- Error log `0041` is already recorded as selesai and verified.
+- Error log `0042` is already recorded as selesai and verified.
+- Error log `0043` had stale top status, but later sections and current full suite prove the allocator guard is fixed.
+- Error log `0044` had stale "belum patch" status, but later lifecycle work proves automated backend/render/report coverage.
+- Current `make verify` passes.
+- Current full Pest summary is `1416 passed, 8405 assertions`.
+- The full suite includes 0043 service package component refund pay-again matrix coverage.
+- The full suite includes 0044 edit/revision/refund/package/report coverage such as:
+  - `NoteRevisionSettlementCarryForwardFeatureTest`
+  - `NoteRevisionRefundDueCarryForwardFeatureTest`
+  - `CreateNoteRevisionSurplusRefundPaidCarryForwardFeatureTest`
+  - `RefundAfterRevisionCurrentRowBoundaryFeatureTest`
+  - `TransactionCashLedgerAfterRevisionRefundFeatureTest`
+  - `ClosedPaidNoteEditPaymentSettlementPreviewFeatureTest`
+  - `PaymentAfterRevisionSettlementFeatureTest`
+  - `EditTransactionWorkspacePackageAutoSplitCharacterizationTest`
+  - `PackageAutoSplitRevisionReportImpactFeatureTest`
+
+#### GAP
+
+- Real browser/manual QA is not closed.
+- Browser refresh/hard-refresh behavior is not proven through a real browser runner.
+- Console errors, responsive visual behavior, modal focus, and real double-click timing remain browser/manual-only checks unless a browser runner is introduced.
+- Broader audit lifecycle redesign remains transitional.
+- No git operation was performed.
+
+#### DECISION
+
+- Treat 0043 as fixed with proof.
+- Treat 0044 as patched with automated proof, not fully fixed, until remaining browser/manual/audit gaps are proven or explicitly deferred by owner decision.
+- Do not patch report code to hide lifecycle state.
+- Do not start broader audit redesign under this issue without a new active scope.
+
+#### Tests / Commands Run
+
+```bash
+make verify
+```
+
+Result:
+
+```text
+PHPStan: [OK] No errors
+Line limit audit: SUCCESS
+Blade PHP/directive audit: SUCCESS
+Contract audit: passed
+Pest: 1416 passed (8405 assertions)
+Duration: 96.80s
+```
+
+Meaning:
+
+- Current repo baseline is GREEN after 0041-0044 lifecycle work.
+- Automated proof supports the status sync.
+- Remaining 0044 closure risk is browser/manual/audit scope, not current automated regression failure.
+
+#### Checklist Changes
+
+- 0043 status synchronized to fixed with proof.
+- 0044 status synchronized to patched with automated proof and residual manual/audit gaps.
+- Active handoff updated so future sessions do not restart from stale Slice 0 pending-test state.
+
+#### Residual Gaps
+
+- Browser/manual QA.
+- Real refresh/hard-refresh proof.
+- Browser-only console/visual/focus/double-click checks.
+- Broader audit lifecycle redesign.
+
+#### Next Allowed Step
+
+- Owner decision: either defer the remaining browser/manual/audit gaps explicitly, or open a browser-runner/manual-QA slice for 0044 refresh and UI behavior proof.
