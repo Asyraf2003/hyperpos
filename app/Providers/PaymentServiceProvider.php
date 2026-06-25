@@ -18,6 +18,7 @@ use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
 use App\Application\Payment\Services\AllocateRefundAcrossComponents;
 use App\Application\Payment\Services\ResolveNotePayableComponents;
+use App\Application\Payment\Services\ReversedRefundedStoreStockPartPaymentGuard;
 use App\Ports\Out\Payment\CustomerPaymentReaderPort;
 use App\Ports\Out\Payment\CustomerPaymentWriterPort;
 use App\Ports\Out\Payment\CustomerRefundReaderPort;
@@ -36,6 +37,7 @@ class PaymentServiceProvider extends ServiceProvider
     {
         $this->app->singleton(AllocatePaymentErrorClassifier::class);
         $this->app->singleton(ResolveNotePayableComponents::class);
+        $this->app->singleton(ReversedRefundedStoreStockPartPaymentGuard::class);
         $this->app->singleton(AllocatePaymentAcrossComponents::class);
         $this->app->singleton(AllocateRefundAcrossComponents::class);
 

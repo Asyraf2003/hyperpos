@@ -6,6 +6,7 @@ namespace Tests\Unit\Application\Payment\Services;
 
 use App\Application\Payment\DTO\PayableNoteComponent;
 use App\Application\Payment\Services\AllocatePaymentAcrossComponents;
+use App\Application\Payment\Services\ReversedRefundedStoreStockPartPaymentGuard;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentAllocation;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
 use App\Core\Shared\ValueObjects\Money;
@@ -19,6 +20,18 @@ final class AllocatePaymentAcrossComponentsTest extends TestCase
 {
     public function test_it_prioritizes_external_purchase_component_before_service_fee(): void
     {
+        $refunds = new class () implements RefundComponentAllocationReaderPort {
+            public function getTotalRefundedAmountByNoteId(string $noteId): Money { return Money::zero(); }
+            public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money { return Money::zero(); }
+            public function getTotalRefundedAmountByWorkItemId(string $workItemId): Money { return Money::zero(); }
+            public function listByNoteId(string $noteId): array { return []; }
+        };
+
+        $inventoryMovements = new class () implements InventoryMovementReaderPort {
+            public function getAll(): array { return []; }
+            public function getBySource(string $sourceType, string $sourceId): array { return []; }
+        };
+
         $service = new AllocatePaymentAcrossComponents(
             new class () implements PaymentComponentAllocationReaderPort {
                 public function getTotalAllocatedAmountByNoteId(string $noteId): Money { return Money::zero(); }
@@ -26,16 +39,8 @@ final class AllocatePaymentAcrossComponentsTest extends TestCase
                 public function getTotalAllocatedAmountByWorkItemId(string $workItemId): Money { return Money::zero(); }
                 public function listByNoteId(string $noteId): array { return []; }
             },
-            new class () implements RefundComponentAllocationReaderPort {
-                public function getTotalRefundedAmountByNoteId(string $noteId): Money { return Money::zero(); }
-                public function getTotalRefundedAmountByCustomerPaymentIdAndNoteId(string $customerPaymentId, string $noteId): Money { return Money::zero(); }
-                public function getTotalRefundedAmountByWorkItemId(string $workItemId): Money { return Money::zero(); }
-                public function listByNoteId(string $noteId): array { return []; }
-            },
-            new class () implements InventoryMovementReaderPort {
-                public function getAll(): array { return []; }
-                public function getBySource(string $sourceType, string $sourceId): array { return []; }
-            },
+            $refunds,
+            new ReversedRefundedStoreStockPartPaymentGuard($refunds, $inventoryMovements),
             new class () implements UuidPort {
                 private int $i = 0;
                 public function generate(): string { return 'alloc-' . ++$this->i; }
