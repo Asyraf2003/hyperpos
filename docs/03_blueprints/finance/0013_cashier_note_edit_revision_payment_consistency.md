@@ -129,3 +129,26 @@ Observed proof:
 Current conclusion:
 - Active edit submit path for this audit is revision-based `StoreNoteRevisionController`, not legacy `UpdateTransactionWorkspaceHandler`.
 - UI/Blade/JS audit must compare against `StoreNoteRevisionRequest` and `CreateNoteRevisionWorkflow` behavior.
+
+### Active Revision Request/Workflow Proof - 2026-06-26
+
+Commands/files inspected:
+- `app/Adapters/In/Http/Controllers/Note/StoreNoteRevisionController.php`
+- `app/Adapters/In/Http/Requests/Note/StoreNoteRevisionRequest.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionWorkflow.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionHandler.php`
+
+Observed proof:
+- `StoreNoteRevisionController` passes `$request->validated()` to `CreateNoteRevisionHandler`.
+- Admin route sets `$enforceWorkspaceEditability=false`; cashier route keeps editability guard enabled.
+- `StoreNoteRevisionRequest` normalizes through `UpdateTransactionWorkspaceInputNormalizer`, adds/defaults `reason`, and uses `UpdateTransactionWorkspaceRules` + `UpdateTransactionWorkspaceValidator`.
+- Current `StoreNoteRevisionRequest` does not force `inline_payment.decision` to `skip`.
+- `CreateNoteRevisionWorkflow` applies replacement first, then calls `CreateTransactionWorkspaceInlinePaymentRecorder` with `payload['inline_payment']`.
+- `CreateNoteRevisionWorkflow` then builds revision settlement and commits revision metadata.
+
+Correction to older handoff context:
+- Older handoff statement "StoreNoteRevisionRequest forces inline_payment.decision to skip" is stale for current source.
+
+Current conclusion:
+- Edit workspace payment modal is active/relevant in current revision path.
+- UI must match post-replacement outstanding settlement because backend records inline payment after replacement is applied.
