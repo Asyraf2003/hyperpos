@@ -111,3 +111,21 @@ Initial docs read:
 Current conclusion:
 - Do not assume `UpdateTransactionWorkspaceHandler` is active edit production path until route proof is checked.
 - Treat real Brave browser proof as manual/operator proof; this session focuses on Blade/JS/source consistency.
+
+### Route Proof - 2026-06-26
+
+Commands executed:
+- `rg -n "workspace|StoreNoteRevision|UpdateTransactionWorkspace|cashier\\.notes\\.workspace|admin\\.notes\\.workspace|notes\\.workspace" routes app/Adapters/In/Http/Controllers app/Providers`
+- `php artisan route:list --path=workspace`
+- `php artisan route:list --path=notes`
+
+Observed proof:
+- `PATCH admin/notes/{noteId}/workspace` -> `StoreNoteRevisionController`, route `admin.notes.workspace.update`.
+- `PATCH cashier/notes/{noteId}/workspace` -> `StoreNoteRevisionController`, route `cashier.notes.workspace.update`.
+- `GET .../{noteId}/workspace/edit` -> `EditTransactionWorkspacePageController`.
+- `POST notes/workspace/store` -> `StoreTransactionWorkspaceController`.
+- `UpdateTransactionWorkspaceController` exists in source but is not bound to the active workspace routes shown by `route:list`.
+
+Current conclusion:
+- Active edit submit path for this audit is revision-based `StoreNoteRevisionController`, not legacy `UpdateTransactionWorkspaceHandler`.
+- UI/Blade/JS audit must compare against `StoreNoteRevisionRequest` and `CreateNoteRevisionWorkflow` behavior.
