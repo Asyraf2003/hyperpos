@@ -232,3 +232,51 @@ Decision:
 - Patch revision preload to explicitly mark historical snapshot package rows as `requires_service_product_template=false`.
 - Patch JS hydration to honor explicit `requires_service_product_template`.
 - Patch package lookup JS so choosing or typing a new package re-enables template requirement.
+
+### Edit Historical Package Snapshot UI Patch Proof - 2026-06-26
+
+Files patched:
+- `app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceServiceStoreStockMapper.php`
+- `public/assets/static/js/pages/cashier-note-workspace/rows.js`
+- `public/assets/static/js/pages/cashier-note-workspace/package-search.js`
+- `tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php`
+- `tests/Feature/Note/CashierWorkspaceServiceProductTemplateMinimumContractFeatureTest.php`
+
+Patch summary:
+- Revision service-store-stock preload now emits:
+  - `requires_service_product_template=false`
+  - `historical_package_snapshot=true`
+- `rows.js` now applies explicit `requires_service_product_template` to the hidden Blade input during hydration.
+- `rows.js` marks historical package snapshots as already template-applied for client-side package guard context.
+- `package-search.js` re-enables `requires_service_product_template=1` when the user clears/searches/selects a new active package.
+- Tests now assert the edit response embeds the historical snapshot markers and static JS keeps the marker/requirement controls.
+
+Proof commands:
+- `php -l app/Application/Note/Services/RevisionWorkspace/RevisionWorkspaceServiceStoreStockMapper.php`
+- `node --check public/assets/static/js/pages/cashier-note-workspace/rows.js`
+- `node --check public/assets/static/js/pages/cashier-note-workspace/package-search.js`
+- `php artisan test tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php tests/Feature/Note/CashierWorkspaceServiceProductTemplateMinimumContractFeatureTest.php`
+
+Proof result:
+- PHP lint: no syntax errors.
+- Both JS syntax checks exited 0.
+- Focused tests: PASS, 9 passed, 146 assertions, duration 7.28s.
+
+Current conclusion:
+- Edit workspace preload no longer forces historical package snapshots through current active-template UI requirement before submit.
+- New package selection still re-enables active-template requirement.
+- Backend exact active-template guard remains intact for new/changed template-locked payloads.
+
+### Local Server Cleanup - 2026-06-26
+
+Execution:
+- Stopped the previously running `php artisan serve --host=127.0.0.1 --port=8001` session with Ctrl+C.
+
+Observed output:
+- Prior requests logged:
+  - `/login`
+  - `/cashier/notes/workspace/create`
+- Server process exited cleanly.
+
+Current conclusion:
+- No dev server is intentionally left running by this session.
