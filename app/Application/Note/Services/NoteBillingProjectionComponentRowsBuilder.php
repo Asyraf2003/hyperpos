@@ -80,7 +80,7 @@ final class NoteBillingProjectionComponentRowsBuilder
         $refunded = min(max($refundedRemainder, 0), $allocated);
         $refundedRemainder -= $refunded;
 
-        if ($this->refundedStoreStock->shouldSkip($componentType, $componentRefId, $refunded)) {
+        if ($this->refundedStoreStock->shouldSkip($componentType, $componentRefId, $refunded, $allocated)) {
             return null;
         }
 
