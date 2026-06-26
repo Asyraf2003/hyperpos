@@ -116,8 +116,11 @@ final class EmployeeDebtReportPdfExportFeatureTest extends TestCase
         $this->assertStringContainsString('Laporan Hutang Karyawan', $html);
         $this->assertStringContainsString('Total Hutang', $html);
         $this->assertStringContainsString('Sudah Dibayar', $html);
-        $this->assertStringContainsString('Rincian Status', $html);
-        $this->assertStringContainsString('Kasbon A', $html);
+        $this->assertStringContainsString('Ringkasan Utama', $html);
+        $this->assertStringContainsString('Catatan Laporan', $html);
+        $this->assertStringContainsString('Detail lengkap tersedia di Excel', $html);
+        $this->assertStringNotContainsString('Rincian Status', $html);
+        $this->assertStringNotContainsString('Kasbon A', $html);
     }
 
     public function test_employee_debt_pdf_view_uses_owner_readable_report_sections_not_detail_tables(): void

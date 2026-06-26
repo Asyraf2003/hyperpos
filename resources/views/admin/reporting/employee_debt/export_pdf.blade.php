@@ -28,41 +28,35 @@
             margin-bottom: 12px;
         }
 
-        .summary,
-        .detail {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        .summary {
-            margin-bottom: 10px;
-        }
-
-        .summary td,
-        .detail th,
-        .detail td {
+        .metric {
             border: 1px solid #d1d5db;
-            padding: 5px 6px;
-            vertical-align: top;
+            border-radius: 4px;
+            margin-bottom: 7px;
+            padding: 8px 10px;
         }
 
-        .summary td:first-child,
-        .detail th {
-            background: #e5e7eb;
+        .metric-label {
+            color: #4b5563;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: 13px;
             font-weight: bold;
         }
 
-        .summary td:first-child {
-            width: 32%;
+        .note {
+            background: #f9fafb;
+            border-left: 4px solid #7c3aed;
+            margin-bottom: 8px;
+            padding: 8px 10px;
         }
 
-        .number {
-            text-align: right;
-            white-space: nowrap;
-        }
-
-        .muted {
-            color: #6b7280;
+        .excel-note {
+            color: #374151;
+            font-size: 9px;
+            margin-top: 14px;
         }
     </style>
 </head>
@@ -73,107 +67,21 @@
         Dicetak: {{ $generatedAt }}
     </div>
 
-    <table class="summary">
-        <tbody>
-            @foreach ($summaryItems as $item)
-                <tr>
-                    <td>{{ $item['label'] }}</td>
-                    <td>{{ $item['value'] }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h2>Ringkasan Utama</h2>
+    @foreach ($summaryItems as $item)
+        <div class="metric">
+            <div class="metric-label">{{ $item['label'] }}</div>
+            <div class="metric-value">{{ $item['value'] }}</div>
+        </div>
+    @endforeach
 
-    <h2>Rincian Per Tanggal</h2>
-    <table class="detail">
-        <thead>
-            <tr>
-                <th>Tanggal</th>
-                <th class="number">Data</th>
-                <th class="number">Total</th>
-                <th class="number">Dibayar</th>
-                <th class="number">Sisa</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($periodRows as $row)
-                <tr>
-                    <td>{{ $row['period_label'] }}</td>
-                    <td class="number">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
-                    <td class="number">{{ $row['total_debt'] }}</td>
-                    <td class="number">{{ $row['total_paid_amount'] }}</td>
-                    <td class="number">{{ $row['total_remaining_balance'] }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="muted">Tidak ada hutang karyawan pada periode ini.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <h2>Catatan Laporan</h2>
+    <div class="note">
+        Laporan ini merangkum hutang karyawan yang dicatat pada periode yang
+        dipilih, jumlah yang sudah dibayar, dan sisa yang masih perlu
+        diselesaikan.
+    </div>
 
-    <h2>Rincian Status</h2>
-    <table class="detail">
-        <thead>
-            <tr>
-                <th>Status</th>
-                <th class="number">Data</th>
-                <th class="number">Total</th>
-                <th class="number">Dibayar</th>
-                <th class="number">Sisa</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($statusRows as $row)
-                <tr>
-                    <td>{{ $row['status'] }}</td>
-                    <td class="number">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
-                    <td class="number">{{ $row['total_debt'] }}</td>
-                    <td class="number">{{ $row['total_paid_amount'] }}</td>
-                    <td class="number">{{ $row['total_remaining_balance'] }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="muted">Tidak ada status hutang pada periode ini.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <h2>Detail Hutang</h2>
-    <table class="detail">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Tanggal Catat</th>
-                <th>Referensi Hutang</th>
-                <th>Employee ID</th>
-                <th>Status</th>
-                <th class="number">Total</th>
-                <th class="number">Dibayar</th>
-                <th class="number">Sisa</th>
-                <th>Catatan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($rows as $row)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $row['recorded_at'] }}</td>
-                    <td>{{ $row['debt_id'] }}</td>
-                    <td>{{ $row['employee_id'] }}</td>
-                    <td>{{ $row['status'] }}</td>
-                    <td class="number">{{ $row['total_debt'] }}</td>
-                    <td class="number">{{ $row['total_paid_amount'] }}</td>
-                    <td class="number">{{ $row['remaining_balance'] }}</td>
-                    <td>{{ $row['notes'] }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="9" class="muted">Tidak ada hutang karyawan pada periode ini.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="excel-note">Detail lengkap tersedia di Excel.</div>
 </body>
 </html>

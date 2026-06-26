@@ -27,6 +27,14 @@
     ],
 ])
 
+<div class="mb-3">
+    <h5 class="mb-1">Ringkasan Utama</h5>
+    <div class="text-muted small">
+        Laporan ini merangkum hutang karyawan yang dicatat, sudah dibayar, dan
+        sisa yang masih perlu diselesaikan.
+    </div>
+</div>
+
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card">
@@ -80,6 +88,14 @@
                 <div class="fs-5 fw-bold">{{ number_format($summary['unpaid_rows'] ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="mb-3">
+    <h5 class="mb-2">Catatan Laporan</h5>
+    <div class="text-muted">
+        Gunakan ringkasan ini untuk melihat posisi hutang karyawan dengan cepat.
+        Detail lengkap tersedia di Excel.
     </div>
 </div>
 
