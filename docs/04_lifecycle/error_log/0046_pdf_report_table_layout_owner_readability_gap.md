@@ -488,6 +488,80 @@ Meaning:
 Continue with the next report family using the same RED -> patch -> GREEN ->
 log-update sequence.
 
+## 2026-06-27 Full Verify Attempt And Cash Ledger Unit Contract Patch
+
+### FACT
+
+After the active PDF report families had owner-readable PDF/screen sections in
+place, full verification was run from
+`/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+make verify
+```
+
+The run passed PHPStan and the contract audits, then failed in Pest on one unit
+test:
+
+```text
+[OK] No errors
+Contract audit passed.
+Tests:    1 failed, 1438 passed (8553 assertions)
+```
+
+Failing test:
+
+- `tests/Unit/Application/Reporting/Exports/TransactionCashLedgerPdfBladePaymentMethodTest.php`
+  - expected PDF HTML to contain `Metode Pembayaran`
+
+### ANALYSIS
+
+The failing test was still enforcing the old PDF contract: transaction cash
+ledger PDF should render detail rows and a payment-method column.
+
+That conflicts with this error log's owner decision:
+
+- PDF is a readable report/ringkasan, not a detail table dump;
+- detailed payment-method rows remain available in Excel and screen detail;
+- PDF should keep payment-method signal only through summary labels such as
+  `Tunai Masuk` and `Transfer Masuk`.
+
+### PATCH
+
+Patched:
+
+- `tests/Unit/Application/Reporting/Exports/TransactionCashLedgerPdfBladePaymentMethodTest.php`
+  - renamed the test to the new contract;
+  - asserted PDF contains `Ringkasan Utama`, `Tunai Masuk`,
+    `Transfer Masuk`, and `Detail lengkap tersedia di Excel`;
+  - asserted PDF no longer contains `Metode Pembayaran`, `INV-001`, or
+    `payment_component_allocations`.
+
+No production query, controller, domain, payment/refund, inventory, or Excel
+writer file was changed in this patch.
+
+### GREEN PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Unit/Application/Reporting/Exports/TransactionCashLedgerPdfBladePaymentMethodTest.php tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Unit\Application\Reporting\Exports\TransactionCashLedgerPdfBladePaymentMethodTest
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerExcelExportFeatureTest
+
+Tests: 9 passed, 83 assertions
+```
+
+### NEXT
+
+Run `make verify` again after the unit contract patch.
+
 ## 2026-06-27 RED And Patch Proof - Inventory Stock Value Slice
 
 ### FACT
