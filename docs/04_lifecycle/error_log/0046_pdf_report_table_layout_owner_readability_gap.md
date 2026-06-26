@@ -488,6 +488,92 @@ Meaning:
 Continue with the next report family using the same RED -> patch -> GREEN ->
 log-update sequence.
 
+## 2026-06-27 RED And Patch Proof - Inventory Stock Value Slice
+
+### FACT
+
+The eighth vertical slice is `inventory_stock_value`.
+
+RED tests added:
+
+- `tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php`
+  - `test_inventory_stock_value_pdf_view_uses_owner_readable_report_sections_not_detail_tables`
+- `tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php`
+  - `test_admin_sees_owner_readable_report_sections_on_inventory_stock_value_page`
+
+Initial RED command:
+
+```bash
+php artisan test tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php
+```
+
+Initial RED result:
+
+```text
+Tests: 2 failed, 10 passed, 50 assertions
+```
+
+Failure meaning:
+
+- inventory stock value PDF did not render `Ringkasan Utama`;
+- inventory stock value screen did not render `Ringkasan Utama`.
+
+Patched presentation files:
+
+- `resources/views/admin/reporting/inventory_stock_value/export_pdf.blade.php`
+  - removed summary grid, movement table, and snapshot table from PDF body;
+  - added `Ringkasan Utama`;
+  - added `Catatan Laporan`;
+  - added `Detail lengkap tersedia di Excel`.
+- `resources/views/admin/reporting/inventory_stock_value/index.blade.php`
+  - added matching report sections to the screen.
+- `tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php`
+  - updated PDF expectation so inventory snapshot/movement detail stays out of
+    PDF and belongs to Excel/detail export.
+
+No query, controller, domain, inventory write logic, costing logic, or Excel
+writer file was changed for this slice.
+
+### GREEN PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\ReportingExports\InventoryStockValueReportPdfExportFeatureTest
+PASS  Tests\Feature\Reporting\InventoryStockValueReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\InventoryStockValueReportExcelExportFeatureTest
+
+Tests: 16 passed, 110 assertions
+```
+
+Meaning:
+
+- inventory stock value PDF still exports as `%PDF`;
+- inventory stock value PDF now renders owner-readable sections and no longer
+  renders movement/snapshot detail tables;
+- inventory stock value screen now renders the same owner-readable sections;
+- inventory stock value Excel export remains available, preserves detailed
+  numeric data, and keeps formula-like product text safe as literal string.
+
+### RESIDUAL
+
+The inventory stock value screen still keeps the existing detail tables below
+the new owner-readable sections because existing UI tests currently cover those
+tables. A later UI-only tightening step may move or remove screen detail tables
+after each report family has the summary/PDF contract in place.
+
+### NEXT
+
+Run focused reporting export/page regression for all touched report families,
+then decide whether to add service-package PDF support or leave it as no-PDF
+route per current route map.
+
 ## 2026-06-27 RED And Patch Proof - Operational Expense Slice
 
 ### FACT
