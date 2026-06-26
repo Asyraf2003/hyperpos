@@ -56,20 +56,15 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('02 April 2026');
         $response->assertSee('03 April 2026');
         $response->assertSee('04 April 2026');
-        $response->assertSee('note-1');
-        $response->assertSee('note-2');
-        $response->assertSee('Alokasi Pembayaran');
-        $response->assertSee('Pengembalian Dana');
-        $response->assertSee('Tabel Sumber');
-        $response->assertSee('ID Sumber');
-        $response->assertSee('ID Disposisi Sumber');
-        $response->assertSee('payment_allocations');
-        $response->assertSee('customer_refunds');
-        $response->assertSee('pay-1');
-        $response->assertSee('ref-1');
+        $response->assertSee('Rincian Ringkas');
+        $response->assertSee('Kejadian Kas');
+        $response->assertSee('Sisa Kas Hari Ini');
         $response->assertSee('Rp 12.000');
         $response->assertSee('Rp 1.000');
         $response->assertSee('Rp 11.000');
+        $response->assertDontSee('Tabel Sumber');
+        $response->assertDontSee('payment_allocations');
+        $response->assertDontSee('customer_refunds');
     }
 
     public function test_admin_sees_owner_readable_report_sections_on_transaction_cash_ledger_page(): void
@@ -109,7 +104,7 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
     }
 
 
-    public function test_admin_cash_ledger_detail_table_exposes_payment_method_for_money_in_rows(): void
+    public function test_admin_cash_ledger_page_keeps_payment_method_summary_without_detail_table(): void
     {
         $this->seedCashInEvent('note-page-detail-cash', 'wi-page-detail-cash', 'pay-page-detail-cash', '2026-04-02', 85000, 'Cash Detail', 'cash');
         $this->seedCashInEvent('note-page-detail-transfer', 'wi-page-detail-transfer', 'pay-page-detail-transfer', '2026-04-02', 30000, 'Transfer Detail', 'transfer');
@@ -122,29 +117,12 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-
-        $content = $response->getContent();
-        $tableStart = strpos($content, '<table class="table align-middle mb-0">');
-
-        if ($tableStart === false) {
-            self::fail('Transaction cash ledger detail table was not rendered.');
-        }
-
-        $tableEnd = strpos($content, '</table>', $tableStart);
-
-        if ($tableEnd === false) {
-            self::fail('Transaction cash ledger detail table closing tag was not rendered.');
-        }
-
-        $detailTableHtml = substr(
-            $content,
-            $tableStart,
-            $tableEnd + strlen('</table>') - $tableStart
-        );
-
-        $this->assertStringContainsString('Metode Pembayaran', $detailTableHtml);
-        $this->assertMatchesRegularExpression('/note-page-detail-cash[\s\S]*Tunai/', $detailTableHtml);
-        $this->assertMatchesRegularExpression('/note-page-detail-transfer[\s\S]*Transfer/', $detailTableHtml);
+        $response->assertSee('Tunai Masuk');
+        $response->assertSee('Transfer Masuk');
+        $response->assertSee('Detail lengkap tersedia di Excel');
+        $response->assertDontSee('Metode Pembayaran');
+        $response->assertDontSee('note-page-detail-cash');
+        $response->assertDontSee('note-page-detail-transfer');
     }
 
     public function test_daily_mode_uses_reference_date_only(): void
@@ -161,10 +139,11 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('02 April 2026 s/d 02 April 2026');
-        $response->assertSee('note-daily-1');
-        $response->assertDontSee('note-daily-2');
+        $response->assertSee('02 April 2026');
         $response->assertSee('Rp 7.000');
         $response->assertDontSee('Rp 9.000');
+        $response->assertDontSee('note-daily-1');
+        $response->assertDontSee('note-daily-2');
     }
 
     public function test_weekly_mode_uses_monday_to_sunday_range(): void
@@ -182,10 +161,12 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('06 April 2026 s/d 12 April 2026');
-        $response->assertSee('note-week-1');
-        $response->assertSee('note-week-2');
-        $response->assertDontSee('note-week-3');
+        $response->assertSee('06 April 2026');
+        $response->assertSee('09 April 2026');
         $response->assertSee('Rp 11.000');
+        $response->assertDontSee('note-week-1');
+        $response->assertDontSee('note-week-2');
+        $response->assertDontSee('note-week-3');
     }
 
     public function test_monthly_mode_uses_first_to_last_day_of_month(): void
@@ -203,10 +184,12 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('01 April 2026 s/d 30 April 2026');
-        $response->assertSee('note-month-1');
-        $response->assertSee('note-month-2');
-        $response->assertDontSee('note-month-3');
+        $response->assertSee('01 April 2026');
+        $response->assertSee('29 April 2026');
         $response->assertSee('Rp 7.000');
+        $response->assertDontSee('note-month-1');
+        $response->assertDontSee('note-month-2');
+        $response->assertDontSee('note-month-3');
     }
 
     public function test_custom_mode_uses_explicit_date_range(): void
@@ -225,10 +208,12 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('02 April 2026 s/d 04 April 2026');
-        $response->assertSee('note-custom-1');
-        $response->assertSee('note-custom-2');
-        $response->assertDontSee('note-custom-3');
+        $response->assertSee('02 April 2026');
+        $response->assertSee('04 April 2026');
         $response->assertSee('Rp 16.000');
+        $response->assertDontSee('note-custom-1');
+        $response->assertDontSee('note-custom-2');
+        $response->assertDontSee('note-custom-3');
     }
 
     public function test_custom_mode_requires_explicit_date_range(): void
