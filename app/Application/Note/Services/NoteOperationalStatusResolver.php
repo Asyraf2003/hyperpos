@@ -15,8 +15,8 @@ final class NoteOperationalStatusResolver
         private readonly PaymentAllocationReaderPort $allocations,
         private readonly CustomerRefundReaderPort $refunds,
         private readonly NoteOperationalStatusEvaluator $statuses,
-        private readonly ?NoteCurrentRevisionResolver $currentRevision = null,
-        private readonly ?CurrentRevisionRowSettlementProjector $currentRevisionSettlements = null,
+        private readonly NoteCurrentRevisionResolver $currentRevision,
+        private readonly CurrentRevisionRowSettlementProjector $currentRevisionSettlements,
     ) {
     }
 
@@ -80,10 +80,6 @@ final class NoteOperationalStatusResolver
     /** @return array{net_paid_rupiah:int,outstanding_rupiah:int}|null */
     private function currentRevisionSettlement(Note $note): ?array
     {
-        if ($this->currentRevision === null || $this->currentRevisionSettlements === null) {
-            return null;
-        }
-
         if (! $this->currentRevision->hasRevision($note->id())) {
             return null;
         }
