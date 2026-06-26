@@ -26,6 +26,22 @@ final class NoteOperationalComponentAllocationTotalsGrouper
     }
 
     /**
+     * @param list<PaymentComponentAllocation> $allocations
+     * @return array<string, int>
+     */
+    public function componentPaymentTotals(array $allocations): array
+    {
+        $totals = [];
+
+        foreach ($allocations as $allocation) {
+            $key = $allocation->componentType() . '::' . $allocation->componentRefId();
+            $totals[$key] = ($totals[$key] ?? 0) + $allocation->allocatedAmountRupiah()->amount();
+        }
+
+        return $totals;
+    }
+
+    /**
      * @param list<RefundComponentAllocation> $allocations
      * @return array<string, int>
      */
@@ -36,6 +52,22 @@ final class NoteOperationalComponentAllocationTotalsGrouper
         foreach ($allocations as $allocation) {
             $workItemId = $allocation->workItemId();
             $totals[$workItemId] = ($totals[$workItemId] ?? 0) + $allocation->refundedAmountRupiah()->amount();
+        }
+
+        return $totals;
+    }
+
+    /**
+     * @param list<RefundComponentAllocation> $allocations
+     * @return array<string, int>
+     */
+    public function componentRefundTotals(array $allocations): array
+    {
+        $totals = [];
+
+        foreach ($allocations as $allocation) {
+            $key = $allocation->componentType() . '::' . $allocation->componentRefId();
+            $totals[$key] = ($totals[$key] ?? 0) + $allocation->refundedAmountRupiah()->amount();
         }
 
         return $totals;
