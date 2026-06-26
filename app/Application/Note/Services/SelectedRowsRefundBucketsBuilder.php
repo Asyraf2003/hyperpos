@@ -23,7 +23,7 @@ final class SelectedRowsRefundBucketsBuilder
             if ($matchedSelectionIds === []) {
                 continue;
             }
-            if (! RefundComponentTypePolicy::isDefaultRefundable($allocation->componentType())) {
+            if (! RefundComponentTypePolicy::isSelectedRowRefundable($allocation->componentType())) {
                 continue;
             }
             $paymentId = $allocation->customerPaymentId();
