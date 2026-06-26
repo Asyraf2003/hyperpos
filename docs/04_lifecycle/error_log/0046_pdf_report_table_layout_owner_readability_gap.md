@@ -488,6 +488,91 @@ Meaning:
 Continue with the next report family using the same RED -> patch -> GREEN ->
 log-update sequence.
 
+## 2026-06-26 RED And Patch Proof - Supplier Payable Slice
+
+### FACT
+
+The fourth vertical slice is `supplier_payable`.
+
+RED tests added:
+
+- `tests/Feature/ReportingExports/SupplierPayableReportPdfExportFeatureTest.php`
+  - `test_supplier_payable_pdf_view_uses_owner_readable_report_sections_not_detail_tables`
+- `tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php`
+  - `test_admin_sees_owner_readable_report_sections_on_supplier_payable_page`
+
+Initial RED command:
+
+```bash
+php artisan test tests/Feature/ReportingExports/SupplierPayableReportPdfExportFeatureTest.php tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php
+```
+
+Initial RED result:
+
+```text
+Tests: 2 failed, 10 passed, 55 assertions
+```
+
+Failure meaning:
+
+- supplier payable PDF did not render `Ringkasan Utama`;
+- supplier payable screen did not render `Ringkasan Utama`.
+
+Patched presentation files:
+
+- `resources/views/admin/reporting/supplier_payable/export_pdf.blade.php`
+  - removed summary/period/supplier/detail tables from PDF body;
+  - added `Ringkasan Utama`;
+  - added `Catatan Laporan`;
+  - added `Detail lengkap tersedia di Excel`.
+- `resources/views/admin/reporting/supplier_payable/index.blade.php`
+  - added matching report sections to the screen.
+- `tests/Feature/ReportingExports/SupplierPayableReportPdfExportFeatureTest.php`
+  - updated PDF expectation so invoice detail stays out of PDF and belongs to
+    Excel/detail export.
+
+No query, controller, domain, procurement, payment, inventory, or Excel writer
+file was changed for this slice.
+
+### GREEN PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/ReportingExports/SupplierPayableReportPdfExportFeatureTest.php tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php tests/Feature/ReportingExports/SupplierPayableReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\ReportingExports\SupplierPayableReportPdfExportFeatureTest
+PASS  Tests\Feature\Reporting\SupplierPayableReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\SupplierPayableReportExcelExportFeatureTest
+
+Tests: 16 passed, 114 assertions
+```
+
+Meaning:
+
+- supplier payable PDF still exports as `%PDF`;
+- supplier payable PDF now renders owner-readable sections and no longer renders
+  invoice detail rows;
+- supplier payable screen now renders the same owner-readable sections;
+- supplier payable Excel export remains available, preserves detailed numeric
+  data, and keeps formula-like text safe as literal string.
+
+### RESIDUAL
+
+The supplier payable screen still keeps the existing detail tables below the new
+owner-readable sections because existing UI tests currently cover those tables.
+A later UI-only tightening step may move or remove screen detail tables after
+each report family has the summary/PDF contract in place.
+
+### NEXT
+
+Continue with the next report family using the same RED -> patch -> GREEN ->
+log-update sequence.
+
 ## 2026-06-26 RED And Patch Proof - Transaction Summary Slice
 
 ### FACT
