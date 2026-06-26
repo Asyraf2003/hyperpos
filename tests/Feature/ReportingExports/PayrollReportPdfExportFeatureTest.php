@@ -93,8 +93,11 @@ final class PayrollReportPdfExportFeatureTest extends TestCase
         $this->assertStringContainsString('Laporan Gaji', $html);
         $this->assertStringContainsString('Jumlah Pencairan', $html);
         $this->assertStringContainsString('Total Nominal', $html);
-        $this->assertStringContainsString('Rincian Mode', $html);
-        $this->assertStringContainsString('Montir A', $html);
+        $this->assertStringContainsString('Ringkasan Utama', $html);
+        $this->assertStringContainsString('Catatan Laporan', $html);
+        $this->assertStringContainsString('Detail lengkap tersedia di Excel', $html);
+        $this->assertStringNotContainsString('Rincian Mode', $html);
+        $this->assertStringNotContainsString('Montir A', $html);
     }
 
     public function test_payroll_pdf_view_uses_owner_readable_report_sections_not_detail_tables(): void
