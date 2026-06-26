@@ -888,12 +888,43 @@ Meaning:
 - payroll screen now renders the same owner-readable sections;
 - payroll Excel export remains available and preserves detailed numeric data.
 
-### RESIDUAL
+### UI TIGHTENING PROOF
 
-The payroll screen still keeps the existing detail tables below the new
-owner-readable sections because existing UI tests currently cover those tables.
-A later UI-only tightening step may move or remove screen detail tables after
-each report family has the summary/PDF contract in place.
+The payroll screen residual was removed after the main PDF contract was green.
+
+Patched:
+
+- `resources/views/admin/reporting/payroll/index.blade.php`
+  - removed table-shaped period/mode/detail blocks from the owner-facing page;
+  - added `Rincian Ringkas` cards for period totals and mode totals;
+  - kept employee names, payroll notes, and row detail in Excel.
+- `tests/Feature/Reporting/PayrollReportPageFeatureTest.php`
+  - stopped expecting employee detail names on the screen report;
+  - asserted the page still shows period, total, mode, and owner-readable
+    report sections;
+  - asserted the old `Detail Pencairan Gaji` table is not rendered.
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/PayrollReportPageFeatureTest.php tests/Feature/ReportingExports/PayrollReportPdfExportFeatureTest.php tests/Feature/ReportingExports/PayrollReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Reporting\PayrollReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\PayrollReportPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\PayrollReportExcelExportFeatureTest
+
+Tests: 15 passed, 96 assertions
+```
+
+Meaning:
+
+- payroll screen now follows the same owner-readable direction as the PDF;
+- payroll PDF remains owner-readable;
+- payroll Excel remains the detailed export surface.
 
 ### NEXT
 
