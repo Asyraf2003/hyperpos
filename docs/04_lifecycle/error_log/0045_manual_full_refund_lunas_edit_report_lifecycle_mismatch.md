@@ -366,6 +366,44 @@ Remaining scope:
   outstanding: `gross - allocated + refunded`. It must be checked and aligned
   with projection/current collectible outstanding before this issue is closed.
 
+## 2026-06-26 Patch Proof 2
+
+Patched transaction summary/per-note report path:
+
+- `app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php`
+  - joins `note_history_projection`
+  - exposes `outstanding_rupiah` from projection when available
+  - keeps fallback formula for legacy rows without projection
+- `app/Application/Reporting/DTO/TransactionSummaryPerNoteRow.php`
+  - accepts optional report/projection outstanding override
+  - keeps old formula as fallback
+- `app/Application/Reporting/Services/TransactionSummaryPerNoteBuilder.php`
+  - passes query `outstanding_rupiah` into the DTO
+- `tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php`
+  - now asserts report raw row and DTO row keep cash history while showing
+    collectible outstanding as `0`
+
+Proof commands:
+
+- `php -l app/Adapters/Out/Reporting/Queries/TransactionSummaryReportingQuery.php`
+- `php -l app/Application/Reporting/DTO/TransactionSummaryPerNoteRow.php`
+- `php -l app/Application/Reporting/Services/TransactionSummaryPerNoteBuilder.php`
+- `php -l tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php`
+- `php artisan test tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php`
+
+Proof result:
+
+- syntax PASS for all changed report/test files.
+- target lifecycle test PASS: `2 passed, 24 assertions`.
+
+Current invariant proven by target test:
+
+- detail billing no longer exposes old refunded package root as current
+  outstanding.
+- projection collectible outstanding is `0`.
+- transaction summary raw/DTO outstanding is `0`.
+- cash history remains visible as allocated/refunded/net cash.
+
 ## NEXT SAFE STEP
 
 Read the local source and DB state for the latest matching note. Update this log
