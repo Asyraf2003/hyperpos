@@ -101,108 +101,44 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <h5 class="mb-2">Rincian Ringkas</h5>
+    <div class="text-muted small">
+        Bagian ini hanya menampilkan perubahan kas per tanggal agar halaman
+        tetap mudah dibaca. Nomor nota, sumber data, dan rincian tiap kejadian
+        tersedia di Excel.
+    </div>
+</div>
+
 <div class="row g-3">
-    <div class="col-12 col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Agregasi Per Tanggal</h5>
+    @forelse ($periodRows as $row)
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Tanggal</div>
+                    <div class="fw-semibold mb-3">{{ $row['period_label'] }}</div>
 
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th class="text-end">Event</th>
-                                <th class="text-end">Net</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($periodRows as $row)
-                                <tr>
-                                    <td>{{ $row['period_label'] }}</td>
-                                    <td class="text-end">{{ number_format($row['total_events'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['net_amount_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada kejadian kas pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Kejadian Kas</span>
+                        <span class="fw-semibold">{{ number_format($row['total_events'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <span class="text-muted">Sisa Kas Hari Ini</span>
+                        <span class="fw-semibold {{ $row['net_amount_rupiah'] >= 0 ? 'text-primary' : 'text-danger' }}">
+                            Rp {{ number_format($row['net_amount_rupiah'], 0, ',', '.') }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-12 col-xl-8">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Detail Event Kas</h5>
-
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Tanggal Event</th>
-                                <th>Nota</th>
-                                <th>Jenis Kejadian</th>
-                                <th>Arah</th>
-                                <th class="text-end">Nominal</th>
-                                <th>Pembayaran</th>
-                                <th>Metode Pembayaran</th>
-                                <th>Pengembalian Dana</th>
-                                <th>Tabel Sumber</th>
-                                <th>ID Sumber</th>
-                                <th>ID Disposisi Sumber</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transaction-cash-ledger-table-body">
-                            @forelse ($rows as $row)
-                                <tr>
-                                    <td>{{ \App\Support\ViewDateFormatter::display($row['event_date'] ?? null) }}</td>
-                                    <td>{{ $row['note_label'] ?? $row['note_id'] }}</td>
-                                    <td>
-                                        {{ match ($row['event_type'] ?? '') {
-                                            'payment_allocation' => 'Alokasi Pembayaran',
-                                            'payment' => 'Pembayaran',
-                                            'refund' => 'Pengembalian Dana',
-                                            default => $row['event_type'] ?? '-',
-                                        } }}
-                                    </td>
-                                    <td>
-                                        <span class="badge {{ $row['direction'] === 'in' ? 'bg-success' : 'bg-danger' }}">
-                                            {{ ($row['direction'] ?? '') === 'in' ? 'Masuk' : (($row['direction'] ?? '') === 'out' ? 'Keluar' : '-') }}
-                                        </span>
-                                    </td>
-                                    <td class="text-end">Rp {{ number_format($row['event_amount_rupiah'], 0, ',', '.') }}</td>
-                                    <td>{{ ($row['customer_payment_id'] ?? null) ? 'Ada' : '-' }}</td>
-                                    <td>
-                                        {{ match ($row['payment_method'] ?? '') {
-                                            'cash' => 'Tunai',
-                                            'transfer', 'tf' => 'Transfer',
-                                            default => ($row['customer_payment_id'] ?? null) ? ($row['payment_method'] ?? '-') : '-',
-                                        } }}
-                                    </td>
-                                    <td>{{ ($row['refund_id'] ?? null) ? 'Ada' : '-' }}</td>
-                                    <td>{{ $row['source_table'] ?? '-' }}</td>
-                                    <td>{{ $row['source_id'] ?? '-' }}</td>
-                                    <td>{{ $row['source_disposition_id'] ?? '-' }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="11" class="text-center text-muted">Belum ada kejadian kas pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-3 d-flex justify-content-end">
-                    @include('layouts.partials.pagination', ['paginator' => $rows])
+    @empty
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-muted">
+                    Belum ada kejadian kas pada periode ini.
                 </div>
             </div>
         </div>
-    </div>
+    @endforelse
 </div>
 @endsection
