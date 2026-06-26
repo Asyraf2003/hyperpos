@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Note\Services;
 
+use App\Application\Note\Services\Concerns\BuildsNoteHistoryCurrentRevisionSettlement;
 use App\Application\Note\Services\CurrentRevision\CurrentRevisionRowSettlementProjector;
 use App\Core\Shared\Exceptions\DomainException;
 use App\Ports\Out\ClockPort;
@@ -12,6 +13,8 @@ use App\Ports\Out\Note\NoteHistoryProjectionWriterPort;
 
 final class NoteHistoryProjectionService
 {
+    use BuildsNoteHistoryCurrentRevisionSettlement;
+
     public function __construct(
         private readonly NoteHistoryProjectionSourceReaderPort $source,
         private readonly NoteHistoryProjectionWriterPort $writer,
@@ -47,17 +50,27 @@ final class NoteHistoryProjectionService
                 'line_close_count' => 0,
                 'line_refund_count' => $sourceRow['line_refund_count'],
             ];
+
         $netPaidRupiah = $currentSettlement['net_paid_rupiah']
             ?? max($sourceRow['allocated_rupiah'] - $sourceRow['refunded_rupiah'], 0);
+
         $outstandingRupiah = $currentSettlement['outstanding_rupiah']
             ?? max($sourceRow['total_rupiah'] - $netPaidRupiah, 0);
-        $lineOpenCount = $currentSettlement['line_open_count'] ?? $sourceRow['line_open_count'];
-        $lineCloseCount = $currentSettlement['line_close_count'] ?? $sourceRow['line_close_count'];
-        $lineRefundCount = $currentSettlement['line_refund_count'] ?? $sourceRow['line_refund_count'];
+
+        $lineOpenCount = $currentSettlement['line_open_count']
+            ?? $sourceRow['line_open_count'];
+
+        $lineCloseCount = $currentSettlement['line_close_count']
+            ?? $sourceRow['line_close_count'];
+
+        $lineRefundCount = $currentSettlement['line_refund_count']
+            ?? $sourceRow['line_refund_count'];
 
         $this->writer->upsert([
             ...$sourceRow,
-            'customer_name_normalized' => $this->normalizeForSearch($sourceRow['customer_name']),
+            'customer_name_normalized' => $this->normalizeForSearch(
+                $sourceRow['customer_name'],
+            ),
             'net_paid_rupiah' => $netPaidRupiah,
             'outstanding_rupiah' => $outstandingRupiah,
             'line_open_count' => $lineOpenCount,
@@ -68,53 +81,6 @@ final class NoteHistoryProjectionService
             'has_refund_lines' => $lineRefundCount > 0,
             'projected_at' => $this->clock->now()->format('Y-m-d H:i:s'),
         ]);
-    }
-
-    /**
-     * @return array{
-     *   net_paid_rupiah:int,
-     *   outstanding_rupiah:int,
-     *   line_open_count:int,
-     *   line_close_count:int,
-     *   line_refund_count:int
-     * }|null
-     */
-    private function currentRevisionSettlement(string $noteId): ?array
-    {
-        if (! $this->currentRevision->hasRevision($noteId)) {
-            return null;
-        }
-
-        $revision = $this->currentRevision->resolveOrFail($noteId);
-        $lines = $revision->lines();
-        $settlements = $this->currentRevisionSettlements->build($revision->noteRootId(), $lines);
-
-        $rows = [];
-        $netPaid = 0;
-        $outstanding = 0;
-
-        foreach ($lines as $line) {
-            $key = $line->workItemRootId() ?? $line->id();
-            $settlement = $settlements[$key] ?? [];
-            $refunded = (int) ($settlement['refunded_rupiah'] ?? 0);
-            $lineOutstanding = (int) ($settlement['outstanding_rupiah'] ?? $line->subtotalRupiah());
-
-            $rows[] = [
-                'line_status' => $this->workItemStatuses->resolve($lineOutstanding, $refunded),
-            ];
-            $netPaid += (int) ($settlement['net_paid_rupiah'] ?? 0);
-            $outstanding += $lineOutstanding;
-        }
-
-        $summary = $this->lineSummary->build($rows);
-
-        return [
-            'net_paid_rupiah' => $netPaid,
-            'outstanding_rupiah' => $outstanding,
-            'line_open_count' => (int) $summary['open_count'],
-            'line_close_count' => (int) $summary['close_count'],
-            'line_refund_count' => (int) $summary['refund_count'],
-        ];
     }
 
     private function normalizeForSearch(string $value): string
