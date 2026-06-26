@@ -1,6 +1,6 @@
 # 0046 PDF Report Table Layout Owner Readability Gap
 
-Status: Characterized RED
+Status: Targeted Verified
 
 Reported by owner on 2026-06-26. This log captures the report readability
 problem found after the latest `0045` lifecycle/report fixes.
@@ -437,3 +437,53 @@ Failure meaning:
 
 Patch only the `operational_profit` screen/PDF presentation so these two RED
 tests become GREEN while keeping Excel export detail unchanged.
+
+## 2026-06-26 Patch Proof - Operational Profit Slice
+
+### FACT
+
+Patched only the operational-profit presentation layer:
+
+- `resources/views/admin/reporting/operational_profit/export_pdf.blade.php`
+  - removed table-shaped summary body;
+  - added `Ringkasan Utama`;
+  - added `Catatan Laporan`;
+  - added `Detail lengkap tersedia di Excel`.
+- `resources/views/admin/reporting/operational_profit/index.blade.php`
+  - added matching `Ringkasan Utama`;
+  - added matching `Catatan Laporan`;
+  - added Excel detail note.
+
+No query, controller, domain, payment/refund, inventory, or Excel writer file was
+changed for this slice.
+
+### PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/ReportingExports/OperationalProfitReportPdfExportFeatureTest.php tests/Feature/Reporting/OperationalProfitReportPageFeatureTest.php tests/Feature/ReportingExports/OperationalProfitReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\ReportingExports\OperationalProfitReportPdfExportFeatureTest
+PASS  Tests\Feature\Reporting\OperationalProfitReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\OperationalProfitReportExcelExportFeatureTest
+
+Tests: 10 passed, 61 assertions
+```
+
+Meaning:
+
+- operational-profit PDF still exports as `%PDF`;
+- operational-profit PDF now renders owner-readable report sections;
+- operational-profit screen now renders the same report sections;
+- operational-profit Excel export remains available and still preserves numeric
+  cells.
+
+### NEXT
+
+Continue with the next report family using the same RED -> patch -> GREEN ->
+log-update sequence.
