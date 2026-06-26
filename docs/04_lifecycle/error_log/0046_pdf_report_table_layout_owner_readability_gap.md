@@ -487,3 +487,88 @@ Meaning:
 
 Continue with the next report family using the same RED -> patch -> GREEN ->
 log-update sequence.
+
+## 2026-06-26 RED And Patch Proof - Transaction Cash Ledger Slice
+
+### FACT
+
+The second vertical slice is `transaction_cash_ledger`.
+
+RED tests added:
+
+- `tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php`
+  - `test_transaction_cash_ledger_pdf_view_uses_owner_readable_report_sections_not_detail_tables`
+- `tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php`
+  - `test_admin_sees_owner_readable_report_sections_on_transaction_cash_ledger_page`
+
+Initial RED command:
+
+```bash
+php artisan test tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php
+```
+
+Initial RED result:
+
+```text
+Tests: 2 failed, 16 passed, 106 assertions
+```
+
+Failure meaning:
+
+- transaction cash ledger PDF did not render `Ringkasan Utama`;
+- transaction cash ledger screen did not render `Ringkasan Utama`.
+
+Patched presentation files:
+
+- `resources/views/admin/reporting/transaction_cash_ledger/export_pdf.blade.php`
+  - removed summary/detail tables from PDF body;
+  - added `Ringkasan Utama`;
+  - added `Catatan Laporan`;
+  - added `Detail lengkap tersedia di Excel`.
+- `resources/views/admin/reporting/transaction_cash_ledger/index.blade.php`
+  - added matching report sections to the screen.
+- `tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php`
+  - updated PDF expectation so source-table detail stays out of PDF and belongs
+    to Excel/detail export.
+
+No query, controller, domain, payment/refund, inventory, or Excel writer file was
+changed for this slice.
+
+### GREEN PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerPdfExportFeatureTest
+PASS  Tests\Feature\Reporting\TransactionCashLedgerPageFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerExcelExportFeatureTest
+
+Tests: 21 passed, 162 assertions
+```
+
+Meaning:
+
+- transaction cash ledger PDF still exports as `%PDF`;
+- transaction cash ledger PDF now renders owner-readable sections and no longer
+  renders source-table detail rows;
+- transaction cash ledger screen now renders the same owner-readable sections;
+- transaction cash ledger Excel export remains available and preserves detailed
+  numeric data.
+
+### RESIDUAL
+
+The transaction cash ledger screen still keeps the existing detail table below
+the new owner-readable report sections because existing UI tests currently cover
+that detail table. A later UI-only tightening step may move or remove screen
+detail tables after each report family has the summary/PDF contract in place.
+
+### NEXT
+
+Continue with the next report family using the same RED -> patch -> GREEN ->
+log-update sequence.
