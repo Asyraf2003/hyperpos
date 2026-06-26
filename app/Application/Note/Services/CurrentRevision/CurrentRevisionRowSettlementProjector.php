@@ -32,8 +32,12 @@ final class CurrentRevisionRowSettlementProjector
     {
         usort($lines, static fn (NoteRevisionLineSnapshot $a, NoteRevisionLineSnapshot $b): int => $a->lineNo() <=> $b->lineNo());
 
-        $paymentTotals = $this->totalsGrouper->paymentTotals($this->componentPayments->listByNoteId($noteId));
-        $refundTotals = $this->totalsGrouper->refundTotals($this->componentRefunds->listByNoteId($noteId));
+        $paymentAllocations = $this->componentPayments->listByNoteId($noteId);
+        $refundAllocations = $this->componentRefunds->listByNoteId($noteId);
+        $paymentTotals = $this->totalsGrouper->paymentTotals($paymentAllocations);
+        $refundTotals = $this->totalsGrouper->refundTotals($refundAllocations);
+        $componentPaymentTotals = $this->totalsGrouper->componentPaymentTotals($paymentAllocations);
+        $componentRefundTotals = $this->totalsGrouper->componentRefundTotals($refundAllocations);
 
         $totalAllocated = $this->legacyPayments->getTotalAllocatedAmountByNoteId($noteId)->amount();
         $totalRefunded = $this->legacyRefunds->getTotalRefundedAmountByNoteId($noteId)->amount();
@@ -47,7 +51,13 @@ final class CurrentRevisionRowSettlementProjector
                 max($totalRefunded - array_sum($refundTotals), 0),
             );
 
-            return $this->componentSummary->build($lines, $paymentTotals, $refundTotals);
+            return $this->componentSummary->build(
+                $lines,
+                $paymentTotals,
+                $refundTotals,
+                $componentPaymentTotals,
+                $componentRefundTotals,
+            );
         }
 
         return $this->legacySummary->build(
