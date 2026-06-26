@@ -892,3 +892,32 @@ Result:
 
 Run payment/refund/report regression subset before investigating the exact
 `157500` refund-due report/edit-down amount.
+
+## 2026-06-26 Reopen 2 Regression Proof 1
+
+### PROOF
+
+Command:
+
+```bash
+php artisan test tests/Feature/Note/CashierRefundSelectionFirstFeatureTest.php tests/Feature/Note/CashierRefundRejectsOpenLineFeatureTest.php tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php tests/Feature/Payment/ServicePackageComponentRefundPayAgainMatrixTest.php tests/Feature/Payment/RecordSelectedRowsCustomerRefundFeatureTest.php tests/Feature/Payment/RecordSelectedRowsNotePaymentFeatureTest.php tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php tests/Feature/Reporting/GetTransactionReportDatasetFeatureTest.php tests/Feature/Reporting/TransactionReportPageFeatureTest.php tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php
+```
+
+Result:
+
+- `86 passed`
+- `539 assertions`
+
+### CURRENT STATUS
+
+Fixed and proven:
+
+- open/partially-paid rows no longer render as clickable refund rows
+- refunded + inventory-reversed store-stock components no longer render as
+  payable billing rows
+- backend payment/refund/report regression subset remains green
+
+Still open:
+
+- exact edit-down-to-`20000` surplus/refund-due amount (`157500`) needs a DB or
+  test reproduction before changing settlement/report behavior
