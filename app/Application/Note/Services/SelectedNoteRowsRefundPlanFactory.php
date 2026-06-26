@@ -54,7 +54,7 @@ final class SelectedNoteRowsRefundPlanFactory
             }
 
             $rowAllocations = $this->rowAllocations($selectedId, $allocations);
-            if ($rowAllocations !== [] && $this->allDefaultRefundable($rowAllocations)) {
+            if ($rowAllocations !== [] && $this->allSelectedRowRefundable($rowAllocations)) {
                 $cancellable[] = $selectedId;
             }
         }
@@ -75,10 +75,10 @@ final class SelectedNoteRowsRefundPlanFactory
     }
 
     /** @param list<PaymentComponentAllocation> $allocations */
-    private function allDefaultRefundable(array $allocations): bool
+    private function allSelectedRowRefundable(array $allocations): bool
     {
         foreach ($allocations as $allocation) {
-            if (! RefundComponentTypePolicy::isDefaultRefundable($allocation->componentType())) {
+            if (! RefundComponentTypePolicy::isSelectedRowRefundable($allocation->componentType())) {
                 return false;
             }
         }
