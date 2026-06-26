@@ -16,7 +16,7 @@ final class CashierOpenNoteRefundStandbyViewFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
-    public function test_open_unpaid_note_shows_refund_or_cancel_line_standby_action(): void
+    public function test_open_unpaid_note_shows_line_but_not_refund_standby_action(): void
     {
         $user = $this->seedKasir();
 
@@ -36,9 +36,10 @@ final class CashierOpenNoteRefundStandbyViewFeatureTest extends TestCase
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']));
 
         $response->assertOk();
-        $response->assertSee('Refund / Batalkan Line', false);
-        $response->assertSee('data-refund-row="1"', false);
-        $response->assertSee('data-row-id="wi-1"', false);
+        $response->assertSee('Servis Ringan');
+        $response->assertDontSee('Refund / Batalkan Line', false);
+        $response->assertDontSee('data-refund-row="1"', false);
+        $response->assertDontSee('data-row-id="wi-1"', false);
     }
 
     private function seedKasir(): User

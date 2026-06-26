@@ -12,6 +12,7 @@ final class CurrentRevisionDetailBaseRowMapper
     public function __construct(
         private readonly CurrentRevisionLinePresentationSupport $presentation,
         private readonly CurrentRevisionPackageBreakdownMapper $packages,
+        private readonly CurrentRevisionStoreStockLineLabelResolver $storeStockLabels,
     ) {
     }
 
@@ -33,7 +34,8 @@ final class CurrentRevisionDetailBaseRowMapper
         return [
             'id' => $key,
             'line_no' => $line->lineNo(),
-            'line_label' => $this->lineLabel($line, $storeLineCount),
+            'line_label' => $this->lineLabel($line, $payload, $storeLineCount),
+            'line_subtitle' => $this->storeStockLabels->summary($payload),
             'type_label' => $this->presentation->typeLabel($line->transactionType()),
             'transaction_type' => $line->transactionType(),
             'can_correct_service_only' => $line->transactionType() === WorkItem::TYPE_SERVICE_ONLY,
@@ -57,12 +59,12 @@ final class CurrentRevisionDetailBaseRowMapper
         return count(is_array($payload[$key] ?? null) ? $payload[$key] : []);
     }
 
-    private function lineLabel(NoteRevisionLineSnapshot $line, int $storeLineCount): string
+    private function lineLabel(NoteRevisionLineSnapshot $line, array $payload, int $storeLineCount): string
     {
         $label = $line->serviceLabel();
 
         return $label === null || trim($label) === ''
-            ? ($storeLineCount > 0 ? ('Produk x' . $storeLineCount) : 'Line Nota')
+            ? ($storeLineCount > 0 ? $this->storeStockLabels->primary($payload) : 'Line Nota')
             : $label;
     }
 }
