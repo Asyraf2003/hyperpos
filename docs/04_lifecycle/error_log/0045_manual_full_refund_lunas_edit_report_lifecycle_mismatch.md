@@ -634,3 +634,132 @@ Proof result:
 For owner manual Brave verification, reset/recreate the manual scenario from a
 fresh note after deploying this patch set, or explicitly resync projection for
 the old note before comparing reports.
+
+## 2026-06-26 Manual Brave Reopen 2
+
+### FACT
+
+Owner created a fresh manual note after restocking products 1-5 with quantity
+`10` each.
+
+Initial transaction composition:
+
+- service + store-stock part: `92500`
+  - paid cash/down payment: `17500`
+  - outstanding: `75000`
+- store-stock product sale: `55000`
+  - paid cash: `55000`
+  - outstanding: `0`
+- service only: `50000`
+  - outstanding: `50000`
+- service + external part: `100000`
+  - paid cash/down payment: `30000`
+  - outstanding: `70000`
+
+Initial expected baseline matched owner reports:
+
+- grand total: `297500`
+- paid: `102500`
+- outstanding: `195000`
+- cash ledger net: `102500`
+- operational profit: `65780`
+- package profit: `90260`
+- inventory available quantity: `47`
+
+Manual defects observed after follow-up actions:
+
+1. Refund action is clickable for rows that are not fully paid/closed. Backend
+   rejects after the owner enters a reason, but the UI should disable the action
+   from the start.
+2. Payment model is intentionally one down payment plus one settlement action;
+   second/third installment payments are not part of this system. UI currently
+   correctly offers only `Lunasi` after initial down payment.
+3. Selected refund on service + store-stock part and service + external part
+   succeeded. After refunding the store-stock product component, detail still
+   showed a `17500` outstanding row:
+   - line 1 service + store-stock part subtotal: `92500`
+   - paid: `75000`
+   - refund: `17500`
+   - outstanding: `17500`
+   - payment UI offered `Lunasi` for `17500`
+4. Executing that offered settlement failed with:
+   `Tidak ada komponen note yang bisa dialokasikan untuk payment ini.`
+5. Owner edited the note by deleting all lines and leaving one new product-only
+   line worth `20000`.
+6. Edit screen could not pay partial/full; saving made the note become paid:
+   - grand total: `20000`
+   - paid: `20000`
+   - refund: `0`
+   - outstanding: `0`
+   - operational status: `Lunas`
+   - pending refund due: `157500`
+7. Owner marked refund due successfully.
+
+Reports after the problematic edit/refund due sequence:
+
+- transaction cash ledger:
+  - total events: `3`
+  - cash in: `122500`
+  - cash out: `17500`
+  - net: `105000`
+- operational profit:
+  - money in: `297500`
+  - refunds: `17500`
+  - external purchase: `0`
+  - store stock COGS: `6720`
+  - operational profit: `273280`
+- package profit:
+  - package value: `92500`
+  - sparepart: `17500`
+  - sparepart COGS: `0`
+  - product refund: `17500`
+  - gross profit: `92500`
+- inventory:
+  - available quantity: `49`
+  - sold quantity: `4`
+  - refund/reversal quantity: `1`
+  - correction/revision quantity: `2`
+- transaction per note:
+  - gross value: `20000`
+  - allocated payment: `122500`
+  - refund paid: `17500`
+  - net cash: `105000`
+  - refund due: `157500`
+  - remaining refund due: `157500`
+  - outstanding: `0`
+  - paid notes: `1`
+
+### GAP
+
+Source-level proof is still pending for this reopened manual evidence.
+
+Suspected boundaries to inspect:
+
+- detail refund action availability for non-closed/non-fully-paid rows
+- detail payment billing rows after selected product-component refund when
+  service fee is intentionally non-refundable
+- downward edit settlement/surplus carry-forward from a previously partially
+  paid/refunded multi-line note to a small current revision
+- report distinction between cash ledger money-in and transaction-report
+  allocated payment after downward revision and refund due
+
+### DECISION
+
+Reopen 0045 for manual lifecycle mismatch. Do not patch blindly.
+
+The next implementation pass must proceed as:
+
+1. map source and DB for the fresh manual note
+2. add/adjust characterization tests for each proven defect
+3. patch one defect at a time
+4. update this log after each proof
+
+### ACTIVE STEP
+
+Find the latest manual note and map note/detail payload fields for refund,
+payment, edit settlement, and report rows.
+
+### PROOF
+
+Current proof is owner manual Brave evidence only. Local DB/source proof is
+pending.
