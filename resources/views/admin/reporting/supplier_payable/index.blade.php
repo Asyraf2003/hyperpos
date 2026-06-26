@@ -143,128 +143,72 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <h5 class="mb-2">Rincian Ringkas</h5>
+    <div class="text-muted small">
+        Halaman ini menampilkan sisa hutang per tanggal dan pemasok secara
+        ringkas. Nomor faktur, tanggal jatuh tempo per faktur, pembayaran, dan
+        baris detail tersedia di Excel.
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @forelse ($periodRows as $row)
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Tanggal Kirim</div>
+                    <div class="fw-semibold mb-3">{{ $row['period_label'] }}</div>
+
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Total Faktur</span>
+                        <span class="fw-semibold">{{ number_format($row['total_rows'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <span class="text-muted">Sisa Hutang</span>
+                        <span class="fw-semibold text-danger">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-muted">
+                    Belum ada faktur pada periode ini.
+                </div>
+            </div>
+        </div>
+    @endforelse
+</div>
+
 <div class="row g-3">
-    <div class="col-12 col-xl-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Rincian Per Tanggal</h5>
+    @forelse ($supplierRows as $row)
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Pemasok</div>
+                    <div class="fw-semibold mb-3">{{ $row['supplier_name'] ?? $row['supplier_id'] }}</div>
 
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th class="text-end">Invoice</th>
-                                <th class="text-end">Outstanding</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($periodRows as $row)
-                                <tr>
-                                    <td>{{ $row['period_label'] }}</td>
-                                    <td class="text-end">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada faktur pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Total Faktur</span>
+                        <span class="fw-semibold">{{ number_format($row['total_rows'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <span class="text-muted">Sisa Hutang</span>
+                        <span class="fw-semibold text-danger">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-12 col-xl-3">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Rincian Pemasok</h5>
-
-                <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Supplier</th>
-                                <th class="text-end">Invoice</th>
-                                <th class="text-end">Outstanding</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($supplierRows as $row)
-                                <tr>
-                                    <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
-                                    <td class="text-end">{{ number_format($row['total_rows'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada pemasok pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+    @empty
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-muted">
+                    Belum ada pemasok pada periode ini.
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-12 col-xl-5">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Detail Hutang Pemasok</h5>
-
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>No Faktur</th>
-                                <th>Supplier</th>
-                                <th>Tanggal Kirim</th>
-                                <th>Due Date</th>
-                                <th>Status</th>
-                                <th class="text-end">Total Tagihan</th>
-                                <th class="text-end">Dibayar</th>
-                                <th class="text-end">Outstanding</th>
-                            </tr>
-                        </thead>
-                        <tbody id="supplier-payable-report-table-body">
-                            @forelse ($rows as $row)
-                                <tr>
-                                    <td>{{ $row['nomor_faktur'] ?? $row['supplier_invoice_id'] }}</td>
-                                    <td>{{ $row['supplier_name'] ?? $row['supplier_id'] }}</td>
-                                    <td>{{ \App\Support\ViewDateFormatter::display($row['shipment_date'] ?? null) }}</td>
-                                    <td>{{ \App\Support\ViewDateFormatter::display($row['due_date'] ?? null) }}</td>
-                                    <td>
-                                        @if (($row['due_status'] ?? '') === 'settled')
-                                            <span class="badge bg-success">{{ $row['due_status_label'] }}</span>
-                                        @elseif (($row['due_status'] ?? '') === 'overdue')
-                                            <span class="badge bg-danger">{{ $row['due_status_label'] }}</span>
-                                        @elseif (($row['due_status'] ?? '') === 'due_today')
-                                            <span class="badge bg-warning text-dark">{{ $row['due_status_label'] }}</span>
-                                        @else
-                                            <span class="badge bg-primary">{{ $row['due_status_label'] }}</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-end">Rp {{ number_format($row['grand_total_rupiah'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['total_paid_rupiah'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['outstanding_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center text-muted">Belum ada faktur pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-3 d-flex justify-content-end">
-                    @include('layouts.partials.pagination', ['paginator' => $rows])
-                </div>
-            </div>
-        </div>
-    </div>
+    @endforelse
 </div>
 @endsection
