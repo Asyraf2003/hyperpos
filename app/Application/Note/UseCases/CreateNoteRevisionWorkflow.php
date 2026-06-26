@@ -9,6 +9,7 @@ use App\Application\Note\Services\BuildCreateNoteRevisionSettlement;
 use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorder;
 use App\Application\Note\Services\EditableWorkspaceNoteGuard;
 use App\Application\Note\Services\NoteCurrentRevisionResolver;
+use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\NoteRevisionBootstrapFactory;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
@@ -26,6 +27,7 @@ final class CreateNoteRevisionWorkflow
         private readonly CreateTransactionWorkspaceInlinePaymentRecorder $payments,
         private readonly CreateNoteRevisionPaymentResultFactory $paymentResults,
         private readonly EditableWorkspaceNoteGuard $guard,
+        private readonly NoteHistoryProjectionService $projection,
         private readonly ClockPort $clock,
     ) {
     }
@@ -89,6 +91,8 @@ final class CreateNoteRevisionWorkflow
             $revision,
             $settlement,
         );
+
+        $this->projection->syncNote($root->id());
 
         return $this->paymentResults->withPaymentSummary($result, $paymentSummary);
     }

@@ -176,6 +176,46 @@ Forensic step 1:
 Current proof is owner manual evidence only. Automated/source/DB proof is still
 pending.
 
+## 2026-06-26 Full Verify Regression Update
+
+### FACT
+
+Owner ran `make verify` and reported 12 failing tests after the first lifecycle
+patch set.
+
+The failures clustered into three causes:
+
+- selected-row refund briefly allowed `service_fee`, breaking the existing
+  domain contract that only product/store-stock payment components are
+  refundable
+- detail billing rows still rendered canceled rows as payable/refundable rows
+- revision projection sync ran before the new revision was committed as
+  `notes.current_revision_id`, so projection settlement could still read the
+  previous revision
+
+### DECISION
+
+Keep the current refund contract narrow:
+
+- `service_fee` remains non-refundable for default and selected-row refund
+- current owner issue is handled by aligning current revision settlement,
+  projection, reports, and UI row visibility, not by making service fee
+  refundable
+
+### ACTIVE STEP
+
+Move note-history projection sync in the revision workflow so it runs after the
+new note revision is inserted and set as `current_revision_id`.
+
+### PROOF
+
+Patch applied:
+
+- `ApplyNoteRevisionAsActiveReplacement` no longer syncs history projection
+  before the revision commit
+- `CreateNoteRevisionWorkflow` now syncs history projection immediately after
+  `CreateNoteRevisionCommitter::commit()`
+
 ## 2026-06-26 Forensic Update 1
 
 ### FACT

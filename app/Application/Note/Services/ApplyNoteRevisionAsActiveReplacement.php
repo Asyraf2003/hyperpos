@@ -14,7 +14,6 @@ final class ApplyNoteRevisionAsActiveReplacement
         private readonly NoteWriterPort $notes,
         private readonly UpdateTransactionWorkspaceWorkItemPersister $workItems,
         private readonly NoteReplacementPaymentAllocationReconciler $payments,
-        private readonly NoteHistoryProjectionService $projection,
         private readonly RevisionSnapshotStoreStockLineTrustMarker $snapshotTrust,
     ) {
     }
@@ -44,6 +43,5 @@ final class ApplyNoteRevisionAsActiveReplacement
         $this->workItems->persist($root, $trustedItems, $root->transactionDate());
         $this->notes->updateTotal($root);
         $this->payments->rebuild($root, $paymentAmounts);
-        $this->projection->syncNote($root->id());
     }
 }
