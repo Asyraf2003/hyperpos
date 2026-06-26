@@ -987,3 +987,182 @@ Still open for a separate pass:
 
 - manual edit-down to one `20000` product line producing `157500` refund due
   needs exact DB/test reproduction before settlement/report logic changes
+
+## 2026-06-26 Reopen 3 Owner Live Note Product Refund Proof
+
+### FACT
+
+Owner reported a new live MariaDB case:
+
+- note id: `12cd7684-1cfe-453b-854b-e1cb86899c89`
+- create flow contained four transaction types:
+  - product-only store stock row
+  - service-only row
+  - service with store-stock package/product component row
+  - service with external purchase row
+- owner paid partially, then settled/lunasi, then refunded the product
+  components.
+- UI/report still showed:
+  - Grand Total `242000`
+  - Sudah Dibayar `207000`
+  - Total Refund `35000`
+  - Sisa Tagihan `35000`
+- executing the offered `lunasi` failed with:
+  `Billing row pembayaran yang dipilih tidak valid untuk nota ini.`
+
+DB proof for the live note:
+
+- `customer_payments` total cash in: `242000`
+- `customer_refunds` total cash out: `35000`
+- refunded components:
+  - `service_store_stock_part` `17500`
+  - `product_only_work_item` `17500`
+- inventory movements for both refunded store-stock lines had stock-out then
+  stock-in reversal.
+- `work_items.status` for the product-only work item was `canceled`, but the
+  current revision snapshot still had the original revision line status `open`.
+
+### ROOT CAUSE
+
+The remaining mismatch was not only a Blade button problem.
+
+Current-revision settlement was still calculating line outstanding as:
+
+```text
+line subtotal - net paid after refund
+```
+
+That made fully refunded product components become collectible debt again even
+though backend payment allocation correctly treated them as non-payable:
+
+- product-only full refund should not reopen a payable billing row
+- store-stock product refund with inventory reversal should not reopen a
+  payable billing row
+- reports should keep cash history visible but should not turn those refunded
+  product components into current collectible debt
+
+### PATCH
+
+Patch behavior now separates cash history from collectible debt:
+
+- `CurrentRevisionComponentCollectibleSettlementBuilder`
+  - computes current line settlement from component-level paid/refund totals
+  - treats fully refunded `product_only_work_item` components as
+    non-collectible
+  - treats refunded + inventory-reversed `service_store_stock_part`
+    components as non-collectible
+- `CurrentRevisionComponentSettlementSummaryBuilder`
+  - uses collectible component settlement for `net_paid_rupiah` and
+    `outstanding_rupiah`
+- `CurrentRevisionRowSettlementProjector`
+  - passes component-level payment/refund totals into the summary builder
+- `NoteBillingProjectionRefundedStoreStockComponentSkipper`
+  - skips fully refunded product-only billing rows, in addition to reversed
+    store-stock part rows
+- `NoteDetailOperationalPayloadBuilder`
+  - treats `outstanding_rupiah <= 0` as close/lunas in the detail payload
+- `NoteOperationalStatusResolver`
+  - uses current-revision `outstanding_rupiah` as the close/open decision when
+    current-revision settlement exists
+- `ManualFullRefundEditLifecycleMismatchFeatureTest`
+  - adds regression coverage for refunded canceled product-only rows not
+    becoming collectible debt
+
+### PROOF
+
+Target proof:
+
+```bash
+php artisan test tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php
+```
+
+Result:
+
+- `5 passed`
+- `44 assertions`
+
+Selected regression proof:
+
+```bash
+php artisan test tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php tests/Feature/Note/RefundAfterRevisionCurrentRowBoundaryFeatureTest.php tests/Feature/Payment/RecordCustomerRefundFeatureTest.php tests/Feature/Note/CashierClosedNoteRefundViewFeatureTest.php tests/Feature/Note/CashierRefundedNoteDetailViewFeatureTest.php tests/Feature/Payment/ServicePackageComponentRefundPayAgainMatrixTest.php tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php tests/Feature/Reporting/GetTransactionReportDatasetFeatureTest.php tests/Feature/Reporting/TransactionReportPageFeatureTest.php tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php tests/Unit/Application/Note/Services/NoteOperationalStatusResolverTest.php
+```
+
+Result:
+
+- `80 passed`
+- `548 assertions`
+
+Full verify proof:
+
+```bash
+make verify
+```
+
+Result:
+
+- PHPStan: no errors
+- line-limit audit: passed
+- Blade PHP/directive audit: passed
+- contract audit: passed
+- Pest: `1423 passed`
+- assertions: `8467`
+- duration: `107.05s`
+
+Live note payload proof after patch:
+
+```json
+{
+  "operational_status": "close",
+  "grand_total_rupiah": 242000,
+  "total_allocated_rupiah": 242000,
+  "total_refunded_rupiah": 35000,
+  "net_paid_rupiah": 207000,
+  "outstanding_rupiah": 0,
+  "can_show_payment_form": false,
+  "can_show_settle_payment_action": false,
+  "billing_outstanding": []
+}
+```
+
+Projection rebuild command run locally:
+
+```bash
+php artisan projection:rebuild-indexes note
+```
+
+Result:
+
+- `Note projection: 1/1`
+- `Projection rebuild selesai.`
+
+Live projection after rebuild:
+
+```json
+{
+  "total_rupiah": 224500,
+  "allocated_rupiah": 242000,
+  "refunded_rupiah": 35000,
+  "net_paid_rupiah": 207000,
+  "outstanding_rupiah": 0,
+  "line_open_count": 0,
+  "line_close_count": 2,
+  "line_refund_count": 2
+}
+```
+
+### CURRENT STATUS
+
+Fixed and verified:
+
+- product-only full refund no longer opens payable billing debt
+- refunded + inventory-reversed store-stock components no longer open payable
+  billing debt
+- detail payload hides payment/lunasi for the live note
+- transaction summary/report projection can show cash history while current
+  collectible outstanding is `0`
+- local note projection was rebuilt for the live database case
+
+Still open for a separate pass:
+
+- manual edit-down to one `20000` product line producing `157500` refund due
+  still needs exact DB/test reproduction before settlement/report logic changes
