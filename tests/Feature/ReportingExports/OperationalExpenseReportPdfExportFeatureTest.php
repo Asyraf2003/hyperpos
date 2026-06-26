@@ -92,6 +92,37 @@ final class OperationalExpenseReportPdfExportFeatureTest extends TestCase
         $this->assertStringContainsString('Bayar listrik', $html);
     }
 
+    public function test_operational_expense_pdf_view_uses_owner_readable_report_sections_not_detail_tables(): void
+    {
+        $html = view('admin.reporting.operational_expense.export_pdf', [
+            'title' => 'Laporan Biaya Operasional',
+            'periodLabel' => '01 Januari 2030 s/d 31 Januari 2030',
+            'generatedAt' => '31 Januari 2030 10:00',
+            'summaryItems' => [
+                ['label' => 'Jumlah Catatan', 'value' => 2],
+                ['label' => 'Total Biaya', 'value' => 'Rp 125.000'],
+                ['label' => 'Kategori Terbesar', 'value' => 'Listrik'],
+            ],
+            'rows' => [
+                [
+                    'date' => '06 Januari 2030',
+                    'expense_id' => 'expense-1',
+                    'category_name' => 'Listrik',
+                    'description' => 'Bayar listrik',
+                    'payment_method' => 'Tunai',
+                    'reference_no' => 'INV-001',
+                    'amount' => 'Rp 100.000',
+                ],
+            ],
+        ])->render();
+
+        $this->assertStringContainsString('Ringkasan Utama', $html);
+        $this->assertStringContainsString('Catatan Laporan', $html);
+        $this->assertStringContainsString('Detail lengkap tersedia di Excel', $html);
+        $this->assertStringNotContainsString('<table class="summary">', $html);
+        $this->assertStringNotContainsString('<table class="detail">', $html);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([
