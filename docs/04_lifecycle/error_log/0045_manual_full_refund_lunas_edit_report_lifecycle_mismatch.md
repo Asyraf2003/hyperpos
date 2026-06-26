@@ -404,6 +404,33 @@ Current invariant proven by target test:
 - transaction summary raw/DTO outstanding is `0`.
 - cash history remains visible as allocated/refunded/net cash.
 
+## 2026-06-26 Regression Proof
+
+Additional fixes after regression:
+
+- `NoteHistoryProjectionService` now forces active total `0` notes to
+  collectible `net_paid=0` and `outstanding=0`, so stale/current revision
+  snapshots cannot recreate debt after a full active-line refund.
+- `TransactionSummaryReportingQuery` only uses projection outstanding as an
+  override for refund-sensitive rows. Non-refund revision/surplus rows keep the
+  legacy safe formula.
+
+Regression command:
+
+- `php artisan test tests/Feature/Note/NoteDetailPageFeatureTest.php tests/Feature/Note/RefundAfterRevisionCurrentRowBoundaryFeatureTest.php tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php tests/Feature/Reporting/TransactionSummaryReportingQueryFeatureTest.php tests/Feature/Reporting/GetTransactionReportDatasetFeatureTest.php tests/Feature/Reporting/TransactionReportPageFeatureTest.php tests/Feature/Reporting/PackageAutoSplitRevisionReportImpactFeatureTest.php`
+
+Regression result:
+
+- PASS: `17 passed, 162 assertions`.
+
+Status after this proof:
+
+- The owner-reported payment/detail/report outstanding mismatch is patched with
+  focused automated proof.
+- Browser/manual Brave QA is still not run in this session.
+- Broader report families outside transaction summary, cash ledger, and package
+  revision regression were not fully re-run in this step.
+
 ## NEXT SAFE STEP
 
 Read the local source and DB state for the latest matching note. Update this log
