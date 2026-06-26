@@ -23,26 +23,40 @@
             margin-bottom: 18px;
         }
 
-        .summary {
-            border-collapse: collapse;
-            margin-bottom: 18px;
-            width: 100%;
+        h2 {
+            font-size: 14px;
+            margin: 20px 0 8px;
         }
 
-        .summary td {
+        .metric {
             border: 1px solid #d1d5db;
-            padding: 7px 9px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            padding: 9px 11px;
         }
 
-        .summary td:first-child {
-            background: #f3f4f6;
+        .metric-label {
+            color: #4b5563;
+            font-size: 10px;
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: 15px;
             font-weight: bold;
-            width: 42%;
         }
 
-        .number {
-            text-align: right;
-            white-space: nowrap;
+        .note {
+            background: #f9fafb;
+            border-left: 4px solid #2563eb;
+            margin-bottom: 8px;
+            padding: 9px 11px;
+        }
+
+        .excel-note {
+            color: #374151;
+            font-size: 10px;
+            margin-top: 16px;
         }
     </style>
 </head>
@@ -53,15 +67,21 @@
         Dicetak: {{ $generatedAt }}
     </div>
 
-    <table class="summary">
-        <tbody>
-            @foreach ($summaryItems as $item)
-                <tr>
-                    <td>{{ $item['label'] }}</td>
-                    <td class="number">{{ $item['value'] }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h2>Ringkasan Utama</h2>
+    @foreach ($summaryItems as $item)
+        <div class="metric">
+            <div class="metric-label">{{ $item['label'] }}</div>
+            <div class="metric-value">{{ $item['value'] }}</div>
+        </div>
+    @endforeach
+
+    <h2>Catatan Laporan</h2>
+    <div class="note">
+        Laporan ini menunjukkan uang masuk lalu mengurangi pengembalian dana,
+        harga beli barang yang terpakai, biaya operasional, gaji, dan hutang
+        karyawan pada periode yang dipilih.
+    </div>
+
+    <div class="excel-note">Detail lengkap tersedia di Excel.</div>
 </body>
 </html>
