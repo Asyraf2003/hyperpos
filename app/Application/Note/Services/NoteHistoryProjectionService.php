@@ -19,6 +19,7 @@ final class NoteHistoryProjectionService
         private readonly NoteCurrentRevisionResolver $currentRevision,
         private readonly CurrentRevisionRowSettlementProjector $currentRevisionSettlements,
         private readonly NoteLineSummaryBuilder $lineSummary,
+        private readonly WorkItemOperationalStatusResolver $workItemStatuses,
     ) {
     }
 
@@ -90,7 +91,7 @@ final class NoteHistoryProjectionService
             $lineOutstanding = (int) ($settlement['outstanding_rupiah'] ?? $line->subtotalRupiah());
 
             $rows[] = [
-                'line_status' => (new WorkItemOperationalStatusResolver())->resolve($lineOutstanding, $refunded),
+                'line_status' => $this->workItemStatuses->resolve($lineOutstanding, $refunded),
             ];
             $netPaid += (int) ($settlement['net_paid_rupiah'] ?? 0);
             $outstanding += $lineOutstanding;
