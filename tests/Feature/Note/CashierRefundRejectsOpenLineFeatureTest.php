@@ -17,6 +17,21 @@ final class CashierRefundRejectsOpenLineFeatureTest extends TestCase
     use RefreshDatabase;
     use SeedsMinimalNotePaymentFixture;
 
+    public function test_detail_does_not_render_open_partially_paid_line_as_refundable(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedOpenPartialPaidNote();
+
+        $html = $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('Servis Open', $html);
+        $this->assertStringNotContainsString('data-refund-row="1"', $html);
+        $this->assertStringNotContainsString('data-row-id="wi-1"', $html);
+    }
+
     public function test_refund_rejects_operationally_open_partially_paid_line_selection(): void
     {
         $user = $this->seedKasir();

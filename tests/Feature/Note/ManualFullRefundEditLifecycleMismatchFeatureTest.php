@@ -124,6 +124,33 @@ final class ManualFullRefundEditLifecycleMismatchFeatureTest extends TestCase
         ]);
     }
 
+    public function test_detail_payment_does_not_offer_refunded_reversed_store_stock_component_as_payable(): void
+    {
+        $this->seedOwnerReportedRefundThenEditPackageLifecycle();
+        $this->seedCurrentPackageProductRefundAndInventoryReversal();
+
+        $data = app(NoteDetailPageDataBuilder::class)->build('note-owner-0045');
+        self::assertIsArray($data);
+
+        $note = $data['note'];
+        $billingRows = $note['billing_rows'];
+
+        self::assertSame(17500, $note['outstanding_rupiah']);
+        self::assertFalse(
+            $note['can_show_payment_form'],
+            'Detail payment must not be offered when the only apparent outstanding is a refunded store-stock component that backend allocation skips.',
+        );
+
+        self::assertSame(
+            [],
+            array_values(array_filter(
+                $billingRows,
+                static fn (array $row): bool => (string) $row['id'] === 'wi-owner-new-package::service_store_stock_part::ssl-owner-new-1'
+            )),
+            'Refunded and inventory-reversed store-stock component must not be rendered as a payable billing row.',
+        );
+    }
+
     private function seedOwnerReportedRefundThenEditPackageLifecycle(): void
     {
         $noteId = 'note-owner-0045';
@@ -301,6 +328,44 @@ final class ManualFullRefundEditLifecycleMismatchFeatureTest extends TestCase
                 'refunded_amount_rupiah' => 20000,
                 'refund_priority' => 2,
             ],
+        ]);
+    }
+
+    private function seedCurrentPackageProductRefundAndInventoryReversal(): void
+    {
+        DB::table('customer_refunds')->insert([
+            'id' => 'refund-owner-current-part-1',
+            'customer_payment_id' => 'payment-owner-current',
+            'note_id' => 'note-owner-0045',
+            'amount_rupiah' => 17500,
+            'refunded_at' => '2026-06-26',
+            'reason' => 'Owner manual current package product refund.',
+        ]);
+
+        DB::table('refund_component_allocations')->insert([
+            'id' => 'rca-owner-current-part-1',
+            'customer_refund_id' => 'refund-owner-current-part-1',
+            'customer_payment_id' => 'payment-owner-current',
+            'note_id' => 'note-owner-0045',
+            'work_item_id' => 'wi-owner-new-package',
+            'component_type' => PaymentComponentType::SERVICE_STORE_STOCK_PART,
+            'component_ref_id' => 'ssl-owner-new-1',
+            'refunded_amount_rupiah' => 17500,
+            'refund_priority' => 1,
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            'id' => 'im-reversal-new-1',
+            'product_id' => 'prod-owner-1',
+            'movement_type' => 'stock_in',
+            'source_type' => 'work_item_store_stock_line_reversal',
+            'source_id' => 'ssl-owner-new-1',
+            'tanggal_mutasi' => '2026-06-26',
+            'qty_delta' => 1,
+            'unit_cost_rupiah' => 1000,
+            'total_cost_rupiah' => 1000,
+            'created_at' => '2026-06-26 10:00:00',
+            'updated_at' => '2026-06-26 10:00:00',
         ]);
     }
 
