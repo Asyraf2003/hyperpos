@@ -763,3 +763,63 @@ payment, edit settlement, and report rows.
 
 Current proof is owner manual Brave evidence only. Local DB/source proof is
 pending.
+
+## 2026-06-26 Reopen 2 Source Proof 1
+
+### FACT
+
+Local DB read attempt failed from this session:
+
+- command attempted to read latest `notes`
+- connection: MySQL `127.0.0.1:3306`, database `bengkelhex`
+- failure: `SQLSTATE[HY000] [2002] Unknown error while connecting`
+
+Source proof found without DB:
+
+- `CurrentRevisionDetailRowMapper` sets `can_refund=true` for both `open` and
+  `close` line status.
+- `SelectedNoteRowsRefundEligibilityGuard` rejects non-close rows with
+  `Line open/belum lunas tidak boleh direfund.`
+- Therefore refund UI can show/click a row that backend will reject. This
+  matches the owner complaint that the button should not be usable from the
+  start.
+- `NoteBillingProjectionComponentRowsBuilder` turns refunded component money
+  into renewed outstanding by calculating:
+  `net_paid = allocated - refunded`, then `outstanding = total - net_paid`.
+- `AllocatePaymentAcrossComponents` then skips refunded store-stock part
+  components when `ReversedRefundedStoreStockPartPaymentGuard` sees an inventory
+  reversal for that component.
+- Therefore payment UI can offer a refunded/reversed store-stock component as
+  payable while backend allocation correctly refuses it. This matches the
+  `Tidak ada komponen note yang bisa dialokasikan untuk payment ini.` symptom.
+
+### GAP
+
+The `157500` refund-due amount after editing down to one `20000` product line
+still needs DB-level proof. Source formula alone explains surplus behavior, but
+not the exact reported amount.
+
+### DECISION
+
+First candidate fixes should be scoped in this order:
+
+1. row refund UI eligibility must match backend close-only refund guard
+2. billing/payment rows must exclude or disable refunded store-stock components
+   that backend payment allocation will skip
+3. downward edit surplus/refund-due math needs DB/test reproduction before
+   changing settlement logic
+
+### ACTIVE STEP
+
+Create characterization tests for the two source-proven UI/backend mismatches
+before patching them.
+
+### PROOF
+
+Source files inspected:
+
+- `CurrentRevisionDetailRowMapper`
+- `SelectedNoteRowsRefundEligibilityGuard`
+- `NoteBillingProjectionComponentRowsBuilder`
+- `AllocatePaymentAcrossComponents`
+- `ReversedRefundedStoreStockPartPaymentGuard`
