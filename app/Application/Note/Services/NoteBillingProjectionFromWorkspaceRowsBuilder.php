@@ -25,6 +25,10 @@ final class NoteBillingProjectionFromWorkspaceRowsBuilder
                 continue;
             }
 
+            if (trim((string) ($row['status'] ?? '')) === 'canceled') {
+                continue;
+            }
+
             $componentRows = $this->componentRows->build($row);
 
             if ($componentRows !== []) {
