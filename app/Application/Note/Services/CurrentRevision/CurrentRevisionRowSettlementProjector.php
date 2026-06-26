@@ -66,11 +66,7 @@ final class CurrentRevisionRowSettlementProjector
             $totalRefunded,
         );
     }
-    /**
-     * @param list<NoteRevisionLineSnapshot> $lines
-     * @param array<string, int> $paymentTotals
-     * @param array<string, int> $refundTotals
-     */
+
     private function mergeNoteLevelRemainders(
         array $lines,
         array &$paymentTotals,
