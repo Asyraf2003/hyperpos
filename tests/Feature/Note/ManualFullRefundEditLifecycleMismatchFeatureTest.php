@@ -6,6 +6,8 @@ namespace Tests\Feature\Note;
 
 use App\Application\Note\Services\NoteDetailPageDataBuilder;
 use App\Application\Note\Services\NoteHistoryProjectionService;
+use App\Adapters\Out\Reporting\Queries\TransactionSummaryReportingQuery;
+use App\Application\Reporting\Services\TransactionSummaryPerNoteBuilder;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
@@ -71,6 +73,16 @@ final class ManualFullRefundEditLifecycleMismatchFeatureTest extends TestCase
         self::assertSame(0, (int) $projection->line_open_count);
         self::assertSame(1, (int) $projection->line_close_count);
         self::assertSame(0, (int) $projection->line_refund_count);
+
+        $rawReportRows = app(TransactionSummaryReportingQuery::class)->rows('2026-06-01', '2026-06-30');
+        self::assertCount(1, $rawReportRows);
+        self::assertSame(112500, $rawReportRows[0]['allocated_payment_rupiah']);
+        self::assertSame(37500, $rawReportRows[0]['refunded_rupiah']);
+        self::assertSame(0, $rawReportRows[0]['outstanding_rupiah']);
+
+        $reportRows = app(TransactionSummaryPerNoteBuilder::class)->build($rawReportRows);
+        self::assertSame(0, $reportRows[0]->toArray()['outstanding_rupiah']);
+        self::assertSame(75000, $reportRows[0]->toArray()['net_cash_collected_rupiah']);
     }
 
     private function seedOwnerReportedRefundThenEditPackageLifecycle(): void
