@@ -108,7 +108,10 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
         $this->assertStringContainsString('Surplus Refund Paid', $html);
         $this->assertStringContainsString('Sisa Refund Due', $html);
         $this->assertStringContainsString('Sisa Piutang', $html);
-        $this->assertStringContainsString('Ada Refund', $html);
+        $this->assertStringContainsString('Ringkasan Utama', $html);
+        $this->assertStringContainsString('Catatan Laporan', $html);
+        $this->assertStringContainsString('Detail lengkap tersedia di Excel', $html);
+        $this->assertStringNotContainsString('Ada Refund', $html);
     }
 
     public function test_pdf_view_uses_owner_readable_report_sections_not_detail_tables(): void
