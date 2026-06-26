@@ -1228,14 +1228,46 @@ Meaning:
 - transaction cash ledger Excel export remains available and preserves detailed
   numeric data.
 
-### RESIDUAL
+### UI TIGHTENING PROOF
 
-The transaction cash ledger screen still keeps the existing detail table below
-the new owner-readable report sections because existing UI tests currently cover
-that detail table. A later UI-only tightening step may move or remove screen
-detail tables after each report family has the summary/PDF contract in place.
+The transaction cash ledger screen residual was removed after the main PDF
+contract was green.
+
+Patched:
+
+- `resources/views/admin/reporting/transaction_cash_ledger/index.blade.php`
+  - removed the screen detail event table from the owner-facing report page;
+  - removed the table-shaped period aggregation block;
+  - added `Rincian Ringkas` card/list output for period-level cash movement;
+  - kept the clear Excel note for full event/source/payment-method detail.
+- `tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php`
+  - stopped expecting note id/source id/detail event rows on the screen report;
+  - asserted the screen keeps `Tunai Masuk` and `Transfer Masuk` summary;
+  - asserted the screen does not render `Metode Pembayaran` detail table rows.
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Reporting\TransactionCashLedgerPageFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionCashLedgerExcelExportFeatureTest
+
+Tests: 21 passed, 160 assertions
+```
+
+Meaning:
+
+- cash ledger screen now follows the same owner-readable direction as the PDF;
+- cash ledger PDF remains owner-readable;
+- cash ledger Excel remains the detailed export surface.
 
 ### NEXT
 
-Continue with the next report family using the same RED -> patch -> GREEN ->
-log-update sequence.
+Continue UI-only tightening for the remaining report screens that still keep
+detail tables below the owner-readable sections.
