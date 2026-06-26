@@ -952,3 +952,38 @@ Result:
 
 - `4 passed`
 - `17 assertions`
+
+## 2026-06-26 Reopen 2 Full Verify Proof
+
+### PROOF
+
+Command:
+
+```bash
+make verify
+```
+
+Result:
+
+- PHPStan: no errors
+- line-limit audit: passed
+- Blade PHP/directive audit: passed
+- contract audit: passed
+- Pest: `1422 passed`
+- assertions: `8459`
+- duration: `99.67s`
+
+### CURRENT STATUS
+
+Fixed and verified:
+
+- rows that are not fully paid no longer render clickable refund UI
+- refunded + inventory-reversed store-stock components no longer render as
+  payable billing rows
+- current-revision product-only detail rows still show product names after
+  refund affordance was removed from open rows
+
+Still open for a separate pass:
+
+- manual edit-down to one `20000` product line producing `157500` refund due
+  needs exact DB/test reproduction before settlement/report logic changes
