@@ -216,6 +216,21 @@ Patch applied:
 - `CreateNoteRevisionWorkflow` now syncs history projection immediately after
   `CreateNoteRevisionCommitter::commit()`
 
+Subset proof:
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Note/CashierDetailRenderedBillingRowsPaymentFeatureTest.php tests/Feature/Note/ClosedNoteFullRefundExternalPurchaseLifecycleFeatureTest.php tests/Feature/Note/ClosedNoteFullRefundLifecycleFeatureTest.php tests/Feature/Note/ClosedNoteFullRefundStoreStockInventoryLifecycleFeatureTest.php tests/Feature/Note/EditTransactionWorkspacePackageAutoSplitCharacterizationTest.php tests/Feature/Note/NoteRevisionStoreStockInventoryLifecycleFeatureTest.php tests/Feature/Note/RefundReportingOwnerDecisionV2CharacterizationTest.php tests/Feature/Payment/RecordSelectedRowsCustomerRefundFeatureTest.php tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php
+```
+
+Result:
+
+- `29 passed`
+- `297 assertions`
+- proves the 12 reported `make verify` failures no longer reproduce in the
+  targeted regression group
+
 ## 2026-06-26 Forensic Update 1
 
 ### FACT
