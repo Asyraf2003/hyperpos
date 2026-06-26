@@ -54,6 +54,7 @@ trait BuildsNoteHistoryCurrentRevisionSettlement
         }
 
         $summary = $this->lineSummary->build($rows);
+        $outstanding = min($outstanding, max($revision->grandTotalRupiah() - $netPaid, 0));
 
         return [
             'net_paid_rupiah' => $netPaid,
