@@ -51,13 +51,17 @@ final class NoteOperationalStatusResolver
         $paidBasis = max($allocated->amount(), $grossPaid->amount());
         $netPaidRupiah = max($paidBasis - $refunded->amount(), 0);
         $currentSettlement = $this->currentRevisionSettlement($note);
+        $outstandingRupiah = max($grandTotal - $netPaidRupiah, 0);
 
         if ($currentSettlement !== null) {
             $grandTotal = $currentSettlement['gross_total_rupiah'];
             $netPaidRupiah = $currentSettlement['net_paid_rupiah'];
+            $outstandingRupiah = $currentSettlement['outstanding_rupiah'];
         }
 
-        $status = $this->statuses->resolve($grandTotal, $netPaidRupiah);
+        $status = $outstandingRupiah <= 0
+            ? NoteOperationalStatusEvaluator::STATUS_CLOSE
+            : $this->statuses->resolve($grandTotal, $netPaidRupiah);
 
         return [
             'operational_status' => $status,
@@ -67,7 +71,7 @@ final class NoteOperationalStatusResolver
             'total_allocated_rupiah' => $allocated->amount(),
             'total_refunded_rupiah' => $refunded->amount(),
             'net_paid_rupiah' => $netPaidRupiah,
-            'outstanding_rupiah' => max($grandTotal - $netPaidRupiah, 0),
+            'outstanding_rupiah' => $outstandingRupiah,
         ];
     }
 
