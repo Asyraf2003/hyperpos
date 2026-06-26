@@ -19,10 +19,11 @@ final class TransactionSummaryPerNoteBuilder
      *   transaction_date:string,
      *   customer_name:string,
      *   gross_transaction_rupiah:int,
-     *   allocated_payment_rupiah:int,
-     *   refunded_rupiah:int,
-     *   refund_due_rupiah:int
-     * }> $rows
+ *   allocated_payment_rupiah:int,
+ *   refunded_rupiah:int,
+ *   refund_due_rupiah:int
+ *   outstanding_rupiah?:int
+ * }> $rows
      * @return list<TransactionSummaryPerNoteRow>
      */
     public function build(array $rows): array
@@ -41,6 +42,7 @@ final class TransactionSummaryPerNoteBuilder
                     $row['allocated_payment_rupiah'],
                     $row['refunded_rupiah'],
                 ),
+                $row['outstanding_rupiah'] ?? null,
             ),
             $rows,
         );
