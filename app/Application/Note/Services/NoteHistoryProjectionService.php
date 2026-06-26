@@ -37,7 +37,16 @@ final class NoteHistoryProjectionService
             throw new DomainException('Source projection note tidak ditemukan.');
         }
 
-        $currentSettlement = $this->currentRevisionSettlement($normalizedNoteId);
+        $activeTotalRupiah = (int) $sourceRow['total_rupiah'];
+        $currentSettlement = $activeTotalRupiah > 0
+            ? $this->currentRevisionSettlement($normalizedNoteId)
+            : [
+                'net_paid_rupiah' => 0,
+                'outstanding_rupiah' => 0,
+                'line_open_count' => 0,
+                'line_close_count' => 0,
+                'line_refund_count' => $sourceRow['line_refund_count'],
+            ];
         $netPaidRupiah = $currentSettlement['net_paid_rupiah']
             ?? max($sourceRow['allocated_rupiah'] - $sourceRow['refunded_rupiah'], 0);
         $outstandingRupiah = $currentSettlement['outstanding_rupiah']

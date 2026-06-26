@@ -43,7 +43,7 @@ final class TransactionSummaryReportingQuery
                 DB::raw('COALESCE(refund_due_totals.refund_due_rupiah, 0) as refund_due_rupiah'),
                 DB::raw('COALESCE(surplus_refund_payment_totals.surplus_refund_paid_rupiah, 0) as surplus_refund_paid_rupiah'),
                 DB::raw('GREATEST(COALESCE(refund_due_totals.refund_due_rupiah, 0) - COALESCE(surplus_refund_payment_totals.surplus_refund_paid_rupiah, 0), 0) as remaining_refund_due_rupiah'),
-                DB::raw('COALESCE(note_history_projection.outstanding_rupiah, GREATEST(notes.total_rupiah - COALESCE(cash_payment_totals.allocated_payment_rupiah, 0) + COALESCE(cash_refund_totals.refunded_rupiah, 0), 0)) as outstanding_rupiah'),
+                DB::raw('CASE WHEN COALESCE(cash_refund_totals.refunded_rupiah, 0) > 0 THEN COALESCE(note_history_projection.outstanding_rupiah, GREATEST(notes.total_rupiah - COALESCE(cash_payment_totals.allocated_payment_rupiah, 0) + COALESCE(cash_refund_totals.refunded_rupiah, 0), 0)) ELSE GREATEST(notes.total_rupiah - COALESCE(cash_payment_totals.allocated_payment_rupiah, 0), 0) END as outstanding_rupiah'),
             ])
             ->map(static fn (object $row): array => [
                 'note_id' => (string) $row->note_id,
