@@ -48,6 +48,8 @@ trait ResolvesNoteOperationalCurrentRevisionSettlement
             );
         }
 
+        $outstanding = min($outstanding, max($revision->grandTotalRupiah() - $netPaid, 0));
+
         return [
             'gross_total_rupiah' => $revision->grandTotalRupiah(),
             'net_paid_rupiah' => $netPaid,

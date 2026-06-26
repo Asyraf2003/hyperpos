@@ -114,7 +114,14 @@ final class ManualFullRefundEditLifecycleMismatchFeatureTest extends TestCase
             ->where('work_item_id', 'wi-owner-new-package')
             ->sum('refunded_amount_rupiah');
 
-        self::assertSame(112500, $currentRefunded);
+        self::assertSame(37500, $currentRefunded);
+
+        $this->assertDatabaseMissing('refund_component_allocations', [
+            'note_id' => 'note-owner-0045',
+            'work_item_id' => 'wi-owner-new-package',
+            'component_type' => PaymentComponentType::SERVICE_FEE,
+            'component_ref_id' => 'wi-owner-new-package',
+        ]);
     }
 
     private function seedOwnerReportedRefundThenEditPackageLifecycle(): void
