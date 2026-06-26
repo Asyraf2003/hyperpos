@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 final class TransactionCashLedgerPdfBladePaymentMethodTest extends TestCase
 {
-    public function test_pdf_blade_renders_payment_method_column_for_cash_ledger_detail_rows(): void
+    public function test_pdf_blade_keeps_payment_method_summary_without_detail_rows(): void
     {
         $html = view('admin.reporting.transaction_cash_ledger.export_pdf', [
             'title' => 'Laporan Buku Kas Transaksi',
@@ -52,8 +52,12 @@ final class TransactionCashLedgerPdfBladePaymentMethodTest extends TestCase
             ],
         ])->render();
 
-        $this->assertStringContainsString('Metode Pembayaran', $html);
-        $this->assertStringContainsString('Tunai', $html);
-        $this->assertStringContainsString('Transfer', $html);
+        $this->assertStringContainsString('Ringkasan Utama', $html);
+        $this->assertStringContainsString('Tunai Masuk', $html);
+        $this->assertStringContainsString('Transfer Masuk', $html);
+        $this->assertStringContainsString('Detail lengkap tersedia di Excel', $html);
+        $this->assertStringNotContainsString('Metode Pembayaran', $html);
+        $this->assertStringNotContainsString('INV-001', $html);
+        $this->assertStringNotContainsString('payment_component_allocations', $html);
     }
 }
