@@ -510,22 +510,23 @@ Additional patched files:
     runtime Laravel container.
 - `app/Application/Payment/Services/RefundComponentTypePolicy.php`
   - keeps generic/default refund limited to product/store-stock parts.
-  - adds selected-row refund policy that also allows `service_fee`.
+  - selected-row refund remains limited to the same default-refundable
+    product/store-stock components after full-regression review.
 - `app/Application/Note/Services/SelectedRowsRefundBucketsBuilder.php`
 - `app/Application/Note/Services/SelectedNoteRowsRefundPlanFactory.php`
 - `app/Application/Payment/Services/RefundablePaymentAllocations.php`
-  - selected-row refund now includes service fee for the selected current row,
-    while generic refund behavior remains unchanged.
+  - selected-row refund policy is explicit and does not include service fee.
 - `tests/Feature/Note/ManualFullRefundEditLifecycleMismatchFeatureTest.php`
   - adds proof that current closed revision refund is accepted after historical
-    package component refund and refunds the current row total `112500`.
+    package component refund without reviving historical refunded product debt.
 - `tests/Unit/Application/Note/Services/NoteOperationalStatusResolverTest.php`
   - keeps legacy no-current-revision behavior covered.
 
 Important regression found and fixed:
 
 - Making `service_fee` globally default-refundable broke generic refund policy.
-- Final fix makes service fee refundable only for selected-row refunds.
+- Full-regression correction: service fee remains non-refundable for default and
+  selected-row refunds.
 
 Proof commands:
 
@@ -548,7 +549,7 @@ Current status:
 
 - UI detail payload: fixed.
 - Backend refund guard matching UI current revision: fixed.
-- Selected-row refund service fee: fixed.
+- Selected-row refund service fee: blocked by policy.
 - Generic refund default product/part behavior: preserved.
 - Transaction summary/per-note report outstanding: fixed.
 - Direct Blade/JS edits: not needed yet for these proven defects.
@@ -586,12 +587,50 @@ Updated decision:
   payable/refundable UI rows.
 - Cap current-revision projection outstanding to current revision grand total.
 
+Final patch set after owner full-verify failures:
+
+- `NoteBillingProjectionFromWorkspaceRowsBuilder`
+  - skips canceled current-revision rows so Blade does not render them as
+    payable/refundable billing rows.
+- `BuildsNoteHistoryCurrentRevisionSettlement`
+- `ResolvesNoteOperationalCurrentRevisionSettlement`
+  - cap current-revision outstanding by the active revision grand total.
+- `ApplyNoteRevisionAsActiveReplacement`
+- `CreateNoteRevisionWorkflow`
+  - history projection sync moved after the new revision is inserted and set as
+    `notes.current_revision_id`.
+- `RefundComponentTypePolicy`
+  - selected-row refund policy stays aligned with default product/store-stock
+    refundable components.
+
+Proof command from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+make verify
+```
+
+Proof result:
+
+- PHPStan: no errors
+- line-limit audit: passed
+- Blade PHP/directive audit: passed
+- contract audit: passed
+- Pest: `1420 passed`, `8450 assertions`
+- duration: `99.51s`
+
+## CURRENT STATUS
+
+- UI create/edit/payment/refund payload alignment for the owner-reported
+  lifecycle is fixed at backend data-source level.
+- Blade/JS contract tests for payment workflow remain green; no direct Blade/JS
+  patch was required for this proven defect.
+- Transaction summary/per-note report, cash ledger, package profit, stock value,
+  PDF, and Excel report suites pass full verify.
+- Existing dirty manual notes created before this patch may still have stale
+  projection rows until they are recreated or projection is resynced.
+
 ## NEXT SAFE STEP
 
-Read the local source and DB state for the latest matching note. Update this log
-again before any patch with:
-
-- actual note id
-- actual allocation/refund rows
-- source paths that decide each action
-- first characterization test target
+For owner manual Brave verification, reset/recreate the manual scenario from a
+fresh note after deploying this patch set, or explicitly resync projection for
+the old note before comparing reports.
