@@ -90,15 +90,19 @@ final class TransactionReportPageFeatureTest extends TestCase
         $response->assertSee('Unduh PDF');
         $response->assertSee('/admin/reports/transactions/export.pdf', false);
         $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
+        $response->assertSee('Rincian Ringkas');
+        $response->assertSee('Jumlah Nota');
+        $response->assertSee('Nilai Transaksi');
         $response->assertSee('Rp 150.000');
         $response->assertSee('Rp 149.999');
         $response->assertSee('Rp 9.000');
         $response->assertSee('Rp 140.999');
         $response->assertSee('Rp 9.001');
-        $response->assertSee('note-1');
-        $response->assertSee('note-2');
+        $response->assertDontSee('note-1');
+        $response->assertDontSee('note-2');
         $response->assertSee('Budi');
         $response->assertSee('Siti');
+        $response->assertDontSee('Detail Per Nota');
         $response->assertSee(route('admin.reports.transaction_cash_ledger.index'), false);
         $response->assertSee(route('admin.reports.employee_debt.index'), false);
         $response->assertSee(route('admin.reports.operational_profit.index'), false);
@@ -195,7 +199,8 @@ final class TransactionReportPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('05 Januari 2030 s/d 05 Januari 2030');
         $response->assertSee('Rp 25.000');
-        $response->assertSee('note-inside');
+        $response->assertSee('Inside Range');
+        $response->assertDontSee('note-inside');
         $response->assertDontSee('note-outside-before');
         $response->assertDontSee('note-outside-after');
     }
