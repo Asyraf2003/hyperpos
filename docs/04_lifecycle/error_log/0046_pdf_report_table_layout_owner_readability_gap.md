@@ -654,12 +654,47 @@ Meaning:
 - inventory stock value Excel export remains available, preserves detailed
   numeric data, and keeps formula-like product text safe as literal string.
 
-### RESIDUAL
+### UI TIGHTENING PROOF
 
-The inventory stock value screen still keeps the existing detail tables below
-the new owner-readable sections because existing UI tests currently cover those
-tables. A later UI-only tightening step may move or remove screen detail tables
-after each report family has the summary/PDF contract in place.
+The inventory stock value screen residual was removed after the main PDF
+contract was green.
+
+Patched:
+
+- `resources/views/admin/reporting/inventory_stock_value/index.blade.php`
+  - removed table-shaped snapshot/movement blocks from the owner-facing page;
+  - added `Rincian Ringkas` cards for stock position and movement totals;
+  - kept item code, average cost, movement source, and row detail in Excel.
+- `tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php`
+  - stopped expecting table/detail-only item code and movement source rows on
+    the screen report;
+  - asserted the page still shows product names, stock value, movement totals,
+    and owner-readable report sections;
+  - asserted the old `Snapshot Stok Saat Ini` and `Ringkasan Mutasi Periode`
+    tables are not rendered.
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Reporting\InventoryStockValueReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\InventoryStockValueReportPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\InventoryStockValueReportExcelExportFeatureTest
+
+Tests: 16 passed, 119 assertions
+```
+
+Meaning:
+
+- inventory stock value screen now follows the same owner-readable direction as
+  the PDF;
+- inventory stock value PDF remains owner-readable;
+- inventory stock value Excel remains the detailed export surface.
 
 ### NEXT
 
