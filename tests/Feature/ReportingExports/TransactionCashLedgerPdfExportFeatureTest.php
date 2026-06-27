@@ -72,7 +72,7 @@ final class TransactionCashLedgerPdfExportFeatureTest extends TestCase
                 [
                     'date' => '02 Januari 2030',
                     'note_label' => 'Budi · 2030-01-02',
-                    'event_type' => 'Alokasi Pembayaran',
+                    'event_type' => 'Pembayaran Tercatat',
                     'direction' => 'Masuk',
                     'payment_marker' => 'Ada',
                     'refund_marker' => '-',
@@ -113,7 +113,7 @@ final class TransactionCashLedgerPdfExportFeatureTest extends TestCase
                 [
                     'date' => '02 Januari 2030',
                     'note_label' => 'Budi · 2030-01-02',
-                    'event_type' => 'Alokasi Pembayaran',
+                    'event_type' => 'Pembayaran Tercatat',
                     'direction' => 'Masuk',
                     'payment_marker' => 'Ada',
                     'refund_marker' => '-',

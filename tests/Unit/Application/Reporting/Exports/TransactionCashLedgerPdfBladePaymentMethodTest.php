@@ -26,7 +26,7 @@ final class TransactionCashLedgerPdfBladePaymentMethodTest extends TestCase
                 [
                     'date' => '31/01/2030',
                     'note_label' => 'INV-001',
-                    'event_type' => 'Alokasi Pembayaran',
+                    'event_type' => 'Pembayaran Tercatat',
                     'direction' => 'Masuk',
                     'payment_method' => 'Tunai',
                     'amount' => 'Rp 85.000',
@@ -39,7 +39,7 @@ final class TransactionCashLedgerPdfBladePaymentMethodTest extends TestCase
                 [
                     'date' => '31/01/2030',
                     'note_label' => 'INV-002',
-                    'event_type' => 'Alokasi Pembayaran',
+                    'event_type' => 'Pembayaran Tercatat',
                     'direction' => 'Masuk',
                     'payment_method' => 'Transfer',
                     'amount' => 'Rp 30.000',
