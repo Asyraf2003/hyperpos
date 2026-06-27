@@ -1157,12 +1157,47 @@ Meaning:
 - supplier payable Excel export remains available, preserves detailed numeric
   data, and keeps formula-like text safe as literal string.
 
-### RESIDUAL
+### UI TIGHTENING PROOF
 
-The supplier payable screen still keeps the existing detail tables below the new
-owner-readable sections because existing UI tests currently cover those tables.
-A later UI-only tightening step may move or remove screen detail tables after
-each report family has the summary/PDF contract in place.
+The supplier payable screen residual was removed after the main PDF contract was
+green.
+
+Patched:
+
+- `resources/views/admin/reporting/supplier_payable/index.blade.php`
+  - removed table-shaped period/supplier/detail invoice blocks from the
+    owner-facing page;
+  - added `Rincian Ringkas` cards for period totals and supplier totals;
+  - kept invoice numbers, due dates per invoice, payments, and row detail in
+    Excel.
+- `tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php`
+  - stopped expecting invoice id detail rows on the screen report;
+  - asserted the page still shows totals, due status buckets, supplier payable
+    warning text, and owner-readable report sections;
+  - asserted the old `Detail Hutang Pemasok` table is not rendered.
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php tests/Feature/ReportingExports/SupplierPayableReportPdfExportFeatureTest.php tests/Feature/ReportingExports/SupplierPayableReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Reporting\SupplierPayableReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\SupplierPayableReportPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\SupplierPayableReportExcelExportFeatureTest
+
+Tests: 16 passed, 120 assertions
+```
+
+Meaning:
+
+- supplier payable screen now follows the same owner-readable direction as the
+  PDF;
+- supplier payable PDF remains owner-readable;
+- supplier payable Excel remains the detailed export surface.
 
 ### NEXT
 
