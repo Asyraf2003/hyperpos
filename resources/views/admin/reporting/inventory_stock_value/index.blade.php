@@ -122,103 +122,76 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <h5 class="mb-2">Rincian Ringkas</h5>
+    <div class="text-muted small">
+        Halaman ini menampilkan posisi stok dan mutasi produk secara ringkas.
+        Kode barang, harga pokok rata-rata, sumber mutasi, dan baris detail
+        tersedia di Excel.
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @forelse ($snapshotRows as $row)
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Produk Snapshot</div>
+                    <div class="fw-semibold mb-3">{{ $row['nama_barang'] }}</div>
+
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Qty Tersedia</span>
+                        <span class="fw-semibold">{{ number_format($row['current_qty_on_hand'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <span class="text-muted">Nilai Stok</span>
+                        <span class="fw-semibold">Rp {{ number_format($row['current_inventory_value_rupiah'], 0, ',', '.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-muted">
+                    Belum ada snapshot persediaan.
+                </div>
+            </div>
+        </div>
+    @endforelse
+</div>
+
 <div class="row g-3">
-    <div class="col-12 col-xl-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Snapshot Stok Saat Ini</h5>
+    @forelse ($movementRows as $row)
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Produk Bermutasi</div>
+                    <div class="fw-semibold mb-3">{{ $row['nama_barang'] ?? '-' }}</div>
 
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Barang</th>
-                                <th>Kode</th>
-                                <th>Nama</th>
-                                <th class="text-end">Qty</th>
-                                <th class="text-end">Harga Pokok Rata-rata</th>
-                                <th class="text-end">Inventory Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-stock-value-snapshot-table-body">
-                            @forelse ($snapshotRows as $row)
-                                <tr>
-                                    <td>
-                                        <div class="fw-semibold">{{ $row['nama_barang'] }}</div>
-                                        <div class="small text-muted">{{ $row['kode_barang'] ?? 'Tanpa kode barang' }}</div>
-                                    </td>
-                                    <td>{{ $row['kode_barang'] ?? '-' }}</td>
-                                    <td>{{ $row['nama_barang'] }}</td>
-                                    <td class="text-end">{{ number_format($row['current_qty_on_hand'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['current_avg_cost_rupiah'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['current_inventory_value_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center text-muted">Belum ada snapshot persediaan.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-3 d-flex justify-content-end">
-                    @include('layouts.partials.pagination', ['paginator' => $snapshotRows])
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Qty Masuk</span>
+                        <span class="fw-semibold text-success">{{ number_format($row['supply_in_qty'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3 mb-2">
+                        <span class="text-muted">Qty Keluar</span>
+                        <span class="fw-semibold text-danger">{{ number_format($row['sale_out_qty'], 0, ',', '.') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3">
+                        <span class="text-muted">Selisih Qty</span>
+                        <span class="fw-semibold">{{ number_format($row['net_qty_delta'], 0, ',', '.') }}</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="col-12 col-xl-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title mb-3">Ringkasan Mutasi Periode</h5>
-
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Barang</th>
-                                <th class="text-end">Supply In</th>
-                                <th class="text-end">Sale Out</th>
-                                <th class="text-end">Refund/Reversal</th>
-                                <th class="text-end">Koreksi/Revisi</th>
-                                <th class="text-end">Net Qty</th>
-                                <th class="text-end">Net Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-stock-value-movement-table-body">
-                            @forelse ($movementRows as $row)
-                                <tr>
-                                    <td>
-                                        <div class="fw-bold">
-                                            {{ $row['nama_barang'] ?? '-' }}
-                                        </div>
-                                        <div class="text-muted" style="font-size: 0.85rem;">
-                                            {{ $row['kode_barang'] ?? '-' }}
-                                        </div>
-                                    </td>
-                                    <td class="text-end">{{ number_format($row['supply_in_qty'], 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($row['sale_out_qty'], 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($row['refund_reversal_qty'], 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($row['revision_correction_qty'], 0, ',', '.') }}</td>
-                                    <td class="text-end">{{ number_format($row['net_qty_delta'], 0, ',', '.') }}</td>
-                                    <td class="text-end">Rp {{ number_format($row['net_cost_delta_rupiah'], 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted">Belum ada mutasi pada periode ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="mt-3 d-flex justify-content-end">
-                    @include('layouts.partials.pagination', ['paginator' => $movementRows])
+    @empty
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-muted">
+                    Belum ada mutasi pada periode ini.
                 </div>
             </div>
         </div>
-    </div>
+    @endforelse
 </div>
 @endsection
