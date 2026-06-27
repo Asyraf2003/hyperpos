@@ -340,3 +340,82 @@ Mulai dengan validasi data dulu. Beri 1 command rg fokus untuk membuktikan strin
 ## Context Advice
 
 Sesi ini sudah padat. Lanjut eksekusi di sesi baru lebih aman agar model tidak kebawa semua hasil scan besar dan mulai patch liar.
+
+### Session Update - 2026-06-27 Slice 1 Payment Billing UI Indonesianized
+
+#### Scope
+
+- Issue source: `docs/04_lifecycle/error_log/0047_transaction_owner_facing_indonesian_language_gap.md`
+- Active slice: Slice 1 - Detail note payment/billing owner-facing Indonesian label cleanup.
+- Patch boundary: presentation only.
+- Production logic change: none.
+- Database enum/column/domain contract/route/request payload/API change: none.
+- Mobile/API scope: untouched.
+- Compiled assets scope: untouched.
+
+#### Files Changed
+
+- `resources/views/cashier/notes/partials/billing-table.blade.php`
+- `resources/views/cashier/notes/partials/payment-modal.blade.php`
+- `public/assets/static/js/pages/cashier-note-payment.js`
+
+#### FACT
+
+- Local focused scan before patch showed owner-facing/internal English terms in Slice 1:
+  - `Billing Row`
+  - `billing projection row`
+  - `Line`
+  - `Tipe Domain`
+  - `existing`
+  - `preset DP`
+  - `clear`
+  - `outstanding`
+  - `Outstanding Terpilih`
+  - `allocation`
+  - `hidden`
+  - `Default`
+  - `service`
+- Patch changed owner-facing labels only.
+- Internal contracts were intentionally left unchanged:
+  - `type="hidden"`
+  - `aria-hidden`
+  - `outstanding_rupiah`
+  - `data-outstanding-rupiah`
+  - `is_service_component`
+  - `eligible_for_dp_preset`
+  - `dataset.outstandingRupiah`
+  - `event.preventDefault`
+- Post-patch focused scan no longer shows Slice 1 owner-facing English/internal terms.
+- Remaining scan hits are internal field/DOM/JS contract names only.
+- `make verify` passed:
+  - `1439 passed`
+  - `8600 assertions`
+  - duration `95.35s`
+
+#### Changes Applied
+
+- `Billing Row` -> `Baris Tagihan`
+- `Line` -> `Baris`
+- `Tipe Domain` -> `Jenis Tagihan`
+- `Ikuti urutan tagihan existing.` -> `Ikuti urutan tagihan sebelumnya.`
+- `Masuk prioritas preset DP.` -> `Masuk prioritas pengaturan DP.`
+- `Bisa dipilih manual setelah komponen sebelumnya clear.` -> `Bisa dipilih manual setelah komponen sebelumnya lunas.`
+- `Belum ada billing projection row untuk nota ini.` -> `Belum ada rincian tagihan untuk nota ini.`
+- `Line ...` rendered payment row label -> `Baris ...`
+- `Data billing row tetap dikirim hidden untuk allocation.` -> Indonesian owner-facing explanation.
+- `Belum ada tagihan outstanding.` -> `Belum ada sisa tagihan.`
+- `Outstanding Terpilih` -> `Sisa Tagihan Terpilih`
+- `Default mengikuti komponen service... outstanding terpilih.` -> Indonesian owner-facing instruction using `servis` and `sisa tagihan`.
+
+#### DECISION
+
+- Slice 1 is complete and verified.
+- Do not translate internal contract names just because they match the broad scan.
+- Next slice should stay narrow and avoid reports/export/refund/versioning unless explicitly selected.
+
+#### NEXT CANDIDATE SLICES
+
+- Slice 2 candidate A: refund due/paid modal owner-facing labels.
+- Slice 2 candidate B: transaction report PDF/Excel labels.
+- Slice 2 candidate C: revision/versioning timeline labels.
+- Slice 2 candidate D: cash ledger source metadata labels.
