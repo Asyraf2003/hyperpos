@@ -1277,12 +1277,46 @@ Meaning:
 - transaction summary Excel export remains available and preserves detailed
   numeric data.
 
-### RESIDUAL
+### UI TIGHTENING PROOF
 
-The transaction summary screen still keeps the existing detail tables below the
-new owner-readable sections because existing UI tests currently cover those
-tables. A later UI-only tightening step may move or remove screen detail tables
-after each report family has the summary/PDF contract in place.
+The transaction summary screen residual was removed after the main PDF contract
+was green.
+
+Patched:
+
+- `resources/views/admin/reporting/transaction_summary/index.blade.php`
+  - removed table-shaped period/customer/detail note blocks from the
+    owner-facing page;
+  - added `Rincian Ringkas` cards for period totals and customer totals;
+  - kept note id, per-note status, and row detail in Excel.
+- `tests/Feature/Reporting/TransactionReportPageFeatureTest.php`
+  - stopped expecting note id detail rows on the screen report;
+  - asserted the page still shows transaction totals, customer summary, refund
+    due summary, and owner-readable report sections;
+  - asserted the old `Detail Per Nota` table is not rendered.
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/TransactionReportPageFeatureTest.php tests/Feature/ReportingExports/TransactionReportPdfExportFeatureTest.php tests/Feature/ReportingExports/TransactionReportExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Reporting\TransactionReportPageFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionReportPdfExportFeatureTest
+PASS  Tests\Feature\ReportingExports\TransactionReportExcelExportFeatureTest
+
+Tests: 15 passed, 117 assertions
+```
+
+Meaning:
+
+- transaction summary screen now follows the same owner-readable direction as
+  the PDF;
+- transaction summary PDF remains owner-readable;
+- transaction summary Excel remains the detailed export surface.
 
 ### NEXT
 
