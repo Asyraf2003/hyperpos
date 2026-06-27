@@ -28,7 +28,7 @@ final class CashierNoteVersioningLineSnapshotViewFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Riwayat Perubahan Nota');
         $response->assertSee('Isi Perubahan Aktif');
-        $response->assertSee('Line 1');
+        $response->assertSee('Rincian 1');
         $response->assertSee('Servis Lama');
         $response->assertSee('50.000');
     }
