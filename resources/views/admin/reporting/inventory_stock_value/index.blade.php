@@ -36,10 +36,6 @@
 
 <div class="mb-3">
     <h5 class="mb-1">Ringkasan Utama</h5>
-    <div class="text-muted small">
-        Laporan ini merangkum posisi stok terbaru, nilai persediaan, dan mutasi
-        utama pada rentang movement yang dipilih.
-    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -115,83 +111,36 @@
 </div>
 
 <div class="mb-3">
-    <h5 class="mb-2">Catatan Laporan</h5>
-    <div class="text-muted">
-        Gunakan ringkasan ini untuk membaca posisi persediaan dengan cepat.
-        Detail lengkap tersedia di Excel.
-    </div>
-</div>
-
-<div class="mb-3">
     <h5 class="mb-2">Rincian Ringkas</h5>
-    <div class="text-muted small">
-        Halaman ini menampilkan posisi stok dan mutasi produk secara ringkas.
-        Kode barang, harga pokok rata-rata, sumber mutasi, dan baris detail
-        tersedia di Excel.
-    </div>
 </div>
 
 <div class="row g-3 mb-4">
-    @forelse ($snapshotRows as $row)
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Produk Snapshot</div>
-                    <div class="fw-semibold mb-3">{{ $row['nama_barang'] }}</div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Produk Snapshot</div>
+            <div class="fs-5 fw-bold">{{ number_format($summary['snapshot_product_rows'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
 
-                    <div class="d-flex justify-content-between gap-3 mb-2">
-                        <span class="text-muted">Qty Tersedia</span>
-                        <span class="fw-semibold">{{ number_format($row['current_qty_on_hand'], 0, ',', '.') }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between gap-3">
-                        <span class="text-muted">Nilai Stok</span>
-                        <span class="fw-semibold">Rp {{ number_format($row['current_inventory_value_rupiah'], 0, ',', '.') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @empty
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-muted">
-                    Belum ada snapshot persediaan.
-                </div>
-            </div>
-        </div>
-    @endforelse
-</div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Produk Bermutasi</div>
+            <div class="fs-5 fw-bold">{{ number_format($summary['movement_product_rows'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
 
-<div class="row g-3">
-    @forelse ($movementRows as $row)
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="text-muted small">Produk Bermutasi</div>
-                    <div class="fw-semibold mb-3">{{ $row['nama_barang'] ?? '-' }}</div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Selisih Qty Periode</div>
+            <div class="fs-5 fw-bold">{{ number_format($summary['period_net_qty_delta'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
 
-                    <div class="d-flex justify-content-between gap-3 mb-2">
-                        <span class="text-muted">Qty Masuk</span>
-                        <span class="fw-semibold text-success">{{ number_format($row['supply_in_qty'], 0, ',', '.') }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between gap-3 mb-2">
-                        <span class="text-muted">Qty Keluar</span>
-                        <span class="fw-semibold text-danger">{{ number_format($row['sale_out_qty'], 0, ',', '.') }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between gap-3">
-                        <span class="text-muted">Selisih Qty</span>
-                        <span class="fw-semibold">{{ number_format($row['net_qty_delta'], 0, ',', '.') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @empty
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-muted">
-                    Belum ada mutasi pada periode ini.
-                </div>
-            </div>
-        </div>
-    @endforelse
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="card"><div class="card-body">
+            <div class="text-muted small">Selisih Nilai Pokok Periode</div>
+            <div class="fs-5 fw-bold">Rp {{ number_format($summary['period_net_cost_delta_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        </div></div>
+    </div>
 </div>
 @endsection
