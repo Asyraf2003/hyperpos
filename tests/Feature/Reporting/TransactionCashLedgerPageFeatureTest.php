@@ -55,7 +55,7 @@ final class TransactionCashLedgerPageFeatureTest extends TestCase
         $response->assertSee('reference_date=2026-04-01', false);
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Kejadian Kas');
-        $response->assertSee('Sisa Kas Hari Ini');
+        $response->assertSee('Nilai Bersih');
         $response->assertSee('Rp 12.000');
         $response->assertSee('Rp 1.000');
         $response->assertSee('Rp 11.000');

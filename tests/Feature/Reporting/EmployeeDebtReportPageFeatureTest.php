@@ -62,8 +62,10 @@ final class EmployeeDebtReportPageFeatureTest extends TestCase
         $response->assertSee('Sisa Hutang');
         $response->assertDontSee('debt-1');
         $response->assertDontSee('debt-4');
-        $response->assertSee('paid');
-        $response->assertSee('unpaid');
+        $response->assertSee('Status Lunas');
+        $response->assertSee('Status Belum Lunas');
+        $response->assertDontSee('paid');
+        $response->assertDontSee('unpaid');
         $response->assertDontSee('Detail Hutang');
         $response->assertSee(route('admin.reports.transaction_cash_ledger.index'), false);
         $response->assertSee(route('admin.reports.employee_debt.index'), false);

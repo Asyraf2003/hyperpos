@@ -70,10 +70,9 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertSee('supplier-payable-report-filter-form', false);
         $response->assertSee('Notifikasi hutang faktur belum aktif.');
         $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
-        $response->assertSee('Status jatuh tempo dievaluasi terhadap tanggal referensi 31 Januari 2030.');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Total Faktur');
-        $response->assertSee('Sisa Hutang');
+        $response->assertSee('Sisa Hutang Lewat Tempo');
         $response->assertSee('Rp 200.000');
         $response->assertSee('Rp 140.000');
         $response->assertSee('Rp 60.000');
@@ -85,6 +84,8 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertDontSee('Detail Hutang Pemasok');
         $response->assertDontSee('invoice-1');
         $response->assertDontSee('invoice-4');
+        $response->assertDontSee('PT Sumber Makmur');
+        $response->assertDontSee('PT Sentosa Jaya');
         $response->assertSee(route('admin.reports.transaction_cash_ledger.index'), false);
         $response->assertSee(route('admin.reports.employee_debt.index'), false);
         $response->assertSee(route('admin.reports.operational_profit.index'), false);
@@ -141,7 +142,6 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('07 Januari 2030 s/d 09 Januari 2030');
-        $response->assertSee('Status jatuh tempo dievaluasi terhadap tanggal referensi 09 Januari 2030.');
         $response->assertSee('Rp 150.000');
         $response->assertSee('Rp 40.000');
         $response->assertSee('Rp 110.000');

@@ -11,8 +11,6 @@
     'resetUrl' => route('admin.reports.operational_profit.index'),
     'rangeLabelText' => 'Rentang kejadian aktif',
     'basisDateLabel' => 'Tanggal kejadian komponen kas dan biaya',
-    'basisDateNote' => 'Mode harian hanya menghitung kejadian yang jatuh tepat pada hari itu. Tidak ada saldo bawaan ke hari berikutnya.',
-    'noteText' => 'Laporan ini sekarang berbasis kas: uang masuk dikurangi pengembalian dana, harga beli produk, biaya operasional, gaji, dan hutang karyawan.',
     'exportActions' => [
         [
             'label' => 'Unduh Excel',

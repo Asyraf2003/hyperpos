@@ -56,8 +56,9 @@ final class OperationalExpenseReportPageFeatureTest extends TestCase
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Jumlah Catatan');
         $response->assertSee('Total Biaya');
+        $response->assertSee('Kategori Terbesar');
         $response->assertSee('Listrik');
-        $response->assertSee('Makan');
+        $response->assertDontSee('Makan');
         $response->assertSee('Rp 215.000');
         $response->assertSee('Rp 175.000');
         $response->assertSee('Rp 6.935');

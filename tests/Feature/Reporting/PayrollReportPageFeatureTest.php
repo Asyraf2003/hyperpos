@@ -47,11 +47,12 @@ final class PayrollReportPageFeatureTest extends TestCase
         $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Jumlah Pencairan');
-        $response->assertSee('Total Pencairan');
+        $response->assertSee('Total Nominal');
+        $response->assertSee('Mode Terbesar');
         $response->assertDontSee('Montir A');
         $response->assertDontSee('Montir B');
         $response->assertSee('Harian');
-        $response->assertSee('Mingguan');
+        $response->assertDontSee('Mingguan');
         $response->assertSee('Rp 100.000');
         $response->assertSee('07 Januari 2030');
         $response->assertDontSee('Detail Pencairan Gaji');
