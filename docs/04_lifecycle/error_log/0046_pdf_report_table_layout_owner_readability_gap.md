@@ -725,6 +725,8 @@ For each family:
   `Detail lengkap tersedia di Excel`.
 - PDF no longer renders detailed row tables.
 - Screen UI renders matching owner-readable sections.
+- Screen UI for the active target families no longer renders the old detail
+  tables under the report sections.
 - Excel export tests remain green and preserve detail/numeric data.
 
 ### PROOF
@@ -738,7 +740,7 @@ php artisan test tests/Feature/ReportingExports/OperationalProfitReportPdfExport
 Result:
 
 ```text
-Tests: 123 passed, 836 assertions
+Tests: 123 passed, 868 assertions
 ```
 
 Meaning:
@@ -746,12 +748,14 @@ Meaning:
 - focused regression for all touched report page/PDF/Excel export tests is
   green;
 - Excel detail remains covered for every touched report family;
+- screen report UI now follows the same owner-readable direction as PDF for
+  `transaction_cash_ledger`, `transaction_summary`, `supplier_payable`,
+  `employee_debt`, `payroll`, `operational_expense`, `inventory_stock_value`,
+  and `operational_profit`;
 - no query/domain/formula patch was needed for this presentation slice.
 
 ### RESIDUAL
 
-- Screen pages still keep existing detail tables below the owner-readable
-  sections because existing UI tests cover those detail tables.
 - `service_package_profit_breakdown` has screen and Excel routes but no active
   PDF route in `routes/web/admin_reporting.php`; this issue did not add a new
   PDF route.
