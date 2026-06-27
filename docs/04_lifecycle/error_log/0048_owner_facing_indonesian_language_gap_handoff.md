@@ -646,3 +646,67 @@ Sesi ini sudah padat. Lanjut eksekusi di sesi baru lebih aman agar model tidak k
 - Slice 4: revision/versioning timeline labels.
 - Slice 5: cash ledger source metadata labels/export.
 - Slice 6: supplier/procurement report labels that appeared in broad scan, but keep separate from transaction note work.
+
+### Session Update - 2026-06-28 Slice 4B Workspace Edit Revision Reason Input Bound
+
+#### Scope
+
+- Issue source: `docs/04_lifecycle/error_log/0047_transaction_owner_facing_indonesian_language_gap.md`
+- Follow-up slice: Slice 4B - workspace edit revision reason input binding.
+- Trigger: owner observed `Riwayat Perubahan Nota` always showing default reason `Revisi workspace nota admin` even after typing text in the workspace edit note section.
+- Patch boundary: workspace edit UI field + focused feature assertions.
+- Production logic change: small UX/data binding fix only.
+- Backend request/controller/domain logic change: none.
+- Database schema change: none.
+- Route/API/mobile/compiled assets change: none.
+
+#### Files Changed
+
+- `resources/views/cashier/notes/workspace/partials/note-description-card.blade.php`
+- `tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php`
+- `tests/Feature/Note/CashierNoteRevisionSubmitFeatureTest.php`
+
+#### FACT
+
+- Admin and cashier workspace edit routes submit `PATCH /{noteId}/workspace` to `StoreNoteRevisionController`.
+- `StoreNoteRevisionRequest` already accepts top-level `reason`.
+- If top-level `reason` is missing or blank, `StoreNoteRevisionRequest` falls back to:
+  - `Revisi workspace nota admin` for admin routes.
+  - `Revisi workspace nota kasir` for cashier routes.
+- Existing workspace UI showed section title `Alasan & Keterangan Nota`, but the only textarea in that section submitted `note[operational_note]`.
+- Therefore owner-typed text in that section updated note operational description, not `note_revisions.reason`.
+- Patch added a dedicated edit-mode-only textarea:
+  - label: `Alasan Perubahan Nota`
+  - name: `reason`
+  - helper: `Akan tampil di Riwayat Perubahan Nota.`
+- Existing `Keterangan Nota` field remains unchanged as `note[operational_note]`.
+
+#### Changes Applied
+
+- Added edit-mode-only `reason` textarea in workspace note description card.
+- Added UI assertions that edit workspace page renders:
+  - `Alasan Perubahan Nota`
+  - `name="reason"`
+  - `Akan tampil di Riwayat Perubahan Nota.`
+- Updated workspace revision submit test payload to send:
+  - `reason => Koreksi manual dari workspace.`
+- Added database assertion that the new `note_revisions` row stores:
+  - `reason => Koreksi manual dari workspace.`
+
+#### Tests
+
+- `php artisan test tests/Feature/Note/EditTransactionWorkspacePageFeatureTest.php tests/Feature/Note/CashierNoteRevisionSubmitFeatureTest.php`
+- Result: PASS, `7 passed (48 assertions)`.
+- Duration: `7.02s`.
+
+#### DECISION
+
+- Slice 4B is complete and verified.
+- Backend fallback reason remains intact for submissions that do not send `reason`.
+- `note[operational_note]` remains separate from `note_revisions.reason`.
+- Error log 0047 remains open/in progress unless remaining scan proves no owner-facing gaps remain.
+
+#### NEXT CANDIDATE SLICES
+
+- Slice 5: cash ledger source metadata labels/export.
+- Slice 6: final broad owner-facing scan for remaining English/internal terms.
