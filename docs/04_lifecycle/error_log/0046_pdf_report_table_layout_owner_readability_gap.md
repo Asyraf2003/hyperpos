@@ -1652,3 +1652,68 @@ Meaning:
 
 Continue UI-only tightening for the remaining report screens that still keep
 detail tables below the owner-readable sections.
+
+## 2026-06-27 Owner Follow-up - Remove Remaining UI Aggregate Loops
+
+### FACT
+
+After the production-scale follow-up, a residual scan still found report screen
+loops that could grow with period, supplier, payroll mode, employee-debt status,
+or operational-expense category data.
+
+Residual UI patterns found:
+
+- `supplier_payable/index.blade.php`: `periodRows` and `supplierRows`;
+- `payroll/index.blade.php`: `periodRows` and `modeRows`;
+- `employee_debt/index.blade.php`: `periodRows` and `statusRows`;
+- `operational_expense/index.blade.php`: `periodRows` and `categoryRows`;
+- several report includes still passed `basisDateNote` / `noteText` strings.
+
+### ANALYSIS
+
+These rows were aggregate rows, not raw Excel detail rows, but they still create
+an unbounded screen surface. That does not match the owner direction: PDF and UI
+should stay as readable reports, while Excel keeps detailed breakdowns.
+
+### PATCH
+
+Patched report screens:
+
+- removed remaining `basisDateNote` and `noteText` arguments from active report
+  screen includes;
+- replaced remaining per-period/per-supplier/per-mode/per-status/per-category
+  UI loops with fixed summary cards sourced from existing `summary` data;
+- updated page tests so owner-facing screens assert summary labels and do not
+  assert detail-like names/status rows;
+- kept Excel export tests unchanged and passing to prove detailed rows remain
+  available in Excel.
+
+### PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+rg -n 'basisDateNote|noteText|Catatan Laporan|Detail lengkap tersedia di Excel|Gunakan ringkasan|Halaman ini|Laporan ini merangkum|Laporan ini menunjukkan|tersedia di Excel|<table|@forelse' resources/views/admin/reporting/*/index.blade.php resources/views/admin/reporting/*/export_pdf.blade.php resources/views/admin/reporting/partials/period_filter.blade.php
+```
+
+Result:
+
+```text
+no matches
+```
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php tests/Feature/Reporting/TransactionReportPageFeatureTest.php tests/Feature/Reporting/SupplierPayableReportPageFeatureTest.php tests/Feature/Reporting/PayrollReportPageFeatureTest.php tests/Feature/Reporting/EmployeeDebtReportPageFeatureTest.php tests/Feature/Reporting/OperationalExpenseReportPageFeatureTest.php tests/Feature/Reporting/OperationalProfitReportPageFeatureTest.php tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownReportPageFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownUiScenarioMatrixFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownHttpWorkflowFeatureTest.php tests/Feature/Reporting/TaxLandedCostReportingFeatureTest.php tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php tests/Feature/ReportingExports/TransactionReportExcelExportFeatureTest.php tests/Feature/ReportingExports/SupplierPayableReportExcelExportFeatureTest.php tests/Feature/ReportingExports/PayrollReportExcelExportFeatureTest.php tests/Feature/ReportingExports/EmployeeDebtReportExcelExportFeatureTest.php tests/Feature/ReportingExports/OperationalExpenseReportExcelExportFeatureTest.php tests/Feature/ReportingExports/ServicePackageProfitBreakdownExcelExportFeatureTest.php
+```
+
+Result:
+
+```text
+Tests: 94 passed, 821 assertions
+```
+
+### NEXT
+
+Run full verification after this residual UI cleanup and record the result.
