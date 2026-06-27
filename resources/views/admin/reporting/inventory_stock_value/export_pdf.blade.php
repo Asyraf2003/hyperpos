@@ -43,18 +43,6 @@
             font-size: 13px;
         }
 
-        .note {
-            background: #f9fafb;
-            border-left: 4px solid #059669;
-            margin-bottom: 8px;
-            padding: 8px 10px;
-        }
-
-        .excel-note {
-            color: #374151;
-            font-size: 9px;
-            margin-top: 14px;
-        }
     </style>
 </head>
 <body>
@@ -73,12 +61,5 @@
         </div>
     @endforeach
 
-    <h2>Catatan Laporan</h2>
-    <div class="note">
-        Laporan ini merangkum posisi stok terbaru, nilai persediaan, dan mutasi
-        utama pada rentang movement yang dipilih.
-    </div>
-
-    <div class="excel-note">Detail lengkap tersedia di Excel.</div>
 </body>
 </html>

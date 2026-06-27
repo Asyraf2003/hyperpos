@@ -46,18 +46,6 @@
             font-weight: bold;
         }
 
-        .note {
-            background: #f9fafb;
-            border-left: 4px solid #2563eb;
-            margin-bottom: 8px;
-            padding: 9px 11px;
-        }
-
-        .excel-note {
-            color: #374151;
-            font-size: 10px;
-            margin-top: 16px;
-        }
     </style>
 </head>
 <body>
@@ -75,12 +63,5 @@
         </div>
     @endforeach
 
-    <h2>Catatan Laporan</h2>
-    <div class="note">
-        Laporan ini merangkum jumlah nota, nilai transaksi, pembayaran yang
-        sudah masuk, refund, dan sisa tagihan pada periode yang dipilih.
-    </div>
-
-    <div class="excel-note">Detail lengkap tersedia di Excel.</div>
 </body>
 </html>
