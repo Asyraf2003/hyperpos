@@ -78,9 +78,9 @@ final class CashierNoteHistoryTableFeatureTest extends TestCase
         $response->assertJsonPath('data.pagination.total', 2);
         $response->assertJsonPath('data.items.0.note_number', 'NOTE-TODAY-1');
         $response->assertJsonPath('data.items.0.payment_status_label', 'Belum Dibayar');
-        $response->assertJsonPath('data.items.0.work_status_label', 'Open: 1 • Selesai: 0 • Batal: 0');
+        $response->assertJsonPath('data.items.0.work_status_label', 'Belum Selesai: 1 • Selesai: 0 • Batal: 0');
         $response->assertJsonPath('data.items.1.note_number', 'NOTE-YESTERDAY-OPEN');
-        $response->assertJsonPath('data.items.1.work_status_label', 'Open: 1 • Selesai: 1 • Batal: 0');
+        $response->assertJsonPath('data.items.1.work_status_label', 'Belum Selesai: 1 • Selesai: 1 • Batal: 0');
     }
 
     private function cashierUser(): User

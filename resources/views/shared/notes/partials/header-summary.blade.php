@@ -7,14 +7,14 @@
   </div>
 
   <div class="note-detail-readonly-field">
-    <div class="note-detail-readonly-label">Customer</div>
+      <div class="note-detail-readonly-label">Pelanggan</div>
     <div class="note-detail-readonly-control">
       {{ $note['customer_name'] }}
     </div>
   </div>
 
   <div class="note-detail-readonly-field">
-    <div class="note-detail-readonly-label">No. HP Customer</div>
+      <div class="note-detail-readonly-label">No. HP Pelanggan</div>
     <div class="note-detail-readonly-control">
       {{ !empty($note['customer_phone']) ? $note['customer_phone'] : '-' }}
     </div>
@@ -46,16 +46,16 @@
   </div>
 
   <div class="note-detail-readonly-field">
-    <div class="note-detail-readonly-label">Jumlah Line</div>
-    <div class="note-detail-readonly-control">
-      {{ count($note['rows']) }} Line
-    </div>
+      <div class="note-detail-readonly-label">Jumlah Rincian</div>
+      <div class="note-detail-readonly-control">
+      {{ count($note['rows']) }} Rincian
+      </div>
   </div>
 
   <div class="note-detail-readonly-field">
-    <div class="note-detail-readonly-label">Ringkasan Line</div>
+    <div class="note-detail-readonly-label">Ringkasan Rincian</div>
     <div class="note-detail-readonly-control">
-      {{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}
+      {{ $note['line_summary']['summary_label'] ?? 'Belum ada rincian.' }}
     </div>
   </div>
 </div>

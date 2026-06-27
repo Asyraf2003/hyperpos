@@ -52,17 +52,17 @@ final class NoteLineSummaryBuilder
         $parts = [];
 
         if ($openCount > 0) {
-            $parts[] = sprintf('%d Open', $openCount);
+            $parts[] = sprintf('%d Belum Selesai', $openCount);
         }
 
         if ($closeCount > 0) {
-            $parts[] = sprintf('%d Close', $closeCount);
+            $parts[] = sprintf('%d Selesai', $closeCount);
         }
 
         if ($refundCount > 0) {
-            $parts[] = sprintf('%d Refund', $refundCount);
+            $parts[] = sprintf('%d Dikembalikan', $refundCount);
         }
 
-        return $parts === [] ? 'Belum ada line.' : implode(', ', $parts);
+        return $parts === [] ? 'Belum ada rincian.' : implode(', ', $parts);
     }
 }
