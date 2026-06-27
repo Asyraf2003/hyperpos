@@ -33,7 +33,7 @@ final class NoteDetailRowMapperTest extends TestCase
         ]);
 
         self::assertCount(1, $row);
-        self::assertSame('Service', $row[0]['type_label']);
+        self::assertSame('Servis', $row[0]['type_label']);
         self::assertSame(30000, $row[0]['outstanding_rupiah']);
         self::assertSame('open', $row[0]['line_status']);
         self::assertFalse($row[0]['can_refund']);

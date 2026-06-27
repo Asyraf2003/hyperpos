@@ -51,7 +51,7 @@ final class NoteCorrectionHistoryBuilderFeatureTest extends TestCase
         $history = app(NoteCorrectionHistoryBuilder::class)->build('note-1');
 
         $this->assertCount(1, $history);
-        $this->assertSame('Correction Nominal Service', $history[0]['event_label']);
+        $this->assertSame('Koreksi Nominal Servis', $history[0]['event_label']);
         $this->assertSame('2026-04-02 10:00:00', $history[0]['created_at']);
         $this->assertSame('Koreksi nominal', $history[0]['reason']);
         $this->assertSame('actor-1', $history[0]['performed_by_actor_id']);
