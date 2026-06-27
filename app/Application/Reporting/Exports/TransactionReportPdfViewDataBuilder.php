@@ -36,12 +36,12 @@ final class TransactionReportPdfViewDataBuilder
     {
         return [
             ['label' => 'Jumlah Nota', 'value' => $this->integerValue($summary['total_rows'] ?? 0)],
-            ['label' => 'Nilai Bruto Transaksi', 'value' => $this->rupiah($summary['gross_transaction_rupiah'] ?? 0)],
+            ['label' => 'Total Nilai Transaksi', 'value' => $this->rupiah($summary['gross_transaction_rupiah'] ?? 0)],
             ['label' => 'Pembayaran Dialokasikan', 'value' => $this->rupiah($summary['allocated_payment_rupiah'] ?? 0)],
             ['label' => 'Dana Dikembalikan', 'value' => $this->rupiah($summary['refunded_rupiah'] ?? 0)],
-            ['label' => 'Refund Due', 'value' => $this->rupiah($summary['refund_due_rupiah'] ?? 0)],
-            ['label' => 'Surplus Refund Paid', 'value' => $this->rupiah($summary['surplus_refund_paid_rupiah'] ?? 0)],
-            ['label' => 'Sisa Refund Due', 'value' => $this->rupiah($summary['remaining_refund_due_rupiah'] ?? 0)],
+            ['label' => 'Pengembalian Belum Dibayar', 'value' => $this->rupiah($summary['refund_due_rupiah'] ?? 0)],
+            ['label' => 'Pengembalian Surplus Sudah Dibayar', 'value' => $this->rupiah($summary['surplus_refund_paid_rupiah'] ?? 0)],
+            ['label' => 'Sisa Pengembalian Belum Dibayar', 'value' => $this->rupiah($summary['remaining_refund_due_rupiah'] ?? 0)],
             ['label' => 'Kas Bersih', 'value' => $this->rupiah($summary['net_cash_collected_rupiah'] ?? 0)],
             ['label' => 'Sisa Tagihan', 'value' => $this->rupiah($summary['outstanding_rupiah'] ?? 0)],
         ];

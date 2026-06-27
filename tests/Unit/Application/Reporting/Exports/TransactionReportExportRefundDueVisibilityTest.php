@@ -43,16 +43,16 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         $this->assertNotNull($period);
         $this->assertNotNull($customer);
 
-        $this->assertSame('Total Refund Due', $summary->getCell('A10')->getValue());
+        $this->assertSame('Total Pengembalian Belum Dibayar', $summary->getCell('A10')->getValue());
         $this->assertSame(7000, $summary->getCell('B10')->getValue());
 
-        $this->assertSame('Refund Due', $detail->getCell('H1')->getValue());
+        $this->assertSame('Pengembalian Belum Dibayar', $detail->getCell('H1')->getValue());
         $this->assertSame(7000, $detail->getCell('H2')->getValue());
 
-        $this->assertSame('Refund Due', $period->getCell('F1')->getValue());
+        $this->assertSame('Pengembalian Belum Dibayar', $period->getCell('F1')->getValue());
         $this->assertSame(7000, $period->getCell('F2')->getValue());
 
-        $this->assertSame('Refund Due', $customer->getCell('F1')->getValue());
+        $this->assertSame('Pengembalian Belum Dibayar', $customer->getCell('F1')->getValue());
         $this->assertSame(7000, $customer->getCell('F2')->getValue());
 
         $spreadsheet->disconnectWorksheets();
@@ -73,7 +73,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         ]);
 
         $this->assertContains(
-            ['label' => 'Refund Due', 'value' => 'Rp 7.000'],
+            ['label' => 'Pengembalian Belum Dibayar', 'value' => 'Rp 7.000'],
             $viewData['summaryItems'],
         );
 
@@ -112,24 +112,24 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         $this->assertNotNull($period);
         $this->assertNotNull($customer);
 
-        $this->assertSame('Total Surplus Refund Paid', $summary->getCell('A11')->getValue());
+        $this->assertSame('Total Pengembalian Surplus Sudah Dibayar', $summary->getCell('A11')->getValue());
         $this->assertSame(3000, $summary->getCell('B11')->getValue());
-        $this->assertSame('Total Sisa Refund Due', $summary->getCell('A12')->getValue());
+        $this->assertSame('Total Sisa Pengembalian Belum Dibayar', $summary->getCell('A12')->getValue());
         $this->assertSame(4000, $summary->getCell('B12')->getValue());
 
-        $this->assertSame('Surplus Refund Paid', $detail->getCell('I1')->getValue());
+        $this->assertSame('Pengembalian Surplus Sudah Dibayar', $detail->getCell('I1')->getValue());
         $this->assertSame(3000, $detail->getCell('I2')->getValue());
-        $this->assertSame('Sisa Refund Due', $detail->getCell('J1')->getValue());
+        $this->assertSame('Sisa Pengembalian Belum Dibayar', $detail->getCell('J1')->getValue());
         $this->assertSame(4000, $detail->getCell('J2')->getValue());
 
-        $this->assertSame('Surplus Refund Paid', $period->getCell('G1')->getValue());
+        $this->assertSame('Pengembalian Surplus Sudah Dibayar', $period->getCell('G1')->getValue());
         $this->assertSame(3000, $period->getCell('G2')->getValue());
-        $this->assertSame('Sisa Refund Due', $period->getCell('H1')->getValue());
+        $this->assertSame('Sisa Pengembalian Belum Dibayar', $period->getCell('H1')->getValue());
         $this->assertSame(4000, $period->getCell('H2')->getValue());
 
-        $this->assertSame('Surplus Refund Paid', $customer->getCell('G1')->getValue());
+        $this->assertSame('Pengembalian Surplus Sudah Dibayar', $customer->getCell('G1')->getValue());
         $this->assertSame(3000, $customer->getCell('G2')->getValue());
-        $this->assertSame('Sisa Refund Due', $customer->getCell('H1')->getValue());
+        $this->assertSame('Sisa Pengembalian Belum Dibayar', $customer->getCell('H1')->getValue());
         $this->assertSame(4000, $customer->getCell('H2')->getValue());
 
         $spreadsheet->disconnectWorksheets();
@@ -147,11 +147,11 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         ]);
 
         $this->assertContains(
-            ['label' => 'Surplus Refund Paid', 'value' => 'Rp 3.000'],
+            ['label' => 'Pengembalian Surplus Sudah Dibayar', 'value' => 'Rp 3.000'],
             $viewData['summaryItems'],
         );
         $this->assertContains(
-            ['label' => 'Sisa Refund Due', 'value' => 'Rp 4.000'],
+            ['label' => 'Sisa Pengembalian Belum Dibayar', 'value' => 'Rp 4.000'],
             $viewData['summaryItems'],
         );
 
@@ -176,8 +176,8 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
 
         $html = view('admin.reporting.transaction_summary.export_pdf', $viewData)->render();
 
-        $this->assertStringContainsString('Surplus Refund Paid', $html);
-        $this->assertStringContainsString('Sisa Refund Due', $html);
+        $this->assertStringContainsString('Pengembalian Surplus Sudah Dibayar', $html);
+        $this->assertStringContainsString('Sisa Pengembalian Belum Dibayar', $html);
         $this->assertStringContainsString('Rp 3.000', $html);
         $this->assertStringContainsString('Rp 4.000', $html);
     }
@@ -199,7 +199,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
             'rows' => [[
                 'note_id' => 'note-export-refund-due-001',
                 'transaction_date' => '2030-01-07',
-                'customer_name' => 'Customer Export Refund Due',
+                'customer_name' => 'Customer Export Pengembalian Belum Dibayar',
                 'gross_transaction_rupiah' => 100000,
                 'allocated_payment_rupiah' => 99999,
                 'refunded_rupiah' => 9000,
@@ -219,7 +219,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
                 'outstanding_rupiah' => 9001,
             ]],
             'customer_rows' => [[
-                'customer_name' => 'Customer Export Refund Due',
+                'customer_name' => 'Customer Export Pengembalian Belum Dibayar',
                 'total_rows' => 1,
                 'gross_transaction_rupiah' => 100000,
                 'allocated_payment_rupiah' => 99999,
@@ -249,7 +249,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
             'rows' => [[
                 'note_id' => 'note-export-surplus-refund-paid-001',
                 'transaction_date' => '2030-01-07',
-                'customer_name' => 'Customer Export Surplus Refund Paid',
+                'customer_name' => 'Customer Export Pengembalian Surplus Sudah Dibayar',
                 'gross_transaction_rupiah' => 100000,
                 'allocated_payment_rupiah' => 99999,
                 'refunded_rupiah' => 9000,
@@ -273,7 +273,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
                 'outstanding_rupiah' => 9001,
             ]],
             'customer_rows' => [[
-                'customer_name' => 'Customer Export Surplus Refund Paid',
+                'customer_name' => 'Customer Export Pengembalian Surplus Sudah Dibayar',
                 'total_rows' => 1,
                 'gross_transaction_rupiah' => 100000,
                 'allocated_payment_rupiah' => 99999,

@@ -36,12 +36,12 @@ final class TransactionReportExcelPeriodSheetWriter
         $this->tables->writeTable($sheet, 1, [
             'Tanggal',
             'Jumlah Nota',
-            'Nilai Bruto Transaksi',
+            'Total Nilai Transaksi',
             'Pembayaran Dialokasikan',
             'Dana Dikembalikan',
-            'Refund Due',
-            'Surplus Refund Paid',
-            'Sisa Refund Due',
+            'Pengembalian Belum Dibayar',
+            'Pengembalian Surplus Sudah Dibayar',
+            'Sisa Pengembalian Belum Dibayar',
             'Kas Bersih',
             'Sisa Tagihan',
         ], $values);

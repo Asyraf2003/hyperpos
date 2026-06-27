@@ -77,9 +77,9 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
                 ['label' => 'Total Transaksi', 'value' => 'Rp 150.000'],
                 ['label' => 'Total Dibayar', 'value' => 'Rp 149.999'],
                 ['label' => 'Total Refund', 'value' => 'Rp 9.000'],
-                ['label' => 'Refund Due', 'value' => 'Rp 0'],
-                ['label' => 'Surplus Refund Paid', 'value' => 'Rp 0'],
-                ['label' => 'Sisa Refund Due', 'value' => 'Rp 0'],
+                ['label' => 'Pengembalian Belum Dibayar', 'value' => 'Rp 0'],
+                ['label' => 'Pengembalian Surplus Sudah Dibayar', 'value' => 'Rp 0'],
+                ['label' => 'Sisa Pengembalian Belum Dibayar', 'value' => 'Rp 0'],
                 ['label' => 'Net Dibayar', 'value' => 'Rp 140.999'],
                 ['label' => 'Sisa Piutang', 'value' => 'Rp 9.001'],
             ],
@@ -104,9 +104,9 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
         $this->assertStringContainsString('Laporan Transaksi', $html);
         $this->assertStringContainsString('Jumlah Nota', $html);
         $this->assertStringContainsString('Total Refund', $html);
-        $this->assertStringContainsString('Refund Due', $html);
-        $this->assertStringContainsString('Surplus Refund Paid', $html);
-        $this->assertStringContainsString('Sisa Refund Due', $html);
+        $this->assertStringContainsString('Pengembalian Belum Dibayar', $html);
+        $this->assertStringContainsString('Pengembalian Surplus Sudah Dibayar', $html);
+        $this->assertStringContainsString('Sisa Pengembalian Belum Dibayar', $html);
         $this->assertStringContainsString('Sisa Piutang', $html);
         $this->assertStringContainsString('Ringkasan Utama', $html);
         $this->assertStringNotContainsString('Catatan Laporan', $html);
@@ -122,7 +122,7 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
                 ['label' => 'Jumlah Nota', 'value' => 2],
-                ['label' => 'Nilai Bruto Transaksi', 'value' => 'Rp 150.000'],
+                ['label' => 'Total Nilai Transaksi', 'value' => 'Rp 150.000'],
                 ['label' => 'Dana Dikembalikan', 'value' => 'Rp 9.000'],
                 ['label' => 'Sisa Tagihan', 'value' => 'Rp 9.001'],
             ],
