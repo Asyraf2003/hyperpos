@@ -99,7 +99,9 @@
               </div>
 
               @if (!empty($entry['reason']))
-                <div class="small text-muted mb-2">{{ $entry['reason'] }}</div>
+                <div class="small text-muted mb-2">
+                  <span class="fw-semibold">Alasan:</span> {{ $entry['reason'] }}
+                </div>
               @endif
 
               @if (!empty($entry['created_by_actor_id']))

@@ -48,7 +48,7 @@ final class NoteBillingProjectionComponentRowFactory
             'is_service_component' => ! $this->classifier->isProduct($type),
             'eligible_for_dp_preset' => ! $this->classifier->isProduct($type) && $outstanding > 0,
             'can_select_manually' => ! $blocked && $outstanding > 0,
-            'selection_blocked_reason' => $blocked ? 'Komponen sebelumnya pada line ini belum lunas. Ikuti urutan tagihan existing.' : null,
+            'selection_blocked_reason' => $blocked ? 'Komponen sebelumnya pada baris ini belum lunas. Ikuti urutan tagihan sebelumnya.' : null,
             'status_label' => $outstanding <= 0 ? 'Lunas' : ($netPaid > 0 ? 'Parsial' : 'Belum Dibayar'),
         ];
     }

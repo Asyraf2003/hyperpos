@@ -84,7 +84,7 @@ final class NoteBillingProjectionRowMapperTest extends TestCase
         self::assertSame('Part External', $first['component_label']);
 
         self::assertFalse($second['can_select_manually']);
-        self::assertSame('Komponen sebelumnya pada line ini belum lunas. Ikuti urutan tagihan existing.', $second['selection_blocked_reason']);
+        self::assertSame('Komponen sebelumnya pada baris ini belum lunas. Ikuti urutan tagihan sebelumnya.', $second['selection_blocked_reason']);
         self::assertSame('Jasa', $second['component_label']);
     }
 
