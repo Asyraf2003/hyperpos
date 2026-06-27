@@ -28,10 +28,6 @@
 
 <div class="mb-3">
     <h5 class="mb-1">Ringkasan Utama</h5>
-    <div class="text-muted small">
-        Laporan ini merangkum jumlah nota, nilai transaksi, pembayaran, refund,
-        dan sisa tagihan pada periode yang dipilih.
-    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -116,20 +112,7 @@
 </div>
 
 <div class="mb-3">
-    <h5 class="mb-2">Catatan Laporan</h5>
-    <div class="text-muted">
-        Gunakan ringkasan ini untuk membaca kondisi transaksi dengan cepat.
-        Detail lengkap tersedia di Excel.
-    </div>
-</div>
-
-<div class="mb-3">
     <h5 class="mb-2">Rincian Ringkas</h5>
-    <div class="text-muted small">
-        Halaman ini menampilkan transaksi per tanggal dan customer secara
-        ringkas. Nomor nota, status per nota, dan baris detail tersedia di
-        Excel.
-    </div>
 </div>
 
 <div class="row g-3 mb-4">

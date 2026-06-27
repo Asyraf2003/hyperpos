@@ -29,10 +29,6 @@
 
 <div class="mb-3">
     <h5 class="mb-1">Ringkasan Utama</h5>
-    <div class="text-muted small">
-        Laporan ini merangkum uang transaksi yang masuk dan uang yang keluar
-        karena refund pada periode yang dipilih.
-    </div>
 </div>
 
 <div class="row g-3 mb-4">
@@ -94,20 +90,7 @@
 </div>
 
 <div class="mb-3">
-    <h5 class="mb-2">Catatan Laporan</h5>
-    <div class="text-muted">
-        Angka utama di atas dipakai untuk membaca posisi kas transaksi dengan
-        cepat. Detail lengkap tersedia di Excel.
-    </div>
-</div>
-
-<div class="mb-3">
     <h5 class="mb-2">Rincian Ringkas</h5>
-    <div class="text-muted small">
-        Bagian ini hanya menampilkan perubahan kas per tanggal agar halaman
-        tetap mudah dibaca. Nomor nota, sumber data, dan rincian tiap kejadian
-        tersedia di Excel.
-    </div>
 </div>
 
 <div class="row g-3">
