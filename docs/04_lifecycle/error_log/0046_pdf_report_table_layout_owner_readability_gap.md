@@ -1,6 +1,6 @@
 # 0046 PDF Report Table Layout Owner Readability Gap
 
-Status: Targeted Verified
+Status: Full Verified
 
 Reported by owner on 2026-06-26. This log captures the report readability
 problem found after the latest `0045` lifecycle/report fixes.
@@ -106,7 +106,29 @@ Result:
 
 ### NEXT
 
-Run full `make verify` after this follow-up patch.
+Full verification completed after this follow-up patch.
+
+Command:
+
+```bash
+make verify
+```
+
+Result:
+
+```text
+[OK] No errors
+Contract audit passed.
+Tests: 1439 passed (8597 assertions)
+```
+
+Meaning:
+
+- PHPStan passed;
+- line-limit and Blade PHP/directive checks passed;
+- contract audit passed;
+- full Pest suite passed after removing screen/PDF descriptions, removing
+  mass detail rendering, and adding summary-only UI/PDF query paths.
 
 ## FACT
 
