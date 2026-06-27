@@ -207,15 +207,15 @@
         @endif
 
         @if ((int) ($row['refund_external_count'] ?? 0) > 0)
-          <div>External dinetralkan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
+          <div>Komponen luar dinetralkan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
         @endif
       </div>
     </div>
   @empty
     <div class="note-detail-line-empty">
-      Belum ada line pada nota ini.
+      Belum ada rincian pada nota ini.
     </div>
   @endforelse
 
-  <div class="small text-muted">Refund dipilih dari rincian yang aktif.</div>
+  <div class="small text-muted">Pengembalian dana dipilih dari rincian yang aktif.</div>
 </div>

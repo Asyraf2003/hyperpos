@@ -73,7 +73,7 @@ final class CashierNoteHistoryLegacyLineSummaryFeatureTest extends TestCase
         /** @var Collection<string, array<string, mixed>> $items */
         $items = collect($response->json('data.items'))->keyBy('note_id');
 
-        $this->assertSame('1 Close', $items->get('note-legacy')['line_summary_label']);
+        $this->assertSame('1 Selesai', $items->get('note-legacy')['line_summary_label']);
         $this->assertSame('Lunas', $items->get('note-legacy')['payment_status_label']);
         $this->assertStringContainsString('/cashier/notes/note-legacy', (string) $items->get('note-legacy')['action_url']);
     }
