@@ -24,13 +24,13 @@
           disabled
           aria-disabled="true"
         >
-          Refund Line Terpilih
+          Pengembalian Dana Rincian Terpilih
         </button>
       @endif
     </div>
 
     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-      <span class="text-muted">Grand Total</span>
+      <span class="text-muted">Total Nota</span>
       <strong class="text-body">{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
     </div>
 
@@ -40,7 +40,7 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-      <span class="text-muted">Total Refund</span>
+      <span class="text-muted">Total Pengembalian Dana</span>
       <strong class="text-body">{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
     </div>
 

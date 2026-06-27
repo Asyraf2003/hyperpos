@@ -188,11 +188,11 @@
                                     <th style="width: 64px;">No</th>
                                     <th>Tanggal</th>
                                     <th>Nota</th>
-                                    <th>Customer</th>
-                                    <th class="text-end">Grand Total</th>
+                                    <th>Pelanggan</th>
+                                    <th class="text-end">Total Nota</th>
                                     <th class="text-end">Sudah Dibayar</th>
                                     <th class="text-end">Sisa Tagihan</th>
-                                    <th>Ringkasan Line</th>
+                                    <th>Ringkasan Rincian</th>
                                     <th style="width: 120px;">Aksi</th>
                                 </tr>
                             </thead>

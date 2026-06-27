@@ -34,7 +34,7 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         /** @var Collection<string, array<string, mixed>> $items */
         $items = collect($response->json('data.items'))->keyBy('note_id');
 
-        $this->assertSame('1 Open', $items->get('note-open')['line_summary_label']);
+        $this->assertSame('1 Belum Selesai', $items->get('note-open')['line_summary_label']);
         $this->assertSame([
             'open' => 1,
             'close' => 0,
@@ -42,7 +42,7 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         ], $items->get('note-open')['line_summary_counts']);
         $this->assertStringContainsString('/admin/notes/note-open', (string) $items->get('note-open')['action_url']);
 
-        $this->assertSame('1 Close', $items->get('note-closed')['line_summary_label']);
+        $this->assertSame('1 Selesai', $items->get('note-closed')['line_summary_label']);
         $this->assertSame([
             'open' => 0,
             'close' => 1,
@@ -69,7 +69,7 @@ final class AdminNoteHistoryTableDataFeatureTest extends TestCase
         $response->assertJsonPath('success', true);
         $response->assertJsonPath('data.pagination.total', 1);
         $response->assertJsonPath('data.items.0.note_id', 'note-closed');
-        $response->assertJsonPath('data.items.0.line_summary_label', '1 Close');
+        $response->assertJsonPath('data.items.0.line_summary_label', '1 Selesai');
     }
 
     private function seedOpenUnpaidNote(string $noteId, string $date, string $customerName, string $phone): void

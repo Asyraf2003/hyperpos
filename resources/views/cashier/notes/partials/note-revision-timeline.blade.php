@@ -18,7 +18,7 @@
             <div class="text-end">R{{ (int) ($currentRevision['revision_number'] ?? 0) }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
-            <small>Customer</small>
+            <small>Pelanggan</small>
             <div class="text-end">{{ $currentRevision['customer_name'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
@@ -50,7 +50,7 @@
           </div>
 
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
-            <small>Customer</small>
+            <small>Pelanggan</small>
             <div class="text-end">{{ $baselineRevision['customer_name'] ?? '-' }}</div>
           </div>
           <div class="ui-key-value d-flex justify-content-between py-2 border-bottom">
@@ -113,7 +113,7 @@
               <div class="border rounded p-3">
                 <div class="row g-3">
                   <div class="col-12 col-md-4">
-                    <small class="text-muted d-block">Customer</small>
+                    <small class="text-muted d-block">Pelanggan</small>
                     <div class="fw-semibold">{{ $entry['customer_name'] ?? '-' }}</div>
                   </div>
                   <div class="col-12 col-md-4">

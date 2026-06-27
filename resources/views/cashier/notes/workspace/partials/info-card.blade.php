@@ -6,7 +6,7 @@
                 <div>
                     <h4 class="workspace-step-title">Info Nota</h4>
                     <p class="workspace-step-help">
-                        Isi identitas customer dan tanggal kerja sebelum menambah rincian.
+                        Isi identitas pelanggan dan tanggal kerja sebelum menambah rincian.
                     </p>
                 </div>
 
@@ -23,7 +23,7 @@
     <div class="workspace-step-body">
         <div class="row g-3">
             <div class="col-12">
-                <label for="note_customer_name" class="form-label">Nama Customer</label>
+                <label for="note_customer_name" class="form-label">Nama Pelanggan</label>
                 <input
                     type="text"
                     id="note_customer_name"
@@ -35,7 +35,7 @@
             </div>
 
             <div class="col-12">
-                <label for="note_customer_phone" class="form-label">No. HP Customer</label>
+                <label for="note_customer_phone" class="form-label">No. HP Pelanggan</label>
                 <input
                     type="text"
                     id="note_customer_phone"
