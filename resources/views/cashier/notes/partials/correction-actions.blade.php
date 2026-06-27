@@ -95,9 +95,9 @@
 
                 <div class="col-12 col-xl-6">
                     <div class="border rounded p-3 h-100">
-                        <div class="fw-bold mb-1">Koreksi Nominal Service Only</div>
+                        <div class="fw-bold mb-1">Koreksi Nominal Servis</div>
                         <div class="small text-muted mb-3">
-                            Gunakan hanya untuk baris service-only ketika nominal servis perlu disesuaikan setelah pembayaran.
+                            Gunakan hanya untuk rincian servis ketika nominal servis perlu disesuaikan setelah pembayaran.
                         </div>
 
                         @if (

@@ -53,9 +53,9 @@ final class NoteDetailRowMapperTest extends TestCase
             'wi-2' => ['allocated_rupiah' => 100000, 'refunded_rupiah' => 0, 'net_paid_rupiah' => 100000, 'outstanding_rupiah' => 0, 'settlement_label' => 'paid'],
         ]);
 
-        self::assertSame('Service + Part External', $rows[0]['type_label']);
+        self::assertSame('Servis + Sparepart Luar', $rows[0]['type_label']);
         self::assertSame(1, $rows[0]['refund_external_count']);
-        self::assertSame('Uang balik mungkin, external tidak memicu stok toko.', $rows[0]['refund_preview_label']);
+        self::assertSame('Uang balik mungkin, komponen luar tidak memicu stok toko.', $rows[0]['refund_preview_label']);
     }
 
     private function mapper(): NoteDetailRowMapper
