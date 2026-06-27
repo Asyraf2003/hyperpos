@@ -814,3 +814,37 @@ Sesi ini sudah padat. Lanjut eksekusi di sesi baru lebih aman agar model tidak k
 - Run a focused broad scan for remaining owner-facing note/report labels only.
 - Continue replacing visible `Versioning` / `Revision` terms in note views with `Riwayat Perubahan` / `Revisi` if not already covered.
 - Keep supplier/procurement report labels separate from transaction note/report work.
+
+### Session Update - 2026-06-28 Slice 6B Revision/Versioning Visible Label Cleanup
+
+#### Scope
+
+- Follow-up from Slice 6 scan for visible `Versioning` / `Revision` labels in note detail pages.
+- Kept internal keys, route parameters, DB fields, test fixture data, and user-entered service names unchanged.
+
+#### Changes Applied
+
+- `resources/views/shared/notes/partials/versioning-compact.blade.php`
+  - `Riwayat Revisi` -> `Riwayat Perubahan`
+  - existing labels already used:
+    - `Riwayat Perubahan Nota`
+    - `Perubahan Aktif`
+    - `Isi Perubahan Aktif`
+- `tests/Feature/Note/CashierNoteDetailUsesCurrentRevisionLinesFeatureTest.php`
+  - UI assertion changed from `Revision Aktif` to `Perubahan Aktif`.
+- `tests/Feature/Note/CashierNoteVersioningLineSnapshotViewFeatureTest.php`
+  - UI assertion changed from `Line 1` to `Rincian 1`.
+
+#### Proof
+
+- Focused scan after patch:
+  - `rg -n --no-heading -S '(Versioning Nota|Revision Aktif|Isi Revision Aktif|Riwayat Revisi)' resources/views/cashier/notes resources/views/shared/notes resources/views/admin/notes`
+  - Result: no matches.
+- Focused tests:
+  - `php artisan test tests/Feature/Note/CashierNoteDetailUsesCurrentRevisionLinesFeatureTest.php tests/Feature/Note/CashierNoteVersioningLineSnapshotViewFeatureTest.php tests/Feature/Note/CashierNoteRevisionSmokeTest.php tests/Feature/Note/CashierNoteMutationHistoryViewFeatureTest.php tests/Feature/Note/AdminNoteDetailPageFeatureTest.php tests/Feature/Note/CashierHybridNoteDetailFeatureTest.php`
+  - Result: PASS, `9 passed (53 assertions)`.
+
+#### DECISION
+
+- Visible note revision/versioning labels in active note views are now Indonesian.
+- Remaining `revision` strings in code/tests are mostly internal identifiers, route names, DB fields, or user/test data and should not be renamed in this slice.
