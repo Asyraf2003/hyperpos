@@ -1,6 +1,6 @@
 # 0046 PDF Report Table Layout Owner Readability Gap
 
-Status: Full Verified
+Status: Targeted Verified
 
 Reported by owner on 2026-06-26. This log captures the report readability
 problem found after the latest `0045` lifecycle/report fixes.
@@ -24,6 +24,89 @@ export:
 - Do not remove Excel detail sheets.
 - Do not patch report formulas before source/domain proof shows a formula bug.
 - Do not close `0044` or `0045` from this issue.
+
+## 2026-06-27 Owner Follow-up - Remove Descriptions And Mass Detail Cards
+
+### FACT
+
+Owner clarified that production report data can contain thousands of products
+or hundreds of service-package rows. Replacing detail tables with one card per
+row is still the wrong contract for screen/PDF because it only changes the
+shape of the detail dump.
+
+Owner also clarified that explanatory description blocks such as
+`Catatan Laporan`, `Detail lengkap tersedia di Excel`, and paragraph copy under
+`Rincian Ringkas` add noise. The report should show titles and numbers only.
+
+### ANALYSIS
+
+The previous patch removed dense tables from active PDF reports, but several
+screen pages still had description paragraphs. `inventory_stock_value` also
+rendered one card per product snapshot and one card per product movement.
+`service_package_profit_breakdown` still rendered the full detail table on the
+screen.
+
+For production scale, the owner-readable screen/PDF contract must be:
+
+- title/header;
+- `Ringkasan Utama` numbers;
+- `Rincian Ringkas` aggregate numbers only when useful;
+- no explanatory paragraphs;
+- no product/package/detail-row loop on screen/PDF;
+- Excel remains the place for all detailed rows.
+
+### PATCH
+
+Patched screen/PDF presentation:
+
+- removed `Catatan Laporan` and the `Detail lengkap tersedia di Excel` copy
+  from active report PDFs and screens;
+- removed paragraph descriptions under report section headings;
+- changed `inventory_stock_value` screen so it no longer renders per-product
+  snapshot/movement cards;
+- changed `service_package_profit_breakdown` screen so it no longer renders
+  the detail package table;
+- kept Excel detail exports unchanged.
+
+Patched system path for production-scale UI/PDF:
+
+- `InventoryStockValueReportPageController` and
+  `InventoryStockValueReportPdfExportController` now use summary-only data;
+- `ServicePackageProfitBreakdownReportPageController` now uses summary-only
+  data;
+- added summary-only reader/query path for inventory stock value;
+- added summary-only reader/query path for service package profit breakdown;
+- retained detail-row data path for Excel exports.
+
+### PROOF
+
+Command, from `/home/asyraf/Code/laravel/bengkel2/app`:
+
+```bash
+php artisan test tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownReportPageFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownUiScenarioMatrixFeatureTest.php tests/Feature/ReportingExports/ServicePackageProfitBreakdownExcelExportFeatureTest.php tests/Feature/Reporting/GetInventoryStockValueReportDatasetFeatureTest.php tests/Feature/Reporting/InventoryMovementSummaryHardeningFeatureTest.php tests/Feature/Reporting/InventoryMovementBucketSplitFeatureTest.php tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php
+```
+
+Result:
+
+```text
+Tests: 30 passed (265 assertions)
+```
+
+Command:
+
+```bash
+./vendor/bin/phpstan analyze --memory-limit=-1
+```
+
+Result:
+
+```text
+[OK] No errors
+```
+
+### NEXT
+
+Run full `make verify` after this follow-up patch.
 
 ## FACT
 
