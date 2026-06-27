@@ -64,7 +64,7 @@ final class CurrentRevisionDetailBaseRowMapper
         $label = $line->serviceLabel();
 
         return $label === null || trim($label) === ''
-            ? ($storeLineCount > 0 ? $this->storeStockLabels->primary($payload) : 'Line Nota')
+            ? ($storeLineCount > 0 ? $this->storeStockLabels->primary($payload) : 'Rincian Nota')
             : $label;
     }
 }

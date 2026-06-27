@@ -31,7 +31,7 @@ final class NoteBillingProjectionComponentRowFactory
             'work_item_id' => $workItemId,
             'line_no' => (int) ($row['line_no'] ?? 0),
             'transaction_type' => (string) ($row['transaction_type'] ?? ''),
-            'domain_type_label' => (string) ($row['type_label'] ?? 'Line Nota'),
+            'domain_type_label' => (string) ($row['type_label'] ?? 'Rincian Nota'),
             'component_type' => $type,
             'component_ref_id' => $refId,
             'component_label' => $this->classifier->label($type),

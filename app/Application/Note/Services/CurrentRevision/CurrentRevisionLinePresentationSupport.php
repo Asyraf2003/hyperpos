@@ -20,7 +20,7 @@ final class CurrentRevisionLinePresentationSupport
     public function refundPreviewLabel(int $storeStockCount, int $externalPurchaseCount): string
     {
         if ($storeStockCount > 0 && $externalPurchaseCount > 0) {
-            return 'Uang balik mungkin, stok toko kembali, external disederhanakan.';
+            return 'Uang balik mungkin, stok toko kembali, komponen luar dinetralkan.';
         }
 
         if ($storeStockCount > 0) {
@@ -28,9 +28,9 @@ final class CurrentRevisionLinePresentationSupport
         }
 
         if ($externalPurchaseCount > 0) {
-            return 'Uang balik mungkin, external tidak memicu stok toko.';
+            return 'Uang balik mungkin, komponen luar tidak memicu stok toko.';
         }
 
-        return 'Refund sederhana mengikuti uang yang memang sudah masuk.';
+        return 'Pengembalian dana sederhana mengikuti uang yang memang sudah masuk.';
     }
 }

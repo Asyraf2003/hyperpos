@@ -21,8 +21,8 @@ final class NoteBillingProjectionComponentClassifier
     {
         return match ($type) {
             PaymentComponentType::PRODUCT_ONLY_WORK_ITEM => 'Produk Toko',
-            PaymentComponentType::SERVICE_STORE_STOCK_PART => 'Part Toko',
-            PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART => 'Part External',
+            PaymentComponentType::SERVICE_STORE_STOCK_PART => 'Sparepart Toko',
+            PaymentComponentType::SERVICE_EXTERNAL_PURCHASE_PART => 'Sparepart Luar',
             PaymentComponentType::SERVICE_FEE => 'Jasa',
             default => 'Komponen Tagihan',
         };
