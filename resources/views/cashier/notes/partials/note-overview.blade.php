@@ -5,16 +5,16 @@
                 <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
                     <div>
                         <h4 class="card-title mb-1">
-                            Info Customer
+                            Info Pelanggan
                             <span class="visually-hidden">Header Nota</span>
                         </h4>
                         <p class="mb-0 text-muted">
-                            Identitas customer dan status nota saat ini.
+                            Identitas pelanggan dan status nota saat ini.
                         </p>
                     </div>
 
                     <span class="badge border">
-                        {{ count($note['rows']) }} Line
+                        {{ count($note['rows']) }} Rincian
                     </span>
                 </div>
 
@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <small>Customer</small>
+                    <small>Pelanggan</small>
                     <div class="text-end">{{ $note['customer_name'] }}</div>
                 </div>
 
@@ -47,29 +47,29 @@
                 </div>
 
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2 border-bottom">
-                    <small>Status Note</small>
+                    <small>Status Nota</small>
                     <div class="text-end text-uppercase">{{ $note['note_state'] }}</div>
                 </div>
 
                 <div class="ui-key-value d-flex justify-content-between align-items-start py-2">
-                    <small>Ringkasan Line</small>
+                    <small>Ringkasan Rincian</small>
                     <div class="text-end">
-                        {{ $note['line_summary']['summary_label'] ?? 'Belum ada line.' }}
+                        {{ $note['line_summary']['summary_label'] ?? 'Belum ada rincian.' }}
                     </div>
                 </div>
 
                 <div class="border rounded p-3 mt-3">
-                    <div class="small text-muted mb-2">Komposisi Status Line</div>
+                    <div class="small text-muted mb-2">Komposisi Status Rincian</div>
 
                     <div class="d-flex flex-wrap gap-2">
                         <span class="badge border">
-                            Open: {{ (int) ($note['line_summary']['open_count'] ?? 0) }}
+                            Belum Selesai: {{ (int) ($note['line_summary']['open_count'] ?? 0) }}
                         </span>
                         <span class="badge border">
-                            Close: {{ (int) ($note['line_summary']['close_count'] ?? 0) }}
+                            Selesai: {{ (int) ($note['line_summary']['close_count'] ?? 0) }}
                         </span>
                         <span class="badge border">
-                            Refund: {{ (int) ($note['line_summary']['refund_count'] ?? 0) }}
+                            Dikembalikan: {{ (int) ($note['line_summary']['refund_count'] ?? 0) }}
                         </span>
                     </div>
                 </div>
@@ -83,13 +83,13 @@
             <div class="card-header">
                 <h4 class="card-title mb-1">Ringkasan Pembayaran</h4>
                 <p class="mb-0 text-muted">
-                    Total, pembayaran, refund, dan sisa tagihan nota.
+                    Total, pembayaran, pengembalian dana, dan sisa tagihan nota.
                 </p>
             </div>
 
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <span class="text-muted">Grand Total</span>
+                    <span class="text-muted">Total Nota</span>
                     <strong>{{ number_format($note['grand_total_rupiah'], 0, ',', '.') }}</strong>
                 </div>
 
@@ -99,7 +99,7 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <span class="text-muted">Total Refund</span>
+                    <span class="text-muted">Total Pengembalian Dana</span>
                     <strong>{{ number_format($note['total_refunded_rupiah'], 0, ',', '.') }}</strong>
                 </div>
 
@@ -110,7 +110,7 @@
 
                 @if ((int) $note['refund_required_rupiah'] > 0)
                     <div class="border rounded p-3 mt-3">
-                        <div class="small text-muted">Refund Wajib Saat Ini</div>
+                        <div class="small text-muted">Pengembalian Wajib Saat Ini</div>
                         <div class="fs-5 fw-bold">{{ number_format($note['refund_required_rupiah'], 0, ',', '.') }}</div>
                     </div>
                 @endif

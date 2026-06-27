@@ -5,15 +5,15 @@
       <table class="table table-striped align-middle mb-0">
         <thead>
           <tr>
-            <th>Line</th>
-            <th>Item / Service</th>
+            <th>Rincian</th>
+            <th>Item / Servis</th>
             <th>Tipe</th>
             <th>Status</th>
             <th class="text-end">Subtotal</th>
             <th class="text-end">Sudah Dibayar</th>
-            <th class="text-end">Refund</th>
+            <th class="text-end">Dikembalikan</th>
             <th class="text-end">Sisa</th>
-            <th>Dampak Refund</th>
+            <th>Dampak Pengembalian</th>
           </tr>
         </thead>
         <tbody>
@@ -60,15 +60,15 @@
                   <div class="small">Stok toko kembali: {{ (int) ($row['refund_stock_return_count'] ?? 0) }}</div>
                 @endif
                 @if ((int) ($row['refund_external_count'] ?? 0) > 0)
-                  <div class="small">External dinetralkan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
+                  <div class="small">Komponen luar dinetralkan: {{ (int) ($row['refund_external_count'] ?? 0) }}</div>
                 @endif
               </td>
             </tr>
           @empty
-            <tr><td colspan="9" class="text-center text-muted py-4">Belum ada line pada nota ini.</td></tr>
+            <tr><td colspan="9" class="text-center text-muted py-4">Belum ada rincian pada nota ini.</td></tr>
           @endforelse
         </tbody>
       </table>
     </div>
-    <div class="small text-muted mt-3">Refund dipilih dari rincian yang aktif.</div>
+    <div class="small text-muted mt-3">Pengembalian dana dipilih dari rincian yang aktif.</div>
 </div>

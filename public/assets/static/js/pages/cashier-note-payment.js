@@ -130,16 +130,16 @@
     const subtitle = byId("detail-payment-subtitle");
 
     if (state.cashStep) {
-      if (title) title.textContent = "Pembayaran Cash";
+      if (title) title.textContent = "Pembayaran Tunai";
       if (subtitle) {
-        subtitle.textContent = "Masukkan uang pelanggan, cek kembalian, lalu simpan cash.";
+        subtitle.textContent = "Masukkan uang pelanggan, cek kembalian, lalu simpan tunai.";
       }
       return;
     }
 
     if (title) title.textContent = "Proses Nota";
     if (subtitle) {
-      subtitle.textContent = "Pilih aksi pembayaran, cek nominal, lalu bayar transfer atau cash.";
+      subtitle.textContent = "Pilih aksi pembayaran, cek nominal, lalu bayar transfer atau tunai.";
     }
   };
 

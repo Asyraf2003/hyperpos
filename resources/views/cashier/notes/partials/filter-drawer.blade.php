@@ -9,15 +9,15 @@
 
         <form id="cashier-note-filter-form">
             <div class="form-group mb-4">
-                <label for="cashier-note-line-status" class="form-label">Status Line</label>
+                <label for="cashier-note-line-status" class="form-label">Status Rincian</label>
                 <select id="cashier-note-line-status" class="form-select">
                     <option value="" @selected($filters['line_status'] === '')>Semua Status</option>
-                    <option value="open" @selected($filters['line_status'] === 'open')>Open</option>
-                    <option value="close" @selected($filters['line_status'] === 'close')>Close</option>
-                    <option value="refund" @selected($filters['line_status'] === 'refund')>Refund</option>
+                    <option value="open" @selected($filters['line_status'] === 'open')>Belum Selesai</option>
+                    <option value="close" @selected($filters['line_status'] === 'close')>Selesai</option>
+                    <option value="refund" @selected($filters['line_status'] === 'refund')>Dikembalikan</option>
                 </select>
                 <div class="form-text">
-                    Daftar kasir selalu memakai window hari ini dan kemarin. Filter dipersempit berdasarkan komposisi line pada nota.
+                    Daftar kasir selalu memakai jendela hari ini dan kemarin. Filter dipersempit berdasarkan komposisi rincian pada nota.
                 </div>
             </div>
 

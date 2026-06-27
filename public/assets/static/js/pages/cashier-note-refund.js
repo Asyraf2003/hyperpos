@@ -141,7 +141,7 @@
       const items = selectedRows();
 
       if (items.length === 0) {
-        selectedContainer.innerHTML = '<div class="small text-muted">Belum ada line dipilih.</div>';
+        selectedContainer.innerHTML = '<div class="small text-muted">Belum ada rincian dipilih.</div>';
         return;
       }
 
@@ -155,10 +155,10 @@
 
         return `
           <div class="border rounded px-3 py-2">
-            <div class="fw-semibold">Line ${escapeHtml(lineNo)} · ${escapeHtml(label)}</div>
+            <div class="fw-semibold">Rincian ${escapeHtml(lineNo)} · ${escapeHtml(label)}</div>
             <div class="small text-muted">${escapeHtml(typeLabel)}</div>
             <div class="small text-muted">${escapeHtml(preview)}</div>
-            <div class="small mt-2">Refund uang: <strong>${refundable}</strong></div>
+            <div class="small mt-2">Pengembalian uang: <strong>${refundable}</strong></div>
           </div>
         `;
       }).join('');
@@ -182,7 +182,7 @@
           <div class="d-flex justify-content-between align-items-start gap-3">
             <div>
               <div class="fw-semibold">${escapeHtml(item.productLabel)}</div>
-              <div class="small text-muted">Line ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
+              <div class="small text-muted">Rincian ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
             </div>
             <strong>+${format(item.qty)}</strong>
           </div>
@@ -199,7 +199,7 @@
       const items = selectedExternalReturns();
 
       if (items.length === 0) {
-        container.innerHTML = '<div class="small text-muted">Tidak ada komponen external yang dinetralkan.</div>';
+        container.innerHTML = '<div class="small text-muted">Tidak ada komponen luar yang dinetralkan.</div>';
         return;
       }
 
@@ -208,7 +208,7 @@
           <div class="d-flex justify-content-between align-items-start gap-3">
             <div>
               <div class="fw-semibold">${escapeHtml(item.description)}</div>
-              <div class="small text-muted">Line ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
+              <div class="small text-muted">Rincian ${escapeHtml(item.lineNo)} · ${escapeHtml(item.lineLabel)}</div>
             </div>
             <div class="text-end">
               <strong>${format(item.amountRupiah)}</strong>
@@ -268,11 +268,11 @@
 
       if (impactNode) {
         if (selectedRows().length === 0) {
-          impactNode.textContent = 'Pilih line lebih dulu untuk melihat perkiraan hasil refund.';
+          impactNode.textContent = 'Pilih rincian lebih dulu untuk melihat perkiraan hasil pengembalian dana.';
         } else if (refundableTotal() > 0) {
-          impactNode.textContent = `Perkiraan refund uang ${format(refundableTotal())}. Dampak stok dan external mengikuti line yang dipilih.`;
+          impactNode.textContent = `Perkiraan pengembalian uang ${format(refundableTotal())}. Dampak stok dan komponen luar mengikuti rincian yang dipilih.`;
         } else {
-          impactNode.textContent = 'Line terpilih sudah tercatat, tetapi nominal refund uang saat ini masih 0 pada contract backend yang aktif.';
+          impactNode.textContent = 'Rincian terpilih sudah tercatat, tetapi nominal pengembalian uang saat ini masih 0 pada kontrak backend yang aktif.';
         }
       }
 

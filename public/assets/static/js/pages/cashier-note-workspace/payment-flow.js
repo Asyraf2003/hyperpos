@@ -542,9 +542,9 @@
     if (!title || !subtitle) return;
 
     if (NS.paymentState.cashStep) {
-      title.textContent = "Pembayaran Cash";
+      title.textContent = "Pembayaran Tunai";
       subtitle.textContent =
-        "Masukkan uang pelanggan, cek kembalian, lalu simpan cash.";
+        "Masukkan uang pelanggan, cek kembalian, lalu simpan tunai.";
       return;
     }
 

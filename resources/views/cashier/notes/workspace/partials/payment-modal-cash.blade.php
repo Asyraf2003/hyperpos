@@ -2,7 +2,7 @@
     <div class="workspace-gform-panel">
         <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
             <div>
-                <div class="fw-semibold fs-4">Kalkulator Cash</div>
+                <div class="fw-semibold fs-4">Kalkulator Tunai</div>
                 <div class="text-muted">
                     Hanya tiga angka utama. Angka tengah langsung bisa diisi.
                 </div>
@@ -37,7 +37,7 @@
                 >
 
                 <div class="form-text mt-3">
-                    Ketik nominal, cek kembalian, lalu simpan cash saat jumlah cukup.
+                    Ketik nominal, cek kembalian, lalu simpan tunai saat jumlah cukup.
                 </div>
             </div>
 
