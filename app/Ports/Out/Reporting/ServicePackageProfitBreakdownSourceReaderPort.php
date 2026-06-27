@@ -27,4 +27,9 @@ interface ServicePackageProfitBreakdownSourceReaderPort
      * }>
      */
     public function getRows(string $fromTransactionDate, string $toTransactionDate): array;
+
+    /**
+     * @return array<string, int>
+     */
+    public function getSummary(string $fromTransactionDate, string $toTransactionDate): array;
 }

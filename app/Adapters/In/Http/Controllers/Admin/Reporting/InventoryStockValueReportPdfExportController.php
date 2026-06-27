@@ -36,7 +36,7 @@ final class InventoryStockValueReportPdfExportController extends Controller
             return $rangeRejection;
         }
 
-        $result = $useCase->handle($query->fromMutationDate(), $query->toMutationDate());
+        $result = $useCase->handleSummaryOnly($query->fromMutationDate(), $query->toMutationDate());
         $dataset = is_array($result->data()) ? $result->data() : [];
 
         $html = $viewFactory->make(

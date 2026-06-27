@@ -18,4 +18,9 @@ final class DatabaseServicePackageProfitBreakdownSourceReaderAdapter implements 
     {
         return $this->query->rows($fromTransactionDate, $toTransactionDate);
     }
+
+    public function getSummary(string $fromTransactionDate, string $toTransactionDate): array
+    {
+        return $this->query->summary($fromTransactionDate, $toTransactionDate);
+    }
 }
