@@ -419,3 +419,83 @@ Sesi ini sudah padat. Lanjut eksekusi di sesi baru lebih aman agar model tidak k
 - Slice 2 candidate B: transaction report PDF/Excel labels.
 - Slice 2 candidate C: revision/versioning timeline labels.
 - Slice 2 candidate D: cash ledger source metadata labels.
+
+### Session Update - 2026-06-27 Slice 2 Surplus Refund Due/Paid UI Indonesianized
+
+#### Scope
+
+- Issue source: `docs/04_lifecycle/error_log/0047_transaction_owner_facing_indonesian_language_gap.md`
+- Active slice: Slice 2 - surplus refund due/paid owner-facing UI and audit timeline labels.
+- Patch boundary: presentation/presenter label only.
+- Production logic change: none.
+- Database enum/column/domain contract/route/request payload/API change: none.
+- Report Excel/PDF scope: untouched.
+- Mobile/API scope: untouched.
+- Compiled assets scope: untouched.
+
+#### Files Changed
+
+- `resources/views/shared/notes/partials/payment-summary-actions.blade.php`
+- `app/Application/Note/Services/NoteSurplusDispositionAuditTimelineRowMapper.php`
+- `tests/Feature/Note/AdminNoteSurplusRefundDueUiFeatureTest.php`
+- `tests/Feature/Note/AdminNoteSurplusRefundPaidUiFeatureTest.php`
+- `tests/Feature/Note/AdminNoteSurplusRefundDueAuditTimelineUiFeatureTest.php`
+
+#### FACT
+
+- Focused scan before patch showed owner-facing/internal English terms in Slice 2:
+  - `Refund Due`
+  - `Refund Paid`
+  - `Amount`
+  - `Reason`
+- Patch changed owner-facing UI/audit labels only.
+- Internal event names and storage contracts were intentionally left unchanged:
+  - `note_revision_surplus_refund_due_created`
+  - `note_revision_surplus_refund_paid_recorded`
+  - `amount_rupiah`
+  - `reason`
+  - surplus refund payment/disposition identifiers
+- Post-patch focused scan on the two production files returned no matches for:
+  - `Refund Due`
+  - `Refund Paid`
+  - `Surplus Refund Paid`
+  - `Amount`
+  - `Reason`
+  - `refund due`
+  - `refund paid`
+- Focused UI tests passed:
+  - `6 passed`
+  - `61 assertions`
+  - duration `6.72s`
+
+#### Changes Applied
+
+- `Tandai Refund Due` -> `Tandai Pengembalian Belum Dibayar`
+- `Refund Due` UI copy -> `Pengembalian Belum Dibayar`
+- `Catat Refund Paid` -> `Catat Pengembalian Sudah Dibayar`
+- `Refund Paid` UI copy -> `Pengembalian Sudah Dibayar`
+- `Riwayat Refund Due` -> `Riwayat Pengembalian Belum Dibayar`
+- `Refund Due Ditandai` -> `Pengembalian Belum Dibayar Ditandai`
+- `Refund Paid Dicatat` -> `Pengembalian Sudah Dibayar Dicatat`
+- `Amount ...` -> `Nominal ...`
+- `Reason: ...` -> `Alasan: ...`
+- `Sisa refund due` -> `Sisa pengembalian belum dibayar`
+
+#### Tests
+
+- `php artisan test tests/Feature/Note/AdminNoteSurplusRefundDueUiFeatureTest.php tests/Feature/Note/AdminNoteSurplusRefundPaidUiFeatureTest.php tests/Feature/Note/AdminNoteSurplusRefundDueAuditTimelineUiFeatureTest.php`
+- Result: PASS, `6 passed (61 assertions)`.
+
+#### DECISION
+
+- Slice 2 is complete and verified.
+- Do not translate internal event names, DB fields, or request fields.
+- Error log 0047 remains open/in progress.
+- Next slice should stay narrow.
+
+#### NEXT CANDIDATE SLICES
+
+- Slice 3 candidate A: transaction report page labels.
+- Slice 3 candidate B: transaction report Excel/PDF export labels.
+- Slice 3 candidate C: revision/versioning timeline labels.
+- Slice 3 candidate D: cash ledger source metadata labels.
