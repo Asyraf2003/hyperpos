@@ -99,13 +99,13 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Qty Tersedia');
-        $response->assertSee('Nilai Stok');
+        $response->assertSee('Nilai Persediaan');
         $response->assertSee('Selisih Qty');
         $response->assertSee('Rp 211.000');
-        $response->assertSee('Supra');
-        $response->assertSee('Vario');
-        $response->assertSee('Beat');
-        $response->assertSee('Scoopy');
+        $response->assertDontSee('Supra');
+        $response->assertDontSee('Vario');
+        $response->assertDontSee('Beat');
+        $response->assertDontSee('Scoopy');
         $response->assertSee('Rp 96.000');
         $response->assertDontSee('Snapshot Stok Saat Ini');
         $response->assertDontSee('Ringkasan Mutasi Periode');
@@ -128,8 +128,9 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Ringkasan Utama');
-        $response->assertSee('Catatan Laporan');
-        $response->assertSee('Detail lengkap tersedia di Excel');
+        $response->assertSee('Rincian Ringkas');
+        $response->assertDontSee('Catatan Laporan');
+        $response->assertDontSee('Detail lengkap tersedia di Excel');
     }
 
 
@@ -195,8 +196,8 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('07 Januari 2030 s/d 09 Januari 2030');
-        $response->assertSee('Supra');
-        $response->assertSee('Vario');
+        $response->assertDontSee('Supra');
+        $response->assertDontSee('Vario');
         $response->assertSee('Rp 52.000');
         $response->assertDontSee('Outside');
         $response->assertDontSee('custom-sr1');
