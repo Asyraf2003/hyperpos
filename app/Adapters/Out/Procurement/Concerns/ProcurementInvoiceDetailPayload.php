@@ -73,9 +73,6 @@ trait ProcurementInvoiceDetailPayload
                 'latest_revision_change_reason' => $summary->latest_revision_change_reason !== null
                     ? (string) $summary->latest_revision_change_reason
                     : null,
-                'latest_revision_actor_id' => $summary->latest_revision_actor_id !== null
-                    ? (string) $summary->latest_revision_actor_id
-                    : null,
                 'latest_revision_changed_at' => $summary->latest_revision_changed_at !== null
                     ? (string) $summary->latest_revision_changed_at
                     : null,

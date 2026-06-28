@@ -66,7 +66,6 @@ trait ProcurementInvoiceDetailSummaryQuery
                 'supplier_invoices.last_revision_no',
                 'latest_revision.event_name as latest_revision_event_name',
                 'latest_revision.change_reason as latest_revision_change_reason',
-                'latest_revision.changed_by_actor_id as latest_revision_actor_id',
                 'latest_revision.changed_at as latest_revision_changed_at',
                 'supplier_invoices.voided_at',
                 'supplier_invoices.void_reason',
