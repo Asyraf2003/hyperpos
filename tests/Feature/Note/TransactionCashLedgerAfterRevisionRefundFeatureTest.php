@@ -101,7 +101,7 @@ final class TransactionCashLedgerAfterRevisionRefundFeatureTest extends TestCase
         $this->assertExcelDetailContainsEvent(
             $detail,
             'note-ledger-revision-refund-001',
-            'Alokasi Pembayaran',
+            'Pembayaran Tercatat',
             'Masuk',
             100000,
             'Pembayaran Nota',

@@ -848,3 +848,58 @@ Sesi ini sudah padat. Lanjut eksekusi di sesi baru lebih aman agar model tidak k
 
 - Visible note revision/versioning labels in active note views are now Indonesian.
 - Remaining `revision` strings in code/tests are mostly internal identifiers, route names, DB fields, or user/test data and should not be renamed in this slice.
+
+### Session Update - 2026-06-28 Cash Ledger Export Formatter Split Verified
+
+#### Scope
+
+- Active issue: `docs/04_lifecycle/error_log/0047_transaction_owner_facing_indonesian_language_gap.md`
+- Handoff: `docs/04_lifecycle/error_log/0048_owner_facing_indonesian_language_gap_handoff.md`
+- Follow-up after cash ledger export owner-facing label cleanup.
+- Trigger: `make verify` failed at `audit-lines` because two export classes exceeded the 100-line limit.
+- Patch type: small architecture cleanup/refactor, no DB/schema/route/API contract change.
+
+#### Files Changed
+
+- Added:
+  - `app/Application/Reporting/Exports/TransactionCashLedgerExportLabelFormatter.php`
+- Refactored:
+  - `app/Application/Reporting/Exports/TransactionCashLedgerPdfViewDataBuilder.php`
+  - `app/Application/Reporting/Exports/TransactionCashLedgerExcelDetailSheetWriter.php`
+- Updated stale test expectation:
+  - `tests/Feature/Note/TransactionCashLedgerAfterRevisionRefundFeatureTest.php`
+
+#### FACT
+
+- `TransactionCashLedgerPdfViewDataBuilder.php` previously exceeded line limit at 111 lines.
+- `TransactionCashLedgerExcelDetailSheetWriter.php` previously exceeded line limit at 101 lines.
+- Shared cash ledger export label mapping was extracted to `TransactionCashLedgerExportLabelFormatter`.
+- After split:
+  - `TransactionCashLedgerExportLabelFormatter.php`: 52 lines
+  - `TransactionCashLedgerPdfViewDataBuilder.php`: 71 lines
+  - `TransactionCashLedgerExcelDetailSheetWriter.php`: 62 lines
+- No bypass label was added.
+- Existing output contract remains owner-facing:
+  - `payment_allocation` -> `Pembayaran Tercatat`
+  - `payment_allocations` -> `Pembayaran Nota`
+  - `customer_refunds` -> `Pengembalian Dana`
+  - `refund` -> `Pengembalian Dana`
+- Stale lifecycle Excel expectation was updated from raw/internal source label to owner-facing source label.
+
+#### PROOF
+
+- `make audit-lines`: PASS.
+- Cash ledger focused/export tests passed after label expectation correction.
+- Full verification:
+  - `make verify`
+  - Result: PASS
+  - `1439 passed (8603 assertions)`
+  - Duration: `91.00s`
+
+#### DECISION
+
+- Cash ledger export label formatter split is complete.
+- Cash ledger export owner-facing labels remain centralized.
+- No further bypass is needed for these files.
+- Continue remaining 0047 work with broad owner-facing scan only; do not rename DB enums, DTO keys, route names, request fields, or user-provided fixture values.
+
