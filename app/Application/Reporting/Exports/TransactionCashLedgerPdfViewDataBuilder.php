@@ -11,9 +11,13 @@ final class TransactionCashLedgerPdfViewDataBuilder
 {
     use FormatsPdfReportValues;
 
+    private readonly TransactionCashLedgerExportLabelFormatter $labels;
+
     public function __construct(
         private readonly ClockPort $clock,
+        ?TransactionCashLedgerExportLabelFormatter $labels = null,
     ) {
+        $this->labels = $labels ?? new TransactionCashLedgerExportLabelFormatter();
     }
 
     public function build(array $dataset, array $filters): array
@@ -53,59 +57,15 @@ final class TransactionCashLedgerPdfViewDataBuilder
         return [
             'date' => $this->formatDate($this->stringValue($row['event_date'] ?? '')),
             'note_label' => $this->stringValue($row['note_label'] ?? $row['note_id'] ?? ''),
-            'event_type' => $this->eventTypeLabel($this->stringValue($row['event_type'] ?? '')),
-            'direction' => $this->directionLabel($this->stringValue($row['direction'] ?? '')),
-            'payment_method' => $this->paymentMethodLabel($this->stringValue($row['payment_method'] ?? '')),
+            'event_type' => $this->labels->eventTypeLabel($this->stringValue($row['event_type'] ?? '')),
+            'direction' => $this->labels->directionLabel($this->stringValue($row['direction'] ?? '')),
+            'payment_method' => $this->labels->paymentMethodLabel($this->stringValue($row['payment_method'] ?? '')),
             'amount' => $this->rupiah($row['event_amount_rupiah'] ?? 0),
             'payment_marker' => $paymentId !== '' ? 'Ada' : '-',
             'refund_marker' => $refundId !== '' ? 'Ada' : '-',
-            'source_table' => $this->sourceLabel($this->stringValue($row['source_table'] ?? '-')),
+            'source_table' => $this->labels->sourceLabel($this->stringValue($row['source_table'] ?? '-')),
             'source_id' => $this->stringValue($row['source_id'] ?? '-') ?: '-',
             'source_disposition_id' => $this->stringValue($row['source_disposition_id'] ?? '-') ?: '-',
         ];
-    }
-
-    private function paymentMethodLabel(string $paymentMethod): string
-    {
-        return match ($paymentMethod) {
-            'cash' => 'Tunai',
-            'transfer' => 'Transfer',
-            '' => '-',
-            default => $paymentMethod,
-        };
-    }
-
-    private function eventTypeLabel(string $type): string
-    {
-        return match ($type) {
-            'payment_allocation' => 'Pembayaran Tercatat',
-            'payment' => 'Pembayaran',
-            'refund' => 'Pengembalian Dana',
-            default => $type,
-        };
-    }
-
-    private function sourceLabel(string $source): string
-    {
-        return match ($source) {
-            'payment_allocations' => 'Pembayaran Nota',
-            'payment_component_allocations' => 'Pembayaran Rincian Nota',
-            'customer_payments' => 'Pembayaran Pelanggan',
-            'customer_refunds' => 'Pengembalian Dana',
-            'refund_component_allocations' => 'Pengembalian Rincian Nota',
-            'note_revision_surplus_refund_payments' => 'Pengembalian Surplus Dibayar',
-            'note_revision_surplus_dispositions' => 'Pengembalian Surplus Ditandai',
-            '', '-' => '-',
-            default => $source,
-        };
-    }
-
-    private function directionLabel(string $direction): string
-    {
-        return match ($direction) {
-            'in' => 'Masuk',
-            'out' => 'Keluar',
-            default => $direction,
-        };
     }
 }
