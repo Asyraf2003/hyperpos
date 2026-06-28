@@ -103,5 +103,16 @@ final class CashierNoteCorrectionHistoryReasonViewFeatureTest extends TestCase
         $this->seedNoteBase('note-1', 'Budi', $today, 50000, 'open');
         $this->seedWorkItemBase('wi-1', 'note-1', 1, WorkItem::TYPE_SERVICE_ONLY, WorkItem::STATUS_OPEN, 50000);
         $this->seedServiceDetailBase('wi-1', 'Servis Lama', 50000, ServiceDetail::PART_SOURCE_NONE);
+        $this->seedServiceOnlyCurrentRevision(
+            'note-1',
+            'note-1-r001',
+            'wi-1',
+            'Budi',
+            $today,
+            50000,
+            'Servis Lama',
+            50000,
+            WorkItem::STATUS_OPEN
+        );
     }
 }
