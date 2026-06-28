@@ -18,6 +18,7 @@ final class RecordSelectedRowsRefundPlanAuditRecorder
         SelectedRowsRefundPlan $plan,
         string $actorId,
         string $actorRole,
+        string $reason,
         array $processed,
         array $finalizedData,
     ): void {
@@ -25,6 +26,7 @@ final class RecordSelectedRowsRefundPlanAuditRecorder
             'note_id' => $plan->noteId(),
             'actor_id' => $actorId,
             'actor_role' => $actorRole,
+            'reason' => trim($reason),
             'selected_row_ids' => $plan->selectedRowIds(),
             'unpaid_row_ids' => $plan->unpaidRowIds(),
             'cancellable_row_ids' => $plan->cancellableRowIds(),

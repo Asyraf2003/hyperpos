@@ -65,7 +65,7 @@ final class RecordSelectedRowsRefundPlanTransaction
             }
 
             $this->projection->syncNote($plan->noteId());
-            $this->audit->record($plan, $actorId, $actorRole, $processed, $finalized->data());
+            $this->audit->record($plan, $actorId, $actorRole, $reason, $processed, $finalized->data());
 
             $this->transactions->commit();
 
