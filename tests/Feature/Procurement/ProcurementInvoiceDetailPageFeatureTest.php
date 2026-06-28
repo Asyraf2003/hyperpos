@@ -173,7 +173,7 @@ final class ProcurementInvoiceDetailPageFeatureTest extends TestCase
         $response->assertSee('Revisi 2');
         $response->assertSee('Alasan Perubahan Terakhir');
         $response->assertSee('Koreksi qty dan pajak supplier.');
-        $response->assertSee('actor-admin');
+        $response->assertDontSee('actor-admin');
     }
 
     private function user(string $role): User

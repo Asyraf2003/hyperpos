@@ -19,7 +19,7 @@ final class ReopenClosedNoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reason' => ['required', 'string'],
+            'reason' => ['required', 'string', 'max:500'],
         ];
     }
 }
