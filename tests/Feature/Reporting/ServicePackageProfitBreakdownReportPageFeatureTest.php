@@ -45,7 +45,7 @@ final class ServicePackageProfitBreakdownReportPageFeatureTest extends TestCase
         $response->assertSee('Ringkasan Utama');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Jumlah Paket');
-        $response->assertSee('Gross Profit Paket');
+        $response->assertSee('Laba Kotor Paket');
         $response->assertDontSee('Detail Paket Service');
         $response->assertDontSee('Belum ada paket service pada periode ini.');
         $response->assertSee(route('admin.reports.service_package_profit_breakdown.index'), false);

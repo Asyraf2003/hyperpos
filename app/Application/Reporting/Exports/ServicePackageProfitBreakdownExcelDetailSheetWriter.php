@@ -59,7 +59,7 @@ final class ServicePackageProfitBreakdownExcelDetailSheetWriter
             'Total Komponen Service',
             'Refund Komponen Produk',
             'Refund Komponen Service',
-            'Gross Profit Paket',
+            'Laba Kotor Paket',
         ], $values);
 
         $this->tables->autosize($sheet, 17);

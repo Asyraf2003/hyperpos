@@ -91,7 +91,7 @@
 
     <div class="col-12">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Gross Profit Paket</div>
+            <div class="text-muted small">Laba Kotor Paket</div>
             <div class="fs-5 fw-bold text-success">Rp {{ number_format($summary['total_package_gross_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>

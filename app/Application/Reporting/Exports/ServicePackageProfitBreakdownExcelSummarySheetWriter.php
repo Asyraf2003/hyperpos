@@ -29,7 +29,7 @@ final class ServicePackageProfitBreakdownExcelSummarySheetWriter
             ['Komponen Service', (int) ($summary['total_service_component_rupiah'] ?? 0)],
             ['Refund Komponen Produk', (int) ($summary['refunded_product_component_rupiah'] ?? 0)],
             ['Refund Komponen Service', (int) ($summary['refunded_service_component_rupiah'] ?? 0)],
-            ['Gross Profit Paket', (int) ($summary['total_package_gross_profit_rupiah'] ?? 0)],
+            ['Laba Kotor Paket', (int) ($summary['total_package_gross_profit_rupiah'] ?? 0)],
         ]);
 
         $this->tables->autosize($sheet, 2);
