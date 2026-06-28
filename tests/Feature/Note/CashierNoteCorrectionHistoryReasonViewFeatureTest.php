@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Note;
 
 use App\Adapters\Out\Persistence\Eloquent\IdentityAccess\EloquentUser as User;
+use App\Application\Note\Services\NoteCorrectionHistoryBuilder;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,6 +55,11 @@ final class CashierNoteCorrectionHistoryReasonViewFeatureTest extends TestCase
                 'created_at' => '2026-04-03 09:00:00',
             ],
         ]);
+
+        $history = app(NoteCorrectionHistoryBuilder::class)->build('note-1');
+
+        $this->assertSame('Koreksi Nominal Servis', $history[0]['event_label'] ?? null);
+        $this->assertSame('Koreksi nominal servis setelah review pelanggan.', $history[0]['reason'] ?? null);
 
         $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
