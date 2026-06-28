@@ -39,6 +39,27 @@ final class RecordSelectedRowsCustomerRefundFeatureTest extends TestCase
 
         $refundId = (string) DB::table('customer_refunds')->value('id');
 
+        $this->assertDatabaseHas('customer_refunds', [
+            'id' => $refundId,
+            'note_id' => 'note-1',
+            'reason' => 'Refund komponen produk line terpilih',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'selected_rows_refund_plan_recorded',
+        ]);
+
+        $auditContext = json_decode(
+            (string) DB::table('audit_logs')
+                ->where('event', 'selected_rows_refund_plan_recorded')
+                ->value('context'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $this->assertSame('Refund komponen produk line terpilih', $auditContext['reason'] ?? null);
+
         $this->assertDatabaseHas('refund_component_allocations', [
             'customer_refund_id' => $refundId,
             'customer_payment_id' => 'payment-1',
