@@ -267,7 +267,10 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
 
         self::assertTrue($revision->isSuccess(), $revision->message());
 
-        $newWorkItemId = (string) DB::table('work_items')->where('note_id', $noteId)->value('id');
+        $newWorkItemId = (string) DB::table('work_items')
+            ->where('note_id', $noteId)
+            ->where('id', '<>', $oldWorkItemId)
+            ->value('id');
         $newStoreStockLineId = (string) DB::table('work_item_store_stock_lines')
             ->where('work_item_id', $newWorkItemId)
             ->value('id');
