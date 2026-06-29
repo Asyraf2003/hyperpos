@@ -12,14 +12,44 @@ pushc: push
 .PHONY: docs-help help
 
 help:
-	@echo "Tersedia Perintah Kerja:"
-	@echo "  make audit-git                      Menjalankan audit laporan arsitektur dan statistik Git"
-	@echo "  make verify-service-product-template  Validasi sintaks rute, controller, views, dan test"
-	@echo "  make docs-help                      Melihat dokumentasi bantuan proyek"
+	@echo "HyperPOS available commands:"
+	@echo ""
+	@echo "  Core verification:"
+	@echo "    make verify                         Run lint, contract audits, and full test suite"
+	@echo "    make ci                             Alias for make verify"
+	@echo "    make test                           Run the full Pest test suite"
+	@echo "    make test-unit                      Run unit tests only"
+	@echo "    make test-feature                   Run feature tests only"
+	@echo "    make test-report                    Run reporting feature tests"
+	@echo "    make test-stock                     Run inventory feature tests"
+	@echo "    make test-arch                      Run architecture dependency tests"
+	@echo ""
+	@echo "  Architecture and repository audits:"
+	@echo "    make audit-git                      Generate Git/repository density and architecture statistics"
+	@echo "    make audit-hex                      Check hexagonal architecture boundaries"
+	@echo "    make audit-lines                    Check line-count guardrails"
+	@echo "    make audit-blade                    Check Blade PHP boundary rules"
+	@echo "    make audit-contract                 Run line-count and Blade contract audits"
+	@echo ""
+	@echo "  Database:"
+	@echo "    make migrate                        Run Laravel migrations"
+	@echo "    make rollback                       Roll back the latest migration batch"
+	@echo "    make reset-db                       Rebuild local database from migrations"
+	@echo ""
+	@echo "  Documentation:"
+	@echo "    make docs-help                      Show documentation entrypoint"
+	@echo ""
+	@echo "  Specialized verification:"
+	@echo "    make verify-service-product-template Validate service catalog/template slice"
+	@echo ""
+	@echo "  Git:"
+	@echo "    make push                           Run project git push wrapper"
+	@echo "    make pushc                          Run push wrapper and clear terminal"
 
 docs-help:
-	@cat docs/DOCS_HELP.md
+	@cat docs/0001_docs_help.md
 # <<< docs targets <<<
+
 
 include mk/seed.mk
 
