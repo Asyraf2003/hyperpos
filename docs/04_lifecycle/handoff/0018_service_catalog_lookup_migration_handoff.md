@@ -348,3 +348,59 @@ Result:
 PASS
 ```
 
+## Session Update - 0058 Inventory Deleted Product Excel Export Visibility
+
+### Status
+
+Resolved.
+
+### Scope
+
+Slice `0058` mengunci export Excel agar label movement untuk produk soft-deleted dan orphan/missing product tetap audit-friendly dan konsisten dengan dataset `0057`.
+
+### Files Changed
+
+- `tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php`
+- `docs/04_lifecycle/error_log/0058_inventory_deleted_product_excel_export_visibility.md`
+- this handoff file
+
+### FACT
+
+- Production code tidak berubah.
+- Dataset movement sudah aman dari slice `0057`.
+- Excel export memakai full dataset dari `GetInventoryStockValueReportDatasetHandler::handle(...)`.
+- Sheet `Mutasi Periode` menulis `movement_rows`.
+- Sheet `Snapshot Stok` tetap hanya memuat current snapshot active product.
+- Empty `kode_barang` orphan terbaca sebagai `null` saat workbook dibaca ulang oleh PhpSpreadsheet.
+
+### Behavior Locked
+
+- Active product muncul normal di Excel movement sheet.
+- Soft-deleted product movement muncul sebagai `[Produk terhapus] {nama_barang}`.
+- Orphan/missing product movement muncul sebagai `[Produk tidak ditemukan: {product_id}]`.
+- Deleted/orphan product tidak masuk Excel snapshot sheet.
+- Qty dan nilai period movement tetap benar.
+- No costing engine changes.
+- No HPP changes.
+- No `inventory_value_rupiah` semantic changes.
+- No migration.
+- No source-type bucket membership changes.
+- No production repair/write.
+
+### Proof
+
+Owner reported targeted regression PASS:
+
+```bash
+php artisan test \
+  tests/Feature/Reporting/InventoryDeletedProductMovementReportVisibilityFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php \
+  tests/Feature/Reporting/GetInventoryStockValueReportDatasetFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+```
+
