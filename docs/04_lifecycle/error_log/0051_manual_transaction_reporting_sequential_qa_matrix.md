@@ -334,3 +334,45 @@ Still required:
 - ordered lifecycle checklist mapped to automated/manual-only evidence
 - final combined targeted run
 - full `make verify`
+
+## 2026-06-29 Transaction Cash Ledger Surface Baseline Proof
+
+### Status
+
+PASS - transaction cash ledger baseline surface proof completed.
+
+### Automated Proof
+
+Owner reported PASS for:
+
+```text
+php artisan test \
+  tests/Feature/Reporting/TransactionCashLedgerPageFeatureTest.php \
+  tests/Feature/ReportingExports/TransactionCashLedgerPdfExportFeatureTest.php \
+  tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php \
+  tests/Feature/Note/TransactionCashLedgerAfterRevisionRefundFeatureTest.php
+```
+
+### Coverage Confirmed
+
+This proves the transaction cash ledger baseline across:
+
+- admin cash ledger report screen
+- PDF export
+- Excel export
+- revision/refund cash ledger lifecycle behavior
+- authorization guardrails
+- cash in / cash out reporting surface continuity
+
+### Remaining Before Final Close
+
+This is not final closure.
+
+Still required:
+
+- operational profit screen/PDF/Excel proof
+- inventory stock value screen/PDF/Excel proof
+- service package profit breakdown screen/export proof
+- ordered lifecycle checklist mapped to automated/manual-only evidence
+- final combined targeted run
+- full `make verify`
