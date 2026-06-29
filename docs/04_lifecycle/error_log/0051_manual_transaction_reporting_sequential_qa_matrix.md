@@ -415,3 +415,41 @@ Still required:
 - ordered lifecycle checklist mapped to automated/manual-only evidence
 - final combined targeted run
 - full `make verify`
+
+## 2026-06-29 Inventory Stock Value Surface Baseline Proof
+
+### Status
+
+PASS - inventory stock value baseline surface proof completed.
+
+### Automated Proof
+
+Owner reported PASS for:
+
+```text
+php artisan test \
+  tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php
+```
+
+### Coverage Confirmed
+
+This proves the inventory stock value baseline across:
+
+- admin inventory stock value report screen
+- PDF export
+- Excel export
+- report surface continuity for stock value summary
+- inventory report export route behavior
+
+### Remaining Before Final Close
+
+This is not final closure.
+
+Still required:
+
+- service package profit breakdown screen/export proof
+- ordered lifecycle checklist mapped to automated/manual-only evidence
+- final combined targeted run
+- full `make verify`
