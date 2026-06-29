@@ -376,3 +376,42 @@ Still required:
 - ordered lifecycle checklist mapped to automated/manual-only evidence
 - final combined targeted run
 - full `make verify`
+
+## 2026-06-29 Operational Profit Surface Baseline Proof
+
+### Status
+
+PASS - operational profit baseline surface proof completed.
+
+### Automated Proof
+
+Owner reported PASS for:
+
+```text
+php artisan test \
+  tests/Feature/Reporting/OperationalProfitReportPageFeatureTest.php \
+  tests/Feature/ReportingExports/OperationalProfitReportPdfExportFeatureTest.php \
+  tests/Feature/ReportingExports/OperationalProfitReportExcelExportFeatureTest.php
+```
+
+### Coverage Confirmed
+
+This proves the operational profit baseline across:
+
+- admin operational profit report screen
+- PDF export
+- Excel export
+- owner-facing profit report surface continuity
+- report export route behavior
+
+### Remaining Before Final Close
+
+This is not final closure.
+
+Still required:
+
+- inventory stock value screen/PDF/Excel proof
+- service package profit breakdown screen/export proof
+- ordered lifecycle checklist mapped to automated/manual-only evidence
+- final combined targeted run
+- full `make verify`
