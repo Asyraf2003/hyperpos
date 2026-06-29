@@ -261,6 +261,57 @@ Candidate test areas:
 
 ## Proof Required Before Close
 
+## 2026-06-29 Slice 1 Update - Supplier Invoice Revision Reason
+
+Status: supplier invoice reason path patched and focused tests passed.
+
+Source map result:
+
+- Update route: `PUT /admin/procurement/supplier-invoices/{supplierInvoiceId}` via `UpdateSupplierInvoiceController`.
+- Request: `UpdateSupplierInvoiceRequest` requires `expected_revision_no` and `change_reason`.
+- Handler path: `UpdateSupplierInvoiceHandler` -> `UpdateSupplierInvoiceTransactionalRunner` -> `UpdateSupplierInvoiceOperation` -> `DatabaseVersionedSupplierInvoiceWriterAdapter`.
+- Persistence path: `PersistsVersionedSupplierInvoiceWrites::persistUpdatedInvoice()` creates `supplier_invoice_versions`, increments `supplier_invoices.last_revision_no`, and writes `supplier_invoice_lines` for the new revision.
+- Detail path: `ProcurementInvoiceDetailSummaryQuery` reads the version whose `revision_no` equals `supplier_invoices.last_revision_no`; `resources/views/admin/procurement/supplier_invoices/show.blade.php` renders latest reason only when present.
+
+Root cause proven from source:
+
+- Revision/version creation and `last_revision_no` bump already existed.
+- The submitted owner-facing `change_reason` was not passed into `SupplierInvoiceChangeContext`.
+- `UpdateSupplierInvoiceTransactionalRunner` previously stored the literal event-like text `supplier_invoice_updated` as the context reason, so the latest visible reason could not show the owner-entered edit reason.
+
+Patch:
+
+- `app/Application/Procurement/UseCases/UpdateSupplierInvoiceHandler.php`
+- `app/Application/Procurement/Services/UpdateSupplierInvoiceTransactionalRunner.php`
+- `tests/Feature/Procurement/UpdateSupplierInvoiceFeatureTest.php`
+- `tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php`
+
+Proof:
+
+```text
+php artisan test tests/Feature/Procurement/UpdateSupplierInvoiceFeatureTest.php tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php
+
+PASS  Tests\Feature\Procurement\UpdateSupplierInvoiceFeatureTest
+PASS  Tests\Feature\Procurement\ProcurementInvoiceDetailPageFeatureTest
+Tests: 14 passed (116 assertions)
+Duration: 6.31s
+```
+
+Verified behavior:
+
+- Supplier invoice update still creates revision/version records.
+- `supplier_invoices.last_revision_no` remains tied to latest revision.
+- `supplier_invoice_versions.change_reason` stores the submitted `change_reason`.
+- `audit_events.reason` stores the submitted `change_reason`.
+- Detail page displays latest supplier invoice reason.
+- Supplier invoice reason HTML is escaped on detail display.
+
+Remaining open items:
+
+- Note correction history manual failures still need reproduction.
+- Timestamp UTC vs Asia/Makassar display still needs focused reproduction and patch.
+- Full `make verify` not yet run for 0049.
+
 Run targeted tests for any changed areas.
 
 Then run:
