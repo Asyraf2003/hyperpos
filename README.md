@@ -1,76 +1,73 @@
 <!-- HYPERPOS_LATEST_HANDOFF_START -->
-Latest Handoff: docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md
+Latest Handoff: docs/04_lifecycle/error_log/0048_owner_facing_indonesian_language_gap_handoff.md
 <!-- HYPERPOS_LATEST_HANDOFF_END -->
 
 # App Kasir Hexagonal
 
 ## ✅ Latest Closed Workflow
 
-Cashier note create/edit/refund/reporting consistency workflow is **FINAL CLOSED**.
+Owner-facing Indonesian language cleanup and reason visibility/audit cleanup is **FINAL CLOSED**.
 
 Source of truth:
-- `docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md`
+- `docs/04_lifecycle/error_log/0048_owner_facing_indonesian_language_gap_handoff.md`
 
 Status:
-FINAL CLOSED / Phase 0-7 FIXED / No Phase 8
+FINAL CLOSED / 0047-0048 FIXED / targeted owner-facing language + reason visibility cleanup complete
 
 Purpose:
-Dokumen ini adalah rambu final untuk AI/operator agar tidak mengulang audit dan source-map workflow cashier note create/edit/refund/reporting yang sudah selesai.
+Dokumen ini adalah pointer terbaru untuk AI/operator agar tidak mengulang cleanup owner-facing label, reason visibility, dan audit propagation yang sudah diverifikasi.
 
 Final scope closed:
-- cashier note create line source-map
-- edit/revision/payment consistency
-- revision payload historical fingerprint
-- UI flexible package
-- refund component-type policy
-- Service Package Profit Breakdown query
-- final regression matrix
-
-Final phase status:
-- Phase 0 Docs Lock: FIXED
-- Phase 0A Owner Decision V2 Docs Lock: FIXED
-- Phase 1 Characterization: FIXED
-- Phase 2 Hardening Guards: FIXED
-- Phase 3 Revision Payload Historical Fingerprint: FIXED
-- Phase 4 UI Flexible Package: FIXED
-- Phase 5 Refund Component-Type Policy: FIXED
-- Phase 6 Service Package Profit Breakdown Query: FIXED
-- Phase 7 Final Regression Matrix: FIXED
+- owner-facing Indonesian label cleanup for transaction/note/report surfaces
+- product edit `change_reason` input, validation, propagation, persistence, and detail proof
+- supplier invoice latest revision reason query and detail display
+- closed/paid note correction history reason display in shared note detail
+- selected rows refund reason audit payload propagation
+- final targeted regression and full verification proof
 
 Final proof:
-- Focused regression matrix GREEN.
-- Final `make verify` GREEN: 1276 passed, 7445 assertions, 54.12s.
+- Focused reason visibility/audit suite GREEN.
+- Final `make verify` GREEN:
+  - phpstan no errors
+  - line audit PASS
+  - Blade PHP audit PASS
+  - contract audit PASS
+  - Pest 1443 passed, 8631 assertions
 
 Canonical closure docs:
+- `docs/04_lifecycle/error_log/0048_owner_facing_indonesian_language_gap_handoff.md`
+- `docs/04_lifecycle/error_log/0039_cashier_note_create_edit_refund_reporting_final_closure.md`
 - `docs/03_blueprints/finance/0011_cashier_note_consistency_workflow_index.md`
 - `docs/03_blueprints/finance/0016_cashier_note_final_regression_matrix.md`
-- `docs/04_lifecycle/error_log/0038_cashier_note_create_edit_refund_reporting_audit_findings.md`
 
 Important:
-- `0038` is historical audit input, not active work.
-- `0011` is the workflow ledger.
-- `0016` is the final regression matrix.
-- This `0039` document is the final closure pointer.
+- `0048` is the latest owner-facing language and reason visibility closure pointer.
+- `0039` remains the previous cashier note create/edit/refund/reporting final closure pointer.
+- `0011` remains the workflow ledger.
+- `0016` remains the final regression matrix for the earlier cashier note consistency workflow.
 
 Do not reopen without new bug evidence:
-- Do not restart Phase 0-7 analysis.
-- Do not create Phase 8.
-- Do not patch cashier note create/edit/refund/reporting from this workflow unless a new concrete failing test, production bug, or owner request explicitly opens a new workflow.
+- Do not restart owner-facing language cleanup scans unless a new concrete label gap is reported.
+- Do not reopen reason visibility/audit propagation unless a new failing test, production bug, or owner request explicitly opens a new workflow.
+- Do not mix future mobile API cleanup, dashboard polish, or broad report redesign into this closed workflow.
 
 Boundaries still locked:
-- No supplier invoice payment proof scope.
+- No DB enum/key rename.
+- No route rename.
+- No request field rename.
+- No DTO key rename.
+- No event literal rename.
 - No Mobile API scope.
 - No Operational Profit formula change.
 - No refund policy change.
-- No Service Package Profit Breakdown behavior change.
-- No migration/route/config from this closure.
+- No supplier payable/reporting redesign from this closure.
 - No git operation requested by this document.
 
 Final stop rule:
-STOP. No Phase 8 for this workflow.
+STOP. This workflow is closed after final `make verify` PASS.
 
 Operator/AI rule:
-Do not reopen this workflow, restart its source-map, or create a new phase unless there is new concrete failing test evidence, production bug evidence, or explicit owner instruction.
+Use this README pointer as the latest closure guard. Do not reopen 0047/0048 unless there is new concrete failing test evidence, production bug evidence, or explicit owner instruction.
 
 ---
 
@@ -248,6 +245,9 @@ Project ini sudah berada pada tahap di mana **inti sistem operasional, jalur kor
 - alur transaksi inti berbasis domain
 - koreksi data dengan jejak riwayat
 - selected-row payment dan settlement komponen pembayaran
+- selected-row refund dengan audit reason propagation
+- supplier invoice revision reason visibility
+- owner-facing Indonesian label consistency
 - service package profit breakdown report
 - Excel export laporan paket service
 - auditability dan histori perubahan
@@ -321,9 +321,10 @@ Bagi HRD teknis, founder, atau pihak yang memegang keputusan teknis, project ini
 Posisi saat ini secara garis besar:
 - core logic dan fondasi sistem sudah menjadi fokus implementasi utama
 - disiplin arsitektur, testing, dan riwayat perubahan sudah menjadi bagian dari karakter project
-- pekerjaan yang masih tersisa terutama berada pada **UI transaksi** dan **UI laporan**
+- owner-facing Indonesian label cleanup dan reason visibility/audit propagation sudah ditutup untuk flow prioritas
+- pekerjaan lanjutan terutama berada pada polish UI/UX, skenario operasional baru, dan pengembangan fitur berikutnya bila ada bukti kebutuhan owner baru
 
-Artinya, project ini sudah cukup matang untuk menunjukkan **arah engineering dan kualitas fondasi**, meskipun masih ada layer presentasi yang sedang disempurnakan.
+Artinya, project ini sudah cukup matang untuk menunjukkan **arah engineering dan kualitas fondasi**, dengan lapisan presentasi yang terus dipoles tanpa mengorbankan integritas data.
 
 ---
 
