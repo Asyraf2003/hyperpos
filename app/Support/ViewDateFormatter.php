@@ -60,7 +60,11 @@ final class ViewDateFormatter
     private static function displayTimezone(): string
     {
         if (function_exists('config')) {
-            $configured = config('app.display_timezone');
+            try {
+                $configured = config('app.display_timezone');
+            } catch (Throwable) {
+                $configured = null;
+            }
 
             if (is_string($configured) && trim($configured) !== '') {
                 return trim($configured);
