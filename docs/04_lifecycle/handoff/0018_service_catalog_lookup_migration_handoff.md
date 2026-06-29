@@ -404,3 +404,62 @@ Result:
 PASS
 ```
 
+## Session Update - 0059 Inventory Stock Value Summary-only Deleted Orphan Parity
+
+### Status
+
+Resolved.
+
+### Scope
+
+Slice `0059` mengunci parity antara full dataset summary dan summary-only aggregate ketika ada inventory movement untuk produk soft-deleted dan orphan/missing product.
+
+### Files Changed
+
+- `tests/Feature/Reporting/InventoryDeletedProductMovementReportVisibilityFeatureTest.php`
+- `docs/04_lifecycle/error_log/0059_inventory_stock_value_summary_only_deleted_orphan_parity.md`
+- this handoff file
+
+### FACT
+
+- Production code tidak berubah.
+- Full dataset path memakai `GetInventoryStockValueReportDatasetHandler::handle(...)`.
+- Summary-only path memakai `GetInventoryStockValueReportDatasetHandler::handleSummaryOnly(...)`.
+- Page report memakai summary-only path.
+- PDF export memakai summary-only path.
+- Summary-only movement aggregate tetap source dari `inventory_movements`.
+- Summary-only snapshot aggregate tetap source dari active `products`.
+- Deleted/orphan movement tetap dihitung pada period movement summary.
+- Deleted/orphan product tetap tidak masuk current snapshot.
+
+### Behavior Locked
+
+- Full dataset summary sama persis dengan summary-only aggregate untuk case deleted/orphan movement.
+- `snapshot_product_rows` hanya menghitung active snapshot product.
+- `movement_product_rows` menghitung active + deleted + orphan movement product.
+- `total_inventory_value_rupiah` tetap dari active current snapshot.
+- Period supply/net qty dan period net cost tetap menghitung semua movement periode.
+- No costing engine changes.
+- No HPP changes.
+- No `inventory_value_rupiah` semantic changes.
+- No migration.
+- No source-type bucket membership changes.
+- No production repair/write.
+
+### Proof
+
+Owner reported targeted regression PASS:
+
+```bash
+php artisan test \
+  tests/Feature/Reporting/InventoryDeletedProductMovementReportVisibilityFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php \
+  tests/Feature/Reporting/GetInventoryStockValueReportDatasetFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+```
+
