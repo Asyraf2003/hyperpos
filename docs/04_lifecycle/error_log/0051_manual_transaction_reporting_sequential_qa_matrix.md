@@ -289,3 +289,48 @@ Keep `0051` open.
 Do not expand this slice into unrelated feature work.
 
 Next implementation slice should add the smallest missing automated parity test around an existing golden master report surface before attempting full final closure.
+
+## 2026-06-29 Transaction Summary Surface Baseline Proof
+
+### Status
+
+PASS - transaction summary baseline surface proof completed.
+
+### Automated Proof
+
+Owner reported PASS for:
+
+```text
+php artisan test \
+  tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php \
+  tests/Feature/Reporting/TransactionReportPageFeatureTest.php \
+  tests/Feature/ReportingExports/TransactionReportPdfExportFeatureTest.php \
+  tests/Feature/ReportingExports/TransactionReportExcelExportFeatureTest.php
+```
+
+### Coverage Confirmed
+
+This proves the transaction summary baseline across:
+
+- dataset/query reconciliation
+- admin report screen
+- PDF export
+- Excel export
+- owner-facing summary labels
+- refund / refund due / surplus refund paid visibility
+- numeric rupiah cells in Excel
+- route and authorization guardrails
+
+### Remaining Before Final Close
+
+This is not final closure.
+
+Still required:
+
+- transaction cash ledger screen/PDF/Excel proof
+- operational profit screen/PDF/Excel proof where available
+- inventory stock value screen/PDF/Excel proof
+- service package profit breakdown screen/export proof
+- ordered lifecycle checklist mapped to automated/manual-only evidence
+- final combined targeted run
+- full `make verify`
