@@ -463,3 +463,59 @@ Result:
 PASS
 ```
 
+## Session Update - 0060 Inventory Stock Value Page Summary Deleted Orphan Visibility
+
+### Status
+
+Resolved.
+
+### Scope
+
+Slice `0060` mengunci HTTP page laporan stok dan nilai persediaan agar summary owner-facing tetap benar ketika ada movement untuk produk soft-deleted dan orphan/missing product.
+
+### Files Changed
+
+- `tests/Feature/Reporting/InventoryStockValueReportPageSummaryVisibilityFeatureTest.php`
+- `docs/04_lifecycle/error_log/0060_inventory_stock_value_page_summary_deleted_orphan_visibility.md`
+- this handoff file
+
+### FACT
+
+- Production code tidak berubah.
+- Page report memakai `GetInventoryStockValueReportDatasetHandler::handleSummaryOnly(...)`.
+- Page view menerima `summary`.
+- Summary-only movement aggregate tetap source dari `inventory_movements`.
+- Summary-only snapshot aggregate tetap source dari active `products`.
+- Deleted/orphan movement tetap dihitung pada period movement summary.
+- Deleted/orphan product tetap tidak masuk current snapshot.
+
+### Behavior Locked
+
+- Admin page report render OK.
+- View yang dipakai benar.
+- `snapshot_product_rows` hanya active snapshot product.
+- `movement_product_rows` menghitung active + deleted + orphan movement product.
+- `total_inventory_value_rupiah` tetap dari active current snapshot.
+- Period supply/net qty dan period net cost tetap menghitung semua movement periode.
+- Owner-facing labels tampil di page.
+- No costing engine changes.
+- No HPP changes.
+- No `inventory_value_rupiah` semantic changes.
+- No migration.
+- No source-type bucket membership changes.
+- No production repair/write.
+
+### Proof
+
+Owner reported test PASS:
+
+```bash
+php artisan test tests/Feature/Reporting/InventoryStockValueReportPageSummaryVisibilityFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+```
+
