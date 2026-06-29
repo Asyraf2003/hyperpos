@@ -481,3 +481,111 @@ Close only after:
 - note correction manual QA is either fixed or proven data/setup-specific,
 - timestamp mismatch is fixed or explicitly documented with acceptable business decision,
 - `make verify` passes.
+
+## Session Update - 2026-06-29 Supplier Invoice Revision Negative Stock, Draft Slot, and Version Timeline UX Fixed
+
+### Slice
+
+- Active issue: supplier invoice revision edit path.
+- Trigger: manual QA revisi faktur supplier.
+- User-facing symptom:
+  - Revisi faktur supplier yang hanya mengubah pajak dari 15% ke 20% gagal.
+  - Error yang muncul: `Revisi faktur akan membuat stok product lama menjadi negatif.`
+  - Alasan perubahan sebelumnya tidak terlihat jelas pada alur gagal.
+  - Histori versi menampilkan snapshot penuh, tetapi tidak menjelaskan perubahan secara ringkas.
+  - Halaman edit otomatis menambahkan slot rincian kosong di atas, yang berisiko ikut tersubmit sebagai line baru.
+
+### Root Cause
+
+- Backend delta movement builder terlalu percaya pada `previous_line_id`.
+- Jika `previous_line_id` kosong/stale/tidak cocok:
+  - line request dianggap sebagai line baru dan dibuat `stock_in`;
+  - old line yang tidak referenced dianggap dihapus dan dibuat `stock_out`;
+  - negative stock guard menolak revisi jika stok product lama sudah habis/berkurang.
+- Pada halaman edit, JS juga otomatis membuat top working line kosong:
+  - setelah draft dipulihkan;
+  - saat halaman edit dibuka tanpa draft.
+- Slot kosong ini aman untuk create form, tetapi fatal untuk edit form karena hidden `previous_line_id` kosong dapat masuk ke request lifecycle.
+- Histori versi sebelumnya hanya menampilkan snapshot penuh per versi, sehingga user harus membandingkan versi secara manual.
+
+### Files Changed
+
+- `app/Application/Procurement/Services/SupplierInvoiceRevisionDeltaMovementsBuilder.php`
+- `public/assets/static/js/pages/admin-procurement-edit.js`
+- `app/Adapters/In/Http/Controllers/Admin/Procurement/Concerns/BuildsProcurementInvoiceDetailViewData.php`
+- `resources/views/admin/procurement/supplier_invoices/show.blade.php`
+- `tests/Feature/Procurement/SupplierInvoiceTaxFinancialInvariantFeatureTest.php`
+- `tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php`
+
+### Backend Fix
+
+- Added safe fallback pairing in `SupplierInvoiceRevisionDeltaMovementsBuilder`.
+- If `previous_line_id` is missing/stale, backend may still pair old/new lines only when all safe identity checks match:
+  - same `line_no`;
+  - same `product_id`;
+  - same `qty_pcs`;
+  - old line has not already been referenced.
+- This allows tax-only/cost-only revisions to create cost revaluation instead of false stock movement.
+- Product/qty changes still use normal delta stock behavior.
+
+### UI Draft/Edit Fix
+
+- Removed automatic top working line creation on supplier invoice edit page load.
+- Removed automatic top working line creation after draft restore.
+- Manual add line remains available through the add button and explicit shortcuts.
+- Empty lines are still pruned before submit as a guardrail.
+- Result: edit form no longer opens with an extra blank row that has empty `previous_line_id`.
+
+### Version Timeline UX Fix
+
+- Added `Ringkasan Perubahan` to supplier invoice version timeline.
+- Diff summary currently includes important owner-facing changes such as:
+  - invoice number change;
+  - shipment date change;
+  - grand total change;
+  - qty change;
+  - added line;
+  - removed line.
+- Full version snapshot is preserved but hidden behind Bootstrap collapse.
+- Owner-facing timeline now shows summary first, with full detail available through `Lihat Detail Versi`.
+- Version 1/initial version shows `Versi awal nota pemasok.`
+
+### Tests Added / Updated
+
+- Added regression test:
+  - `SupplierInvoiceTaxFinancialInvariantFeatureTest::test_received_invoice_tax_only_revision_with_missing_previous_line_id_pairs_by_same_line_product_and_qty`
+- The test proves:
+  - tax-only revision with missing `previous_line_id` succeeds;
+  - cost revaluation movement is created;
+  - false `stock_out` movement is not created.
+- Updated procurement invoice detail page test to assert:
+  - `Ringkasan Perubahan`;
+  - diff text for changed invoice number/date/total/qty/added line;
+  - `Lihat Detail Versi`;
+  - Bootstrap collapse attributes.
+
+### Verification
+
+- Targeted regression initially failed with:
+  - `Revisi faktur akan membuat stok product lama menjadi negatif.`
+- After backend fallback pairing, targeted regression passed.
+- `SupplierInvoiceTaxFinancialInvariantFeatureTest` passed.
+- `ProcurementInvoiceDetailPageFeatureTest` passed.
+- Combined targeted runs passed after JS and timeline UX changes.
+
+### Final Decision
+
+- Keep full version data for audit and debugging.
+- Show owner-facing concise change summary by default.
+- Hide full snapshot behind expandable detail.
+- Treat missing/stale `previous_line_id` as recoverable only for safe same-line/same-product/same-qty revision cases.
+- Do not auto-create blank working line on edit page load.
+
+### Remaining Follow-up
+
+- Consider adding browser-level/manual QA notes for:
+  - edit page opens with no extra blank line;
+  - add button still creates a new blank line intentionally;
+  - stale localStorage draft no longer causes false stock-out on tax-only revision;
+  - version timeline collapse works on mobile and desktop.
+
