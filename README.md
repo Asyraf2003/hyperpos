@@ -144,25 +144,44 @@ That is why the repository contains ADRs, lifecycle logs, handoffs, error logs, 
 
 ### Cashier Flow
 
-![Cashier dashboard](.github/assets/readme/cashier-dashboard.png)
-
-![Cashier create note](.github/assets/readme/cashier-create-note.png)
-
-![Cashier note detail](.github/assets/readme/cashier-note-detail.png)
+<table>
+  <tr>
+    <td width="33%">
+      <img src=".github/assets/readme/cashier-dashboard.png" alt="Cashier dashboard">
+    </td>
+    <td width="33%">
+      <img src=".github/assets/readme/cashier-create-note.png" alt="Cashier create note">
+    </td>
+    <td width="33%">
+      <img src=".github/assets/readme/cashier-note-detail.png" alt="Cashier note detail">
+    </td>
+  </tr>
+</table>
 
 ### Admin and Reporting
 
-![Admin dashboard](.github/assets/readme/admin-dashboard.png)
-
-![Dashboard report](.github/assets/readme/dashboard-report.png)
-
-![Admin product table](.github/assets/readme/admin-product-table.png)
-
-![Supplier payment proof](.github/assets/readme/admin-supplier-payment-proof.png)
+<table>
+  <tr>
+    <td width="50%">
+      <img src=".github/assets/readme/admin-dashboard.png" alt="Admin dashboard">
+    </td>
+    <td width="50%">
+      <img src=".github/assets/readme/dashboard-report.png" alt="Dashboard report">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src=".github/assets/readme/admin-product-table.png" alt="Admin product table">
+    </td>
+    <td width="50%">
+      <img src=".github/assets/readme/admin-supplier-payment-proof.png" alt="Supplier payment proof">
+    </td>
+  </tr>
+</table>
 
 ### Export
 
-![Excel export](.github/assets/readme/report-export-excel.png)
+<img src=".github/assets/readme/report-export-excel.png" alt="Excel export">
 
 ## Production Context
 
