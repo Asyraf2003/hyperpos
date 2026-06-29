@@ -15,15 +15,20 @@ final class ViewDateFormatterTest extends TestCase
         self::assertSame('01 Juni 2026', ViewDateFormatter::display('2026-06-01'));
     }
 
-    public function test_it_preserves_time_when_requested(): void
+    public function test_it_displays_database_timestamp_in_operational_timezone(): void
     {
-        self::assertSame('01 Juni 2026 14:30', ViewDateFormatter::display('2026-06-01 14:30:45', true));
+        self::assertSame('29 Juni 2026 10:07', ViewDateFormatter::display('2026-06-29 02:07:45', true));
     }
 
     public function test_it_converts_legacy_slash_date_text(): void
     {
         self::assertSame('01 Juni 2026', ViewDateFormatter::display('01/06/2026'));
         self::assertSame('01 Juni 2026 14:30', ViewDateFormatter::display('01/06/2026 14:30', true));
+    }
+
+    public function test_it_does_not_shift_date_only_business_values(): void
+    {
+        self::assertSame('29 Juni 2026', ViewDateFormatter::display('2026-06-29'));
     }
 
     public function test_it_displays_range_with_indonesian_month_names(): void
