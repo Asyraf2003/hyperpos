@@ -92,6 +92,53 @@ final class ReverseSupplierReceiptFeatureTest extends TestCase
             ->assertSessionHasErrors(['reason']);
     }
 
+    public function test_supplier_receipt_reversal_rolls_back_delta_movement_when_projection_rebuild_fails(): void
+    {
+        $this->seedReceivedInvoice();
+
+        DB::table('inventory_movements')->insert([
+            'id' => 'movement-existing-unprojected-stock-out',
+            'product_id' => 'product-1',
+            'movement_type' => 'stock_out',
+            'source_type' => 'legacy_stock_out_fixture',
+            'source_id' => 'legacy-stock-out-1',
+            'tanggal_mutasi' => '2026-04-18',
+            'qty_delta' => -1,
+            'unit_cost_rupiah' => 10000,
+            'total_cost_rupiah' => -10000,
+        ]);
+
+        $response = $this->actingAs($this->admin())
+            ->from(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
+            ->post(route('admin.procurement.supplier-receipts.reverse.store', ['supplierReceiptId' => 'receipt-1']), [
+                'reversed_at' => '2026-04-19',
+                'reason' => 'Paksa failure rebuild untuk memastikan rollback.',
+            ]);
+
+        $response->assertRedirect(route('admin.procurement.supplier-invoices.show', ['supplierInvoiceId' => 'invoice-1']))
+            ->assertSessionHasErrors(['supplier_receipt_reversal']);
+
+        $this->assertDatabaseMissing('inventory_movements', [
+            'source_type' => 'supplier_receipt_reversal_line',
+            'source_id' => 'receipt-line-1',
+        ]);
+
+        $this->assertDatabaseMissing('supplier_receipt_reversals', [
+            'supplier_receipt_id' => 'receipt-1',
+        ]);
+
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-1',
+            'qty_on_hand' => 5,
+        ]);
+
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-1',
+            'avg_cost_rupiah' => 10000,
+            'inventory_value_rupiah' => 50000,
+        ]);
+    }
+
     private function seedReceivedInvoice(): void
     {
         DB::table('suppliers')->insert([
