@@ -1,33 +1,35 @@
-# App Kasir Hexagonal - Technical README
+# HyperPOS Technical README
 
-Dokumen ini adalah README teknis untuk repository App Kasir Hexagonal.
+HyperPOS is a Laravel/MySQL workshop POS and operations system built around a dense transactional domain: cashier notes, service jobs, spare parts, supplier invoices, inventory movements, payment allocation, refunds, revision history, audit trails, and operational reporting.
 
-README publik ada di `README.md`. File ini sengaja lebih padat, lebih teknis, dan lebih eksplisit karena repository ini bukan sekadar demo CRUD Laravel. Ini sistem operasional bengkel dengan transaksi, stok, supplier procurement, payment lifecycle, refund, audit trail, reporting, dan workflow documentation yang cukup besar untuk membuat README biasa menyerah lebih dulu.
+This repository is intentionally not shaped like a simple CRUD demo. The core problem is state coherence: every UI action that changes money, stock, payment, refund, supplier payable, or report output must remain explainable across database rows, read models, UI pages, PDF exports, Excel exports, and audit history.
 
-## Latest lifecycle pointer
+## Production Context
 
-Latest closed lifecycle:
+HyperPOS has been operated as a live Laravel/MySQL application for a real workshop environment.
 
-- `docs/99_archive/04_lifecycle/error_log/0049_manual_qa_supplier_invoice_revision_and_timezone_gap.md`
-- `docs/99_archive/04_lifecycle/handoff/0050_legacy_timestamp_repair_handoff.md`
+Owner-reported production operation metadata:
 
-Status:
+| Signal | Value |
+|---|---:|
+| Live runtime | Laravel + MySQL |
+| Production style | Shared hosting / constrained deployment environment |
+| MySQL update cycles while live | 12 |
+| File update cycles while live | 31 |
+| User-visible downtime during those update cycles | 0 reported |
+| Production data visibility in repository | metadata only, no production dump |
+| Production repair policy | read-only diagnostic first, no blind data mutation |
 
-- 0049 final closed.
-- 0050 final closed.
-- Production timestamp repair: not recommended.
-- Production diagnostic: read-only SQL only.
-- Owner-facing timestamp display: fixed via display timezone.
-- Date-only business fields: not shifted.
+Important boundary: this repository does not contain the production database. Production claims in this file are limited to source code, metadata, documented lifecycle notes, owner-reported operation evidence, and local verification evidence.
 
-## Repository density snapshot
+## Repository Density Snapshot
 
-Snapshot dari `make audit-git`:
+Snapshot source: `make audit-git`.
 
 | Area | Count |
 |---|---:|
 | Total files | 21,726 |
-| Total dirs | 3,008 |
+| Total directories | 3,008 |
 | PHP files | 2,088 |
 | Blade files | 132 |
 | Markdown docs | 443 |
@@ -56,27 +58,25 @@ Commit distribution:
 | 2026-05 | 947 |
 | 2026-06 | 923 |
 
-The repository is documentation-heavy and test-heavy by design. This is not accidental bloat. This app touches mutable operational state, money, stock, payment settlement, refunds, supplier invoices, and reports.
+This density exists because the application touches mutable operational state. A wrong change can silently corrupt money, stock, debt, payable, payment allocation, refund status, or report totals.
 
-## Architecture position
+## Architecture
 
-The project follows a Hexagonal / Ports and Adapters direction.
-
-High-level split:
+HyperPOS follows a Hexagonal / Ports and Adapters direction.
 
 | Layer | Role |
 |---|---|
-| Core | Domain rules, invariants, value objects, domain entities |
-| Application | Use cases, orchestration, transactional flows |
-| Ports | Contracts between application and infrastructure |
-| Adapters/In | HTTP controllers, web entry points, UI-facing adapters |
-| Adapters/Out | Persistence, read models, external implementation details |
-| Resources/Blade | Presentation only, no embedded PHP directives |
-| Database | Migrations, seeders, persistence schema |
-| Tests | Feature, characterization, regression, domain and support coverage |
-| Docs | ADR, blueprint, lifecycle, audit evidence, handoff/archive |
+| `app/Core` | Domain entities, invariants, value objects, validation rules |
+| `app/Application` | Use cases, orchestration, transactional workflows |
+| `app/Ports` | Contracts between application and infrastructure |
+| `app/Adapters/In` | HTTP controllers, request boundary, presenter boundary |
+| `app/Adapters/Out` | Persistence, projections, reporting queries, external implementation |
+| `resources/views` | Presentation rendering only |
+| `database` | Migrations, seeders, schema evolution |
+| `tests` | Unit, feature, characterization, regression, architecture tests |
+| `docs` | ADR, blueprint, lifecycle, audit evidence, runbooks, handoffs |
 
-Current structural signal from `make audit-git`:
+Structural signal from `make audit-git`:
 
 | Group | Count |
 |---|---:|
@@ -87,7 +87,7 @@ Current structural signal from `make audit-git`:
 | Application | 590 |
 | test:src ratio | 498:1418 |
 
-Strict typing:
+Strictness signal:
 
 | Signal | Value |
 |---|---:|
@@ -97,256 +97,326 @@ Strict typing:
 | `readonly` property occurrences | 1370 |
 | `DateTimeImmutable` uses | 305 |
 
-## Main business domains
+## Engineering Position
 
-### Note / Transaction domain
+The project is built around a few hard rules:
+
+1. Business rules should not be buried in Blade, controllers, or raw query fragments.
+2. Money is stored as integer rupiah.
+3. Stock movement must have a source and must be reversible or explainable.
+4. Payment and refund allocation must not exceed backend-allocatable component capacity.
+5. UI labels must not invent states that the backend cannot execute.
+6. Reports must use explicit read models and reconciliation logic.
+7. Sensitive mutations must be audited.
+8. Revisions must preserve history instead of overwriting meaning.
+9. Production repair must be read-only diagnostic first.
+10. Manual QA findings must become automated regression tests before closure.
+
+## Main Business Domains
+
+### Note / Transaction
 
 The Note domain is the heaviest part of the system.
 
 It covers:
 
 - cashier transaction workspace;
-- multi-line note creation;
-- store-stock product lines;
-- service lines;
-- external product/case-cost lines;
-- service package pricing;
-- inline payment lifecycle;
-- closed/paid note correction;
-- note revision;
-- settlement carry-forward;
+- multi-line transaction note creation;
+- product-only rows;
+- service-only rows;
+- service with store-stock spare part rows;
+- service with external purchase / case-cost rows;
+- service package / template auto-fill;
+- inline cash and transfer payments;
+- partial and full payment;
+- edit / revision after transaction creation;
+- paid note correction;
+- revision settlement carry-forward;
 - surplus disposition;
 - refund due;
 - refund paid;
-- note current projection;
+- selected-row refund;
+- full refund lifecycle;
+- note current revision pointer;
+- note history projection;
+- current detail read model;
+- reporting consistency.
+
+Representative risk handled:
+
+- edit after payment;
+- edit after refund;
+- stale current revision;
+- payable UI showing a component that backend allocation rejects;
+- duplicated submit;
+- lost payment after revision;
+- report total based on obsolete note value;
+- current detail page disagreeing with history page.
+
+### Payment
+
+Payment is treated as allocation, not just "insert payment row".
+
+The system handles:
+
+- customer payments;
+- cash detail;
+- transfer payment method;
 - payment allocation;
-- reporting consistency;
-- audit timeline.
+- component-level payment allocation;
+- selected-row payment;
+- retry/concurrency handling;
+- over-allocation protection;
+- legacy payment allocation synthesis;
+- paid note auto-close;
+- payment visibility in cash ledger and transaction reports.
 
-Test count signal:
+Failure class handled:
 
-- Note: 139 test files.
-- Payment: 12 test files.
-- Cashier: 1 test file.
-- Related reporting and refund characterization tests are also spread under Reporting and Feature/Note.
+- double-click payment;
+- paying an already-paid component;
+- paying a refunded/non-payable component;
+- partial payment carry-forward after note revision;
+- repeated submit after browser refresh;
+- old legacy payment allocation still needing report compatibility.
 
-### Procurement domain
+### Refund
 
-Procurement covers supplier invoices and inventory receipt/costing.
+Refund is modeled as a business event and allocation lifecycle, not a negative payment shortcut.
+
+The system handles:
+
+- customer refund;
+- selected-row refund plan;
+- refundable payment allocation detection;
+- refund component allocation;
+- refund pair limit guard;
+- full refund lifecycle;
+- selected product/store-stock refund;
+- refunded inventory reversal;
+- refund report impact;
+- refund visibility in cash ledger;
+- post-refund edit/revision edge cases.
+
+Failure class handled:
+
+- refund larger than refundable amount;
+- refunding non-refundable service fee by accident;
+- refund button visible when backend cannot execute;
+- refunded rows re-entering payment flow;
+- report showing cash history without explaining current collectible state.
+
+### Product / Inventory
+
+Inventory is treated as operational ledger state.
+
+The system covers:
+
+- product catalog;
+- stock adjustment;
+- stock adjustment reversal;
+- stock projection rebuild;
+- inventory costing projection rebuild;
+- stock-out movement;
+- refund/reversal stock return;
+- negative stock policy;
+- product threshold;
+- product versioning;
+- product lifecycle with soft delete and restore.
+
+Failure class handled:
+
+- negative stock caused by revision;
+- duplicate product rows;
+- stock movement without source;
+- stale inventory projection;
+- product deletion while still referenced by operational history;
+- report mismatch between stock movement and current snapshot.
+
+### Procurement / Supplier Invoice
+
+Procurement covers supplier invoice lifecycle and inventory receipt/cost effects.
 
 It includes:
 
 - supplier invoice creation;
-- supplier invoice update/revision;
+- supplier invoice edit/update;
+- received supplier invoice revision;
 - supplier invoice version writer;
-- supplier invoice version timeline;
-- tax input and tax amount handling;
-- rounding residue confirmation;
+- version timeline;
+- invoice line mapping;
+- tax input and tax summary;
+- landed-cost tax allocation;
+- rounding residue;
 - received invoice cost revaluation;
-- inventory movement effects;
+- inventory movement delta;
 - negative stock guard;
-- supplier invoice payment proof;
-- supplier payable/reporting surfaces.
+- supplier payment;
+- supplier payment reversal;
+- supplier receipt and receipt reversal;
+- supplier payment proof upload;
+- supplier payable reporting.
 
-Relevant recent hardening:
+Recent hardening includes:
 
-- supplier invoice edit reason propagation fixed;
-- supplier invoice version timeline added;
-- tax-only revision false negative-stock blocker fixed;
+- supplier invoice edit reason propagation;
+- latest reason display;
+- supplier invoice version timeline;
+- tax-only revision no longer triggering false negative-stock blocker;
 - edit draft key isolated by expected revision number;
-- Blade PHP directive removed from supplier invoice version timeline;
-- oversized procurement view/service files split to satisfy audit-lines.
+- Blade `@php` removal from supplier invoice version timeline;
+- oversized view/service files split for line-count audit.
 
-Test count signal:
+### Reporting
 
-- Procurement: 56 test files.
-- Biggest procurement tests include supplier invoice financial invariant and create/update/detail regression suites.
+Reporting is not just a UI table layer. It is a read-model and reconciliation boundary.
 
-### Product / Inventory domain
+Covered reporting surfaces:
 
-Product and inventory concerns include:
+- dashboard overview;
+- dashboard operational performance;
+- transaction summary;
+- transaction cash ledger;
+- operational profit;
+- service package profit breakdown;
+- inventory movement;
+- inventory stock value;
+- supplier payable;
+- employee debt;
+- payroll;
+- operational expense;
+- PDF exports;
+- Excel exports.
 
-- product catalog;
-- stock projection;
-- stock in/out movement;
-- inventory value;
-- stock value reporting;
-- product versions;
-- product edit reason;
-- threshold/dashboard signal.
+Report-specific hardening includes:
 
-The system treats stock as a sensitive operational ledger, not a casual integer column.
-
-### Reporting domain
-
-Reporting covers:
-
-- operational profit summary;
-- transaction reports;
-- refund reports;
-- stock value export;
-- dashboard reports;
-- owner-facing report labels;
-- export safety such as formula injection prevention.
-
-Test count signal:
-
-- Reporting: 48 test files.
-- ReportingExports: 17 test files.
+- report source-of-truth boundary;
+- cash / transfer split;
+- refund visibility;
+- surplus refund paid visibility;
+- owner-facing label cleanup;
+- Excel formula injection hardening;
+- PDF readability and table layout;
+- screen/PDF/Excel consistency checks.
 
 ### Employee Finance / Expense
 
-The app includes finance-adjacent internal modules:
+The system includes internal finance modules:
 
-- employee finance;
-- payroll/debt lifecycle;
+- employee master;
+- employee versioning;
+- employee debt;
+- employee debt payment;
+- employee debt principal adjustment;
+- employee debt payment reversal;
+- payroll disbursement;
+- payroll disbursement reversal;
 - operational expense;
-- expense reporting boundaries.
-
-Test count signal:
-
-- EmployeeFinance: 29 test files.
-- Expense: 22 test files.
+- expense category lifecycle;
+- employee debt and payroll reporting;
+- operational expense reporting.
 
 ### Audit / Security / Access
 
-The project carries multiple audit/security workflows:
+HyperPOS includes hardening work around:
 
-- audit event write path;
-- transactional outbox audit runtime;
-- role/capability boundaries;
-- cashier/admin access separation;
-- public storage helper hardening;
+- audit logs;
+- audit event writer;
+- audit snapshots;
+- transactional audit outbox;
+- role/capability boundary;
+- admin/cashier area separation;
+- transaction entry capability guard;
+- public surface output storage hardening;
+- proof attachment content-type handling;
 - XSS hardening;
 - JavaScript URL hardening;
 - login/rate-limit analysis;
-- seeder credential boundary;
-- export formula injection hardening.
+- seeder credential boundary.
 
-Test count signal:
+## UI / DB / System Coherence
 
-- AuditLog: 12 test files.
-- IdentityAccess: 3 test files.
-- Seeder: 2 test files.
-- Auth: 2 test files.
+The main design pressure is consistency between:
 
-## Documentation map
+- UI action availability;
+- backend command guard;
+- database state;
+- current projection;
+- revision history;
+- payment/refund allocation;
+- inventory movement;
+- report source;
+- PDF export;
+- Excel export.
 
-Root documentation currently includes:
+The system explicitly tracks bugs where a UI action appears valid but backend allocation rejects it, or where reports show a value that is mathematically true for cash history but misleading for current collectible state.
 
-- `docs/01_standards/`
-- `docs/02_architecture/adr/`
-- `docs/03_blueprints/`
-- `docs/04_lifecycle/`
-- `docs/05_audits/`
-- `docs/99_archive/`
+This is why lifecycle docs and characterization tests exist. The project keeps evidence of these mismatches instead of pretending a green happy-path test means the domain is safe.
 
-Document categories:
+## Operational Failure Classes Covered
+
+The repository includes or tracks protections for:
+
+- double-click create;
+- double-click payment;
+- double-click refund;
+- repeated submit;
+- browser refresh after submit;
+- browser back after submit;
+- partial request completion;
+- power-loss style interruption assumption;
+- stale modal payload;
+- stale current revision pointer;
+- duplicate product line;
+- malformed numeric input;
+- zero amount;
+- overpayment;
+- over-refund;
+- negative stock;
+- stale report projection;
+- report/export mismatch;
+- internal label leakage to owner-facing UI.
+
+## Documentation System
+
+The project uses documentation as an operational control layer.
 
 | Path | Purpose |
 |---|---|
-| `docs/01_standards/` | engineering standards, workflow rules, AI/operator rules |
-| `docs/02_architecture/adr/` | architecture decisions |
-| `docs/03_blueprints/` | implementation plans, matrices, source maps |
-| `docs/04_lifecycle/` | active lifecycle work only |
-| `docs/05_audits/` | audit reports |
-| `docs/99_archive/` | closed workflow, historical handoff, old proof |
+| `docs/01_standards/` | Engineering standards, workflow rules, AI/operator rules |
+| `docs/02_architecture/adr/` | Permanent architecture and domain decisions |
+| `docs/03_blueprints/` | Implementation plans, source maps, matrices |
+| `docs/04_lifecycle/` | Active lifecycle work |
+| `docs/05_audits/` | Audit reports |
+| `docs/99_archive/` | Closed lifecycle work, historical handoff, old proof |
 
-Policy:
+Important documentation rules:
 
-- active lifecycle folders must not become graveyards;
-- closed error logs must move to archive;
-- closed runbooks and diagnostic SQL must move to archive;
-- README public must not start with handoff metadata;
-- technical lifecycle pointers belong here, not in public README.
+- active lifecycle files should not become graveyards;
+- closed lifecycle work moves to archive;
+- public README must stay readable for non-technical readers;
+- technical stats, closure pointers, and audit density belong here;
+- production repair runbooks must not encourage blind writes.
 
-## Guardrails
+## Current Active Lifecycle Pointer
 
-The project uses Makefile audits and strict workflow checks.
+Current active manual QA scope:
 
-Important checks include:
+- `docs/04_lifecycle/error_log/0048_manual_transaction_reporting_sequential_qa_matrix.md`
 
-- line limit audit;
-- Blade PHP/directive audit;
-- contract audit;
-- static analysis;
-- test suite;
-- verification target.
+Purpose:
 
-Recent guardrail fixes:
+- run ordered manual QA across create, payment, edit, refund, reports, PDF, Excel, inventory, and cash impact;
+- catch UI/DB/report drift;
+- convert every discovered mismatch into automated regression tests;
+- update public and technical documentation after behavior is proven.
 
-- oversized `BuildsProcurementInvoiceDetailViewData.php` split into smaller view traits;
-- oversized `SupplierInvoiceRevisionDeltaMovementsBuilder.php` split by extracting previous-line resolver;
-- `@php` directive removed from supplier invoice Blade;
-- collapse detail ID moved from Blade logic into view data;
-- active error log archive cleanup started.
+Recent closed/archived lifecycle context:
 
-## Blade boundary
+- `docs/99_archive/04_lifecycle/error_log/0049_manual_qa_supplier_invoice_revision_and_timezone_gap.md`
+- `docs/99_archive/04_lifecycle/handoff/0050_legacy_timestamp_repair_handoff.md`
 
-Blade is presentation only.
-
-Forbidden:
-
-- `@php`
-- raw PHP directive
-- business logic
-- data assembly
-- formatting logic that belongs in view-data builder
-
-Allowed:
-
-- rendering prepared data;
-- Blade control flow for display;
-- escaped output;
-- simple conditional visibility.
-
-The supplier invoice version timeline is a recent example: version detail collapse IDs must be prepared in the view data layer, not generated with `@php` in Blade.
-
-## Timestamp policy
-
-Application timezone remains UTC for source/storage interpretation.
-
-Owner-facing display timezone:
-
-- `APP_DISPLAY_TIMEZONE`
-- default: `Asia/Makassar`
-
-Rules:
-
-- timestamp display converts to owner-facing display timezone;
-- date-only business values must not be shifted;
-- production timestamp repair must not run without proof;
-- production diagnostic must be read-only first;
-- UTC-like rows should not be repaired;
-- unknown rows should not be bulk-shifted.
-
-Recent production diagnostic result:
-
-- MySQL runtime appeared WIB-like / UTC+7.
-- Owner operational timezone is WITA / UTC+8.
-- Recent audit/supplier invoice rows were UTC-like.
-- Several note/refund/mutation candidate tables were empty.
-- No legacy timestamp repair write is recommended.
-
-## Current closure state
-
-Latest resolved workflows:
-
-### 0048
-
-Owner-facing Indonesian cleanup and reason visibility/audit cleanup.
-
-Status:
-
-- archived;
-- closed;
-- previous closure pointer.
-
-### 0049
-
-Manual QA supplier invoice revision and timestamp display gap.
-
-Closed scope:
+Closed 0049/0050 scope:
 
 - supplier invoice edit reason propagation;
 - latest reason display;
@@ -356,84 +426,92 @@ Closed scope:
 - note correction history manual failure reclassification;
 - timestamp display fix;
 - file split for line audit;
-- Blade PHP directive cleanup.
+- Blade PHP directive cleanup;
+- production read-only timestamp diagnostic;
+- no production timestamp repair recommendation.
 
-Status:
+## Timestamp Policy
 
-- archived;
-- closed;
-- latest manual QA follow-up closure.
+Storage/source interpretation remains UTC-oriented.
 
-### 0050
+Owner-facing display timezone:
 
-Legacy timestamp repair handoff.
+- `APP_DISPLAY_TIMEZONE`
+- default: `Asia/Makassar`
 
-Closed scope:
+Rules:
 
-- production read-only diagnostic;
-- schema timestamp type classification;
-- data candidate classification;
-- no repair recommendation.
+- timestamp display converts to owner-facing display timezone;
+- date-only business fields must not be shifted;
+- production timestamp repair must not run without proof;
+- production diagnostic must be read-only first;
+- UTC-like rows should not be repaired;
+- unknown rows must not be bulk-shifted.
 
-Status:
+Recent production diagnostic result:
 
-- archived;
-- closed;
-- production timestamp repair decision record.
+- MySQL runtime appeared WIB-like / UTC+7;
+- owner operational timezone is WITA / UTC+8;
+- recent audit/supplier invoice rows were UTC-like;
+- several note/refund/mutation candidate tables were empty;
+- no legacy timestamp repair write is recommended.
 
-## Verification practice
+## Verification
 
-Typical final verification pattern:
+Main verification commands:
 
 ```bash
+make help
+make audit-git
 make audit-lines
 make audit-blade
+make audit-contract
 make verify
 ```
 
-For focused procurement work:
+Focused examples:
 
 ```bash
-php artisan test \
-  tests/Feature/Procurement/SupplierInvoiceTaxFinancialInvariantFeatureTest.php \
-  tests/Feature/Procurement/ProcurementInvoiceDetailPageFeatureTest.php \
-  tests/Feature/Procurement/UpdateSupplierInvoiceFeatureTest.php
+php artisan test tests/Feature/Note
+php artisan test tests/Feature/Payment
+php artisan test tests/Feature/Procurement
+php artisan test tests/Feature/Reporting
+php artisan test tests/Feature/ReportingExports
+php artisan test tests/Unit
+php artisan test tests/Arch
 ```
 
-For timestamp support:
+Focused timestamp support:
 
 ```bash
 php artisan test tests/Unit/Support/ViewDateFormatterTest.php
 ```
 
-For note correction history:
+Current repository help entrypoint:
 
 ```bash
-php artisan test --filter=CashierNoteCorrectionHistoryReasonViewFeatureTest
+make help
+make docs-help
 ```
 
-## Known tooling note
+## Known Tooling Note
 
-`make audit-git` currently prints the report successfully but shows an arithmetic syntax error around the final class / interface section:
+`make audit-git` is expected to generate repository density and architecture statistics.
 
-```text
-scripts/git_report.sh: line 119: 0
-0: arithmetic syntax error in expression
-```
+If the script prints noise around arithmetic parsing, treat it as a tooling cleanup issue, not as source truth for application behavior. The output should be cleaned so repository audit proof is not noisy.
 
-The report still completes afterward, but the script should be cleaned later so audit output is not noisy.
+## Reader Boundary
 
-## Operator rule
+Use `README.md` for broad product explanation.
 
-Public-facing explanation goes in:
+Use this file for:
 
-- `README.md`
+- architecture;
+- density;
+- verification commands;
+- production-operation metadata;
+- domain failure classes;
+- lifecycle pointers;
+- audit/QA context.
 
-Technical density, lifecycle closure, audit stats, and AI/operator context go in:
-
-- `README_TECHNICAL.md`
-- `docs/`
-
-Do not put handoff metadata at the top of public README.
-
-Do not reopen archived lifecycle work without new concrete failing test, production bug evidence, or explicit owner instruction.
+Do not place production secrets, credentials, database dumps, private customer data, or unredacted operational evidence in this repository.
