@@ -57,6 +57,9 @@ final class ReverseSupplierReceiptHandler
             $effects = $this->inventoryEffects->apply($deltaMovements);
 
             if ($effects->isFailure()) {
+                $this->transactions->rollBack();
+                $started = false;
+
                 return Result::failure(
                     'Proyeksi inventory gagal diperbarui setelah reversal penerimaan supplier.',
                     ['supplier_receipt_reversal' => ['SUPPLIER_RECEIPT_REVERSAL_INVENTORY_REBUILD_FAILED']]
