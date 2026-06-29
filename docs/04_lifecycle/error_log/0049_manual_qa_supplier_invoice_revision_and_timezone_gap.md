@@ -312,6 +312,52 @@ Remaining open items:
 - Timestamp UTC vs Asia/Makassar display still needs focused reproduction and patch.
 - Full `make verify` not yet run for 0049.
 
+## 2026-06-29 Slice 2 Update - Note Correction History
+
+Status: note correction history path reproduced with focused tests; no app patch required in this slice.
+
+Source map result:
+
+- History source: `DatabaseNoteCorrectionHistoryReaderAdapter` reads only `note_mutation_events` for the current `note_id`.
+- Snapshot source: the same reader reads `note_mutation_snapshots` for before/after totals and refund metadata.
+- Payload path: `NoteCorrectionHistoryBuilder` -> `NoteDetailPageDataBuilder` -> `NoteDetailNotePayloadBuilder` as `note['correction_history']`.
+- View path: `resources/views/cashier/notes/partials/correction-history.blade.php` renders only when `note['correction_history'] !== []`.
+
+Conclusion from focused reproduction:
+
+- If a note has no `note_mutation_events`, the correction history block is intentionally not rendered.
+- If a note has a native mutation event, the detail page renders `Riwayat Mutasi Nota`, the mapped mutation label, and `Alasan:`.
+- Correction reason HTML is escaped by Blade.
+- Revision timeline and correction history can render together on the same note detail page.
+
+Patch:
+
+- No application behavior patch.
+- Added focused characterization coverage in `tests/Feature/Note/CashierNoteCorrectionHistoryReasonViewFeatureTest.php`.
+
+Proof:
+
+```text
+php artisan test tests/Feature/Note/NoteCorrectionHistoryBuilderFeatureTest.php tests/Feature/Note/CashierNoteCorrectionHistoryReasonViewFeatureTest.php tests/Feature/Note/NoteCorrectionHistoryPageFeatureTest.php tests/Feature/Note/NoteDetailPageShowsNativeCorrectionHistoryFeatureTest.php
+
+PASS  Tests\Feature\Note\NoteCorrectionHistoryBuilderFeatureTest
+PASS  Tests\Feature\Note\CashierNoteCorrectionHistoryReasonViewFeatureTest
+PASS  Tests\Feature\Note\NoteCorrectionHistoryPageFeatureTest
+PASS  Tests\Feature\Note\NoteDetailPageShowsNativeCorrectionHistoryFeatureTest
+Tests: 5 passed (35 assertions)
+Duration: 6.03s
+```
+
+Manual QA interpretation:
+
+- Tests 12-15 should be verified with a note that actually has native correction mutation rows in `note_mutation_events`.
+- If owner tested an ordinary closed/paid note without correction mutations, the absence of `Riwayat Mutasi Nota` is expected and not a code bug.
+
+Remaining open items:
+
+- Timestamp UTC vs Asia/Makassar display still needs focused reproduction and patch.
+- Full `make verify` not yet run for 0049.
+
 Run targeted tests for any changed areas.
 
 Then run:
