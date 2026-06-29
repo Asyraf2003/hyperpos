@@ -418,7 +418,7 @@ final class InventoryStockValueReportExcelExportFeatureTest extends TestCase
         $this->assertSame('KB-X-DEL', $movementRowsByProductId['excel-product-deleted']['kode_barang']);
 
         $this->assertSame('[Produk tidak ditemukan: excel-product-orphan]', $movementRowsByProductId['excel-product-orphan']['nama_barang']);
-        $this->assertSame('', $movementRowsByProductId['excel-product-orphan']['kode_barang']);
+        $this->assertNull($movementRowsByProductId['excel-product-orphan']['kode_barang']);
 
         $this->assertSame(5, $movementRowsByProductId['excel-product-active']['supply_in_qty']);
         $this->assertSame(2, $movementRowsByProductId['excel-product-deleted']['supply_in_qty']);
