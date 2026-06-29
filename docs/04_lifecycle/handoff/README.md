@@ -112,3 +112,55 @@ php artisan test --filter=GetInventoryStockValueReportDatasetFeatureTest
 
 Then re-run read-only projection-vs-ledger residual diagnostic.
 
+## Session Update - Post-patch Rebuild Verified
+
+### FACT
+
+Owner rebuilt inventory costing projection after patch.
+
+Result:
+
+```text
+success         = true
+message         = Inventory costing projection rebuilt.
+total_movements = 18
+total_products  = 6
+```
+
+Post-rebuild diagnostic:
+
+```text
+total_qty_diff          = 0
+total_value_diff        = 0
+total_rounding_residual = 26
+```
+
+### DECISION
+
+The same-day stock-out skip bug is fixed.
+
+Remaining rows are not projection-vs-ledger mismatches. They are integer average-cost rounding residuals only:
+
+```text
+prod-year-001 residual = 3
+prod-year-006 residual = 23
+total residual         = 26
+```
+
+### NEXT
+
+Treat residual visibility as a separate reporting/UI decision.
+
+Possible next slice:
+
+```text
+Add admin/report visibility for:
+inventory_value_rupiah - (avg_cost_rupiah * qty_on_hand)
+```
+
+Name candidate:
+
+```text
+Sisa Pembulatan HPP
+```
+

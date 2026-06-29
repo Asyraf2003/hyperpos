@@ -206,3 +206,72 @@ value_diff = 0 for projection vs movement ledger
 
 Remaining residuals should be true integer average-cost rounding residuals only.
 
+## Session Update - Local Rebuild and Residual Verification
+
+### Rebuild Proof
+
+Owner ran costing projection rebuild after patch.
+
+Result:
+
+```text
+success         = true
+message         = Inventory costing projection rebuilt.
+total_movements = 18
+total_products  = 6
+```
+
+### Post-rebuild Diagnostic
+
+Read-only projection-vs-ledger diagnostic after rebuild:
+
+```text
+mismatch_rows                = 2
+total_qty_diff               = 0
+total_value_diff             = 0
+total_rounding_residual      = 26
+```
+
+Rows with remaining residual:
+
+```text
+prod-year-006:
+projection_qty       = 30
+projection_avg       = 1149
+projection_value     = 34493
+movement_qty         = 30
+movement_value       = 34493
+qty_diff             = 0
+value_diff           = 0
+rounding_residual    = 23
+
+prod-year-001:
+projection_qty       = 9
+projection_avg       = 1183
+projection_value     = 10650
+movement_qty         = 9
+movement_value       = 10650
+qty_diff             = 0
+value_diff           = 0
+rounding_residual    = 3
+```
+
+### Final Verification
+
+The confirmed projection mismatch is fixed.
+
+The remaining `mismatch_rows` are not ledger mismatches. They are true integer average-cost rounding residuals:
+
+```text
+prod-year-001: 10650 - (1183 * 9)  = 3
+prod-year-006: 34493 - (1149 * 30) = 23
+total residual = 26
+```
+
+### Final Status
+
+- `product_inventory_costing.inventory_value_rupiah` now matches movement ledger value.
+- `product_inventory.qty_on_hand` matches movement ledger qty.
+- Remaining residual is expected from integer average-cost storage.
+- Follow-up should treat residual visibility separately from projection correctness.
+
