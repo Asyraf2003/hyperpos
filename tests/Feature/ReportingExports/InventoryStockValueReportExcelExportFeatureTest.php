@@ -210,6 +210,83 @@ final class InventoryStockValueReportExcelExportFeatureTest extends TestCase
         $spreadsheet->disconnectWorksheets();
     }
 
+
+    public function test_inventory_stock_value_excel_export_shows_rounding_residual_diagnostics(): void
+    {
+        $this->seedProduct('product-residual', 'KB-RES', 'Residual Part', 'Federal', 30, 15000);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'excel-residual-m1',
+                'product_id' => 'product-residual',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'excel-residual-receipt-line-1',
+                'tanggal_mutasi' => '2030-01-07',
+                'qty_delta' => 30,
+                'unit_cost_rupiah' => 1149,
+                'total_cost_rupiah' => 34493,
+            ],
+        ]);
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'product-residual', 'qty_on_hand' => 30],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'product-residual', 'avg_cost_rupiah' => 1149, 'inventory_value_rupiah' => 34493],
+        ]);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.export_excel', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
+            ])
+        );
+
+        $response->assertOk();
+
+        $path = tempnam(sys_get_temp_dir(), 'inventory-stock-value-residual-diagnostic-');
+        file_put_contents($path, $response->streamedContent());
+
+        $spreadsheet = IOFactory::load($path);
+        $summary = $spreadsheet->getSheetByName('Ringkasan');
+        $snapshot = $spreadsheet->getSheetByName('Snapshot Stok');
+
+        $this->assertNotNull($summary);
+        $this->assertNotNull($snapshot);
+
+        $summaryCells = [];
+        foreach ($summary->getRowIterator() as $row) {
+            foreach ($row->getCellIterator() as $cell) {
+                $summaryCells[] = $cell->getValue();
+            }
+        }
+
+        $snapshotCells = [];
+        foreach ($snapshot->getRowIterator() as $row) {
+            foreach ($row->getCellIterator() as $cell) {
+                $snapshotCells[] = $cell->getValue();
+            }
+        }
+
+        $this->assertContains('Nilai Berdasar Avg x Qty', $summaryCells);
+        $this->assertContains(34470, $summaryCells);
+        $this->assertContains('Residual Pembulatan HPP', $summaryCells);
+        $this->assertContains(23, $summaryCells);
+        $this->assertContains('Selisih Nilai Ledger', $summaryCells);
+        $this->assertContains(0, $summaryCells);
+
+        $this->assertContains('Nilai Avg x Qty', $snapshotCells);
+        $this->assertContains('Residual Pembulatan HPP', $snapshotCells);
+        $this->assertContains('Selisih Nilai Ledger', $snapshotCells);
+        $this->assertContains(34470, $snapshotCells);
+        $this->assertContains(23, $snapshotCells);
+
+        unlink($path);
+        $spreadsheet->disconnectWorksheets();
+    }
+
     public function test_kasir_cannot_export_inventory_stock_value_report(): void
     {
         $response = $this->actingAs($this->user('kasir'))->get(

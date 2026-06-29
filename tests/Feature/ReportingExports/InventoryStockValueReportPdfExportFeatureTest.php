@@ -212,6 +212,30 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
         $this->assertStringNotContainsString('<table>', $html);
     }
 
+
+    public function test_inventory_stock_value_pdf_view_shows_rounding_residual_diagnostic_summary(): void
+    {
+        $html = view('admin.reporting.inventory_stock_value.export_pdf', [
+            'title' => 'Stok dan Nilai Persediaan',
+            'periodLabel' => '01 Januari 2030 s/d 31 Januari 2030',
+            'referenceDateLabel' => '31 Januari 2030',
+            'generatedAt' => '31 Januari 2030 10:00',
+            'summaryItems' => [
+                ['label' => 'Nilai Persediaan', 'value' => 'Rp 34.493'],
+                ['label' => 'Nilai Berdasar Avg x Qty', 'value' => 'Rp 34.470'],
+                ['label' => 'Residual Pembulatan HPP', 'value' => 'Rp 23'],
+                ['label' => 'Selisih Nilai Ledger', 'value' => 'Rp 0'],
+            ],
+            'movementRows' => [],
+            'snapshotRows' => [],
+        ])->render();
+
+        $this->assertStringContainsString('Nilai Berdasar Avg x Qty', $html);
+        $this->assertStringContainsString('Residual Pembulatan HPP', $html);
+        $this->assertStringContainsString('Selisih Nilai Ledger', $html);
+        $this->assertStringContainsString('Rp 23', $html);
+    }
+
     private function user(string $role): User
     {
         $user = User::query()->create([

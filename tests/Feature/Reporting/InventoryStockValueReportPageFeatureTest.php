@@ -204,6 +204,57 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertDontSee('custom-sto1');
     }
 
+
+    public function test_inventory_stock_value_page_shows_rounding_residual_and_ledger_diff_diagnostics(): void
+    {
+        $this->seedProduct('product-residual', 'KB-RES', 'Residual Part', 'Federal', 30, 15000);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'page-residual-m1',
+                'product_id' => 'product-residual',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'page-residual-receipt-line-1',
+                'tanggal_mutasi' => '2030-01-07',
+                'qty_delta' => 30,
+                'unit_cost_rupiah' => 1149,
+                'total_cost_rupiah' => 34493,
+            ],
+        ]);
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'product-residual', 'qty_on_hand' => 30],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'product-residual', 'avg_cost_rupiah' => 1149, 'inventory_value_rupiah' => 34493],
+        ]);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.index', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertSee('Nilai Persediaan');
+        $response->assertSee('Rp 34.493');
+
+        $response->assertSee('Nilai Berdasar Avg x Qty');
+        $response->assertSee('Rp 34.470');
+
+        $response->assertSee('Residual Pembulatan HPP');
+        $response->assertSee('Rp 23');
+
+        $response->assertSee('Selisih Qty Ledger');
+        $response->assertSee('0');
+
+        $response->assertSee('Selisih Nilai Ledger');
+        $response->assertSee('Rp 0');
+    }
+
     public function test_custom_mode_requires_explicit_date_range(): void
     {
         $response = $this->actingAs($this->user('admin'))->get(
