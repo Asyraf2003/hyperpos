@@ -328,6 +328,124 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-1">Riwayat Versi Nota Pemasok</h4>
+                    </div>
+
+                    <div class="card-body">
+                        @if (($versionTimelineView ?? []) === [])
+                            <p class="text-muted mb-0">Belum ada riwayat versi nota pemasok.</p>
+                        @else
+                            <div class="timeline">
+                                @foreach ($versionTimelineView as $entry)
+                                    <div class="timeline-item pb-4">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-2">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    {{ $entry['revision_label'] }} · {{ $entry['event_name'] }}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {{ \App\Support\ViewDateFormatter::display($entry['changed_at'] ?? null, true) }}
+                                                    @if ($entry['actor_label'])
+                                                        · {{ $entry['actor_label'] }}
+                                                    @endif
+                                                </small>
+                                            </div>
+
+                                            @if ($entry['reason_label'])
+                                                <span class="badge bg-light-info text-info align-self-start">
+                                                    {{ $entry['reason_label'] }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="border rounded p-3 bg-light-subtle">
+                                            <div class="row g-3 mb-3">
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Nomor Faktur</small>
+                                                    <div class="fw-semibold">{{ $entry['snapshot']['nomor_faktur'] }}</div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Pemasok</small>
+                                                    <div class="fw-semibold">{{ $entry['snapshot']['supplier_name'] }}</div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Tanggal Pengiriman</small>
+                                                    <div>{{ $entry['snapshot']['shipment_date'] }}</div>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block">Tanggal Jatuh Tempo</small>
+                                                    <div>{{ $entry['snapshot']['due_date'] }}</div>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <small class="text-muted d-block">Subtotal Sebelum Pajak</small>
+                                                    <div>{{ $entry['snapshot']['subtotal_before_tax_label'] }}</div>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <small class="text-muted d-block">Pajak Supplier</small>
+                                                    <div>{{ $entry['snapshot']['tax_amount_label'] }}</div>
+                                                    @if ($entry['snapshot']['tax_input'] !== null)
+                                                        <small class="text-muted">Input: {{ $entry['snapshot']['tax_input'] }}</small>
+                                                    @endif
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <small class="text-muted d-block">Total Nota</small>
+                                                    <div class="fw-semibold">{{ $entry['snapshot']['grand_total_label'] }}</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-sm mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Kode</th>
+                                                            <th>Nama Barang</th>
+                                                            <th>Merek</th>
+                                                            <th>Ukuran</th>
+                                                            <th class="text-end">Qty</th>
+                                                            <th class="text-end">Subtotal</th>
+                                                            <th class="text-end">Pajak</th>
+                                                            <th class="text-end">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse ($entry['snapshot']['lines'] as $line)
+                                                            <tr>
+                                                                <td>{{ $line['line_no'] }}</td>
+                                                                <td>{{ $line['kode_barang'] }}</td>
+                                                                <td>{{ $line['nama_barang'] }}</td>
+                                                                <td>{{ $line['merek'] }}</td>
+                                                                <td>{{ $line['ukuran'] }}</td>
+                                                                <td class="text-end">{{ $line['qty_pcs'] }}</td>
+                                                                <td class="text-end">{{ $line['line_subtotal_before_tax_label'] }}</td>
+                                                                <td class="text-end">
+                                                                    {{ $line['tax_amount_label'] }}
+                                                                    @if ($line['tax_input'] !== null)
+                                                                        <small class="text-muted d-block">Input: {{ $line['tax_input'] }}</small>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-end">{{ $line['line_total_label'] }}</td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="9" class="text-center text-muted py-3">
+                                                                    Tidak ada rincian pada versi ini.
+                                                                </td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
 
         </div>
