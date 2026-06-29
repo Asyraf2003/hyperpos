@@ -519,3 +519,70 @@ Result:
 PASS
 ```
 
+## Session Update - 0061 Inventory Stock Value PDF Deleted Orphan No-crash
+
+### Status
+
+Resolved.
+
+### Scope
+
+Slice `0061` mengunci PDF export route laporan stok dan nilai persediaan agar tetap aman ketika ada movement untuk produk soft-deleted dan orphan/missing product.
+
+### Files Changed
+
+- `tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php`
+- `docs/04_lifecycle/error_log/0061_inventory_stock_value_pdf_deleted_orphan_no_crash.md`
+- this handoff file
+
+### FACT
+
+- Production code tidak berubah.
+- PDF export memakai `GetInventoryStockValueReportDatasetHandler::handleSummaryOnly(...)`.
+- Summary-only snapshot aggregate tetap source dari active `products`.
+- Summary-only movement aggregate tetap source dari `inventory_movements`.
+- PDF view tetap summary-only.
+- PDF tidak render movement detail table.
+- PDF tidak render snapshot detail table.
+- Deleted/orphan movement tetap aman untuk PDF route.
+- Deleted/orphan product tetap tidak masuk current snapshot.
+
+### Behavior Locked
+
+- Admin PDF export route returns 200.
+- Response content type is `application/pdf`.
+- Download filename tetap benar.
+- PDF content starts with `%PDF`.
+- PDF content contains `%%EOF`.
+- No costing engine changes.
+- No HPP changes.
+- No `inventory_value_rupiah` semantic changes.
+- No migration.
+- No source-type bucket membership changes.
+- No production repair/write.
+- No PDF layout change.
+
+### Final Chain Status
+
+Inventory stock value deleted/orphan reporting chain closed:
+
+- `0057` dataset movement visibility: resolved.
+- `0058` Excel export visibility: resolved.
+- `0059` summary-only parity: resolved.
+- `0060` page summary visibility: resolved.
+- `0061` PDF no-crash route: resolved.
+
+### Proof
+
+Owner reported test PASS:
+
+```bash
+php artisan test tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php --filter=deleted_and_orphan
+```
+
+Result:
+
+```text
+PASS
+```
+
