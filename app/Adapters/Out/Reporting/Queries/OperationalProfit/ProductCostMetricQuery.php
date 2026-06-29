@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 final class ProductCostMetricQuery
 {
+    private const REVISION_REVERSE_SOURCE_TYPE = 'transaction_workspace_updated';
+
     public function externalPurchaseCost(string $fromDate, string $toDate): int
     {
         $issued = (int) (DB::table('work_item_external_purchase_lines')
@@ -42,7 +44,13 @@ final class ProductCostMetricQuery
             ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
             ->sum('total_cost_rupiah') ?? 0);
 
-        return $issued - $returned;
+        $revisionReversed = (int) (DB::table('inventory_movements')
+            ->where('movement_type', 'stock_in')
+            ->where('source_type', self::REVISION_REVERSE_SOURCE_TYPE)
+            ->whereBetween('tanggal_mutasi', [$fromDate, $toDate])
+            ->sum('total_cost_rupiah') ?? 0);
+
+        return $issued - $returned - $revisionReversed;
     }
 
     private function startOfDay(string $date): string
