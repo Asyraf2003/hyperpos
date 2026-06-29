@@ -198,3 +198,98 @@ all relevant tests PASS
 
 Continue with export/UI diagnostic visibility only after this handoff is committed.
 
+## Session Update - 0053 Inventory Rounding Residual Report Presentation
+
+### Status
+
+PATCHED - page, Excel, PDF summary builder, and targeted tests PASS.
+
+### Context
+
+Slice `0052` made rounding residual and ledger diff visible at dataset level.
+
+Slice `0053` completes presentation-level visibility.
+
+### Failing Proof First
+
+Initial presentation tests showed:
+
+```text
+Page FAIL:
+Expected HTML to contain "Nilai Berdasar Avg x Qty"
+
+Excel FAIL:
+Summary sheet did not contain "Nilai Berdasar Avg x Qty"
+
+PDF view PASS:
+PDF view received injected summaryItems directly
+```
+
+### Patch Summary
+
+Added report presentation for:
+
+```text
+Nilai Berdasar Avg x Qty
+Residual Pembulatan HPP
+Selisih Qty Ledger
+Selisih Nilai Ledger
+```
+
+Presentation layers updated:
+
+- Page summary UI
+- Excel Ringkasan sheet
+- Excel Snapshot Stok sheet
+- PDF summary data builder
+
+### Regression During Patch
+
+Excel export initially failed because ledger-only products were included as snapshot rows.
+
+Fix:
+
+- Retain movement ledger join for diagnostic diff.
+- Do not include ledger-only products in current snapshot filter.
+
+Snapshot inclusion remains based on current inventory and/or current costing rows.
+
+### Files Changed
+
+- `app/Adapters/Out/Reporting/InventoryCurrentSnapshotDatabaseQuery.php`
+- `app/Adapters/Out/Reporting/InventoryStockValueSummaryDatabaseQuery.php`
+- `resources/views/admin/reporting/inventory_stock_value/index.blade.php`
+- `app/Application/Reporting/Exports/InventoryStockValueReportExcelSummarySheetWriter.php`
+- `app/Application/Reporting/Exports/InventoryStockValueReportExcelSnapshotSheetWriter.php`
+- `app/Application/Reporting/Exports/InventoryStockValueReportPdfViewDataBuilder.php`
+- `tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php`
+- `tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php`
+- `tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php`
+- `docs/04_lifecycle/error_log/0053_inventory_rounding_residual_report_presentation.md`
+
+### Acceptance Proof
+
+Owner reported:
+
+```text
+PASS all targeted tests
+20 passed
+```
+
+Proof command:
+
+```bash
+php artisan test \
+  tests/Feature/Reporting/InventoryStockValueReportPageFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportExcelExportFeatureTest.php \
+  tests/Feature/ReportingExports/InventoryStockValueReportPdfExportFeatureTest.php \
+  tests/Feature/Reporting/GetInventoryStockValueReportDatasetFeatureTest.php
+```
+
+### Boundary
+
+- No costing engine change.
+- No HPP change.
+- No main inventory value semantics change.
+- Residual is now visible as diagnostic, not treated as ledger mismatch.
+
