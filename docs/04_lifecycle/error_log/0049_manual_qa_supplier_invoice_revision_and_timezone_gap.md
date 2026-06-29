@@ -589,3 +589,47 @@ Close only after:
   - stale localStorage draft no longer causes false stock-out on tax-only revision;
   - version timeline collapse works on mobile and desktop.
 
+
+## Session Update - 2026-06-29 Supplier Invoice Edit Draft Revision Scope Hardened
+
+### Slice
+
+- Follow-up hardening for supplier invoice edit draft lifecycle.
+- Trigger: after fixing negative stock revision bug and removing automatic blank edit row.
+- Scope: edit supplier invoice draft key isolation.
+
+### Problem
+
+- Edit form draft key previously used only invoice id:
+  - `admin.procurement.edit-supplier-invoice.{invoiceId}.draft.v1`
+- This allowed stale localStorage draft from an older revision to be restored after a successful revision.
+- In supplier invoice edit lifecycle, stale draft data is dangerous because line identity depends on `previous_line_id`.
+- Old draft lines may contain stale/empty `previous_line_id`, which can cause backend delta builder to interpret tax-only edits as delete+insert lines.
+
+### Fix
+
+- Changed supplier invoice edit draft key to include expected revision number:
+  - `admin.procurement.edit-supplier-invoice.{invoiceId}.revision.{expectedRevisionNo}.draft.v1`
+- Result:
+  - draft for revision N is not reused for revision N+1;
+  - after successful revision, opening edit page uses a new draft namespace;
+  - stale draft restore risk is reduced without removing local draft convenience.
+
+### Files Changed
+
+- `resources/views/admin/procurement/supplier_invoices/edit.blade.php`
+
+### Verification
+
+- Manual browser console confirmed key format:
+  - `admin.procurement.edit-supplier-invoice.e8f5fd4c-f0cc-4698-86b7-ade9d1130b40.revision.4.draft.v1`
+- Targeted tests passed:
+  - `SupplierInvoiceTaxFinancialInvariantFeatureTest`
+  - `ProcurementInvoiceDetailPageFeatureTest`
+
+### Final Decision
+
+- Keep localStorage draft support for edit form.
+- Scope edit draft by invoice id and expected revision number.
+- Do not reuse drafts across supplier invoice revisions.
+
