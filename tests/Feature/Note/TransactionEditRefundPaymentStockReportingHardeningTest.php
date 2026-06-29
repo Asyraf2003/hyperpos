@@ -629,7 +629,7 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
             $noteId,
             $this->refundedStoreStockRevisionPayload(),
             'admin-0062-d',
-            true,
+            false,
         );
 
         self::assertTrue($revision->isSuccess(), $revision->message());
