@@ -224,6 +224,65 @@ final class GetInventoryStockValueReportDatasetFeatureTest extends TestCase
         );
     }
 
+
+    public function test_inventory_stock_value_report_dataset_exposes_rounding_residual_separately_from_ledger_mismatch(): void
+    {
+        $this->seedProduct('product-residual', 'KB-RES', 'Residual Part', 'Federal', 30, 15000);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'residual-m1',
+                'product_id' => 'product-residual',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'residual-receipt-line-1',
+                'tanggal_mutasi' => '2030-01-07',
+                'qty_delta' => 30,
+                'unit_cost_rupiah' => 1149,
+                'total_cost_rupiah' => 34493,
+            ],
+        ]);
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'product-residual', 'qty_on_hand' => 30],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'product-residual', 'avg_cost_rupiah' => 1149, 'inventory_value_rupiah' => 34493],
+        ]);
+
+        $result = app(GetInventoryStockValueReportDatasetHandler::class)
+            ->handle('2030-01-01', '2030-01-31');
+
+        $this->assertTrue($result->isSuccess());
+
+        $data = $result->data();
+        $snapshotRows = $data['snapshot_rows'] ?? [];
+        $summary = $data['summary'] ?? [];
+
+        $this->assertSame(1, count($snapshotRows));
+
+        $row = $snapshotRows[0];
+
+        $this->assertSame(30, $row['current_qty_on_hand']);
+        $this->assertSame(1149, $row['current_avg_cost_rupiah']);
+        $this->assertSame(34493, $row['current_inventory_value_rupiah']);
+
+        $this->assertSame(34470, $row['current_inventory_value_by_average_rupiah']);
+        $this->assertSame(23, $row['current_rounding_residual_rupiah']);
+
+        $this->assertSame(30, $row['ledger_qty_on_hand']);
+        $this->assertSame(34493, $row['ledger_inventory_value_rupiah']);
+        $this->assertSame(0, $row['ledger_qty_diff']);
+        $this->assertSame(0, $row['ledger_value_diff_rupiah']);
+
+        $this->assertSame(34493, $summary['total_inventory_value_rupiah']);
+        $this->assertSame(34470, $summary['total_inventory_value_by_average_rupiah']);
+        $this->assertSame(23, $summary['total_rounding_residual_rupiah']);
+        $this->assertSame(0, $summary['total_ledger_qty_diff']);
+        $this->assertSame(0, $summary['total_ledger_value_diff_rupiah']);
+    }
+
     private function seedProduct(
         string $id,
         ?string $kodeBarang,
