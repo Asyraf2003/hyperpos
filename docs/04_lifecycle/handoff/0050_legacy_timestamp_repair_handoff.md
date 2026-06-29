@@ -119,3 +119,97 @@ Before any write on production:
 
 Do not create global migration that updates every timestamp column.
 
+
+## 2026-06-29 Production Read-only Diagnostic Result
+
+Status: production read-only diagnostic completed. No repair recommended.
+
+### Scope
+
+Diagnostic was run against production shared-hosting database using SQL `SELECT` only.
+
+No production write query was executed.
+
+### Runtime Finding
+
+Production MySQL runtime showed:
+
+- `UTC_TIMESTAMP()` matched UTC.
+- `NOW()` was 7 hours ahead of UTC.
+- Live owner local time matched `UTC_TIMESTAMP() + INTERVAL 8 HOUR`.
+
+Interpretation:
+
+- Production MySQL session/runtime appears WIB-like / UTC+7.
+- Owner operational display timezone remains Asia/Makassar / UTC+8.
+- Runtime timezone alone must not be used as proof to shift stored data.
+
+### Production Schema Finding
+
+Timestamp candidate columns split into:
+
+- `DATETIME` literal fields:
+  - `audit_events.occurred_at`
+  - `audit_event_snapshots.created_at`
+  - `note_mutation_events.occurred_at`
+  - `note_revision_surplus_dispositions.occurred_at`
+  - `note_revision_surplus_refund_payments.occurred_at`
+
+- `TIMESTAMP` session-sensitive fields:
+  - `note_revisions.created_at`
+  - `note_revision_surplus_dispositions.created_at`
+  - `note_revision_surplus_refund_payments.created_at`
+  - `supplier_invoice_versions.changed_at`
+
+### Production Data Finding
+
+Rows found:
+
+- `audit_events.occurred_at`: populated.
+- `audit_event_snapshots.created_at`: populated.
+- `supplier_invoice_versions.changed_at`: populated.
+- `note_mutation_events.occurred_at`: empty.
+- `note_revision_surplus_dispositions.occurred_at`: empty.
+- `note_revision_surplus_refund_payments.occurred_at`: empty.
+- `note_revisions.created_at`: empty.
+
+### Classification
+
+Recent `audit_events.occurred_at` rows and matching `supplier_invoice_versions.changed_at` rows showed the same raw timestamp for the same supplier invoice update event.
+
+The raw timestamp plus 8 hours matched the expected owner-facing Asia/Makassar display time.
+
+Classification for proven recent supplier invoice/audit rows:
+
+- UTC-like.
+
+Classification for older product seed/create rows without owner action-time memory:
+
+- unknown.
+
+Empty tables:
+
+- not repair candidates.
+
+### Decision
+
+No legacy timestamp repair write is recommended at this time.
+
+The current display-layer fix is the correct solution for proven UTC-like audit/history data.
+
+### Reason
+
+A write repair would be unsafe because:
+
+- proven recent audit/supplier invoice timestamps are UTC-like and already display correctly after formatter conversion;
+- several candidate note/refund/mutation tables are empty in production;
+- older rows without a known real action time remain unknown;
+- production MySQL session timezone is UTC+7 while owner operation timezone is UTC+8, so session display cannot be treated as canonical stored business time;
+- date-only business fields remain excluded.
+
+### Acceptance
+
+- Production diagnostic was read-only.
+- No date-only business field was treated as a repair candidate.
+- No bulk timestamp shift is needed.
+- Repair write remains forbidden unless future rows are proven local-like with reliable owner action-time evidence.
