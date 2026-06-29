@@ -58,6 +58,59 @@ final class TimestampReadOnlyDiagnosticCommandTest extends TestCase
         }
     }
 
+    public function test_it_exposes_mixed_utc_like_and_local_like_legacy_rows_for_manual_classification(): void
+    {
+        DB::table('audit_events')->insert([
+            [
+                'id' => 'audit-utc-like-legacy-row',
+                'bounded_context' => 'note',
+                'aggregate_type' => 'note',
+                'aggregate_id' => 'note-utc-like',
+                'event_name' => 'diagnostic_utc_like_row',
+                'actor_id' => null,
+                'actor_role' => null,
+                'reason' => 'UTC-like row: expected local action time 11:45 WITA',
+                'source_channel' => 'test',
+                'request_id' => null,
+                'correlation_id' => null,
+                'occurred_at' => '2026-06-29 03:45:00',
+                'metadata_json' => json_encode(['classification' => 'utc_like']),
+            ],
+            [
+                'id' => 'audit-local-like-legacy-row',
+                'bounded_context' => 'note',
+                'aggregate_type' => 'note',
+                'aggregate_id' => 'note-local-like',
+                'event_name' => 'diagnostic_local_like_row',
+                'actor_id' => null,
+                'actor_role' => null,
+                'reason' => 'Local-like row: raw value already looked like 11:45 WITA',
+                'source_channel' => 'test',
+                'request_id' => null,
+                'correlation_id' => null,
+                'occurred_at' => '2026-06-29 11:45:00',
+                'metadata_json' => json_encode(['classification' => 'local_like']),
+            ],
+        ]);
+
+        $exitCode = Artisan::call('diagnostics:timestamp-readonly', [
+            '--limit' => 10,
+            '--table' => 'audit_events',
+        ]);
+
+        $output = Artisan::output();
+
+        self::assertSame(0, $exitCode);
+
+        self::assertStringContainsString('diagnostic_utc_like_row', $output);
+        self::assertStringContainsString('2026-06-29 03:45:00', $output);
+        self::assertStringContainsString('29 Juni 2026 11:45', $output);
+
+        self::assertStringContainsString('diagnostic_local_like_row', $output);
+        self::assertStringContainsString('2026-06-29 11:45:00', $output);
+        self::assertStringContainsString('29 Juni 2026 19:45', $output);
+    }
+
     public function test_it_does_not_run_database_write_queries(): void
     {
         $this->insertAuditEvent();
