@@ -112,6 +112,99 @@ final class InventoryDeletedProductMovementReportVisibilityFeatureTest extends T
         $this->assertSame(5000, $summary['total_inventory_value_rupiah']);
     }
 
+    public function test_summary_only_path_matches_full_dataset_summary_when_deleted_and_orphan_movements_exist(): void
+    {
+        $this->seedProduct('summary-product-active', 'KB-SUM-ACT', 'Summary Active Part');
+        $this->seedProduct('summary-product-deleted', 'KB-SUM-DEL', 'Summary Deleted Part', '2030-01-15 10:00:00');
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'summary-movement-active-in',
+                'product_id' => 'summary-product-active',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'summary-receipt-active-line',
+                'tanggal_mutasi' => '2030-01-10',
+                'qty_delta' => 5,
+                'unit_cost_rupiah' => 1000,
+                'total_cost_rupiah' => 5000,
+            ],
+            [
+                'id' => 'summary-movement-deleted-in',
+                'product_id' => 'summary-product-deleted',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'summary-receipt-deleted-line',
+                'tanggal_mutasi' => '2030-01-11',
+                'qty_delta' => 2,
+                'unit_cost_rupiah' => 2000,
+                'total_cost_rupiah' => 4000,
+            ],
+        ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        try {
+            DB::table('inventory_movements')->insert([
+                'id' => 'summary-movement-orphan-in',
+                'product_id' => 'summary-product-orphan',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'summary-receipt-orphan-line',
+                'tanggal_mutasi' => '2030-01-12',
+                'qty_delta' => 3,
+                'unit_cost_rupiah' => 3000,
+                'total_cost_rupiah' => 9000,
+            ]);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'summary-product-active', 'qty_on_hand' => 5],
+            ['product_id' => 'summary-product-deleted', 'qty_on_hand' => 2],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'summary-product-active', 'avg_cost_rupiah' => 1000, 'inventory_value_rupiah' => 5000],
+            ['product_id' => 'summary-product-deleted', 'avg_cost_rupiah' => 2000, 'inventory_value_rupiah' => 4000],
+        ]);
+
+        $handler = app(GetInventoryStockValueReportDatasetHandler::class);
+
+        $fullResult = $handler->handle('2030-01-01', '2030-01-31');
+        $summaryOnlyResult = $handler->handleSummaryOnly('2030-01-01', '2030-01-31');
+
+        $this->assertTrue($fullResult->isSuccess());
+        $this->assertTrue($summaryOnlyResult->isSuccess());
+
+        $fullData = $fullResult->data();
+        $summaryOnlyData = $summaryOnlyResult->data();
+
+        $this->assertIsArray($fullData);
+        $this->assertIsArray($summaryOnlyData);
+
+        $fullSummary = $fullData['summary'] ?? null;
+        $summaryOnly = $summaryOnlyData['summary'] ?? null;
+
+        $this->assertIsArray($fullSummary);
+        $this->assertIsArray($summaryOnly);
+
+        ksort($fullSummary);
+        ksort($summaryOnly);
+
+        $this->assertSame($fullSummary, $summaryOnly);
+
+        $this->assertSame(1, $summaryOnly['snapshot_product_rows']);
+        $this->assertSame(3, $summaryOnly['movement_product_rows']);
+        $this->assertSame(5, $summaryOnly['total_qty_on_hand']);
+        $this->assertSame(5000, $summaryOnly['total_inventory_value_rupiah']);
+        $this->assertSame(10, $summaryOnly['period_supply_in_qty']);
+        $this->assertSame(10, $summaryOnly['period_net_qty_delta']);
+        $this->assertSame(18000, $summaryOnly['period_net_cost_delta_rupiah']);
+    }
+
+
     /**
      * @param list<array<string, mixed>> $rows
      * @return array<string, mixed>
