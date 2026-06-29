@@ -89,6 +89,101 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
         $this->assertStringStartsWith('%PDF', $response->getContent());
     }
 
+    public function test_inventory_stock_value_pdf_export_handles_deleted_and_orphan_movements_without_snapshot_pollution(): void
+    {
+        DB::table('products')->insert([
+            [
+                'id' => 'pdf-product-active',
+                'kode_barang' => 'KB-PDF-ACT',
+                'nama_barang' => 'PDF Active Part',
+                'merek' => 'Federal',
+                'ukuran' => 100,
+                'harga_jual' => 15000,
+                'deleted_at' => null,
+            ],
+            [
+                'id' => 'pdf-product-deleted',
+                'kode_barang' => 'KB-PDF-DEL',
+                'nama_barang' => 'PDF Deleted Part',
+                'merek' => 'Federal',
+                'ukuran' => 100,
+                'harga_jual' => 15000,
+                'deleted_at' => '2030-01-15 10:00:00',
+            ],
+        ]);
+
+        DB::table('inventory_movements')->insert([
+            [
+                'id' => 'pdf-movement-active-in',
+                'product_id' => 'pdf-product-active',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'pdf-receipt-active-line',
+                'tanggal_mutasi' => '2030-01-10',
+                'qty_delta' => 5,
+                'unit_cost_rupiah' => 1000,
+                'total_cost_rupiah' => 5000,
+            ],
+            [
+                'id' => 'pdf-movement-deleted-in',
+                'product_id' => 'pdf-product-deleted',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'pdf-receipt-deleted-line',
+                'tanggal_mutasi' => '2030-01-11',
+                'qty_delta' => 2,
+                'unit_cost_rupiah' => 2000,
+                'total_cost_rupiah' => 4000,
+            ],
+        ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        try {
+            DB::table('inventory_movements')->insert([
+                'id' => 'pdf-movement-orphan-in',
+                'product_id' => 'pdf-product-orphan',
+                'movement_type' => 'stock_in',
+                'source_type' => 'supplier_receipt_line',
+                'source_id' => 'pdf-receipt-orphan-line',
+                'tanggal_mutasi' => '2030-01-12',
+                'qty_delta' => 3,
+                'unit_cost_rupiah' => 3000,
+                'total_cost_rupiah' => 9000,
+            ]);
+        } finally {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        }
+
+        DB::table('product_inventory')->insert([
+            ['product_id' => 'pdf-product-active', 'qty_on_hand' => 5],
+            ['product_id' => 'pdf-product-deleted', 'qty_on_hand' => 2],
+        ]);
+
+        DB::table('product_inventory_costing')->insert([
+            ['product_id' => 'pdf-product-active', 'avg_cost_rupiah' => 1000, 'inventory_value_rupiah' => 5000],
+            ['product_id' => 'pdf-product-deleted', 'avg_cost_rupiah' => 2000, 'inventory_value_rupiah' => 4000],
+        ]);
+
+        $response = $this->actingAs($this->user('admin'))->get(
+            route('admin.reports.inventory_stock_value.export_pdf', [
+                'period_mode' => 'monthly',
+                'reference_date' => '2030-01-31',
+            ])
+        );
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $response->assertDownload('laporan-stok-persediaan-2030-01-01-sampai-2030-01-31.pdf');
+
+        $content = $response->getContent();
+
+        $this->assertIsString($content);
+        $this->assertStringStartsWith('%PDF', $content);
+        $this->assertStringContainsString('%%EOF', $content);
+    }
+
+
     public function test_kasir_cannot_export_inventory_stock_value_report_as_pdf(): void
     {
         $response = $this->actingAs($this->user('kasir'))->get(
