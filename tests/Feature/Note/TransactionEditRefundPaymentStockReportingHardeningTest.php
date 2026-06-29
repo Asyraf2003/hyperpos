@@ -406,6 +406,154 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
         self::assertSame(270000, $dashboard['summary']['total_operational_profit_rupiah']);
     }
 
+    public function test_unpaid_store_stock_note_rejects_refund_but_allows_revision_without_cash_or_inventory_refund_side_effect(): void
+    {
+        $admin = $this->loginAsAuthorizedAdmin();
+        $this->seedStoreStockProduct();
+
+        $create = app(CreateTransactionWorkspaceHandler::class)->handle($this->createUnpaidStoreStockPayload());
+
+        self::assertTrue($create->isSuccess(), $create->message());
+
+        $noteId = (string) ($create->data()['note']['id'] ?? '');
+        self::assertNotSame('', $noteId);
+
+        $oldWorkItemId = (string) DB::table('work_items')->where('note_id', $noteId)->value('id');
+        $oldStoreStockLineId = (string) DB::table('work_item_store_stock_lines')
+            ->where('work_item_id', $oldWorkItemId)
+            ->value('id');
+
+        self::assertNotSame('', $oldWorkItemId);
+        self::assertNotSame('', $oldStoreStockLineId);
+
+        $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => $noteId]))
+            ->post(route('admin.notes.refunds.store', ['noteId' => $noteId]), [
+                'selected_row_ids' => [$oldWorkItemId],
+                'refunded_at' => '2026-05-21',
+                'reason' => '0062-C forged refund unpaid note',
+            ])
+            ->assertRedirect(route('admin.notes.show', ['noteId' => $noteId]))
+            ->assertSessionHasErrors(['refund']);
+
+        self::assertSame(0, DB::table('customer_refunds')->count());
+        self::assertSame(0, DB::table('refund_component_allocations')->count());
+        self::assertSame(0, DB::table('customer_payments')->count());
+        self::assertSame(0, DB::table('inventory_movements')
+            ->where('source_type', 'work_item_store_stock_line_reversal')
+            ->count());
+        $this->assertDatabaseMissing('note_mutation_events', [
+            'note_id' => $noteId,
+            'mutation_type' => 'note_rows_canceled_via_refund',
+        ]);
+
+        $revision = app(CreateNoteRevisionHandler::class)->handle(
+            $noteId,
+            $this->unpaidStoreStockRevisionPayload(),
+            'admin-0062-c',
+            true,
+        );
+
+        self::assertTrue($revision->isSuccess(), $revision->message());
+
+        $newWorkItemId = (string) DB::table('work_items')->where('note_id', $noteId)->value('id');
+        $newStoreStockLineId = (string) DB::table('work_item_store_stock_lines')
+            ->where('work_item_id', $newWorkItemId)
+            ->value('id');
+
+        self::assertNotSame('', $newWorkItemId);
+        self::assertNotSame('', $newStoreStockLineId);
+        self::assertNotSame($oldWorkItemId, $newWorkItemId);
+        self::assertNotSame($oldStoreStockLineId, $newStoreStockLineId);
+
+        $this->assertDatabaseHas('note_history_projection', [
+            'note_id' => $noteId,
+            'total_rupiah' => 150000,
+            'allocated_rupiah' => 0,
+            'refunded_rupiah' => 0,
+            'net_paid_rupiah' => 0,
+            'outstanding_rupiah' => 150000,
+        ]);
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-0062-a',
+            'movement_type' => 'stock_in',
+            'source_type' => 'transaction_workspace_updated',
+            'source_id' => $oldStoreStockLineId,
+            'tanggal_mutasi' => '2026-05-22',
+            'qty_delta' => 2,
+            'unit_cost_rupiah' => 40000,
+            'total_cost_rupiah' => 80000,
+        ]);
+        $this->assertDatabaseHas('inventory_movements', [
+            'product_id' => 'product-0062-a',
+            'movement_type' => 'stock_out',
+            'source_type' => 'work_item_store_stock_line',
+            'source_id' => $newStoreStockLineId,
+            'tanggal_mutasi' => '2026-05-22',
+            'qty_delta' => -1,
+            'unit_cost_rupiah' => 40000,
+            'total_cost_rupiah' => -40000,
+        ]);
+        self::assertSame(0, DB::table('inventory_movements')
+            ->where('source_type', 'work_item_store_stock_line_reversal')
+            ->count());
+        $this->assertDatabaseHas('product_inventory', [
+            'product_id' => 'product-0062-a',
+            'qty_on_hand' => 9,
+        ]);
+        $this->assertDatabaseHas('product_inventory_costing', [
+            'product_id' => 'product-0062-a',
+            'avg_cost_rupiah' => 40000,
+            'inventory_value_rupiah' => 360000,
+        ]);
+
+        $transaction = app(GetTransactionReportDatasetHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+        $cashLedger = app(TransactionCashLedgerReportingQuery::class)
+            ->reconciliation('2026-05-01', '2026-05-31');
+        $inventoryMovement = app(GetInventoryMovementSummaryHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+        $profit = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+
+        self::assertTrue($transaction->isSuccess());
+        self::assertTrue($inventoryMovement->isSuccess());
+        self::assertTrue($profit->isSuccess());
+
+        $transactionSummary = $transaction->data()['summary'];
+        self::assertSame(1, $transactionSummary['total_rows']);
+        self::assertSame(150000, $transactionSummary['gross_transaction_rupiah']);
+        self::assertSame(0, $transactionSummary['allocated_payment_rupiah']);
+        self::assertSame(0, $transactionSummary['refunded_rupiah']);
+        self::assertSame(0, $transactionSummary['net_cash_collected_rupiah']);
+        self::assertSame(150000, $transactionSummary['outstanding_rupiah']);
+        self::assertSame(0, $transactionSummary['settled_rows']);
+        self::assertSame(1, $transactionSummary['outstanding_rows']);
+
+        self::assertSame([
+            'total_in_rupiah' => 0,
+            'cash_in_rupiah' => 0,
+            'transfer_in_rupiah' => 0,
+            'total_out_rupiah' => 0,
+        ], $cashLedger);
+
+        $movementRow = $inventoryMovement->data()['rows'][0];
+        self::assertSame('product-0062-a', $movementRow['product_id']);
+        self::assertSame(3, $movementRow['sale_out_qty']);
+        self::assertSame(0, $movementRow['refund_reversal_qty']);
+        self::assertSame(2, $movementRow['revision_correction_qty']);
+        self::assertSame(-1, $movementRow['net_qty_delta']);
+        self::assertSame(80000, $movementRow['total_in_cost_rupiah']);
+        self::assertSame(120000, $movementRow['total_out_cost_rupiah']);
+        self::assertSame(-40000, $movementRow['net_cost_delta_rupiah']);
+
+        $profitRow = $profit->data()['row'];
+        self::assertSame(0, $profitRow['cash_in_rupiah']);
+        self::assertSame(0, $profitRow['refunded_rupiah']);
+        self::assertSame(40000, $profitRow['store_stock_cogs_rupiah']);
+        self::assertSame(-40000, $profitRow['cash_operational_profit_rupiah']);
+    }
+
     private function seedStoreStockProduct(): void
     {
         DB::table('products')->insert([
@@ -504,6 +652,43 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
     }
 
     /** @return array<string, mixed> */
+    private function createUnpaidStoreStockPayload(): array
+    {
+        return [
+            'idempotency_key' => '0062-c-create-unpaid-store-stock',
+            'note' => [
+                'customer_name' => 'Budi 0062 C',
+                'customer_phone' => '08123456789',
+                'transaction_date' => '2026-05-20',
+            ],
+            'items' => [[
+                'entry_mode' => 'service',
+                'description' => null,
+                'part_source' => 'store_stock',
+                'service' => [
+                    'name' => 'Servis 0062 C',
+                    'price_rupiah' => 50000,
+                    'notes' => null,
+                ],
+                'product_lines' => [[
+                    'product_id' => 'product-0062-a',
+                    'qty' => 2,
+                    'unit_price_rupiah' => 100000,
+                    'price_basis' => 'current_catalog',
+                ]],
+                'external_purchase_lines' => [],
+            ]],
+            'inline_payment' => [
+                'decision' => 'skip',
+                'payment_method' => null,
+                'paid_at' => null,
+                'amount_paid_rupiah' => null,
+                'amount_received_rupiah' => null,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
     private function upwardStoreStockRevisionPayload(): array
     {
         return [
@@ -562,6 +747,43 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
                 'product_lines' => [[
                     'product_id' => 'product-0062-a',
                     'qty' => 2,
+                    'unit_price_rupiah' => 100000,
+                    'price_basis' => 'revision_snapshot',
+                ]],
+                'external_purchase_lines' => [],
+            ]],
+            'inline_payment' => [
+                'decision' => 'skip',
+                'payment_method' => null,
+                'paid_at' => null,
+                'amount_paid_rupiah' => null,
+                'amount_received_rupiah' => null,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function unpaidStoreStockRevisionPayload(): array
+    {
+        return [
+            'reason' => '0062-C unpaid store-stock edit after rejected refund.',
+            'note' => [
+                'customer_name' => 'Budi 0062 C Revised',
+                'customer_phone' => '08123456789',
+                'transaction_date' => '2026-05-22',
+            ],
+            'items' => [[
+                'entry_mode' => 'service',
+                'description' => null,
+                'part_source' => 'store_stock',
+                'service' => [
+                    'name' => 'Servis 0062 C Revised',
+                    'price_rupiah' => 50000,
+                    'notes' => null,
+                ],
+                'product_lines' => [[
+                    'product_id' => 'product-0062-a',
+                    'qty' => 1,
                     'unit_price_rupiah' => 100000,
                     'price_basis' => 'revision_snapshot',
                 ]],
