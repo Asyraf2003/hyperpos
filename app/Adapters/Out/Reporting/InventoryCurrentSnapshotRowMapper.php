@@ -19,6 +19,12 @@ final class InventoryCurrentSnapshotRowMapper
             'current_qty_on_hand' => (int) $row->current_qty_on_hand,
             'current_avg_cost_rupiah' => (int) $row->current_avg_cost_rupiah,
             'current_inventory_value_rupiah' => (int) $row->current_inventory_value_rupiah,
+            'current_inventory_value_by_average_rupiah' => (int) $row->current_inventory_value_by_average_rupiah,
+            'current_rounding_residual_rupiah' => (int) $row->current_rounding_residual_rupiah,
+            'ledger_qty_on_hand' => (int) $row->ledger_qty_on_hand,
+            'ledger_inventory_value_rupiah' => (int) $row->ledger_inventory_value_rupiah,
+            'ledger_qty_diff' => (int) $row->ledger_qty_diff,
+            'ledger_value_diff_rupiah' => (int) $row->ledger_value_diff_rupiah,
         ];
     }
 }
