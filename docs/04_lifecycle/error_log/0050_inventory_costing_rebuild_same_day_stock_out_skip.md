@@ -2,9 +2,9 @@
 
 ## Status
 
-CONFIRMED BUG - diagnostic only.
+FINAL CLOSED.
 
-No production patch in this note.
+Closed after targeted same-day stock-out regression, local rebuild residual verification, and closure regression for net-zero product ledger cleanup.
 
 ## Summary
 
@@ -196,15 +196,15 @@ inventory_value_rupiah = 10650
 
 After patch, targeted test passed.
 
-### Remaining Follow-up
+### Follow-up Verification Requirement - Completed
 
-Run broader inventory/reporting tests and re-run read-only residual diagnostics to confirm:
+Broader inventory/reporting verification and read-only residual diagnostics were required to confirm:
 
 ```text
 value_diff = 0 for projection vs movement ledger
 ```
 
-Remaining residuals should be true integer average-cost rounding residuals only.
+Remaining residuals were confirmed as true integer average-cost rounding residuals only.
 
 ## Session Update - Local Rebuild and Residual Verification
 
@@ -275,3 +275,54 @@ total residual = 26
 - Remaining residual is expected from integer average-cost storage.
 - Follow-up should treat residual visibility separately from projection correctness.
 
+## Final Closure - 2026-06-29 WITA
+
+### Status
+
+FINAL CLOSED.
+
+### Closure Regression Added
+
+Added closure regression coverage:
+
+```text
+test_rebuild_costing_projection_removes_stale_projection_when_product_ledger_net_qty_is_zero
+```
+
+This proves rebuild does not keep stale `product_inventory_costing` rows when a product has ledger movements but final net quantity is zero.
+
+### Final Test Proof
+
+Owner reported PASS after adding the closure regression:
+
+```bash
+php artisan test tests/Feature/Inventory/RebuildInventoryCostingProjectionWithStockOutFeatureTest.php
+```
+
+Existing coverage also confirms:
+
+- normal stock-out rebuild remains valid
+- value-only cost revaluation remains valid
+- same-day stock-out before stock-in no longer inflates costing projection
+- stale projection rows are cleared when ledger is empty
+- stale projection row is cleared when a specific product ledger nets to zero
+
+### Final Decision
+
+No production code patch is required after the closure regression.
+
+The costing projection rebuild now derives inventory costing from the movement ledger aggregate:
+
+```text
+qty   = SUM(qty_delta)
+value = SUM(total_cost_rupiah)
+avg   = intdiv(value, qty)
+```
+
+Products with `qty <= 0` are intentionally excluded from `product_inventory_costing`.
+
+### No Remaining Follow-up
+
+No remaining technical debt is tracked under this error log.
+
+Any future inventory rounding residual work must stay in the residual visibility/reporting logs, not this costing rebuild correctness log.
