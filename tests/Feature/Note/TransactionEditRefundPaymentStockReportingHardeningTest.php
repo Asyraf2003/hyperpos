@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Note;
 
 use App\Adapters\Out\Reporting\Queries\TransactionCashLedgerReportingQuery;
+use App\Application\Note\Services\NoteRevisionSurplusDispositionActionViewDataBuilder;
 use App\Application\Note\UseCases\CreateNoteRevisionHandler;
 use App\Application\Note\UseCases\CreateTransactionWorkspaceHandler;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
@@ -301,12 +302,17 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
             'total_rupiah' => 250000,
             'allocated_rupiah' => 250000,
             'refunded_rupiah' => 0,
-            'net_paid_rupiah' => 350000,
+            'net_paid_rupiah' => 250000,
             'outstanding_rupiah' => 0,
         ]);
         self::assertSame(0, DB::table('customer_refunds')->count());
         self::assertSame(0, DB::table('note_revision_surplus_dispositions')->count());
         self::assertSame(0, DB::table('note_revision_surplus_refund_payments')->count());
+
+        $surplusAction = app(NoteRevisionSurplusDispositionActionViewDataBuilder::class)->build($noteId);
+        self::assertTrue($surplusAction['has_pending_refund_due_action']);
+        self::assertSame(100000, $surplusAction['pending_items'][0]['unresolved_pending_rupiah']);
+        self::assertSame('refund_due', $surplusAction['pending_items'][0]['disposition_type']);
 
         $this->assertDatabaseHas('inventory_movements', [
             'product_id' => 'product-0062-a',
