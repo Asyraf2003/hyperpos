@@ -453,3 +453,48 @@ Still required:
 - ordered lifecycle checklist mapped to automated/manual-only evidence
 - final combined targeted run
 - full `make verify`
+
+## 2026-06-29 Service Package Profit Breakdown Surface Baseline Proof
+
+### Status
+
+PASS - service package profit breakdown baseline surface proof completed.
+
+### Automated Proof
+
+Owner reported PASS for:
+
+```text
+php artisan test \
+  tests/Feature/Reporting/ServicePackageProfitBreakdownQueryTest.php \
+  tests/Feature/Reporting/ServicePackageProfitBreakdownReportPageFeatureTest.php \
+  tests/Feature/Reporting/ServicePackageProfitBreakdownHttpWorkflowFeatureTest.php \
+  tests/Feature/Reporting/ServicePackageProfitBreakdownUiScenarioMatrixFeatureTest.php \
+  tests/Feature/ReportingExports/ServicePackageProfitBreakdownExcelExportFeatureTest.php
+```
+
+### Coverage Confirmed
+
+This proves the service package profit breakdown baseline across:
+
+- query/read model
+- admin report screen
+- HTTP workflow
+- UI scenario matrix
+- Excel export
+
+### PDF Scope Note
+
+No service package profit breakdown PDF export test was found in the current repository scan.
+
+Do not mark PDF coverage as completed unless a dedicated route/test exists later.
+
+### Remaining Before Final Close
+
+This is not final closure.
+
+Still required:
+
+- ordered lifecycle checklist mapped to automated/manual-only evidence
+- final combined targeted run
+- full `make verify`
