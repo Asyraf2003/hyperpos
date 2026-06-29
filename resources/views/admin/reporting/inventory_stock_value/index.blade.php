@@ -108,6 +108,11 @@
         </div></div>
     </div>
 
+    <div class="col-12">
+        <div class="small fw-semibold text-warning">Diagnostik Internal</div>
+        <div class="small text-muted">Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.</div>
+    </div>
+
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card border-warning"><div class="card-body">
             <div class="text-muted small">Nilai Berdasar Avg x Qty</div>

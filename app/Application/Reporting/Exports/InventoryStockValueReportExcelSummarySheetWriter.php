@@ -37,6 +37,7 @@ final class InventoryStockValueReportExcelSummarySheetWriter
             ['Produk Belum Konfigurasi Threshold', $this->int($summary['stock_unconfigured_product_rows'] ?? 0)],
             [null, null],
             ['Diagnostik Internal', null],
+            ['Catatan Diagnostik', 'Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.'],
             ['Nilai Berdasar Avg x Qty', $this->int($summary['total_inventory_value_by_average_rupiah'] ?? 0)],
             ['Residual Pembulatan HPP', $this->int($summary['total_rounding_residual_rupiah'] ?? 0)],
             ['Selisih Qty Ledger', $this->int($summary['total_ledger_qty_diff'] ?? 0)],
@@ -50,9 +51,9 @@ final class InventoryStockValueReportExcelSummarySheetWriter
         }
 
         $sheet->getStyle('A1')->getFont()->setBold(true);
-        $sheet->getStyle('A6:A26')->getFont()->setBold(true);
+        $sheet->getStyle('A6:A27')->getFont()->setBold(true);
         $sheet->getColumnDimension('A')->setWidth(38);
-        $sheet->getColumnDimension('B')->setWidth(24);
+        $sheet->getColumnDimension('B')->setWidth(82);
     }
 
     private function int(mixed $value): int

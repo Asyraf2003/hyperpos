@@ -39,6 +39,7 @@ final class InventoryStockValueReportPdfViewDataBuilder
             ['label' => 'Produk Bermutasi', 'value' => $this->integerValue($summary['movement_product_rows'] ?? 0)],
             ['label' => 'Qty Tersedia', 'value' => $this->integerValue($summary['total_qty_on_hand'] ?? 0)],
             ['label' => 'Nilai Persediaan', 'value' => $this->rupiah($summary['total_inventory_value_rupiah'] ?? 0)],
+            ['label' => 'Diagnostik Internal', 'value' => 'Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.'],
             ['label' => 'Nilai Berdasar Avg x Qty', 'value' => $this->rupiah($summary['total_inventory_value_by_average_rupiah'] ?? 0)],
             ['label' => 'Residual Pembulatan HPP', 'value' => $this->rupiah($summary['total_rounding_residual_rupiah'] ?? 0)],
             ['label' => 'Selisih Qty Ledger', 'value' => $this->integerValue($summary['total_ledger_qty_diff'] ?? 0)],
