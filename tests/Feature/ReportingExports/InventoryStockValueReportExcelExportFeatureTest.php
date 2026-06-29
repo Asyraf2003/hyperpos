@@ -271,14 +271,16 @@ final class InventoryStockValueReportExcelExportFeatureTest extends TestCase
         }
 
         $this->assertContains('Nilai Berdasar Avg x Qty', $summaryCells);
+        $this->assertContains('Catatan Diagnostik', $summaryCells);
+        $this->assertContains('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.', $summaryCells);
         $this->assertContains(34470, $summaryCells);
         $this->assertContains('Residual Pembulatan HPP', $summaryCells);
         $this->assertContains(23, $summaryCells);
         $this->assertContains('Selisih Nilai Ledger', $summaryCells);
         $this->assertContains(0, $summaryCells);
 
-        $this->assertContains('Nilai Avg x Qty', $snapshotCells);
-        $this->assertContains('Residual Pembulatan HPP', $snapshotCells);
+        $this->assertContains('Nilai Avg x Qty (Diagnostik)', $snapshotCells);
+        $this->assertContains('Residual Pembulatan HPP (Diagnostik)', $snapshotCells);
         $this->assertContains('Selisih Nilai Ledger', $snapshotCells);
         $this->assertContains(34470, $snapshotCells);
         $this->assertContains(23, $snapshotCells);

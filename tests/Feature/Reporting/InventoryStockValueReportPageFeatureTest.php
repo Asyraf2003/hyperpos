@@ -242,6 +242,9 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Nilai Persediaan');
         $response->assertSee('Rp 34.493');
 
+        $response->assertSee('Diagnostik Internal');
+        $response->assertSee('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.');
+
         $response->assertSee('Nilai Berdasar Avg x Qty');
         $response->assertSee('Rp 34.470');
 

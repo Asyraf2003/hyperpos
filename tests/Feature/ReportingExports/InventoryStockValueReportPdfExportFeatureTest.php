@@ -222,6 +222,7 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
                 ['label' => 'Nilai Persediaan', 'value' => 'Rp 34.493'],
+                ['label' => 'Diagnostik Internal', 'value' => 'Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.'],
                 ['label' => 'Nilai Berdasar Avg x Qty', 'value' => 'Rp 34.470'],
                 ['label' => 'Residual Pembulatan HPP', 'value' => 'Rp 23'],
                 ['label' => 'Selisih Nilai Ledger', 'value' => 'Rp 0'],
@@ -230,6 +231,8 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
             'snapshotRows' => [],
         ])->render();
 
+        $this->assertStringContainsString('Diagnostik Internal', $html);
+        $this->assertStringContainsString('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.', $html);
         $this->assertStringContainsString('Nilai Berdasar Avg x Qty', $html);
         $this->assertStringContainsString('Residual Pembulatan HPP', $html);
         $this->assertStringContainsString('Selisih Nilai Ledger', $html);
