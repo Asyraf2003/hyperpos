@@ -23,6 +23,7 @@ final class CashierNoteCorrectionHistoryReasonViewFeatureTest extends TestCase
     {
         $user = $this->seedKasir();
         $this->seedOpenServiceOnlyNote();
+        $reason = 'Koreksi nominal servis <script>alert("nota")</script>.';
 
         DB::table('note_mutation_events')->insert([
             'id' => 'mutation-1',
@@ -30,7 +31,7 @@ final class CashierNoteCorrectionHistoryReasonViewFeatureTest extends TestCase
             'mutation_type' => 'paid_service_only_work_item_corrected',
             'actor_id' => 'actor-kasir',
             'actor_role' => 'kasir',
-            'reason' => 'Koreksi nominal servis setelah review pelanggan.',
+            'reason' => $reason,
             'occurred_at' => '2026-04-03 09:00:00',
         ]);
 
@@ -60,24 +61,45 @@ final class CashierNoteCorrectionHistoryReasonViewFeatureTest extends TestCase
         $history = app(NoteCorrectionHistoryBuilder::class)->build('note-1');
 
         $this->assertSame('Koreksi Nominal Servis', $history[0]['event_label'] ?? null);
-        $this->assertSame('Koreksi nominal servis setelah review pelanggan.', $history[0]['reason'] ?? null);
+        $this->assertSame($reason, $history[0]['reason'] ?? null);
 
         $page = app(NoteDetailPageDataBuilder::class)->build('note-1');
 
         $this->assertSame(
-            'Koreksi nominal servis setelah review pelanggan.',
+            $reason,
             $page['note']['correction_history'][0]['reason'] ?? null
         );
 
         $this->actingAs($user)
             ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
             ->assertOk()
+            ->assertSee('Riwayat Perubahan Nota')
+            ->assertSee('Perubahan Aktif')
             ->assertSee('Riwayat Mutasi Nota')
             ->assertSee('Koreksi Nominal Servis')
             ->assertSee('Alasan:')
-            ->assertSee('Koreksi nominal servis setelah review pelanggan.')
+            ->assertSee('Koreksi nominal servis &lt;script&gt;alert(&quot;nota&quot;)&lt;/script&gt;.', false)
+            ->assertDontSee($reason, false)
             ->assertDontSee('Diproses oleh:')
             ->assertDontSee('actor-kasir');
+    }
+
+    public function test_cashier_note_detail_without_correction_history_does_not_show_empty_history_block(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedOpenServiceOnlyNote();
+
+        $page = app(NoteDetailPageDataBuilder::class)->build('note-1');
+
+        $this->assertSame([], $page['note']['correction_history']);
+
+        $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-1']))
+            ->assertOk()
+            ->assertSee('Riwayat Perubahan Nota')
+            ->assertSee('Perubahan Aktif')
+            ->assertDontSee('Riwayat Mutasi Nota')
+            ->assertDontSee('Alasan:');
     }
 
     private function seedKasir(): User
