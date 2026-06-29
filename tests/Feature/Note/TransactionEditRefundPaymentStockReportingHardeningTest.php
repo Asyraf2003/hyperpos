@@ -35,7 +35,7 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
         $oldWorkItemId = (string) DB::table('work_items')->where('note_id', $noteId)->value('id');
         $oldStoreStockLineId = (string) DB::table('work_item_store_stock_lines')
             ->where('work_item_id', $oldWorkItemId)
-            ->value('id');
+            ->value('source_id');
         $oldPaymentId = (string) DB::table('customer_payments')->value('id');
 
         self::assertNotSame('', $oldWorkItemId);
