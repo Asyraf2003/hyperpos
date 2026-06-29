@@ -145,3 +145,56 @@ Cashier create/edit note workspace service-name autocomplete for service-only, s
 
 ## Next Step
 If the owner wants to continue DB hardening, the next valid step is PostgreSQL compatibility classification for remaining migrations or a PostgreSQL test harness dry-run, not Go API implementation yet.
+
+## Session Update - 0052 Inventory Average Cost Rounding Residual Visibility
+
+### Status
+
+PATCHED - dataset-level diagnostic visibility proof PASS.
+
+### Context
+
+Previous slice `0051` fixed the costing projection engine mismatch.
+
+Remaining value gap is true integer average-cost rounding residual:
+
+```text
+rounding_residual = inventory_value_rupiah - (avg_cost_rupiah * qty_on_hand)
+```
+
+Known post-rebuild residual:
+
+```text
+prod-year-001: 3
+prod-year-006: 23
+total residual: 26
+```
+
+### Files Changed
+
+- `app/Adapters/Out/Reporting/InventoryCurrentSnapshotDatabaseQuery.php`
+- `app/Adapters/Out/Reporting/InventoryCurrentSnapshotRowMapper.php`
+- `app/Application/Reporting/Services/InventoryStockValueReportSummaryBuilder.php`
+- `tests/Feature/Reporting/GetInventoryStockValueReportDatasetFeatureTest.php`
+- `docs/04_lifecycle/error_log/0052_inventory_average_cost_rounding_residual_visibility.md`
+
+### Acceptance Proof
+
+Owner reported:
+
+```text
+GetInventoryStockValueReportDatasetFeatureTest PASS
+all relevant tests PASS
+```
+
+### Boundary
+
+- No costing engine change.
+- No HPP change.
+- No aggressive main report value change.
+- Dataset now separates ledger mismatch from rounding residual.
+
+### Next
+
+Continue with export/UI diagnostic visibility only after this handoff is committed.
+
