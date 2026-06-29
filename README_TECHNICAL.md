@@ -28,15 +28,15 @@ Snapshot source: `make audit-git`.
 
 | Area | Count |
 |---|---:|
-| Total files | 21,726 |
-| Total directories | 3,008 |
+| Total files | 21,727 |
+| Total directories | 3,006 |
 | PHP files | 2,088 |
 | Blade files | 132 |
-| Markdown docs | 443 |
+| Markdown docs | 444 |
 | Migrations | 95 |
 | Test files | 498 |
 | Route files | 23 |
-| Total commits | 3,363 |
+| Total commits | 3,370 |
 | Unique commit days | 102 |
 
 LOC snapshot:
@@ -47,7 +47,7 @@ LOC snapshot:
 | `tests/` PHP | 77,205 |
 | `database/` PHP | 15,440 |
 | `resources/` Blade | 17,265 |
-| `docs/` Markdown | 125,637 |
+| `docs/` Markdown | 125,869 |
 
 Commit distribution:
 
@@ -56,7 +56,7 @@ Commit distribution:
 | 2026-03 | 397 |
 | 2026-04 | 1,096 |
 | 2026-05 | 947 |
-| 2026-06 | 923 |
+| 2026-06 | 930 |
 
 This density exists because the application touches mutable operational state. A wrong change can silently corrupt money, stock, debt, payable, payment allocation, refund status, or report totals.
 
@@ -402,7 +402,7 @@ Important documentation rules:
 
 Current active manual QA scope:
 
-- `docs/04_lifecycle/error_log/0048_manual_transaction_reporting_sequential_qa_matrix.md`
+- `docs/04_lifecycle/error_log/0051_manual_transaction_reporting_sequential_qa_matrix.md`
 
 Purpose:
 
