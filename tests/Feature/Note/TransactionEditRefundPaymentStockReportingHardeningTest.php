@@ -314,13 +314,37 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
             'outstanding_rupiah' => 0,
         ]);
         self::assertSame(0, DB::table('customer_refunds')->count());
-        self::assertSame(0, DB::table('note_revision_surplus_dispositions')->count());
-        self::assertSame(0, DB::table('note_revision_surplus_refund_payments')->count());
+        $dispositionId = (string) DB::table('note_revision_surplus_dispositions')
+            ->where('note_root_id', $noteId)
+            ->value('id');
+
+        self::assertNotSame('', $dispositionId);
+        $this->assertDatabaseHas('note_revision_surplus_dispositions', [
+            'id' => $dispositionId,
+            'note_revision_settlement_id' => $noteId . '-r002-settlement',
+            'note_revision_id' => $noteId . '-r002',
+            'note_root_id' => $noteId,
+            'disposition_type' => 'refund_due',
+            'amount_rupiah' => 100000,
+            'before_pending_rupiah' => 100000,
+            'after_pending_rupiah' => 0,
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('note_revision_surplus_refund_payments', [
+            'note_revision_surplus_disposition_id' => $dispositionId,
+            'note_revision_settlement_id' => $noteId . '-r002-settlement',
+            'note_revision_id' => $noteId . '-r002',
+            'note_root_id' => $noteId,
+            'amount_rupiah' => 100000,
+            'effective_date' => '2026-05-21',
+            'status' => 'active',
+        ]);
 
         $surplusAction = app(NoteRevisionSurplusDispositionActionViewDataBuilder::class)->build($noteId);
-        self::assertTrue($surplusAction['has_pending_refund_due_action']);
-        self::assertSame(100000, $surplusAction['pending_items'][0]['unresolved_pending_rupiah']);
-        self::assertSame('refund_due', $surplusAction['pending_items'][0]['disposition_type']);
+        self::assertFalse($surplusAction['has_pending_refund_due_action']);
+        self::assertSame([], $surplusAction['pending_items']);
+        self::assertFalse($surplusAction['has_pending_refund_paid_action']);
+        self::assertSame([], $surplusAction['refund_paid_items']);
 
         $this->assertDatabaseHas('inventory_movements', [
             'product_id' => 'product-0062-a',
@@ -377,8 +401,10 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
         self::assertSame(250000, $transactionSummary['gross_transaction_rupiah']);
         self::assertSame(250000, $transactionSummary['allocated_payment_rupiah']);
         self::assertSame(0, $transactionSummary['refunded_rupiah']);
-        self::assertSame(0, $transactionSummary['refund_due_rupiah']);
-        self::assertSame(250000, $transactionSummary['net_cash_collected_rupiah']);
+        self::assertSame(100000, $transactionSummary['refund_due_rupiah']);
+        self::assertSame(100000, $transactionSummary['surplus_refund_paid_rupiah']);
+        self::assertSame(0, $transactionSummary['remaining_refund_due_rupiah']);
+        self::assertSame(150000, $transactionSummary['net_cash_collected_rupiah']);
         self::assertSame(0, $transactionSummary['outstanding_rupiah']);
         self::assertSame(1, $transactionSummary['settled_rows']);
 
@@ -386,7 +412,7 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
             'total_in_rupiah' => 250000,
             'cash_in_rupiah' => 250000,
             'transfer_in_rupiah' => 0,
-            'total_out_rupiah' => 0,
+            'total_out_rupiah' => 100000,
         ], $cashLedger);
 
         $movementRow = $inventoryMovement->data()['rows'][0];
@@ -403,15 +429,15 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
 
         $profitRow = $profit->data()['row'];
         self::assertSame(350000, $profitRow['cash_in_rupiah']);
-        self::assertSame(0, $profitRow['refunded_rupiah']);
+        self::assertSame(100000, $profitRow['refunded_rupiah']);
         self::assertSame(80000, $profitRow['store_stock_cogs_rupiah']);
         self::assertSame(80000, $profitRow['product_purchase_cost_rupiah']);
-        self::assertSame(270000, $profitRow['cash_operational_profit_rupiah']);
+        self::assertSame(170000, $profitRow['cash_operational_profit_rupiah']);
 
         $dashboard = app(GetDashboardOperationalPerformanceDatasetHandler::class)
             ->handle('2026-05-01', '2026-05-31');
 
-        self::assertSame(270000, $dashboard['summary']['total_operational_profit_rupiah']);
+        self::assertSame(170000, $dashboard['summary']['total_operational_profit_rupiah']);
     }
 
     public function test_unpaid_store_stock_note_rejects_refund_but_allows_revision_without_cash_or_inventory_refund_side_effect(): void
