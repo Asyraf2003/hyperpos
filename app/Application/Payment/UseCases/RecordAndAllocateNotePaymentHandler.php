@@ -7,6 +7,7 @@ namespace App\Application\Payment\UseCases;
 use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Payment\Services\AllocatePaymentErrorClassifier;
 use App\Application\Payment\Services\PaymentTransactionRetryRunner;
+use App\Application\Payment\Services\RecordAndAllocateNotePaymentAuditPayloadBuilder;
 use App\Application\Payment\Services\RecordAndAllocateNotePaymentOperation;
 use App\Application\Payment\Services\RecordNotePaymentIdempotencyService;
 use App\Application\Shared\DTO\Result;
@@ -24,6 +25,7 @@ final class RecordAndAllocateNotePaymentHandler
         private readonly AuditLogPort $audit,
         private readonly NoteHistoryProjectionService $projection,
         private readonly RecordNotePaymentIdempotencyService $idempotency,
+        private readonly RecordAndAllocateNotePaymentAuditPayloadBuilder $auditPayloads,
     ) {
     }
 
@@ -62,20 +64,13 @@ final class RecordAndAllocateNotePaymentHandler
                     $amountReceivedRupiah,
                 );
 
-                $this->audit->record('payment_allocated', [
-                    'payment_id' => $recorded->payment()->id(),
-                    'note_id' => trim($noteId),
-                    'amount' => $amountRupiah,
-                    'payment_method' => $recorded->payment()->paymentMethod(),
-                    'amount_received' => $amountReceivedRupiah,
-                    'change' => $this->changeAmount(
-                        $recorded->payment()->paymentMethod(),
-                        $amountRupiah,
-                        $amountReceivedRupiah,
-                    ),
-                    'allocation_count' => $recorded->allocationCount(),
-                    'selected_row_ids' => $selectedRowIds,
-                ]);
+                $this->audit->record('payment_allocated', $this->auditPayloads->build(
+                    $recorded,
+                    $noteId,
+                    $amountRupiah,
+                    $amountReceivedRupiah,
+                    $selectedRowIds,
+                ));
 
                 $this->projection->syncNote(trim($noteId));
 
@@ -95,14 +90,5 @@ final class RecordAndAllocateNotePaymentHandler
         } catch (Throwable $e) {
             throw $e;
         }
-    }
-
-    private function changeAmount(string $paymentMethod, int $amountRupiah, ?int $amountReceivedRupiah): ?int
-    {
-        if ($paymentMethod !== CustomerPayment::METHOD_CASH || $amountReceivedRupiah === null) {
-            return null;
-        }
-
-        return max($amountReceivedRupiah - $amountRupiah, 0);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Adapters\In\Http\Controllers\Note;
 
+use App\Adapters\In\Http\Controllers\Note\Support\NotePaymentRedirectMessageBuilder;
 use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
 use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
@@ -21,6 +22,7 @@ final class RecordNotePaymentController extends Controller
         RecordAndAllocateNotePaymentHandler $flow,
         RecordNotePaymentIdempotencyService $idempotency,
         NoteRouteAreaResolver $routes,
+        NotePaymentRedirectMessageBuilder $messages,
     ): RedirectResponse {
         $data = $request->validated();
 
@@ -82,22 +84,6 @@ final class RecordNotePaymentController extends Controller
 
         return redirect()
             ->route($routes->showRoute($request), ['noteId' => $noteId])
-            ->with('success', $this->successMessage($data, $amount));
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function successMessage(array $data, int $amount): string
-    {
-        if (($data['payment_method'] ?? '') !== 'cash') {
-            return 'Pembayaran berhasil dicatat.';
-        }
-
-        $change = max(((int) ($data['amount_received'] ?? 0)) - $amount, 0);
-
-        return $change > 0
-            ? 'Pembayaran berhasil dicatat. Kembalian: ' . number_format($change, 0, ',', '.')
-            : 'Pembayaran berhasil dicatat.';
+            ->with('success', $messages->success($data, $amount));
     }
 }

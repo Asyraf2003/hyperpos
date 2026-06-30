@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Application\Note\UseCases;
 
 use App\Application\Note\Services\ApplyNoteRevisionAsActiveReplacement;
-use App\Application\Note\Services\AutoSettleNoteRevisionSurplusRefund;
-use App\Application\Note\Services\BuildCreateNoteRevisionSettlement;
 use App\Application\Note\Services\CreateTransactionWorkspaceInlinePaymentRecorder;
 use App\Application\Note\Services\EditableWorkspaceNoteGuard;
 use App\Application\Note\Services\NoteCurrentRevisionResolver;
@@ -14,7 +12,6 @@ use App\Application\Note\Services\NoteHistoryProjectionService;
 use App\Application\Note\Services\NoteRevisionBootstrapFactory;
 use App\Ports\Out\ClockPort;
 use App\Ports\Out\Note\NoteReaderPort;
-use DateTimeImmutable;
 
 final class CreateNoteRevisionWorkflow
 {
@@ -23,10 +20,8 @@ final class CreateNoteRevisionWorkflow
         private readonly NoteCurrentRevisionResolver $current,
         private readonly NoteRevisionBootstrapFactory $factory,
         private readonly CreateNoteRevisionPayloadNoteBuilder $payloadNotes,
-        private readonly CreateNoteRevisionCommitter $committer,
+        private readonly CreateNoteRevisionSettlementCommitter $settlementCommits,
         private readonly ApplyNoteRevisionAsActiveReplacement $applier,
-        private readonly BuildCreateNoteRevisionSettlement $settlements,
-        private readonly AutoSettleNoteRevisionSurplusRefund $autoSurplusRefund,
         private readonly CreateTransactionWorkspaceInlinePaymentRecorder $payments,
         private readonly CreateNoteRevisionPaymentResultFactory $paymentResults,
         private readonly EditableWorkspaceNoteGuard $guard,
@@ -35,7 +30,9 @@ final class CreateNoteRevisionWorkflow
     ) {
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function execute(
         string $noteRootId,
         array $payload,
@@ -68,14 +65,6 @@ final class CreateNoteRevisionWorkflow
         $this->applier->apply($root, $replacement, $payload['items'] ?? []);
         $paymentSummary = $this->payments->record($root, $payload['inline_payment'] ?? []);
 
-        $settlement = $this->settlements->build(
-            sprintf('%s-settlement', $revisionId),
-            $revisionId,
-            $root->id(),
-            $root->totalRupiah()->amount(),
-            $createdAt,
-        );
-
         $revision = $this->factory->createNextRevision(
             $revisionId,
             $current->id(),
@@ -86,38 +75,20 @@ final class CreateNoteRevisionWorkflow
             $reason,
         );
 
-        $result = $this->committer->commit(
+        $result = $this->settlementCommits->commit(
+            $revisionId,
             $root->id(),
             $current->id(),
+            $root->totalRupiah()->amount(),
             $actorId,
             $reason,
             $revision,
-            $settlement,
+            $payload,
+            $createdAt,
         );
-
-        if ($settlement !== null) {
-            $this->autoSurplusRefund->settle(
-                $settlement,
-                $actorId,
-                $reason,
-                $this->effectiveAt($payload, $createdAt),
-            );
-        }
 
         $this->projection->syncNote($root->id());
 
         return $this->paymentResults->withPaymentSummary($result, $paymentSummary);
-    }
-
-    /** @param array<string, mixed> $payload */
-    private function effectiveAt(array $payload, DateTimeImmutable $fallback): DateTimeImmutable
-    {
-        $date = trim((string) ($payload['note']['transaction_date'] ?? ''));
-
-        if ($date === '') {
-            return $fallback;
-        }
-
-        return new DateTimeImmutable($date);
     }
 }

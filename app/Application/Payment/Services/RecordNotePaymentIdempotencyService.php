@@ -13,13 +13,16 @@ final class RecordNotePaymentIdempotencyService
 
     public function __construct(
         private readonly IdempotencyRecordPort $records,
+        private readonly PaymentIdempotencyScopeResolver $scopes,
     ) {
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function replay(array $payload): ?Result
     {
-        $scope = $this->scope($payload);
+        $scope = $this->scopes->resolve($payload);
 
         if ($scope === null) {
             return null;
@@ -43,33 +46,29 @@ final class RecordNotePaymentIdempotencyService
             ]);
         }
 
-        return Result::success(
-            $record['result_payload']['data'] ?? [],
-            'Pembayaran sudah diproses sebelumnya.',
-        );
+        return Result::success($record['result_payload']['data'] ?? [], 'Pembayaran sudah diproses sebelumnya.');
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function start(array $payload): void
     {
-        $scope = $this->scope($payload);
+        $scope = $this->scopes->resolve($payload);
 
         if ($scope === null) {
             return;
         }
 
-        $this->records->createProcessing(
-            $scope['actor_id'],
-            self::OPERATION,
-            $scope['key'],
-            $scope['hash'],
-        );
+        $this->records->createProcessing($scope['actor_id'], self::OPERATION, $scope['key'], $scope['hash']);
     }
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * @param array<string, mixed> $payload
+     */
     public function succeed(array $payload, string $noteId, Result $result): void
     {
-        $scope = $this->scope($payload);
+        $scope = $this->scopes->resolve($payload);
 
         if ($scope === null) {
             return;
@@ -82,48 +81,5 @@ final class RecordNotePaymentIdempotencyService
             ['data' => $result->data(), 'message' => $result->message()],
             $noteId,
         );
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     * @return array{actor_id:string,key:string,hash:string}|null
-     */
-    private function scope(array $payload): ?array
-    {
-        $key = trim((string) ($payload['idempotency_key'] ?? ''));
-
-        if ($key === '') {
-            return null;
-        }
-
-        $actorId = trim((string) ($payload['_actor_id'] ?? ''));
-
-        return [
-            'actor_id' => $actorId !== '' ? $actorId : 'anonymous',
-            'key' => $key,
-            'hash' => $this->hash($payload),
-        ];
-    }
-
-    /** @param array<string, mixed> $payload */
-    private function hash(array $payload): string
-    {
-        unset($payload['_actor_id'], $payload['idempotency_key']);
-
-        $this->sortRecursive($payload);
-
-        return hash('sha256', json_encode($payload, JSON_THROW_ON_ERROR));
-    }
-
-    /** @param array<string, mixed> $value */
-    private function sortRecursive(array &$value): void
-    {
-        foreach ($value as &$item) {
-            if (is_array($item)) {
-                $this->sortRecursive($item);
-            }
-        }
-
-        ksort($value);
     }
 }
