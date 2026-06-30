@@ -4,7 +4,7 @@
 
 In progress for the broader edit/refund/payment/stock/reporting campaign.
 
-Sub-slices A-I are closed with automated proof.
+Sub-slices A-K are closed with automated proof.
 
 ## Context
 
@@ -44,7 +44,8 @@ Existing tests covered important pieces separately:
 - package component refund/pay-again matrix;
 - transaction/cash/inventory/profit reporting reconciliation.
 - revision duplicate-submit idempotency;
-- refund duplicate-submit idempotency.
+- refund duplicate-submit idempotency;
+- payment duplicate-submit idempotency.
 
 The initial missing proof was a combined regression where a paid or unpaid store-stock transaction crosses edit, payment, refund guard, stock movement, and reports in one scenario. The later hardening added duplicate-submit protection for both revision and primary selected-row refund paths, including real UI hidden-key coverage.
 
@@ -61,6 +62,7 @@ The initial missing proof was a combined regression where a paid or unpaid store
 
 - `app/Application/Payment/UseCases/RecordAndAllocateNotePaymentHandler.php`
 - `app/Application/Payment/Services/RecordAndAllocateNotePaymentOperation.php`
+- `app/Application/Payment/Services/RecordNotePaymentIdempotencyService.php`
 - `app/Application/Note/Policies/NotePaidStatusPolicy.php`
 - `app/Application/Note/Services/NoteOperationalStatusResolver.php`
 
@@ -240,6 +242,35 @@ Coverage:
 - legacy/alternate refund form partial also carries the same hidden key contract;
 - normal UI refund submits activate the backend duplicate-submit guard.
 
+### 0062-J - Primary Customer Payment Duplicate Submit
+
+Test:
+
+- `test_duplicate_payment_submit_with_same_idempotency_key_replays_without_duplicate_cash_in_or_allocation`
+
+Coverage:
+
+- same cashier selected-row payment request is submitted twice with the same `idempotency_key`;
+- second submit replays/no-ops before stale outstanding-row checks reject an already-paid row;
+- only one `customer_payments` row is created;
+- only one `customer_payment_cash_details` row is created;
+- only one `payment_component_allocations` row is created;
+- idempotency record is persisted with operation `record_note_payment`;
+- duplicate submit does not create duplicate cash-in, cash detail, or component allocation.
+
+### 0062-K - Payment Modal UI Sends Payment Idempotency Key
+
+Test:
+
+- `test_detail_payment_modal_uses_simple_create_like_payment_flow`
+
+Coverage:
+
+- note detail payment modal renders a hidden `idempotency_key`;
+- key is generated server-side for normal payment submit;
+- old input key is preserved on validation retry;
+- normal UI payment submits activate the backend duplicate-submit guard.
+
 ## Failing Test Proof
 
 Initial 0062-A run failed before the report COGS production patch:
@@ -383,6 +414,42 @@ Meaning:
 - backend refund idempotency would only work if a key was sent;
 - normal refund modal UI did not send a key, so real double-click/back-button resubmit paths were not protected.
 
+0062-J primary payment duplicate-submit RED:
+
+```bash
+php artisan test tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php --filter=duplicate_payment_submit
+```
+
+Initial RED result:
+
+```text
+Hanya billing row outstanding yang boleh dipilih untuk pembayaran.
+```
+
+Meaning:
+
+- first submit correctly created payment/allocation state;
+- second same-key submit did not replay the completed operation;
+- the request fell through into normal selected-row payment validation and failed against the already-paid row;
+- the stale error avoided duplicate payment rows in this fixture, but did not provide idempotent UX or a stored duplicate-submit contract.
+
+0062-K payment modal UI RED:
+
+```bash
+php artisan test tests/Feature/Note/CashierNoteDetailSimplePaymentModalUxFeatureTest.php --filter=detail_payment_modal_uses_simple_create_like_payment_flow
+```
+
+Initial RED result:
+
+```text
+Expected response to contain: name="idempotency_key"
+```
+
+Meaning:
+
+- backend payment idempotency would only work if a key was sent;
+- normal payment modal UI did not send a key, so real double-click/back-button resubmit paths were not protected.
+
 ## Patch Summary
 
 Production code changed:
@@ -406,6 +473,10 @@ Production code changed:
 - `app/Adapters/In/Http/Controllers/Admin/Note/NoteDetailPageController.php`
 - `resources/views/cashier/notes/partials/refund-modal.blade.php`
 - `resources/views/cashier/notes/partials/refund-form.blade.php`
+- `app/Application/Payment/Services/RecordNotePaymentIdempotencyService.php`
+- `app/Adapters/In/Http/Requests/Note/RecordNotePaymentRequest.php`
+- `app/Adapters/In/Http/Controllers/Note/RecordNotePaymentController.php`
+- `resources/views/cashier/notes/partials/payment-modal.blade.php`
 
 Patch behavior:
 
@@ -422,6 +493,9 @@ Patch behavior:
 - selected-row refund submit supports optional `idempotency_key` with operation `record_selected_rows_refund`;
 - repeated same-key same-payload selected-row refund requests replay success before stale canceled/refunded row checks;
 - normal refund modal submits now emit a hidden idempotency key so backend duplicate-submit protection is active in the real UI path;
+- customer payment submit supports optional `idempotency_key` with operation `record_note_payment`;
+- repeated same-key same-payload payment requests replay success before stale already-paid row checks;
+- normal payment modal submits now emit a hidden idempotency key so backend duplicate-submit protection is active in the real UI path;
 - no inventory movement source type was renamed or re-bucketed.
 
 ## Test Added
@@ -430,6 +504,8 @@ File:
 
 - `tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php`
 - `tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php`
+- `tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php`
+- `tests/Feature/Note/CashierNoteDetailSimplePaymentModalUxFeatureTest.php`
 
 Tests:
 
@@ -442,6 +518,8 @@ Tests:
 - `test_edit_workspace_page_renders_revision_idempotency_key_for_normal_submit`
 - `test_duplicate_refund_submit_with_same_idempotency_key_replays_without_duplicate_cash_or_inventory`
 - `test_refund_modal_renders_idempotency_key_for_normal_submit`
+- `test_duplicate_payment_submit_with_same_idempotency_key_replays_without_duplicate_cash_in_or_allocation`
+- `test_detail_payment_modal_uses_simple_create_like_payment_flow`
 
 ## Regression Proof
 
@@ -544,6 +622,53 @@ PASS
 Tests: 40 passed (489 assertions)
 ```
 
+Focused 0062-J proof:
+
+```bash
+php artisan test tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php --filter=duplicate_payment_submit
+```
+
+Result:
+
+```text
+PASS
+Tests: 1 passed (11 assertions)
+```
+
+Focused 0062-K proof:
+
+```bash
+php artisan test tests/Feature/Note/CashierNoteDetailSimplePaymentModalUxFeatureTest.php --filter=detail_payment_modal_uses_simple_create_like_payment_flow
+```
+
+Result:
+
+```text
+PASS
+Tests: 1 passed (18 assertions)
+```
+
+Payment/edit/refund targeted regression proof:
+
+```bash
+php artisan test \
+  tests/Feature/Note/RecordNotePaymentHttpFeatureTest.php \
+  tests/Feature/Note/CashierNoteDetailSimplePaymentModalUxFeatureTest.php \
+  tests/Feature/Payment/RecordAndAllocateNotePaymentFeatureTest.php \
+  tests/Feature/Payment/RecordSelectedRowsNotePaymentFeatureTest.php \
+  tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php \
+  tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php \
+  tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php \
+  tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+Tests: 33 passed (479 assertions)
+```
+
 Edit/create UI idempotency regression proof:
 
 ```bash
@@ -621,6 +746,8 @@ Tests: 34 passed (457 assertions)
 - Normal edit form submits carry `idempotency_key`, so the backend duplicate-submit guard is active for real UI use.
 - Duplicate selected-row refund submit does not create duplicate cash refund, component allocation, or stock reversal.
 - Normal refund form submits carry `idempotency_key`, so the backend duplicate-submit guard is active for real UI use.
+- Duplicate selected-row payment submit does not create duplicate cash-in, cash detail, or component allocation.
+- Normal payment form submits carry `idempotency_key`, so the backend duplicate-submit guard is active for real UI use.
 - Unpaid note refund attempt is rejected.
 - Refunded store-stock admin correction preserves payment/refund history.
 - Master product price change does not rewrite historical transaction line value.
@@ -637,11 +764,10 @@ Tests: 34 passed (457 assertions)
 
 Not closed by this campaign yet:
 
-- primary customer payment duplicate-submit idempotency audit;
 - package component edit/refund/pay-again matrix beyond the existing package refund/pay-again proof;
 - external purchase/pass-through refund and edit reporting matrix;
 - one-click reason/default UX hardening for edit/refund actions.
 
 ## Final Status
 
-Sub-slices A-I are closed with automated proof. The broader edit/refund/payment/stock/reporting campaign continues through the remaining backlog above.
+Sub-slices A-K are closed with automated proof. The broader edit/refund/payment/stock/reporting campaign continues through the remaining backlog above.
