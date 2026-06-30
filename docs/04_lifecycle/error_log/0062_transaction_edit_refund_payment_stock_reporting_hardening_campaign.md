@@ -178,6 +178,21 @@ Coverage:
 - rejected revision does not create inventory reversal/reissue side effects;
 - reports remain tied to the original transaction/payment/COGS values.
 
+### 0062-F - Paid Store-stock Downward Revision Duplicate Submit
+
+Test:
+
+- `test_paid_store_stock_revision_downward_duplicate_submit_replays_without_duplicate_revision_refund_or_stock`
+
+Coverage:
+
+- same admin downward revision request is submitted twice with the same `idempotency_key`;
+- second submit replays/no-ops instead of creating revision `r003`;
+- only one new revision, one settlement, one refund_due, and one surplus_refund_paid row are created;
+- only one edit reversal is created for the old store-stock line;
+- replacement stock-out is issued once;
+- idempotency record is persisted with operation `create_note_revision`.
+
 ## Failing Test Proof
 
 Initial 0062-A run failed before the report COGS production patch:
