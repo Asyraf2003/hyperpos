@@ -2,9 +2,9 @@
 
 ## Status
 
-Resolved for sub-slices A-E.
+In progress for the broader edit/refund/payment/stock/reporting campaign.
 
-No remaining campaign backlog.
+Sub-slices A-I are closed with automated proof.
 
 ## Context
 
@@ -43,8 +43,10 @@ Existing tests covered important pieces separately:
 - edit after refund preserving historical rows;
 - package component refund/pay-again matrix;
 - transaction/cash/inventory/profit reporting reconciliation.
+- revision duplicate-submit idempotency;
+- refund duplicate-submit idempotency.
 
-The missing proof was a combined regression where a paid or unpaid store-stock transaction crosses edit, payment, refund guard, stock movement, and reports in one scenario.
+The initial missing proof was a combined regression where a paid or unpaid store-stock transaction crosses edit, payment, refund guard, stock movement, and reports in one scenario. The later hardening added duplicate-submit protection for both revision and primary selected-row refund paths, including real UI hidden-key coverage.
 
 ## Source Map
 
@@ -67,6 +69,8 @@ The missing proof was a combined regression where a paid or unpaid store-stock t
 - `app/Adapters/In/Http/Controllers/Note/RecordClosedNoteRefundController.php`
 - `app/Application/Note/Services/SelectedNoteRowsRefundPlanResolver.php`
 - `app/Application/Note/Services/SelectedNoteRowsRefundEligibilityGuard.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundIdempotencyService.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundPlanTransaction.php`
 
 ### Inventory Movement
 
@@ -206,6 +210,36 @@ Coverage:
 - old input key is preserved on validation retry;
 - create workspace hidden idempotency key behavior remains unchanged.
 
+### 0062-H - Primary Selected-row Refund Duplicate Submit
+
+Test:
+
+- `test_duplicate_refund_submit_with_same_idempotency_key_replays_without_duplicate_cash_or_inventory`
+
+Coverage:
+
+- same cashier selected-row refund request is submitted twice with the same `idempotency_key`;
+- second submit replays/no-ops before stale refund eligibility checks can reject an already-canceled row;
+- only one `customer_refunds` row is created;
+- only one `refund_component_allocations` row is created;
+- only one `work_item_store_stock_line_reversal` inventory movement is created;
+- idempotency record is persisted with operation `record_selected_rows_refund`;
+- duplicate submit does not create duplicate cash refund, duplicate component allocation, or duplicate stock reversal.
+
+### 0062-I - Refund Modal UI Sends Refund Idempotency Key
+
+Test:
+
+- `test_refund_modal_renders_idempotency_key_for_normal_submit`
+
+Coverage:
+
+- note detail refund modal renders a hidden `idempotency_key`;
+- key is generated server-side for normal refund submit;
+- old input key is preserved on validation retry;
+- legacy/alternate refund form partial also carries the same hidden key contract;
+- normal UI refund submits activate the backend duplicate-submit guard.
+
 ## Failing Test Proof
 
 Initial 0062-A run failed before the report COGS production patch:
@@ -313,6 +347,42 @@ Meaning:
 - backend revision idempotency was available only if a key was sent;
 - normal edit UI did not send a key, so double-click protection was not active from the real form.
 
+0062-H primary refund duplicate-submit RED:
+
+```bash
+php artisan test tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php --filter=duplicate_refund_submit
+```
+
+Initial RED result:
+
+```text
+Session has unexpected errors: Line yang sudah batal/refund tidak boleh dipilih lagi.
+```
+
+Meaning:
+
+- first submit correctly created refund/cancel/reversal state;
+- second same-key submit did not replay the completed operation;
+- the request fell through into normal refund eligibility and failed against the already-canceled row;
+- the stale error avoided duplicate refund rows in this fixture, but did not provide idempotent UX or a stored duplicate-submit contract.
+
+0062-I refund modal UI RED:
+
+```bash
+php artisan test tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php --filter=refund_modal_renders_idempotency_key
+```
+
+Initial RED result:
+
+```text
+Expected response to contain: name="idempotency_key"
+```
+
+Meaning:
+
+- backend refund idempotency would only work if a key was sent;
+- normal refund modal UI did not send a key, so real double-click/back-button resubmit paths were not protected.
+
 ## Patch Summary
 
 Production code changed:
@@ -328,6 +398,14 @@ Production code changed:
 - `app/Adapters/In/Http/Controllers/Cashier/Note/EditTransactionWorkspacePageController.php`
 - `resources/views/cashier/notes/workspace/create.blade.php`
 - `app/Adapters/Out/Reporting/Queries/DashboardOperationalPerformance/RefundPerDayQuery.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundIdempotencyService.php`
+- `app/Application/Payment/Services/RecordSelectedRowsRefundPlanTransaction.php`
+- `app/Adapters/In/Http/Requests/Note/RecordClosedNoteRefundRequest.php`
+- `app/Adapters/In/Http/Controllers/Note/RecordClosedNoteRefundController.php`
+- `app/Adapters/In/Http/Controllers/Cashier/Note/NoteDetailPageController.php`
+- `app/Adapters/In/Http/Controllers/Admin/Note/NoteDetailPageController.php`
+- `resources/views/cashier/notes/partials/refund-modal.blade.php`
+- `resources/views/cashier/notes/partials/refund-form.blade.php`
 
 Patch behavior:
 
@@ -341,6 +419,9 @@ Patch behavior:
 - revision submit supports optional `idempotency_key` with operation `create_note_revision`;
 - repeated same-key same-payload revision requests return the stored success result without mutating note, stock, settlement, refund_due, or refund_paid again;
 - edit workspace page now emits a hidden idempotency key so normal UI submits activate the backend guard;
+- selected-row refund submit supports optional `idempotency_key` with operation `record_selected_rows_refund`;
+- repeated same-key same-payload selected-row refund requests replay success before stale canceled/refunded row checks;
+- normal refund modal submits now emit a hidden idempotency key so backend duplicate-submit protection is active in the real UI path;
 - no inventory movement source type was renamed or re-bucketed.
 
 ## Test Added
@@ -348,6 +429,7 @@ Patch behavior:
 File:
 
 - `tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php`
+- `tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php`
 
 Tests:
 
@@ -358,6 +440,8 @@ Tests:
 - `test_store_stock_transaction_keeps_historical_line_price_after_master_product_price_change`
 - `test_paid_store_stock_revision_downward_duplicate_submit_replays_without_duplicate_revision_refund_or_stock`
 - `test_edit_workspace_page_renders_revision_idempotency_key_for_normal_submit`
+- `test_duplicate_refund_submit_with_same_idempotency_key_replays_without_duplicate_cash_or_inventory`
+- `test_refund_modal_renders_idempotency_key_for_normal_submit`
 
 ## Regression Proof
 
@@ -411,6 +495,53 @@ Result:
 ```text
 PASS
 Tests: 1 passed (6 assertions)
+```
+
+Focused 0062-H proof:
+
+```bash
+php artisan test tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php --filter=duplicate_refund_submit
+```
+
+Result:
+
+```text
+PASS
+Tests: 1 passed (11 assertions)
+```
+
+Focused 0062-I proof:
+
+```bash
+php artisan test tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php --filter=refund_modal_renders_idempotency_key
+```
+
+Result:
+
+```text
+PASS
+Tests: 1 passed (4 assertions)
+```
+
+Primary refund idempotency regression proof:
+
+```bash
+php artisan test \
+  tests/Feature/Note/RecordClosedNoteRefundControllerFeatureTest.php \
+  tests/Feature/Payment/RecordSelectedRowsClosedNoteRefundHttpFeatureTest.php \
+  tests/Feature/Payment/RecordSelectedRowsCustomerRefundFeatureTest.php \
+  tests/Feature/Payment/RecordCustomerRefundFeatureTest.php \
+  tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php \
+  tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php \
+  tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php \
+  tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+Tests: 40 passed (489 assertions)
 ```
 
 Edit/create UI idempotency regression proof:
@@ -488,6 +619,8 @@ Tests: 34 passed (457 assertions)
 - Paid edit downward preserves old payment, creates refund-due, records default surplus refund paid, and does not treat surplus as profit.
 - Duplicate paid downward edit submit does not create duplicate revision, stock correction, settlement, refund_due, or refund_paid rows.
 - Normal edit form submits carry `idempotency_key`, so the backend duplicate-submit guard is active for real UI use.
+- Duplicate selected-row refund submit does not create duplicate cash refund, component allocation, or stock reversal.
+- Normal refund form submits carry `idempotency_key`, so the backend duplicate-submit guard is active for real UI use.
 - Unpaid note refund attempt is rejected.
 - Refunded store-stock admin correction preserves payment/refund history.
 - Master product price change does not rewrite historical transaction line value.
@@ -500,10 +633,15 @@ Tests: 34 passed (457 assertions)
 - Transaction summary/cash ledger current report uses capped current allocations.
 - Gross customer payment history remains preserved in `customer_payments`.
 
-## Backlog
+## Remaining Backlog
 
-No remaining backlog for this campaign.
+Not closed by this campaign yet:
+
+- primary customer payment duplicate-submit idempotency audit;
+- package component edit/refund/pay-again matrix beyond the existing package refund/pay-again proof;
+- external purchase/pass-through refund and edit reporting matrix;
+- one-click reason/default UX hardening for edit/refund actions.
 
 ## Final Status
 
-Sub-slices A-E are closed with automated proof.
+Sub-slices A-I are closed with automated proof. The broader edit/refund/payment/stock/reporting campaign continues through the remaining backlog above.
