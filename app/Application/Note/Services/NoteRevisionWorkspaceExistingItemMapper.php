@@ -27,9 +27,18 @@ final class NoteRevisionWorkspaceExistingItemMapper
      */
     public function mapMany(NoteRevision $revision): array
     {
+        return $this->mapLines($revision->lines());
+    }
+
+    /**
+     * @param list<NoteRevisionLineSnapshot> $lines
+     * @return list<array<string, mixed>>
+     */
+    public function mapLines(array $lines): array
+    {
         $items = [];
 
-        foreach ($revision->lines() as $line) {
+        foreach ($lines as $line) {
             $items[] = $this->mapLine($line);
         }
 
