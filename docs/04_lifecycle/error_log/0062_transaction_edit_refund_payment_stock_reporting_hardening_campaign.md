@@ -2,9 +2,9 @@
 
 ## Status
 
-Resolved for sub-slices A-D.
+Resolved for sub-slices A-E.
 
-Sub-slice E remains backlog.
+No remaining campaign backlog.
 
 ## Context
 
@@ -158,6 +158,22 @@ Coverage:
 - note projection keeps current outstanding state while preserving refund totals;
 - transaction summary, cash ledger, inventory movement, and operational profit reconcile the payment/refund/edit timeline.
 
+### 0062-E - Store-stock Master Price Change Historical Stability
+
+Test:
+
+- `test_store_stock_transaction_keeps_historical_line_price_after_master_product_price_change`
+
+Coverage:
+
+- changing `products.harga_jual` after transaction does not rewrite existing note total;
+- existing store-stock line total remains the transaction snapshot amount;
+- transaction summary and operational profit continue reading historical transaction truth;
+- attempted revision with old lower snapshot price is rejected by current minimum selling price guard;
+- rejected revision does not create extra note revision;
+- rejected revision does not create inventory reversal/reissue side effects;
+- reports remain tied to the original transaction/payment/COGS values.
+
 ## Failing Test Proof
 
 Initial 0062-A run failed before production patch:
@@ -221,6 +237,7 @@ Tests:
 - `test_paid_store_stock_revision_downward_preserves_payment_creates_surplus_policy_and_reconciles_reports`
 - `test_unpaid_store_stock_note_rejects_refund_but_allows_revision_without_cash_or_inventory_refund_side_effect`
 - `test_refunded_store_stock_note_revision_preserves_refund_history_and_reconciles_reports_without_double_reversal`
+- `test_store_stock_transaction_keeps_historical_line_price_after_master_product_price_change`
 
 ## Regression Proof
 
@@ -234,7 +251,7 @@ Result:
 
 ```text
 PASS
-Tests: 4 passed (213 assertions)
+Tests: 5 passed (241 assertions)
 ```
 
 Targeted domain baseline proof:
@@ -268,6 +285,8 @@ Tests: 27 passed (321 assertions)
 - Paid edit downward preserves old payment and creates surplus policy state.
 - Unpaid note refund attempt is rejected.
 - Refunded store-stock admin correction preserves payment/refund history.
+- Master product price change does not rewrite historical transaction line value.
+- Revision below current master minimum price is rejected without financial/stock side effects.
 - Store-stock edit uses revision reversal/reissue, not refund reversal.
 - Refund reversal remains `work_item_store_stock_line_reversal`.
 - Edit reversal remains `transaction_workspace_updated`.
@@ -277,16 +296,8 @@ Tests: 27 passed (321 assertions)
 
 ## Backlog
 
-### 0062-E
-
-Store-stock master product price changed after transaction:
-
-- historical transaction line price remains stable;
-- report/profit does not follow changed master price;
-- edit policy remains explicit.
+No remaining backlog for this campaign.
 
 ## Final Status
 
-Sub-slices A-D are closed with automated proof.
-
-Sub-slice E is intentionally deferred to keep this campaign controlled and readable.
+Sub-slices A-E are closed with automated proof.
