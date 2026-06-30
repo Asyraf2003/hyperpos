@@ -134,6 +134,107 @@ final class NoteEditRefundSettlementDecisionPolicyTest extends TestCase
         );
     }
 
+    public function test_fully_refunded_note_edit_preloads_no_old_lines_allows_new_current_line_and_preserves_shadow_history(): void
+    {
+        $admin = $this->loginAsAuthorizedAdmin();
+        $this->seedFullyRefundablePaidProductNote();
+
+        $this->actingAs($admin)
+            ->from(route('admin.notes.show', ['noteId' => 'note-0042-full']))
+            ->post(route('admin.notes.refunds.store', ['noteId' => 'note-0042-full']), [
+                'selected_row_ids' => ['wi-0042-full-a', 'wi-0042-full-b'],
+                'refunded_at' => '2026-06-30',
+                'reason' => 'ADR-0042 full refund before new edit.',
+            ])
+            ->assertRedirect(route('admin.notes.index'))
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
+
+        self::assertSame(0, (int) DB::table('notes')->where('id', 'note-0042-full')->value('total_rupiah'));
+        self::assertSame(30000, (int) DB::table('customer_refunds')->where('note_id', 'note-0042-full')->sum('amount_rupiah'));
+        self::assertSame(2, DB::table('refund_component_allocations')->where('note_id', 'note-0042-full')->count());
+
+        $editResponse = $this->actingAs($admin)
+            ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-0042-full']));
+
+        $editResponse->assertOk();
+
+        $oldItems = $this->extractWorkspaceOldItems($editResponse->getContent());
+        self::assertSame([], $oldItems, 'Fully refunded note edit must open with no old editable draft lines.');
+
+        $this->actingAs($admin)
+            ->patch(route('admin.notes.workspace.update', ['noteId' => 'note-0042-full']), [
+                'note' => [
+                    'customer_name' => 'ADR 0042 Fully Refunded Revised',
+                    'customer_phone' => '08123456789',
+                    'transaction_date' => '2026-06-30',
+                ],
+                'reason' => 'ADR-0042 add new current line after full refund.',
+                'items' => [
+                    [
+                        'entry_mode' => 'product',
+                        'description' => null,
+                        'part_source' => 'store_stock',
+                        'service' => [
+                            'name' => null,
+                            'price_rupiah' => null,
+                            'notes' => null,
+                        ],
+                        'product_lines' => [
+                            [
+                                'product_id' => 'product-0042-new',
+                                'qty' => 1,
+                                'unit_price_rupiah' => 45000,
+                                'price_basis' => 'current_catalog',
+                            ],
+                        ],
+                        'external_purchase_lines' => [],
+                    ],
+                ],
+                'inline_payment' => [
+                    'decision' => 'skip',
+                    'payment_method' => null,
+                    'paid_at' => null,
+                    'amount_paid_rupiah' => null,
+                    'amount_received_rupiah' => null,
+                ],
+            ])
+            ->assertRedirect(route('admin.notes.show', ['noteId' => 'note-0042-full']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'note_id' => 'note-0042-full',
+            'work_item_id' => 'wi-0042-full-a',
+            'refunded_amount_rupiah' => 10000,
+        ]);
+        $this->assertDatabaseHas('refund_component_allocations', [
+            'note_id' => 'note-0042-full',
+            'work_item_id' => 'wi-0042-full-b',
+            'refunded_amount_rupiah' => 20000,
+        ]);
+        self::assertSame(2, DB::table('refund_component_allocations')->where('note_id', 'note-0042-full')->count());
+        self::assertSame(30000, (int) DB::table('customer_refunds')->where('note_id', 'note-0042-full')->sum('amount_rupiah'));
+
+        $newWorkItemId = (string) DB::table('work_items')
+            ->where('note_id', 'note-0042-full')
+            ->whereNotIn('id', ['wi-0042-full-a', 'wi-0042-full-b'])
+            ->value('id');
+
+        self::assertNotSame('', $newWorkItemId);
+
+        $detail = app(NoteDetailPageDataBuilder::class)->build('note-0042-full');
+        self::assertIsArray($detail);
+        self::assertTrue($this->detailRowsContain($detail['note']['rows'], 'New Current Product'));
+        self::assertTrue(
+            $this->revisionTimelineContains($detail['note']['revision_timeline']['timeline'] ?? [], 'Full Refund Product A'),
+            'Full-refund shadow line A must remain visible through history after a new active line is added.'
+        );
+        self::assertTrue(
+            $this->revisionTimelineContains($detail['note']['revision_timeline']['timeline'] ?? [], 'Full Refund Product B'),
+            'Full-refund shadow line B must remain visible through history after a new active line is added.'
+        );
+    }
+
     /**
      * @return list<array<string, mixed>>
      */
@@ -258,6 +359,66 @@ final class NoteEditRefundSettlementDecisionPolicyTest extends TestCase
                 'component_amount_rupiah_snapshot' => 30000,
                 'allocated_amount_rupiah' => 30000,
                 'allocation_priority' => 3,
+            ],
+        ]);
+    }
+
+    private function seedFullyRefundablePaidProductNote(): void
+    {
+        $noteId = 'note-0042-full';
+        $date = '2026-06-30';
+
+        $this->seedNotePaymentProduct('product-0042-full-a', 'ADR42-A', 'Full Refund Product A', 'ADR', 100, 10000);
+        $this->seedNotePaymentProduct('product-0042-full-b', 'ADR42-B', 'Full Refund Product B', 'ADR', 100, 20000);
+        $this->seedNotePaymentProduct('product-0042-new', 'ADR42-N', 'New Current Product', 'ADR', 100, 45000);
+        $this->seedInventory('product-0042-full-a', 10);
+        $this->seedInventory('product-0042-full-b', 10);
+        $this->seedInventory('product-0042-new', 10);
+
+        $this->seedNoteBase($noteId, 'ADR 0042 Fully Refunded', $date, 30000, 'closed');
+
+        $this->seedWorkItemBase('wi-0042-full-a', $noteId, 1, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 10000);
+        $this->seedStoreStockLineBase('ssl-0042-full-a', 'wi-0042-full-a', 'product-0042-full-a', 1, 10000);
+
+        $this->seedWorkItemBase('wi-0042-full-b', $noteId, 2, WorkItem::TYPE_STORE_STOCK_SALE_ONLY, WorkItem::STATUS_OPEN, 20000);
+        $this->seedStoreStockLineBase('ssl-0042-full-b', 'wi-0042-full-b', 'product-0042-full-b', 1, 20000);
+
+        $this->seedCurrentRevision(
+            $noteId,
+            $noteId . '-r001',
+            'ADR 0042 Fully Refunded',
+            null,
+            $date,
+            30000,
+            [
+                $this->productRevisionLine($noteId . '-r001-line-01', 'wi-0042-full-a', 'ssl-0042-full-a', 1, 'product-0042-full-a', 'Full Refund Product A', 10000),
+                $this->productRevisionLine($noteId . '-r001-line-02', 'wi-0042-full-b', 'ssl-0042-full-b', 2, 'product-0042-full-b', 'Full Refund Product B', 20000),
+            ],
+        );
+
+        $this->seedCustomerPaymentBase('payment-0042-full', 30000, $date);
+        DB::table('payment_component_allocations')->insert([
+            [
+                'id' => 'pca-0042-full-a',
+                'customer_payment_id' => 'payment-0042-full',
+                'note_id' => $noteId,
+                'work_item_id' => 'wi-0042-full-a',
+                'component_type' => PaymentComponentType::PRODUCT_ONLY_WORK_ITEM,
+                'component_ref_id' => 'wi-0042-full-a',
+                'component_amount_rupiah_snapshot' => 10000,
+                'allocated_amount_rupiah' => 10000,
+                'allocation_priority' => 1,
+            ],
+            [
+                'id' => 'pca-0042-full-b',
+                'customer_payment_id' => 'payment-0042-full',
+                'note_id' => $noteId,
+                'work_item_id' => 'wi-0042-full-b',
+                'component_type' => PaymentComponentType::PRODUCT_ONLY_WORK_ITEM,
+                'component_ref_id' => 'wi-0042-full-b',
+                'component_amount_rupiah_snapshot' => 20000,
+                'allocated_amount_rupiah' => 20000,
+                'allocation_priority' => 2,
             ],
         ]);
     }
