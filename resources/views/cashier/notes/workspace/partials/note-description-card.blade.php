@@ -22,7 +22,8 @@
                     rows="3"
                     class="form-control @error('reason') is-invalid @enderror"
                     placeholder="Contoh: salah input harga, revisi item, atau koreksi setelah review"
-                >{{ old('reason') }}</textarea>
+                    required
+                >{{ old('reason', 'Revisi nota via workspace') }}</textarea>
                 @error('reason')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

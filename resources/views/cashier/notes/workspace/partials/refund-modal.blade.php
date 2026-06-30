@@ -82,7 +82,7 @@
                                 class="form-control"
                                 placeholder="Jelaskan alasan pengembalian dana"
                                 required
-                            >{{ old('reason') }}</textarea>
+                            >{{ old('reason', 'Pengembalian dana / pembatalan rincian') }}</textarea>
                         </div>
                     </div>
 

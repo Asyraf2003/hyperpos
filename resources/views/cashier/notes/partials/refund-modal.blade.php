@@ -83,7 +83,7 @@
                       type="text"
                       id="note-refund-reason"
                       name="reason"
-                      value="{{ old('reason') }}"
+                      value="{{ old('reason', 'Pengembalian dana / pembatalan rincian') }}"
                       class="form-control"
                       required
                       autocomplete="off"
