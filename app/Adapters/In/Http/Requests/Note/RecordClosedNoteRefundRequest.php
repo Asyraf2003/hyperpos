@@ -23,6 +23,7 @@ final class RecordClosedNoteRefundRequest extends FormRequest
             'selected_row_ids.*' => ['string', 'distinct'],
             'refunded_at' => ['required', 'date_format:Y-m-d'],
             'reason' => ['required', 'string', 'max:500'],
+            'idempotency_key' => ['nullable', 'string', 'max:120'],
         ];
     }
 }
