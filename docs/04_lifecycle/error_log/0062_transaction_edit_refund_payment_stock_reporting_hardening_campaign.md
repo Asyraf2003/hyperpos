@@ -117,11 +117,15 @@ Coverage:
 - original gross payment preserved;
 - current component allocations capped to revised total;
 - revision settlement records `overpaid_pending` surplus;
-- pending refund-due action remains visible through surplus action builder;
-- no customer refund or surplus refund payment is created automatically;
+- default revision workflow creates `refund_due` for the surplus;
+- default revision workflow records immediate `surplus_refund_paid` through the existing surplus refund payment ledger;
+- no pending refund-due or refund-paid action remains after the default auto-settlement;
+- no legacy `customer_refunds` row is created for revision surplus;
 - edit reversal and replacement issue are distinct from refund reversal;
 - transaction summary and cash ledger use current capped allocation;
-- operational profit and dashboard use real cash-in and net replacement COGS.
+- transaction summary exposes `refund_due_rupiah`, `surplus_refund_paid_rupiah`, and zero remaining refund due;
+- cash ledger reports the surplus refund paid as a cash outflow;
+- operational profit and dashboard exclude the returned surplus from profit.
 
 ### 0062-C - Unpaid Store-stock Refund Attempt And Edit
 
@@ -176,7 +180,7 @@ Coverage:
 
 ## Failing Test Proof
 
-Initial 0062-A run failed before production patch:
+Initial 0062-A run failed before the report COGS production patch:
 
 ```bash
 php artisan test tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php
@@ -210,12 +214,50 @@ Dashboard operational performance had the same drift in `StoreStockCogsPerDayQue
 
 The inventory engine was not changed. The bug was report COGS interpretation of existing edit reversal movement.
 
+Later 0062-B was tightened after owner policy clarification:
+
+```bash
+php artisan test tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php --filter=paid_store_stock_revision_downward
+```
+
+Initial RED result:
+
+```text
+Failed asserting that two strings are not identical.
+
+tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php:321
+```
+
+Meaning:
+
+- paid downward revision created `overpaid_pending` settlement;
+- but no `note_revision_surplus_dispositions` refund-due row was written;
+- therefore the surplus existed only as a pending action, not as committed customer-money obligation.
+
+After auto-settlement was added, the same test exposed a dashboard mismatch:
+
+```text
+Failed asserting that 270000 is identical to 170000.
+
+tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php:440
+```
+
+Meaning:
+
+- transaction report, cash ledger, and operational profit summary already read surplus refund paid correctly;
+- dashboard refund aggregation still read only legacy `customer_refunds`;
+- dashboard profit could still include returned surplus as profit.
+
 ## Patch Summary
 
 Production code changed:
 
 - `app/Adapters/Out/Reporting/Queries/OperationalProfit/ProductCostMetricQuery.php`
 - `app/Adapters/Out/Reporting/Queries/DashboardOperationalPerformance/StoreStockCogsPerDayQuery.php`
+- `app/Application/Note/Services/AutoSettleNoteRevisionSurplusRefund.php`
+- `app/Application/Note/UseCases/CreateNoteRevisionWorkflow.php`
+- `app/Providers/InfrastructureServiceProvider.php`
+- `app/Adapters/Out/Reporting/Queries/DashboardOperationalPerformance/RefundPerDayQuery.php`
 
 Patch behavior:
 
@@ -223,6 +265,9 @@ Patch behavior:
 - refund reversal still offsets COGS;
 - edit/revision reversal `transaction_workspace_updated` now also offsets COGS;
 - cross-period negative COGS behavior remains valid because existing tests still pass;
+- paid downward revision surplus now creates refund-due and immediate surplus-refund-paid records inside the revision transaction;
+- surplus auto-settlement writes canonical `audit_events` and keeps FK-backed audit links;
+- cash ledger and dashboard refund aggregation both include `note_revision_surplus_refund_payments`;
 - no inventory movement source type was renamed or re-bucketed.
 
 ## Test Added
@@ -251,7 +296,20 @@ Result:
 
 ```text
 PASS
-Tests: 5 passed (241 assertions)
+Tests: 5 passed (245 assertions)
+```
+
+Focused 0062-B proof after owner policy clarification:
+
+```bash
+php artisan test tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php --filter=paid_store_stock_revision_downward
+```
+
+Result:
+
+```text
+PASS
+Tests: 1 passed (62 assertions)
 ```
 
 Targeted domain baseline proof:
@@ -274,7 +332,7 @@ Result:
 
 ```text
 PASS
-Tests: 27 passed (321 assertions)
+Tests: 31 passed (397 assertions)
 ```
 
 ## Financial And Stock Invariants Locked
@@ -282,7 +340,7 @@ Tests: 27 passed (321 assertions)
 - Refund is not edit.
 - Edit is not refund.
 - Paid edit upward creates outstanding delta; it does not erase old payment.
-- Paid edit downward preserves old payment and creates surplus policy state.
+- Paid edit downward preserves old payment, creates refund-due, records default surplus refund paid, and does not treat surplus as profit.
 - Unpaid note refund attempt is rejected.
 - Refunded store-stock admin correction preserves payment/refund history.
 - Master product price change does not rewrite historical transaction line value.
@@ -291,6 +349,7 @@ Tests: 27 passed (321 assertions)
 - Refund reversal remains `work_item_store_stock_line_reversal`.
 - Edit reversal remains `transaction_workspace_updated`.
 - Operational profit and dashboard COGS use net replacement COGS after edit reversal.
+- Dashboard refund/profit reads surplus refund paid cash-out, not only legacy customer refunds.
 - Transaction summary/cash ledger current report uses capped current allocations.
 - Gross customer payment history remains preserved in `customer_payments`.
 
