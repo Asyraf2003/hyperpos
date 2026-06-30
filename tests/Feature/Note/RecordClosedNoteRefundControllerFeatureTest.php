@@ -112,6 +112,23 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         ]);
     }
 
+    public function test_refund_modal_renders_idempotency_key_for_normal_submit(): void
+    {
+        $user = $this->seedKasir();
+        $this->seedClosedPaidProductOnlyNote();
+
+        $response = $this->actingAs($user)
+            ->get(route('cashier.notes.show', ['noteId' => 'note-1']));
+
+        $response->assertOk();
+        $response->assertSee('id="note-refund-form"', false);
+        $response->assertSee('name="idempotency_key"', false);
+        self::assertMatchesRegularExpression(
+            '/<input[^>]+type="hidden"[^>]+name="idempotency_key"[^>]+value="[^"]{8,}"/',
+            (string) $response->getContent(),
+        );
+    }
+
 
     public function test_cashier_cannot_record_refund_for_historical_note_outside_cashier_access_window(): void
     {
