@@ -756,6 +756,120 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
         self::assertSame(10000, $profitRow['cash_operational_profit_rupiah']);
     }
 
+    public function test_store_stock_transaction_keeps_historical_line_price_after_master_product_price_change(): void
+    {
+        $this->seedStoreStockProduct();
+
+        $create = app(CreateTransactionWorkspaceHandler::class)->handle($this->createPaidStoreStockPayload());
+
+        self::assertTrue($create->isSuccess(), $create->message());
+
+        $noteId = (string) ($create->data()['note']['id'] ?? '');
+        self::assertNotSame('', $noteId);
+
+        $oldWorkItemId = (string) DB::table('work_items')->where('note_id', $noteId)->value('id');
+        $oldStoreStockLineId = (string) DB::table('work_item_store_stock_lines')
+            ->where('work_item_id', $oldWorkItemId)
+            ->value('id');
+
+        self::assertNotSame('', $oldWorkItemId);
+        self::assertNotSame('', $oldStoreStockLineId);
+
+        DB::table('products')
+            ->where('id', 'product-0062-a')
+            ->update(['harga_jual' => 999999]);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => $noteId,
+            'total_rupiah' => 250000,
+        ]);
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'id' => $oldStoreStockLineId,
+            'product_id' => 'product-0062-a',
+            'qty' => 2,
+            'line_total_rupiah' => 200000,
+        ]);
+        $this->assertDatabaseMissing('work_item_store_stock_lines', [
+            'id' => $oldStoreStockLineId,
+            'line_total_rupiah' => 1999998,
+        ]);
+
+        $beforeRevisionTransaction = app(GetTransactionReportDatasetHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+        $beforeRevisionProfit = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+
+        self::assertTrue($beforeRevisionTransaction->isSuccess());
+        self::assertTrue($beforeRevisionProfit->isSuccess());
+        self::assertSame(250000, $beforeRevisionTransaction->data()['summary']['gross_transaction_rupiah']);
+        self::assertSame(250000, $beforeRevisionTransaction->data()['summary']['allocated_payment_rupiah']);
+        self::assertSame(80000, $beforeRevisionProfit->data()['row']['store_stock_cogs_rupiah']);
+
+        $revision = app(CreateNoteRevisionHandler::class)->handle(
+            $noteId,
+            $this->masterPriceSnapshotRevisionPayload(),
+            'admin-0062-e',
+            false,
+        );
+
+        self::assertTrue($revision->isSuccess(), $revision->message());
+
+        $newStoreStockLineId = (string) DB::table('inventory_movements')
+            ->where('product_id', 'product-0062-a')
+            ->where('movement_type', 'stock_out')
+            ->where('source_type', 'work_item_store_stock_line')
+            ->where('tanggal_mutasi', '2026-05-23')
+            ->where('qty_delta', -1)
+            ->where('total_cost_rupiah', -40000)
+            ->where('source_id', '<>', $oldStoreStockLineId)
+            ->value('source_id');
+
+        self::assertNotSame('', $newStoreStockLineId);
+
+        $this->assertDatabaseHas('notes', [
+            'id' => $noteId,
+            'total_rupiah' => 150000,
+        ]);
+        $this->assertDatabaseHas('work_item_store_stock_lines', [
+            'id' => $newStoreStockLineId,
+            'product_id' => 'product-0062-a',
+            'qty' => 1,
+            'line_total_rupiah' => 100000,
+        ]);
+        $this->assertDatabaseMissing('work_item_store_stock_lines', [
+            'id' => $newStoreStockLineId,
+            'line_total_rupiah' => 999999,
+        ]);
+        $this->assertDatabaseHas('note_revision_settlements', [
+            'note_revision_id' => $noteId . '-r002',
+            'note_root_id' => $noteId,
+            'gross_total_rupiah' => 150000,
+            'carry_forward_paid_rupiah' => 250000,
+            'net_paid_rupiah' => 250000,
+            'outstanding_rupiah' => 0,
+            'surplus_rupiah' => 100000,
+            'settlement_status' => 'overpaid_pending',
+        ]);
+
+        $transaction = app(GetTransactionReportDatasetHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+        $cashLedger = app(TransactionCashLedgerReportingQuery::class)
+            ->reconciliation('2026-05-01', '2026-05-31');
+        $profit = app(GetOperationalProfitSummaryHandler::class)
+            ->handle('2026-05-01', '2026-05-31');
+
+        self::assertTrue($transaction->isSuccess());
+        self::assertTrue($profit->isSuccess());
+
+        self::assertSame(150000, $transaction->data()['summary']['gross_transaction_rupiah']);
+        self::assertSame(150000, $transaction->data()['summary']['allocated_payment_rupiah']);
+        self::assertSame(0, $transaction->data()['summary']['outstanding_rupiah']);
+        self::assertSame(150000, $cashLedger['total_in_rupiah']);
+        self::assertSame(250000, $profit->data()['row']['cash_in_rupiah']);
+        self::assertSame(40000, $profit->data()['row']['store_stock_cogs_rupiah']);
+        self::assertSame(210000, $profit->data()['row']['cash_operational_profit_rupiah']);
+    }
+
     private function seedStoreStockProduct(): void
     {
         DB::table('products')->insert([
@@ -1017,6 +1131,43 @@ final class TransactionEditRefundPaymentStockReportingHardeningTest extends Test
                 'part_source' => 'store_stock',
                 'service' => [
                     'name' => 'Servis 0062 D Revised',
+                    'price_rupiah' => 50000,
+                    'notes' => null,
+                ],
+                'product_lines' => [[
+                    'product_id' => 'product-0062-a',
+                    'qty' => 1,
+                    'unit_price_rupiah' => 100000,
+                    'price_basis' => 'revision_snapshot',
+                ]],
+                'external_purchase_lines' => [],
+            ]],
+            'inline_payment' => [
+                'decision' => 'skip',
+                'payment_method' => null,
+                'paid_at' => null,
+                'amount_paid_rupiah' => null,
+                'amount_received_rupiah' => null,
+            ],
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function masterPriceSnapshotRevisionPayload(): array
+    {
+        return [
+            'reason' => '0062-E master product price changed after transaction.',
+            'note' => [
+                'customer_name' => 'Budi 0062 E Revised',
+                'customer_phone' => '08123456789',
+                'transaction_date' => '2026-05-23',
+            ],
+            'items' => [[
+                'entry_mode' => 'service',
+                'description' => null,
+                'part_source' => 'store_stock',
+                'service' => [
+                    'name' => 'Servis 0062 E Revised',
                     'price_rupiah' => 50000,
                     'notes' => null,
                 ],
