@@ -10,6 +10,11 @@
       <form method="POST" action="{{ $refundModalConfig['action'] ?? $refundAction }}" id="note-refund-form">
         @csrf
         <div id="note-refund-hidden-selected-rows"></div>
+        <input
+          type="hidden"
+          name="idempotency_key"
+          value="{{ old('idempotency_key', $refundModalConfig['idempotency_key'] ?? '') }}"
+        >
         <input type="hidden" id="refund_amount_rupiah" value="">
 
         <div class="modal-body">
