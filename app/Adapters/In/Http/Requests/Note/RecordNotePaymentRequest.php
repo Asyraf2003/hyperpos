@@ -31,6 +31,7 @@ final class RecordNotePaymentRequest extends FormRequest
             'paid_at' => ['required', 'date_format:Y-m-d'],
             'amount_paid' => ['nullable', 'integer', 'min:1'],
             'amount_received' => ['nullable', 'integer', 'min:1'],
+            'idempotency_key' => ['nullable', 'string', 'max:120'],
         ];
     }
 

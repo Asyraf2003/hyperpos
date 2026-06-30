@@ -7,6 +7,7 @@ namespace App\Adapters\In\Http\Controllers\Note;
 use App\Adapters\In\Http\Controllers\Note\Support\NoteRouteAreaResolver;
 use App\Adapters\In\Http\Requests\Note\RecordNotePaymentRequest;
 use App\Application\Note\Services\SelectedNoteRowsPaymentAmountResolver;
+use App\Application\Payment\Services\RecordNotePaymentIdempotencyService;
 use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
@@ -18,9 +19,28 @@ final class RecordNotePaymentController extends Controller
         RecordNotePaymentRequest $request,
         SelectedNoteRowsPaymentAmountResolver $selectedRowsResolver,
         RecordAndAllocateNotePaymentHandler $flow,
+        RecordNotePaymentIdempotencyService $idempotency,
         NoteRouteAreaResolver $routes,
     ): RedirectResponse {
         $data = $request->validated();
+
+        $user = $request->user();
+        $idempotencyPayload = $data + [
+            '_actor_id' => $user !== null ? (string) $user->getAuthIdentifier() : '',
+            '_note_id' => trim($noteId),
+        ];
+
+        $replayed = $idempotency->replay($idempotencyPayload);
+
+        if ($replayed !== null) {
+            if ($replayed->isFailure()) {
+                return back()->withErrors(['payment' => $replayed->message() ?? 'Pembayaran gagal dicatat.'])->withInput();
+            }
+
+            return redirect()
+                ->route($routes->showRoute($request), ['noteId' => $noteId])
+                ->with('success', $replayed->message() ?? 'Pembayaran berhasil dicatat.');
+        }
 
         $selectedRowIds = is_array($data['selected_row_ids'] ?? null)
             ? array_values($data['selected_row_ids'])
@@ -53,6 +73,7 @@ final class RecordNotePaymentController extends Controller
             $selectedRowIds,
             $paymentMethod,
             $amountReceived,
+            $idempotencyPayload,
         );
 
         if ($result->isFailure()) {
