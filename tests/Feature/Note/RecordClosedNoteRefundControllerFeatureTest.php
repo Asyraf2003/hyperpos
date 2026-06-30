@@ -123,6 +123,7 @@ final class RecordClosedNoteRefundControllerFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('id="note-refund-form"', false);
         $response->assertSee('name="idempotency_key"', false);
+        $response->assertSee('Pengembalian dana / pembatalan rincian', false);
         self::assertMatchesRegularExpression(
             '/<input[^>]+type="hidden"[^>]+name="idempotency_key"[^>]+value="[^"]{8,}"/',
             (string) $response->getContent(),

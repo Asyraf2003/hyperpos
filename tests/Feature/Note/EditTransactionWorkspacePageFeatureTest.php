@@ -135,6 +135,11 @@ final class EditTransactionWorkspacePageFeatureTest extends TestCase
         $response->assertSee('Proses Nota');
         $response->assertSee('Alasan Perubahan Nota');
         $response->assertSee('name="reason"', false);
+        $response->assertSee('Revisi nota via workspace', false);
+        self::assertMatchesRegularExpression(
+            '/<textarea[^>]+id="note_revision_reason"[^>]+name="reason"[^>]+required[^>]*>/',
+            (string) $response->getContent(),
+        );
         $response->assertSee('Akan tampil di Riwayat Perubahan Nota.');
         $response->assertSee('id="workspace-payment-modal"', false);
         $response->assertSee('Bayar Penuh');
