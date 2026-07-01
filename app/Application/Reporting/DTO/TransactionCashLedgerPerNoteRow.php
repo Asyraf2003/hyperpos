@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\DTO;
 
-use App\Application\Reporting\DTO\Concerns\TransactionCashLedgerPerNoteRowSourceAccessors;
-
 final class TransactionCashLedgerPerNoteRow
 {
-    use TransactionCashLedgerPerNoteRowSourceAccessors;
     public function __construct(
         private readonly string $noteId,
         private readonly string $eventDate,
@@ -80,6 +77,21 @@ final class TransactionCashLedgerPerNoteRow
     public function refundId(): ?string
     {
         return $this->refundId;
+    }
+
+    public function sourceTable(): string
+    {
+        return $this->sourceTable;
+    }
+
+    public function sourceId(): string
+    {
+        return $this->sourceId;
+    }
+
+    public function sourceDispositionId(): ?string
+    {
+        return $this->sourceDispositionId;
     }
 
     /**
