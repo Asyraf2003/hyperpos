@@ -124,7 +124,7 @@ Slice 0 - Structure, Source Map, and Guardrail.
 - [ ] Product-only case covered.
 - [ ] Store-stock case covered.
 - [ ] Service package stock component case covered.
-- [ ] Cash and transfer payment variants covered.
+- [x] Cash and transfer payment variants covered.
 - [ ] Payment/refund/allocation/inventory/projection assertions exist.
 - [ ] Targeted matrix PASS.
 
@@ -154,7 +154,7 @@ Slice 0 - Structure, Source Map, and Guardrail.
 - [ ] Excel export parity asserted.
 - [ ] PDF view data parity asserted.
 - [ ] PDF Blade parity asserted.
-- [ ] Cash ledger affected fields asserted if touched.
+- [x] Cash ledger affected fields asserted if touched.
 - [ ] Operational profit affected fields asserted if touched.
 - [ ] Service package breakdown affected fields asserted if touched.
 - [ ] No report formula patch without write-side proof.

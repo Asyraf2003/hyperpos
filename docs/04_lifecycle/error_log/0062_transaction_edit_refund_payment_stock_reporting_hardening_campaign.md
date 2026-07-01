@@ -842,6 +842,24 @@ PASS
 Tests: 15 passed (352 assertions)
 ```
 
+Cash/transfer delta and cash ledger detail proof:
+
+```bash
+php artisan test \
+  tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php \
+  tests/Feature/Reporting/GetTransactionCashLedgerPerNoteFeatureTest.php \
+  tests/Feature/ReportingExports/TransactionCashLedgerExcelExportFeatureTest.php \
+  tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php \
+  tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php
+```
+
+Result:
+
+```text
+PASS
+Tests: 17 passed (159 assertions)
+```
+
 Revision idempotency baseline proof:
 
 ```bash
@@ -923,6 +941,9 @@ Tests: 34 passed (457 assertions)
 - Dashboard refund/profit reads surplus refund paid cash-out, not only legacy customer refunds.
 - Transaction summary/cash ledger current report uses capped current allocations.
 - Gross customer payment history remains preserved in `customer_payments`.
+- Transfer payment after paid upward revision records only the outstanding delta.
+- Transfer payment after paid upward revision does not create cash detail rows.
+- Cash ledger splits cash-in and transfer-in while keeping cash-only received/change fields on cash rows.
 
 ## Remaining Backlog
 
@@ -930,4 +951,4 @@ No remaining backlog for this campaign.
 
 ## Final Status
 
-Sub-slices A-N are closed with automated proof.
+Sub-slices A-O are closed with automated proof.
