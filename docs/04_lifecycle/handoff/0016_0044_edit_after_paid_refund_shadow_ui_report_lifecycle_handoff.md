@@ -940,3 +940,131 @@ Meaning:
 #### Next Allowed Step
 
 - Continue only with a browser-runner/manual QA slice or explicit owner deferral for the remaining 0044 residual gaps.
+
+### Session Update - 2026-07-01 17:52 WITA - Golden Lifecycle Automated QA Extension
+
+#### Slice
+
+- Active slice: 0044 automated-first residual QA.
+- Status: targeted edit/refund/payment/stock/reporting proof PASS.
+- Production runtime patch: none.
+
+#### Files Read
+
+- `docs/02_architecture/adr/0042_note_edit_refund_settlement_machine_contract.md`
+- `docs/04_lifecycle/workflow/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_workflow.md`
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+- `docs/04_lifecycle/error_log/0062_transaction_edit_refund_payment_stock_reporting_hardening_campaign.md`
+- `docs/99_archive/04_lifecycle/error_log/0044_edit_after_paid_refund_shadow_ui_report_lifecycle_gap.md`
+- `tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php`
+- `app/Application/Reporting/UseCases/GetTransactionReportDatasetHandler.php`
+- `app/Application/Reporting/UseCases/GetInventoryMovementSummaryHandler.php`
+- `app/Application/Reporting/UseCases/GetOperationalProfitSummaryHandler.php`
+- `app/Adapters/Out/Reporting/Queries/TransactionCashLedgerReportingQuery.php`
+
+#### Files Changed
+
+- `tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php`
+- `docs/04_lifecycle/handoff/0016_0044_edit_after_paid_refund_shadow_ui_report_lifecycle_handoff.md`
+
+#### FACT
+
+- The existing normal editable line test still proves non-refunded old lines
+  preload `revision_snapshot`.
+- The refunded-shadow flow still proves edit workspace renders
+  `"oldItems":[]` and does not render `revision_snapshot` for the old
+  refunded-shadow line.
+- The stale `revision_snapshot` payload is accepted only as a replacement
+  flow and does not revive the old refunded work item identity.
+- The old refunded work item remains the refund history anchor.
+- The current replacement receives a new work item identity.
+- Active payment allocation is not reassigned to the old refunded-shadow
+  work item.
+
+#### GAP
+
+- No new runtime bug was proven.
+- No production code was changed.
+- Browser refresh/hard-refresh, console, visual, focus, and real
+  double-click checks remain outside this automated proof.
+- Broader audit lifecycle redesign remains outside this patch.
+
+#### DECISION
+
+- Extend the existing golden refund-shadow lifecycle test rather than
+  creating a parallel fixture file.
+- Lock the financial split between current allocation and physical cash
+  ledger:
+  - current replacement gets net available allocation after refund;
+  - customer payment and refund cash rows remain preserved;
+  - cash ledger reports total in/out from money events.
+- Lock stock/reporting guardrails:
+  - old issued stock is revision-reversed exactly once;
+  - no extra refund reversal is created by edit;
+  - replacement line issues stock exactly once;
+  - transaction, cash ledger, inventory movement, and operational profit
+    handlers reconcile the same lifecycle.
+
+#### Tests / Commands Run
+
+```bash
+php artisan test tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php \
+  --filter=test_cashier_product_replacement_reuses_only_net_payment_after_refund
+
+php artisan test tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php
+
+php artisan test \
+  tests/Feature/Note/CashierProductReplacementBackdatedPriceFinanceFeatureTest.php \
+  tests/Feature/Note/TransactionEditRefundPaymentStockReportingHardeningTest.php \
+  tests/Feature/Note/RevisionAfterRefundPreservesHistoricalWorkItemsFeatureTest.php \
+  tests/Feature/Note/RefundAfterRevisionCurrentRowBoundaryFeatureTest.php \
+  tests/Feature/Note/PaymentAfterRevisionSettlementFeatureTest.php \
+  tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php \
+  tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php \
+  tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+```
+
+Result:
+
+```text
+PASS  Tests\Feature\Note\CashierProductReplacementBackdatedPriceFinanceFeatureTest
+Tests: 1 passed (44 assertions)
+
+PASS  Tests\Feature\Note\CashierProductReplacementBackdatedPriceFinanceFeatureTest
+Tests: 4 passed (80 assertions)
+
+Tests: 26 passed (491 assertions)
+```
+
+Meaning:
+
+- Golden lifecycle automated QA now covers edit workspace shadow behavior,
+  stale payload identity, allocation preservation, stock reversal/reissue,
+  cash ledger, transaction summary, inventory movement, and operational
+  profit reconciliation.
+- The added proof is test-only hardening.
+- 0044 is still not a real-browser/manual closure.
+
+#### Checklist Changes
+
+- [x] Golden lifecycle automated QA extended.
+- [x] Refunded-shadow old line stays out of editable `oldItems`.
+- [x] `revision_snapshot` remains absent for refunded-shadow old line.
+- [x] Normal editable old line keeps `revision_snapshot` coverage.
+- [x] Stale payload does not revive old refunded identity.
+- [x] Old refund anchor remains historical.
+- [x] Current replacement uses a new identity.
+- [x] Payment/refund/allocation/stock/report assertions added.
+
+#### Residual Gaps
+
+- Real browser/manual QA remains open/deferred.
+- Refresh/hard-refresh proof remains open/deferred.
+- Browser-only console/visual/focus/double-click checks remain open/deferred.
+- Broader audit lifecycle redesign remains open unless owner starts that scope.
+
+#### Next Allowed Step
+
+- Run full verification and audit line proof.
+- After green proof, either stop with automated-first residual documented or
+  start a separate browser/manual QA slice if owner opens that scope.
