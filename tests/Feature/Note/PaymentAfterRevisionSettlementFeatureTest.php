@@ -6,6 +6,7 @@ namespace Tests\Feature\Note;
 
 use App\Adapters\Out\Reporting\Queries\TransactionCashLedgerReportingQuery;
 use App\Application\Note\UseCases\CreateNoteRevisionHandler;
+use App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
 use App\Core\Payment\PaymentComponentAllocation\PaymentComponentType;
@@ -130,7 +131,7 @@ final class PaymentAfterRevisionSettlementFeatureTest extends TestCase
             'total_out_rupiah' => 0,
         ], $beforeLedger);
 
-        $payment = app(\App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler::class)->handle(
+        $payment = app(RecordAndAllocateNotePaymentHandler::class)->handle(
             'note-payment-after-revision-001',
             20000,
             '2026-05-22',
