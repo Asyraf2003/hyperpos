@@ -1022,6 +1022,10 @@ php artisan test \
   tests/Feature/Reporting/TransactionReportingReconciliationFeatureTest.php \
   tests/Feature/Reporting/GetOperationalProfitSummaryFeatureTest.php \
   tests/Feature/Reporting/TransactionCashLedgerReportingQueryFeatureTest.php
+
+make verify
+
+make audit-lines
 ```
 
 Result:
@@ -1034,6 +1038,11 @@ PASS  Tests\Feature\Note\CashierProductReplacementBackdatedPriceFinanceFeatureTe
 Tests: 4 passed (80 assertions)
 
 Tests: 26 passed (491 assertions)
+
+Tests: 1476 passed (9225 assertions)
+Duration: 92.39s
+
+SUCCESS: Semua file memenuhi standar limit baris (atau memiliki label bypass).
 ```
 
 Meaning:
@@ -1043,6 +1052,7 @@ Meaning:
   cash ledger, transaction summary, inventory movement, and operational
   profit reconciliation.
 - The added proof is test-only hardening.
+- Full automated verification and line audit remain green.
 - 0044 is still not a real-browser/manual closure.
 
 #### Checklist Changes
@@ -1065,6 +1075,5 @@ Meaning:
 
 #### Next Allowed Step
 
-- Run full verification and audit line proof.
-- After green proof, either stop with automated-first residual documented or
-  start a separate browser/manual QA slice if owner opens that scope.
+- Stop with automated-first residual documented, or start a separate
+  browser/manual QA slice if owner opens that scope.
