@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Note;
 
+use App\Adapters\Out\Reporting\Queries\TransactionCashLedgerReportingQuery;
 use App\Application\Note\UseCases\CreateNoteRevisionHandler;
 use App\Core\Note\WorkItem\ServiceDetail;
 use App\Core\Note\WorkItem\WorkItem;
@@ -97,6 +98,93 @@ final class PaymentAfterRevisionSettlementFeatureTest extends TestCase
             'net_paid_rupiah' => 120000,
             'outstanding_rupiah' => 0,
         ]);
+    }
+
+    public function test_admin_transfer_payment_after_upward_revision_records_only_delta_without_cash_detail(): void
+    {
+        $this->seedClosedPaidServiceOnlyNote();
+
+        $revision = $this->app->make(CreateNoteRevisionHandler::class)->handle(
+            'note-payment-after-revision-001',
+            $this->upwardRevisionPayload(),
+            'admin-payment-after-revision-001',
+            false,
+        );
+
+        self::assertTrue($revision->isSuccess(), $revision->message());
+
+        $currentWorkItemId = (string) DB::table('work_items')
+            ->where('note_id', 'note-payment-after-revision-001')
+            ->where('id', '<>', 'wi-payment-after-revision-old-001')
+            ->value('id');
+
+        self::assertNotSame('', $currentWorkItemId);
+
+        $beforeLedger = app(TransactionCashLedgerReportingQuery::class)
+            ->reconciliation('2026-05-01', '2026-05-31');
+
+        self::assertSame([
+            'total_in_rupiah' => 100000,
+            'cash_in_rupiah' => 0,
+            'transfer_in_rupiah' => 0,
+            'total_out_rupiah' => 0,
+        ], $beforeLedger);
+
+        $payment = app(\App\Application\Payment\UseCases\RecordAndAllocateNotePaymentHandler::class)->handle(
+            'note-payment-after-revision-001',
+            20000,
+            '2026-05-22',
+            [$currentWorkItemId . '::service_fee::' . $currentWorkItemId],
+            'transfer',
+            null,
+        );
+
+        self::assertTrue($payment->isSuccess(), $payment->message());
+
+        $newPaymentId = (string) DB::table('customer_payments')
+            ->where('id', '<>', 'payment-payment-after-revision-001')
+            ->value('id');
+
+        self::assertNotSame('', $newPaymentId);
+
+        $this->assertDatabaseHas('customer_payments', [
+            'id' => $newPaymentId,
+            'amount_rupiah' => 20000,
+            'paid_at' => '2026-05-22',
+            'payment_method' => 'transfer',
+        ]);
+
+        $this->assertDatabaseMissing('customer_payment_cash_details', [
+            'customer_payment_id' => $newPaymentId,
+        ]);
+
+        $this->assertDatabaseHas('payment_component_allocations', [
+            'customer_payment_id' => $newPaymentId,
+            'note_id' => 'note-payment-after-revision-001',
+            'work_item_id' => $currentWorkItemId,
+            'component_type' => PaymentComponentType::SERVICE_FEE,
+            'component_ref_id' => $currentWorkItemId,
+            'allocated_amount_rupiah' => 20000,
+        ]);
+
+        $this->assertDatabaseHas('note_history_projection', [
+            'note_id' => 'note-payment-after-revision-001',
+            'total_rupiah' => 120000,
+            'allocated_rupiah' => 120000,
+            'refunded_rupiah' => 0,
+            'net_paid_rupiah' => 120000,
+            'outstanding_rupiah' => 0,
+        ]);
+
+        $afterLedger = app(TransactionCashLedgerReportingQuery::class)
+            ->reconciliation('2026-05-01', '2026-05-31');
+
+        self::assertSame([
+            'total_in_rupiah' => 120000,
+            'cash_in_rupiah' => 0,
+            'transfer_in_rupiah' => 20000,
+            'total_out_rupiah' => 0,
+        ], $afterLedger);
     }
 
     private function seedClosedPaidServiceOnlyNote(): void
