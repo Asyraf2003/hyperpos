@@ -24,75 +24,33 @@ final class TransactionCashLedgerPerNoteRow
     ) {
     }
 
-    public function noteId(): string
-    {
-        return $this->noteId;
-    }
+    public function noteId(): string { return $this->noteId; }
 
-    public function eventDate(): string
-    {
-        return $this->eventDate;
-    }
+    public function eventDate(): string { return $this->eventDate; }
 
-    public function eventType(): string
-    {
-        return $this->eventType;
-    }
+    public function eventType(): string { return $this->eventType; }
 
-    public function direction(): string
-    {
-        return $this->direction;
-    }
+    public function direction(): string { return $this->direction; }
 
-    public function eventAmountRupiah(): int
-    {
-        return $this->eventAmountRupiah;
-    }
+    public function eventAmountRupiah(): int { return $this->eventAmountRupiah; }
 
-    public function paymentMethod(): ?string
-    {
-        return $this->paymentMethod;
-    }
+    public function paymentMethod(): ?string { return $this->paymentMethod; }
 
-    public function cashAmountPaidRupiah(): ?int
-    {
-        return $this->cashAmountPaidRupiah;
-    }
+    public function cashAmountPaidRupiah(): ?int { return $this->cashAmountPaidRupiah; }
 
-    public function cashAmountReceivedRupiah(): ?int
-    {
-        return $this->cashAmountReceivedRupiah;
-    }
+    public function cashAmountReceivedRupiah(): ?int { return $this->cashAmountReceivedRupiah; }
 
-    public function cashChangeRupiah(): ?int
-    {
-        return $this->cashChangeRupiah;
-    }
+    public function cashChangeRupiah(): ?int { return $this->cashChangeRupiah; }
 
-    public function customerPaymentId(): ?string
-    {
-        return $this->customerPaymentId;
-    }
+    public function customerPaymentId(): ?string { return $this->customerPaymentId; }
 
-    public function refundId(): ?string
-    {
-        return $this->refundId;
-    }
+    public function refundId(): ?string { return $this->refundId; }
 
-    public function sourceTable(): string
-    {
-        return $this->sourceTable;
-    }
+    public function sourceTable(): string { return $this->sourceTable; }
 
-    public function sourceId(): string
-    {
-        return $this->sourceId;
-    }
+    public function sourceId(): string { return $this->sourceId; }
 
-    public function sourceDispositionId(): ?string
-    {
-        return $this->sourceDispositionId;
-    }
+    public function sourceDispositionId(): ?string { return $this->sourceDispositionId; }
 
     /**
      * @return array{
