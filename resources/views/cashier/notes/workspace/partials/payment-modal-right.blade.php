@@ -15,6 +15,11 @@
                 Bayar Penuh
             </button>
 
+            <div class="text-muted small">
+                Bayar Penuh memakai sisa tagihan dari sistem.
+                Transfer mencatat nominal itu; tunai membuka kalkulator kembalian.
+            </div>
+
             <button
                 type="button"
                 class="btn btn-outline-secondary text-start"
