@@ -191,7 +191,8 @@ final class CashierProductReplacementBackdatedPriceFinanceFeatureTest extends Te
             ->get(route('admin.notes.workspace.edit', ['noteId' => 'note-1']));
 
         $edit->assertOk();
-        $edit->assertSee('revision_snapshot');
+        $edit->assertSee('"oldItems":[]', false);
+        $edit->assertDontSee('revision_snapshot');
 
         $response = $this->actingAs($user)->patch(
             route('admin.notes.workspace.update', ['noteId' => 'note-1']),
