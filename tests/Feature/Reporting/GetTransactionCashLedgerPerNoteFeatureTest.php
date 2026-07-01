@@ -49,6 +49,9 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'direction' => 'in',
                 'event_amount_rupiah' => 60000,
                 'payment_method' => 'unknown',
+                'cash_amount_paid_rupiah' => null,
+                'cash_amount_received_rupiah' => null,
+                'cash_change_rupiah' => null,
                 'customer_payment_id' => 'payment-1',
                 'refund_id' => null,
                 'source_table' => 'payment_allocations',
@@ -62,6 +65,9 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'direction' => 'in',
                 'event_amount_rupiah' => 50000,
                 'payment_method' => 'unknown',
+                'cash_amount_paid_rupiah' => null,
+                'cash_amount_received_rupiah' => null,
+                'cash_change_rupiah' => null,
                 'customer_payment_id' => 'payment-2',
                 'refund_id' => null,
                 'source_table' => 'payment_allocations',
@@ -75,6 +81,9 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'direction' => 'out',
                 'event_amount_rupiah' => 10000,
                 'payment_method' => null,
+                'cash_amount_paid_rupiah' => null,
+                'cash_amount_received_rupiah' => null,
+                'cash_change_rupiah' => null,
                 'customer_payment_id' => 'payment-1',
                 'refund_id' => 'refund-1',
                 'source_table' => 'customer_refunds',
@@ -95,6 +104,7 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
 
         $this->seedCustomerPayment('payment-cash', 85000, '2026-04-02', 'cash');
         $this->seedCustomerPayment('payment-transfer', 30000, '2026-04-02', 'transfer');
+        $this->seedCashDetail('payment-cash', 85000, 100000, 15000);
 
         $this->seedPaymentComponentAllocation(
             'component-allocation-cash',
@@ -131,6 +141,9 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'direction' => 'in',
                 'event_amount_rupiah' => 85000,
                 'payment_method' => 'cash',
+                'cash_amount_paid_rupiah' => 85000,
+                'cash_amount_received_rupiah' => 100000,
+                'cash_change_rupiah' => 15000,
                 'customer_payment_id' => 'payment-cash',
                 'refund_id' => null,
                 'source_table' => 'payment_component_allocations',
@@ -144,6 +157,9 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
                 'direction' => 'in',
                 'event_amount_rupiah' => 30000,
                 'payment_method' => 'transfer',
+                'cash_amount_paid_rupiah' => null,
+                'cash_amount_received_rupiah' => null,
+                'cash_change_rupiah' => null,
                 'customer_payment_id' => 'payment-transfer',
                 'refund_id' => null,
                 'source_table' => 'payment_component_allocations',
@@ -225,6 +241,20 @@ final class GetTransactionCashLedgerPerNoteFeatureTest extends TestCase
             'component_amount_rupiah_snapshot' => $amountRupiah,
             'allocated_amount_rupiah' => $amountRupiah,
             'allocation_priority' => 1,
+        ]);
+    }
+
+    private function seedCashDetail(
+        string $paymentId,
+        int $amountPaidRupiah,
+        int $amountReceivedRupiah,
+        int $changeRupiah,
+    ): void {
+        DB::table('customer_payment_cash_details')->insert([
+            'customer_payment_id' => $paymentId,
+            'amount_paid_rupiah' => $amountPaidRupiah,
+            'amount_received_rupiah' => $amountReceivedRupiah,
+            'change_rupiah' => $changeRupiah,
         ]);
     }
 
