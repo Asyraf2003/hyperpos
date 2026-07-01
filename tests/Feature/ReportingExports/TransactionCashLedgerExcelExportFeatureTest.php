@@ -58,27 +58,36 @@ final class TransactionCashLedgerExcelExportFeatureTest extends TestCase
         $this->assertSame('Tanggal Event', $detail->getCell('B1')->getValue());
         $this->assertSame('Metode Pembayaran', $detail->getCell('G1')->getValue());
         $this->assertSame('Nominal', $detail->getCell('H1')->getValue());
-        $this->assertSame('Asal Catatan', $detail->getCell('K1')->getValue());
-        $this->assertSame('ID Asal Catatan', $detail->getCell('L1')->getValue());
-        $this->assertSame('ID Disposisi Asal', $detail->getCell('M1')->getValue());
+        $this->assertSame('Tunai Dibayar', $detail->getCell('I1')->getValue());
+        $this->assertSame('Uang Pelanggan', $detail->getCell('J1')->getValue());
+        $this->assertSame('Kembalian Tunai', $detail->getCell('K1')->getValue());
+        $this->assertSame('Asal Catatan', $detail->getCell('N1')->getValue());
+        $this->assertSame('ID Asal Catatan', $detail->getCell('O1')->getValue());
+        $this->assertSame('ID Disposisi Asal', $detail->getCell('P1')->getValue());
         $this->assertSame('02 Januari 2030', $detail->getCell('B2')->getValue());
         $this->assertSame('note-1', $detail->getCell('C2')->getValue());
         $this->assertSame('Pembayaran Tercatat', $detail->getCell('E2')->getValue());
         $this->assertSame('Masuk', $detail->getCell('F2')->getValue());
         $this->assertSame('Tunai', $detail->getCell('G2')->getValue());
         $this->assertSame(8000, $detail->getCell('H2')->getValue());
-        $this->assertSame('Pembayaran Nota', $detail->getCell('K2')->getValue());
-        $this->assertSame('pay-1', $detail->getCell('L2')->getValue());
-        $this->assertNull($detail->getCell('M2')->getValue());
+        $this->assertSame(8000, $detail->getCell('I2')->getValue());
+        $this->assertSame(10000, $detail->getCell('J2')->getValue());
+        $this->assertSame(2000, $detail->getCell('K2')->getValue());
+        $this->assertSame('Pembayaran Nota', $detail->getCell('N2')->getValue());
+        $this->assertSame('pay-1', $detail->getCell('O2')->getValue());
+        $this->assertNull($detail->getCell('P2')->getValue());
 
         $this->assertSame('04 Januari 2030', $detail->getCell('B4')->getValue());
         $this->assertSame('Pengembalian Dana', $detail->getCell('E4')->getValue());
         $this->assertSame('Keluar', $detail->getCell('F4')->getValue());
         $this->assertSame('-', $detail->getCell('G4')->getValue());
         $this->assertSame(1000, $detail->getCell('H4')->getValue());
-        $this->assertSame('Pengembalian Dana', $detail->getCell('K4')->getValue());
-        $this->assertSame('ref-1', $detail->getCell('L4')->getValue());
-        $this->assertNull($detail->getCell('M4')->getValue());
+        $this->assertNull($detail->getCell('I4')->getValue());
+        $this->assertNull($detail->getCell('J4')->getValue());
+        $this->assertNull($detail->getCell('K4')->getValue());
+        $this->assertSame('Pengembalian Dana', $detail->getCell('N4')->getValue());
+        $this->assertSame('ref-1', $detail->getCell('O4')->getValue());
+        $this->assertNull($detail->getCell('P4')->getValue());
         $this->assertNull($detail->getCell('C5')->getValue());
 
         $this->assertSame('02 Januari 2030', $period->getCell('A2')->getValue());
@@ -149,6 +158,13 @@ final class TransactionCashLedgerExcelExportFeatureTest extends TestCase
             'amount_rupiah' => $amountRupiah,
             'paid_at' => $paidAt,
             'payment_method' => 'cash',
+        ]);
+
+        DB::table('customer_payment_cash_details')->insert([
+            'customer_payment_id' => $paymentId,
+            'amount_paid_rupiah' => $amountRupiah,
+            'amount_received_rupiah' => $amountRupiah + 2000,
+            'change_rupiah' => 2000,
         ]);
 
         DB::table('payment_allocations')->insert([
