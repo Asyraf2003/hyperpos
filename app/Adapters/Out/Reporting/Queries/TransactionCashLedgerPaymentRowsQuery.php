@@ -38,6 +38,9 @@ final class TransactionCashLedgerPaymentRowsQuery
                 'event_amount_rupiah',
                 'customer_payment_id',
                 'payment_method',
+                'cash_amount_paid_rupiah',
+                'cash_amount_received_rupiah',
+                'cash_change_rupiah',
                 'source_table',
             ])
             ->map(static fn (object $row): array => [
@@ -48,6 +51,9 @@ final class TransactionCashLedgerPaymentRowsQuery
                 'direction' => 'in',
                 'event_amount_rupiah' => (int) $row->event_amount_rupiah,
                 'payment_method' => self::normalizePaymentMethod($row->payment_method ?? null),
+                'cash_amount_paid_rupiah' => self::nullableInt($row->cash_amount_paid_rupiah ?? null),
+                'cash_amount_received_rupiah' => self::nullableInt($row->cash_amount_received_rupiah ?? null),
+                'cash_change_rupiah' => self::nullableInt($row->cash_change_rupiah ?? null),
                 'customer_payment_id' => (string) $row->customer_payment_id,
                 'refund_id' => null,
                 'source_table' => (string) $row->source_table,
@@ -75,5 +81,10 @@ final class TransactionCashLedgerPaymentRowsQuery
         }
 
         return $method === '' ? 'unknown' : $method;
+    }
+
+    private static function nullableInt(mixed $value): ?int
+    {
+        return $value === null ? null : (int) $value;
     }
 }
