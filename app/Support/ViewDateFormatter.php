@@ -38,9 +38,6 @@ final class ViewDateFormatter
         return self::display($from) . ' s/d ' . self::display($to);
     }
 
-    /**
-     * @return array{label: string, value: string}
-     */
     private static function shouldUseDisplayTimezone(mixed $value, string $text, bool $withTime): bool
     {
         if (! $withTime) {
