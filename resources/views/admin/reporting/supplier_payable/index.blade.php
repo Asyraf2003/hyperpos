@@ -25,13 +25,6 @@
         ],
     ],
 ])
-<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
-    <div aria-hidden="true">🔔</div>
-    <div>
-        <div class="fw-semibold">Notifikasi hutang faktur belum aktif.</div>
-        <div class="small mb-0">Template UI reminder hutang faktur masih hardcoded; pengiriman notifikasi otomatis belum diaktifkan pada flow produksi.</div>
-    </div>
-</div>
 
 <div class="mb-3">
     <h5 class="mb-1">Ringkasan Utama</h5>

@@ -68,7 +68,6 @@ final class SupplierPayableReportPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Hutang Pemasok');
         $response->assertSee('supplier-payable-report-filter-form', false);
-        $response->assertSee('Notifikasi hutang faktur belum aktif.');
         $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Total Faktur');

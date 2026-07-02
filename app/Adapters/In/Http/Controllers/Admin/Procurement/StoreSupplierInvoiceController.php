@@ -43,7 +43,7 @@ final class StoreSupplierInvoiceController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resolveTaxRoundingResidueConfirmed(array $data): bool
     {
@@ -51,7 +51,7 @@ final class StoreSupplierInvoiceController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resolveTaxInput(array $data): ?string
     {
@@ -65,7 +65,7 @@ final class StoreSupplierInvoiceController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resolveAutoReceive(array $data): bool
     {
@@ -77,7 +77,7 @@ final class StoreSupplierInvoiceController extends Controller
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function resolveTanggalTerima(array $data): ?string
     {
