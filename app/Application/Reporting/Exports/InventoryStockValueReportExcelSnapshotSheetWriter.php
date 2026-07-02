@@ -25,12 +25,12 @@ final class InventoryStockValueReportExcelSnapshotSheetWriter
             'Inventory Value',
             'Reorder Point',
             'Critical Threshold',
-            'Nilai Avg x Qty (Diagnostik)',
-            'Residual Pembulatan HPP (Diagnostik)',
-            'Qty Ledger',
-            'Nilai Ledger',
-            'Selisih Qty Ledger',
-            'Selisih Nilai Ledger',
+            'Nilai Pembanding Avg x Qty',
+            'Selisih Pembulatan Modal',
+            'Stok Menurut Riwayat',
+            'Nilai Menurut Riwayat',
+            'Selisih Stok vs Riwayat',
+            'Selisih Nilai vs Riwayat',
         ];
 
         foreach ($headers as $index => $header) {

@@ -84,33 +84,33 @@ final class OperationalProfitReportPdfExportFeatureTest extends TestCase
     public function test_operational_profit_pdf_view_contains_indonesian_report_labels(): void
     {
         $html = view('admin.reporting.operational_profit.export_pdf', [
-            'title' => 'Laporan Laba Kas Operasional',
+            'title' => 'Ringkasan Kas Operasional',
             'periodLabel' => '01 Januari 2030 s/d 31 Januari 2030',
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
-                ['label' => 'Uang Masuk', 'value' => 'Rp 200.000'],
-                ['label' => 'Pengembalian Dana', 'value' => 'Rp 10.000'],
-                ['label' => 'Laba Kas Operasional', 'value' => 'Rp 35.000'],
+                ['label' => 'Uang Diterima', 'value' => 'Rp 200.000'],
+                ['label' => 'Uang Dikembalikan', 'value' => 'Rp 10.000'],
+                ['label' => 'Sisa Kas Operasional', 'value' => 'Rp 35.000'],
             ],
         ])->render();
 
-        $this->assertStringContainsString('Laporan Laba Kas Operasional', $html);
-        $this->assertStringContainsString('Uang Masuk', $html);
-        $this->assertStringContainsString('Pengembalian Dana', $html);
-        $this->assertStringContainsString('Laba Kas Operasional', $html);
+        $this->assertStringContainsString('Ringkasan Kas Operasional', $html);
+        $this->assertStringContainsString('Uang Diterima', $html);
+        $this->assertStringContainsString('Uang Dikembalikan', $html);
+        $this->assertStringContainsString('Sisa Kas Operasional', $html);
         $this->assertStringContainsString('Rp 35.000', $html);
     }
 
     public function test_operational_profit_pdf_view_uses_owner_readable_report_sections_not_table_layout(): void
     {
         $html = view('admin.reporting.operational_profit.export_pdf', [
-            'title' => 'Laporan Laba Kas Operasional',
+            'title' => 'Ringkasan Kas Operasional',
             'periodLabel' => '01 Januari 2030 s/d 31 Januari 2030',
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
-                ['label' => 'Uang Masuk', 'value' => 'Rp 200.000'],
-                ['label' => 'Pengembalian Dana', 'value' => 'Rp 10.000'],
-                ['label' => 'Laba Kas Operasional', 'value' => 'Rp 35.000'],
+                ['label' => 'Uang Diterima', 'value' => 'Rp 200.000'],
+                ['label' => 'Uang Dikembalikan', 'value' => 'Rp 10.000'],
+                ['label' => 'Sisa Kas Operasional', 'value' => 'Rp 35.000'],
             ],
         ])->render();
 

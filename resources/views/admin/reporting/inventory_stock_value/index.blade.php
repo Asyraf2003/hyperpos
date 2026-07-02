@@ -25,6 +25,13 @@
         ],
     ],
 ])
+@php
+    $ledgerQtyDiff = (float) ($summary['total_ledger_qty_diff'] ?? 0);
+    $ledgerValueDiff = (int) ($summary['total_ledger_value_diff_rupiah'] ?? 0);
+    $ledgerQtyHealthy = $ledgerQtyDiff == 0.0;
+    $ledgerValueHealthy = $ledgerValueDiff === 0;
+@endphp
+
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
     <div>
@@ -40,104 +47,111 @@
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Produk Snapshot</div>
+            <div class="text-muted small">Produk Tercatat di Stok</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['snapshot_product_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Produk Bermutasi</div>
+            <div class="text-muted small">Produk Bergerak</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['movement_product_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Tersedia</div>
+            <div class="text-muted small">Total Stok Tersedia</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['total_qty_on_hand'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nilai Persediaan</div>
+            <div class="text-muted small">Nilai Modal Stok</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_inventory_value_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Masuk Pembelian</div>
+            <div class="text-muted small">Barang Masuk dari Supplier</div>
             <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_supply_in_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Keluar Penjualan</div>
+            <div class="text-muted small">Barang Keluar Terjual/Dipakai</div>
             <div class="fs-5 fw-bold text-danger">{{ number_format($summary['period_sale_out_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Balik Refund/Reversal</div>
+            <div class="text-muted small">Barang Balik dari Refund</div>
             <div class="fs-5 fw-bold text-success">{{ number_format($summary['period_refund_reversal_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Qty Koreksi/Revisi</div>
+            <div class="text-muted small">Barang Koreksi/Revisi</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['period_revision_correction_qty'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Selisih Qty Periode</div>
+            <div class="text-muted small">Perubahan Stok Bersih</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['period_net_qty_delta'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Selisih Nilai Pokok Periode</div>
+            <div class="text-muted small">Perubahan Modal Stok Bersih</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['period_net_cost_delta_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12">
-        <div class="small fw-semibold text-warning">Diagnostik Internal</div>
-        <div class="small text-muted">Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.</div>
+        <div class="small fw-semibold text-info">Validasi Sistem</div>
+        <div class="small text-muted">Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.</div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card border-warning"><div class="card-body">
-            <div class="text-muted small">Nilai Berdasar Avg x Qty</div>
+            <div class="text-muted small">Nilai Pembanding Avg x Qty</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_inventory_value_by_average_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
-        <div class="card border-warning"><div class="card-body">
-            <div class="text-muted small">Residual Pembulatan HPP</div>
-            <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_rounding_residual_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        <div class="card border-info"><div class="card-body">
+            <div class="text-muted small">Selisih Pembulatan Modal</div>
+            <div class="fs-5 fw-bold text-muted">Rp {{ number_format($summary['total_rounding_residual_rupiah'] ?? 0, 0, ',', '.') }}</div>
+            <div class="small text-muted mt-1">Selisih kecil akibat pembulatan modal rata-rata. Nilai stok resmi tetap memakai Nilai Modal Stok.</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
-        <div class="card border-info"><div class="card-body">
-            <div class="text-muted small">Selisih Qty Ledger</div>
-            <div class="fs-5 fw-bold">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
+        <div class="card {{ $ledgerQtyHealthy ? 'border-success' : 'border-danger' }}"><div class="card-body">
+            <div class="text-muted small">Selisih Stok vs Riwayat</div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="fs-5 fw-bold {{ $ledgerQtyHealthy ? 'text-success' : 'text-danger' }}">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
+                <span class="badge {{ $ledgerQtyHealthy ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }}">{{ $ledgerQtyHealthy ? 'Sehat' : 'Perlu Dicek' }}</span>
+            </div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
-        <div class="card border-info"><div class="card-body">
-            <div class="text-muted small">Selisih Nilai Ledger</div>
-            <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
+        <div class="card {{ $ledgerValueHealthy ? 'border-success' : 'border-danger' }}"><div class="card-body">
+            <div class="text-muted small">Selisih Nilai vs Riwayat</div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="fs-5 fw-bold {{ $ledgerValueHealthy ? 'text-success' : 'text-danger' }}">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                <span class="badge {{ $ledgerValueHealthy ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }}">{{ $ledgerValueHealthy ? 'Sehat' : 'Perlu Dicek' }}</span>
+            </div>
         </div></div>
     </div>
 
@@ -150,28 +164,28 @@
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Produk Snapshot</div>
+            <div class="text-muted small">Produk Tercatat di Stok</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['snapshot_product_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Produk Bermutasi</div>
+            <div class="text-muted small">Produk Bergerak</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['movement_product_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Selisih Qty Periode</div>
+            <div class="text-muted small">Perubahan Stok Bersih</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['period_net_qty_delta'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Selisih Nilai Pokok Periode</div>
+            <div class="text-muted small">Perubahan Modal Stok Bersih</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['period_net_cost_delta_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>

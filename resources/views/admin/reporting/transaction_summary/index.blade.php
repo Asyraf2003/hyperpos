@@ -39,56 +39,56 @@
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Total Nilai Transaksi</div>
+            <div class="text-muted small">Total Nilai Nota</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['gross_transaction_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Pembayaran Dialokasikan</div>
+            <div class="text-muted small">Pembayaran Masuk ke Nota</div>
             <div class="fs-5 fw-bold text-success">Rp {{ number_format($summary['allocated_payment_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Dana Dikembalikan</div>
+            <div class="text-muted small">Uang Refund Dibayar</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['refunded_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Kas Bersih</div>
+            <div class="text-muted small">Uang Bersih Diterima</div>
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['net_cash_collected_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Pengembalian Belum Dibayar</div>
+            <div class="text-muted small">Refund yang Harus Dibayar</div>
             <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['refund_due_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Pengembalian Surplus Sudah Dibayar</div>
+            <div class="text-muted small">Kelebihan Bayar Sudah Dikembalikan</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['surplus_refund_paid_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Sisa Pengembalian Belum Dibayar</div>
+            <div class="text-muted small">Sisa Refund Belum Dibayar</div>
             <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-2">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Sisa Tagihan</div>
+            <div class="text-muted small">Sisa Tagihan Customer</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -97,14 +97,15 @@
 <div class="row g-3 mb-4">
     <div class="col-12 col-md-6">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Lunas</div>
+            <div class="text-muted small">Nota Selesai</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['settled_rows'] ?? 0, 0, ',', '.') }}</div>
+            <div class="small text-muted mt-1">Nota yang saldonya sudah beres. Bisa karena sudah dibayar lunas atau refund sudah selesai.</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Sisa Tagihan</div>
+            <div class="text-muted small">Nota Belum Selesai</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['outstanding_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
@@ -117,28 +118,28 @@
 <div class="row g-3">
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Lunas</div>
+            <div class="text-muted small">Nota Selesai</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['settled_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Nota Sisa Tagihan</div>
+            <div class="text-muted small">Nota Belum Selesai</div>
             <div class="fs-5 fw-bold">{{ number_format($summary['outstanding_rows'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Sisa Tagihan</div>
+            <div class="text-muted small">Sisa Tagihan Customer</div>
             <div class="fs-5 fw-bold text-danger">Rp {{ number_format($summary['outstanding_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
         <div class="card"><div class="card-body">
-            <div class="text-muted small">Sisa Pengembalian Belum Dibayar</div>
+            <div class="text-muted small">Sisa Refund Belum Dibayar</div>
             <div class="fs-5 fw-bold text-warning">Rp {{ number_format($summary['remaining_refund_due_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>

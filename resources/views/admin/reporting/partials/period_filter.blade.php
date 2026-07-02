@@ -25,9 +25,10 @@
                                 <div class="fw-semibold">{{ $basisDateLabel ?? 'Tanggal referensi laporan' }}</div>
                             </div>
 
+                            @php($reportPeriodContext = \App\Support\ViewDateFormatter::reportPeriodContext($filters['date_from'] ?? null, $filters['date_to'] ?? null))
                             <div>
-                                <div class="text-muted small">{{ $rangeLabelText ?? 'Rentang Aktif' }}</div>
-                                <div class="fw-semibold">{{ \App\Support\ViewDateFormatter::range($filters['date_from'] ?? null, $filters['date_to'] ?? null) }}</div>
+                                <div class="text-muted small">{{ $reportPeriodContext['label'] }}</div>
+                                <div class="fw-semibold">{{ $reportPeriodContext['value'] }}</div>
                             </div>
                         </div>
 
@@ -98,7 +99,7 @@
 >
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">FIlter Laporan</h5>
+            <h5 class="mb-0">Filter Laporan</h5>
             <button
                 type="button"
                 id="{{ $formId }}-close-filter"

@@ -216,10 +216,10 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
             'referenceDateLabel' => '31 Januari 2030',
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
-                ['label' => 'Produk Snapshot', 'value' => 2],
-                ['label' => 'Nilai Persediaan', 'value' => 'Rp 96.000'],
-                ['label' => 'Qty Masuk Pembelian', 'value' => 13],
-                ['label' => 'Selisih Nilai Pokok Periode', 'value' => 'Rp 96.000'],
+                ['label' => 'Produk Tercatat di Stok', 'value' => 2],
+                ['label' => 'Nilai Modal Stok', 'value' => 'Rp 96.000'],
+                ['label' => 'Barang Masuk dari Supplier', 'value' => 13],
+                ['label' => 'Perubahan Modal Stok Bersih', 'value' => 'Rp 96.000'],
             ],
             'movementRows' => [
                 [
@@ -267,9 +267,9 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
             'referenceDateLabel' => '31 Januari 2030',
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
-                ['label' => 'Produk Snapshot', 'value' => 2],
-                ['label' => 'Nilai Persediaan', 'value' => 'Rp 96.000'],
-                ['label' => 'Qty Masuk Pembelian', 'value' => 13],
+                ['label' => 'Produk Tercatat di Stok', 'value' => 2],
+                ['label' => 'Nilai Modal Stok', 'value' => 'Rp 96.000'],
+                ['label' => 'Barang Masuk dari Supplier', 'value' => 13],
             ],
             'movementRows' => [
                 [
@@ -316,21 +316,21 @@ final class InventoryStockValueReportPdfExportFeatureTest extends TestCase
             'referenceDateLabel' => '31 Januari 2030',
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
-                ['label' => 'Nilai Persediaan', 'value' => 'Rp 34.493'],
-                ['label' => 'Diagnostik Internal', 'value' => 'Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.'],
-                ['label' => 'Nilai Berdasar Avg x Qty', 'value' => 'Rp 34.470'],
-                ['label' => 'Residual Pembulatan HPP', 'value' => 'Rp 23'],
-                ['label' => 'Selisih Nilai Ledger', 'value' => 'Rp 0'],
+                ['label' => 'Nilai Modal Stok', 'value' => 'Rp 34.493'],
+                ['label' => 'Validasi Sistem', 'value' => 'Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.'],
+                ['label' => 'Nilai Pembanding Avg x Qty', 'value' => 'Rp 34.470'],
+                ['label' => 'Selisih Pembulatan Modal', 'value' => 'Rp 23'],
+                ['label' => 'Selisih Nilai vs Riwayat', 'value' => 'Rp 0'],
             ],
             'movementRows' => [],
             'snapshotRows' => [],
         ])->render();
 
-        $this->assertStringContainsString('Diagnostik Internal', $html);
-        $this->assertStringContainsString('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.', $html);
-        $this->assertStringContainsString('Nilai Berdasar Avg x Qty', $html);
-        $this->assertStringContainsString('Residual Pembulatan HPP', $html);
-        $this->assertStringContainsString('Selisih Nilai Ledger', $html);
+        $this->assertStringContainsString('Validasi Sistem', $html);
+        $this->assertStringContainsString('Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.', $html);
+        $this->assertStringContainsString('Nilai Pembanding Avg x Qty', $html);
+        $this->assertStringContainsString('Selisih Pembulatan Modal', $html);
+        $this->assertStringContainsString('Selisih Nilai vs Riwayat', $html);
         $this->assertStringContainsString('Rp 23', $html);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Exports;
 
+use App\Support\ViewDateFormatter;
 use App\Ports\Out\ClockPort;
 use Carbon\CarbonImmutable;
 use Throwable;
@@ -20,12 +21,15 @@ final class TransactionReportPdfViewDataBuilder
         $summary = is_array($dataset['summary'] ?? null) ? $dataset['summary'] : [];
         $rows = is_array($dataset['rows'] ?? null) ? $dataset['rows'] : [];
 
+        $periodContext = ViewDateFormatter::reportPeriodContext(
+            $filters['date_from'] ?? null,
+            $filters['date_to'] ?? null,
+        );
+
         return [
             'title' => 'Laporan Transaksi',
-            'periodLabel' => $this->formatRange(
-                $this->stringValue($filters['date_from'] ?? ''),
-                $this->stringValue($filters['date_to'] ?? ''),
-            ),
+            'periodLabelCaption' => $periodContext['label'],
+            'periodLabel' => $periodContext['value'],
             'generatedAt' => $this->clock->now()->format('d/m/Y H:i'),
             'summaryItems' => $this->summaryItems($summary),
             'rows' => array_map(fn (array $row): array => $this->rowData($row), $rows),
@@ -36,14 +40,14 @@ final class TransactionReportPdfViewDataBuilder
     {
         return [
             ['label' => 'Jumlah Nota', 'value' => $this->integerValue($summary['total_rows'] ?? 0)],
-            ['label' => 'Total Nilai Transaksi', 'value' => $this->rupiah($summary['gross_transaction_rupiah'] ?? 0)],
-            ['label' => 'Pembayaran Dialokasikan', 'value' => $this->rupiah($summary['allocated_payment_rupiah'] ?? 0)],
-            ['label' => 'Dana Dikembalikan', 'value' => $this->rupiah($summary['refunded_rupiah'] ?? 0)],
-            ['label' => 'Pengembalian Belum Dibayar', 'value' => $this->rupiah($summary['refund_due_rupiah'] ?? 0)],
-            ['label' => 'Pengembalian Surplus Sudah Dibayar', 'value' => $this->rupiah($summary['surplus_refund_paid_rupiah'] ?? 0)],
-            ['label' => 'Sisa Pengembalian Belum Dibayar', 'value' => $this->rupiah($summary['remaining_refund_due_rupiah'] ?? 0)],
-            ['label' => 'Kas Bersih', 'value' => $this->rupiah($summary['net_cash_collected_rupiah'] ?? 0)],
-            ['label' => 'Sisa Tagihan', 'value' => $this->rupiah($summary['outstanding_rupiah'] ?? 0)],
+            ['label' => 'Total Nilai Nota', 'value' => $this->rupiah($summary['gross_transaction_rupiah'] ?? 0)],
+            ['label' => 'Pembayaran Masuk ke Nota', 'value' => $this->rupiah($summary['allocated_payment_rupiah'] ?? 0)],
+            ['label' => 'Uang Refund Dibayar', 'value' => $this->rupiah($summary['refunded_rupiah'] ?? 0)],
+            ['label' => 'Refund yang Harus Dibayar', 'value' => $this->rupiah($summary['refund_due_rupiah'] ?? 0)],
+            ['label' => 'Kelebihan Bayar Sudah Dikembalikan', 'value' => $this->rupiah($summary['surplus_refund_paid_rupiah'] ?? 0)],
+            ['label' => 'Sisa Refund Belum Dibayar', 'value' => $this->rupiah($summary['remaining_refund_due_rupiah'] ?? 0)],
+            ['label' => 'Uang Bersih Diterima', 'value' => $this->rupiah($summary['net_cash_collected_rupiah'] ?? 0)],
+            ['label' => 'Sisa Tagihan Customer', 'value' => $this->rupiah($summary['outstanding_rupiah'] ?? 0)],
         ];
     }
 

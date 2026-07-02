@@ -96,10 +96,11 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Stok dan Nilai Persediaan');
         $response->assertSee('inventory-stock-value-report-filter-form', false);
         $response->assertSee('Notifikasi stok belum aktif.');
-        $response->assertSee('01 Januari 2030 s/d 31 Januari 2030');
+        $response->assertSee('Bulan Terkait');
+        $response->assertSee('Januari 2030');
         $response->assertSee('Rincian Ringkas');
-        $response->assertSee('Qty Tersedia');
-        $response->assertSee('Nilai Persediaan');
+        $response->assertSee('Total Stok Tersedia');
+        $response->assertSee('Nilai Modal Stok');
         $response->assertSee('Selisih Qty');
         $response->assertSee('Rp 211.000');
         $response->assertDontSee('Supra');
@@ -195,7 +196,8 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('07 Januari 2030 s/d 09 Januari 2030');
+        $response->assertSee('Bulan Terkait');
+        $response->assertSee('Januari 2030');
         $response->assertDontSee('Supra');
         $response->assertDontSee('Vario');
         $response->assertSee('Rp 52.000');
@@ -239,23 +241,24 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         );
 
         $response->assertOk();
-        $response->assertSee('Nilai Persediaan');
+        $response->assertSee('Nilai Modal Stok');
         $response->assertSee('Rp 34.493');
 
-        $response->assertSee('Diagnostik Internal');
-        $response->assertSee('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.');
+        $response->assertSee('Validasi Sistem');
+        $response->assertSee('Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.');
 
-        $response->assertSee('Nilai Berdasar Avg x Qty');
+        $response->assertSee('Nilai Pembanding Avg x Qty');
         $response->assertSee('Rp 34.470');
 
-        $response->assertSee('Residual Pembulatan HPP');
+        $response->assertSee('Selisih Pembulatan Modal');
         $response->assertSee('Rp 23');
 
-        $response->assertSee('Selisih Qty Ledger');
+        $response->assertSee('Selisih Stok vs Riwayat');
         $response->assertSee('0');
 
-        $response->assertSee('Selisih Nilai Ledger');
+        $response->assertSee('Selisih Nilai vs Riwayat');
         $response->assertSee('Rp 0');
+        $response->assertSee('Sehat');
     }
 
     public function test_custom_mode_requires_explicit_date_range(): void

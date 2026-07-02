@@ -51,7 +51,7 @@
 <body>
     <h1>{{ $title }}</h1>
     <div class="meta">
-        Periode: {{ $periodLabel }}<br>
+        {{ $periodLabelCaption ?? 'Rentang Tanggal' }}: {{ $periodLabel }}<br>
         Dicetak: {{ $generatedAt }}
     </div>
 

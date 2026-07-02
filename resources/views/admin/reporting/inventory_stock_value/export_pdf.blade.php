@@ -48,7 +48,7 @@
 <body>
     <h1>{{ $title }}</h1>
     <div class="meta">
-        Rentang movement: {{ $periodLabel }}<br>
+        {{ $periodLabelCaption ?? 'Rentang Tanggal' }}: {{ $periodLabel }}<br>
         Tanggal referensi: {{ $referenceDateLabel }}<br>
         Dicetak: {{ $generatedAt }}
     </div>

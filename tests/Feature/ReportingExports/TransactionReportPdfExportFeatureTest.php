@@ -76,10 +76,10 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
                 ['label' => 'Jumlah Nota', 'value' => 2],
                 ['label' => 'Total Transaksi', 'value' => 'Rp 150.000'],
                 ['label' => 'Total Dibayar', 'value' => 'Rp 149.999'],
-                ['label' => 'Total Dana Dikembalikan', 'value' => 'Rp 9.000'],
-                ['label' => 'Pengembalian Belum Dibayar', 'value' => 'Rp 0'],
-                ['label' => 'Pengembalian Surplus Sudah Dibayar', 'value' => 'Rp 0'],
-                ['label' => 'Sisa Pengembalian Belum Dibayar', 'value' => 'Rp 0'],
+                ['label' => 'Total Uang Refund Dibayar', 'value' => 'Rp 9.000'],
+                ['label' => 'Refund yang Harus Dibayar', 'value' => 'Rp 0'],
+                ['label' => 'Kelebihan Bayar Sudah Dikembalikan', 'value' => 'Rp 0'],
+                ['label' => 'Sisa Refund Belum Dibayar', 'value' => 'Rp 0'],
                 ['label' => 'Net Dibayar', 'value' => 'Rp 140.999'],
                 ['label' => 'Sisa Piutang', 'value' => 'Rp 9.001'],
             ],
@@ -96,22 +96,22 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
                     'remaining_refund_due' => 'Rp 0',
                     'net_paid' => 'Rp 90.999',
                     'outstanding' => 'Rp 9.001',
-                    'status' => 'Ada Pengembalian Dana',
+                    'status' => 'Ada Uang Dikembalikan',
                 ],
             ],
         ])->render();
 
         $this->assertStringContainsString('Laporan Transaksi', $html);
         $this->assertStringContainsString('Jumlah Nota', $html);
-        $this->assertStringContainsString('Total Dana Dikembalikan', $html);
-        $this->assertStringContainsString('Pengembalian Belum Dibayar', $html);
-        $this->assertStringContainsString('Pengembalian Surplus Sudah Dibayar', $html);
-        $this->assertStringContainsString('Sisa Pengembalian Belum Dibayar', $html);
+        $this->assertStringContainsString('Total Uang Refund Dibayar', $html);
+        $this->assertStringContainsString('Refund yang Harus Dibayar', $html);
+        $this->assertStringContainsString('Kelebihan Bayar Sudah Dikembalikan', $html);
+        $this->assertStringContainsString('Sisa Refund Belum Dibayar', $html);
         $this->assertStringContainsString('Sisa Piutang', $html);
         $this->assertStringContainsString('Ringkasan Utama', $html);
         $this->assertStringNotContainsString('Catatan Laporan', $html);
         $this->assertStringNotContainsString('Detail lengkap tersedia di Excel', $html);
-        $this->assertStringNotContainsString('Ada Pengembalian Dana', $html);
+        $this->assertStringNotContainsString('Ada Uang Dikembalikan', $html);
     }
 
     public function test_pdf_view_uses_owner_readable_report_sections_not_detail_tables(): void
@@ -122,9 +122,9 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
             'generatedAt' => '31 Januari 2030 10:00',
             'summaryItems' => [
                 ['label' => 'Jumlah Nota', 'value' => 2],
-                ['label' => 'Total Nilai Transaksi', 'value' => 'Rp 150.000'],
-                ['label' => 'Dana Dikembalikan', 'value' => 'Rp 9.000'],
-                ['label' => 'Sisa Tagihan', 'value' => 'Rp 9.001'],
+                ['label' => 'Total Nilai Nota', 'value' => 'Rp 150.000'],
+                ['label' => 'Uang Refund Dibayar', 'value' => 'Rp 9.000'],
+                ['label' => 'Sisa Tagihan Customer', 'value' => 'Rp 9.001'],
             ],
             'rows' => [
                 [
@@ -139,7 +139,7 @@ final class TransactionReportPdfExportFeatureTest extends TestCase
                     'remaining_refund_due' => 'Rp 0',
                     'net_paid' => 'Rp 90.999',
                     'outstanding' => 'Rp 9.001',
-                    'status' => 'Ada Pengembalian Dana',
+                    'status' => 'Ada Uang Dikembalikan',
                 ],
             ],
         ])->render();

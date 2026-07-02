@@ -35,14 +35,14 @@ final class TransactionReportExcelCustomerSheetWriter
         $this->tables->writeTable($sheet, 1, [
             'Nama Pelanggan',
             'Jumlah Nota',
-            'Total Nilai Transaksi',
-            'Pembayaran Dialokasikan',
-            'Dana Dikembalikan',
-            'Pengembalian Belum Dibayar',
-            'Pengembalian Surplus Sudah Dibayar',
-            'Sisa Pengembalian Belum Dibayar',
-            'Kas Bersih',
-            'Sisa Tagihan',
+            'Total Nilai Nota',
+            'Pembayaran Masuk ke Nota',
+            'Uang Refund Dibayar',
+            'Refund yang Harus Dibayar',
+            'Kelebihan Bayar Sudah Dikembalikan',
+            'Sisa Refund Belum Dibayar',
+            'Uang Bersih Diterima',
+            'Sisa Tagihan Customer',
         ], $values);
 
         $this->tables->autosize($sheet, 10);

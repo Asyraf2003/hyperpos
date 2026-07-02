@@ -110,7 +110,7 @@ final class InventoryStockValueReportExcelExportFeatureTest extends TestCase
         $this->assertNotNull($movement);
 
         $this->assertSame('Stok dan Nilai Persediaan', $summary->getCell('A1')->getValue());
-        $this->assertSame('01/01/2030 s/d 31/01/2030', $summary->getCell('B2')->getValue());
+        $this->assertSame('Januari 2030', $summary->getCell('B2')->getValue());
         $this->assertSame(4, $summary->getCell('B6')->getValue());
         $this->assertSame(2, $summary->getCell('B7')->getValue());
         $this->assertSame(21, $summary->getCell('B8')->getValue());
@@ -270,18 +270,18 @@ final class InventoryStockValueReportExcelExportFeatureTest extends TestCase
             }
         }
 
-        $this->assertContains('Nilai Berdasar Avg x Qty', $summaryCells);
-        $this->assertContains('Catatan Diagnostik', $summaryCells);
-        $this->assertContains('Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.', $summaryCells);
+        $this->assertContains('Nilai Pembanding Avg x Qty', $summaryCells);
+        $this->assertContains('Catatan Validasi Sistem', $summaryCells);
+        $this->assertContains('Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.', $summaryCells);
         $this->assertContains(34470, $summaryCells);
-        $this->assertContains('Residual Pembulatan HPP', $summaryCells);
+        $this->assertContains('Selisih Pembulatan Modal', $summaryCells);
         $this->assertContains(23, $summaryCells);
-        $this->assertContains('Selisih Nilai Ledger', $summaryCells);
+        $this->assertContains('Selisih Nilai vs Riwayat', $summaryCells);
         $this->assertContains(0, $summaryCells);
 
-        $this->assertContains('Nilai Avg x Qty (Diagnostik)', $snapshotCells);
-        $this->assertContains('Residual Pembulatan HPP (Diagnostik)', $snapshotCells);
-        $this->assertContains('Selisih Nilai Ledger', $snapshotCells);
+        $this->assertContains('Nilai Pembanding Avg x Qty', $snapshotCells);
+        $this->assertContains('Selisih Pembulatan Modal', $snapshotCells);
+        $this->assertContains('Selisih Nilai vs Riwayat', $snapshotCells);
         $this->assertContains(34470, $snapshotCells);
         $this->assertContains(23, $snapshotCells);
 

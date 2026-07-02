@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Reporting\Exports;
 
+use App\Support\ViewDateFormatter;
 use Carbon\CarbonImmutable;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
@@ -13,35 +14,37 @@ final class InventoryStockValueReportExcelSummarySheetWriter
     {
         $sheet->setTitle('Ringkasan');
 
+        $periodContext = ViewDateFormatter::reportPeriodContext($filters['date_from'] ?? null, $filters['date_to'] ?? null);
+
         $rows = [
             ['Stok dan Nilai Persediaan', null],
-            ['Rentang movement', $this->formatRange($filters['date_from'] ?? null, $filters['date_to'] ?? null)],
+            [$periodContext['label'], $periodContext['value']],
             ['Mode periode', $this->periodModeLabel($filters['period_mode'] ?? 'monthly')],
             ['Tanggal referensi', $this->formatDate($filters['reference_date'] ?? null)],
             [null, null],
-            ['Produk Snapshot', $this->int($summary['snapshot_product_rows'] ?? 0)],
-            ['Produk Bermutasi', $this->int($summary['movement_product_rows'] ?? 0)],
-            ['Qty Tersedia', $this->int($summary['total_qty_on_hand'] ?? 0)],
-            ['Nilai Persediaan', $this->int($summary['total_inventory_value_rupiah'] ?? 0)],
-            ['Qty Masuk Pembelian', $this->int($summary['period_supply_in_qty'] ?? 0)],
-            ['Qty Keluar Penjualan', $this->int($summary['period_sale_out_qty'] ?? 0)],
-            ['Qty Balik Refund/Reversal', $this->int($summary['period_refund_reversal_qty'] ?? 0)],
-            ['Qty Koreksi/Revisi', $this->int($summary['period_revision_correction_qty'] ?? 0)],
-            ['Selisih Qty Periode', $this->int($summary['period_net_qty_delta'] ?? 0)],
+            ['Produk Tercatat di Stok', $this->int($summary['snapshot_product_rows'] ?? 0)],
+            ['Produk Bergerak', $this->int($summary['movement_product_rows'] ?? 0)],
+            ['Total Stok Tersedia', $this->int($summary['total_qty_on_hand'] ?? 0)],
+            ['Nilai Modal Stok', $this->int($summary['total_inventory_value_rupiah'] ?? 0)],
+            ['Barang Masuk dari Supplier', $this->int($summary['period_supply_in_qty'] ?? 0)],
+            ['Barang Keluar Terjual/Dipakai', $this->int($summary['period_sale_out_qty'] ?? 0)],
+            ['Barang Balik dari Refund', $this->int($summary['period_refund_reversal_qty'] ?? 0)],
+            ['Barang Koreksi/Revisi', $this->int($summary['period_revision_correction_qty'] ?? 0)],
+            ['Perubahan Stok Bersih', $this->int($summary['period_net_qty_delta'] ?? 0)],
             ['Nilai Masuk Periode', $this->int($summary['period_total_in_cost_rupiah'] ?? 0)],
             ['Nilai Keluar Periode', $this->int($summary['period_total_out_cost_rupiah'] ?? 0)],
-            ['Selisih Nilai Pokok Periode', $this->int($summary['period_net_cost_delta_rupiah'] ?? 0)],
+            ['Perubahan Modal Stok Bersih', $this->int($summary['period_net_cost_delta_rupiah'] ?? 0)],
             ['Produk Aman', $this->int($summary['stock_safe_product_rows'] ?? 0)],
             ['Produk Low', $this->int($summary['stock_low_product_rows'] ?? 0)],
             ['Produk Critical', $this->int($summary['stock_critical_product_rows'] ?? 0)],
             ['Produk Belum Konfigurasi Threshold', $this->int($summary['stock_unconfigured_product_rows'] ?? 0)],
             [null, null],
-            ['Diagnostik Internal', null],
-            ['Catatan Diagnostik', 'Nilai utama tetap Nilai Persediaan; Avg x Qty hanya pembanding pembulatan.'],
-            ['Nilai Berdasar Avg x Qty', $this->int($summary['total_inventory_value_by_average_rupiah'] ?? 0)],
-            ['Residual Pembulatan HPP', $this->int($summary['total_rounding_residual_rupiah'] ?? 0)],
-            ['Selisih Qty Ledger', $this->int($summary['total_ledger_qty_diff'] ?? 0)],
-            ['Selisih Nilai Ledger', $this->int($summary['total_ledger_value_diff_rupiah'] ?? 0)],
+            ['Validasi Sistem', null],
+            ['Catatan Validasi Sistem', 'Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.'],
+            ['Nilai Pembanding Avg x Qty', $this->int($summary['total_inventory_value_by_average_rupiah'] ?? 0)],
+            ['Selisih Pembulatan Modal', $this->int($summary['total_rounding_residual_rupiah'] ?? 0)],
+            ['Selisih Stok vs Riwayat', $this->int($summary['total_ledger_qty_diff'] ?? 0)],
+            ['Selisih Nilai vs Riwayat', $this->int($summary['total_ledger_value_diff_rupiah'] ?? 0)],
         ];
 
         foreach ($rows as $index => $row) {
