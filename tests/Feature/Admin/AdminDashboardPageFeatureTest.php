@@ -40,19 +40,24 @@ final class AdminDashboardPageFeatureTest extends TestCase
                 ->get(route('admin.dashboard'));
 
             $response->assertOk();
-            $response->assertSee('Dashboard Laporan');
-            $response->assertSee('Total Penjualan Bulan Ini');
+            $response->assertSee('<main id="main"', false);
+            $response->assertSee('role="main"', false);
+            $response->assertSee('aria-label="Buka menu utama"', false);
+            $response->assertSee('aria-label="Ganti tema gelap atau terang"', false);
+            $response->assertSee('aria-label="Tutup menu utama"', false);
+            $response->assertSee('Ringkasan Toko');
+            $response->assertSee('Total Nilai Nota Bulan Ini');
             $response->assertSee('Rp 150.000');
-            $response->assertSee('Net Cash Bulan Ini');
+            $response->assertSee('Uang Bersih Diterima Bulan Ini');
             $response->assertSee('Rp 140.999');
-            $response->assertSee('Outstanding Bulan Ini');
+            $response->assertSee('Sisa Tagihan Bulan Ini');
             $response->assertSee('Rp 9.001');
-            $response->assertSee('Total Qty On Hand');
+            $response->assertSee('Total Stok Tersedia');
             $response->assertSee('21 Unit');
-            $response->assertSee('Nilai Persediaan');
+            $response->assertSee('Nilai Modal Stok');
             $response->assertSee('Rp 211.000');
             $response->assertSee('Status Stok Saat Ini');
-            $response->assertSee('Cetak Laporan Resmi');
+            $response->assertSee('Cetak / Unduh Laporan');
             $response->assertSee(route('admin.reports.transaction_summary.export_pdf', [
                 'period_mode' => 'monthly',
                 'reference_date' => '2030-01-09',
@@ -87,20 +92,24 @@ final class AdminDashboardPageFeatureTest extends TestCase
                 '2',
                 'Mulai Perlu Restok',
             ]);
-            $response->assertSee('Uang Masuk Hari Ini');
+            $response->assertSee('Uang Diterima Hari Ini');
             $response->assertSee('Rp 50.000');
-            $response->assertSee('Laba Kas Operasional Bulan Ini');
+            $response->assertSee('Sisa Kas Operasional Bulan Ini');
+            $response->assertDontSee('Net Cash Bulan Ini');
+            $response->assertDontSee('Outstanding Bulan Ini');
+            $response->assertDontSee('Total Qty On Hand');
+            $response->assertDontSee('Aktivitas Ledger Periode Ini');
             $response->assertSee('Rp -74.000');
-            $response->assertSee('Kas Keluar Bulan Ini');
+            $response->assertSee('Uang Dikembalikan Bulan Ini');
             $response->assertSee('Rp 5.000');
-            $response->assertSee('Aktivitas Ledger Periode Ini');
-            $response->assertSee('Kas Masuk Sebelum Refund');
-            $response->assertSee('Refund Keluar Periode Ini');
-            $response->assertSee('Qty Keluar Sebelum Reversal');
-            $response->assertSee('Net Qty Setelah Reversal');
-            $response->assertSee('Outstanding Supplier');
+            $response->assertSee('Riwayat Uang dan Stok Bulan Ini');
+            $response->assertSee('Uang Masuk Sebelum Refund');
+            $response->assertSee('Uang Refund Keluar Bulan Ini');
+            $response->assertSee('Barang Keluar Sebelum Barang Balik');
+            $response->assertSee('Barang Keluar Bersih');
+            $response->assertSee('Sisa Hutang Supplier');
             $response->assertSee('Rp 30.000');
-            $response->assertSee('Hutang Karyawan');
+            $response->assertSee('Kasbon/Hutang Karyawan');
             $response->assertSee('Rp 60.000');
             $response->assertSee('Biaya Operasional');
             $response->assertSee('Barang Paling Laku');
@@ -154,7 +163,7 @@ final class AdminDashboardPageFeatureTest extends TestCase
                 ->get(route('admin.dashboard', ['month' => '2030-01']));
 
             $response->assertOk();
-            $response->assertSee('Periode Dashboard');
+            $response->assertSee('Bulan Dashboard');
             $response->assertSee('Filter &amp; Cetak', false);
             $response->assertSee('id="admin-dashboard-filter-drawer"', false);
             $response->assertSee('name="month"', false);

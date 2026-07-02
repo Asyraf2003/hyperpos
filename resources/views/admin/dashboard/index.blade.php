@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Dashboard Laporan')
-@section('heading', 'Dashboard Laporan')
+@section('title', 'Ringkasan Toko')
+@section('heading', 'Ringkasan Toko')
 @section('heading_title_class', 'dashboard-heading-title')
 @section('heading_actions')
     <span class="text-muted small fw-bold dashboard-heading-period">
-        Periode:
+        Bulan:
         {{ \App\Support\ViewDateFormatter::range($dashboard['period']['date_from'] ?? null, $dashboard['period']['date_to'] ?? null) }}
     </span>
 
@@ -645,13 +645,13 @@
     :root {
         --dash-primary: #435ebe;
         --dash-primary-soft: #eef2ff;
-        --dash-success: #28c76f;
+        --dash-success: #147a3d;
         --dash-success-soft: #ecfdf3;
-        --dash-warning: #fdac41;
+        --dash-warning: #8a4b00;
         --dash-warning-soft: #fff7e8;
-        --dash-danger: #ea5455;
+        --dash-danger: #b4232a;
         --dash-danger-soft: #fff1f2;
-        --dash-info: #00cfe8;
+        --dash-info: #006b78;
         --dash-info-soft: #ecfeff;
     }
 
@@ -659,8 +659,8 @@
         --report-surface: var(--bs-body-bg);
         --report-surface-soft: var(--bs-tertiary-bg, var(--bs-secondary-bg));
         --report-border: color-mix(in srgb, var(--bs-border-color) 82%, var(--bs-primary) 18%);
-        --report-text: color-mix(in srgb, var(--bs-body-color) 88%, white 12%);
-        --report-text-muted: color-mix(in srgb, var(--bs-secondary-color) 72%, white 28%);
+        --report-text: var(--bs-body-color);
+        --report-text-muted: color-mix(in srgb, var(--bs-body-color) 72%, var(--bs-secondary-color) 28%);
         --report-radius-xl: 1.6rem;
         --report-radius-lg: 1.25rem;
         --report-radius-md: 1rem;
@@ -679,6 +679,26 @@
 
     .dashboard-report * {
         box-sizing: border-box;
+    }
+
+    .dashboard-report {
+        color: var(--report-text);
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .dashboard-report p {
+        color: var(--report-text-muted);
+    }
+
+    .dashboard-report a:not(.btn) {
+        text-underline-offset: .18em;
+        text-decoration-thickness: .08em;
+    }
+
+    .dashboard-report a:not(.btn):hover,
+    .dashboard-report a:not(.btn):focus-visible {
+        text-decoration: underline;
     }
 
     .dashboard-report .card,
@@ -720,6 +740,7 @@
         margin-bottom: 0;
         font-weight: 700;
         line-height: 1.65;
+        text-wrap: pretty;
     }
 
     .dashboard-report .card-head,
@@ -803,7 +824,8 @@
 
     .dashboard-report .hero-metric-label {
         font-size: .79rem;
-        opacity: .9;
+        opacity: 1;
+        color: #fff;
         margin-bottom: .25rem;
         font-weight: 700;
     }
@@ -1258,15 +1280,15 @@
                         <div class="col-12">
                             <div class="hero-grid">
                                 <div class="hero-metric">
-                                    <div class="hero-metric-label">Total Penjualan Bulan Ini</div>
+                                    <div class="hero-metric-label">Total Nilai Nota Bulan Ini</div>
                                     <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_gross_transaction_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                                 <div class="hero-metric">
-                                    <div class="hero-metric-label">Net Cash Bulan Ini</div>
+                                    <div class="hero-metric-label">Uang Bersih Diterima Bulan Ini</div>
                                     <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_net_cash_collected_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                                 <div class="hero-metric">
-                                    <div class="hero-metric-label">Outstanding Bulan Ini</div>
+                                    <div class="hero-metric-label">Sisa Tagihan Bulan Ini</div>
                                     <h4 class="hero-metric-value">Rp {{ number_format($dashboard['hero']['monthly_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</h4>
                                 </div>
                             </div>
@@ -1307,11 +1329,11 @@
                         <i class="bi-box-seam"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Total Qty On Hand</div>
+                        <div class="stat-title">Total Stok Tersedia</div>
                         <div class="stat-value">{{ number_format($dashboard['stats']['total_qty_on_hand'] ?? 0, 0, ',', '.') }} Unit</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-boxes"></i>
-                            Snapshot stok saat ini
+                            Stok yang tercatat saat ini
                         </p>
                     </div>
                 </div>
@@ -1325,11 +1347,11 @@
                         <i class="bi-buildings"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Nilai Persediaan</div>
+                        <div class="stat-title">Nilai Modal Stok</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['total_inventory_value_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-buildings"></i>
-                            Nilai inventory snapshot saat ini
+                            Nilai modal barang yang masih tersedia
                         </p>
                     </div>
                 </div>
@@ -1343,11 +1365,11 @@
                         <i class="bi-wallet2"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Uang Masuk Hari Ini</div>
+                        <div class="stat-title">Uang Diterima Hari Ini</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['daily_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-wallet2"></i>
-                            Berdasarkan arus kas transaksi hari ini
+                            Uang masuk dari transaksi hari ini
                         </p>
                     </div>
                 </div>
@@ -1361,11 +1383,11 @@
                         <i class="bi-repeat"></i>
                     </div>
                     <div>
-                        <div class="stat-title">Laba Bulan Ini</div>
+                        <div class="stat-title">Sisa Kas Operasional Bulan Ini</div>
                         <div class="stat-value">Rp {{ number_format($dashboard['stats']['monthly_cash_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                         <p class="stat-meta meta-flat">
                             <i class="bi bi-graph-up-arrow"></i>
-                            Ringkasan laba periode berjalan
+                            Sisa kas setelah refund, modal produk, biaya, gaji, dan kasbon
                         </p>
                     </div>
                 </div>
@@ -1379,49 +1401,49 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Posisi Keuangan Bulan Ini</h5>
-                            <p class="section-subtitle">Ringkasan keuangan yang sudah terhubung ke data report aktif.</p>
+                            <h5 class="section-title">Ringkasan Uang Bulan Ini</h5>
+                            <p class="section-subtitle">Ringkasan uang masuk, uang keluar, dan sisa kas dari data laporan aktif.</p>
                         </div>
                         <span class="badge-soft bg-soft-info">
                             <i class="bi bi-bank"></i>
-                            Live
+                            Data Aktif
                         </span>
                     </div>
 
                     <div class="finance-grid">
                         <div class="finance-box">
-                            <div class="finance-label">Kas Masuk Bulan Ini</div>
+                            <div class="finance-label">Uang Diterima Bulan Ini</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_in_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-up">
                                 <i class="bi bi-arrow-up-right"></i>
-                                Arus kas transaksi masuk periode berjalan
+                                Uang masuk dari pembayaran customer bulan ini
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Kas Keluar Bulan Ini</div>
+                            <div class="finance-label">Uang Dikembalikan Bulan Ini</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_out_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-down">
                                 <i class="bi bi-arrow-down-right"></i>
-                                Refund transaksi pada periode berjalan
+                                Uang refund yang sudah dibayar bulan ini
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Laba Kas Operasional Bulan Ini</div>
+                            <div class="finance-label">Sisa Kas Operasional Bulan Ini</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_cash_operational_profit_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-flat">
                                 <i class="bi bi-arrow-repeat"></i>
-                                Laba kas operasional periode berjalan
+                                Sisa kas operasional bulan ini
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Net Cash Flow Bulan Ini</div>
+                            <div class="finance-label">Selisih Uang Masuk/Keluar Bulan Ini</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['finance']['monthly_net_cash_flow_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-up">
                                 <i class="bi bi-graph-up-arrow"></i>
-                                Selisih kas masuk dan kas keluar periode berjalan
+                                Selisih uang diterima dan uang dikembalikan bulan ini
                             </p>
                         </div>
                     </div>
@@ -1436,14 +1458,14 @@
                 <div class="panel-card-body">
                     <div class="card-head">
                         <div>
-                            <h5 class="section-title">Aktivitas Ledger Periode Ini</h5>
+                            <h5 class="section-title">Riwayat Uang dan Stok Bulan Ini</h5>
                             <p class="section-subtitle">
-                                Konteks aktivitas kas dan stok sebelum dibaca sebagai posisi aktif/current.
+                                Ringkasan perubahan uang dan stok selama bulan ini sebelum melihat posisi akhir.
                             </p>
                         </div>
                         <span class="badge-soft bg-soft-warning">
                             <i class="bi bi-journal-check"></i>
-                            Audit Context
+                            Riwayat Sistem
                         </span>
                     </div>
 
@@ -1451,44 +1473,44 @@
                         <div class="helper-note mb-3">
                             Periode ini punya kas masuk Rp {{ number_format($dashboard['ledger_activity']['cash_in_before_refund_rupiah'] ?? 0, 0, ',', '.') }},
                             tetapi refund juga tercatat Rp {{ number_format($dashboard['ledger_activity']['cash_refund_out_rupiah'] ?? 0, 0, ',', '.') }}.
-                            Karena itu net cash dan current sales bisa tampil 0 meskipun aktivitas ledger pernah terjadi.
+                            Karena itu net cash dan current sales bisa tampil 0 meskipun riwayat transaksi pernah terjadi.
                         </div>
                     @endif
 
                     <div class="finance-grid">
                         <div class="finance-box">
-                            <div class="finance-label">Kas Masuk Sebelum Refund</div>
+                            <div class="finance-label">Uang Masuk Sebelum Refund</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['ledger_activity']['cash_in_before_refund_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-up">
                                 <i class="bi bi-arrow-up-right"></i>
-                                Gross kas masuk dari ledger periode aktif
+                                Uang masuk sebelum dikurangi refund
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Refund Keluar Periode Ini</div>
+                            <div class="finance-label">Uang Refund Keluar Bulan Ini</div>
                             <div class="finance-value">Rp {{ number_format($dashboard['ledger_activity']['cash_refund_out_rupiah'] ?? 0, 0, ',', '.') }}</div>
                             <p class="finance-note meta-down">
                                 <i class="bi bi-arrow-down-right"></i>
-                                Kas keluar karena refund periode aktif
+                                Uang keluar untuk refund bulan ini
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Qty Keluar Sebelum Reversal</div>
+                            <div class="finance-label">Barang Keluar Sebelum Barang Balik</div>
                             <div class="finance-value">{{ number_format($dashboard['ledger_activity']['stock_out_qty_before_reversal'] ?? 0, 0, ',', '.') }} Unit</div>
                             <p class="finance-note meta-flat">
                                 <i class="bi bi-box-arrow-up"></i>
-                                Stok keluar menurut inventory movement periode aktif
+                                Barang keluar menurut riwayat stok bulan ini
                             </p>
                         </div>
 
                         <div class="finance-box">
-                            <div class="finance-label">Net Qty Setelah Reversal</div>
+                            <div class="finance-label">Barang Keluar Bersih</div>
                             <div class="finance-value">{{ number_format($dashboard['ledger_activity']['net_stock_out_qty'] ?? 0, 0, ',', '.') }} Unit</div>
                             <p class="finance-note meta-flat">
                                 <i class="bi bi-arrow-repeat"></i>
-                                Qty keluar dikurangi reversal/refund stok
+                                Barang keluar setelah dikurangi barang balik/refund
                             </p>
                         </div>
                     </div>
@@ -1508,7 +1530,7 @@
                         </div>
                         <span class="badge-soft bg-soft-primary">
                             <i class="bi bi-clipboard-data"></i>
-                            Asset Overview
+                            Ringkasan Aset
                         </span>
                     </div>
 
@@ -1520,7 +1542,7 @@
                                         <span class="product-avatar bg-soft-primary"><i class="bi bi-box2-heart"></i></span>
                                         <div>
                                             <div class="asset-title">Persediaan Barang</div>
-                                            <p class="asset-subtitle">Nilai inventory snapshot saat ini</p>
+                                            <p class="asset-subtitle">Nilai modal barang yang masih tersedia</p>
                                         </div>
                                     </div>
                                     <p class="asset-value">Rp {{ number_format($dashboard['position']['inventory_value_rupiah'] ?? 0, 0, ',', '.') }}</p>
@@ -1530,8 +1552,8 @@
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-success"><i class="bi bi-cash-coin"></i></span>
                                         <div>
-                                            <div class="asset-title">Outstanding Transaksi</div>
-                                            <p class="asset-subtitle">Sisa tagihan transaksi bulan ini</p>
+                                            <div class="asset-title">Sisa Tagihan Customer</div>
+                                            <p class="asset-subtitle">Sisa tagihan customer bulan ini</p>
                                         </div>
                                     </div>
                                     <p class="asset-value">Rp {{ number_format($dashboard['position']['transaction_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</p>
@@ -1545,8 +1567,8 @@
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-warning"><i class="bi bi-tools"></i></span>
                                         <div>
-                                            <div class="asset-title">Outstanding Supplier</div>
-                                            <p class="asset-subtitle">Hutang supplier bulan ini</p>
+                                            <div class="asset-title">Sisa Hutang Supplier</div>
+                                            <p class="asset-subtitle">Sisa hutang supplier bulan ini</p>
                                         </div>
                                     </div>
                                     <p class="asset-value">Rp {{ number_format($dashboard['position']['supplier_outstanding_rupiah'] ?? 0, 0, ',', '.') }}</p>
@@ -1556,8 +1578,8 @@
                                     <div class="asset-left">
                                         <span class="product-avatar bg-soft-info"><i class="bi bi-truck"></i></span>
                                         <div>
-                                            <div class="asset-title">Hutang Karyawan</div>
-                                            <p class="asset-subtitle">Sisa hutang karyawan bulan ini</p>
+                                            <div class="asset-title">Kasbon/Hutang Karyawan</div>
+                                            <p class="asset-subtitle">Sisa kasbon/hutang karyawan bulan ini</p>
                                         </div>
                                     </div>
                                     <p class="asset-value">Rp {{ number_format($dashboard['position']['employee_debt_remaining_rupiah'] ?? 0, 0, ',', '.') }}</p>
@@ -1607,7 +1629,7 @@
                         </div>
                         <span class="badge-soft bg-soft-success">
                             <i class="bi bi-bar-chart-line"></i>
-                            Live
+                            Data Aktif
                         </span>
                     </div>
 
@@ -1645,7 +1667,7 @@
                                             <td>
                                                 <span class="badge-soft bg-soft-success">
                                                     <i class="bi bi-bar-chart-line"></i>
-                                                    Live
+                                                    Data Aktif
                                                 </span>
                                             </td>
                                         </tr>
@@ -1735,7 +1757,7 @@
                         </div>
                         <span class="badge-soft bg-soft-warning">
                             <i class="bi bi-exclamation-triangle"></i>
-                            Live
+                            Data Aktif
                         </span>
                     </div>
 

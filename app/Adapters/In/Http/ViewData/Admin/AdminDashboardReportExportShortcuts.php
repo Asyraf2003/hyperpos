@@ -25,13 +25,13 @@ final class AdminDashboardReportExportShortcuts
                 'excel' => 'admin.reports.transaction_cash_ledger.export_excel',
             ],
             [
-                'label' => 'Stok dan Nilai Persediaan',
+                'label' => 'Stok dan Nilai Modal',
                 'index' => 'admin.reports.inventory_stock_value.index',
                 'pdf' => 'admin.reports.inventory_stock_value.export_pdf',
                 'excel' => 'admin.reports.inventory_stock_value.export_excel',
             ],
             [
-                'label' => 'Laba Kas Operasional',
+                'label' => 'Ringkasan Kas Operasional',
                 'index' => 'admin.reports.operational_profit.index',
                 'pdf' => 'admin.reports.operational_profit.export_pdf',
                 'excel' => 'admin.reports.operational_profit.export_excel',
@@ -43,7 +43,7 @@ final class AdminDashboardReportExportShortcuts
                 'excel' => 'admin.reports.operational_expense.export_excel',
             ],
             [
-                'label' => 'Payroll',
+                'label' => 'Gaji Karyawan',
                 'index' => 'admin.reports.payroll.index',
                 'pdf' => 'admin.reports.payroll.export_pdf',
                 'excel' => 'admin.reports.payroll.export_excel',

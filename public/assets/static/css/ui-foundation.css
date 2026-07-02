@@ -214,6 +214,16 @@ textarea.form-control {
     font-weight: 600;
 }
 
+a:not(.btn):not(.sidebar-link):not(.dropdown-item) {
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 0.08em;
+}
+
+a:not(.btn):not(.sidebar-link):not(.dropdown-item):hover,
+a:not(.btn):not(.sidebar-link):not(.dropdown-item):focus-visible {
+    text-decoration: underline;
+}
+
 .modal-content {
     border-radius: 1rem;
     overflow: hidden;

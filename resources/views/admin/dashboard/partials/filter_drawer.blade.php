@@ -12,7 +12,7 @@
     <div class="p-4">
         <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
             <div>
-                <h5 class="mb-1 fw-bold">Filter Dashboard</h5>
+                <h5 class="mb-1 fw-bold">Filter Bulan Dashboard</h5>
             </div>
 
             <button
@@ -37,7 +37,7 @@
         >
             <section class="d-grid gap-3">
                 <div>
-                    <div class="section-title mb-1">Periode Dashboard {{ $dashboard['period']['date_from'] ?? '-' }} s.d {{ $dashboard['period']['date_to'] ?? '-' }}</div>
+                    <div class="section-title mb-1">Bulan Dashboard {{ $dashboard['period']['date_from'] ?? '-' }} s.d {{ $dashboard['period']['date_to'] ?? '-' }}</div>
                 </div>
 
                 <div class="form-group">
@@ -53,18 +53,18 @@
 
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary fw-bold">
-                        Terapkan Periode
+                        Terapkan Bulan
                     </button>
 
                     <a href="{{ route('admin.dashboard') }}" class="btn btn-light-secondary fw-bold">
-                        Reset Bulan Aktif
+                        Kembali ke Bulan Ini
                     </a>
                 </div>
             </section>
 
             <section class="d-grid gap-3">
                 <div>
-                    <div class="section-title mb-1">Cetak Laporan Resmi</div>
+                    <div class="section-title mb-1">Cetak / Unduh Laporan</div>
                 </div>
 
                 <div class="d-grid gap-3">
@@ -72,7 +72,7 @@
                         <div class="report-export-shortcut-card">
                             <div class="inventory-title mb-2">{{ $shortcut['label'] }}</div>
                             <p class="inventory-meta mb-3">
-                                Periode dashboard: {{ $dashboardFilterDrawer['active_month'] }}
+                                Bulan dashboard: {{ $dashboardFilterDrawer['active_month'] }}
                             </p>
 
                             <div class="report-export-shortcut-actions">

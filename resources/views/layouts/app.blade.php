@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
@@ -31,14 +31,14 @@
             @include('layouts.partials.sidebar-cashier')
         @endif
 
-        <div id="main" class="d-flex flex-column min-vh-100">
+        <main id="main" class="d-flex flex-column min-vh-100" role="main" tabindex="-1">
 
             <div class="page-content flex-grow-1">
                 @include('layouts.partials.alerts')
 
                 @hasSection('heading')
                     <div class="page-heading layout-page-heading d-flex align-items-center gap-3 flex-wrap @hasSection('heading_actions') has-heading-actions @endif">
-                        <a href="#" class="burger-btn layout-heading-icon-action d-block d-xl-none">
+                        <a href="#" class="burger-btn layout-heading-icon-action d-block d-xl-none" aria-label="Buka menu utama" title="Buka menu utama">
                             <i class="bi bi-justify fs-3"></i>
                         </a>
 
@@ -74,7 +74,7 @@
             </div>
 
             @include('layouts.partials.footer')
-        </div>
+        </main>
     </div>
 
     <script src="{{ asset('assets/static/js/components/dark.js') }}?v={{ config('app.asset_version') }}"></script>
