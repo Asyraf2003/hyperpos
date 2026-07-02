@@ -114,22 +114,22 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
 
         $this->assertSame('Total Kelebihan Bayar Sudah Dikembalikan', $summary->getCell('A11')->getValue());
         $this->assertSame(3000, $summary->getCell('B11')->getValue());
-        $this->assertSame('Total Sisa Refund yang Harus Dibayar', $summary->getCell('A12')->getValue());
+        $this->assertSame('Total Sisa Refund Belum Dibayar', $summary->getCell('A12')->getValue());
         $this->assertSame(4000, $summary->getCell('B12')->getValue());
 
         $this->assertSame('Kelebihan Bayar Sudah Dikembalikan', $detail->getCell('I1')->getValue());
         $this->assertSame(3000, $detail->getCell('I2')->getValue());
-        $this->assertSame('Sisa Refund yang Harus Dibayar', $detail->getCell('J1')->getValue());
+        $this->assertSame('Sisa Refund Belum Dibayar', $detail->getCell('J1')->getValue());
         $this->assertSame(4000, $detail->getCell('J2')->getValue());
 
         $this->assertSame('Kelebihan Bayar Sudah Dikembalikan', $period->getCell('G1')->getValue());
         $this->assertSame(3000, $period->getCell('G2')->getValue());
-        $this->assertSame('Sisa Refund yang Harus Dibayar', $period->getCell('H1')->getValue());
+        $this->assertSame('Sisa Refund Belum Dibayar', $period->getCell('H1')->getValue());
         $this->assertSame(4000, $period->getCell('H2')->getValue());
 
         $this->assertSame('Kelebihan Bayar Sudah Dikembalikan', $customer->getCell('G1')->getValue());
         $this->assertSame(3000, $customer->getCell('G2')->getValue());
-        $this->assertSame('Sisa Refund yang Harus Dibayar', $customer->getCell('H1')->getValue());
+        $this->assertSame('Sisa Refund Belum Dibayar', $customer->getCell('H1')->getValue());
         $this->assertSame(4000, $customer->getCell('H2')->getValue());
 
         $spreadsheet->disconnectWorksheets();
@@ -151,7 +151,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
             $viewData['summaryItems'],
         );
         $this->assertContains(
-            ['label' => 'Sisa Refund yang Harus Dibayar', 'value' => 'Rp 4.000'],
+            ['label' => 'Sisa Refund Belum Dibayar', 'value' => 'Rp 4.000'],
             $viewData['summaryItems'],
         );
 
@@ -177,7 +177,7 @@ final class TransactionReportExportRefundDueVisibilityTest extends TestCase
         $html = view('admin.reporting.transaction_summary.export_pdf', $viewData)->render();
 
         $this->assertStringContainsString('Kelebihan Bayar Sudah Dikembalikan', $html);
-        $this->assertStringContainsString('Sisa Refund yang Harus Dibayar', $html);
+        $this->assertStringContainsString('Sisa Refund Belum Dibayar', $html);
         $this->assertStringContainsString('Rp 3.000', $html);
         $this->assertStringContainsString('Rp 4.000', $html);
     }
