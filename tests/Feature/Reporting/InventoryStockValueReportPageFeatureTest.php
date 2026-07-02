@@ -249,7 +249,7 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Rp 34.493');
 
         $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
-        $response->assertSee('Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.');
+        $response->assertSee('Buka bagian ini untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.');
 
         $response->assertSee('Nilai Pembanding Avg x Qty');
         $response->assertSee('Rp 34.470');
