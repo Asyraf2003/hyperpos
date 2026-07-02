@@ -95,12 +95,16 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertOk();
         $response->assertSee('Stok dan Nilai Persediaan');
         $response->assertSee('inventory-stock-value-report-filter-form', false);
-        $response->assertSee('Notifikasi stok belum aktif.');
+        $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
         $response->assertSee('Bulan Terkait');
         $response->assertSee('Januari 2030');
         $response->assertSee('Rincian Ringkas');
         $response->assertSee('Total Stok Tersedia');
         $response->assertSee('Nilai Modal Stok');
+        $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
+        $response->assertSee('<details class="stock-validation-dropdown">', false);
+        $response->assertDontSee('Notifikasi stok belum aktif.');
+        $response->assertDontSee('Template UI reminder stok masih hardcoded');
         $response->assertSee('Perubahan Stok Bersih');
         $response->assertSee('Rp 211.000');
         $response->assertDontSee('Supra');
@@ -244,7 +248,7 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Nilai Modal Stok');
         $response->assertSee('Rp 34.493');
 
-        $response->assertSee('Validasi Sistem');
+        $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
         $response->assertSee('Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.');
 
         $response->assertSee('Nilai Pembanding Avg x Qty');

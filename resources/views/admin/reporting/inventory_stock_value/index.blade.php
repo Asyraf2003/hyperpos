@@ -26,14 +26,7 @@
     ],
 ])
 
-<div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
-    <div aria-hidden="true">🔔</div>
-    <div>
-        <div class="fw-semibold">Notifikasi stok belum aktif.</div>
-        <div class="small mb-0">Template UI reminder stok masih hardcoded; pengiriman notifikasi otomatis belum diaktifkan pada flow produksi.</div>
-    </div>
-</div>
-
+<div class="inventory-stock-value-report">
 <div class="mb-3">
     <h5 class="mb-1">Ringkasan Utama</h5>
 </div>
@@ -110,43 +103,53 @@
     </div>
 
     <div class="col-12">
-        <div class="small fw-semibold text-info">Validasi Sistem</div>
-        <div class="small text-muted">Bagian ini mengecek apakah ringkasan stok saat ini cocok dengan riwayat keluar-masuk barang. Nilai sehat untuk selisih stok dan nilai adalah 0.</div>
-    </div>
+        <details class="stock-validation-dropdown">
+            <summary>
+                <span>
+                    <span class="stock-validation-title d-block">Cek Kecocokan Stok dan Riwayat Barang</span>
+                    <span class="stock-validation-help d-block small">
+                        Buka bagian ini untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.
+                    </span>
+                </span>
+            </summary>
 
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card border-warning"><div class="card-body">
-            <div class="text-muted small">Nilai Pembanding Avg x Qty</div>
-            <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_inventory_value_by_average_rupiah'] ?? 0, 0, ',', '.') }}</div>
-        </div></div>
-    </div>
+            <div class="row g-3 mt-2">
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card border-warning"><div class="card-body">
+                        <div class="text-muted small">Nilai Pembanding Avg x Qty</div>
+                        <div class="fs-5 fw-bold">Rp {{ number_format($summary['total_inventory_value_by_average_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                    </div></div>
+                </div>
 
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card border-info"><div class="card-body">
-            <div class="text-muted small">Selisih Pembulatan Modal</div>
-            <div class="fs-5 fw-bold text-muted">Rp {{ number_format($summary['total_rounding_residual_rupiah'] ?? 0, 0, ',', '.') }}</div>
-            <div class="small text-muted mt-1">Selisih kecil akibat pembulatan modal rata-rata. Nilai stok resmi tetap memakai Nilai Modal Stok.</div>
-        </div></div>
-    </div>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card border-info"><div class="card-body">
+                        <div class="text-muted small">Selisih Pembulatan Modal</div>
+                        <div class="fs-5 fw-bold text-muted">Rp {{ number_format($summary['total_rounding_residual_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                        <div class="small text-muted mt-1">Selisih kecil akibat pembulatan modal rata-rata. Nilai stok resmi tetap memakai Nilai Modal Stok.</div>
+                    </div></div>
+                </div>
 
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_qty_diff') }}"><div class="card-body">
-            <div class="text-muted small">Selisih Stok vs Riwayat</div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_qty_diff') }}">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
-                <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_qty_diff') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_qty_diff') }}</span>
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_qty_diff') }}"><div class="card-body">
+                        <div class="text-muted small">Selisih Stok vs Riwayat</div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_qty_diff') }}">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
+                            <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_qty_diff') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_qty_diff') }}</span>
+                        </div>
+                    </div></div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_value_diff_rupiah') }}"><div class="card-body">
+                        <div class="text-muted small">Selisih Nilai vs Riwayat</div>
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_value_diff_rupiah') }}">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                            <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_value_diff_rupiah') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_value_diff_rupiah') }}</span>
+                        </div>
+                    </div></div>
+                </div>
             </div>
-        </div></div>
-    </div>
-
-    <div class="col-12 col-md-6 col-xl-3">
-        <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_value_diff_rupiah') }}"><div class="card-body">
-            <div class="text-muted small">Selisih Nilai vs Riwayat</div>
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_value_diff_rupiah') }}">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
-                <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_value_diff_rupiah') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_value_diff_rupiah') }}</span>
-            </div>
-        </div></div>
+        </details>
     </div>
 
 </div>
@@ -183,5 +186,6 @@
             <div class="fs-5 fw-bold">Rp {{ number_format($summary['period_net_cost_delta_rupiah'] ?? 0, 0, ',', '.') }}</div>
         </div></div>
     </div>
+</div>
 </div>
 @endsection
