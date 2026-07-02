@@ -108,9 +108,11 @@
                 <span>
                     <span class="stock-validation-title d-block">Cek Kecocokan Stok dan Riwayat Barang</span>
                     <span class="stock-validation-help d-block small">
-                        Buka bagian ini untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.
+                        Klik tombol cek selengkapnya untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.
                     </span>
                 </span>
+
+                <span class="stock-validation-action" aria-hidden="true"></span>
             </summary>
 
             <div class="row g-3 mt-2">

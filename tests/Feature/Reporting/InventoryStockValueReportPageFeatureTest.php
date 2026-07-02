@@ -103,6 +103,8 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Nilai Modal Stok');
         $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
         $response->assertSee('<details class="stock-validation-dropdown">', false);
+        $response->assertSee('stock-validation-action', false);
+        $response->assertSee('Klik tombol cek selengkapnya');
         $response->assertDontSee('Notifikasi stok belum aktif.');
         $response->assertDontSee('Template UI reminder stok masih hardcoded');
         $response->assertSee('Perubahan Stok Bersih');
@@ -249,7 +251,7 @@ final class InventoryStockValueReportPageFeatureTest extends TestCase
         $response->assertSee('Rp 34.493');
 
         $response->assertSee('Cek Kecocokan Stok dan Riwayat Barang');
-        $response->assertSee('Buka bagian ini untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.');
+        $response->assertSee('Klik tombol cek selengkapnya untuk melihat pembanding nilai stok, selisih pembulatan modal, dan kecocokan stok dengan riwayat keluar-masuk barang.');
 
         $response->assertSee('Nilai Pembanding Avg x Qty');
         $response->assertSee('Rp 34.470');
