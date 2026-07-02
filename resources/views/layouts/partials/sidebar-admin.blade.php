@@ -4,7 +4,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
                     <a href="{{ route('admin.dashboard') }}">
-                        <img src="{{ asset('assets/compiled/svg/logo.svg') }}" alt="Logo HyperPOS">
+                        <img src="{{ asset('assets/compiled/svg/logo.svg') }}" alt="Logo HyperPOS" width="150" height="40" decoding="async">
                     </a>
                 </div>
 

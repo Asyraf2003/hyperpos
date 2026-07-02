@@ -1302,7 +1302,7 @@
                 <div class="admin-profile-top bg-primary p-4 text-white card profile-card h-100 border-0 shadow-sm overflow-hidden">
                     <div class="d-flex align-items-center gap-3 mb-4">
                         <div class="admin-avatar-wrap flex-shrink-0">
-                            <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna" class="rounded-circle border border-2 border-white" style="width: 64px; height: 64px; object-fit: cover;">
+                            <img src="{{ asset('assets/compiled/jpg/1.jpg') }}" alt="Foto Pengguna" width="64" height="64" decoding="async" loading="lazy" class="rounded-circle border border-2 border-white" style="width: 64px; height: 64px; object-fit: cover;">
                         </div>
                         <div class="min-w-0">
                             <h5 class="profile-name fw-bold mb-0 text-truncate text-white">{{ $appShell['actor_label'] ?? 'Admin' }}</h5>
