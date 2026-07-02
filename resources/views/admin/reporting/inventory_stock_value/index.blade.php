@@ -24,12 +24,6 @@
         ],
     ],
 ])
-@php
-    $ledgerQtyDiff = (float) ($summary['total_ledger_qty_diff'] ?? 0);
-    $ledgerValueDiff = (int) ($summary['total_ledger_value_diff_rupiah'] ?? 0);
-    $ledgerQtyHealthy = $ledgerQtyDiff == 0.0;
-    $ledgerValueHealthy = $ledgerValueDiff === 0;
-@endphp
 
 <div class="alert alert-warning d-flex align-items-start gap-2" role="alert">
     <div aria-hidden="true">🔔</div>
@@ -135,21 +129,21 @@
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
-        <div class="card {{ $ledgerQtyHealthy ? 'border-success' : 'border-danger' }}"><div class="card-body">
+        <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_qty_diff') }}"><div class="card-body">
             <div class="text-muted small">Selisih Stok vs Riwayat</div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="fs-5 fw-bold {{ $ledgerQtyHealthy ? 'text-success' : 'text-danger' }}">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
-                <span class="badge {{ $ledgerQtyHealthy ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }}">{{ $ledgerQtyHealthy ? 'Sehat' : 'Perlu Dicek' }}</span>
+                <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_qty_diff') }}">{{ number_format($summary['total_ledger_qty_diff'] ?? 0, 0, ',', '.') }}</div>
+                <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_qty_diff') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_qty_diff') }}</span>
             </div>
         </div></div>
     </div>
 
     <div class="col-12 col-md-6 col-xl-3">
-        <div class="card {{ $ledgerValueHealthy ? 'border-success' : 'border-danger' }}"><div class="card-body">
+        <div class="card {{ \App\Support\InventoryStockValueValidationStatusPresenter::cardClass($summary, 'total_ledger_value_diff_rupiah') }}"><div class="card-body">
             <div class="text-muted small">Selisih Nilai vs Riwayat</div>
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="fs-5 fw-bold {{ $ledgerValueHealthy ? 'text-success' : 'text-danger' }}">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
-                <span class="badge {{ $ledgerValueHealthy ? 'bg-light-success text-success' : 'bg-light-danger text-danger' }}">{{ $ledgerValueHealthy ? 'Sehat' : 'Perlu Dicek' }}</span>
+                <div class="fs-5 fw-bold {{ \App\Support\InventoryStockValueValidationStatusPresenter::textClass($summary, 'total_ledger_value_diff_rupiah') }}">Rp {{ number_format($summary['total_ledger_value_diff_rupiah'] ?? 0, 0, ',', '.') }}</div>
+                <span class="badge {{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeClass($summary, 'total_ledger_value_diff_rupiah') }}">{{ \App\Support\InventoryStockValueValidationStatusPresenter::badgeText($summary, 'total_ledger_value_diff_rupiah') }}</span>
             </div>
         </div></div>
     </div>
