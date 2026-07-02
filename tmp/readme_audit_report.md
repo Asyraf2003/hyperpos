@@ -998,4 +998,5 @@ Blueprint scope continuation setelah audit 1461 selective patch ditutup.
 | `blueprint.md` | Baseline state saat blueprint dibuat, locked workflow, scope aktif, ambiguity inventory |
 
 ---
-
+[asyraf@arch app]$ TIMEFORMAT=$'\nreal=%3R sec\nuser=%3U sec\nsys=%3S sec'
+time XDEBUG_MODE=off php -d memory_limit=-1 vendor/bin/pest
