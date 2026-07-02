@@ -58,6 +58,7 @@ final class ReportPeriodFilterContextBoundaryTest extends TestCase
             'resetUrl' => '/reports/boundary',
             'basisDateLabel' => 'Tanggal referensi laporan',
             'filters' => $filters,
+            'errors' => new \Illuminate\Support\ViewErrorBag(),
             'useReportPeriodContext' => $useContext,
         ])->render();
     }
