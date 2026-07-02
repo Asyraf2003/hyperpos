@@ -36,7 +36,7 @@ final class WebPageAccessFeatureTest extends TestCase
             ->get(route('admin.dashboard'));
 
         $response->assertOk();
-        $response->assertSee('Dashboard Laporan');
+        $response->assertSee('Ringkasan Toko');
     }
 
     public function test_kasir_can_access_cashier_dashboard(): void
