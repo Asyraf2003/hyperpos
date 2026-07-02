@@ -52,6 +52,13 @@ final class ReportPeriodFilterContextBoundaryTest extends TestCase
      */
     private function renderPeriodFilter(array $filters, bool $useContext = false): string
     {
+        $filters = array_replace([
+            'period_mode' => 'monthly',
+            'reference_date' => $filters['date_to'] ?? $filters['date_from'] ?? '2030-01-31',
+            'date_from' => $filters['date_from'] ?? '2030-01-01',
+            'date_to' => $filters['date_to'] ?? '2030-01-31',
+        ], $filters);
+
         return view('admin.reporting.partials.period_filter', [
             'formId' => 'report-period-boundary-filter-form',
             'action' => '/reports/boundary',
