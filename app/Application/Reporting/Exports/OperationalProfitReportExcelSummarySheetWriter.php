@@ -15,7 +15,7 @@ final class OperationalProfitReportExcelSummarySheetWriter
 
     public function write(Worksheet $sheet, array $row, array $filters): void
     {
-        $periodContext = ViewDateFormatter::reportPeriodContext($filters['date_from'] ?? null, $filters['date_to'] ?? null);
+        $periodContext = ReportPeriodDateLabelFormatter::context($filters['date_from'] ?? null, $filters['date_to'] ?? null);
 
         $sheet->setTitle('Ringkasan');
         $sheet->setCellValue('A1', 'Ringkasan Kas Operasional');

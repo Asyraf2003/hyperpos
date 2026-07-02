@@ -18,7 +18,7 @@ final class OperationalProfitReportPdfViewDataBuilder
     {
         $row = is_array($dataset['row'] ?? null) ? $dataset['row'] : [];
 
-        $periodContext = ViewDateFormatter::reportPeriodContext(
+        $periodContext = ReportPeriodDateLabelFormatter::context(
             $filters['date_from'] ?? null,
             $filters['date_to'] ?? null,
         );

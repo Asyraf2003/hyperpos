@@ -25,7 +25,7 @@
                                 <div class="fw-semibold">{{ $basisDateLabel ?? 'Tanggal referensi laporan' }}</div>
                             </div>
 
-                            @php($reportPeriodContext = \App\Support\ViewDateFormatter::reportPeriodContext($filters['date_from'] ?? null, $filters['date_to'] ?? null))
+                            @php($reportPeriodContext = \App\Support\ReportPeriodDateLabelFormatter::context($filters['date_from'] ?? null, $filters['date_to'] ?? null))
                             <div>
                                 <div class="text-muted small">{{ $reportPeriodContext['label'] }}</div>
                                 <div class="fw-semibold">{{ $reportPeriodContext['value'] }}</div>

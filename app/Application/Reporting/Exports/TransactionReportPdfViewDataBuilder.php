@@ -21,7 +21,7 @@ final class TransactionReportPdfViewDataBuilder
         $summary = is_array($dataset['summary'] ?? null) ? $dataset['summary'] : [];
         $rows = is_array($dataset['rows'] ?? null) ? $dataset['rows'] : [];
 
-        $periodContext = ViewDateFormatter::reportPeriodContext(
+        $periodContext = ReportPeriodDateLabelFormatter::context(
             $filters['date_from'] ?? null,
             $filters['date_to'] ?? null,
         );

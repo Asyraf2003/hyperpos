@@ -21,7 +21,7 @@ final class InventoryStockValueReportPdfViewDataBuilder
     {
         $summary = is_array($dataset['summary'] ?? null) ? $dataset['summary'] : [];
 
-        $periodContext = ViewDateFormatter::reportPeriodContext(
+        $periodContext = ReportPeriodDateLabelFormatter::context(
             $filters['date_from'] ?? null,
             $filters['date_to'] ?? null,
         );

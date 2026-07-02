@@ -14,7 +14,7 @@ final class InventoryStockValueReportExcelSummarySheetWriter
     {
         $sheet->setTitle('Ringkasan');
 
-        $periodContext = ViewDateFormatter::reportPeriodContext($filters['date_from'] ?? null, $filters['date_to'] ?? null);
+        $periodContext = ReportPeriodDateLabelFormatter::context($filters['date_from'] ?? null, $filters['date_to'] ?? null);
 
         $rows = [
             ['Stok dan Nilai Persediaan', null],
